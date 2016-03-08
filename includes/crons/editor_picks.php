@@ -57,7 +57,7 @@ if ($editor_pick_count < $config['editor_picks_limit'])
 		<img src=\"{$config['website_url']}{$config['path']}/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 		<br />
 		<p>Hello <strong>liamdawe</strong>,</p>
-		<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to 3!</p>
+		<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to {$config['editor_picks_limit']}!</p>
 		<div>
 
 	</body>

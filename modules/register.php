@@ -29,7 +29,6 @@ if (core::config('allow_registrations') == 1)
 	{
 		$templating->block('main');
 
-
 		$templating->set('rules', core::config('rules'));
 		$templating->set('captcha', $captcha);
 

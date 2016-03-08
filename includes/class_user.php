@@ -20,13 +20,13 @@ class user
 	{
 		global $db, $core;
 
-		$db->sqlquery("SELECT `password_salt` FROM `users` WHERE `username` = ?", array($username));
-		if ($db->num_rows() == 1)
+		$db->sqlquery("SELECT `password_salt` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+		if ($db->num_rows() > 0)
 		{
 			$info = $db->fetch();
 			$safe_password = hash('sha256', $info['password_salt'] . $password);
 
-			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE `username` = ? AND `password` = ?", array($username, $safe_password));
+			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $safe_password));
 			if ($db->num_rows() == 1)
 			{
 				$user = $db->fetch();

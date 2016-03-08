@@ -12,7 +12,7 @@
 								</div>
 								<div class="comment-actions">
 									<ul>
-										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:comment_id},{:plain_username}"><span class="icon quote">Quote</span></a></li>
+										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:plain_username}" data-comment="{:text_plain}"><span class="icon quote">Quote</span></a></li>
 									</ul>
 								</div>
 							</div>
@@ -30,8 +30,26 @@
 						</div>
 [/block: review_comments]
 
-
 [block: bottom]
 	</div>
 </div>
 [/block: bottom]
+
+[block: form_top]
+<form method="post" action="/admin.php?module=comments&amp;aid={:article_id}">
+[/block: form_top]
+
+[block: form_bottom]
+	<div class="box">
+		<div class="body group">
+			<label class="checkbox">
+				<input type="checkbox" name="subscribe" {:subscribe_check}/> <strong>Subscribe to article to receive comment replies</strong>
+			</label>
+			<label class="checkbox">
+				<input type="checkbox" name="emails" {:subscribe_email_check}/> <strong>Receive comment replies via email?</strong>
+			</label>
+			<button type="submit" name="act" value="comment" class="btn btn-primary">Post Comment</button>
+		</div>
+	</div>
+</form>
+[/block: form_bottom]

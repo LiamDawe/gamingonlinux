@@ -44,7 +44,7 @@ $templating->merge('home');
 
 if (isset($_GET['error']) && $_GET['error'] == 'toomanypicks')
 {
-	$core->message("Sorry there are already 3 articles set as editor picks!", NULL, 1);
+	$core->message("Sorry there are already " . core::config('editor_picks_limit') " articles set as editor picks!", NULL, 1);
 }
 
 if (isset($_GET['message']) && $_GET['message'] == 'picked')

@@ -1,0 +1,24 @@
+[block: top]
+<div class="box">
+<div class="head">Here you can search by article title</div>
+<div class="body group">
+<form method="get" class="form-inline" action="{:url}index.php">
+<input type="hidden" name="module" value="search" />
+<input type="text" class="form-control" name="q" value="{:search_text}" /> <button class="btn btn-primary">Search</button><br />
+</form>
+</div>
+</div>
+[/block: top]
+
+[block: row]
+			<div class="box">
+				<div class="article body group">
+					<a href="/articles/{:article_link}">{:title}</a> by {:username} {:date}
+					<div class="tags"><ul>{:categories_list}</li></div>
+				</div>
+			</div>
+[/block: row]
+
+[block: bottom]
+{:pagination}
+[/block: bottom]

@@ -1,0 +1,191 @@
+[block: submitted_top]
+<div class="box">
+	<div class="head">Managing Article Submissions</div>
+	<div class="body group">
+	<strong>ALL EDITORS MAKE SURE YOU READ!</strong> Last amended 04th May 2014.<br />
+	Here you can Approve or Delete submitted articles, submitted articles posted date will update to right now so they show up at the top of the articles list so it doesn't matter when you approve them.<br />
+	<br />
+	Approved articles will retained the submitters name not the person who approve's it.<br />
+	<br />
+	<strong>Titles: </strong>Make sure titles are more than 1 or 2 words long, are descriptive and make sense. A game's title is not enough. Must be at least 10 characters. No question marks in titles.<br />
+	<strong>Taglines: </strong>At least 100 characters long, no longer than the tagline image. Make sure no information is in the tagline that isn't in the main article!
+	<strong>Tagline images: </strong>All articles MUST have a tagline image.</div>
+</div>
+[/block: submitted_top]
+
+[block: item_top]
+{:lock_button}
+[/block: item_top]
+
+[block: submitted_row]
+<div class="box">
+	<div class="body group">
+	<form method="post" role="form">
+		<strong>{:article_title}</strong> by {:username} submitted on {:date_submitted} <br />
+		<button type="submit" class="btn btn-primary" formaction="{:url}admin.php?module=articles&view=Submitted&aid={:article_id}">Edit</button>
+		<button type="submit" class="btn btn-info" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview</button>
+	</form>
+	</div>
+</div>
+[/block: submitted_row]
+
+[block: edit_locked]
+		<div class="box">
+			<div class="head">Editing is currently locked</div>
+			<div class="body group">Locked by {:locked_username} at {:locked_date}, lock will be removed once editing is finished, or automatically after time</div>
+		</div>
+[/block: edit_locked]
+
+[block: submitted_item]
+<script src="{:url}includes/jscripts/jquery.form.min.js"></script>
+{:lock_button}
+<div class="box">
+	<div class="body group">
+		<form id="imageform2" method="post" enctype="multipart/form-data" action='{:url}includes/ajax_tagline_upload.php' style="clear:both">
+			<h4>Article Tagline Image (shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height). Max of 120kb!</h4>
+			<div id='imageloadstatus2' style='display:none'><img src="{:url}templates/default/images/loader2.gif" alt="Uploading...."/></div>
+			<div id='imageloadbutton2'>
+			<input class="form-control" type="file" name="photos2" id="photoimg2" multiple="true" {:edit_state}/>
+			<input type="hidden" name="article_id" value="{:article_id}" />
+			</div>
+		</form>
+		<div id='preview2'>
+			{:top_image}
+		</div>
+
+		Categories:<br />
+		<select tabindex="-1" multiple="" name="categories[]" id="articleCategories" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:categorys_list}
+		</select>
+		<script type="application/javascript">
+		    $("#articleCategories").select2();
+		    $('#content').on('keydown', '.select2-input', function(event) { if (event.which == 9){ event.preventDefault(); } });
+		</script>
+		<br />
+		Title: <em>Please make it as descriptive a title as possible, just a games name for example is not good! <strong>Minimum of 20 characters</strong>.</em><br />
+		<input type="text" name="title" id="title" class="form-control" value="{:article_title}" {:edit_state}/> by {:username} ip {:ip_address}<br />
+		Friendly url (what shows in the url bar). <strong>Warning:</strong> editing it after an article is posted will break links to it:<br />
+		<input type="text" name="slug" id="slug" class="form-control" value="{:slug}" readonly="readonly"/> <a href="#" onclick="disable_slug()">Edit</a>
+	</div>
+</div>
+<div class="box">
+	<div class="body group">
+		<label for="tagline">
+			Tagline of article, This is what will show on the home page only.<br />
+			<strong>Must be over 100 characters but no more than 400! Plain text only.</strong>
+		</label>
+		<textarea name="tagline" class="form-control" id="tagline" cols="100" rows="4" placeholder="Enter a tagline, take text from your main post!" {:edit_state_textarea}>{:tagline}</textarea><br />
+		<div id="count"></div>
+	</div>
+</div>
+[/block: submitted_item]
+
+[block: submitted_bottom]
+</div>
+</div>
+<div class="box">
+	<div class="body group">
+		<label class="checkbox">
+			<input type="checkbox" name="show_block" /> Editors Pick? <em>This will show the article under the Editors Pick heading on the Articles block!</em>
+		</label>
+		<label class="checkbox">
+			<input type="checkbox" name="submit_as_self" {:self_check}/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em>
+		</label>
+		<button type="submit" name="act" value="Approve" {:edit_state}/>Approve</button> <button type="submit" name="act" value="Edit_Submitted" class="btn btn-primary" {:edit_state}>Edit</button> <button type="submit" name="act" value="Deny" {:edit_state}/>Deny</button> <button type="submit" value="Preview_Submitted" {:preview_action} name="act" class="btn btn-info">Preview Submitted Article</button>
+		<input type="hidden" name="article_id" value="{:article_id}" />
+		<input type="hidden" name="check" value="Submitted" />
+		<input type="hidden" name="author_id" value="{:author_id}" />
+		<input type="hidden" name="temp_tagline_image" value="{:temp_tagline_image}" />
+	</form>
+	</div>
+</div>
+<div class="box">
+	<div class="body group">
+		<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajaxImageUpload.php' style="clear:both">
+			Upload your images, no bigger than 1MB!
+			<div id='imageloadstatus' style='display:none'>
+				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>
+			</div>
+			<div id='imageloadbutton'>
+				<input type="file" name="photos[]" id="photoimg" multiple="true" />
+			</div>
+			<input type="hidden" name="article_id" value="{:article_id}" />
+		</form>
+	</div>
+</div>
+<div id='preview' class="uploads">
+</div>
+<div class="uploads">
+{:previously_uploaded}
+</div>
+<div class="box">
+	<div class="head">Article Edit History</div>
+	<div class="body list" style="overflow:auto; height:200px;">
+		<ul>
+[/block: submitted_bottom]
+
+[/block: edit_bottom]
+
+[block: edit_history]
+						{:history}
+[/block: edit_history]
+
+[block: edit_bottom_history]
+		</ul>
+	</div>
+</div>
+[/block: edit_bottom_history]
+
+[block: deny]
+<div class="box">
+	<div class="body group">
+		You are about to deny posting of the submitted article, please leave a message to tell the user why!<br />
+		<form method="post" action="admin.php?module=articles&amp;article_id={:article_id}">
+		<textarea name="message" rows="5" cols="100"></textarea>
+		<button type="submit" name="act" value="Deny" class="btn btn-danger">Deny Article</button>
+		<input type="hidden" name="article_id" value="{:article_id}" />
+		<input type="hidden" name="yes" value="yes" />
+		</form>
+	</div>
+</div>
+[/block: deny]
+
+[block: comments_top]
+<div class="box comments group">
+	<div class="head"><a name="comments">Editor Comments</a></div>
+	<div class="body group">
+[/block: comments_top]
+
+[block: review_comments]
+						<div id="r{:comment_id}" class="comment group">
+							<div class="comment-meta group">
+								<div class="comment-post">
+									{:username} commented <abbr title="{:tzdate}" class="timeago">on {:date}</abbr>
+								</div>
+								<div class="comment-actions">
+									<ul>
+										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:comment_id},{:plain_username}"><span class="icon quote">Quote</span></a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="comment-author">
+								<img class="avatar" alt="" src="{:comment_avatar}" />
+								<ul class="comment-badges">
+                                    					{:editor}
+									{:donator_badge}
+								</ul>
+								<ul class="comment-social">
+								</ul>
+							</div>
+							<div id="{:comment_id}" class="comment-body">
+								<div id="{:comment_id}">
+									<p>{:text}</p>
+								</div>
+								<div class="comment-quote">{:text_plain}</div>
+							</div>
+						</div>
+[/block: review_comments]
+
+[block: bottom]
+	</div>
+</div>
+[/block: bottom]

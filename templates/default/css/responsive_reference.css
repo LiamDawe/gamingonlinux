@@ -1,0 +1,41 @@
+/*
+ * ------------------------------
+ * Responsive CSS
+ * ------------------------------
+ */
+/* DESKTOP */
+@media only screen and (min-width: 1200px) {
+	
+}
+/* WIDESCREEN */
+@media only screen and (min-width: 1400px) {
+	
+}
+/* LANDSCAPE TABLET/NETBOOK/LAPTOP */
+@media only screen and (max-width: 1024px) {
+	
+}
+/* TABLET/NETBOOK */
+@media only screen and (max-width: 768px) {
+	
+}
+/* SMALL TABLET */
+@media only screen and (max-width: 600px) {
+	
+}
+/* MOBILE LANDSCAPE */
+@media only screen and (max-width: 480px) {
+	
+}
+/* MOBILE PORTRAIT */
+@media only screen and (max-width: 320px) {
+	
+}
+/* LANDSCAPE ORIENTATION */
+@media only screen and (orientation: landscape) {
+
+}
+/* PORTRAIT ORIENTATION */
+@media only screen and (orientation: portrait) {
+
+}

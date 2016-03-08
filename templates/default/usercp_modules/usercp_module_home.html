@@ -1,0 +1,56 @@
+[block: top]
+<div class="box"><div class="head">Welcome to the User Control Panel</div></div>
+[/block: top]
+
+[block: premium]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="{:url}usercp.php?module=home">
+			<a href="/donate/"><strong>GOL Premium</strong></a>
+			<label>Select your preferred theme:<br />
+			<select class="form-control" name="theme" {:state}>
+				{:theme_options}
+			</select></label>
+			{:supporter_link}<br />
+			<button type="submit" name="act" value="premium" class="btn btn-primary {:state}">Update</button>
+		</form>
+	</div>
+</div>
+[/block: premium]
+
+[block: main]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="{:url}usercp.php?module=home">
+			{:profile_fields}
+			<strong>Security</strong><br />
+			<label class="checkbox">
+				Get email's when we detect a new device logging in? <input type="checkbox" name="emaillogin" {:email_on_login} />
+			</label><br />
+			<strong>Articles &amp; Forum topics</strong><br />
+			<label class="checkbox">
+				Auto subscribe when replying? <input type="checkbox" name="subscribe" {:subscribe_check} />
+			</label>
+			<label class="checkbox">
+				Auto subscribe when creating an article? <input type="checkbox" name="subscribe_article" {:subscribe_article_check} />
+			</label>
+			<label class="checkbox">
+				Get email replies when subscribed? <input type="checkbox" name="emails" {:subscribe_email_check} />
+			</label>
+			<label>Email options for replies<br />
+			<select class="form-control" name="email_options">
+				{:email_options}
+			</select></label>
+			<label class="checkbox">
+				Get email's when receiving a Personal Message? <input type="checkbox" name="emailpm" {:email_on_pm} />
+			</label>
+			<br />
+			<label for="bio">Biography, for Editors this will show on articles you create, for normal users it will just show it on your profile, keep it short.</label>
+			<textarea name="bio" cols="100" rows="10">{:bio}</textarea><br />
+			<button type="submit" name="act" value="Update">Update</button>
+		</form>
+	</div>
+</div>
+{:twitter_button}
+{:steam_button}
+[/block: main]

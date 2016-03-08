@@ -1,0 +1,48 @@
+<?php
+class check_user 
+{
+	// 0 = linking from usercp
+	// 1 = logging in using steam that has already been setup
+	// 2 = making a new user
+	public $new = '';
+	
+	function check_that_id($steam_id, $steam_username)
+	{
+		global $db, $core;
+
+		// if they are logging in
+		if ($_SESSION['user_id'] == 0)
+		{
+			$db->sqlquery("SELECT `username`, `user_id`, `user_group`, `secondary_user_group`, `theme`, `infinite_scroll` FROM `users` WHERE `steam_id` = ?", array($steam_id));
+			$result = $db->fetch();
+			if (!empty($result)) 
+			{
+				$this->new = 1;
+
+				return $result;
+			} 
+		
+			else 
+			{
+				$this->new = 2;
+				
+				$result = array();
+				
+				$result['steam_id'] = $steam_id;
+
+				return $result;
+			}
+			
+			
+		}
+		
+		// if they are linking via usercp to a logged in account
+		else
+		{
+			$db->sqlquery("UPDATE `users` SET steam_id = ?, `steam_username` = ? WHERE `user_id` = ?", array($steam_id, $steam_username, $_SESSION['user_id']));
+			$this->new = 0;
+			return;
+		}
+	}
+}
+?>

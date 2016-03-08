@@ -1,0 +1,58 @@
+[block: editor]
+<script type="text/javascript">
+window.onload = function() {
+	window.OctusEditor = new OctusEditor();
+};
+</script>
+<a id="{:anchor_name}"></a><strong>Make sure your post follows our rules, <a href="{:url}index.php?module=rules" target="_blank">click here for them</a>.  Also be sure to check out the <a href="{:url}index.php?module=guidelines" target="_blank">Article Guide</a> for guidlines on what to include in articles.</strong><br />
+	<div class="octus-editor group">
+        	<div class="styles group">
+			    <ul>
+				<li data-tag="b" class="bold" accesskey="B">B</li>
+				<li data-tag="i" class="italic" accesskey="I">I</li>
+				<li data-tag="u" class="underline" accesskey="U">U</li>
+				<li data-tag="s" class="strike">S</li>
+			    </ul>
+			    <ul>
+				<li data-tag="img">img</li>
+				<li data-tag="url">url</li>
+				<li data-tag="youtube">YouTube</li>
+			    </ul>
+			    <ul>
+				<li data-tag="code">code</li>
+				<li data-tag="quote">quote</li>
+				<li data-tag="spoiler">spoiler</li>
+				{:page_button}
+			    </ul>
+			    <ul>
+				<li class="dropdown">
+				    Smiley
+				    <ul class="smiley">
+				        <li data-snippet=":&gt;&lt;:" style="background-image: url(/templates/default/images/emoticons/angry.png);">Angry</li>
+				        <li data-snippet=":'(" style="background-image: url(/templates/default/images/emoticons/cry.png);">Cry</li>
+				        <li data-snippet=":dizzy:" style="background-image: url(/templates/default/images/emoticons/dizzy.png);" >Dizzy</li>
+				        <li data-snippet=":D" style="background-image: url(/templates/default/images/emoticons/grin.png);">Grin</li>
+				        <li data-snippet="^_^" style="background-image: url(/templates/default/images/emoticons/happy.png);">Happy</li>
+				        <li data-snippet="&lt;3" style="background-image: url(/templates/default/images/emoticons/heart.png);">Heart</li>
+				        <li data-snippet=":huh:" style="background-image: url(/templates/default/images/emoticons/huh.png);">huh</li>
+				        <li data-snippet=":|" style="background-image: url(/templates/default/images/emoticons/pouty.png);">Pouty</li>
+				        <li data-snippet=":(" style="background-image: url(/templates/default/images/emoticons/sad.png);">Sad</li>
+				        <li data-snippet=":O" style="background-image: url(/templates/default/images/emoticons/shocked.png);">Shocked</li>
+				        <li data-snippet=":sick:" style="background-image: url(/templates/default/images/emoticons/sick.png);">Sick</li>
+				        <li data-snippet=":)" style="background-image: url(/templates/default/images/emoticons/smile.png);">Smile</li>
+				        <li data-snippet=":P" style="background-image: url(/templates/default/images/emoticons/tongue.png);">Tongue</li>
+				        <li data-snippet=":S:" style="background-image: url(/templates/default/images/emoticons/unsure.png);">Unsure</li>
+				        <li data-snippet=":woot:" style="background-image: url(/templates/default/images/emoticons/w00t.png);">Woot!</li>
+				        <li data-snippet=":whistle:" style="background-image: url(/templates/default/images/emoticons/whistle.png);">Whistle</li>
+				        <li data-snippet=";)" style="background-image: url(/templates/default/images/emoticons/wink.png);">Wink</li>
+				        <li data-snippet=":wub:" style="background-image: url(/templates/default/images/emoticons/wub.png);">Wub</li>
+				    </ul>
+				</li>
+			    </ul>
+		</div>
+			<noscript><div class="no-script">This content editor needs javascript, please enable javascript to use this editor!</div></noscript>
+			<div class="textarea group">
+			    <textarea name="{:name}" rows="3" cols="17" id="editor_content2" {:disabled}>{:content}</textarea>
+			</div>
+	</div>
+[/block: editor]

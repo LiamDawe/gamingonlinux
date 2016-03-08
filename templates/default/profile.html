@@ -1,0 +1,77 @@
+[block: main]
+			<!-- profile page -->
+				<div class="box">
+					<div class="head">Personal profile for {:username} {:supporter_badge}{:editor_badge}</div>
+				</div>
+
+				<div class="box">
+					<div class="body group profile">
+						<div class="avatar">
+							<img src="{:avatar}" alt="users avatar" />
+						</div>
+						<div class="profile_info">
+							Registered: {:registered_date} <br />
+							Last Login: {:last_login}<br />
+							Article Comments: {:article_comments}<br />
+							Forum Posts: {:forum_posts}
+							{:distro}
+						</div>
+					</div>
+				</div>
+
+				<div class="box">
+					<div class="body group profile">
+						<strong>Findable On</strong><br />
+						{:profile_fields}
+						{:message_link}
+						{:email}
+					</div>
+				</div>
+[/block: main]
+
+[block: articles_top]
+<div class="box">
+	<div class="head">Latest 5 Articles:</div>
+	<div class="body list">
+		<ul>
+[/block: articles_top]
+
+
+[block: articles]
+	<li>{:latest_article_link}</li>
+[/block: articles]
+
+[block: articles_bottom]
+						<li><a href="/index.php?module=search&author_id={:user_id}"><i class="icon-search"></i>View more articles from {:username}</a></li>
+						</ul>
+					</div>
+				</div>
+[/block: articles_bottom]
+
+[block: bio]
+				<div class="box">
+					<div class="head">A little about me</div>
+					<div class="body group">
+						{:bio_text}
+					</div>
+				</div>
+[/block: bio]
+
+[block: end]
+			<div class="box">
+				<div class="body group">
+					{:admin_links}
+				</div>
+			</div>
+[/block: end]
+
+[block: article_comments_list]
+				<div class="box">
+					<div class="head">Latest Comments</div>
+					<div class="body list">
+						<ul>
+							{:comment_posts}
+						</ul>
+					</div>
+				</div>
+[/block: article_comments_list]

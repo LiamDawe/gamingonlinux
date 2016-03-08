@@ -1,0 +1,193 @@
+[block: main]
+<script language="javascript" type="text/javascript" src="/includes/jscripts/datetimepicker.js"></script>
+<div class="box"><div class="head">Manage the release calendar here</div></div>
+[/block: main]
+
+[block: search]
+<div class="box">
+	<div class="head">
+		Search for a specific game
+	</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=calendar&view=search">
+			Game Name: <input type="text" name="name"  /><br />
+			<button formaction="admin.php?module=calendar&view=search" name="search" value="Search" type="submit">Search</button>
+		</form>
+	</div>
+</div>
+[/block: search]
+
+[block: search_result_top]
+<div class="box">
+[/block: search_result_top]
+
+[block: search_items]
+<div class="body group">
+{:name} - <a href="admin.php?module=calendar&view=edit&id={:id}">Edit</a>
+</div>
+[/block: search_items]
+
+[block: search_result_bottom]
+</div>
+[/block: search_result_bottom]
+
+[block: edit_top]
+<script language="javascript" type="text/javascript" src="/includes/jscripts/datetimepicker.js"></script>
+<div class="box">
+	<div class="head">
+		Edit the calendar item
+	</div>
+[/block: edit_top]
+
+[block: edit_item]
+			<div class="body group cal">
+				<form method="post" action="admin.php?module=calendar">
+					Game Name: <input type="text" name="name" value="{:name}" /><br />
+					Link: <em>Link to our article if one exists, otherwise link direct to the website</em> <strong>*not required*</strong><br />
+					<input type="text" name="link" value="{:link}" /><br />
+					Comment: <strong>*not required*</strong><br />
+					<input type="text" name="comment" value="{:comment}" /><br />
+					Release Date: <em>click the tiny calendar!</em> <br />
+					<input name="date" id="datepicker" type="text" value="{:date} "/>
+					<script>
+					var picker = new Pikaday({
+						field: document.getElementById('datepicker'),
+						format: "DD-MM-YYYY",
+						showTime: false
+					});</script>
+					Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
+					<button formaction="admin.php?module=calendar" name="act" value="Edit" type="submit">Edit</button> <button formaction="admin.php?module=calendar" name="act" value="Delete" type="submit">Delete</button>
+					<input type="hidden" name="id" value="{:id}" />
+				</form>
+			</div>
+[/block: edit_item]
+
+[block: edit_bottom]
+</div>
+[/block: edit_bottom]
+
+[block: add]
+<div class="box">
+	<div class="head">
+		Add a new game
+	</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=calendar">
+			Game Name: <input type="text" name="name"  /><br />
+			Link: <em>Link to our article if one exists, otherwise link direct to the website</em> <strong>*not required*</strong><br />
+			<input type="text" name="link" /><br />
+			Comment: <strong>*not required*</strong><br />
+			<input type="text" name="comment" /><br />
+			Release Date: <em>click the tiny calendar!</em>
+			<input name="date" id="datepicker" type="text" />
+			<script>
+			var picker = new Pikaday({
+				field: document.getElementById('datepicker'),
+				format: "DD-MM-YYYY",
+				showTime: false
+			});</script>
+			Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" /><br />
+			<button formaction="admin.php?module=calendar" name="act" value="Add" type="submit">Add Game</button>
+		</form>
+	</div>
+</div>
+[/block: add]
+
+[block: manage_top]
+<script>
+    $(function(){
+      // bind change event to select
+      $('#year').bind('change', function () {
+          var year = $(this).val(); // get selected value
+          if (year) { // require a year
+              window.location = 'https://www.gamingonlinux.com/admin.php?module=calendar&view=manage&year=' + year; // redirect
+          }
+          return false;
+      });
+    });
+</script>
+<div class="box"><div class="head">Pick a year:</div><div class="body group"><form><select id="year" name="year">{:options}</select></form></div></div>
+[/block: manage_top]
+
+[block: head]
+<div class="box">
+	<div class="collapse_container">
+		<div class="collapse_header">
+			<span>{:month}</span>
+		</div>
+		<div class="collapse_content">
+[/block: head]
+
+[block: item]
+			<div class="body group cal">
+				<form method="post" action="admin.php?module=calendar">
+					Game Name: <input type="text" name="name" value="{:name}" /><br />
+					Link: <em>Link to our article if one exists, otherwise link direct to the website</em> <strong>*not required*</strong><br />
+					<input type="text" name="link" value="{:link}" /><br />
+					Comment: <strong>*not required*</strong><br />
+					<input type="text" name="comment" value="{:comment}" /><br />
+					Release Date: <em>click the tiny calendar!</em>
+					<input name="date" id="datepicker_{:id}" type="text" value="{:date}"/>
+					<script>
+					var picker = new Pikaday({
+						field: document.getElementById('datepicker_{:id}'),
+						format: "DD-MM-YYYY",
+						showTime: false
+					});</script>
+					Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
+					<button formaction="admin.php?module=calendar" name="act" value="Edit" type="submit">Edit</button> <button formaction="admin.php?module=calendar" name="act" value="Delete" type="submit">Delete</button>
+					<input type="hidden" name="id" value="{:id}" />
+				</form>
+			</div>
+[/block: item]
+
+[block: bottom]
+		</div>
+	</div>
+</div>
+[/block: bottom]
+
+[block: submit_main]
+<script language="javascript" type="text/javascript" src="/includes/jscripts/datetimepicker.js"></script>
+<div class="box"><div class="head">Manage user submitted games for the release calendar here</div></div>
+[/block: submit_main]
+
+[block: submit_top]
+<script>
+    $(function(){
+      // bind change event to select
+      $('#year').bind('change', function () {
+          var year = $(this).val(); // get selected value
+          if (year) { // require a year
+              window.location = 'https://www.gamingonlinux.com/admin.php?module=calendar&view=submitted&year=' + year; // redirect
+          }
+          return false;
+      });
+    });
+</script>
+<div class="box"><div class="head">Pick a year:</div><div class="body group"><form><select id="year" name="year">{:options}</select></form></div></div>
+[/block: submit_top]
+
+[block: submit_item]
+		<div class="body group cal">
+			<form method="post" action="admin.php?module=calendar">
+				Game Name: <input type="text" name="name" value="{:name}" /><br />
+				Link: <em>Link to our article if one exists, otherwise link direct to the website</em> <strong>*not required*</strong><br />
+				<input type="text" name="link" value="{:link}" /><br />
+				Comment: <strong>*not required*</strong><br />
+				<input type="text" name="comment" value="{:comment}" /><br />
+				Release Date: <em>click the tiny calendar!</em>
+				<input name="date" id="datepicker" type="text" value="{:date}"/>
+				<script>
+				var picker = new Pikaday({
+					field: document.getElementById('datepicker'),
+					format: "DD-MM-YYYY",
+					showTime: false
+				});</script>
+				<input name="date" id="date" type="text" size="25" value="{:date}">
+				Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
+				<button formaction="admin.php?module=calendar" name="act" value="Approve" type="submit">Approve</button> <button formaction="admin.php?module=calendar" name="act" value="Delete" type="submit">Delete</button>
+				<input type="hidden" name="id" value="{:id}" /> <input type="hidden" name="submitted" value="1" />
+			</form>
+		</div>
+[/block: submit_item]

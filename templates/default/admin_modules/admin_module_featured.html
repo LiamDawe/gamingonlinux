@@ -1,0 +1,46 @@
+[block: add]
+<div class="box">
+	<div class="head">Add a new Featured image here for editor pick articles. These are all the eligible articles.</div>
+	<div class="body group">
+	<form method="post" action="/admin.php?module=featured" enctype="multipart/form-data" id="something">
+	Featured carousel Image (Must be {:max_width} width, {:max_height} height). Max of 300kb!<br />
+	<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
+	<select name="article_id">{:options}</select>
+	<button type="submit" name="act" value="add" class="btn btn-primary">Upload</button>
+	</form>
+	</div>
+</div>
+[/block: add]
+
+[block: add_existing]
+<div class="box">
+	<div class="head">Add a new Featured image here for editor pick articles. These are the current editor picks only.</div>
+	<div class="body group">
+	<form method="post" action="/admin.php?module=featured" enctype="multipart/form-data" id="something">
+	Featured carousel Image (Must be {:max_width} width, {:max_height} height). Max of 300kb!<br />
+	<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
+	<select name="article_id">{:options}</select>
+	<button type="submit" name="act" value="add" class="btn btn-primary">Upload</button>
+	</form>
+	</div>
+</div>
+[/block: add_existing]
+
+[block: manage_top]
+<div class="box"><div class="head">Manage the picture Carousel here.</div></div>
+[/block: manage_top]
+
+[block: manage_item]
+<div class="box">
+<form method="post" action="/admin.php?module=featured" enctype="multipart/form-data" id="something">
+	<div class="head">{:title}</div>
+	<div class="body group">
+	{:current_image}
+	Carousel Image (Must be {:max_width} width, {:max_height} height). Max of 55kb!<br />
+	<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
+	<button type="submit" name="act" value="edit" class="btn btn-primary">Edit</button> <button type="submit" name="act" value="delete" class="btn btn-primary">Delete</button>
+	<input type="hidden" name="article_id" value="{:article_id}" />
+	</div>
+</form>
+</div>
+[/block: manage_item]

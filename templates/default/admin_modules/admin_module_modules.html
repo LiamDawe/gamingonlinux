@@ -1,0 +1,39 @@
+[block: main]
+Here you can edit the main website modules.<br />
+<form method="post" action="admin.php?module=modules">
+<strong>Add Module</strong><br />
+File Name (<em>Without the files extension!</em>) <input type="text" name="file" /><br />
+<label>Active? <input type="checkbox" name="active" checked /></label><br />
+<button type="submit" name="action" value="Add" class="button">Add Module</button>
+<input type="hidden" name="type" value="main" />
+</form>
+<br />
+[/block: main]
+
+[block: main_module]
+<form method="post" action="admin.php?module=modules">
+Module File Name: {:module_file_name} <br />
+<input type="submit" name="action" value="Disable" {:disabled_check} class="button" /> <input type="submit" name="action" value="Enable" {:enabled_check} class="button" /> <input type="submit" name="action" value="Delete" class="red-button" />
+<input type="hidden" name="type" value="{:type}" /> <input type="hidden" name="id" value="{:id}" />
+</form><br />
+[/block: main_module]
+
+[block: usercp]
+Here you can edit the User Control Panel website modules.<br />
+<strong>Add Module:</strong><br />
+<br />
+[/block: usercp]
+
+[block: usercp_module]
+<form method="post" action="admin.php?module=modules">
+Module File Name: <br />
+usercp_ <input type="text" name="file" value="{:module_file_name}" /> <br />
+Module Title (<em>This will be the title of the link to it</em>): <br />
+<input type="text" name="title" value="{:title}" /><br />
+Module Link: <br />
+<input type="text" name="link" value="{:link}" /><br />
+<label>Show a link in sidebar menu? <input type="checkbox" name="sidebar" {:sidebar_checked}/></label><br />
+<input type="submit" name="action" value="Disable" {:disabled_check} class="button" /> <input type="submit" name="action" value="Enable" {:enabled_check} class="button" /> <input type="submit" name="action" value="Delete" class="red-button" /> <input type="submit" name="action" value="Edit" class="button" />
+<input type="hidden" name="type" value="{:type}" /> <input type="hidden" name="id" value="{:id}" />
+</form><br />
+[/block: usercp_module]

@@ -1,0 +1,29 @@
+[block: menu]
+				<!-- Articles Sidebar -->
+				<div class="box">
+					<div class="head">Popular this week</div>
+					<div class="body list">
+						<ul>
+							{:top_articles}
+						</ul>
+					</div>
+
+					<div class="head">View by Category</div>
+					<div class="body">
+						<form name="form1">
+						<select onchange="window.open(this.options[this.selectedIndex].value, '_self')">
+							<option>Pick One</option>
+							{:category_links}
+						</select>
+						</form>
+					</div>
+
+					<div class="head">Contact</div>
+					<div class="body list">
+					<ul>
+						<li><a href="{:submit_article_link}">Submit Article</a></li>
+						<li><a href="/email-us/">Email an editor</a></li>
+					</ul>
+					</div>
+				</div>
+[/block: menu]

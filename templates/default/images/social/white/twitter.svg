@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: IcoMoon.io -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32.000125885009766"
+   height="32"
+   viewBox="0 0 32.000125885009766 32"
+   fill="#000000"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="twitter.svg"
+   inkscape:export-filename="C:\Users\Julian Richen\Desktop\gol\assets\template\images\social\twitter.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1058"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="7.375"
+     inkscape:cx="-21.355869"
+     inkscape:cy="16"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <g
+     id="g4"
+     style="fill:#ffffff;fill-opacity:1"
+     transform="matrix(0.99996875,0,0,1,5.6291125e-4,-10e-4)">
+    <path
+       d="M 32,6.076 C 30.823,6.598 29.557,6.951 28.229,7.11 29.584,6.297 30.625,5.011 31.116,3.478 29.847,4.23 28.442,4.777 26.947,5.071 25.749,3.795 24.043,2.998 22.155,2.998 c -3.626,0 -6.565,2.939 -6.565,6.565 0,0.515 0.058,1.016 0.17,1.496 C 10.304,10.785 5.466,8.171 2.228,4.199 1.663,5.169 1.339,6.296 1.339,7.5 c 0,2.278 1.159,4.287 2.921,5.465 -1.076,-0.034 -2.088,-0.329 -2.974,-0.821 -0.001,0.027 -0.001,0.055 -0.001,0.083 0,3.181 2.263,5.834 5.266,6.438 -0.551,0.15 -1.131,0.23 -1.73,0.23 -0.423,0 -0.834,-0.041 -1.235,-0.118 0.836,2.608 3.26,4.506 6.133,4.559 -2.247,1.761 -5.078,2.81 -8.154,2.81 -0.53,0 -1.052,-0.031 -1.566,-0.092 2.905,1.863 6.356,2.95 10.064,2.95 12.076,0 18.679,-10.004 18.679,-18.68 0,-0.285 -0.006,-0.568 -0.019,-0.849 C 30.007,8.548 31.12,7.392 32,6.076 z"
+       id="path6"
+       style="fill:#ffffff;fill-opacity:1"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

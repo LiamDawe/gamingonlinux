@@ -1,0 +1,109 @@
+[block: top]
+<div id="wrapper" class="group">
+	<div id="header" class="group">
+		<div class="container group">
+			<div id="header-inner" class="col-12">
+				<h1 id="logo-res">
+                    			<a href="/index.php"><img alt="" src="{:url}templates/default/images/icon.svg"><span>Gaming On Linux</span></a>
+               			</h1>
+				<div id="navigation">
+					<div id="navigation-mobile">
+						<a href="#navigation" title="Show navigation">Show navigation</a>
+						<a href="#" title="Hide navigation">Hide navigation</a>
+					</div>
+					<div id="extra">
+				        <ul>
+				            <li><a href="{:donate_link}">Support Us</a></li>
+				            <li><a href="/crowdfunding/">Wiki</a></li>
+				            <li class="login">
+				                {:user_menu}
+				            </li>
+				        </ul>
+				    </div>
+					<ul>
+						<li class="extra"><a href="{:sales_link}">Sales</a></li>
+						<li class="extra"><a href="{:donate_link}">Support Us</a></li>
+						<li>
+						<a href="{:contact_link}">Submit</a>
+							<ul>
+								<li><a href="{:submit_a}">Article</a></li>
+								<li><a href="{:submit_e}">Tip</a></li>
+							</ul>
+						</li>
+						<li class="extra"><a href="/crowdfunding/">Wiki</a></li>
+						<li>
+						<a href="{:forum_link}">Forum</a>
+							<ul>
+								<li><a href="{:forum_link}">Forum</a></li>
+								<li><a href="/irc/">IRC</a></li>
+							</ul>
+						</li>
+						<li class="login extra">
+							{:user_menu}
+						</li>
+						<li class="search">
+							<a href="{:url}index.php?module=search">Search</a>
+							<div>
+								<form method="get" action="{:url}index.php?module=search">
+									<input type="hidden" name="module" value="search" />
+									<input type="text" class="form-control" name="q" placeholder="Search Articles" />
+									<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+								</form>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="body" class="smooth group">
+[/block: top]
+
+[block: featured]
+		<div class="group" id="main-article" style="background: url('{:url}uploads/carousel/{:image}'); background-size: 100%;">
+
+			<div class="container">
+				<div class="col-12">
+					<div class="article group">
+						<div class="info group">
+							<div class="title"><span class="badge-featured">Featured</span> <a href="{:article_link}">{:title}</a></div>
+							<div class="meta">Posted by {:username} (<a href="{:article_link}">{:comment_count} Comments</a>) {:edit_link} {:editors_pick_link}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+[/block: featured]
+
+[block: patreon]
+<div class="container">
+	<div class="col-12">
+		<div class="box">
+			<div class="patreon body">
+				<img style="float: right;" src="templates/default/images/patreon_logo.png" alt=""/><a href="https://www.patreon.com/liamdawe">Support me on Patreon</a> to keep GamingOnLinux (and me) alive.
+			</div>
+		</div>
+	</div>
+</div>
+[/block: patreon]
+
+[block: left]
+		<div id="content" class="container group">
+			<div class="{:articles_css} col-9">
+[/block: left]
+
+[block: left_end]
+			<!-- end content column -->
+			</div>
+[/block: left_end]
+
+[block: right]
+	<!-- Sidebar -->
+			<div class="col-3">
+[/block: right]
+
+[block: right_end]
+			</div>
+		</div>
+[/block: right_end]

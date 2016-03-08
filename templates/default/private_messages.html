@@ -1,0 +1,118 @@
+[block: top]
+<div class="box">
+	<div class="head">Your private messages</div>
+	<div class="body group"><a href="{:compose_link}">Compose New PM</a></div>
+</div>
+[/block: top]
+
+[block: message_row]
+<div class="box {:new_message_bg}">
+	<div class="body group">
+	{:mail_icon}<a href="{:pm_url}" {:new_message_bolding}>{:title}</a> (Replies: {:reply_count}) - Last reply {:last_reply_date} by {:last_reply_username}<br />
+	Created {:creation_date} by {:author}
+	</div>
+</div>
+[/block: message_row]
+
+[block: bottom]
+<div class="box">
+	<div class="body group"><a href="{:compose_link}">Compose New PM</a></div>
+</div>
+{:pagination}
+[/block: bottom]
+
+[block: view_top]
+<ul class="breadcrumb">
+	<li><a href="/private-messages/">Back to message list.</a></li>
+</ul>
+<div class="box"><div class="head">Users in conversation: {:conversation_list}</div></div>
+<div class="box comments group">
+	<div class="body group">
+[/block: view_top]
+
+[block: view_row]
+{:pagination}
+<div class="box"><div class="head">{:title}</div></div>
+						<div id="r{:post_id}" class="comment group">
+							<div class="comment-meta group">
+								<div class="comment-post">
+									PM from <a href="/profiles/{:user_id}">{:username}</a> <abbr title="{:tzdate}" class="timeago">on {:message_date}</abbr> {:edit_link}
+								</div>
+								<div class="comment-actions">
+									<ul>
+										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:post_id},{:plain_username}"><span class="icon quote">Quote</span></a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="comment-author">
+								<img class="avatar" alt="" src="{:avatar}" />
+								<ul class="comment-badges">
+                                    					{:editor}
+									{:donator_badge}
+								</ul>
+								<ul class="comment-social">
+									{:profile_fields}
+								</ul>
+							</div>
+							<div id="{:post_id}" class="comment-body">
+								<div id="{:post_id}">
+									<p>{:message_text}</p>
+								</div>
+								<div class="comment-quote">{:text_plain}</div>
+							</div>
+						</div>
+[/block: view_row]
+
+[block: view_row_reply]
+						<div id="r{:post_id}" class="comment group">
+							<div class="comment-meta group">
+								<div class="comment-post">
+									PM from <a href="/profiles/{:user_id}">{:username}</a> <abbr title="{:tzdate}" class="timeago">on {:message_date}</abbr> {:edit_link}
+								</div>
+								<div class="comment-actions">
+									<ul>
+										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:post_id},{:plain_username}"><span class="icon quote">Quote</span></a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="comment-author">
+								<img class="avatar" alt="" src="{:avatar}" />
+								<ul class="comment-badges">
+                                    					{:editor}
+									{:donator_badge}
+								</ul>
+								<ul class="comment-social">
+									{:profile_fields}
+								</ul>
+							</div>
+							<div id="{:post_id}" class="comment-body">
+								<div id="{:post_id}">
+									<p>{:message_text}</p>
+								</div>
+								<div class="comment-quote">{:text_plain}</div>
+							</div>
+						</div>
+[/block: view_row_reply]
+
+[block: preview]
+<div class="box">
+	<div class="head">PM Preview</div>
+	<div class="body group">{:message}</div>
+</div>
+[/block: preview]
+
+[block: reply]
+</div></div>
+{:pagination}
+[/block: reply]
+
+[block: delete]
+<form method="post" action="/index.php?module=messages">
+	<button formaction="/index.php?module=messages" type="submit" name="act" value="Delete">Delete Message</button>
+	<input type="hidden" name="conversation_id" value="{:conversation_id}" />
+</form>
+[/block: delete]
+
+[block: edit]
+<div class="box"><div class="head">Edit your personal message</div></div>
+[/block: edit]

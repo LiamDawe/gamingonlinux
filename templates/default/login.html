@@ -1,0 +1,104 @@
+[block: main]
+                		<div class="box">
+					<div class="body group">
+						<form method="post" action="/index.php?module=login">
+							<input name="username" type="text" value="{:username}" placeholder="Username" />
+							<input name="password" type="password" placeholder="Password" />
+							<label>
+								<input name="remember_name" type="checkbox" {:username_remembered:}/> Remember username
+							</label>
+							<label>
+								<input name="stay" checked="checked" type="checkbox" /> Stay logged in
+							</label>
+							<hr />
+							<input type="submit" name="action" value="Login" />
+							<span class="group fright" style="margin-top: 7px;">Or login with...</span>
+							<hr />
+							<div class="group">
+								<a href="/index.php?module=login&amp;steam" class="button fleft">
+									<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -4px;">
+										<image xlink:href="/templates/default/images/social/steam.svg" src="templates/default/images/social/steam.png" width="18" height="18" />
+									</svg>
+									Steam
+								</a>
+								<a href="/index.php?module=login&amp;twitter" class="button fright">
+									<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -3px;">
+										<image xlink:href="/templates/default/images/social/twitter.svg" src="templates/default/images/social/twitter.png" width="18" height="18s" />
+									</svg>
+									Twitter
+								</a>
+							</div>
+							<hr />
+							<div class="group">
+								<a href="/register/" class="button fleft">Register</a> 
+								<a href="/index.php?module=login&amp;forgot" class="button fright">Forgot Login?</a>
+							</div>
+						</form>
+					</div>
+				</div>
+[/block: main]
+
+[block: small]
+                		<div class="box">
+					<div class="body group">
+						<p>Due to spam you need to <a href="//www.gamingonlinux.com/register/">Register</a> and <a href="//www.gamingonlinux.com/index.php?module=login">Login</a> to comment.</p>
+						<form method="post" action="/index.php?module=login">
+							<input name="username" type="text" value="" placeholder="Username" />
+							<input name="password" type="password" placeholder="Password" />
+							<label>
+								<input name="remember_name" type="checkbox"/> Remember username
+							</label>
+							<label>
+								<input name="stay" checked="checked" type="checkbox" /> Stay logged in
+							</label>
+							<hr />
+							<input type="submit" name="action" value="Login" />
+							<span class="group fright" style="margin-top: 7px;">Or login with...</span>
+							<hr />
+							<div class="group">
+								<a href="/index.php?module=login&amp;steam" class="button fleft">
+									<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -4px;">
+										<image xlink:href="/templates/default/images/social/steam.svg" src="templates/default/images/social/steam.png" width="18" height="18" />
+									</svg>
+									Steam
+								</a>
+								<a href="/index.php?module=login&amp;twitter" class="button fright">
+									<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -3px;">
+										<image xlink:href="/templates/default/images/social/twitter.svg" src="templates/default/images/social/twitter.png" width="18" height="18" />
+									</svg>
+									Twitter
+								</a>
+							</div>
+							<hr />
+							<div class="group">
+								<a href="/register/" class="button fleft">Register</a> 
+								<a href="/index.php?module=login&amp;forgot" class="button fright">Forgot Login?</a>
+							</div>
+						</form>
+					</div>
+				</div>
+[/block: small]
+
+[block: forgot]
+<div class="well well-sm">
+	<form method="post" action="index.php?module=login">
+	Here you can request your password.<br />
+	Email address 
+	<input type="text" class="form-control" name="email" /> 
+	<input type="submit" name="action" value="Send" class="btn btn-primary" />
+	</form>
+</div>
+[/block: forgot]
+
+[block: reset]
+<div class="well well-sm">
+	<form method="post" action="index.php?module=login&code={:code}&email={:email}">
+	New password<br />
+	<input type="password" name="password" /><br />
+	Password again<br />
+	<input type="password" name="password_again" /><br />
+	<br />
+	<input type="submit" name="action" value="Reset" class="btn btn-primary" />
+	</form>
+</div>
+[/block: reset]

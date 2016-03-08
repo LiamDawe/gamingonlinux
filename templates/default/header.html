@@ -1,0 +1,64 @@
+[block: header]
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>{:title} | GamingOnLinux</title>
+<meta name="keywords" content="linux, steamos, gaming, linux gaming, linux games, linux game reviews, games, reviews, interviews" />
+<meta name="description" content="{:meta_description}" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:site_name" content="GamingOnLinux" />
+<link href="{:url}templates/default/images/favicons/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+{:meta_data}
+<!--JS Files-->
+<script src="{:url}includes/jscripts/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="{:url}templates/default/js/editor.js"></script>
+<!--Apple Devices-->
+<link rel="apple-touch-icon" sizes="180x180" href="{:url}templates/default/images/favicons/apple-touch-icon-180x180.png" />
+<link rel="apple-touch-icon" sizes="152x152" href="{:url}templates/default/images/favicons/apple-touch-icon-152x152.png" />
+<link rel="apple-touch-icon" sizes="144x144" href="{:url}templates/default/images/favicons/apple-touch-icon-144x144.png" />
+<link rel="apple-touch-icon" sizes="120x120" href="{:url}templates/default/images/favicons/apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" sizes="114x114" href="{:url}templates/default/images/favicons/apple-touch-icon-114x114.png" />
+<link rel="apple-touch-icon" sizes="76x76" href="{:url}templates/default/images/favicons/apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" sizes="72x72" href="{:url}templates/default/images/favicons/apple-touch-icon-72x72.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="{:url}templates/default/images/favicons/apple-touch-icon-60x60.png" />
+<link rel="apple-touch-icon" sizes="57x57" href="{:url}templates/default/images/favicons/apple-touch-icon-57x57.png" />
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="{:url}template/default/images/favicons/apple-touch-icon-precomposed.png" />
+<!--Windows 8 Metro UI-->
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="{:url}templates/default/images/favicons/mstile-144x144.png">
+<meta name="msapplication-config" content="{:url}templates/default/images/favicons/browserconfig.xml">
+<!-- Custom CSS Styles -->
+<link rel="stylesheet" type="text/css" href="{:url}templates/default/css/style.css?v=6.1.1" />
+<link rel="stylesheet" type="text/css" href="{:url}templates/default/css/editor.css" />
+<link rel="stylesheet" href="{:url}includes/jscripts/fancybox/jquery.fancybox.css?v=2.1.6" type="text/css" media="screen" />
+<!-- Qtip2 -->
+<link rel="stylesheet" href="{:url}includes/jscripts/qtip2/jquery.qtip.min.css?v=2.1.6" type="text/css" media="screen" />
+<script src="{:url}includes/jscripts/qtip2/imagesloaded.pkg.min.js"></script>
+<!-- datetime picker -->
+<script language="javascript" type="text/javascript" src="{:url}includes/jscripts/timepicker/moment.js"></script>
+<script language="javascript" type="text/javascript" src="{:url}includes/jscripts/timepicker/datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="{:url}includes/jscripts/timepicker/datepicker.css" />
+<!-- fancybox for images -->
+<script async type="text/javascript" src="{:url}includes/jscripts/fancybox/jquery.fancybox.pack.js?v=2.1.5"></script>
+<link href="https://plus.google.com/104852318604553771493" rel="publisher">
+{:rss_link}
+<script async type="text/javascript" src="{:url}includes/jscripts/header.js?v=8"></script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
+</head>
+
+<body itemscope itemtype="http://schema.org/Article" {:body_class}>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+[/block: header]
+
+[block: category_selection]
+<script src="{:url}includes/jscripts/select2/select2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{:url}includes/jscripts/select2/select2.css">
+[/block: category_selection]

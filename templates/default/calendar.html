@@ -1,0 +1,74 @@
+[block: top]
+<div class="box">
+	<div class="head">Linux game release calendar, due later this month: {:this_month}</div>
+	<div class="body group"><img src="/templates/default/images/cal.gif" alt="" /> We have an ical too, <a href="https://www.gamingonlinux.com/calendar_ical.php">copy this url</a>. Link to it in your calendar apps to stay up to date!</div>
+	<div class="body group"><strong>Best Guess FAQ</strong>: It's an educated guess, nothing more.</div>
+</div>
+[/block: top]
+
+[block: submit]
+<div class="box">
+	<div class="collapse_container">
+		<div class="collapse_header">
+			<span>Submit Game: Click me!</span>
+		</div>
+		<div class="collapse_content">
+			<div class="body group cal">
+				<form method="post" action="index.php?module=calendar">
+					Game Name: <br />
+					<input type="text" name="name" /><br />
+					Link: <strong>*not required*</strong><br />
+					<input type="text" name="link" />
+					Release Date: </a><br />
+					<input name="date" id="datepicker" type="text" />
+					<script>
+					var picker = new Pikaday({
+				        field: document.getElementById('datepicker'),
+				        format: "DD-MM-YYYY",
+						showTime: false
+				    });</script>
+					Best guess <em>If there isn't an exact date!</em> <input type="checkbox" name="guess" /><br />
+					<button formaction="index.php?module=calendar" name="act" value="submit" type="submit">Submit Game</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+[/block: submit]
+
+[block: picker]
+<div class="box">
+	<div class="head">Pick a year and month:</div>
+	<div class="body form-group">
+		<form method="get">
+			<input type="hidden" name="module" value="calendar" />
+			<div class="group">
+				<div class="col-5">
+					<select name="year">{:options}</select>
+				</div>
+				<div class="col-5">
+					<select name="month">{:month_options}</select>
+				</div>
+				<div class="col-2">
+					<button type="submit">Change</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="box">
+[/block: picker]
+
+[block: head]
+<div class="head">
+	<span class="badge"><a href="/index.php?module=calendar&year={:prev_year}&month={:prev}">&lt; Prev</a></span> {:month} <span class="badge"><a href="/index.php?module=calendar&year={:next_year}&month={:next}">Next &gt;</a></span>
+</div>
+[/block: head]
+
+[block: item]
+<div class="body group">{:best_guess} {:day}: {:name} {:edit}</div>
+[/block: item]
+
+[block: bottom]
+</div>
+[/block: bottom]

@@ -1,0 +1,22 @@
+[block: add_category]
+<div class="box"><div class="head">Here you can add a Category tag for articles</div></div>
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=categorys" class="form-inline">
+			Category Name: <input type="text" name="category_name" placeholder="category name" /> <input type="submit" name="act" value="Add" class="btn btn-primary" />
+		</form>
+	</div>
+</div>
+<div class="box"><div class="head">Current Categorys:</div></div>
+[/block: add_category]
+
+[block: category_row]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=categorys" class="form-inline">
+		Category Name: <input type="text" name="category_name" value="{:category_name}" /> <input type="submit" name="act" value="Edit" class="btn btn-primary "/> <input type="submit" name="act" value="Delete" class="btn btn-danger" />
+		<input type="hidden" name="category_id" value="{:category_id}" />
+		</form>
+	</div>
+</div>
+[/block: category_row]

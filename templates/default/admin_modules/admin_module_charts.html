@@ -1,0 +1,26 @@
+[block: add_chart]
+<div class="box">
+	<div class="head">Add new chart</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=charts">
+			Chart name: <input type="text" name="name" value="{:name}" /><br />
+			Horizontal Axis Label (bottom of the chart): <input type="text" name="h_label" value="{:h_label}" /><br />
+			Label names, put each one on a new line.
+			<textarea name="labels" cols="100" rows="10">{:labels}</textarea><br />
+			Data values, put each one on a new line to match each label line
+			<textarea name="data" cols="100" rows="10">{:data}</textarea><br />
+			<input type="submit" name="submit" value="Add" />
+			<input type="hidden" name="act" value="add_chart" />
+		</form>
+	</div>
+</div>
+[/block: add_chart]
+
+[block: manage_charts]
+<div class="box">
+	<div class="head">Manage your existing charts - <a href="/admin.php?module=charts&amp;view=add">Add a new chart</a></div>
+	<div class="body group">
+		{:chart_list}
+	</div>
+</div>
+[/block: manage_charts]

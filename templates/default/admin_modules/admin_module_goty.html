@@ -1,0 +1,108 @@
+[block: add]
+			<div class="box">
+				<div class="head">Add a GOTY game</div>
+				<div class="body group">Add a missing game here<br />
+				<form method="post">Name: <input type="text" name="name" /> Category: <select name="category">{:options}</select> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="add">Add Game</button></form></div>
+			</div>
+[/block: add]
+
+[block: submitted_top]
+<div class="box"><div class="head">A list of user submitted GOTY nominations</div></div>
+[/block: submitted_top]
+
+[block: submitted_row]
+<div class="box"><div class="body group">
+<form method="post" action="{:url}goty.php&game_id={:id}">
+<input type="text" name="name" value="{:game_name}" />
+<span class="gotycategory">{:category_name}</span>
+<div class="gotyadminbuttons" style="float:right;" data-comment="Yes, I didnt want to clear css cache">
+	<button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="accept" class="fnone">Accept Game For Voting</button>
+	<button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="deny" class="fnone">Deny Game For Voting</button>
+</div>
+<input type="hidden" name="id" value="{:id}" />
+</form>
+</div></div>
+[/block: submitted_row]
+
+[block: manage_category]
+<div class="box"><div class="head">Please select a GOTY category to view first</div></div>
+[/block: manage_category]
+
+[block: category_manage_row]
+<div class="box">
+	<div class="body group">
+		<a href="/admin.php?module=goty&view=manage&id={:category_id}">{:category_name}</a>
+	</div>
+</div>
+[/block: category_manage_row]
+
+[block: manage_top]
+<div class="box"><div class="head">A list of all the accepted GOTY nominations</div></div>
+[/block: manage_top]
+
+[block: manage_row]
+<div class="box"><div class="body group">
+<form method="post" action="{:url}goty.php&game_id={:id}">
+<input type="text" value="{:game_name}" name="game" /> Category: <select name="category">{:options}</select> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="edit" class="fnone">Edit</button> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="delete" class="fnone">Delete</button>
+<input type="hidden" name="id" value="{:id}" />
+</form>
+</div></div>
+[/block: manage_row]
+
+[block: config]
+<div class="box">
+	<div class="head">GOTY Config</div>
+	<div class="body group">
+	<form method="post">
+		<label>New games open? <input type="checkbox" name="games" {:games_check}/></label>
+		<label>Voting open? <input type="checkbox" name="voting" {:voting_check}/></label>
+		<button class="fnone" name="act" value="config">Edit</button> {:end_awards}
+	</form>
+	</div>
+</div>
+[/block: config]
+
+[block: category_top]
+<div class="box">
+	<div class="head">Pick your category!</div>
+</div>
+<div class="goty">
+[/block: category_top]
+
+[block: category_row]
+<div class="box">
+	<div class="body group">
+		<a href="/admin.php?module=goty&view=top10&category_id={:category_id}">{:category_name}</a>
+	</div>
+</div>
+[/block: category_row]
+
+[block: category_bottom]
+</div>
+[/block: category_bottom]
+
+[block: game_list]
+<div class="box">
+	<div class="head">Here's the current top10 for {:name}</div>
+</div>
+<div class="goty">
+[/block: game_list]
+
+[block: game_row]
+<div class="col-4">
+<div class="box"><div class="body group">
+{:game_name}<br />
+{:votes}
+{:leaderboard}
+</div></div>
+</div>
+[/block: game_row]
+
+[block: games_bottom]
+</div>
+<br class="clearer" />
+[/block: games_bottom]
+
+[block: topchart]
+{:chart}
+[/block: topchart]

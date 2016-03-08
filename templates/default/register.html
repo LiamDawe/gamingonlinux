@@ -1,0 +1,91 @@
+[block: main]
+<style>
+    .hideme{
+        display:none;
+        visibility: hidden;
+ position: absolute;
+    left: -999em;
+    }
+</style>
+    		<script src="https://www.google.com/recaptcha/api.js"></script>
+                		<div class="box">
+					<div class="body group">
+		You can use this form to register to become a full user of the website. If you do not see a captcha to prove you are not a bot disable adblock plus. You never see the captcha again once registered.<br />
+		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>.</strong>
+		<br />
+		<form method="post" action="/index.php?module=register">
+			Username, please use plain text: <br />
+			<input type="text" class="form-control" name="username" /><br />
+			Password: <br />
+			<input type="password" class="form-control" name="password" /><br />
+			Verify Password: <br />
+			<input type="password" class="form-control" name="verify_password" /><br />
+			Email, <strong>Valid email address required for verification!</strong> <br />
+			<input type="text" class="form-control" name="uemail" /><br />
+			<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
+			{:captcha}
+			<input type="submit" name="register" value="Register" class="btn btn-primary" />
+		</form>
+	</div>
+</div>
+[/block: main]
+
+[block: twitter_new]
+<style>
+    .hideme{
+        display:none;
+        visibility: hidden;
+	 position: absolute;
+    left: -999em;
+    }
+</style>
+<script src="https://www.google.com/recaptcha/api.js"></script>
+You are about to create a new account with twitter, please enter the following details to complete the registration. If you want to link it to an existing account, you need to login normally and do this from the user control panel home page (at the bottom!). As this creates a whole new user linked with this twitter account.<br />
+<br />
+<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>.</strong>
+	<form method="post" action="/index.php?module=register">
+	Username: <br />
+	<input type="text" name="username" /><br />
+	Password: <br />
+	<input type="password" name="password" /><br />
+	Verify Password: <br />
+	<input type="password" name="verify_password" /><br />
+	Email, <strong>Valid email address required for verification!</strong> <br />
+	<input type="text" name="uemail" /><br />
+	<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
+	{:captcha}
+	<input type="submit" value="Register" class="btn btn-primary" />
+	<input type="hidden" name="register" value="twitter" />
+	</form>
+[/block: twitter_new]
+
+[block: steam_new]
+<style>
+    .hideme{
+        display:none;
+        visibility: hidden;
+	 position: absolute;
+    left: -999em;
+    }
+</style>
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<div class="well well-sm">
+	Hello <strong>{:username}</strong>! You are about to create a <strong>new account</strong> with Steam, please enter the following details to complete the registration. <br />
+If you want to link it to an existing account, you need to login normally and do this from the user control panel home page (at the bottom!). As this creates a whole new user linked with this Steam account.<br />
+<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>.</strong>
+		<form method="post" action="/index.php?module=register">
+		Username: <br />
+		<input type="text" name="username" /><br />
+		Password: <br />
+		<input type="password" name="password" /><br />
+		Verify Password: <br />
+		<input type="password" name="verify_password" /><br />
+		Email, <strong>Valid email address required for verification!</strong> <br />
+		<input type="text" name="uemail" /><br />
+		<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
+		{:captcha}
+		<input type="submit" value="Register" class="btn btn-primary" />
+		<input type="hidden" name="register" value="steam" />
+		</form>
+</div>
+[/block: steam_new]

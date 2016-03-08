@@ -1,0 +1,100 @@
+[block: main]
+				<div class="box">
+					<div class="head">Welcome to the admin control panel {:username}.</div>
+				</div>
+[/block: main]
+
+[block: comments_top]
+				<div class="box">
+					<div class="head">Admin message-box</div>
+				</div>
+				<div class="box">
+					<div class="body group">
+						<form method="post" action="admin.php?module=home">
+							<textarea name="text" class="form-control" rows="5"></textarea><br />
+							<button class="btn btn-primary" type="submit" name="act" value="comment">Add Comment</button>
+						</form>
+					</div>
+					<div class="body list noblock" style="overflow:auto; height:250px;">
+						<ul>
+[/block: comments_top]
+
+[block: comment]
+							{:admin_comments}
+[/block: comment]
+
+[block: comments_bottom]
+						</ul>
+					</div>
+				</div>
+[/block: comments_bottom]
+
+[block: comments_alltop]
+				<div class="box">
+					<div class="head">Message all editors here</div>
+				</div>
+				<div class="box">
+					<div class="body group">
+						<form method="post" action="admin.php?module=home">
+							<textarea name="text" class="form-control" rows="5"></textarea><br />
+							<button class="btn btn-primary" type="submit" name="act" value="commentall">Add Comment</button>
+						</form>
+					</div>
+					<div class="body list noblock" style="overflow:auto; height:250px;">
+						<ul>
+[/block: comments_alltop]
+
+[block: commentall]
+							{:editor_comments}
+[/block: commentall]
+
+[block: comments_bottomall]
+						</ul>
+					</div>
+					<div class="body group"><a href="admin.php?module=more_comments&view=editors">View more editor comments</a></div>
+				</div>
+[/block: comments_bottomall]
+
+[block: editor_tracking]
+				<div class="box">
+					<div class="head">Editor Actions</div>
+				</div>
+				<div class="box">
+					<div class="body list">
+						<ul>
+[/block: editor_tracking]
+
+[block: tracking_row]
+							{:editor_action}
+[/block: tracking_row]
+
+[block: tracking_bottom]
+						</ul>
+					</div>
+				</div>
+[/block: tracking_bottom]
+
+[block: view_content]
+		<div class="box">
+			<ul class="breadcrumb">
+				<li><a href="/admin.php?module-home">Admin Home</a></li>
+				<li class="active">Viewing deleted content</li>
+			</ul>
+		</div>
+
+		<div class="box">
+			<div class="head">Viewing deleted content</div>
+		</div>
+
+		<div class="box">
+			<div class="body group">
+				{:action}
+			</div>
+		</div>
+
+		<div class="box">
+			<div class="body group">
+				{:content}
+			</div>
+		</div>
+[/block: view_content]

@@ -1,0 +1,20 @@
+[block: main_top]
+	<div class="box"><div class="head">Manage topic subscriptions</div></div>
+	<table class="table">
+[/block: main_top]
+
+[block: post_row]
+	<tr>
+		<td width="60px" class="forum_cell"><img src="{:topic_pip}" width="30px" height="30px" alt="pip" /></td>
+		<td width="425px" class="forum_cell"><a href="/forum/topic/{:topic_id}">{:post_title}</a> - <strong><a href="/usercp.php?module=topic_subscriptions&go=unsubscribe&topic_id={:topic_id}"> <i class="icon-trash"></i> Unsubscribe</a></strong><br />
+		by <a href="/profiles/{:author_id}">{:post_author}</a> on {:post_date}<br />
+		Replys: {:replies} Views: {:views}</td>
+		<td width="35px" class="forum_cell"><img src="/templates/default/images/last_post.png" alt="" /></td>
+		<td width="200px" class="forum_cell" valign="top">Last Post {:last_post_name}</td>
+	</tr>
+[/block: post_row]
+
+[block: main_bottom]
+	</table>
+{:pagination}
+[/block: main_bottom]

@@ -1,0 +1,98 @@
+[block: search]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=users&view=search">
+		Search for a user to view and edit their details.
+		Username: <input type="text" name="username" /><button type="submit" class="button">Search Usernames</button>
+		</form>
+	</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=users&view=search">
+		Search for a user via email to view and edit their details.
+		Email: <input type="text" name="email" /><button type="submit" class="button">Search Emails</button>
+		</form>
+	</div>
+</div>
+[/block: search]
+
+[block: search_row_top]
+<div class="box">
+	<div class="body group">
+		Here are the users matching that search:<br />
+	</div>
+</div>
+[/block: search_row_top]
+
+[block: search_row]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+		<a href="admin.php?module=users&view=edituser&user_id={:user_id}">{:username}</a> - {:email}
+		</form>
+	</div>
+</div>
+[/block: search_row]
+
+[block: premium_row_top]
+<div class="box"><div class="body group">Here you can quickly access GOL Premium users</div></div>
+[/block: premium_row_top]
+
+[block: premium_row]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+		<a href="admin.php?module=users&view=edituser&user_id={:user_id}">{:username}</a>
+		</form>
+	</div>
+</div>
+[/block: premium_row]
+
+[block: edituser]
+<div class="box"><div class="head">Here you can edit {:username}'s details.</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+			Username: <input type="text" name="username" class="form-control" value="{:username}" /><br />
+			Email: <input type="text" name="email" class="form-control" value="{:email}" /><br />
+			Website: <input type="text" name="website" class="form-control" value="{:website}" /><br />
+			<label for="bio">Biography, for Editors this will show on articles you create, for normal users it will just show it on your profile, keep it short.</label>
+			<textarea name="article_bio" class="bbcode-editor" cols="100" rows="10">{:bio}</textarea><br />
+			{:admin_only}
+			Avatar: <img src="{:avatar}" alt="avatar" /><br />
+			<button type="submit" name="act" value="edituser" class="btn btn-primary">Edit</button>
+			<button type="submit" name="act" value="deleteavatar" class="btn btn-danger">Delete Avatar</button>
+			<button type="submit" name="act" value="delete_user" class="btn btn-danger">Delete User</button>
+			{:delete_content_button}
+			{:ban_button}
+		</form>
+	</div>
+</div>
+[/block: edituser]
+
+[block: ipban]
+<form method="post" action="admin.php?module=users">
+Here you can ban an IP Address from logging in or registering.
+IP: <input type="text" name="ip" /><button type="submit" class="red-button">Ban IP</button>
+<input type="hidden" name="act" value="ipban" />
+</form>
+[/block: ipban]
+
+[block: iprow]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=users">
+		IP: {:ip} <button type="submit" class="button" name="action" value="unipban">UnBan</button> <button type="submit" class="button" name="act" value="editipban">Edit</button>
+		<input type="hidden" name="id" value="{:id}" />
+		</form>
+	</div>
+</div>
+[/block: iprow]
+
+[block: editip]
+<div class="box">
+	<form method="post" action="admin.php?module=users">
+	Edit the IP
+	IP: <input type="text" name="ip" value="{:ip}" /><button type="submit" class="button">Edit IP</button>
+	<input type="hidden" name="act" value="editipban" /> <input type="hidden" name="id" value="{:id}" /> <input type="hidden" name="act2" value="go" />
+	</form>
+</div>
+[/block: editip]

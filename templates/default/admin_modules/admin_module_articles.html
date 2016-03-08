@@ -1,0 +1,319 @@
+[block: add]
+				<div class="box">
+					<div class="head">Add a new Article here.</div>
+				</div>
+[/block: add]
+
+[block: add_bottom]
+						</div>
+				</div>
+				<div class="box">
+					<div class="body group">
+							<label class="checkbox">
+								<input type="checkbox" name="show_block" /> Editors Pick? <em>You will be sent to the featured image uploader after!</em>
+							</label>
+							<label class="checkbox">
+								<input type="checkbox" name="show_article" checked /> Enable article?
+							</label>
+							<label class="checkbox">
+								<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to article to receive comment replies via email?
+							</label>
+							<button type="submit" name="act" value="add" class="btn btn-primary">Publish Now</button> <button type="submit" name="act" value="Preview" class="btn btn-info">Preview</button> <button type="submit" name="act" value="review" class="btn btn-info">Submit for Review</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info">Save as draft</button>
+							<input type="hidden" name="check" value="Add" />
+							<input type="hidden" name="temp_tagline_image" value="{:temp_tagline_image}" />
+						</form>
+					</div>
+				</div>
+				<div class="box">
+					<div class="body group">
+						<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajaxImageUpload.php' style="clear:both">
+							Upload your images, no bigger than 1MB!
+							<div id='imageloadstatus' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
+							<div id='imageloadbutton'>
+							<input class="form-control" type="file" name="photos[]" id="photoimg" multiple="true" />
+							</div>
+						</form>
+					</div>
+				</div>
+				<div id="preview" class="uploads">
+				</div>
+				{:previously_uploaded}
+[/block: add_bottom]
+
+[block: edit_locked]
+				<div class="box">
+					<div class="head">Editing is currently locked</div>
+					<div class="body group">Locked by {:locked_username} at {:locked_date}, lock will be removed once editing is finished, or automatically after time</div>
+				</div>
+[/block: edit_locked]
+
+[block: edit_top]
+				{:lock_button}
+				<div class="box">
+					<div class="head">Edit the article here.</div>
+				</div>
+[/block: edit_top]
+
+[block: edit_bottom]
+				</div>
+			</div>
+				<div class="box">
+					<div class="body group">
+						<label class="checkbox">
+							<input type="checkbox" name="show_block" {:show_block_check}/> Editors Pick? <em>You will be sent to the featured image uploader after!</em>
+						</label>
+						<label class="checkbox">
+							<input type="checkbox" name="show_article" {:show_article_check} /> Enable article?
+						</label>
+						<button  type="submit" name="act" value="Edit" class="btn btn-primary" {:edit_state}>Edit</button> <button type="submit" name="act" value="Preview" formaction="/admin.php?module=preview" class="btn btn-info" {:edit_state}>Preview</button> {:top_image_delete}
+						<input type="hidden" name="article_id" value="{:article_id}" />
+						<input type="hidden" name="check" value="Edit" />
+						<input type="hidden" name="temp_tagline_image" value="{:temp_tagline_image}" />
+					</form>
+				</div>
+			</div>
+			<div class="box">
+				<div class="body group ">
+					<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajaxImageUpload.php' style="clear:both">
+						Upload your images, no bigger than 1MB!
+						<div id='imageloadstatus' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
+						<div id='imageloadbutton'>
+						<input type="file" name="photos[]" id="photoimg" multiple="true" {:edit_state}/>
+						</div>
+						<input type="hidden" name="article_id" value="{:article_id}" />
+					</form>
+				</div>
+			</div>
+			<div id='preview' class="uploads">
+			</div>
+			<div class="uploads">
+			{:previously_uploaded}
+			</div>
+			<div class="box">
+				<div class="head">Article Edit History</div>
+				<div class="body list" style="overflow:auto; height:200px;">
+					<ul>
+[/block: edit_bottom]
+
+[block: edit_history]
+						{:history}
+[/block: edit_history]
+
+[block: edit_bottom_history]
+					</ul>
+				</div>
+			</div>
+[/block: edit_bottom_history]
+
+[block: manage_cat_top]
+<div class="box"><div class="head">Here you can select a category to manage or view all.</div></div>
+			<div class="box">
+				<div class="body group">
+					<a href="admin.php?module=articles&view=manage&category=inactive">View inactive articles</a>
+				</div>
+			</div>
+			<div class="box">
+				<div class="body group">
+					<a href="admin.php?module=articles&view=manage&category=all">View All</a>
+				</div>
+			</div>
+[/block: manage_cat_top]
+
+[block: manage_cat]
+			<div class="box">
+				<div class="body group">
+					<a href="admin.php?module=articles&view=manage&category_id={:category_id}">{:category_name}</a>
+				</div>
+			</div>
+[/block: manage_cat]
+
+[block: manage_row]
+		<!-- Article -->
+		<div class="box">
+			<div class="head"><a href="/articles/{:article_link}">{:title}</a></div>
+		</div>
+		<div class="box">
+			<div class="body group">
+				<p class="small muted">by {:username} {:date}</p>
+				<p>
+					{:text}
+					{:categories_list}
+					<p class="small muted"><a href="/articles/{:article_link}/#comments"><span class="glyphicon glyphicon-comment"></span> {:comment_count} Comments</a></p>
+				</p>
+
+			</div>
+		</div>
+		<div class="box">
+			<div class="body group">
+			<form method="post" action="admin.php?module=articles">
+			<button type="submit" formaction="admin.php?module=articles&view=Edit&article_id={:article_id}">Edit</button>
+			<button type="submit" name="act" value="Delete">Delete</button>
+			<input type="hidden" name="article_id" value="{:article_id}" />
+			</form>
+			</div>
+		</div>
+[/block: manage_row]
+
+[block: manage_bottom]
+{:pagination}
+[/block: manage_bottom]
+
+[block: preview_row]
+		<script src="{:url}includes/jscripts/jquery.form.js"></script>
+		<div class="box">
+			<div class="head">Here is how it would look on the homepage</div>
+		</div>
+		<!-- Article -->
+				<div class="article group">
+					<div class="image group">
+					<a href="articles/{:article_link}">
+						{:top_image_nobbcode}
+					</a>
+					</div>
+					<div class="info group">
+						<div class="title"><a href="articles/{:article_link}">{:title}</a></div>
+						<div class="meta">Posted by {:username}, {:date} (<a href="/articles/{:article_link}/#comments">{:comment_count} Comments</a>)</div>
+						<div class="desc">{:tagline} </div>
+						<div class="tags">
+							<ul>
+								{:categories_list_preview}
+							</ul>
+						</div>
+					</div>
+				</div>
+		<div class="box">
+			<div class="head">Here is the full article</div>
+		</div>
+		<!-- article page -->
+
+				<div class="article individual no-image group">
+					<div class="image group">
+						<a href="#">
+
+						</a>
+					</div>
+					<div class="clearer"> </div>
+					<div class="info group">
+						<div class="bubble">
+							<div class="title">{:title}</div>
+							<div class="meta">Posted {:username}, {:date}</div>
+						</div>
+					</div>
+					<div class="content group">
+						{:text_full}
+					</div>
+					<div class="tags group">
+						<ul>
+							{:categories_list_preview}
+						</ul>
+					</div>
+				</div>
+	<div class="box">
+		<div class="head">Edit some more below</div>
+	</div>
+[/block: preview_row]
+
+[block: preview_bottom]
+</div>
+</div>
+<div class="box">
+	<div class="body group">
+		{:subscribe_box}
+		<label class="checkbox">
+			<input type="checkbox" name="show_block" {:pick_check}/> Editors Pick?
+		</label>
+		{:enable_article}
+		{:submit_as_self}
+		{:buttons}
+		<input type="hidden" name="article_id" value="{:article_id}" />
+		<input type="hidden" name="author_id" value="{:author_id}" />
+		<input type="hidden" name="check" value="{:check}" />
+		</form>
+	</div>
+</div>
+<div class="box">
+	<div class="body group">
+		<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajaxImageUpload.php' style="clear:both">
+			Upload your images, no bigger than 1MB!
+			<div id='imageloadstatus' style='display:none'>
+				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>
+			</div>
+			<div id='imageloadbutton'>
+				<input type="file" name="photos[]" id="photoimg" multiple="true" />
+			</div>
+			<input type="hidden" name="article_id" value="{:article_id}" />
+		</form>
+
+		<div class="col-md-12" id='preview'>
+		</div>
+	</div>
+</div>
+{:previously_uploaded}
+[/block: preview_bottom]
+
+[block: comments_top]
+Here you can view comments reported as spam and act accordingly.<br />
+[/block: comments_top]
+
+[block: article_comments]
+	<div class="row">
+		<div class="span9">
+			<table class="table table-bordered">
+				<thead>
+				<th class="alert alert-info no-bottom-margin no-rounded-corners" colspan="2">Comment by {:username} commented on <a href="/articles/{:article_link}">{:article_title}</a> {:date} <br />
+				Spam Report By {:reported_by}</th>
+				</thead>
+				<tbody>
+				<tr>
+				<td valign="top" width="120px">
+					<img src="{:comment_avatar}" alt="avatar" />
+				</td>
+				<td valign="top">
+					<div id="{:comment_id}" class="forumpost">{:text}</div><br />
+					<form method="post" action="admin.php?module=articles">
+						<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=articles&comment_id={:comment_id}" class="btn btn-warning" /><i class="icon-remove-sign"></i> Delete Report</button>
+						<button type="submit" formaction="/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={:comment_id}" class="btn btn-danger"><i class="icon-trash"></i> Delete Comment</button>
+						<button type="submit" formaction="/index.php?module=articles_full&amp;view=Edit&amp;comment_id={:comment_id}&page=1" class="btn btn-info"><i class="icon-pencil"></i> Edit</button
+					</form>
+				</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+[/block: article_comments]
+
+[block: comment_reports_bottom]
+{:pagination}
+[/block: comment_reports_bottom]
+
+[block: guest_comments_top]
+Show all comments from ip address: {:ip_address}
+We found these users matching that IP: {:username_list}<br />
+[/block: guest_comments_top]
+
+[block: guest_comment_row]
+	<div class="row">
+		<div class="span9">
+			<table class="table table-bordered">
+				<thead>
+				<th class="alert alert-info no-bottom-margin no-rounded-corners" colspan="2">Comment by {:username} commented on <a href="/articles/{:article_link}">{:article_title}</a> {:date}</th>
+				</thead>
+				<tbody>
+				<tr>
+				<td valign="top" width="120px">
+					<img src="{:comment_avatar}" alt="avatar" />
+				</td>
+				<td valign="top">
+					<div id="{:comment_id}" class="forumpost">{:text}</div><br />
+					<form method="post" action="admin.php?module=articles">
+						<button type="submit" name="act" value="deletegcomment" formaction="/admin.php?module=articles&ip_id={:comment_id}" class="btn btn-danger"><i class="icon-trash"></i> Delete Comment</button>
+						<button type="submit" formaction="/index.php?module=articles_full&amp;view=Edit&amp;comment_id={:comment_id}&page=1" class="btn btn-info"><i class="icon-pencil"></i> Edit</button
+					</form>
+				</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+[/block: guest_comment_row]

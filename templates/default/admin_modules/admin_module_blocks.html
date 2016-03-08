@@ -1,0 +1,67 @@
+[block: add]
+Create a new custom block.<br />
+<form method="post" action="admin.php?module=blocks">
+	Block Name <em>Used for admininstration</em>: <input type="text" name="name" /><br />
+	Title <em>Shown on the block itself</em>: <input type="text" name="title" /><br />
+	Title Link <em>The title will be a clickable link to this.</em> <input type="text" name="link" /><br />
+	Block content <em>HTML is allowed</em>:<br />
+	<textarea name="text" cols="100" rows="5"></textarea><br />
+	Activated? <input type="checkbox" name="activated" checked/><br />
+	Style<br />
+	<select name="style"><option value="block">Standard style</option><option value="block_plain">No style</option></select><br />
+	None premium only? <input type="checkbox" name="nonpremium" /><br />
+	Homepage only? <input type="checkbox" name="homepage" /><br />
+	<input type="hidden" name="type" value="{:type}" />
+	<input type="submit" name="act" value="Add" />
+</form>
+[/block: add]
+
+[block: manage_top]
+Add a block from uploaded file.<br />
+<form method="post" action="admin.php?module=blocks">
+	Block Name <em>Used for admininstration</em>: <br />
+	<input type="text" name="name" /><br />
+	Block Filename <em>Filename of the block, without the extension!<em><br />
+	block_<input type="text" name="file" /><br />
+	Activated? <input type="checkbox" name="activated" checked/><br />
+	<input type="hidden" name="type" value="{:type}" />
+	<button type="submit" name="act" value="addmain" class="button">Add</button>
+</form><br />
+<br />
+Here you can re-arrange the blocks you have on the portal right now, Enable/Disable blocks and Delete blocks!<br />
+[/block: manage_top]
+
+[block: normal_row]
+<div class="block">
+	<form method="post" action="admin.php?module=blocks{:type}">
+		Block Name <em>Used for admininstration</em>: <input type="text" name="name" value="{:block_name}" /><br />
+		Title <em>Shown on the block itself</em>: <input type="text" name="title" value="{:block_title}" /><br />
+		Title Link <em>The title will be a clickable link to this.</em> <input type="text" name="link" value="{:link}" /><br />
+		Block Link <em>The filename of the block itself to be included</em> <input type="text" name="filename" value="{:block_link}" /><br />
+		Activated? <input type="checkbox" name="activated" {:checked}/><br />
+		<input type="submit" name="act" value="Update" /> <input type="submit" name="act" value="Delete" />
+		<input type="hidden" name="block_id" value="{:block_id}" />
+		<input type="hidden" name="type" value="normal" />
+	</form>
+</div>
+[/block: normal_row]
+
+[block: custom_row]
+<div class="block">
+	<form method="post" action="admin.php?module=blocks{:type}">
+		Block Name <em>Used for admininstration</em>: <input type="text" name="name" value="{:block_name}" /><br />
+		Title <em>Shown on the block itself</em>: <input type="text" name="title" value="{:block_title}" /><br />
+		Title Link <em>The title will be a clickable link to this.</em> <input type="text" name="link" value="{:link}" /><br />
+		Block content <em>HTML is allowed</em>:<br />
+		<textarea name="block_text" cols="100" rows="5">{:block_text}</textarea><br />
+		Activated? <input type="checkbox" name="activated" {:checked}/><br />
+		Style<br />
+		<select name="style">{:options}</select><br />
+		None premium only? <input type="checkbox" name="nonpremium" {:nonpremium_check}/><br />
+		Homepage only? <input type="checkbox" name="homepage" {:homepage_check}/><br />
+		<input type="submit" name="act" value="Update" /> <input type="submit" name="act" value="Delete" />
+		<input type="hidden" name="block_id" value="{:block_id}" />
+		<input type="hidden" name="type" value="custom" />
+	</form>
+</div>
+[/block: custom_row]

@@ -1,0 +1,104 @@
+[block: main]
+		<div id="content" class="sales container group">
+			<div class="col-12">
+[/block: main]
+
+[block: main2]
+             <!-- sales intro -->
+                <div class="box">
+                    <div class="head">Linux Games On Sale: {:total_count}</div>
+                    <div class="body group">
+                        <div class="group">
+                            <div class="col-12">
+                                <p>Here you can see the latest games on sale from across the globe that can be played on Linux, your chance to snap up some great cheap games!</p>
+                            </div>
+                            <div class="col-8">
+                                <p>You need to be logged in to be able to report a sale that has ended.</p>
+                            </div>
+                            <div class="col-4 align-right">
+                                <a class="button small fnone" href="{:url}index.php?module=submit_sale">Submit Sale</a>
+                                <a class="button small fnone" href="http://www.gamingonlinux.com/article_rss.php" target="_blank"><img alt="" src="/templates/default/images/social/rss.svg" style="width: 16px;" /></a>
+
+                                <a class="button small fnone" href="http://www.twitter.com/linuxgamesales" target="_blank"><img alt="" src="/templates/default/images/social/twitter.svg" style="width: 16px;" /></a>
+                            </div>
+                        </div>
+                        <hr />
+                       <form name="form1" role="form" method="get">
+                            <div class="group">
+                                <div class="col-6">
+                                    Pick a single store, or select multiple stores.<br />
+                                    <select name="stores[]" class="form-control" multiple>
+                                       {:provider_jump_list}
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="inline">
+                                        <input type="checkbox" name="drmfree" /> DRM Free
+                                    </label>
+                                    <label class="inline">
+                                        <input type="checkbox" name="online" /> Requires Product Key
+                                    </label>
+                                    <label class="inline">
+                                        <input type="checkbox" name="steam" /> Steam Key
+                                    </label>
+                                    <select name="price">
+					<option value="">Price Options</option>
+					<option value="$5">Under $5</option>
+					<option value="$10">Under $10</option>
+					<option value="£5">Under £5</option>
+					<option value="£10">Under £10</option>
+					<option value="5€">Under 5€</option>
+					<option value="10€">Under 10€</option>
+                                    </select>
+                                    <div class="align-right">
+                                        <button type="submit" name="search" value="on" formaction="/sales.php" class="fnone">Filter</button> <button type="submit" formaction="/sales.php" name="reset" class="fnone">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+				</div></div>
+
+				<!-- sales headers -->
+				<table id="sort" class="sort table table-striped table-hover">
+				<thead>
+				<tr>
+
+						<th class="sort-header">Name</th>
+						<th class="sort-header">Expiry</th>
+						<th class="sort-header">&pound;</th>
+						<th class="sort-header">&dollar;</th>
+						<th class="sort-header">&euro;</th>
+						<th class="sort-header">Store</th>
+
+
+				</tr>
+				</thead>
+				<tbody>
+[/block: main2]
+
+[block: row]
+
+					<tr>
+					<td id="{:sale_id}" class="span5" data-sort="{:name}">
+					{:info} {:edit_link}<br />
+					{:pre-order} {:drmfree_check} {:prkey_check} {:steam_check} {:bundle_check}
+					{:report_button}
+					</td>
+					<td class="span3" data-sort="{:expire_time}">{:expires}</td>
+					<td class="span1" data-sort="{:pound_plain}">{:pounds_original}{:pounds}</td>
+					<td class="span1" data-sort="{:dollar_plain}">{:dollars_original}{:dollars}</td>
+					<td class="span1" data-sort="{:euro_plain}">{:euros_original}{:euros}</td>
+					<td class="span1" data-sort="{:provider}">{:provider}</td>
+					</tr>
+
+[/block: row]
+
+[block: bottom]
+				</tbody>
+			</table>
+			</div>
+
+		</div>
+		<script src='{:url}includes/jscripts/tablesort.min.js'></script>
+		<script>(function(){new Tablesort(document.getElementById('sort'));})();</script>
+[/block: bottom]

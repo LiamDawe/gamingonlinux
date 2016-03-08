@@ -1,0 +1,286 @@
+[block: category_add]
+<div class="alert alert-info no-bottom-margin"><h4>Add new forum categorys here</h4></div>
+<form method="post" action="admin.php?module=forum">
+	Category names, put each one on a new line.
+	<textarea name="list" cols="100" rows="10"></textarea><br />
+	<input type="submit" name="submit" value="Add" />
+	<input type="hidden" name="act" value="category" />
+</form>
+[/block: category_add]
+
+[block: forum_add]
+<div class="alert alert-info no-bottom-margin"><h4>Add new forum here</h4></div>
+<form method="post" action="admin.php?module=forum">
+	<div class="container">
+	<div class="box">
+		Forum Name
+		</div>
+		<div class="box2">
+		<input type="text" name="forum" />
+		</div>
+		<div class="box">
+		Description
+		</div>
+		<div class="box2">
+		<input type="text" name="description" />
+		</div>
+		<div class="box">
+		Category
+		</div>
+		<div class="box2">
+		<select name="category">
+		{:options}
+		</select>
+		</div>
+		<div class="box">
+		User Group Options
+		</div>
+		<table width="100%" cellspacing="0" cellpadding="0">
+		<tr>
+			<td>
+				View Forum
+			</td>
+			<td>
+				Post Topics
+			</td>
+			<td>
+				Reply to posts
+			</td>
+			<td>
+				Lock topics
+			</td>
+			<td>
+				Stick topics
+			</td>
+			<td>
+				Delete topics
+			</td>
+			<td>
+				Delete own topics
+			</td>
+			<td>
+				Avoid flood control
+			</td>
+			<td>
+				Can move topics
+			</td>
+		</tr>
+[/block: forum_add]
+
+[block: forum_groups]
+		<tr>
+			<td class="box" colspan="9">
+				{:group_name}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="checkbox" name="cview[{:group_id}]" CHECKED>
+			</td>
+			<td>
+				<input type="checkbox" name="ctopic[{:group_id}]">
+			</td>
+			<td>
+				<input type="checkbox" name="creply[{:group_id}]">
+			</td>
+			<td>
+				<input type="checkbox" name="clock[{:group_id}]">
+			</td>
+			<td>
+				<input type="checkbox" name="csticky[{:group_id}]">
+			</td>
+			<td>
+				<input type="checkbox" name="cdelete[{:group_id}]">
+			</td>
+			<td>
+				<input type="checkbox" name="cdelete_own[{:group_id}]">
+			</td>
+			<td>
+				<input type="checkbox" name="cfloods[{:group_id}]">
+			</td>
+			<td>
+				<input type="checkbox" name="cmove[{:group_id}]">
+			</td>
+		</tr>
+[/block: forum_groups]
+
+[block: forum_end]
+		</table>
+	</div>
+	<input type="submit" value="Add Forum" />
+	<input type="hidden" name="act" value="forum" />
+</form>
+[/block: forum_end]
+
+[block: category_top]
+<div class="alert alert-info">
+	<form method="post" action="admin.php?module=forum">
+	<div class="articles-header">Name <input type="text" name="name" value="{:category_name}" /> Order: <input type="text" name="order" value="{:category_order}" size="3" /> <input type="submit" name="submit" value="Delete" /> <input type="submit" name="submit" value="Edit" /> <input type="hidden" name="category_id" value="{:category_id}" /> <input type="hidden" name="act" value="categorymanage" /></div>
+	</form>
+</div>
+	<table class="table table-bordered">
+[/block: category_top]
+
+[block: forum_row]
+	<form method="post" action="admin.php?module=forum">
+	<tr>
+		<td width="5%" class="forum_cell"><img src="templates/default/images/forum_icon.png" alt="pip" /></td>
+		<td width="80%" class="forum_cell">Name<br />
+		<input type="text" name="name" value="{:forum_name}" /><br />
+		Description<br />
+		<input type="text" name="description" value="{:forum_description}" /><br />
+		Order: <input type="text" name="order" value="{:forum_order}" size="3" /><br />
+		Posts: {:forum_posts}<br />
+		<input type="submit" name="submit" value="Delete" /> <input type="submit" name="submit" value="Edit" /> <input type="hidden" name="forum_id" value="{:forum_id}" /> <input type="hidden" name="act" value="forummanage" /><br />
+		<a href="admin.php?module=forum&amp;view=permissions&amp;forum_id={:forum_id}">Edit Forum Permissions</a></td>
+	</tr>
+	</form>
+[/block: forum_row]
+
+[block: category_bottom]
+	</table>
+[/block: category_bottom]
+
+[block: permissions_top]
+<form method="post" action="admin.php?module=forum">
+	Editing forum permissions for <strong>{:forum_name}</strong><br />
+		<table width="100%" cellspacing="0" cellpadding="0">
+		<tr>
+			<td>
+				View Forum
+			</td>
+			<td>
+				Post Topics
+			</td>
+			<td>
+				Reply to posts
+			</td>
+			<td>
+				Lock topics
+			</td>
+			<td>
+				Stick topics
+			</td>
+			<td>
+				Delete topics
+			</td>
+			<td>
+				Delete own topics
+			</td>
+			<td>
+				Avoid flood control
+			</td>
+			<td>
+				Can move topics
+			</td>
+		</tr>
+[/block: permissions_top]
+
+[block: forum_permission_group]
+<tr>
+				<td colspan="11">
+						<strong>{:group_name}</strong>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="checkbox" name="cview[{:group_id}]" {:view}>
+					</td>
+					<td>
+						<input type="checkbox" name="ctopic[{:group_id}]" {:post}>
+					</td>
+					<td>
+						<input type="checkbox" name="creply[{:group_id}]" {:reply}>
+					</td>
+					<td>
+						<input type="checkbox" name="clock[{:group_id}]" {:lock}>
+					</td>
+					<td>
+						<input type="checkbox" name="csticky[{:group_id}]" {:sticky}>
+					</td>
+					<td>
+						<input type="checkbox" name="cdelete[{:group_id}]" {:delete}>
+					</td>
+					<td>
+						<input type="checkbox" name="cdelete_own[{:group_id}]" {:deleteo}>
+					</td>
+					<td>
+						<input type="checkbox" name="cfloods[{:group_id}]" {:floods}>
+					</td>
+					<td>
+						<input type="checkbox" name="cmove[{:group_id}]" {:move}>
+					</td>
+				</tr>
+[/block: forum_permission_group]
+
+[block: permissions_bottom]
+</table>
+<input type="hidden" name="forum_id" value="{:forum_id}" />
+<input type="hidden" name="act" value="permissions" />
+<input type="submit" value="Edit">
+</form>
+[/block: permissions_bottom]
+
+[block: topic_top]
+<div class="alert alert-info no-bottom-margin"><h4>List of reported forum topics</h4></div><br />
+[/block: topic_top]
+
+[block: reply_top]
+<div class="alert alert-info no-bottom-margin"><h4>List of reported forum replies</h4></div><br />
+[/block: reply_top]
+
+[block: topic]
+				<div class="box">
+				<div class="body group">
+				Reported by {:reporter}<br />
+					<table class="table table-bordered">
+					<thead>
+						<th class="alert alert-info no-bottom-margin no-rounded-corners" colspan="2"><strong>{:topic_title}</strong> {:topic_date}</th>
+					</thead>
+					<tbody>
+					<tr>
+					<td valign="top" width="120px">
+						<img src="{:avatar}" alt="avatar" /><br />
+							{:username}<br />
+					</td>
+					<td valign="top">
+						{:post_text}<br />
+					</td>
+					</tr>
+					</tbody> 
+					</table>
+
+				<form method="post" action="">
+					<button formaction="/admin.php?module=forum&view=removetopicreport&topic_id={:topic_id}" class="btn btn-primary">Remove Report</button> <button formaction="/index.php?module=editpost&post_id={:post_id}&reported&page=1" class="btn btn-info">Edit</button> <button name="moderator_options" value="Delete" formaction="/index.php?module=viewtopic&amp;topic_id={:topic_id}&reported" class="btn btn-danger">Delete</button>
+				</form>
+				</div>
+				</div>
+[/block: topic]
+
+[block: reply]
+				<div class="box">
+				<div class="body group">
+				Reported by {:reporter}<br />
+					<table class="table table-bordered">
+					<thead>
+						<th class="alert alert-info no-bottom-margin no-rounded-corners" colspan="2"><strong>{:topic_title}</strong> {:post_date}</th>
+					</thead>
+					<tbody>
+					<tr>
+					<td valign="top" width="120px">
+						<img src="{:avatar}" alt="avatar" /><br />
+							{:username}<br />
+					</td>
+					<td valign="top">
+						{:post_text}<br />
+					</td>
+					</tr>
+					</tbody> 
+					</table>
+
+				<form method="post" action="">
+					<button formaction="/admin.php?module=forum&view=removereplyreport&post_id={:post_id}" class="btn btn-primary">Remove Report</button> <button formaction="/index.php?module=editpost&post_id={:post_id}&reported&page=1" class="btn btn-info">Edit</button> <button name="moderator_options" value="Delete" formaction="/index.php?module=viewtopic&view=deletepost&post_id={:post_id}&topic_id={:topic_id}&reported" class="btn btn-danger">Delete</button>
+				</form>
+				</div>
+				</div>
+[/block: reply]

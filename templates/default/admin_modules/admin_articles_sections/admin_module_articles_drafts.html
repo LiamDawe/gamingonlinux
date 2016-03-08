@@ -1,0 +1,67 @@
+[block: drafts_top]
+<div class="box">
+	<div class="head">Your Draft Articles</div>
+	<div class="body group">
+		<form method="post">
+			<button formaction="admin.php?module=articles&view=add" class="btn btn-sm btn-info">Make new article</button>
+		</form>
+	</div>
+</div>
+[/block: drafts_top]
+
+[block: single_draft_top]
+<div class="box"><div class="head">Viewing Draft Article</div></div>
+[/block: single_draft_top]
+
+[block: drafts_row]
+<div class="box">
+	<div class="body group">
+		<form method="post" role="form">
+			<strong>{:article_title}</strong> by created {:date_submitted} <br />
+			<button type="submit" class="btn btn-primary" formaction="{:url}admin.php?module=articles&view=drafts&aid={:article_id}">Edit</button>
+			<button type="submit" name="act" value="Preview" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview</button>
+			<button type="submit" name="act" value="delete_draft" formaction="{:url}admin.php?module=articles">Delete</button>
+			<input type="hidden" name="article_id" value="{:article_id}" />
+		</form>
+	</div>
+</div>
+[/block: drafts_row]
+
+[block: drafts_bottom]
+	</div>
+</div>
+<div class="box">
+	<div class="body group">
+		<label class="checkbox">
+			<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to article to receive comment replies via email
+		</label>
+		<label class="checkbox">
+			<input type="checkbox" name="show_block" /> Editors Pick? <em>This will show the article under the Editors Pick heading on the Articles block!</em>
+		</label>
+		<button type="submit" name="act" value="add" class="btn btn-primary">Publish Now</button> <button type="submit" name="act" value="Move_Draft" class="btn btn-info" />Move to Admin Review Queue</button> <button type="submit" name="act" value="Edit_Draft" class="btn btn-primary" >Edit</button> <button type="submit" name="act" value="Preview" class="btn btn-info" formaction="/admin.php?module=preview" />Preview</button>
+		<input type="hidden" name="article_id" value="{:article_id}" />
+		<input type="hidden" name="author_id" value="{:author_id}" />
+		<input type="hidden" name="check" value="Draft" />
+		</form>
+	</div>
+</div>
+<div class="box">
+	<div class="body group">
+		<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajaxImageUpload.php' style="clear:both">
+			Upload your images, no bigger than 1MB!
+			<div id='imageloadstatus' style='display:none'>
+				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>
+			</div>
+			<div id='imageloadbutton'>
+				<input type="file" name="photos[]" id="photoimg" multiple="true" />
+			</div>
+			<input type="hidden" name="article_id" value="{:article_id}" />
+		</form>
+	</div>
+</div>
+<div id="preview" class="uploads">
+</div>
+<div class="uploads">
+{:previously_uploaded}
+</div>
+[/block: drafts_bottom]

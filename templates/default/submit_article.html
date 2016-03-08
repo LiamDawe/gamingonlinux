@@ -1,0 +1,69 @@
+[block: submit]
+    		<script src="https://www.google.com/recaptcha/api.js"></script>
+			<!-- submit article page -->
+				<div class="box">
+					<div class="body group"><strong>We highly recommend saving articles on your PC before previewing/submitting in case of errors!</strong><br />
+					Submit an article here, it will go into our submission queue.</div>
+				</div>
+
+				<div class="box">
+					<div class="body group">
+						<form id="imageform2" method="post" enctype="multipart/form-data" action='{:url}includes/ajax_tagline_upload.php' style="clear:both">
+							Article homepage image. Max of 120kb!
+							<div id='imageloadstatus2' style='display:none'><img src="{:url}templates/default/images/loader2.gif" alt="Uploading...."/></div>
+							<div id='imageloadbutton2'>
+								<input class="form-control" type="file" name="photos2" id="photoimg2" multiple="true" />
+								<small>Shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height. </small>
+							</div>
+						</form>
+						<div id='preview2'>
+							{:tagline_image}
+						</div>
+						<form action="/index.php?module=submit_article" method="post">
+							<label class="control-label">Title</label><input type="text" name="title" class="form-control" placeholder="Enter a title..." value="{:title}" /><br />
+							{:guest_fields}
+[/block: submit]
+
+[block: submit_bottom]
+							<p>Please be aware that by submitting an article you agree to us making changes to it including spelling, grammar, rewording to fit the websites style.</p>
+							{:captcha}
+							{:subscribe_box}
+							<button type="submit" name="act" value="Submit" class="btn btn-primary">Submit</button> <button input type="submit" name="act" value="Preview" class="btn btn-info">Preview</button>
+						</form>
+					</div>
+				</div>
+[/block: submit_bottom]
+
+[block: guest_fields]
+<label>Your Name: <em>Not Required, you will be called "Guest" if you leave it blank.</em></label>
+<input type="text" class="form-control" name="name" placeholder="Enter your name..." value="{:guest_username}" /><br />
+<label>Your Email: <em><strong>Required</strong>, will not be published, so we can email you when it's denied/accepted!</em></label>
+<input type="text" class="form-control" name="email" placeholder="Enter your email address..." value="{:guest_email}" /><br />
+[/block: guest_fields]
+
+[block: preview_row]
+    			<script src="https://www.google.com/recaptcha/api.js"></script>
+<script src="includes/jscripts/jquery.form.min.js"></script>
+				<div class="article individual no-image group">
+					<div class="image group">
+						<a href="#">
+
+						</a>
+					</div>
+					<div class="clearer"> </div>
+					<div class="info group">
+						<div class="bubble">
+							<div class="title">{:title}</div>
+							<div class="meta">Posted {:username}, {:date}</div>
+						</div>
+					</div>
+					<div class="content group">
+						{:text_full}
+					</div>
+					<div class="tags group">
+						<ul>
+							<li><a href="#">Categries will be here</a></li>
+						</ul>
+					</div>
+				</div>
+[/block: preview_row]

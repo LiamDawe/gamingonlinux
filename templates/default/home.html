@@ -1,0 +1,45 @@
+[block: announcement_top]
+	<div class="box">
+[/block: announcement_top]
+
+[block: announcement]
+		<div class="body group announce">
+			{:text}
+		</div>
+[/block: announcement]
+
+[block: announcement_bottom]
+</div>
+[/block: announcement_bottom]
+
+[block: articles_top]
+				<div class="box" style="margin: 0;">
+					<div class="head">Latest News</div>
+				</div>
+[/block: articles_top]
+
+[block: article_row]
+				<!-- Article -->
+				<div class="article group">
+					<div class="image group">
+					<a href="{:article_link}">
+						{:top_image}
+					</a>
+					</div>
+					<div class="info group">
+						<div class="title"><a href="{:article_link}">{:title}</a></div>
+						<div class="meta">Posted by {:username}, {:date} <span class="meta-date">(<a href="{:article_link}#comments">{:comment_count} Comments</a>)</span></div>
+						<div class="desc">{:text} {:edit_link} {:editors_pick_link}</div>
+						<div class="tags">
+							<ul>
+								{:categories_list}
+							</ul>
+						</div>
+					</div>
+				</div>
+[/block: article_row]
+
+[block: bottom]
+	<div class="clearer"> </div>
+	{:pagination}
+[/block: bottom]

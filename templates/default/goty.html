@@ -1,0 +1,170 @@
+[block: vote_popover]
+<div class="hidden" style="display:none">
+	<div id="wrap">
+	    <p>Your vote has been registered!<br /><br /><strong>Be sure to tell people you voted</strong>: <br /><br /><a class="button small fnone" href="https://twitter.com/intent/tweet?text=I just voted in the GOL GOTY Awards%20%23Linux%20%23Gaming&url=http://www.gamingonlinux.com/goty.php&via=gamingonlinux" target="_blank"><img src="/templates/default/images/social/twitter.svg" /></a></p>
+	</div>
+</div>
+[/block: vote_popover]
+
+[block: main]
+		<div id="content" class="container group">
+			<div class="col-12">
+[/block: main]
+
+[block: top]
+			<img src="/templates/default/images/goty.svg" alt />
+			<div class="box">
+				<div class="head">GamingOnLinux's GOTY Awards, Total Votes: {:total_votes}</div>
+				<div class="body group">Welcome to the GOL GOTY awards, where you can vote to support your favourite Linux game released in 2015. You only get one vote per category, so be sure it's the right game!<br />
+<br />
+Early Access and Open Source games have their own category, to both be fair to them and to other games.<br />
+<br />
+This is for <strong>Native Linux</strong> games only.
+{:voting_text}</div>
+			</div>
+[/block: top]
+
+[block: top10_bread]
+	<div class="box">
+		<ul class="breadcrumb">
+			<li><a href="/goty.php">Back to GOTY home</a></li>
+			<li>Viewing the top 10 games</a></li>
+			<li><a href="/goty.php?category_id={:category_id}">{:category_name}</a></li>
+		</ul>
+	</div>
+[/block: top10_bread]
+
+[block: top10]
+<div class="box">
+	<div class="head">Top 10 in {:category_name}</div>
+</div>
+<div class="goty">
+[/block: top10]
+
+[block: topchart]
+{:chart}
+[/block: topchart]
+
+[block: top_games]
+<div class="box">
+	<div class="head">Winners in {:category_name} | <a href="goty.php?view=top10&category_id={:category_id}">View top 10 games</a></div>
+[/block: top_games]
+
+[block: top_row]
+	<div class="col-4">
+		<div>
+		<form method="post" action="{:url}goty.php?game_id={:game_id}&category_id={:category_id}">
+		{:vote_button}
+		{:game_name}<br />
+		Votes: {:game_counter}<br />
+		{:leaderboard}
+		Direct link: <a href="{:url}goty.php?direct&game_id={:game_id}&category_id={:category_id}">Click me</a>.
+		</form>
+		</div>
+	</div>
+[/block: top_row]
+
+[block: top_end]
+</div>
+<div class="clearer"></div>
+[/block: top_end]
+
+[block: add]
+			<div class="box">
+				<div class="head">Add a game</div>
+				<div class="body group">Add a missing game here<br />
+				<form method="post">Name: <input type="text" name="name" /> Category: <select name="category">{:options}</select> <button type="submit" formaction="goty.php" name="act" value="add">Add Game</button></form></div>
+			</div>
+[/block: add]
+
+[block: category_bread]
+	<div class="box">
+		<ul class="breadcrumb">
+			<li><a href="/goty.php">Back to GOTY home</a></li>
+			<li>Viewing category</a></li>
+			<li>{:category_name}</a></li>
+		</ul>
+	</div>
+[/block: category_bread]
+
+[block: description]
+<div class="box"><div class="body group">{:category_description}</div></div>
+[/block: description]
+
+[block: games_list]
+<div class="box">
+	<div class="head">Pick your game and vote!</div>
+	<div class="body group">Filter: <a href="{:url}goty.php?category_id={:category_id}">Reset</a> <a href="{:url}goty.php?filter=misc&category_id={:category_id}">#0-9</a> <a href="{:url}goty.php?filter=a&category_id={:category_id}">A</a> <a href="{:url}goty.php?filter=b&category_id={:category_id}">B</a> <a href="{:url}goty.php?filter=c&category_id={:category_id}">C</a> <a href="{:url}goty.php?filter=d&category_id={:category_id}">D</a> <a href="{:url}goty.php?filter=e&category_id={:category_id}">E</a> <a href="{:url}goty.php?filter=f&category_id={:category_id}">F</a> <a href="{:url}goty.php?filter=g&category_id={:category_id}">G</a> <a href="{:url}goty.php?filter=h&category_id={:category_id}">H</a> <a href="{:url}goty.php?filter=i&category_id={:category_id}">I</a> <a href="{:url}goty.php?filter=j&category_id={:category_id}">J</a> <a href="{:url}goty.php?filter=k&category_id={:category_id}">K</a> <a href="{:url}goty.php?filter=l&category_id={:category_id}">L</a> <a href="{:url}goty.php?filter=m&category_id={:category_id}">M</a> <a href="{:url}goty.php?filter=n&category_id={:category_id}">N</a> <a href="{:url}goty.php?filter=o&category_id={:category_id}">O</a> <a href="{:url}goty.php?filter=p&category_id={:category_id}">P</a> <a href="{:url}goty.php?filter=q&category_id={:category_id}">Q</a> <a href="{:url}goty.php?filter=r&category_id={:category_id}">R</a> <a href="{:url}goty.php?filter=s&category_id={:category_id}">S</a> <a href="{:url}goty.php?filter=t&category_id={:category_id}">T</a> <a href="{:url}goty.php?filter=u&category_id={:category_id}">U</a> <a href="{:url}goty.php?filter=v&category_id={:category_id}">V</a> <a href="{:url}goty.php?filter=w&category_id={:category_id}">W</a> <a href="{:url}goty.php?filter=x&category_id={:category_id}">X</a> <a href="{:url}goty.php?filter=y&category_id={:category_id}">Y</a> <a href="{:url}goty.php?filter=z&category_id={:category_id}">Z</a></div>
+</div>
+<div class="goty">
+[/block: games_list]
+
+[block: direct_crumb]
+<div class="box">
+	<ul class="breadcrumb">
+		<li><a href="/goty.php">Back to GOTY home</a></li>
+		<li><a href="/goty.php?category_id={:category_id}">{:category_name}</a></li>
+		<li class="active">{:game_name}</li>
+	</ul>
+</div>
+[/block: direct_crumb]
+
+[block: direct]
+<div class="box"><div class="head">You have been linked directly to vote for {:game_name} in {:category_name}</div></div>
+[/block: direct]
+
+[block: direct_closed]
+<div class="box"><div class="head">Voting is not currently open, so check back soon!</div></div>
+[/block: direct_closed]
+
+[block: game_row]
+<div class="col-4">
+<div class="box"><div class="body group">
+{:vote_button}
+{:game_name}<br />
+{:votes}
+{:leaderboard}
+Direct link: <a href="{:url}goty.php?direct&game_id={:game_id}&category_id={:category_id}">Click me</a>.
+</div></div>
+</div>
+[/block: game_row]
+
+[block: category_top]
+<div class="box">
+	<div class="head">Pick your category and vote!</div>
+</div>
+<div class="goty">
+[/block: category_top]
+
+[block: category_row]
+<div class="col-4">
+	<div class="box">
+		<div class="body group">
+			<a href="/goty.php?category_id={:category_id}">{:category_name}</a>{:tick}
+		</div>
+	</div>
+</div>
+[/block: category_row]
+
+[block: category_bottom]
+</div>
+[/block: category_bottom]
+
+[block: direct_row]
+<div class="box"><div class="body group">
+{:game_name}<br />
+{:votes}
+{:leaderboard}
+Direct link: <a href="{:url}goty.php?direct&game_id={:game_id}&category_id={:category_id}">Click me</a>.
+{:vote_button}
+</div></div>
+[/block: direct_row]
+
+[block: games_bottom]
+</div>
+<br class="clearer" />
+[/block: games_bottom]
+
+[block: bottom]
+</div></div>
+[/block: bottom]

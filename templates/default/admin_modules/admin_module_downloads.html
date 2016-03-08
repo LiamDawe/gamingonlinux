@@ -1,0 +1,17 @@
+[block: category_add]
+Here you can add a Download Category
+<form method="post" action="admin.php?module=downloads">
+	Category Name: <input type="text" name="category_name" /> <input type="submit" value="Add" /> <input type="hidden" name="act" value="category_add" />
+</form><br />
+<br />
+<strong>Current Download Categorys:</strong><br />
+[/block: category_add]
+
+[block: category_row]
+<form method="post" action="admin.php?module=downloads">
+	Category Name: <input type="text" name="category_name" value="{:category_name}" /><br />
+	<input type="submit" name="act2" value="Delete" /> <input type="submit" name="act2" value="Edit" />
+	<input type="hidden" name="act" value="category_manage" />
+	<input type="hidden" name="category_id" value="{:category_id}" />
+</form>
+[/block: category_row]

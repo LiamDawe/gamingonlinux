@@ -1,0 +1,27 @@
+[block: main]
+<div class="box"><div class="head">Here you can change the main configuration of your website.</div></div>
+<div class="box">
+<div class="body group">
+	<form method="post" action="{:form_url}admin.php?module=config">
+	Admin Contact Email<br />
+	<input type="text" name="contact_email" value="{:contact_email}" /><br />
+	Template<br />
+	<input type="text" name="template" value="{:template}" /><br />
+	Default Module<br />
+	<input type="text" name="default_module" value="{:default_module}" /><br />
+	<label class="checkbox">
+		<input type="checkbox" name="allow_registrations" {:register_check} /> Allow User Registration
+	</label>
+	Message to show when registrations are off<br />
+	<textarea name="reg_message" cols="50" rows="5">{:reg_message}</textarea><br />
+	<label class="checkbox">
+		<input type="checkbox" name="register_captcha" {:register_captcha_check}/> Show a captcha on registration
+	</label>
+	Website Url (with no trailing slash!)<br />
+	<input type="text" name="url" value="{:url}" />
+	<br />
+	<input class="btn btn-primary" type="submit" name="Submit" value="Edit" />
+	</form>
+</div>
+</div>
+[/block: main]

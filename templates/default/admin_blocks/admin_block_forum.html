@@ -1,0 +1,12 @@
+[block: main]
+<div class="box">
+	<div class="head">Forum Admin</div>
+	<div class="body list">
+	<ul class="nav nav-list">
+		{:admin_links}
+		<li><a href="admin.php?module=forum&amp;view=reportedtopics">Reported topics {:topic_count}</a></li>
+		<li><a href="admin.php?module=forum&amp;view=reportedreplies">Reported posts {:replies_count}</a></li>
+	</ul>
+	</div>
+</div>
+[/block: main]

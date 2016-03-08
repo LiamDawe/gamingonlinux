@@ -1,0 +1,31 @@
+[block: top]
+<div class="box comments group">
+	<div class="head"><a name="comments">Moderation Queue</a></div>
+
+[/block: top]
+
+[block: approve_topic]
+	<div class="body group">
+					Title: {:topic_title}, by <a href="/profiles/{:author_id}">{:username}</a>
+					<div id="r{:comment_id}" class="comment group">
+						<div class="comment-meta group">
+							<div class="comment-post">
+								{:topic_text}
+							</div>
+						</div>
+					</div>
+					<form action="" method="post">
+						<button type="submit" name="action" value="approve_topic">Approve Topic</button> <button type="submit" name="action" value="remove_topic">Remove Topic</button> <button type="submit" name="action" value="remove_topic_ban">Remove & Ban User</button>
+						<input type="hidden" name="topic_id" value="{:topic_id}" />
+						<input type="hidden" name="author_id" value="{:author_id}" />
+						<input type="hidden" name="forum_id" value="{:forum_id}" />
+						<input type="hidden" name="creation_date" value="{:creation_date}" />
+					</form>
+	</div>
+[/block: approve_topic]
+
+
+[block: bottom]
+	</div>
+</div>
+[/block: bottom]

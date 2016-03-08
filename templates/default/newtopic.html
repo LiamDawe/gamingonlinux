@@ -1,0 +1,41 @@
+[block: main]
+			<!-- new topic page -->
+				<ul class="breadcrumb">
+					<li><a href="/forum/">Forum</a></li>
+					<li><a href="/forum/{:forum_id}/">{:forum_name}</a></li>
+					<li class="active">Creating a new topic</li>
+				</ul>
+				<form method="post">
+				<div class="box">
+					<div class="body group">
+[/block: main]
+
+[block: poll]
+		<button type="button" id="add-poll">Add Poll</button> <button type="button" id="delete-poll">Delete Poll</button><br />
+		<br />
+		<div id="create-poll">
+			Poll question: <input disabled="disabled" type="text" id="pquestion" name="pquestion" />
+			Poll options: <br />
+			<div id='TextBoxesGroup'>
+				<div id="TextBoxDiv1">
+					<input disabled="disabled" type="textbox" name="poption[]" class="poll-option" id="option1" />
+					<input disabled="disabled" type="textbox" name="poption[]" class="poll-option" id="option2" />
+				</div>
+			</div>
+			<button disabled="disabled" type="button" id='addButton'>Add another option</button>
+			<button disabled="disabled" type="button" id='removeButton'>Remove option</button><br /><br />
+		</div>
+[/block: poll]
+
+[block: top]
+Topic Title: <input type="text" name="title" /><br />
+[/block: top]
+
+[block: bottom]
+						<label>Subscribe to topic to receive replies via email <input type="checkbox" name="subscribe" checked /></label><br />
+						{:options}
+						<button type="submit" name="act" value="Add" formaction="index.php?module=newtopic&amp;forum_id={:forum_id}">Add</button>
+					</div>
+				</div>
+			</form>
+[/block: bottom]

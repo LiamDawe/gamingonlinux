@@ -1,0 +1,47 @@
+[block: top]
+    			<script src="https://www.google.com/recaptcha/api.js"></script>
+			<!-- email us page -->
+				<div class="box">
+					<div class="head">Email Us</div>
+					<div class="body group">If you are submitting a full article please use the <a href="/submit-article/">Submit Article area!</a> Or if your game has gone on sale submit it to our <a href="/sales/">Sales Page</a>!</div>
+				</div>
+[/block: top]
+
+[block: main]
+				<div class="box">
+					<div class="body group">
+						<h4>Please read this section BEFORE emailing, thank you.</h4>
+						If you send us any keys for games then <strong>make sure you very clearly state how they can/cannot be used.</strong> So, if they are not to be given out, say so!<br />
+						<br />
+						<strong>Paid articles</strong>: We do not take payment for articles, it's as simple as that.<br />
+						<br />
+						You can find us on these social networks for very quick tips, or continue below to email us!<br />
+						<div class="group">
+
+						    <a class="button small fnone" href="https://www.facebook.com/gamingonlinux" target="_blank"><img src="/templates/default/images/social/facebook.svg"></a>
+
+						    <a class="button small fnone" href="https://plus.google.com/+Gamingonlinux" target="_blank"><img src="/templates/default/images/social/google-plus.svg"></a>
+
+						    <a class="button small fnone" href="https://twitter.com/gamingonlinux" target="_blank"><img src="/templates/default/images/social/twitter.svg"></a>
+
+						</div><br />
+						<form method="post" action="/index.php?module=email_us" role="form">
+							<fieldset>
+								<div class="form-group">
+									<label for="input-name" class="control-label">Your Name</label>
+									<input class="form-control" id="input-name" type="text" name="name" value="{:name}" />
+								</div>
+								<div class="form-group">
+									<label for="input-email" class="control-label">Your Email</label>
+									<input class="form-control" id="input-email" type="text" name="email" value="{:email}" />
+			
+								</div>
+									<label for="input-message" class="control-label">Message</label>
+									<textarea id="input-message" class="markItUp" name="message" cols="100" rows="25">{:message}</textarea><br />
+								{:captcha}
+								<button type="submit" name="act" class="btn btn-primary">Send Email</button>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+[/block: main]

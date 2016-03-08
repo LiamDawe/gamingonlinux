@@ -1,0 +1,111 @@
+[block: footer]
+	</div>
+</div>
+<div id="footer" class="group smooth grid">
+	<div id="footer-wrapper" class="row">
+		<div class="container">
+			<div id="social" class="col-8">
+				<ul>
+					<li>
+						<a href="https://www.facebook.com/gamingonlinux" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/facebook.svg" width="30" height="30" />
+
+						</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/+Gamingonlinux" rel="publisher" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/google-plus.svg" width="30" height="30" />
+						</a>
+					</li>
+					<li>
+						<a href="https://www.youtube.com/user/GamingOnLinuxcom" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/youtube.svg" width="30" height="30" />
+						</a>
+					</li>
+					<li>
+						<a href="http://www.twitch.tv/gamingonlinux" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/twitch.svg" width="30" height="30" />
+						</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/gamingonlinux" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/twitter.svg" width="30" height="30" />
+						</a>
+					</li>
+					<li>
+						<a href="https://steamcommunity.com/groups/gamingonlinux" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/steam.svg" width="30" height="30" />
+						</a>
+					</li>
+					<li>
+						<a href="http://www.gamingonlinux.com/article_rss.php" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/rss-website.svg" width="30" height="30" />
+						</a>
+					</li>
+					<li>
+						<a href="http://www.gamingonlinux.com/forum_rss.php" target="_blank">
+							<img alt src="{:url}templates/default/images/social/white/rss-forum.svg" width="30" height="30" />
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div id="about" class="col-4">
+				<a href="http://gamingonlinux.com/">GamingOnLinux.com &copy; {:year}</a> - <a href="https://www.gamingonlinux.com/privacy.html">Privacy Policy</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="{:url}includes/jscripts/jquery.timeago.js"></script>
+<script type="text/javascript" src="{:url}includes/jscripts/jquery.qtip.min.js"></script>
+
+<script type="text/javascript">
+	// if (typeof postdate == "undefined") { postdate = 0; } else { postdate.setDate(postdate.getDate() + 1); }
+	jQuery("abbr.timeago").timeago('init'); //, {cutoff:86400}
+	jQuery('a.tooltip-top').qtip({
+	    position: {
+	        my: 'bottom center',
+	        at: 'top center'
+	    },
+	    style: {
+	        classes: 'qtip-bootstrap qtip-shadow'
+	    }
+	});
+	jQuery('span.tooltip-top').qtip({
+	    position: {
+	        my: 'bottom center',
+	        at: 'top center'
+	    },
+	    style: {
+	        classes: 'qtip-bootstrap qtip-shadow'
+	    }
+	});
+	jQuery('img.tooltip-top').qtip({
+		position: {
+			my: 'bottom center',
+			at: 'top center'
+		},
+		style: {
+			classes: 'qtip-bootstrap qtip-shadow'
+		}
+	});
+</script>
+
+<!-- stats script -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(["setCookieDomain", "*.gamingonlinux.com"]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//stats.gamingonlinux.com/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 1]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//stats.gamingonlinux.com/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+</body>
+</html>{:debug}
+[/block: footer]

@@ -230,7 +230,7 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 	$user_menu = "<a href=\"/index.php?module=login\">Account</a>
 							<div>
 								<form method=\"post\" action=\"".url."index.php?module=login\">
-									<input name=\"username\" type=\"text\" value=\"$username\" placeholder=\"Username\" />
+									<input name=\"username\" type=\"text\" value=\"$username\" placeholder=\"Username or Email\" />
 									<input name=\"password\" type=\"password\" placeholder=\"Password\" />
 									<label>
 										<input name=\"remember_name\" type=\"checkbox\" $username_remembered/> Remember username

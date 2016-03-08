@@ -2,7 +2,7 @@
                 		<div class="box">
 					<div class="body group">
 						<form method="post" action="/index.php?module=login">
-							<input name="username" type="text" value="{:username}" placeholder="Username" />
+							<input name="username" type="text" value="{:username}" placeholder="Username or Email" />
 							<input name="password" type="password" placeholder="Password" />
 							<label>
 								<input name="remember_name" type="checkbox" {:username_remembered:}/> Remember username
@@ -30,7 +30,7 @@
 							</div>
 							<hr />
 							<div class="group">
-								<a href="/register/" class="button fleft">Register</a> 
+								<a href="/register/" class="button fleft">Register</a>
 								<a href="/index.php?module=login&amp;forgot" class="button fright">Forgot Login?</a>
 							</div>
 						</form>
@@ -43,7 +43,7 @@
 					<div class="body group">
 						<p>Due to spam you need to <a href="//www.gamingonlinux.com/register/">Register</a> and <a href="//www.gamingonlinux.com/index.php?module=login">Login</a> to comment.</p>
 						<form method="post" action="/index.php?module=login">
-							<input name="username" type="text" value="" placeholder="Username" />
+							<input name="username" type="text" value="" placeholder="Username or Email" />
 							<input name="password" type="password" placeholder="Password" />
 							<label>
 								<input name="remember_name" type="checkbox"/> Remember username
@@ -71,7 +71,7 @@
 							</div>
 							<hr />
 							<div class="group">
-								<a href="/register/" class="button fleft">Register</a> 
+								<a href="/register/" class="button fleft">Register</a>
 								<a href="/index.php?module=login&amp;forgot" class="button fright">Forgot Login?</a>
 							</div>
 						</form>
@@ -83,8 +83,8 @@
 <div class="well well-sm">
 	<form method="post" action="index.php?module=login">
 	Here you can request your password.<br />
-	Email address 
-	<input type="text" class="form-control" name="email" /> 
+	Email address
+	<input type="text" class="form-control" name="email" />
 	<input type="submit" name="action" value="Send" class="btn btn-primary" />
 	</form>
 </div>

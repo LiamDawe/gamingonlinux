@@ -38,24 +38,22 @@ if (isset($_GET['message']))
 	{
 		$core->message("You have been sent here to due being flagged as a spammer! Please contact us directly if this is false.");
 	}
+	if ($_GET['message'] == 'unpicked')
+	{
+		$core->message("That article is now not an editors pick! What did it do wrong? :(");
+	}
+	if ($_GET['message'] == 'picked')
+	{
+		$core->message("That article is now an editors pick! Remember to give it a featured image!");
+	}
 }
-
-$templating->merge('home');
 
 if (isset($_GET['error']) && $_GET['error'] == 'toomanypicks')
 {
 	$core->message("Sorry there are already " . core::config('editor_picks_limit') " articles set as editor picks!", NULL, 1);
 }
 
-if (isset($_GET['message']) && $_GET['message'] == 'picked')
-{
-	$core->message("That article is now an editors pick! Check it out in the sidebar and bow down to its glory!");
-}
-
-if (isset($_GET['message']) && $_GET['message'] == 'unpicked')
-{
-	$core->message("That article is now not an editors pick! What did it do wrong? :(");
-}
+$templating->merge('home');
 
 if (!isset($_GET['view']))
 {

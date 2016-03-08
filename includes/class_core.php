@@ -977,5 +977,33 @@ class core
 		}
 		$templating->set('page_button', $page_button);
 	}
+
+	// convert bytes to human readable stuffs, only up to MB as we will never be uploading more than MB files directly
+	public static function readable_bytes($bytes, $decimals = 2)
+	{
+	    $kilobyte = 1024;
+	    $megabyte = $kilobyte * 1024;
+
+	    if (($bytes >= 0) && ($bytes < $kilobyte))
+		{
+	        return $bytes . ' B';
+
+	    }
+		else if (($bytes >= $kilobyte) && ($bytes < $megabyte))
+		{
+	        return round($bytes / $kilobyte, $decimals) . ' KB';
+
+	    }
+		else if (($bytes >= $megabyte))
+		{
+	        return round($bytes / $megabyte, $decimals) . ' MB';
+	    }
+
+		// not really needed, but in case i accidentally don't put something to even 1KB on upload limits
+		else
+		{
+	        return $bytes . ' B';
+	    }
+	}
 }
 ?>

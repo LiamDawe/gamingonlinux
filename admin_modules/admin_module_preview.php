@@ -167,6 +167,7 @@ $templating->set('article_bio', $bio);
 // this bit is for the final form
 $templating->merge('admin_modules/article_form');
 $templating->block('full_editor', 'admin_modules/article_form');
+$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 $templating->set('main_formaction', '<form id="form" method="post" action="'.core::config('url').'admin.php?module=preview" enctype="multipart/form-data">');
 $templating->set('tagline', $_POST['tagline']);
 $templating->set('tagline_image', $top_image);

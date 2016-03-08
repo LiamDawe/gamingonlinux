@@ -102,6 +102,7 @@ else
 	// get the edit row
 	$templating->merge('admin_modules/article_form');
 	$templating->block('full_editor', 'admin_modules/article_form');
+	$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 
 	// remove these, as it's a draft, we don't lock/disable crap here as it's personal to the user
 	$templating->set('edit_state', '');

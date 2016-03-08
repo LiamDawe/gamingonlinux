@@ -184,6 +184,7 @@ else if (isset($_GET['aid']))
 	// get the edit row
 	$templating->merge('admin_modules/article_form');
 	$templating->block('full_editor', 'admin_modules/article_form');
+	$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 	$templating->set('main_formaction', '<form method="post" action="'.$config['path'].'admin.php?module=articles" enctype="multipart/form-data">');
 	$templating->set('edit_state', $edit_state);
 	$templating->set('edit_state_textarea', $edit_state_textarea);

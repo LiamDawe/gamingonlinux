@@ -107,14 +107,16 @@ foreach ($xml->item as $game)
 
 			$price = mb_substr($game->price, 1, null,'UTF-8');
 			$price_original = mb_substr($game->fullPrice, 1,null, 'UTF-8');
+
 			//for testing output
+			/*
 			echo "Title: ", $game->{'plainTitle'}, "<br />\n";
 			echo "URL: ", $game->{'link'}, "<br />\n";
 			echo "Currency: " . $currency . "<br />\n";
 			echo "Price: $" . $price . "<br />\n";
 			echo "Original Price: $" . $dollars_original . "<br />\n";
 			echo "% off: ", $game->{'discountpercent'}, "%<br />\n";
-			echo "<br />==================================================<br />";
+			echo "<br />==================================================<br />";*/
 
 			$title = $game->{'plainTitle'};
 			$discount = $game->{'discountpercent'};

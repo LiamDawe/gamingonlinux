@@ -21,7 +21,7 @@ foreach ($fetch_config as $config_set)
 
 define('url', $config['path']);
 
-if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST") 
+if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 {
 	if (isset($_FILES['photos2']) && $_FILES['photos2']['error'] == 0)
 	{
@@ -29,37 +29,37 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		{
 			echo '<span class="imgList">Did you select an image? Couldn\'t find one.</span>';
 		}
-			
+
 		else
 		{
 			// check the dimensions
 			$image_info = getimagesize($_FILES['photos2']['tmp_name']);
 			$image_type = $image_info[2];
-					
+
 			list($width, $height, $type, $attr) = $image_info;
 			if ($width < 550 || $height < 250)
-			{	
+			{
 				echo '<span class="imgList">Image was too small, we re-size it automatically for the home-page!</span>';
 				return;
 			}
 
 			// check if its too big
-			if ($_FILES['photos2']['size'] > 120900)
+			if ($_FILES['photos2']['size'] > core::config('max_tagline_image_filesize'))
 			{
 				$image_info = getimagesize($_FILES['photos2']['tmp_name']);
 				$image_type = $image_info[2];
-				if( $image_type == IMAGETYPE_JPEG ) 
+				if( $image_type == IMAGETYPE_JPEG )
 				{
 					$oldImage = imagecreatefromjpeg($_FILES['photos2']['tmp_name']);
 					imagejpeg($oldImage, $_FILES['photos2']['tmp_name'], 90);
-				} 
-					
+				}
+
 				// cannot compress gifs so it's just too big
 				else if( $image_type == IMAGETYPE_GIF )
 				{
 					echo '<span class="imgList">File size too big!</span>';
 					return;
-				} 
+				}
 
 				else if( $image_type == IMAGETYPE_PNG )
 				{
@@ -73,13 +73,13 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				if (filesize($_FILES['photos2']['tmp_name']) > 85900)
 				{
 					// try reducing it some more
-					if( $image_type == IMAGETYPE_JPEG ) 
+					if( $image_type == IMAGETYPE_JPEG )
 					{
 						$oldImage = imagecreatefromjpeg($_FILES['photos2']['tmp_name']);
 						imagejpeg($oldImage, $_FILES['photos2']['tmp_name'], 85);
-							
+
 						clearstatcache();
-							
+
 						// still too big
 						if (filesize($_FILES['photos2']['tmp_name']) > 85900)
 						{
@@ -87,7 +87,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 							return;
 						}
 					}
-						
+
 					// gif so can't reduce it
 					else
 					{
@@ -102,21 +102,21 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			{
 				echo '<span class="imgList">That was not an image!</span>';
 				return;
-			}	
+			}
 		}
-			
+
 		$image_info = getimagesize($_FILES['photos2']['tmp_name']);
 		$image_type = $image_info[2];
 		$file_ext = '';
-		if( $image_type == IMAGETYPE_JPEG ) 
+		if( $image_type == IMAGETYPE_JPEG )
 		{
 			$file_ext = 'jpg';
-		} 
-					
+		}
+
 		else if( $image_type == IMAGETYPE_GIF )
 		{
 			$file_ext = 'gif';
-		} 
+		}
 
 		else if( $image_type == IMAGETYPE_PNG )
 		{
@@ -125,12 +125,12 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 
 		// give the image a random file name
 		$imagename = rand() . 'idgol.' . $file_ext;
-					
+
 		// the actual image
 		$source = $_FILES['photos2']['tmp_name'];
-				
+
 		// where to upload to
-		$target = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/" . $imagename;	
+		$target = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/" . $imagename;
 
 		include($_SERVER['DOCUMENT_ROOT'] . url . 'includes/class_image.php');
 		$image_func = new SimpleImage();
@@ -144,9 +144,9 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			if (isset($_SESSION['uploads_tagline']))
 			{
 				unlink($_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/" . $_SESSION['uploads_tagline']['image_name']);
-				unlink($_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/thumbnails/temp/" . $_SESSION['uploads_tagline']['image_name']);				
+				unlink($_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/thumbnails/temp/" . $_SESSION['uploads_tagline']['image_name']);
 			}
-			
+
 			$_SESSION['uploads_tagline']['image_name'] = $imagename;
 			$_SESSION['uploads_tagline']['image_rand'] = $_SESSION['image_rand'];
 
@@ -159,7 +159,6 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		else
 		{
 			echo '<span class="imgList">There was an error while trying to upload!</span>';
-			
 		}
 	}
 }

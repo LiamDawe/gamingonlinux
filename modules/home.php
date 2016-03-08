@@ -50,7 +50,7 @@ if (isset($_GET['message']))
 
 if (isset($_GET['error']) && $_GET['error'] == 'toomanypicks')
 {
-	$core->message("Sorry there are already " . core::config('editor_picks_limit') " articles set as editor picks!", NULL, 1);
+	$core->message("Sorry there are already " . core::config('editor_picks_limit') . " articles set as editor picks!", NULL, 1);
 }
 
 $templating->merge('home');

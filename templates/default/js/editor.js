@@ -222,9 +222,8 @@ function OctusEditor(editorPath) {
 	 */
     function quote(text, name) {
         var field   = document.querySelector('#' + masterEditor + ' .textarea textarea'),
-            content = text;
 
-        content = "[quote=" + name + "]" + content;
+        content = "[quote=" + name + "]" + text;
         content += "[/quote]";
 
         field.value += content;

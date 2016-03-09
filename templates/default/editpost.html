@@ -1,9 +1,15 @@
-[block: topic]
-			<!-- edit topic page -->
-				<div class="box"><div class="head">Editing the main topic</div></div>
-[/block: topic]
-
 [block: post]
-			<!-- edit reply page -->
+			<!-- edit forum post -->
 				<div class="box"><div class="head">Editing a forum post</div></div>
+				<form method="post">
 [/block: post]
+
+[block: edit_top]
+Topic Title: <input type="text" name="title" value="{:title}" /><br />
+[/block: edit_top]
+
+[block: edit_bottom]
+<button type="submit" name="act" value="Edit" formaction="{:action}">Edit</button>
+<input type="hidden" name="page" value="{:page}" /><input type="hidden" name="topic_id" value="{:topic_id}" />
+</form>
+[/block: edit_bottom]

@@ -182,7 +182,7 @@ else {
 	$sales_link = url . 'sales.php';
 	$forum_link = url . 'index.php?module=forum';
 	$contact_link = url . 'index.php?module=contact';
-	$submit_a = url . 'index.php?module=articles&view=Submit';
+	$submit_a = url . 'index.php?module=submit_article&view=Submit';
 	if (isset($_SESSION['user_group']))
 	{
 		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)

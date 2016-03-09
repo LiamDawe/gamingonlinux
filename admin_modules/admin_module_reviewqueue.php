@@ -156,8 +156,10 @@ else
 			$editor_disabled = 1;
 
 			$preview_action = 'formaction="admin.php?module=comments&aid=' . $_GET['aid'] . '"';
+			$preview_text = 'Preview & Comments';
 		}
 		$preview_action = 'formaction="/admin.php?module=preview"';
+		$preview_text = 'Preview & Edit More';
 	}
 	// if it's not locked, no editing
 	else if ($article['locked'] == 0)
@@ -167,6 +169,7 @@ else
 		$editor_disabled = 1;
 
 		$preview_action = 'formaction="admin.php?module=comments&aid=' . $_GET['aid'] . '"';
+		$preview_text = 'Preview & Comments';
 	}
 
 	$lock_button = '';
@@ -295,6 +298,7 @@ Full Image Url: <a href=\"{$config['path']}uploads/articles/tagline_images/{$art
 	$templating->set('subscribe_box', $subscribe_check);
 
 	$templating->set('preview_action', $preview_action);
+	$templating->set('preview_text', $preview_text);
 
 	$templating->set('article_id', $article['article_id']);
 	$templating->set('author_id', $article['author_id']);
@@ -326,110 +330,6 @@ Full Image Url: <a href=\"{$config['path']}uploads/articles/tagline_images/{$art
 	$templating->block('edit_history', 'admin_modules/admin_articles_sections/admin_review');
 	$templating->set('history', $history);
 	$templating->block('edit_bottom_history', 'admin_modules/admin_articles_sections/admin_review');
-
-	$templating->block('comments_top', 'admin_modules/admin_articles_sections/admin_review');
-
-	/*
-	EDITOR COMMENTS
-	*/
-
-	$db->sqlquery("SELECT a.*, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.desura, u.steam, u.twitter_on_profile, u.website FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, 9", array($_GET['aid'], $core->start));
-	while ($comments = $db->fetch())
-	{
-		// make date human readable
-		$date = $core->format_date($comments['time_posted']);
-
-		if ($comments['author_id'] == 0)
-		{
-			$username = $comments['guest_username'];
-			$quote_username = $comments['guest_username'];
-		}
-		else
-		{
-			$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
-			$quote_username = $comments['username'];
-		}
-
-		// sort out the avatar
-		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-		if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
-		{
-			$comment_avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=http://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-		}
-
-		// either uploaded or linked an avatar
-		else
-		{
-			$comment_avatar = $comments['avatar'];
-			if ($comments['avatar_uploaded'] == 1)
-			{
-				$comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-			}
-		}
-
-		$editor_bit = '';
-		// check if editor or admin
-		if ($comments['user_group'] == 1 || $comments['user_group'] == 2)
-		{
-			$editor_bit = "<span class=\"label label-success\">Editor</span><br />";
-		}
-
-		$templating->merge('admin_modules/admin_module_comments');
-		$templating->block('review_comments', 'admin_modules/admin_module_comments');
-		$templating->set('user_id', $comments['author_id']);
-		$templating->set('username', $username);
-		$templating->set('plain_username', $quote_username);
-		$templating->set('editor', $editor_bit);
-		$templating->set('comment_avatar', $comment_avatar);
-		$templating->set('date', $date);
-		$templating->set('text', bbcode($comments['comment_text'], 0));
-		$templating->set('article_id', $_GET['aid']);
-		$templating->set('comment_id', $comments['comment_id']);
-	}
-
-	$templating->block('bottom', 'admin_modules/admin_articles_sections/admin_review');
-
-	if (isset($_GET['error']))
-	{
-		if ($_GET['error'] == 'emptycomment')
-		{
-			$core->message('You cannot post an empty comment dummy!', NULL, 1);
-		}
-		if ($_GET['error'] == 'doublecomment')
-		{
-			$core->message('You cannot post the same comment again dummy!', NULL, 1);
-		}
-	}
-
-	// find if they have auto subscribe on
-	$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-	$subscribe_info = $db->fetch();
-
-	$subscribe_check = '';
-	if ($subscribe_info['auto_subscribe'] == 1)
-	{
-		$subscribe_check = 'checked';
-	}
-
-	$subscribe_email_check = '';
-	if ($subscribe_info['auto_subscribe_email'] == 1)
-	{
-		$subscribe_email_check = 'checked';
-	}
-
-	$templating->set('subscribe_check', $subscribe_check);
-	$templating->set('subscribe_email_check', $subscribe_email_check);
-
-	$comment = '';
-	if (isset($_SESSION['acomment']))
-	{
-		$comment = $_SESSION['acomment'];
-	}
-	$templating->set('comment', $comment);
-
-	$core->editor('text', $comment, $config['path'] .'admin.php?module=reviewqueue&aid=' . $_GET['aid'], null, 'editor_comments');
-
-	$templating->block('form_bottom', 'admin_modules/admin_module_comments');
 }
 
 if (isset($_POST['act']))

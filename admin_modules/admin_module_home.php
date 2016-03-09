@@ -34,7 +34,7 @@ if (!isset($_GET['view']))
 			$comment_text = bbcode($comments['text'], 0, 1);
 			$date = $core->format_date($comments['date_posted']);
 
-			$templating->set('admin_comments', "<a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a> - <li>{$date}<br /> {$comment_text}</li>");
+			$templating->set('admin_comments', "<li><a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a> - {$date}<br /> {$comment_text}</li>");
 		}
 
 		$templating->block('comments_bottom', 'admin_modules/admin_home');

@@ -1220,7 +1220,7 @@ else if (isset($_POST['act']))
 				$show = 1;
 			}
 
-			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `page2` = ?, `page3` = ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $text2, $text3, $block, $show, $_POST['article_id']));
+			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, $show, $_POST['article_id']));
 
 			$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
 
@@ -1452,7 +1452,7 @@ else if (isset($_POST['act']))
 				$block = 1;
 			}
 
-			$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `page2` = ?, `page3` = ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $tagline, $text, $text2, $text3, $block, $_POST['article_id']));
+			$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $tagline, $text, $block, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
 				{

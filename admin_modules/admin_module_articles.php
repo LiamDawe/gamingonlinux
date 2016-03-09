@@ -553,6 +553,7 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 				$active = 0;
 				$paginate_link = "admin.php?module=articles&view=manage&category=inactive&";
 				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, a.article_top_image, a.article_top_image_filename, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
+				$count_query = "SELECT `article_id` FROM `articles` WHERE `active` = 0 AND `admin_review` = 0 AND `draft` = 0 AND `submitted_unapproved` = 0";
 			}
 
 			else if ($_GET['category'] == 'all')
@@ -560,15 +561,16 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 				$active = 1;
 				$paginate_link = "admin.php?module=articles&view=manage&category=all&";
 				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, a.article_top_image, a.article_top_image_filename, u.username FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
+				$count_query = "SELECT `article_id` FROM `articles`";
 			}
 
 			// count how many there is in total
-			$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `active` = {$active}");
+			$db->sqlquery($count_query);
 			$total = $db->num_rows();
 
 			if ($total == 0)
 			{
-				$core->message('Category view empty!');
+				$core->message('Category empty!');
 			}
 
 			else

@@ -90,32 +90,6 @@
 	<div class="body group">
 [/block: comments_top]
 
-[block: review_comments]
-						<div id="r{:comment_id}" class="comment group">
-							<div class="comment-meta group">
-								<div class="comment-post">
-									{:username} commented <abbr title="{:tzdate}" class="timeago">on {:date}</abbr>
-								</div>
-								<div class="comment-actions">
-									<ul>
-										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:comment_id},{:plain_username}"><span class="icon quote">Quote</span></a></li>
-									</ul>
-								</div>
-							</div>
-							<div class="comment-author">
-								<img class="avatar" alt="" src="{:comment_avatar}" />
-								<ul class="comment-social">
-								</ul>
-							</div>
-							<div id="{:comment_id}" class="comment-body">
-								<div id="{:comment_id}">
-									<p>{:text}</p>
-								</div>
-								<div class="comment-quote">{:text_plain}</div>
-							</div>
-						</div>
-[/block: review_comments]
-
 [block: bottom]
 	</div>
 </div>

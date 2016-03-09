@@ -374,7 +374,8 @@ Full Image Url: <a href=\"{$config['path']}uploads/articles/tagline_images/{$art
 			$editor_bit = "<span class=\"label label-success\">Editor</span><br />";
 		}
 
-		$templating->block('review_comments', 'admin_modules/admin_articles_sections/admin_review');
+		$templating->merge('admin_modules/admin_module_comments');
+		$templating->block('review_comments', 'admin_modules/admin_module_comments');
 		$templating->set('user_id', $comments['author_id']);
 		$templating->set('username', $username);
 		$templating->set('plain_username', $quote_username);
@@ -426,16 +427,10 @@ Full Image Url: <a href=\"{$config['path']}uploads/articles/tagline_images/{$art
 	}
 	$templating->set('comment', $comment);
 
-			$buttons = '<label class="checkbox">
-			<input type="checkbox" name="subscribe" '. $subscribe_check . ' /> <strong>Subscribe to article to receive comment replies</strong>
-			</label>
-			<label class="checkbox">
-			<input type="checkbox" name="emails" ' . $subscribe_email_check . ' /> <strong>Receive comment replies via email?</strong>
-			</label>
-			<button type="submit" name="act" value="comment" class="btn btn-primary">Post Comment</button>';
+	$core->editor('text', $comment, $config['path'] .'admin.php?module=reviewqueue&aid=' . $_GET['aid'], null, 'editor_comments');
 
-			$core->editor('text', $comment, $buttons, $config['path'] .'admin.php?module=reviewqueue&aid=' . $_GET['aid'], null, 'editor_comments');
-		}
+	$templating->block('form_bottom', 'admin_modules/admin_module_comments');
+}
 
 if (isset($_POST['act']))
 {

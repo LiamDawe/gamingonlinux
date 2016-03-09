@@ -18,14 +18,16 @@ if (!isset($_GET['aid']))
 		}
 	}
 
-	if (isset($_GET['error']) && $_GET['error'] == 'doesntexist')
+	if (isset($_GET['error']))
 	{
-		$core->message('Article doesn\'t exist, someone must have gotten to it first!', NULL, 1);
-	}
-
-	if (isset($_GET['error']) && $_GET['error'] == 'alreadyapproved')
-	{
-		$core->message('Article already approved, someone must have gotten to it first!');
+		if ($_GET['error'] == 'doesntexist')
+		{
+			$core->message('Article doesn\'t exist, someone must have gotten to it first!', NULL, 1);
+		}
+		if ($_GET['error'] == 'alreadyapproved')
+		{
+			$core->message('Article already approved, someone must have gotten to it first!');
+		}
 	}
 
 	$templating->block('review_top', 'admin_modules/admin_articles_sections/admin_review');

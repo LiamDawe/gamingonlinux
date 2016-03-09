@@ -83,6 +83,9 @@ function quotes($body)
 
 function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 {
+	//  get rid of empty BBCode, is there a point in having excess markup?
+	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
+	
 	// Array for tempory storing codeblock contents
 	$codeBlocks = [];
 
@@ -204,9 +207,6 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 
 		$body = preg_replace($find, $replace, $body);
 	}
-
-	//  get rid of empty BBCode, is there a point in having excess markup?
-	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
 
 	$find = array(
         "/\[url\=(.+?)\](.+?)\[\/url\]/is",

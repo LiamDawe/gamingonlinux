@@ -2,14 +2,13 @@
 <div class="box">
 	<div class="head">Managing Article Submissions</div>
 	<div class="body group">
-	<strong>ALL EDITORS MAKE SURE YOU READ!</strong> Last amended 04th May 2014.<br />
-	Here you can Approve or Delete submitted articles, submitted articles posted date will update to right now so they show up at the top of the articles list so it doesn't matter when you approve them.<br />
-	<br />
-	Approved articles will retained the submitters name not the person who approve's it.<br />
-	<br />
-	<strong>Titles: </strong>Make sure titles are more than 1 or 2 words long, are descriptive and make sense. A game's title is not enough. Must be at least 10 characters. No question marks in titles.<br />
-	<strong>Taglines: </strong>At least 100 characters long, no longer than the tagline image. Make sure no information is in the tagline that isn't in the main article!
-	<strong>Tagline images: </strong>All articles MUST have a tagline image.</div>
+		Here you can Approve or Delete submitted articles, submitted articles posted date will update to right now so they show up at the top of the articles list so it doesn't matter when you approve them.<br />
+		<br />
+		Approved articles will retained the submitters name not the person who approves it.<br />
+		<br />
+		<strong>Titles: </strong>Make sure titles are more than 1 or 2 words long, are descriptive and make sense. A game's title is not enough. Must be at least 10 characters.<br />
+		<strong>Taglines: </strong>Make sure no information is in the tagline that isn't in the main article!
+	</div>
 </div>
 [/block: submitted_top]
 
@@ -90,7 +89,7 @@
 		<label class="checkbox">
 			<input type="checkbox" name="submit_as_self" {:self_check}/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em>
 		</label>
-		<button type="submit" name="act" value="Approve" {:edit_state}/>Approve</button> <button type="submit" name="act" value="Edit_Submitted" class="btn btn-primary" {:edit_state}>Edit</button> <button type="submit" name="act" value="Deny" {:edit_state}/>Deny</button> <button type="submit" value="Preview_Submitted" {:preview_action} name="act" class="btn btn-info">Preview Submitted Article</button>
+		<button type="submit" name="act" value="Approve" {:edit_state}/>Approve & Publish Now</button> <button type="submit" name="act" value="Edit_Submitted" class="btn btn-primary" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Deny" {:edit_state}/>Deny</button> <button type="submit" value="Preview_Submitted" {:preview_action} name="act" class="btn btn-info">Preview Submitted Article & Edit More</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />
 		<input type="hidden" name="check" value="Submitted" />
 		<input type="hidden" name="author_id" value="{:author_id}" />

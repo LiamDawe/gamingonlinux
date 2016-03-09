@@ -170,11 +170,20 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 		$body = preg_replace($find, $replace, $body);
 	}
 
-	// remove the new line after quotes, stop massive spacing
-	$body = str_replace("[/quote]\r\n", '[/quote]', $body);
+	// remove extra new lines, caused by editors adding a new line after bbcode elements for easier reading when editing
+	$find_lines = array(
+		"/\[\/quote\]\r\n/is",
+		"/\[ul\]\r\n/is",
+		"/\[youtube\](.+?)\[\/youtube\]\r\n/is"
+	);
 
-	// stop lists having a big gap at the top
-	$body = str_replace("[ul]\r\n", '[ul]', $body);
+	$replace_lines = array(
+		"[/quote]",
+		'[ul]',
+		"[youtube]$1[/youtube]"
+	);
+
+	$body = preg_replace($find_lines, $replace_lines, $body);
 
 	$body = quotes($body);
 

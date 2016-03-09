@@ -212,29 +212,36 @@ jQuery(document).ready(function()
     });
 	});
 
-  $(".likebutton").click(function(){
+    $(".likebutton").click(function(){
     //Get our comment
     var comment = $(this).parents('.comment')[0];
     //Get the comment ID
     var sid = comment.id.slice(1);
     //Send of a like (needs a like/dislike check)
       var $that = $(this);
-      $.post('//www.gamingonlinux.com/includes/like.php', {
+      $.post('/includes/like.php', {
        sid: sid,
        sta: $that.find("span").text().toLowerCase()
       }, function (returndata){
-        if(returndata === "1"){
+        if(returndata === "liked")
+        {
           var likeobj = $("#"+sid+" div.likes");
           var numlikes = likeobj.html().replace(" Likes","");
           numlikes = parseInt(numlikes) + 1;
           likeobj.html(numlikes + " Likes");
           var button = $(comment).find(".likebutton span");
-          if ($that.find("span").text().toLowerCase() == 'like') {
-            button.text("Unlike").removeClass("like").addClass("unlike");
-          } else {
-            button.text("Like").removeClass("unlike").addClass("like");
-          }
-        } else if ( returndata === "4" ) {
+          button.text("Unlike").removeClass("like").addClass("unlike");
+      }
+      else if(returndata === "unliked")
+      {
+          var likeobj = $("#"+sid+" div.likes");
+          var numlikes = likeobj.html().replace(" Likes","");
+          numlikes = parseInt(numlikes) - 1;
+          likeobj.html(numlikes + " Likes");
+          var button = $(comment).find(".likebutton span");
+          button.text("Like").removeClass("unlike").addClass("like");
+      }
+      else if ( returndata === "5" ) {
           $that.qtip({
             content: {
               text: 'You need to be <a href="/index.php?module=login">logged in</a> to like a post. Or <a href="/index.php?module=register">register</a> to become a GOL member'

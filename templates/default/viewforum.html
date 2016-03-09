@@ -6,7 +6,7 @@
 					</ul>
 					<div class="box">
 						<div class="head">{:forum_name}</div>
-						<div class="subhead">{:new_topic_link}</div>	
+						<div class="subhead">{:new_topic_link}</div>
 					</div>
 					<table class="table table-bordered">
 [/block: main_top]
@@ -14,7 +14,7 @@
 [block: post_row]
 	<tr>
 		<td width="30px" id="forum-post" class="forum_cell"><img src="{:topic_pip}" width="30px" height="30px" alt="pip" /></td>
-		<td width="455px" id="forum-post" class="forum_cell"><div>{:is_locked} {:is_sticky} <a href="/forum/topic/{:topic_id}">{:post_title}</a></div> {:pagination_post}
+		<td width="455px" id="forum-post" class="forum_cell"><div>{:is_locked} {:is_sticky} <a href="{:topic_link}">{:post_title}</a></div> {:pagination_post}
 		by <a href="/profiles/{:author_id}"><span class="glyphicon glyphicon-user"></span> {:post_author}</a> on {:post_date}<br />
 		Replies: {:post_replys} Views: {:post_views}</td>
 		<td width="25px" id="forum-post" class="forum_cell"><img src="/templates/default/images/last_post.png" alt="" /></td>

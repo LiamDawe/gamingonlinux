@@ -73,7 +73,7 @@ else
 	$pagination = $core->pagination_link(9, $total_pages, "/forum/{$forum_id}/", $page);
 
 	// get the posts for this forum
-	$db->sqlquery("SELECT t.*, u.`username`, u.avatar, u.gravatar_email, u.avatar_gravatar, u.avatar_uploaded, u2.`username` as `username_last`, u2.`user_id` as `user_id_last` FROM `forum_topics` t LEFT JOIN `users` u ON t.`author_id` = u.`user_id` LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id` WHERE t.`forum_id`= ? AND t.approved = 1 ORDER BY t.is_sticky DESC, t.`last_post_date` DESC LIMIT ?, 9", array($forum_id, $core->start));
+	$db->sqlquery("SELECT t.*, u.`username`, u.`avatar`, u.`gravatar_email`, u.`avatar_gravatar`, u.`avatar_uploaded`, u2.`username` as `username_last`, u2.`user_id` as `user_id_last` FROM `forum_topics` t LEFT JOIN `users` u ON t.`author_id` = u.`user_id` LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id` WHERE t.`forum_id`= ? AND t.approved = 1 ORDER BY t.is_sticky DESC, t.`last_post_date` DESC LIMIT ?, 9", array($forum_id, $core->start));
 	while ($post = $db->fetch())
 	{
 		$pagination_post = '';
@@ -94,7 +94,14 @@ else
 			{
 				for ($i = 1; $i <= $lastpage; $i++)
 				{
-					$pages[] = " <li><a href=\"/forum/topic/{$post['topic_id']}/page={$i}\">$i</a></li>";
+					if (core::config('pretty_urls') == 1)
+					{
+						$pages[] = " <li><a href=\"/forum/topic/{$post['topic_id']}/page={$i}\">$i</a></li>";
+					}
+					else
+					{
+						$pages[] = " <li><a href=\"/index.php?module=viewtopic&amp;topic_id={$post['topic_id']}&amp;page={$i}\">$i</a></li>";
+					}
 				}
 
 				$pagination_post = "<div class=\"fleft\"><ul class=\"pagination\">" . implode(' ', $pages) . "</ul></div><div class=\"clearer\"></div>";
@@ -135,6 +142,17 @@ else
 		$templating->set('is_locked', $locked);
 
 		$templating->set('topic_pip', $topic_pip);
+
+		if (core::config('pretty_urls') == 1)
+		{
+			$topic_link = "/forum/topic/{$post['topic_id']}";
+		}
+		else
+		{
+			$topic_link = "/index.php?module=viewtopic&amp;topic_id={$post['topic_id']}";
+		}
+
+		$templating->set('topic_link', $topic_link);
 		$templating->set('topic_id', $post['topic_id']);
 		$templating->set('post_title', $post['topic_title']);
 		$templating->set('author_id', $post['author_id']);

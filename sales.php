@@ -220,7 +220,7 @@ else if (isset($_GET['order']) && $_GET['order'] == 'asc')
 }
 
 $templating->block('main2', 'sales');
-$templating->set('url', $config['path']);
+$templating->set('url', $config['website_url']);
 
 $db->sqlquery("SELECT DISTINCT(`info`) FROM `game_sales`");
 $total_count = $db->num_rows();
@@ -640,7 +640,7 @@ while ($list = $db->fetch())
 }
 
 $templating->block('bottom', 'sales');
-$templating->set('url', $config['path']);
+$templating->set('url', $config['website_url']);
 
 // get providers
 $providers_list = '';

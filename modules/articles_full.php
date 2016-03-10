@@ -463,7 +463,6 @@ if (!isset($_GET['go']))
 						$templating->block('article_comments', 'articles_full');
 						$templating->set('user_id', $comments['author_id']);
 						$templating->set('username', $into_username . $username);
-						$templating->set('plain_username', $quote_username);
 						$templating->set('editor', $editor_bit);
 						$templating->set('comment_avatar', $comment_avatar);
 						$templating->set('date', $comment_date);
@@ -476,7 +475,6 @@ if (!isset($_GET['go']))
 						}
 
 						$templating->set('text', bbcode($comments['comment_text'] . $last_edited, 0));
-						$templating->set('text_plain', htmlspecialchars($comments['comment_text'], ENT_QUOTES));
 						$templating->set('article_id', $_GET['aid']);
 						$templating->set('comment_id', $comments['comment_id']);
 
@@ -487,27 +485,32 @@ if (!isset($_GET['go']))
 
 						$templating->set('total_likes', $total_likes);
 
-						$like_text = "Like";
-						$like_class = "like";
-						if ($_SESSION['user_id'] != 0)
+						$logged_in_options = '';
+						if ($_SESSION['user_group'] != 4)
 						{
-							// Checks current login user liked this status or not
-							$qnumlikes = $db->sqlquery("SELECT `like_id` FROM likes WHERE user_id = ? AND comment_id = ?", array($_SESSION['user_id'], $comments['comment_id']));
-							$numlikes = $db->num_rows();
+							$like_text = "Like";
+							$like_class = "like";
+							if ($_SESSION['user_id'] != 0)
+							{
+								// Checks current login user liked this status or not
+								$qnumlikes = $db->sqlquery("SELECT `like_id` FROM likes WHERE user_id = ? AND comment_id = ?", array($_SESSION['user_id'], $comments['comment_id']));
+								$numlikes = $db->num_rows();
 
-							if ($numlikes == 0)
-							{
-								$like_text = "Like";
-								$like_class = "like";
+								if ($numlikes == 0)
+								{
+									$like_text = "Like";
+									$like_class = "like";
+								}
+								else if ($numlikes >= 1)
+								{
+									$like_text = "Unlike";
+									$like_class = "unlike";
+								}
 							}
-							else if ($numlikes >= 1)
-							{
-								$like_text = "Unlike";
-								$like_class = "unlike";
-							}
+							$logged_in_options = $templating->block_store('logged_in_options', 'articles_full');
+							$logged_in_options = $templating->store_replace($logged_in_options, array('plain_username'=> $quote_username,'text_plain'=>htmlspecialchars($comments['comment_text'], ENT_QUOTES), 'like_text'=>$like_text, 'like_class'=>$like_class));
 						}
-						$templating->set('like_text', $like_text);
-						$templating->set('like_class', $like_class);
+						$templating->set('logged_in_options', $logged_in_options);
 
 						$donator_badge = '';
 

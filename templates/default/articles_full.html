@@ -77,8 +77,7 @@
 										{:report_link}
 										{:edit} {:delete}
 										<li><a class="tooltip-top" href="#{:comment_id}" title="Link to this comment"><span class="icon link">Link</span></a></li>
-										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:plain_username}" data-comment="{:text_plain}"><span class="icon quote">Quote</span></a></li>
-										<li><a class="likebutton tooltip-top" title="Like"><span class="icon {:like_class}">{:like_text}</span></a></li>
+										{:logged_in_options}
 									</ul>
 								</div>
 							</div>
@@ -101,6 +100,11 @@
 							</div>
 						</div>
 [/block: article_comments]
+
+[block: logged_in_options]
+<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:plain_username}" data-comment="{:text_plain}"><span class="icon quote">Quote</span></a></li>
+<li><a class="likebutton tooltip-top" title="Like"><span class="icon {:like_class}">{:like_text}</span></a></li>
+[/block: logged_in_options]
 
 [block: bottom]
 					</div>

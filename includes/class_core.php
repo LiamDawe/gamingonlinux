@@ -956,7 +956,7 @@ class core
 
 		$templating->merge('editor');
 		$templating->block('editor');
-		$templating->set('url', $config['path']);
+		$templating->set('url', $this->config('website_url'));
 		$templating->set('name', $name);
 		$templating->set('content', $content);
 		$templating->set('anchor_name', $anchor_name);

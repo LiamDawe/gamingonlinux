@@ -5,7 +5,7 @@ $text3 = trim($_POST['text3']);
 
 $title = strip_tags($_POST['title']);
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `page2` = ?, `page3` = ?, `show_in_menu` = 0, `active` = 0, `draft` = 1, `date` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, $text2, $text3, $core->date));
+$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `draft` = 1, `date` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, $core->date));
 
 $article_id = $db->grab_id();
 
@@ -41,8 +41,6 @@ if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_r
 unset($_SESSION['atitle']);
 unset($_SESSION['atagline']);
 unset($_SESSION['atext']);
-unset($_SESSION['atext2']);
-unset($_SESSION['atext3']);
 unset($_SESSION['acategories']);
 unset($_SESSION['uploads_tagline']);
 unset($_SESSION['image_rand']);

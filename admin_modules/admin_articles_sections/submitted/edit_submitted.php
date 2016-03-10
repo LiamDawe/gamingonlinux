@@ -89,5 +89,5 @@ else
 	unset($_SESSION['uploads_tagline']);
 	unset($_SESSION['image_rand']);
 
-	header("Location: {$config['path']}admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&message=editdone");
+	header("Location: {$config['website_url']}admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&message=editdone");
 }

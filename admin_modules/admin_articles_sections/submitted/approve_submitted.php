@@ -249,10 +249,10 @@ else
 
 		if (!isset($_POST['show_block']))
 		{
-			header("Location: {$config['path']}admin.php?module=articles&view=Submitted&accepted");
+			header("Location: {$config['website_url']}admin.php?module=articles&view=Submitted&accepted");
 		}
 		else {
-			header("Location: {$config['path']}admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
+			header("Location: {$config['website_url']}admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 		}
 
 

@@ -155,10 +155,10 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 				<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 				</head>
 				<body>
-				<img src=\"{$config['path']}/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+				<img src=\"{$config['website_url']}templates/default/images/logo.png\" alt=\"Gaming On Linux\">
 				<br />
 				<p>Hello <strong>{$email_user['username']}</strong>,</p>
-				<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"{$config['path']}/admin.php?module=articles&view=adminreview&aid={$article_id}\">{$title}</a></strong>\".</p>
+				<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"{$config['website_url']}admin.php?module=articles&view=adminreview&aid={$article_id}\">{$title}</a></strong>\".</p>
 				</body>
 				</html>
 				";

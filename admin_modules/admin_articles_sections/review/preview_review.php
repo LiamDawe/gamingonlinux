@@ -73,22 +73,22 @@ $tagline = $_POST['tagline'];
 $top_image = '';
 if (isset($article) && $article['article_top_image'] == 1)
 {
-	$top_image = "<img src=\"{$config['path']}/uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\"><br />";
-	$top_image_nobbcode = "<img src=\"{$config['path']}uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\">";
+	$top_image = "<img src=\"{$config['website_url']}uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\"><br />";
+	$top_image_nobbcode = "<img src=\"{$config['website_url']}uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\">";
 }
 		if (!empty($article['tagline_image']))
 		{
-			$top_image = "<img src=\"{$config['path']}/uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\"><br />
+			$top_image = "<img src=\"{$config['website_url']}uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\"><br />
 			BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />";
-			$top_image_nobbcode = "<img src=\"{$config['path']}/uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
+			$top_image_nobbcode = "<img src=\"{$config['website_url']}uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
 			$top_image_delete = " <button class=\"red-button\" name=\"act\" value=\"deletetopimage\">Delete Tagline Image</button>";
 		}
 
 		$tagline_bbcode = '';
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{
-			$top_image_nobbcode = "<img src=\"{$config['path']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\">";
-			$top_image = "<img src=\"{$config['path']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+			$top_image_nobbcode = "<img src=\"{$config['website_url']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\">";
+			$top_image = "<img src=\"{$config['website_url']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 			BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
 			$tagline_bbcode = '/temp/' . $_SESSION['uploads_tagline']['image_name'];
 		}
@@ -128,7 +128,7 @@ if (isset($article) && $article['article_top_image'] == 1)
 		// this bit is for the final form
 		$templating->merge('admin_modules/article_form');
 		$templating->block('full_editor', 'admin_modules/article_form');
-		$templating->set('main_formaction', '<form id="form" method="post" action="'.$config['path'].'admin.php?module=articles&edit" enctype="multipart/form-data">');
+		$templating->set('main_formaction', '<form id="form" method="post" action="'.$config['website_url'].'admin.php?module=articles&edit" enctype="multipart/form-data">');
 
 		// get categorys
 		$categories_list = '';
@@ -181,7 +181,7 @@ if (isset($article) && $article['article_top_image'] == 1)
 		foreach($article_images as $value)
 		{
 			$previously_uploaded .= "<div class=\"col-md-12\" id=\"{$value['id']}\"><img src=\"/uploads/articles/article_images/{$value['filename']}\" class='imgList'><br />
-			BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]{$config['path']}/uploads/articles/article_images/{$value['filename']}[/img]\" />
+			BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]{$config['website_url']}uploads/articles/article_images/{$value['filename']}[/img]\" />
 			<a href=\"#\" id=\"{$value['id']}\" class=\"trash\">Delete Image</a></div>";
 		}
 

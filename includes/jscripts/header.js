@@ -332,7 +332,7 @@ jQuery(document).ready(function()
 	$('#editor_content2').val($('#editor_content2').val() + text);
   });
 
-  $('#preview_pm_button').click(function() {
+  $('#preview_text_button').click(function() {
   var text = $('#editor_content').val();
   $('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
   $('.preview_pm').show();

@@ -667,6 +667,8 @@ if (!isset($_GET['go']))
 								$templating->set('subsribe_check', $subscribe_check);
 								$templating->set('subscribe_email_check', $subscribe_email_check);
 								$templating->set('aid', $_GET['aid']);
+
+								$templating->block('preview', 'articles_full');
 							}
 						}
 					}
@@ -693,72 +695,7 @@ if (!isset($_GET['go']))
 		$templating->set_previous('meta_description', 'Editing a comment on GamingOnLinux', 1);
 		$templating->set_previous('title', 'Editing a comment', 1);
 
-		if (isset($_GET['preview']))
-		{
-			$templating->block('preview_top', 'articles_full');
-			$templating->block('preview', 'articles_full');
-
-			$templating->set('username', $_SESSION['username']);
-
-			$templating->set('editor', '');
-			$templating->set('edit', '');
-			$templating->set('delete', '');
-			$templating->set('report_spam', '');
-			$templating->set('comment_id', '');
-
-			$date = $core->format_date($comment['time_posted']);
-
-			$templating->set('date', $date);
-			$templating->set('tzdate', date('c',$comment['time_posted']) ); //piratelv timeago
-
-			$steam = "<img src=\"/templates/default/images/steam.png\" alt=\"steam\" />";
-			$website = "<i class=\"icon-globe\"></i>";
-
-			$templating->set('steam', $steam);
-			$templating->set('website', $website);
-
-			$templating->set('text_preview', bbcode($_POST['text']));
-
-			// avatar
-			if ($comment['author_id'] != 0)
-			{
-				$db->sqlquery("SELECT `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($comment['author_id']), 'articles_full.php');
-				$comments = $db->fetch();
-
-				// sort out the avatar
-				// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-				if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
-				{
-					$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=//www.gamingonlinux.com/uploads/avatars/no_avatar.png&size=125";
-				}
-
-				// either uploaded or linked an avatar
-				else
-				{
-					$comment_avatar = $comments['avatar'];
-					if ($comments['avatar_uploaded'] == 1)
-					{
-						$comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-					}
-				}
-			}
-
-			else
-			{
-				$comment_avatar = core::config('website_url') . '/uploads/avatars/no_avatar.png';
-			}
-
-			$templating->set('comment_avatar', $comment_avatar);
-		}
-
-		if (isset($_GET['preview']))
-		{
-			$comment_text = $_POST['text'];
-		}
-		else
-		{
-			$comment_text = $comment['comment_text'];
-		}
+		$comment_text = $comment['comment_text'];
 
 		if (isset($_GET['error']))
 		{
@@ -777,8 +714,10 @@ if (!isset($_GET['go']))
 
 		$templating->block('edit_comment_buttons', 'articles_full');
 		$templating->set('comment_id', $comment['comment_id']);
-		$templating->set('path', core::config('path'));
+		$templating->set('url', core::config('website_url'));
 		$templating->set('page', $page);
+
+		$templating->block('preview', 'articles_full');
 	}
 }
 
@@ -1025,115 +964,6 @@ else if (isset($_GET['go']))
 					}
 				}
 			}
-		}
-	}
-
-	if ($_GET['go'] == 'preview')
-	{
-		if (empty($_POST['text']))
-		{
-			$db->sqlquery("SELECT a.`title` FROM `articles` a WHERE `article_id` = ?", array($_POST['aid']), 'articles_full.php');
-			$comment = $db->fetch();
-
-			$nice_title = $core->nice_title($comment['title']);
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: /articles/$nice_title.{$_POST['aid']}/error=emptycomment#commentbox");
-			}
-			else {
-				header("Location: ".url."index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
-			}
-
-		}
-
-		else
-		{
-			$templating->block('preview', 'articles_full');
-			$templating->set_previous('meta_description', 'Previewing a comment on GamingOnLinux.com', 1);
-			$templating->set_previous('title', ' - Previewing comment', 1);
-
-			if ($_SESSION['user_id'] == 0)
-			{
-				$username = $_POST['guest_name'];
-			}
-
-			else
-			{
-				$username = $_SESSION['username'];
-			}
-
-			$templating->set('username', $username);
-
-			$templating->set('editor', '');
-			$templating->set('edit', '');
-			$templating->set('delete', '');
-			$templating->set('report_spam', '');
-			$templating->set('comment_id', '');
-
-			$date = $core->format_date($core->date);
-
-			$templating->set('date', $date);
-
-			$steam = "<img src=\"/templates/default/images/steam.png\" alt=\"steam\" />";
-			$website = "<i class=\"icon-globe\"></i>";
-			$twitter = "<img src=\"/templates/default/images/twitter.gif\" alt=\"twitter\" />";
-
-			$templating->set('steam', $steam);
-			$templating->set('website', $website);
-			$templating->set('twitter', $twitter);
-
-			$text_preview = trim($_POST['text']);
-			$text_preview = htmlspecialchars($text_preview);
-			$templating->set('text_preview', bbcode($text_preview));
-
-			// avatar
-			$db->sqlquery("SELECT `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']), 'articles_full.php');
-			$comments = $db->fetch();
-
-			// sort out the avatar
-			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-			if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
-			{
-				$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=//www.gamingonlinux.com/uploads/avatars/no_avatar.png&size=125";
-			}
-
-			// either uploaded or linked an avatar
-			else
-			{
-				$comment_avatar = $comments['avatar'];
-				if ($comments['avatar_uploaded'] == 1)
-				{
-					$comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-				}
-			}
-
-			$templating->set('comment_avatar', $comment_avatar);
-
-			// find if they have auto subscribe on
-			$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']), 'articles_full.php');
-			$subscribe_info = $db->fetch();
-
-			$subscribe_check = '';
-			if ($subscribe_info['auto_subscribe'] == 1)
-			{
-				$subscribe_check = 'checked';
-			}
-
-			$subscribe_email_check = '';
-			if ($subscribe_info['auto_subscribe_email'] == 1)
-			{
-				$subscribe_email_check = 'checked';
-			}
-
-			$templating->block('comments_box_top', 'articles_full');
-
-			$core->editor('text', $_POST['text']);
-
-			$templating->block('comment_buttons', 'articles_full');
-			$templating->set('path', core::config('path'));
-			$templating->set('subsribe_check', $subscribe_check);
-			$templating->set('subscribe_email_check', $subscribe_email_check);
-			$templating->set('aid', $_POST['aid']);
 		}
 	}
 

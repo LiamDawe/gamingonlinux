@@ -227,7 +227,7 @@ else if (isset($_GET['aid']))
 		}
 	}
 
-	$templating->set('categorys_list', $categorys_list);
+	$templating->set('categories_list', $categorys_list);
 
 	if (empty($article['username']))
 	{

@@ -204,6 +204,18 @@ else
 			}
 
 			$templating->block('view_top', 'private_messages');
+
+			if (core::config('pretty_urls') == 1)
+			{
+				$message_list_link = '/private-messages/';
+			}
+			else
+			{
+				$message_list_link = '/index.php?module=messages';
+			}
+
+			$templating->set('message_list_link', $message_list_link);
+
 			$templating->set('conversation_list', $p_list);
 			$templating->set('form_action', 'index.php?module=messages');
 

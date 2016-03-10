@@ -45,3 +45,14 @@ while ($top_articles = $db->fetch())
 }
 
 $templating->set('top_articles', $hot_articles);
+
+if ($config['pretty_urls'] == 1)
+{
+	$email_link = "/email-us/";
+}
+else
+{
+	$email_link = core::config('website_url') . 'index.php?module=email_us';
+}
+
+$templating->set('email_us_link', $email_us);

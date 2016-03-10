@@ -67,7 +67,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						$_SESSION['uploads'][$image_id]['image_rand'] = $_SESSION['image_rand'];
 					}
 
-					$bbcode = "[img]{$config['path']}uploads/articles/article_images/{$image_name}[/img]";
+					$bbcode = "[img]{$config['website_url']}uploads/articles/article_images/{$image_name}[/img]";
 
 					echo "<div class=\"box\"><div class=\"body group\"><div id=\"{$image_id}\"><img src=\"/uploads/articles/article_images/$image_name\" class='imgList'><br />";
 					echo "BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$image_id}\" class=\"trash\">Delete image</button>";

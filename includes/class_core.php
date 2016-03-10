@@ -478,8 +478,8 @@ class core
 		global $db, $config;
 
 		$types = array('jpg', 'png', 'gif');
-		$full_file_big = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/" . $file;
-		$full_file_thumbnail = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/thumbnails/" . $file;
+		$full_file_big = $this->config('path') . "uploads/articles/tagline_images/temp/" . $file;
+		$full_file_thumbnail = $this->config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $file;
 
 		if (!file_exists($full_file_big))
 		{
@@ -526,7 +526,7 @@ class core
 			$source_thumbnail = $full_file_thumbnail;
 
 			// where to upload to
-			$target_thumbnail = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/thumbnails/" . $imagename;
+			$target_thumbnail = $this->config('path') . "uploads/articles/tagline_images/thumbnails/" . $imagename;
 
 			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail))
 			{
@@ -538,12 +538,12 @@ class core
 				{
 					if ($image['article_top_image'] == 1)
 					{
-						unlink($_SERVER['DOCUMENT_ROOT'] . url . 'uploads/articles/topimages/' . $image['article_top_image_filename']);
+						unlink($this->config('path') . 'uploads/articles/topimages/' . $image['article_top_image_filename']);
 					}
 					if (!empty($image['tagline_image']))
 					{
-						unlink($_SERVER['DOCUMENT_ROOT'] . url . 'uploads/articles/tagline_images/' . $image['tagline_image']);
-						unlink($_SERVER['DOCUMENT_ROOT'] . url . 'uploads/articles/tagline_images/thumbnails/' . $image['tagline_image']);
+						unlink($this->config('path') . 'uploads/articles/tagline_images/' . $image['tagline_image']);
+						unlink($this->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $image['tagline_image']);
 					}
 				}
 
@@ -559,6 +559,7 @@ class core
 		}
 	}
 
+	// this should probably be removed, we never use it, we dont even show sales images anymore
 	function sale_image($sale_id)
 	{
 		global $db, $config;
@@ -797,14 +798,14 @@ class core
 			$source = $_FILES['new_image']['tmp_name'];
 
 			// where to upload to
-			$target = $_SERVER['DOCUMENT_ROOT'] . "/uploads/carousel/" . $imagename;
+			$target = $this->config('path') . "uploads/carousel/" . $imagename;
 
 			if (move_uploaded_file($source, $target))
 			{
 				// remove old avatar
 				if (!empty($image['featured_image']))
 				{
-					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/carousel/' . $image['image']);
+					unlink($this->config('path') . 'uploads/carousel/' . $image['image']);
 				}
 
 				$db->sqlquery("UPDATE `articles` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));

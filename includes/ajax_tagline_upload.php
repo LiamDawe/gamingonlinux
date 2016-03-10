@@ -19,8 +19,6 @@ foreach ($fetch_config as $config_set)
 	$config[$config_set['data_key']] = $config_set['data_value'];
 }
 
-define('url', $config['path']);
-
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 {
 	if (isset($_FILES['photos2']) && $_FILES['photos2']['error'] == 0)
@@ -130,27 +128,27 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		$source = $_FILES['photos2']['tmp_name'];
 
 		// where to upload to
-		$target = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/" . $imagename;
+		$target = core::config('path') . "uploads/articles/tagline_images/temp/" . $imagename;
 
-		include($_SERVER['DOCUMENT_ROOT'] . url . 'includes/class_image.php');
+		include(core::config('path') . 'includes/class_image.php');
 		$image_func = new SimpleImage();
 		$image_func->load($_FILES['photos2']['tmp_name']);
 		$image_func->resize(350,220);
-		$image_func->save($_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename, $image_type);
+		$image_func->save(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename, $image_type);
 
 		if (move_uploaded_file($source, $target))
 		{
 			// replace any existing just-uploaded image
 			if (isset($_SESSION['uploads_tagline']))
 			{
-				unlink($_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/temp/" . $_SESSION['uploads_tagline']['image_name']);
-				unlink($_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/thumbnails/temp/" . $_SESSION['uploads_tagline']['image_name']);
+				unlink(core::config('path') . "uploads/articles/tagline_images/temp/" . $_SESSION['uploads_tagline']['image_name']);
+				unlink(core::config('path') . "uploads/articles/tagline_images/thumbnails/temp/" . $_SESSION['uploads_tagline']['image_name']);
 			}
 
 			$_SESSION['uploads_tagline']['image_name'] = $imagename;
 			$_SESSION['uploads_tagline']['image_rand'] = $_SESSION['image_rand'];
 
-			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".url."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\" class='imgList'><br />";
+			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\" class='imgList'><br />";
 			echo "BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />";
 			echo "<input type=\"hidden\" name=\"image_name\" value=\"{$imagename}\" />";
 			echo "<a href=\"#\" id=\"{$imagename}\" class=\"trash_tagline\">Delete Image</a></div>";

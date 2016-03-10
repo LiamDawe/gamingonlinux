@@ -520,7 +520,7 @@ class core
 			$source = $full_file_big;
 
 			// where to upload to
-			$target = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/articles/tagline_images/" . $imagename;
+			$target = $this->config('path') . "uploads/articles/tagline_images/" . $imagename;
 
 			// the actual image
 			$source_thumbnail = $full_file_thumbnail;

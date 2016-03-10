@@ -2,10 +2,8 @@
 $title = strip_tags($_POST['title']);
 $tagline = trim($_POST['tagline']);
 $text = trim($_POST['text']);
-$text2 = trim($_POST['text2']);
-$text3 = trim($_POST['text3']);
 
-$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `page2` = ?, `page3` = ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $tagline, $text, $text2, $text3, $_POST['article_id']));
+$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $tagline, $text, $_POST['article_id']));
 
 $db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
 
@@ -35,4 +33,4 @@ unset($_SESSION['uploads']);
 unset($_SESSION['uploads_tagline']);
 unset($_SESSION['image_rand']);
 
-header("Location: " . core::config('path') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&message=editdone");
+header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&message=editdone");

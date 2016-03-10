@@ -1,10 +1,8 @@
 <?php
 $text = trim($_POST['text']);
-$text2 = trim($_POST['text2']);
-$text3 = trim($_POST['text3']);
 $title = strip_tags($_POST['title']);
 
-$db->sqlquery("UPDATE `articles` SET `draft` = 0, `admin_review` = 1, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `page2` = ?, `page3` = ? WHERE `article_id` = ?", array($title, $_POST['slug'], $_POST['tagline'], $text, $text2, $text3, $_POST['article_id']));
+$db->sqlquery("UPDATE `articles` SET `draft` = 0, `admin_review` = 1, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ? WHERE `article_id` = ?", array($title, $_POST['slug'], $_POST['tagline'], $text, $_POST['article_id']));
 
 // update admin notifications
 $db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("{$_SESSION['username']} sent a new article to the admin review queue.", $core->date, $_POST['article_id']));
@@ -18,8 +16,6 @@ if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_r
 unset($_SESSION['atitle']);
 unset($_SESSION['atagline']);
 unset($_SESSION['atext']);
-unset($_SESSION['atext2']);
-unset($_SESSION['atext3']);
 unset($_SESSION['acategories']);
 unset($_SESSION['tagerror']);
 unset($_SESSION['aactive']);
@@ -58,10 +54,10 @@ foreach ($users_array as $email_user)
 	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 	</head>
 	<body>
-	<img src=\"{$config['path']}/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+	<img src=\"{$config['website_url']}templates/default/images/logo.png\" alt=\"Gaming On Linux\">
 	<br />
 	<p>Hello <strong>{$email_user['username']}</strong>,</p>
-	<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"{$config['path']}/admin.php?module=articles&view=adminreview&aid={$article_id}\">{$title_upper}</a></strong>\".</p>
+	<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"{$config['website_url']}admin.php?module=articles&view=adminreview&aid={$article_id}\">{$title_upper}</a></strong>\".</p>
 	</body>
 	</html>";
 

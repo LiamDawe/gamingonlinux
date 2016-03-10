@@ -390,7 +390,7 @@ else
 					// either no avatar (gets no avatar from gravatars redirect) or gravatar set
 					if ($topic['avatar_gravatar'] == 1)
 					{
-						$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $topic['gravatar_email'] ) ) ) . "?d={$config['website_url']}{$config['path']}/uploads/avatars/no_avatar.png&size=125";
+						$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $topic['gravatar_email'] ) ) ) . "?d={$config['website_url']}uploads/avatars/no_avatar.png&size=125";
 					}
 
 					// either uploaded or linked an avatar
@@ -489,7 +489,7 @@ else
 					$report_link = '';
 					if ($_SESSION['user_id'] != 0)
 					{
-						$report_link = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"{$config['path']}index.php?module=viewtopic&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li>";
+						$report_link = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=viewtopic&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li>";
 					}
 					$templating->set('report_link', $report_link);
 				}
@@ -533,7 +533,7 @@ else
 						$edit_link = '';
 						if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group(1,2) == true)
 						{
-							$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"{$config['path']}index.php?module=editpost&amp;post_id={$post['post_id']}&page={$page}\"><span class=\"icon edit\"></span></a></li>";
+							$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"{$config['website_url']}index.php?module=editpost&amp;post_id={$post['post_id']}&page={$page}\"><span class=\"icon edit\"></span></a></li>";
 						}
 						$templating->set('edit_link', $edit_link);
 
@@ -541,7 +541,7 @@ else
 						$delete_link = '';
 						if ($user->check_group(1,2) == true)
 						{
-							$delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"{$config['path']}index.php?module=viewtopic&amp;view=deletepost&amp;post_id={$post['post_id']}&amp;topic_id={$topic['topic_id']}\"><span class=\"icon delete\"></span></a>";
+							$delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"{$config['website_url']}index.php?module=viewtopic&amp;view=deletepost&amp;post_id={$post['post_id']}&amp;topic_id={$topic['topic_id']}\"><span class=\"icon delete\"></span></a>";
 						}
 						$templating->set('delete_link', $delete_link);
 
@@ -561,7 +561,7 @@ else
 						$avatar = '';
 						if ($post['avatar_gravatar'] == 1)
 						{
-							$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $post['gravatar_email'] ) ) ) . "?d={$config['website_url']}{$config['path']}/uploads/avatars/no_avatar.png&size=125";
+							$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $post['gravatar_email'] ) ) ) . "?d={$config['website_url']}uploads/avatars/no_avatar.png&size=125";
 						}
 
 						else if (!empty($post['avatar']) && $post['avatar_gravatar'] == 0)
@@ -658,7 +658,7 @@ else
 						$report_link = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$report_link = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"{$config['path']}index.php?module=viewtopic&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li>";
+							$report_link = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"{$config['website_url']}index.php?module=viewtopic&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li>";
 						}
 						$templating->set('report_link', $report_link);
 

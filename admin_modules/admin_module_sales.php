@@ -118,7 +118,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$drmfree = '';
 			$pr_key = '';
 			$steam = '';
-			$desura = '';
 
 			if ($item['pre-order'] == 1)
 			{
@@ -350,7 +349,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$core->message('Sale was accepted by someone else already!');
 		}
 
-		$db->sqlquery("SELECT s.`id`,s.`info`, s.`website`, s.`date`, s.`provider_id`, s.pwyw, s.pounds, s.dollars, s.euros, s.savings, s.has_screenshot, s.drmfree, s.pr_key, s.steam, s.desura, s.expires, s.screenshot_filename, s.submitted_by_id, s.`pre-order`, s.`beat_average`, u.username, p.`name` FROM `game_sales` s LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id LEFT JOIN `users` u ON s.submitted_by_id = u.user_id WHERE s.`accepted` = 0 ORDER BY s.`id` DESC");
+		$db->sqlquery("SELECT s.`id`,s.`info`, s.`website`, s.`date`, s.`provider_id`, s.pwyw, s.pounds, s.dollars, s.euros, s.savings, s.has_screenshot, s.drmfree, s.pr_key, s.steam, s.expires, s.screenshot_filename, s.submitted_by_id, s.`pre-order`, s.`beat_average`, u.username, p.`name` FROM `game_sales` s LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id LEFT JOIN `users` u ON s.submitted_by_id = u.user_id WHERE s.`accepted` = 0 ORDER BY s.`id` DESC");
 
 		if ($db->num_rows() > 0)
 		{
@@ -403,7 +402,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$drmfree = '';
 				$pr_key = '';
 				$steam = '';
-				$desura = '';
 				$assets_only = '';
 				if ($sale['pre-order'] == 1)
 				{
@@ -421,16 +419,11 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				{
 					$steam = '<span class="label label-inverse">Steam</span>';
 				}
-				if ($sale['desura'] == 1)
-				{
-					$desura = '<span class="label">Desura</span>';
-				}
 
 				$templating->set('preorder', $preorder);
 				$templating->set('drmfree', $drmfree);
 				$templating->set('pr_key', $pr_key);
 				$templating->set('steam', $steam);
-				$templating->set('desura', $desura);
 
 				$expires = '';
 				if ($sale['expires'] != 0)
@@ -504,7 +497,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$drmfree = 0;
 			$pr_key = 0;
 			$steam = 0;
-			$desura = 0;
 			$pwyw = 0;
 			$beat_average = 0;
 			$game_assets = 0;
@@ -525,10 +517,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			{
 				$steam = 1;
 			}
-			if (isset($_POST['desura']))
-			{
-				$desura = 1;
-			}
 			if (isset($_POST['pwyw']))
 			{
 				$pwyw = 1;
@@ -545,7 +533,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				$expires = strtotime(gmdate($_POST['expires']));
 			}
 
-			$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `desura` = ?, `savings` = ?, `pwyw` = ?, `beat_average` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, euros_original = ?, `expires` = ?, `pre-order` = ?", array($_POST['info'], $_POST['website'], $core->date, $_POST['provider'], $drmfree, $pr_key, $steam, $desura, $_POST['savings'], $pwyw, $beat_average, $_POST['pounds'], $_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'], $_POST['euros'], $_POST['euros_original'], $expires, $preorder));
+			$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `savings` = ?, `pwyw` = ?, `beat_average` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, euros_original = ?, `expires` = ?, `pre-order` = ?", array($_POST['info'], $_POST['website'], $core->date, $_POST['provider'], $drmfree, $pr_key, $steam, $_POST['savings'], $pwyw, $beat_average, $_POST['pounds'], $_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'], $_POST['euros'], $_POST['euros_original'], $expires, $preorder));
 
 			$sale_id = $db->grab_id();
 
@@ -582,7 +570,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$drmfree = 0;
 			$pr_key = 0;
 			$steam = 0;
-			$desura = 0;
 			$pwyw = 0;
 			$beat_average = 0;
 			$game_assets = 0;
@@ -603,10 +590,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			{
 				$steam = 1;
 			}
-			if (isset($_POST['desura']))
-			{
-				$desura = 1;
-			}
 			if (isset($_POST['pwyw']))
 			{
 				$pwyw = 1;
@@ -622,7 +605,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				$expires = strtotime(gmdate($_POST['expires']));
 			}
 
-			$db->sqlquery("UPDATE `game_sales` SET `info` = ?, `website` = ?, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `desura` = ?, `savings` = ?, `pwyw` = ?, `beat_average` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, `euros_original` = ?, `expires` = ?, `pre-order` = ? WHERE `id` = ?", array($_POST['info'], $_POST['website'], $_POST['provider'], $drmfree, $pr_key, $steam, $desura, $_POST['savings'], $pwyw, $beat_average, $_POST['pounds'], $_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'], $_POST['euros'], $_POST['euros_original'], $expires, $preorder, $_POST['id']));
+			$db->sqlquery("UPDATE `game_sales` SET `info` = ?, `website` = ?, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `savings` = ?, `pwyw` = ?, `beat_average` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, `euros_original` = ?, `expires` = ?, `pre-order` = ? WHERE `id` = ?", array($_POST['info'], $_POST['website'], $_POST['provider'], $drmfree, $pr_key, $steam, $_POST['savings'], $pwyw, $beat_average, $_POST['pounds'], $_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'], $_POST['euros'], $_POST['euros_original'], $expires, $preorder, $_POST['id']));
 
 			if ($core->sale_image($_POST['id'], $_FILES['new_image']) == true)
 			{

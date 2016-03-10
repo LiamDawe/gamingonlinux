@@ -84,8 +84,8 @@ class steam_user
 					$_SESSION['user_group'] = $userdata['user_group'];
 					$_SESSION['secondary_user_group'] = $userdata['secondary_user_group'];
 					$_SESSION['theme'] = $userdata['theme'];
-					$_SESSION['infinite_scroll'] = $userdata['infinite_scroll'];
 					$_SESSION['bad'] = 0;
+					$_SESSION['in_mod_queue'] = $userdata['in_mod_queue'];
 
 					header("Location: {$_GET['real_return']}");
 				}

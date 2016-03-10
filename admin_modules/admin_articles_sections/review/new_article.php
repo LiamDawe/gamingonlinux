@@ -1,8 +1,6 @@
 <?php
 // This file is for putting a new article directly into the admin review queue
 $text = trim($_POST['text']);
-$text2 = trim($_POST['text2']);
-$text3 = trim($_POST['text3']);
 
 // count how many editors picks we have
 $db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
@@ -16,8 +14,6 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 	$_SESSION['aslug'] = $_POST['aslug'];
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['atext2'] = $_POST['text2'];
-	$_SESSION['atext3'] = $_POST['text3'];
 	$_SESSION['acategories'] = $_POST['categories'];
 
 	header("Location: admin.php?module=articles&view=add&error=empty&temp_tagline=$temp_tagline");
@@ -29,8 +25,6 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 			$_SESSION['aslug'] = $_POST['aslug'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['atext2'] = $_POST['text2'];
-			$_SESSION['atext3'] = $_POST['text3'];
 			$_SESSION['acategories'] = $_POST['categories'];
 
 			header("Location: admin.php?module=articles&view=add&error=shorttagline&temp_tagline=$temp_tagline");
@@ -42,8 +36,6 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 			$_SESSION['aslug'] = $_POST['aslug'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['atext2'] = $_POST['text2'];
-			$_SESSION['atext3'] = $_POST['text3'];
 			$_SESSION['acategories'] = $_POST['categories'];
 
 			header("Location: admin.php?module=articles&view=add&error=taglinetoolong&temp_tagline=$temp_tagline");
@@ -55,8 +47,6 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 			$_SESSION['aslug'] = $_POST['aslug'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['atext2'] = $_POST['text2'];
-			$_SESSION['atext3'] = $_POST['text3'];
 			$_SESSION['acategories'] = $_POST['categories'];
 
 			header("Location: admin.php?module=articles&view=add&error=shorttitle&temp_tagline=$temp_tagline");
@@ -68,8 +58,6 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 			$_SESSION['aslug'] = $_POST['aslug'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['atext2'] = $_POST['text2'];
-			$_SESSION['atext3'] = $_POST['text3'];
 			$_SESSION['acategories'] = $_POST['categories'];
 
 			header("Location: admin.php?module=articles&view=add&error=toomanypicks&temp_tagline=$temp_tagline");
@@ -79,7 +67,7 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 		{
 			$title = strip_tags($_POST['title']);
 
-			$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `page2` = ?, `page3` = ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, $text2, $text3, $core->date));
+			$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, $core->date));
 
 			$article_id = $db->grab_id();
 
@@ -121,8 +109,6 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 			unset($_SESSION['aslug']);
 			unset($_SESSION['atagline']);
 			unset($_SESSION['atext']);
-			unset($_SESSION['atext2']);
-			unset($_SESSION['atext3']);
 			unset($_SESSION['acategories']);
 			unset($_SESSION['uploads_tagline']);
 			unset($_SESSION['image_rand']);

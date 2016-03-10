@@ -27,7 +27,7 @@ $core = new core();
 
 include('includes/class_mail.php');
 
-define('url', core::config('path'));
+define('url', core::config('website_url'));
 
 include('includes/class_user.php');
 $user = new user();

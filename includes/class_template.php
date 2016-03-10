@@ -33,7 +33,7 @@ class template
 			$template_folder = 'default';
 		}
 
-		if (!is_dir($_SERVER['DOCUMENT_ROOT'] . core::config('path') . "templates/{$template_folder}"))
+		if (!is_dir(core::config('path') . "templates/{$template_folder}"))
 		{
 			die("Error loading template folder ($template_folder). " . $_SERVER['DOCUMENT_ROOT'] . core::config('path') . "templates/" . $template_folder);
 		}

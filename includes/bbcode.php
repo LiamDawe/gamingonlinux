@@ -6,13 +6,13 @@ function do_charts($body)
 {
 	global $db;
 
-    require_once('./includes/SVGGraph/SVGGraph.php');
-
 	preg_match_all("/\[chart\](.+?)\[\/chart\]/is", $body, $matches);
 
 	$chart_id = 0;
 
 	$how_many = sizeof($matches[1]);
+
+	require_once(core::config('path') . 'includes/SVGGraph/SVGGraph.php');
 
 	foreach ($matches[1] as $id)
 	{
@@ -36,10 +36,10 @@ function do_charts($body)
             }
         }
 
-				$settings = array('graph_title' => $chart_info['name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
-				$graph = new SVGGraph(400, 300, $settings);
-				$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
-				$graph->colours = $colours;
+		$settings = array('graph_title' => $chart_info['name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
+		$graph = new SVGGraph(400, 300, $settings);
+		$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
+		$graph->colours = $colours;
 
         $graph->Values($labels);
         $get_graph = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
@@ -85,7 +85,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 {
 	//  get rid of empty BBCode, is there a point in having excess markup?
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
-	
+
 	// Array for tempory storing codeblock contents
 	$codeBlocks = [];
 

@@ -39,7 +39,7 @@ else
 			$compose_link = '/private-messages/compose/';
 		}
 		else {
-			$compose_link = "{$config['path']}index.php?module=messages&view=compose";
+			$compose_link = core::config('website_url') . "index.php?module=messages&view=compose";
 		}
 		$templating->set('compose_link', $compose_link);
 
@@ -85,7 +85,7 @@ else
 				$pm_url = "/private-messages/{$message['conversation_id']}/";
 			}
 			else {
-				$pm_url = "{$config['path']}index.php?module=messages&view=message&id={$message['conversation_id']}";
+				$pm_url = core::config('website_url') . "index.php?module=messages&view=message&id={$message['conversation_id']}";
 			}
 
 			$templating->set('pm_url', $pm_url);
@@ -205,6 +205,7 @@ else
 
 			$templating->block('view_top', 'private_messages');
 			$templating->set('conversation_list', $p_list);
+			$templating->set('form_action', 'index.php?module=messages');
 
 			// count them for pagination
 			$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_messages` WHERE `conversation_id` = ? AND position > 0", array($_GET['id']));
@@ -420,14 +421,14 @@ else
 			// Stop them from replying if it's only them left in the convo
 			if ($count_participants != 1)
 			{
-				$buttons = '<button type="submit" name="act" value="Reply">Reply</button><button type="submit" name="act" value="preview_reply" formaction="' . $config['path'] . 'index.php?module=messages#commentbox">Preview Reply</button>
-				<input type="hidden" name="conversation_id" value="'.$start['conversation_id'].'" />';
-
-
 				$templating->block('reply', 'private_messages');
 				$templating->set('pagination', $pagination);
 
-				$core->editor('text', '', $buttons, $config['path'] . 'index.php?module=messages');
+				$core->editor('text', '');
+
+				$templating->block('view_bottom', 'private_messages');
+				$templating->set('preview_action', 'index.php?module=messages#commentbox');
+				$templating->set('conversation_id', $start['conversation_id']);
 			}
 
 			$templating->block('delete', 'private_messages');
@@ -530,268 +531,6 @@ else
 		$buttons = '<button type="submit" name="act" value="Edit" class="btn btn-primary">Edit</button><button type="submit" name="act" value="preview_edit" class="btn btn-primary">Preview Edit</button>';
 
 		$core->editor('text', $text, $buttons, $config['path'] . 'index.php?module=messages&message_id='.$_GET['message_id'].'&conversation_id='.$_GET['conversation_id'].'&page=' . $page);
-	}
-
-	if (isset($_POST['act']) && $_POST['act'] == 'preview_reply')
-	{
-		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'empty')
-			{
-				$core->message('You have to enter a message to reply!', NULL, 1);
-			}
-		}
-
-		include('includes/profile_fields.php');
-
-		// get usernames of everyone in this conversation
-		$db->sqlquery("SELECT u.`username`, u.`user_id` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.user_id = p.participant_id WHERE p.conversation_id = ?", array($_POST['conversation_id']));
-		$p_list = '';
-
-		$count_participants = $db->num_rows();
-
-		while ($participants = $db->fetch())
-		{
-			$p_list .= "<a href=\"/profiles/{$participants['user_id']}/\">{$participants['username']}</a> ";
-		}
-
-		$templating->block('view_top', 'private_messages');
-		$templating->set('conversation_list', $p_list);
-
-		// count them for pagination
-		$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_messages` WHERE `conversation_id` = ? AND position > 0", array($_POST['conversation_id']));
-		$total = $db->num_rows();
-
-		// sort out the pagination link
-		$pagination = $core->pagination_link(9, $total, "/private-messages/{$_GET['id']}/", $page);
-
-		// user profile fields
-		$db_grab_fields = '';
-		foreach ($profile_fields as $field)
-		{
-			$db_grab_fields .= "u.`{$field['db_field']}`,";
-		}
-
-		$db->sqlquery("SELECT i.conversation_id, i.`title`, m.creation_date, m.message, m.message_id, m.author_id, u.username, u.user_group, u.secondary_user_group, u.avatar, u.avatar_gravatar,u.gravatar_email, $db_grab_fields u.avatar_uploaded FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.conversation_id = i.conversation_id INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_POST['conversation_id']));
-		$start = $db->fetch();
-
-		$templating->block('view_row', 'private_messages');
-		$templating->set('pagination', $pagination);
-		$templating->set('title', $start['title']);
-		$templating->set('post_id', $start['message_id']);
-		$templating->set('message_date', $core->format_date($start['creation_date']));
-		$templating->set('tzdate', date('c',$start['creation_date']) ); //piratelv timeago
-		$templating->set('plain_username',$start['username']);
-		$templating->set('text_plain', $start['message']);
-
-		// sort out the avatar
-		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-		if (empty($start['avatar']) || $start['avatar_gravatar'] == 1)
-		{
-			$avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $start['gravatar_email'] ) ) ) . "?d=http://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-		}
-
-		// either uploaded or linked an avatar
-		else
-		{
-			$avatar = $start['avatar'];
-			if ($start['avatar_uploaded'] == 1)
-			{
-				$avatar = "/uploads/avatars/{$start['avatar']}";
-			}
-		}
-
-		$templating->set('avatar', $avatar);
-		$templating->set('username', $start['username']);
-		$templating->set('message_text', bbcode($start['message']));
-
-		$donator_badge = '';
-
-		if (($start['secondary_user_group'] == 6 || $start['secondary_user_group'] == 7) && $start['user_group'] != 1 && $start['user_group'] != 2)
-		{
-			$donator_badge = '<br />
-			<span class="label label-warning">GOL Supporter!</span><br /> ';
-		}
-		$templating->set('donator_badge', $donator_badge);
-
-		$editor_bit = '';
-		// check if editor or admin
-		if ($start['user_group'] == 1 || $start['user_group'] == 2)
-		{
-			$editor_bit = "<span class=\"label label-success\">Editor</span><br />";
-		}
-		$templating->set('editor', $editor_bit);
-
-		$profile_fields_output = '';
-
-		foreach ($profile_fields as $field)
-		{
-			if (!empty($start[$field['db_field']]))
-			{
-				$url = '';
-				if ($field['base_link_required'] == 1 && strpos($start[$field['db_field']], $field['base_link']) === false ) //base_link_required and not already in the database
-				{
-					$url = $field['base_link'];
-				}
-
-				$image = '';
-				if (isset($field['image']) && $field['image'] != NULL)
-				{
-					$image = "<img src=\"{$field['image']}\" alt=\"{$field['name']}\" />";
-				}
-
-				$span = '';
-				if (isset($field['span']))
-				{
-					$span = $field['span'];
-				}
-				$into_output = '';
-				if ($field['name'] != 'Distro')
-				{
-					$into_output .= "<li><a href=\"$url{$start[$field['db_field']]}\">$image$span</a></li>";
-				}
-
-				$profile_fields_output .= $into_output;
-			}
-		}
-
-		$templating->set('profile_fields', $profile_fields_output);
-
-		$edit_link = '';
-		if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $start['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
-		{
-			$page = '';
-			if (!empty($_GET['page']) && is_numeric($_GET['page']))
-			{
-				$page = $_GET['page'];
-			}
-
-			$edit_link = "<a href=\"/index.php?module=messages&amp;view=Edit&amp;message_id={$start['message_id']}&conversation_id={$start['conversation_id']}&page=$page\"><i class=\"icon-edit\"></i> Edit</a>";
-		}
-		$templating->set('edit_link', $edit_link);
-
-		// replies
-		$db->sqlquery("SELECT m.creation_date, m.message, m.message_id, m.author_id, u.username, u.user_group, u.secondary_user_group, u.avatar, u.avatar_gravatar,u.gravatar_email, $db_grab_fields u.avatar_uploaded FROM `user_conversations_messages` m INNER JOIN `users` u ON u.user_id = m.author_id WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_POST['conversation_id'], $core->start));
-		while ($replies = $db->fetch())
-		{
-			$templating->block('view_row_reply', 'private_messages');
-			$templating->set('message_date', $core->format_date($replies['creation_date']));
-			$templating->set('tzdate', date('c',$replies['creation_date']) ); //piratelv timeago
-			$templating->set('post_id', $replies['message_id']);
-			$templating->set('plain_username',$replies['username']);
-			$templating->set('text_plain', $replies['message']);
-
-			// sort out the avatar
-			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-			if (empty($replies['avatar']) || $replies['avatar_gravatar'] == 1)
-			{
-				$avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $replies['gravatar_email'] ) ) ) . "?d=http://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-			}
-
-			// either uploaded or linked an avatar
-			else
-			{
-				$avatar = $replies['avatar'];
-				if ($replies['avatar_uploaded'] == 1)
-				{
-					$avatar = "/uploads/avatars/{$replies['avatar']}";
-				}
-			}
-
-			$templating->set('avatar', $avatar);
-			$templating->set('username', $replies['username']);
-			$templating->set('message_text', bbcode($replies['message']));
-
-			$donator_badge = '';
-
-			if (($replies['secondary_user_group'] == 6 || $replies['secondary_user_group'] == 7) && $replies['user_group'] != 1 && $replies['user_group'] != 2)
-			{
-				$donator_badge = '<br />
-				<span class="label label-warning">GOL Supporter!</span><br /> ';
-			}
-			$templating->set('donator_badge', $donator_badge);
-
-			$profile_fields_output = '';
-
-			foreach ($profile_fields as $field)
-			{
-				if (!empty($replies[$field['db_field']]))
-				{
-					$url = '';
-					if ($field['base_link_required'] == 1)
-					{
-						$url = $field['base_link'];
-					}
-
-					$image = '';
-					if (isset($field['image']) && $field['image'] != NULL)
-					{
-						$image = "<img src=\"{$field['image']}\" alt=\"{$field['name']}\" />";
-					}
-
-					$span = '';
-					if (isset($field['span']))
-					{
-						$span = $field['span'];
-					}
-					$into_output = '';
-					if ($field['name'] != 'Distro')
-					{
-						$into_output .= "<li><a href=\"$url{$replies[$field['db_field']]}\">$image$span</a></li>";
-					}
-
-					$profile_fields_output .= $into_output;
-				}
-			}
-
-			$templating->set('profile_fields', $profile_fields_output);
-
-			$editor_bit = '';
-			// check if editor or admin
-			if ($replies['user_group'] == 1 || $replies['user_group'] == 2)
-			{
-				$editor_bit = "<span class=\"label label-success\">Editor</span><br />";
-			}
-			$templating->set('editor', $editor_bit);
-
-			$edit_link = '';
-			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $replies['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
-			{
-				$page = '';
-				if (!empty($_GET['page']) && is_numeric($_GET['page']))
-				{
-					$page = $_GET['page'];
-				}
-				$edit_link = "<a href=\"/index.php?module=messages&amp;view=Edit&amp;message_id={$replies['message_id']}&conversation_id={$_GET['id']}&page={$page}\"><i class=\"icon-edit\"></i> Edit</a>";
-			}
-			$templating->set('edit_link', $edit_link);
-		}
-
-		$templating->block('reply', 'private_messages');
-		$templating->set('pagination', $pagination);
-
-		$templating->block('preview', 'private_messages');
-		$templating->set('message',  bbcode($_POST['text']));
-
-		$text = '';
-		if (!empty($_POST['text']))
-		{
-			$text = $_POST['text'];
-		}
-
-		// Stop them from replying if it's only them left in the convo
-		if ($count_participants != 1)
-		{
-			$buttons = '<button type="submit" name="act" value="Reply">Reply</button><button type="submit" name="act" value="preview_reply" formaction="' . $config['path'] . 'index.php?module=messages#commentbox">Preview Reply</button>
-			<input type="hidden" name="conversation_id" value="'.$start['conversation_id'].'" />';
-
-			$core->editor('text', $text, $buttons, $config['path'] . 'index.php?module=messages');
-		}
-
-		$templating->block('delete', 'private_messages');
-		$templating->set('conversation_id', $start['conversation_id']);
-
-		$db->sqlquery("UPDATE `user_conversations_participants` SET `unread` = 0 WHERE `participant_id` = ? AND `conversation_id` = ?", array($_SESSION['user_id'], $_GET['id']));
 	}
 
 	if (isset($_POST['act']) && $_POST['act'] == 'New')

@@ -134,7 +134,7 @@ else if (isset($_POST['show_block']) && $editor_pick_count == 3)
 }
 
 // if they aren't uploading a tagline image on a brand new article
-else if (!isset($_SESSION['uploads_tagline']) && !isset($_POST['draft']))
+else if (!isset($_SESSION['uploads_tagline']) && !isset($_POST['check']))
 {
 	$_SESSION['atitle'] = $_POST['title'];
 	$_SESSION['aslug'] = $slug;
@@ -220,7 +220,7 @@ else
 	}
 
 	// remove the draft article as we have published it from a draft and we created a new article
-	if (isset($_POST['draft']) && $_POST['draft'] == 1)
+	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
 	{
 		$db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 	}

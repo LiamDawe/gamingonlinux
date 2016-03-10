@@ -55,7 +55,7 @@ if (isset($_GET['view']))
 
 		$templating->merge('admin_modules/article_form');
 		$templating->block('full_editor', 'admin_modules/article_form');
-		$templating->set('main_formaction', '<form method="post" action="'.$config['path'].'admin.php?module=articles" enctype="multipart/form-data" id="something">');
+		$templating->set('main_formaction', '<form method="post" action="'.$config['website_url'].'admin.php?module=articles" enctype="multipart/form-data" id="something">');
 		$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 
 		// get categorys
@@ -120,7 +120,7 @@ if (isset($_GET['view']))
 					if ($key['image_rand'] == $_SESSION['image_rand'])
 					{
 						$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div class=\"col-md-12\" id=\"{$key['image_id']}\"><img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
-						BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]{$config['path']}/uploads/articles/article_images/{$key['image_name']}[/img]\" /></div>
+						BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]{$config['website_url']}/uploads/articles/article_images/{$key['image_name']}[/img]\" /></div>
 						<a href=\"#\" id=\"{$key['image_id']}\" class=\"trash\">Delete Image</a></div></div></div>";
 					}
 				}
@@ -355,7 +355,7 @@ if (isset($_GET['view']))
 				$templating->set('slug', $article['slug']);
 			}
 
-			$templating->set('main_formaction', '<form method="post" action="'.$config['path'].'admin.php?module=articles" enctype="multipart/form-data">');
+			$templating->set('main_formaction', '<form method="post" action="'.$config['website_url'].'admin.php?module=articles" enctype="multipart/form-data">');
 
 			if (empty($article['username']))
 			{
@@ -418,7 +418,7 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 				{
 					foreach($_SESSION['uploads'] as $key)
 					{
-						$bbcode = "[img]{$config['path']}/uploads/articles/article_images/{$key['image_name']}[/img]";
+						$bbcode = "[img]{$config['website_url']}/uploads/articles/article_images/{$key['image_name']}[/img]";
 						$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$key['image_id']}\"><img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
 						BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /></div>
 						<button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$key['image_id']}\" class=\"trash\">Delete image</button>
@@ -433,7 +433,7 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 
 			foreach($article_images as $value)
 			{
-				$bbcode = "[img]{$config['path']}/uploads/articles/article_images/{$value['filename']}[/img]";
+				$bbcode = "[img]{$config['website_url']}/uploads/articles/article_images/{$value['filename']}[/img]";
 				$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$value['id']}\"><img src=\"/uploads/articles/article_images/{$value['filename']}\" class='imgList'><br />
 				BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
 				<button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$value['id']}\" class=\"trash\">Delete image</button></div></div></div>";
@@ -1019,17 +1019,17 @@ else if (isset($_POST['act']))
 					<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 					</head>
 					<body>
-					<img src=\"{$config['path']}/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+					<img src=\"{$config['website_url']}/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
 					<br />
 					<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$username}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"{$config['path']}/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title_upper}</a></strong>\".</p>
+					<p><strong>{$username}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"{$config['website_url']}/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title_upper}</a></strong>\".</p>
 					<div>
 				 	<hr>
 				 	{$comment_email}
 				 	<hr>
-				 	You can manage your subscriptions anytime in your <a href=\"{$config['path']}/usercp.php\">User Control Panel</a>.
+				 	You can manage your subscriptions anytime in your <a href=\"{$config['website_url']}/usercp.php\">User Control Panel</a>.
 				 	<hr>
-				  	<p>If you haven&#39;t registered at <a href=\"{$config['path']}\" target=\"_blank\">{$config['path']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+				  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 				  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 					</div>
 					</body>
@@ -1263,10 +1263,10 @@ else if (isset($_POST['act']))
 			else {
 				if (!isset($_POST['show_block']))
 				{
-					header("Location: {$config['path']}index.php?module=articles_full&aid={$_POST['article_id']}");
+					header("Location: {$config['website_url']}index.php?module=articles_full&aid={$_POST['article_id']}");
 				}
 				else {
-					header("Location: {$config['path']}admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
+					header("Location: {$config['website_url']}admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 				}
 			}
 

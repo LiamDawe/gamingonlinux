@@ -470,13 +470,14 @@ else
 			$user_to = $user_info['username'];
 		}
 
-		$buttons = '<button type="submit" name="act" value="New" class="btn btn-primary" >Send Message</button><button type="submit" name="act" value="preview_new" class="btn btn-primary" formaction="' . $config['path'] . 'index.php?module=messages#commentbox">Preview Message</button>';
+		$templating->block('compose_top', 'private_messages');
+		$templating->set('to', $user_to);
+		$templating->set('title', $title);
 
-		$core->editor('text', $text, $buttons, $config['path'] . 'index.php?module=messages', '<div class="box"><div class="head">Compose a new private message</div></div>
-		To (seperate names by commas, make sure you have their exact username!)<br />
-		<input type="text" name="to" value="'.$user_to.'" /><br />
-		Title<br />
-		<input type="text" name="title" value="'.$title.'" /><br />');
+		$core->editor('text', $text);
+
+		$templating->block('compose_bottom', 'private_messages');
+		$templating->set('preview_action', '/index.php?module=messages#commentbox');
 	}
 
 	if (isset($_POST['act']) && $_POST['act'] == 'preview_new')

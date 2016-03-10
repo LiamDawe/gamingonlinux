@@ -21,6 +21,24 @@
 {:pagination}
 [/block: bottom]
 
+[block: compose_top]
+<form method="post" action="/index.php?module=messages">
+	<div class="box">
+		<div class="head">Compose a new private message</div>
+		<div class="body group">
+			To (seperate names by commas, make sure you have their exact username!)<br />
+			<input type="text" name="to" value="{:to}" /><br />
+			Title<br />
+			<input type="text" name="title" value="{:title}" /><br />
+[/block: compose_top]
+
+[block: compose_bottom]
+			<button type="submit" name="act" value="New" class="btn btn-primary">Send Message</button><button type="submit" name="act" value="preview_new" class="btn btn-primary" formaction="{:preview_action}">Preview Message</button>
+		</div>
+	</div>
+</form>
+[/block: compose_bottom]
+
 [block: view_top]
 <ul class="breadcrumb">
 	<li><a href="/private-messages/">Back to message list.</a></li>

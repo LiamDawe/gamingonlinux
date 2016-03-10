@@ -43,7 +43,7 @@
 <ul class="breadcrumb">
 	<li><a href="{:message_list_link}">Back to message list.</a></li>
 </ul>
-<form method="post" action="{:form_action}">
+<form method="post" action="/index.php?module=messages">
 <div class="box"><div class="head">Users in conversation: {:conversation_list}</div></div>
 <div class="box comments group">
 	<div class="body group">
@@ -146,4 +146,14 @@
 
 [block: edit]
 <div class="box"><div class="head">Edit your personal message</div></div>
+<form method="post" action="{:formaction}">
 [/block: edit]
+
+[block: edit_bottom]
+<div class="box">
+	<div class="body group">
+		<button type="submit" name="act" value="Edit" class="btn btn-primary">Edit</button><button id="preview_pm_button" type="button">Preview Edit</button>
+	</div>
+</div>
+</form>
+[/block: edit_bottom]

@@ -144,17 +144,19 @@ else
 
 			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
 			{
-				$templating->block('edit', 'private_messages');
-
 				$page = '';
 				if (!empty($_GET['page']) && is_numeric($_GET['page']))
 				{
 					$page = $_GET['page'];
 				}
 
-				$buttons = '<button type="submit" name="act" value="Edit" class="btn btn-primary">Edit</button><button type="submit" name="act" value="preview_edit" class="btn btn-primary">Preview Edit</button>';
+				$templating->block('edit', 'private_messages');
+				$templating->set('formaction', core::config('website_url') . 'index.php?module=messages&message_id='.$_GET['message_id'].'&conversation_id='.$_GET['conversation_id'].'&page=' . $page);
 
-				$core->editor('text', $info['message'], $buttons, $config['path'] . 'index.php?module=messages&message_id='.$_GET['message_id'].'&conversation_id='.$_GET['conversation_id'].'&page=' . $page);
+				$core->editor('text', $info['message']);
+
+				$templating->block('edit_bottom', 'private_messages');
+				$templating->block('preview', 'private_messages');
 			}
 
 			else
@@ -217,7 +219,6 @@ else
 			$templating->set('message_list_link', $message_list_link);
 
 			$templating->set('conversation_list', $p_list);
-			$templating->set('form_action', 'index.php?module=messages');
 
 			// count them for pagination
 			$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_messages` WHERE `conversation_id` = ? AND position > 0", array($_GET['id']));
@@ -542,12 +543,12 @@ else
 			{
 				if ($config['pretty_urls'] == 1)
 				{
-					header("Location: {$config['path']}private-messages/compose/message=notfound");
+					header("Location:" . core::config('website_url') . "private-messages/compose/message=notfound");
 					die();
 				}
 				else
 				{
-					header("Location: {$config['path']}index.php?module=messages&view=compose&message=notfound");
+					header("Location: " . core::config('website_url') . "index.php?module=messages&view=compose&message=notfound");
 					die();
 				}
 			}
@@ -672,7 +673,14 @@ else
 					$page = "page={$_GET['page']}";
 				}
 
-				header("Location: /private-messages/{$_GET['conversation_id']}/$page");
+				if ($config['pretty_urls'] == 1)
+				{
+					header("Location: /private-messages/{$_GET['conversation_id']}/$page");
+				}
+				else
+				{
+					header("Location: " . core::config('website_url') . "index.php?module=messages&view=message&id={$_GET['conversation_id']}&page=$page");
+				}
 			}
 
 			else
@@ -830,11 +838,10 @@ else
 			{
 				header("Location: /private-messages/{$_POST['conversation_id']}/page=$page");
 			}
-			else {
-				header("Location: {$config['path']}index.php?module=messages&view=message&id={$_POST['conversation_id']}&page=$page#$post_id");
+			else
+			{
+				header("Location: " . core::config('website_url') . "index.php?module=messages&view=message&id={$_POST['conversation_id']}&page=$page#$post_id");
 			}
-
-
 		}
 	}
 }

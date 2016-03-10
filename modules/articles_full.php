@@ -476,7 +476,7 @@ if (!isset($_GET['go']))
 						}
 
 						$templating->set('text', bbcode($comments['comment_text'] . $last_edited, 0));
-						$templating->set('text_plain', htmlspecialchars_decode($comments['comment_text'], ENT_QUOTES));
+						$templating->set('text_plain', htmlspecialchars($comments['comment_text'], ENT_QUOTES));
 						$templating->set('article_id', $_GET['aid']);
 						$templating->set('comment_id', $comments['comment_id']);
 

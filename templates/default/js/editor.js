@@ -203,7 +203,8 @@ function OctusEditor(editorPath) {
 	 *
 	 * Get YouTube ID
 	 */
-    function getYouTubeID(input) {
+     function getYouTubeID(input)
+     {
         var id;
         if(input === "") {
             input = window.prompt('Enter YouTube URL');
@@ -218,16 +219,26 @@ function OctusEditor(editorPath) {
     /*
 	 * quote()
 	 *
-	 * Insert a quote
+	 * Insert a quote, decodeEntities sorts out the html for the textarea
 	 */
-    function quote(text, name) {
-        var field   = document.querySelector('#' + masterEditor + ' .textarea textarea'),
+     function decodeEntities(encodedString)
+     {
+         var textArea = document.createElement('textarea');
+         textArea.innerHTML = encodedString;
+         return textArea.value;
+     }
 
-        content = "[quote=" + name + "]" + text;
-        content += "[/quote]";
+     function quote(text, name)
+     {
+         var field   = document.querySelector('#' + masterEditor + ' .textarea textarea'),
 
-        field.value += content;
-    }
+         text = decodeEntities(text);
+
+         content = "[quote=" + name + "]" + text;
+         content += "[/quote]";
+
+         field.value += content;
+     }
 
     /*
 	 * popUp()

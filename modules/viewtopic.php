@@ -30,8 +30,6 @@ else
 
 			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
 		}
-
-
 	}
 
 
@@ -57,8 +55,6 @@ else
 
 			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
 		}
-
-
 	}
 
 	else if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
@@ -484,7 +480,7 @@ else
 					$templating->set('post_id', $topic['topic_id']);
 					$templating->set('topic_id', $topic['topic_id']);
 					$templating->set('post_text', bbcode($topic['topic_text'], 0));
-					$templating->set('text_plain', htmlspecialchars_decode($topic['topic_text'], ENT_QUOTES));
+					$templating->set('text_plain', htmlspecialchars($topic['topic_text'], ENT_QUOTES));
 
 					$report_link = '';
 					if ($_SESSION['user_id'] != 0)
@@ -651,7 +647,7 @@ else
 						$templating->set('donator_badge', $donator_badge);
 
 						$templating->set('post_text', bbcode($post['reply_text'], 0));
-						$templating->set('text_plain', htmlspecialchars_decode($post['reply_text'], ENT_QUOTES));
+						$templating->set('text_plain', htmlspecialchars($post['reply_text'], ENT_QUOTES));
 						$templating->set('post_id', $post['post_id']);
 						$templating->set('topic_id', $_GET['topic_id']);
 

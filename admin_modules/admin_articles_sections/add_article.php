@@ -242,17 +242,17 @@ else
 	}
 	else if (core::config('pretty_urls') == 1 && isset($_POST['show_block']))
 	{
-		header("Location: " . core::config('path') . "admin.php?module=featured&view=add&article_id={$article_id}");
+		header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
 	}
 	else
 	{
 		if (!isset($_POST['show_block']))
 		{
-			header("Location: " . core::config('path') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
+			header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
 		}
 		else
 		{
-			header("Location: " . core::config('path') . "admin.php?module=featured&view=add&article_id={$article_id}");
+			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
 		}
 	}
 }

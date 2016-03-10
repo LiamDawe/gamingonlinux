@@ -10,13 +10,13 @@ if (!isset($_SESSION['user_group']) || ($_SESSION['user_group'] != 1 && $_SESSIO
 		$submit_link = '/submit-article/';
 	}
 	else {
-		$submit_link = $config['path'] . 'index.php?module=articles&amp;view=Submit';
+		$submit_link = core::config('website_url') . 'index.php?module=articles&amp;view=Submit';
 	}
 }
-	
+
 else if (isset($_SESSION['user_group']) && $_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
 {
-	$submit_link = $config['path'] . 'admin.php?module=articles&amp;view=add';
+	$submit_link = core::config('website_url') . 'admin.php?module=articles&amp;view=add';
 }
 
 $templating->set('submit_article_link', $submit_link);
@@ -40,8 +40,8 @@ while ($top_articles = $db->fetch())
 		$hot_articles .= "<li class=\"list-group-item\"><a href=\"/articles/{$core->nice_title($top_articles['title'])}.{$top_articles['article_id']}\">{$top_title}</a></li>";
 	}
 	else {
-		$hot_articles .= '<li class="list-group-item"><a href="' . $config['path'] . 'index.php?module=articles_full&amp;aid=' . $top_articles['article_id'] . '">' . $top_title . '</a></li>';
-	}	
+		$hot_articles .= '<li class="list-group-item"><a href="' . core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $top_articles['article_id'] . '">' . $top_title . '</a></li>';
+	}
 }
 
 $templating->set('top_articles', $hot_articles);

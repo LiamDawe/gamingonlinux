@@ -15,24 +15,19 @@ if ($_SESSION['user_id'] == 0)
 
 $templating->block('left');
 
-if ($user->check_group(6) == false)
-{
-	$templating->block('mainad');
-}
-
 // Here we sort out what modules we are allowed to load
 $modules_allowed = '';
 $module_links = '';
 $db->sqlquery('SELECT `module_file_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `usercp_modules` WHERE `activated` = 1');
 while ($modules = $db->fetch())
-{	
+{
 	// modules allowed for loading
 	$modules_allowed .= " {$modules['module_file_name']} ";
 
 	// links
 	if ($modules['show_in_sidebar'] == 1)
 	{
-		$module_links .= "<li class=\"list-group-item\"><a href=\"{$modules['module_link']}\">{$modules['module_title']}</a></li>\r\n";	
+		$module_links .= "<li class=\"list-group-item\"><a href=\"{$modules['module_link']}\">{$modules['module_title']}</a></li>\r\n";
 	}
 }
 

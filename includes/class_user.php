@@ -110,7 +110,7 @@ class user
 								<hr>
 								Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "
 								<hr>
-								<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . core::config('path') . "\" target=\"_blank\">" . core::config('website_url') . core::config('path') . "</a>, Forward this mail to <a href=\"mailto:contact@gamingonlinux.com\" target=\"_blank\">contact@gamingonlinux.com</a> with some info about what you want us to do about it.</p>
+								<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:contact@gamingonlinux.com\" target=\"_blank\">contact@gamingonlinux.com</a> with some info about what you want us to do about it.</p>
 								<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 								<p>-----------------------------------------------------------------------------------------------------------</p>
 								</div>";

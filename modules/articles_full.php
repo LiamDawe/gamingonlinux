@@ -673,6 +673,11 @@ if (!isset($_GET['go']))
 
 								$templating->block('preview', 'articles_full');
 							}
+
+							else
+							{
+								$core->message('To comment you need to activate your account! You were sent an email with instructions on how to activate. <a href="/index.php?module=activate_user&redo=1">Click here to re-send a new activation key</a>');
+							}
 						}
 					}
 				}

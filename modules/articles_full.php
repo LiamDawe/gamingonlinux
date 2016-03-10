@@ -231,7 +231,7 @@ if (!isset($_GET['go']))
 					// sort out the avatar
 					if ($article['avatar_gravatar'] == 1)
 					{
-						$avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode($config['website_url'] . '/uploads/avatars/no_avatar.png') . '&size=125';
+						$avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode($config['website_url'] . 'uploads/avatars/no_avatar.png') . '&size=125';
 					}
 
 					// either uploaded or linked an avatar
@@ -658,12 +658,12 @@ if (!isset($_GET['go']))
 									$comment = $_SESSION['acomment'];
 								}
 								$templating->block('comments_box_top', 'articles_full');
-								$templating->set('path', core::config('path'));
+								$templating->set('url', core::config('website_url'));
 
 								$core->editor('text', $comment);
 
 								$templating->block('comment_buttons', 'articles_full');
-								$templating->set('path', core::config('path'));
+								$templating->set('url', core::config('website_url'));
 								$templating->set('subsribe_check', $subscribe_check);
 								$templating->set('subscribe_email_check', $subscribe_email_check);
 								$templating->set('aid', $_GET['aid']);

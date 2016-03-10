@@ -143,7 +143,7 @@
 [/block: comments_closed]
 
 [block: comments_box_top]
-<form method="post" action="{:path}index.php?module=articles_full&amp;go=comment" enctype="multipart/form-data">
+<form method="post" action="{:url}index.php?module=articles_full&amp;go=comment" enctype="multipart/form-data">
 [/block: comments_box_top]
 
 [block: comment_buttons]
@@ -156,7 +156,7 @@
 		<input type="checkbox" name="emails" {:subscribe_email_check} /> <strong>Receive comment replies via email?</strong>
 		</label>
 		<input type="hidden" name="aid" value="{:aid}" />
-		<button type="submit" class="button" formaction="{:path}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button type="submit" class="button" formaction="{:path}index.php?module=articles_full&amp;go=preview">Preview</button>
+		<button type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=preview">Preview</button>
 	</div>
 </div>
 </form>

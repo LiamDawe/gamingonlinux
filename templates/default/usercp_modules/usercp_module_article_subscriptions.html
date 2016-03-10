@@ -1,18 +1,16 @@
 [block: main_top]
 <div class="box"><div class="head">Manage Article Subscriptions</div></div>
-	<table class="table">
 [/block: main_top]
 
 [block: post_row]
-	<tr>
-		<td>
+	<div class="box">
+		<div class="body group">
 			<a href="/articles/{:article_link}">{:title}</a> - <strong><a href="/usercp.php?module=article_subscriptions&go=unsubscribe&article_id={:article_id}"> <i class="icon-trash"></i> Unsubscribe</a></strong><br />
-			by <a href="/profiles/{:author_id}">{:author}</a> on {:date}<br />
-		</td>
-	</tr>
+			by <a href="/profiles/{:author_id}">{:author}</a> on {:date}
+		</div>
+	</div>
 [/block: post_row]
 
 [block: main_bottom]
-	</table>
 {:pagination}
 [/block: main_bottom]

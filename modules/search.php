@@ -4,7 +4,7 @@ $templating->set_previous('meta_description', 'Search for Linux gaming articles 
 
 $templating->merge('search');
 $templating->block('top');
-$templating->set('url', $config['path']);
+$templating->set('url', core::config('website_url'));
 
 $search_text = '';
 if (isset($_GET['q']))

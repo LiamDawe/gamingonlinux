@@ -34,7 +34,7 @@ if (!isset($_GET['go']))
 
 				$templating->merge('search');
 				$templating->block('top');
-				$templating->set('url', $config['path']);
+				$templating->set('url', core::config('website_url'));
 				$templating->set('search_text', '');
 			}
 
@@ -58,11 +58,11 @@ if (!isset($_GET['go']))
 				$article_meta_image = '';
 				if ($article['article_top_image'] == 1)
 				{
-					$article_meta_image = core::config('website_url') . core::config('path') . "/uploads/articles/topimages/{$article['article_top_image_filename']}";
+					$article_meta_image = core::config('website_url') . "/uploads/articles/topimages/{$article['article_top_image_filename']}";
 				}
 				if (!empty($article['tagline_image']))
 				{
-					$article_meta_image = core::config('website_url') . core::config('path') . "/uploads/articles/tagline_images/{$article['tagline_image']}";
+					$article_meta_image = core::config('website_url') . "/uploads/articles/tagline_images/{$article['tagline_image']}";
 				}
 
 				$nice_title = $core->nice_title($article['title']);
@@ -88,7 +88,7 @@ if (!isset($_GET['go']))
 				$date = $core->format_date($article['date']);
 
 				$templating->block('article', 'articles_full');
-				$templating->set('url', $config['path']);
+				$templating->set('url', core::config('website_url'));
 				$templating->set('share_url', "http://www.gamingonlinux.com/articles/$nice_title.{$_GET['aid']}/");
 
 				$templating->set('rules', $config['rules']);
@@ -111,7 +111,7 @@ if (!isset($_GET['go']))
 						$page ='admin.php?module=articles&view=drafts';
 					}
 					$templating->set('edit_link', '');
-					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"{$config['path']}{$page}\">Back</button> <button type=\"submit\" formaction=\"{$config['path']}{$page}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
+					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"{$config['url']}{$page}\">Back</button> <button type=\"submit\" formaction=\"{$config['url']}{$page}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
 				}
 
 				if ($user->check_group(1,2) == false && $user->check_group(5) == false)
@@ -184,8 +184,10 @@ if (!isset($_GET['go']))
 				if (!empty($article['tagline_image']))
 				{
 					$tagline_bbcode  = $article['tagline_image'];
-				} else {
-					$tagline_bbcode = ""; //Piratelv @ 05/06/14 -- Some older articles didn't have this
+				}
+				else
+				{
+					$tagline_bbcode = "";
 				}
 
 				$article_page = 1;

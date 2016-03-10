@@ -82,7 +82,7 @@ if (!isset($_GET['go']))
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
 
 				// meta tags for g+, facebook and twitter images
-				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"{$config['website_url']}{$config['path']}/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n$twitter_card", 1);
+				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"{$config['website_url']}/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n$twitter_card", 1);
 
 				// make date human readable
 				$date = $core->format_date($article['date']);
@@ -95,7 +95,7 @@ if (!isset($_GET['go']))
 
 				if (($user->check_group(1,2) == true || $user->check_group(5) == true) && !isset($_GET['preview']))
 				{
-					$templating->set('edit_link', " <a href=\"{$config['path']}admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"><i class=\"icon-pencil\"></i><strong>Edit</strong></a>");
+					$templating->set('edit_link', " <a href=\"" . core::config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"><i class=\"icon-pencil\"></i><strong>Edit</strong></a>");
 					$templating->set('admin_button', '');
 				}
 
@@ -231,7 +231,7 @@ if (!isset($_GET['go']))
 					// sort out the avatar
 					if ($article['avatar_gravatar'] == 1)
 					{
-						$avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode($config['website_url'].$config['path'] . '/uploads/avatars/no_avatar.png') . '&size=125';
+						$avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode($config['website_url'] . '/uploads/avatars/no_avatar.png') . '&size=125';
 					}
 
 					// either uploaded or linked an avatar
@@ -349,7 +349,7 @@ if (!isset($_GET['go']))
 					}
 					else
 					{
-						$pagination_linking = core::config('website_url') . core::config('path') . 'index.php?module=articles_full&amp;aid=' . $_GET['aid'] . '&amp;';
+						$pagination_linking = core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $_GET['aid'] . '&amp;';
 					}
 
 					// sort out the pagination link
@@ -457,7 +457,7 @@ if (!isset($_GET['go']))
 						$into_username = '';
 						if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
 						{
-							$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . core::config('path') . 'templates/default/images/distros/' . $comments['distro'] . '.svg" />';
+							$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . core::config('website_url') . 'templates/default/images/distros/' . $comments['distro'] . '.svg" />';
 						}
 
 						$templating->block('article_comments', 'articles_full');
@@ -570,21 +570,21 @@ if (!isset($_GET['go']))
 						$comment_edit_link = '';
 						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
 						{
-							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"{$config['path']}index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
+							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"{$config['website_url']}index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
 						}
 						$templating->set('edit', $comment_edit_link);
 
 						$comment_delete_link = '';
 						if ($user->check_group(1,2) == true)
 						{
-							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"{$config['path']}index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
+							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"{$config['website_url']}index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 						}
 						$templating->set('delete', $comment_delete_link);
 
 						$report_link = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$report_link = "<li><a class=\"tooltip-top\" href=\"{$config['path']}index.php?module=articles_full&amp;go=report_comment&amp;article_id={$_GET['aid']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
+							$report_link = "<li><a class=\"tooltip-top\" href=\"{$config['website_url']}index.php?module=articles_full&amp;go=report_comment&amp;article_id={$_GET['aid']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
 						}
 						$templating->set('report_link', $report_link);
 					}
@@ -745,7 +745,7 @@ if (!isset($_GET['go']))
 
 			else
 			{
-				$comment_avatar = core::config('path') . '/uploads/avatars/no_avatar.png';
+				$comment_avatar = core::config('website_url') . '/uploads/avatars/no_avatar.png';
 			}
 
 			$templating->set('comment_avatar', $comment_avatar);
@@ -791,10 +791,10 @@ else if (isset($_GET['go']))
 		{
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: " . core::config('path') . "/articles/$title_nice.{$_POST['aid']}/error=noid#commentbox");
+				header("Location: " . core::config('website_url') . "/articles/$title_nice.{$_POST['aid']}/error=noid#commentbox");
 			}
 			else {
-				header("Location: " . core::config('path') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=noid#commentbox");
+				header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=noid#commentbox");
 			}
 
 			die();
@@ -831,10 +831,10 @@ else if (isset($_GET['go']))
 				{
 					if (core::config('pretty_urls') == 1)
 					{
-						header("Location: " . core::config('path') . "articles/$title_nice.{$_POST['aid']}/error=locked#commentbox");
+						header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=locked#commentbox");
 					}
 					else {
-						header("Location: " . core::config('path') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=locked#commentbox");
+						header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=locked#commentbox");
 					}
 
 					die();
@@ -860,10 +860,10 @@ else if (isset($_GET['go']))
 					{
 						if (core::config('pretty_urls') == 1)
 						{
-							header("Location: " . core::config('path') . "articles/$title_nice.{$_POST['aid']}/error=doublecomment#commentbox");
+							header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=doublecomment#commentbox");
 						}
 						else {
-							header("Location: " . core::config('path') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
+							header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
 						}
 
 						die();
@@ -873,10 +873,10 @@ else if (isset($_GET['go']))
 					{
 						if (core::config('pretty_urls') == 1)
 						{
-							header("Location: " . core::config('path') . "articles/$title_nice.{$_POST['aid']}/error=emptycomment#commentbox");
+							header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=emptycomment#commentbox");
 						}
 						else {
-							header("Location: " . core::config('path') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
+							header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
 						}
 
 						die();
@@ -952,17 +952,17 @@ else if (isset($_GET['go']))
 							<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 							</head>
 							<body>
-							<img src=\"{$config['website_url']}{$config['path']}/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+							<img src=\"{$config['website_url']}templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 							<br />
 							<p>Hello <strong>{$email_user['username']}</strong>,</p>
-							<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}{$config['path']}articles/$title_nice.$article_id/page=$comment_page#r{$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+							<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/page=$comment_page#r{$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 							<div>
 						 	<hr>
 						 	{$comment_email}
 						 	<hr>
-						 	You can unsubscribe from this article by <a href=\"{$config['website_url']}{$config['path']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"{$config['website_url']}{$config['path']}usercp.php\">User Control Panel</a>.
+						 	You can unsubscribe from this article by <a href=\"{$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"{$config['website_url']}usercp.php\">User Control Panel</a>.
 						 	<hr>
-						  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}{$config['path']}\" target=\"_blank\">{$config['website_url']}{$config['path']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+						  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 						  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 						  	<p>-----------------------------------------------------------------------------------------------------------</p>
 							</div>
@@ -970,7 +970,7 @@ else if (isset($_GET['go']))
 							</html>
 							";
 
-							$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on {$config['website_url']}{$config['path']}articles/$title_nice.$article_id/page=$comment_page#r{$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}{$config['path']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+							$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on {$config['website_url']}articles/$title_nice.$article_id/page=$comment_page#r{$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 							$boundary = uniqid('np');
 
@@ -1020,7 +1020,7 @@ else if (isset($_GET['go']))
 						}
 						else
 						{
-							header("Location: " . core::config('path') . "index.php?module=articles_full&aid=$article_id&page={$comment_page}#{$new_comment_id}");
+							header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&page={$comment_page}#{$new_comment_id}");
 						}
 					}
 				}

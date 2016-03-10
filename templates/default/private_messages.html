@@ -33,7 +33,7 @@
 [/block: compose_top]
 
 [block: compose_bottom]
-			<button type="submit" name="act" value="New" class="btn btn-primary">Send Message</button><button type="submit" name="act" value="preview_new" class="btn btn-primary" formaction="{:preview_action}">Preview Message</button>
+			<button type="submit" name="act" value="New" class="btn btn-primary">Send Message</button><button id="preview_pm_button" type="button">Preview Reply</button>
 		</div>
 	</div>
 </form>
@@ -121,18 +121,14 @@
 		</div>
 	</div>
 </form>
+[/block: view_bottom]
+
+[block: preview]
 <div class="preview_pm">
 	<div class="box">
 		<div class="head">PM Preview</div>
 		<div class="pm_text_preview body group"></div>
 	</div>
-</div>
-[/block: view_bottom]
-
-[block: preview]
-<div class="box">
-	<div class="head">PM Preview</div>
-	<div class="body group">{:message}</div>
 </div>
 [/block: preview]
 

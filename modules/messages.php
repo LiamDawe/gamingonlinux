@@ -439,8 +439,9 @@ else
 				$core->editor('text', '');
 
 				$templating->block('view_bottom', 'private_messages');
-				$templating->set('preview_action', 'index.php?module=messages#commentbox');
 				$templating->set('conversation_id', $start['conversation_id']);
+
+				$templating->block('preview', 'private_messages');
 			}
 
 			$templating->block('delete', 'private_messages');
@@ -490,59 +491,7 @@ else
 		$core->editor('text', $text);
 
 		$templating->block('compose_bottom', 'private_messages');
-		$templating->set('preview_action', '/index.php?module=messages#commentbox');
-	}
-
-	if (isset($_POST['act']) && $_POST['act'] == 'preview_new')
-	{
-		$title = '';
-		$text = '';
-		$user_to = '';
-		if (!empty($_POST['to']))
-		{
-			$user_to = $_POST['to'];
-		}
-		if (!empty($_POST['title']))
-		{
-			$title = $_POST['title'];
-		}
-		if (!empty($_POST['text']))
-		{
-			$text = $_POST['text'];
-		}
-
-		$templating->block('preview');
-		$templating->set('message', bbcode($_POST['text']));
-
-		$buttons = '<button type="submit" name="act" value="New" class="btn btn-primary" >Send Message</button><button type="submit" name="act" value="preview_new" class="btn btn-primary" >Preview Message</button>';
-
-		$core->editor('text', $text, $buttons, $config['path'] . 'index.php?module=messages', '<div class="box"><div class="head">Compose a new private message</div></div>
-		To (seperate names by commas, make sure you have their exact username!)<br />
-		<input type="text" name="to" value="'.$user_to.'" /><br />
-		Title<br />
-		<input type="text" name="title" value="'.$title.'" /><br />');
-	}
-
-	if (isset($_POST['act']) && $_POST['act'] == 'preview_edit')
-	{
-		$page = '';
-		if (!empty($_GET['page']) && is_numeric($_GET['page']))
-		{
-			$page = $_GET['page'];
-		}
-
-		$text = '';
-		if (!empty($_POST['text']))
-		{
-			$text = $_POST['text'];
-		}
-
-		$templating->block('preview');
-		$templating->set('message', bbcode($text));
-
-		$buttons = '<button type="submit" name="act" value="Edit" class="btn btn-primary">Edit</button><button type="submit" name="act" value="preview_edit" class="btn btn-primary">Preview Edit</button>';
-
-		$core->editor('text', $text, $buttons, $config['path'] . 'index.php?module=messages&message_id='.$_GET['message_id'].'&conversation_id='.$_GET['conversation_id'].'&page=' . $page);
+		$templating->block('preview', 'private_messages');
 	}
 
 	if (isset($_POST['act']) && $_POST['act'] == 'New')

@@ -11,7 +11,7 @@ if (isset($_GET['view']))
 			{
 				$core->message('Added that carousel item!');
 			}
-			
+
 			if ($_GET['message'] == 'empty')
 			{
 				$core->message('You must fill out all fields!', 1, NULL);
@@ -20,7 +20,7 @@ if (isset($_GET['view']))
 		$templating->block('add', 'admin_modules/admin_module_featured');
 		$templating->set('max_width', $config['carousel_image_width']);
 		$templating->set('max_height', $config['carousel_image_height']);
-		
+
 		// get articles that are new enough and populate the list
 		$timeout = 777600; // 9 days
 
@@ -42,7 +42,7 @@ if (isset($_GET['view']))
 		$templating->block('add_existing', 'admin_modules/admin_module_featured');
 		$templating->set('max_width', $config['carousel_image_width']);
 		$templating->set('max_height', $config['carousel_image_height']);
-		
+
 		$options = '';
 		$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `show_in_menu` = 1");
 		while ($list = $db->fetch())
@@ -56,7 +56,7 @@ if (isset($_GET['view']))
 		}
 		$templating->set('options', $options);
 	}
-	
+
 	if ($_GET['view'] == 'manage')
 	{
 		if (isset($_GET['message']))
@@ -65,15 +65,15 @@ if (isset($_GET['view']))
 			{
 				$core->message('You edited that carousel item!');
 			}
-			
+
 			if ($_GET['message'] == 'deleted')
 			{
 				$core->message('You have deleted that carousel item!');
 			}
 		}
-		
+
 		$templating->block('manage_top', 'admin_modules/admin_module_featured');
-		
+
 		$db->sqlquery("SELECT `featured_image`, `title`, `article_id` FROM `articles` WHERE `show_in_menu` = 1");
 		$count = $db->num_rows();
 
@@ -85,7 +85,7 @@ if (isset($_GET['view']))
 			$image = '<strong>This Editors Pick currently has no featured image set!</strong><br />';
 			if (!empty($items['featured_image']))
 			{
-				$image = "<img src=\"{$config['website_url']}{$config['path']}/uploads/carousel/{$items['featured_image']}\" width=\"100%\" class=\"img-responsive\"/>";
+				$image = "<img src=\"{$config['website_url']}uploads/carousel/{$items['featured_image']}\" width=\"100%\" class=\"img-responsive\"/>";
 			}
 
 			$templating->set('current_image', $image);
@@ -101,7 +101,7 @@ if (isset($_POST['act']))
 	{
 		if ($core->carousel_image($_POST['article_id']) == true)
 		{
-			header("Location: ".url."admin.php?module=featured&view=add&message=added");
+			header("Location: /admin.php?module=featured&view=add&message=added");
 		}
 		else
 		{
@@ -109,25 +109,25 @@ if (isset($_POST['act']))
 		}
 
 	}
-	
+
 	if ($_POST['act'] == 'edit')
 	{
 		if ($core->carousel_image($_POST['article_id']) == true)
 		{
-			header("Location: ".url."admin.php?module=featured&view=manage&message=edited");
+			header("Location: /admin.php?module=featured&view=manage&message=edited");
 		}
 		else
 		{
 			$core->message($core->error_message, NULL, 1);
 		}
 	}
-	
+
 	if ($_POST['act'] == 'delete')
 	{
-		unlink($_SERVER['DOCUMENT_ROOT'] . 'uploads/carousel/' . $carousel['image']);
-			
+		unlink(core::config('path') . 'uploads/carousel/' . $carousel['image']);
+
 		$db->sqlquery("UPDATE `articles` SET `featured_image` = '' WHERE `article_id` = ?", array($_POST['article_id']));
-		
-		header("Location: ".url."admin.php?module=featured&view=manage&message=deleted");
+
+		header("Location: /admin.php?module=featured&view=manage&message=deleted");
 	}
 }

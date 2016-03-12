@@ -475,19 +475,16 @@ else
 					$templating->set('editor', $editor_bit);
 					$templating->set('donator_badge', $donator_badge);
 
-					$templating->set('plain_username', $topic['username']);
-
 					$templating->set('post_id', $topic['topic_id']);
 					$templating->set('topic_id', $topic['topic_id']);
 					$templating->set('post_text', bbcode($topic['topic_text'], 0));
-					$templating->set('text_plain', htmlspecialchars($topic['topic_text'], ENT_QUOTES));
 
-					$report_link = '';
+					$user_options = '';
 					if ($_SESSION['user_id'] != 0)
 					{
-						$report_link = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=viewtopic&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li>";
+						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=viewtopic&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$topic['username']."\" data-comment=\"".htmlspecialchars($topic['topic_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
 					}
-					$templating->set('report_link', $report_link);
+					$templating->set('user_options', $user_options);
 				}
 
 				$reply_count = 0;
@@ -575,8 +572,6 @@ else
 							$avatar = "/uploads/avatars/no_avatar.png";
 						}
 
-						$templating->set('plain_username', $post['username']);
-
 						$templating->set('avatar', $avatar);
 
 						$editor_bit = '';
@@ -647,16 +642,15 @@ else
 						$templating->set('donator_badge', $donator_badge);
 
 						$templating->set('post_text', bbcode($post['reply_text'], 0));
-						$templating->set('text_plain', htmlspecialchars($post['reply_text'], ENT_QUOTES));
 						$templating->set('post_id', $post['post_id']);
 						$templating->set('topic_id', $_GET['topic_id']);
 
-						$report_link = '';
+						$user_options = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$report_link = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"{$config['website_url']}index.php?module=viewtopic&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li>";
+							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=viewtopic&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$post['username']."\" data-comment=\"".htmlspecialchars($post['reply_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
 						}
-						$templating->set('report_link', $report_link);
+						$templating->set('user_options', $user_options);
 
 						$reply_count++;
 					}

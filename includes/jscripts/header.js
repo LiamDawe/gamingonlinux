@@ -377,10 +377,5 @@ jQuery(document).ready(function()
   $('.preview_pm').show();
   $('#preview').scrollMinimal();
   $(".preview_pm").highlight();
-
-  /*
-  $('html, body').animate({
-  scrollTop: $('.preview_pm').offset().top
-  }, 1000);*/
   });
 });

@@ -1,3 +1,25 @@
+// scroll to an element if it's not in view, all other ways I could find completely sucked
+jQuery.fn.scrollMinimal = function(smooth) {
+  var cTop = this.offset().top;
+  var cHeight = this.outerHeight(true);
+  var windowTop = $(window).scrollTop();
+  var visibleHeight = $(window).height();
+
+  if (cTop < windowTop) {
+    if (smooth) {
+      $('body').animate({'scrollTop': cTop}, 'slow', 'swing');
+    } else {
+      $(window).scrollTop(cTop);
+    }
+  } else if (cTop + cHeight > windowTop + visibleHeight) {
+    if (smooth) {
+      $('body').animate({'scrollTop': cTop - visibleHeight + cHeight}, 'slow', 'swing');
+    } else {
+      $(window).scrollTop(cTop - visibleHeight + cHeight);
+    }
+  }
+};
+
 function resetFormElement(e)
 {
   e.wrap('<form>').closest('form').get(0).reset();
@@ -336,8 +358,10 @@ jQuery(document).ready(function()
   var text = $('#editor_content').val();
   $('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
   $('.preview_pm').show();
+  $('#preview').scrollMinimal();
+  /*
   $('html, body').animate({
   scrollTop: $('.preview_pm').offset().top
-  }, 1000);
+  }, 1000);*/
   });
 });

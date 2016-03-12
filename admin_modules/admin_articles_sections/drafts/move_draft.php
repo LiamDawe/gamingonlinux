@@ -54,10 +54,10 @@ foreach ($users_array as $email_user)
 	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 	</head>
 	<body>
-	<img src=\"{$config['website_url']}templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+	<img src=\"" . core::config('website_url') . "templates/default/images/logo.png\" alt=\"Gaming On Linux\">
 	<br />
 	<p>Hello <strong>{$email_user['username']}</strong>,</p>
-	<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"{$config['website_url']}admin.php?module=articles&view=adminreview&aid={$article_id}\">{$title_upper}</a></strong>\".</p>
+	<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . core::config('website_url') . "sadmin.php?module=articles&view=adminreview&aid={$article_id}\">{$title_upper}</a></strong>\".</p>
 	</body>
 	</html>";
 
@@ -67,7 +67,7 @@ foreach ($users_array as $email_user)
 	$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 	// Mail it
-	if ($config['send_emails'] == 1) // only send emails if this is on, we turn it to 0 on the test site
+	if (core::config('send_emails') == 1) // only send emails if this is on, we turn it to 0 on the test site
 	{
 		mail($to, $subject, $message, $headers);
 	}

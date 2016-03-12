@@ -26,7 +26,7 @@ if (!isset($_GET['aid']))
 	while ($article = $db->fetch())
 	{
 		$templating->block('drafts_row', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
-		$templating->set('url', $config['website_url']);
+		$templating->set('url', core::config('website_url'));
 		$templating->set('article_id', $article['article_id']);
 		$templating->set('article_title', $article['title']);
 		$templating->set('username', $article['username']);
@@ -108,8 +108,8 @@ else
 	$templating->set('edit_state', '');
 	$templating->set('edit_state_textarea', '');
 
-	$templating->set('url', $config['website_url']);
-	$templating->set('main_formaction', '<form method="post" action="'.$config['website_url'].'admin.php?module=articles" enctype="multipart/form-data" id="something">');
+	$templating->set('url', core::config('website_url'));
+	$templating->set('main_formaction', '<form method="post" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data" id="something">');
 
 	// get categorys
 	$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
@@ -176,19 +176,19 @@ else
 	$top_image = '';
 	if (!empty($article['tagline_image']))
 	{
-		$top_image = "<img src=\"{$config['website_url']}uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+		$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a><br />";
 	}
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
-		$top_image = "<img src=\"{$config['website_url']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+		$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
 	}
 
 	$templating->set('tagline_image', $top_image);
 
-	$templating->set('max_height', $config['article_image_max_height']);
-	$templating->set('max_width', $config['article_image_max_width']);
+	$templating->set('max_height', core::config('article_image_max_height'));
+	$templating->set('max_width', core::config('article_image_max_width'));
 
 	$core->editor('text', $text, 1);
 
@@ -202,7 +202,7 @@ else
 
 	foreach($article_images as $value)
 	{
-		$bbcode = "[img]{$config['website_url']}uploads/articles/article_images/{$value['filename']}[/img]";
+		$bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$value['filename']}[/img]";
 		$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$value['id']}\"><img src=\"/uploads/articles/article_images/{$value['filename']}\" class='imgList'><br />
 		BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
 		<button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$value['id']}\" class=\"trash\">Delete image</button>

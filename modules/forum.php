@@ -86,7 +86,7 @@ foreach ($category_array as $category)
 				$forum_link = "/forum/" . $forum['id'] . '/';
 			}
 			else {
-				$forum_link = $config['path'] . 'index.php?module=viewforum&amp;forum_id=' . $forum['id'];
+				$forum_link = core::config('website_url') . 'index.php?module=viewforum&amp;forum_id=' . $forum['id'];
 			}
 			$templating->set('forum_link', $forum_link);
 

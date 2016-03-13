@@ -26,7 +26,7 @@ foreach ($chucks as $row)
 		$avatar = "https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
 		if ($rowuser['avatar_uploaded'] == "1")
 		{
-			$avatar = core::config('website_url') . '/uploads/avatars/' . $rowuser['avatar'];
+			$avatar = core::config('website_url') . 'uploads/avatars/' . $rowuser['avatar'];
 		}
 		else if ($rowuser['avatar_gravatar'] == "1")
 		{

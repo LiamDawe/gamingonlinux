@@ -17,4 +17,4 @@ It is also recommanded to have the following php extentions available:
 ## Setting up a dev enviroment
 
 Setup apache to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
-Import the development SQL database from the stripped SQL file `includes/dev/db.sql` (sql file doesn't exist yet)
+Import the development SQL database from the stripped SQL file `includes/dev/db.sql`  

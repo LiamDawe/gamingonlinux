@@ -1,6 +1,8 @@
 <?php
 $templating->merge('admin_modules/admin_module_calendar');
 
+$years_array = range(2014, 2020);
+
 if (isset($_GET['error']))
 {
 	if ($_GET['error'] == 'missing')
@@ -95,7 +97,6 @@ if (isset($_GET['view']))
 		$templating->block('submit_main', 'admin_modules/admin_module_calendar');
 
 		$templating->block('submit_top', 'admin_modules/admin_module_calendar');
-		$years_array = array(2014,2015,2016);
 
 		$options = '';
 		foreach ($years_array as $what_year)
@@ -157,7 +158,6 @@ if (isset($_GET['view']))
 		$templating->block('add', 'admin_modules/admin_module_calendar');
 
 		$templating->block('manage_top', 'admin_modules/admin_module_calendar');
-		$years_array = array(2014,2015,2016);
 
 		$options = '';
 		foreach ($years_array as $what_year)

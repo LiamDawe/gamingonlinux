@@ -77,7 +77,8 @@ if (isset($_SESSION['user_group']) && $_SESSION['user_group'] != 0)
 }
 
 $templating->block('picker');
-$years_array = array(2014,2015,2016);
+
+$years_array = range(2014, 2020);
 
 $options = '';
 foreach ($years_array as $what_year)

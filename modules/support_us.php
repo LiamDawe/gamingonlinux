@@ -7,19 +7,35 @@ $templating->block('main');
 
 $templating->block('list_top');
 
-// get supporter list
-$db->sqlquery("SELECT `username`, `user_id`, `supporter_link` FROM `users` WHERE `secondary_user_group` IN (6,7) AND `user_group` != 1 AND `user_group` != 2");
-while ($supporter_list = $db->fetch())
-{
-	$templating->block('list_row');
-	$templating->set('user_id', $supporter_list['user_id']);
-	$templating->set('username', $supporter_list['username']);
+// get supporter list Sorted by last login
+$res = $db->sqlquery("SELECT `username`, `user_id`, `avatar`, `gravatar_email`, `avatar_uploaded`,`avatar_gravatar`, `supporter_link` FROM `users` WHERE `secondary_user_group` IN (6,7) AND `user_group` != 1 AND `user_group` != 2 ORDER BY last_login DESC");
 
-	$supporter_link = '';
-	if (!empty($supporter_list['supporter_link']))
-	{
-		$supporter_link = "- <a href=\"{$supporter_list['supporter_link']}\">{$supporter_list['supporter_link']}</a>";
+//Chop the results up in arrays of 3 users per row
+$chucks = array_chunk($res->fetch_all_rows(), 3);
+
+foreach ($chucks as $row) {
+	$templating->block('list_row_start');
+	foreach ($row as $bb => $rowuser) {
+
+		$templating->block('person');
+
+		$templating->set('user_id', $rowuser['user_id']);
+		$templating->set('username', $rowuser['username']);
+
+		$avatar = "https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
+		if ($rowuser['avatar_uploaded'] == "1"){
+			$avatar = core::config('website_url') . '/uploads/avatars/' . $rowuser['avatar'];
+		} else if ($rowuser['avatar_gravatar'] == "1") {
+			$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $rowuser['gravatar_email'] ) ) ) . "?d=https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
+		}
+		$templating->set('avatarurl', $avatar);
+
+		$supporter_link = '';
+		if (!empty($rowuser['supporter_link']))
+		{
+			$supporter_link = "<a href=\"{$rowuser['supporter_link']}\">{$rowuser['supporter_link']}</a>";
+		}
+		$templating->set('supporter_link', $supporter_link);
 	}
-	$templating->set('supporter_link', $supporter_link);
+	$templating->block('list_row_end');
 }
-?>

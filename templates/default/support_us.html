@@ -1,6 +1,6 @@
 [block: main]
 			<!-- support us page -->
-                		<div class="box">
+        		<div class="box">
 					<div class="body group">
                         You can help keep GamingOnLinux alive by <a href="https://www.patreon.com/liamdawe">pledging to this Patreon</a> run by Liam Dawe, the owner of GamingOnLinux.<br /><br />
                         If you can't help financially you can help in other ways:<br />
@@ -18,10 +18,23 @@
 				</div>
 [/block: list_top]
 
-[block: list_row]
-				<div class="box">
+[block: list_row_start]
+				<div class="supportusrow">
+
+[/block: list_row_start]
+
+[block: list_row_end]
+				</div>
+[/block: list_row_end]
+
+[block: person]
+				<div class="box profile">
 					<div class="body group">
-						<a href="/profiles/{:user_id}">{:username}</a> {:supporter_link}
+						<a href="/profiles/{:user_id}">
+						<img src="{:avatarurl}" alt="{:username}">
+						{:username}</a> <br />
+						{:supporter_link}
 					</div>
 				</div>
-[/block: list_row]
+[/block: person]
+

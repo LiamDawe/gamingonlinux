@@ -26,7 +26,7 @@ if (!isset($_POST['act']))
 	if ($user->check_group(1,2) == TRUE || $user->check_group(6,7))
 	{
 		$templating->block('premium', 'usercp_modules/usercp_module_home');
-		$templating->set('url', $config['path']);
+		$templating->set('url', core::config('website_url'));
 		$state = 'disabled';
 		if ($user->check_group(1,2) == true || $user->check_group(5,6))
 		{
@@ -61,7 +61,7 @@ if (!isset($_POST['act']))
 	}
 
 	$templating->block('main', 'usercp_modules/usercp_module_home');
-	$templating->set('url', $config['path']);
+	$templating->set('url', core::config('website_url'));
 
 	$profile_fields_output = '';
 
@@ -279,9 +279,10 @@ else if (isset($_POST['act']))
 			}
 		}
 
-		header("Location: {$config['path']}usercp.php?module=home&updated");
+		header("Location: " . core::config('website_url') . "usercp.php?module=home&updated");
 	}
 
+	// need to add in a check in here to doubly be sure they are a premium person
 	if ($_POST['act'] == 'premium')
 	{
 		$supporter_link = '';
@@ -296,21 +297,21 @@ else if (isset($_POST['act']))
 
 		$_SESSION['theme'] = $_POST['theme'];
 
-		header("Location: {$config['path']}usercp.php?module=home&updated");
+		header("Location: " . core::config('website_url') . "usercp.php?module=home&updated");
 	}
 
 	if ($_POST['act'] == 'twitter_remove')
 	{
 		$db->sqlquery("UPDATE `users` SET `twitter_username` = ?, `oauth_uid` = ?, `oauth_provider` = ? WHERE `user_id` = ?", array('', '', '', $_SESSION['user_id']));
 
-		header("Location: {$config['path']}usercp.php");
+		header("Location: " . core::config('website_url') . "usercp.php");
 	}
 
 	if ($_POST['act'] == 'steam_remove')
 	{
 		$db->sqlquery("UPDATE `users` SET `steam_username` = ?, `steam_id` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
 
-		header("Location: {$config['path']}usercp.php");
+		header("Location: " . core::config('website_url') . "usercp.php");
 	}
 }
 ?>

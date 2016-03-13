@@ -13,10 +13,11 @@ $res = $db->sqlquery("SELECT `username`, `user_id`, `avatar`, `gravatar_email`, 
 //Chop the results up in arrays of 3 users per row
 $chucks = array_chunk($res->fetch_all_rows(), 3);
 
-foreach ($chucks as $row) {
+foreach ($chucks as $row)
+{
 	$templating->block('list_row_start');
-	foreach ($row as $bb => $rowuser) {
-
+	foreach ($row as $bb => $rowuser)
+	{
 		$templating->block('person');
 
 		$templating->set('user_id', $rowuser['user_id']);
@@ -29,7 +30,7 @@ foreach ($chucks as $row) {
 		}
 		else if ($rowuser['avatar_gravatar'] == "1")
 		{
-			$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $rowuser['gravatar_email'] ) ) ) . "?d=https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
+			$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $rowuser['gravatar_email'] ) ) ) . "?d=https://www.gamingonlinux.com/uploads/avatars/no_avatar.png&size=125";
 		}
 		$templating->set('avatarurl', $avatar);
 

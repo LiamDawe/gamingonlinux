@@ -368,7 +368,7 @@ jQuery(document).ready(function()
 
   $(".uploads").on("click", ".add_button", function(){
 	var text = $(this).data('bbcode');
-	$('#editor_content2').val($('#editor_content2').val() + text);
+	$('#editor_content').val($('#editor_content').val() + text);
   });
 
   $('#preview_text_button').click(function() {

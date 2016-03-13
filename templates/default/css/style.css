@@ -799,6 +799,38 @@ ul.social-networks li > a {
 	float: right;
 }
 
+.box.profile {
+	float: left;
+	margin: 6px;
+}
+.box.profile:first-child {
+	margin-left: 0px;
+}
+.box.profile:last-child {
+	margin-right: 0px;
+}
+.box.profile .body {
+	height: 195px;
+	width: 280px;
+	text-align: center;
+	overflow: hidden;
+}
+.box.profile img {
+	display: block;
+	margin: 0 auto;
+}
+.box.profile a {
+    word-wrap: break-word;
+}
+.box.profile a:hover {
+	color: #518FD0;
+}
+.supportusrow:after {
+	display: block;
+	clear: both;
+	content: "";
+}
+
 /*
  * ------------------------------
  * Icons

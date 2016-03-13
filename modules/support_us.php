@@ -23,9 +23,12 @@ foreach ($chucks as $row) {
 		$templating->set('username', $rowuser['username']);
 
 		$avatar = "https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-		if ($rowuser['avatar_uploaded'] == "1"){
+		if ($rowuser['avatar_uploaded'] == "1")
+		{
 			$avatar = core::config('website_url') . '/uploads/avatars/' . $rowuser['avatar'];
-		} else if ($rowuser['avatar_gravatar'] == "1") {
+		}
+		else if ($rowuser['avatar_gravatar'] == "1")
+		{
 			$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $rowuser['gravatar_email'] ) ) ) . "?d=https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
 		}
 		$templating->set('avatarurl', $avatar);

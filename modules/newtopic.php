@@ -107,7 +107,7 @@ else if (!isset($_POST['act']))
 
 	if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 	{
-		$core->editor('text', $text, $config['path'] . '');
+		$core->editor('text', $text);
 	}
 
 	$templating->block('bottom', 'newtopic');
@@ -231,7 +231,7 @@ else if (isset($_POST['act']))
 					header("Location: /forum/topic/{$topic_id}");
 				}
 				else {
-					header("Location: {$config['path']}index.php?module=viewtopic&topic_id={$topic_id}");
+					header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
 				}
 			}
 
@@ -239,7 +239,7 @@ else if (isset($_POST['act']))
 			{
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `topic_id` = ?, `mod_queue` = 1", array("A new forum topic was added to the moderation queue", $core->date, $topic_id));
 
-				header("Location: {$config['path']}index.php?module=viewforum&forum_id=$forum_id&message=queue");
+				header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id=$forum_id&message=queue");
 			}
 		}
 	}

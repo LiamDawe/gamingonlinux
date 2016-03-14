@@ -68,7 +68,7 @@ else
 	{
 		if ($_GET['error'] == 'empty')
 		{
-			$core->message('You have to fill in a title, tagline and text!', NULL, 1);
+			$core->message('You have to fill in a title, friendly url (under the title), tagline and text!', NULL, 1);
 		}
 
 		else if ($_GET['error'] == 'shorttagline')

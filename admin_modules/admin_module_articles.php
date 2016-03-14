@@ -1397,6 +1397,7 @@ else if (isset($_POST['act']))
 		$title = strip_tags($_POST['title']);
 		$tagline = trim($_POST['tagline']);
 		$text = trim($_POST['text']);
+		$slug = trim($_POST['slug']);
 
 		$temp_tagline = 0;
 		if (!empty($_POST['temp_tagline_image']))
@@ -1405,11 +1406,12 @@ else if (isset($_POST['act']))
 		}
 
 		// make sure its not empty
-		if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['article_id']))
+		if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['article_id']) || empty($slug))
 		{
 			$_SESSION['atitle'] = $_POST['title'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
+			$_SESSION['aslug'] = $slug;
 
 			$_SESSION['acategories'] = $_POST['categories'];
 
@@ -1422,6 +1424,7 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['aslug'] = $slug;
 
 			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
 		}
@@ -1432,6 +1435,7 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['aslug'] = $slug;
 
 			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
 		}
@@ -1442,6 +1446,7 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['aslug'] = $slug;
 
 			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
 		}
@@ -1454,7 +1459,7 @@ else if (isset($_POST['act']))
 				$block = 1;
 			}
 
-			$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $tagline, $text, $block, $_POST['article_id']));
+			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
 				{
@@ -1492,6 +1497,7 @@ else if (isset($_POST['act']))
 			unset($_SESSION['uploads']);
 			unset($_SESSION['uploads_tagline']);
 			unset($_SESSION['image_rand']);
+			unset($_SESSION['aslug']);
 
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{

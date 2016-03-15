@@ -371,6 +371,16 @@ jQuery(document).ready(function()
 	$('#editor_content').val($('#editor_content').val() + text);
   });
 
+  $('#generate_preview').click(function()
+  {
+      var article_id = $(this).data('article-id');
+      $.post('/includes/ajax/generate_preview_code.php', { article_id: article_id })
+      .done (function(result)
+      {
+          $('#preview_code').val(result);
+      });
+  });
+
   $('#preview_text_button').click(function() {
   var text = $('#editor_content').val();
   $('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});

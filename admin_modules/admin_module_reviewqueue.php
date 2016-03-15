@@ -96,7 +96,7 @@ else
 		}
 	}
 
-	$query = "SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?";
+	$query = "SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?";
 
 	$db->sqlquery($query, array($_GET['aid']));
 
@@ -185,6 +185,12 @@ else
 
 	// get the edit row
 	$templating->merge('admin_modules/article_form');
+
+	$templating->block('preview_code', 'admin_modules/article_form');
+	$templating->set('preview_url', core::config('website_url') . 'index.php?module=articles_full.php&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
+	$templating->set('edit_state', $edit_state);
+	$templating->set('article_id', $article['article_id']);
+
 	$templating->block('full_editor', 'admin_modules/article_form');
 	$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 	$templating->set('edit_state', $edit_state);

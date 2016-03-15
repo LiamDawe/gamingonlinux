@@ -102,7 +102,7 @@ else if (isset($_GET['aid']))
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');
 
-	$db->sqlquery("SELECT a.article_id, a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.guest_ip, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `submitted_article` = 1 AND `active` = 0 AND `article_id` = ?", array($_GET['aid']));
+	$db->sqlquery("SELECT a.article_id, a.preview_code,a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.guest_ip, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `submitted_article` = 1 AND `active` = 0 AND `article_id` = ?", array($_GET['aid']));
 
 	$article = $db->fetch();
 
@@ -113,7 +113,7 @@ else if (isset($_GET['aid']))
 		$core->message("You have unlocked the article for others to edit!");
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery("SELECT a.article_id, a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
+		$db->sqlquery("SELECT a.article_id, a.preview_code,a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
 
 		$article = $db->fetch();
 	}
@@ -123,7 +123,7 @@ else if (isset($_GET['aid']))
 		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], $core->date, $article['article_id']));
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery("SELECT a.article_id, a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
+		$db->sqlquery("SELECT a.article_id, a.preview_code,a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
 
 		$article = $db->fetch();
 	}
@@ -133,7 +133,7 @@ else if (isset($_GET['aid']))
 		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", NULL, 1);
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery("SELECT a.article_id, a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
+		$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
 
 		$article = $db->fetch();
 	}
@@ -183,6 +183,12 @@ else if (isset($_GET['aid']))
 
 	// get the edit row
 	$templating->merge('admin_modules/article_form');
+
+	$templating->block('preview_code', 'admin_modules/article_form');
+	$templating->set('preview_url', core::config('website_url') . 'index.php?module=articles_full.php&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
+	$templating->set('edit_state', $edit_state);
+	$templating->set('article_id', $article['article_id']);
+
 	$templating->block('full_editor', 'admin_modules/article_form');
 	$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 	$templating->set('main_formaction', '<form method="post" action="'.$config['website_url'].'admin.php?module=articles" enctype="multipart/form-data">');
@@ -311,23 +317,6 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 	$templating->set('article_id', $article['article_id']);
 	$templating->set('author_id', $article['author_id']);
 	$previously_uploaded = '';
-
-	/* I DONT THINK THIS BIT IS NEEDED, OR EVEN CORRECT
-	// IT'S A SUBMITTED ARTICLE, UPLOADED IMAGES WILL ALWAYS HAVE AN ID ATTACHED TO IT AS SOON AS THEY ARE UPLOADED (at least they should!!)
-	// SO NOT SURE WHY THIS BIT IS EVEN HERE
-	if (isset($_GET['error']))
-	{
-		// sort out previously uploaded images
-		if (isset($_SESSION['uploads']))
-		{
-			foreach($_SESSION['uploads'] as $key)
-			{
-				$previously_uploaded .= "<div id=\"{$key['image_id']}\"><img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
-				BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]{$config['path']}/uploads/articles/article_images/{$key['image_name']}[/img]\" /></div>
-				<a href=\"#\" id=\"{$key['image_id']}\" class=\"trash\">Delete Image</a></div>";
-			}
-		}
-	}*/
 
 	// add in uploaded images from database
 	$db->sqlquery("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article['article_id']));

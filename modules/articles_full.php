@@ -68,6 +68,8 @@ if (!isset($_GET['go']))
 				else
 				{
 					$templating->set_previous('title', 'PREVIEW: ' . $article['title'], 1);
+
+					$core->message('Article currently inactive, you are seeing a private preview. Please do not share this unless you have been given permission.');
 				}
 
 				// set the article image meta

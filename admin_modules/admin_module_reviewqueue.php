@@ -187,7 +187,7 @@ else
 	$templating->merge('admin_modules/article_form');
 
 	$templating->block('preview_code', 'admin_modules/article_form');
-	$templating->set('preview_url', core::config('website_url') . 'index.php?module=articles_full.php&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
+	$templating->set('preview_url', core::config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
 	$templating->set('edit_state', $edit_state);
 	$templating->set('article_id', $article['article_id']);
 

@@ -215,7 +215,7 @@ if (!isset($_POST['act']))
 	else
 	{
 		$steam_button = '<div class="box"><div class="body group"><form method="post" action="/index.php?module=login&steam">
-		<button type="submit" formaction="/index.php?module=login&amp;steam"><img src="'.$config['path'].'uploads/steam_login_with_large_border.png" /></button>
+		<button type="submit" formaction="/index.php?module=login&amp;steam"><img src="'.core::config('website_url').'uploads/steam_login_with_large_border.png" /></button>
 		</form></div></div>';
 	}
 

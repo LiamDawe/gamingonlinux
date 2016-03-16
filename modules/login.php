@@ -272,7 +272,7 @@ else if (isset($_POST['action']))
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: noreply@gamingonlinux.com\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
-			if (mail($_POST['email'], 'GamingOnLinux.com password reset request', "Please click <a href=\"{$config['website_url']}{$config['path']}/index.php?module=login&reset&code={$random_string}&email={$_POST['email']}\">this link</a> to reset your password", $headers) == true)
+			if (mail($_POST['email'], 'GamingOnLinux.com password reset request', "Please click <a href=\"" . core::config('website_url') . "index.php?module=login&reset&code={$random_string}&email={$_POST['email']}\">this link</a> to reset your password", $headers) == true)
 			{
 				// tell them it's done
 				$core->message("An email has been sent to {$_POST['email']} with instructions on how to change your password.");

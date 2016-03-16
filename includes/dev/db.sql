@@ -726,7 +726,6 @@ CREATE TABLE IF NOT EXISTS `poll_votes` (
 --
 
 CREATE TABLE IF NOT EXISTS `saved_sessions` (
-  `sid` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `session_id` varchar(64) COLLATE utf8_bin NOT NULL,
   `browser_agent` text COLLATE utf8_bin NOT NULL,

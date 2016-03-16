@@ -27,14 +27,14 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) 
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
 
-	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
+	if ($_POST['check'] == 'Draft')
 	{
 		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline";
 	}
 
 	else
 	{
-		$url = "admin.php?module=articles&view=add&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline";
+		$url = "admin.php?module=articles&view=add&error=empty&temp_tagline=$temp_tagline";
 	}
 
 	header("Location: $url");
@@ -50,14 +50,14 @@ else if (strlen($_POST['tagline']) < 100)
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
 
-	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
+	if ($_POST['check'] == 'Draft')
 	{
 		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline";
 	}
 
 	else
 	{
-		$url = "admin.php?module=articles&view=add&aid={$_POST['article_id']}&error=shorttaline&temp_tagline=$temp_tagline";
+		$url = "admin.php?module=articles&view=add&error=shorttagline&temp_tagline=$temp_tagline";
 	}
 
 	header("Location: $url");
@@ -80,7 +80,7 @@ else if (strlen($_POST['tagline']) > 400)
 
 	else
 	{
-		$url = "admin.php?module=articles&view=add&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline";
+		$url = "admin.php?module=articles&view=add&error=taglinetoolong&temp_tagline=$temp_tagline";
 	}
 
 	header("Location: $url");
@@ -96,14 +96,14 @@ else if (strlen($_POST['title']) < 10)
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
 
-	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
+	if ($_POST['check'] == 'Draft')
 	{
 		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=shorttile&temp_tagline=$temp_tagline";
 	}
 
 	else
 	{
-		$url = "admin.php?module=articles&view=add&aid={$_POST['article_id']}&error=shorttile&temp_tagline=$temp_tagline";
+		$url = "admin.php?module=articles&view=add&error=shorttile&temp_tagline=$temp_tagline";
 	}
 
 	header("Location: $url");
@@ -119,14 +119,14 @@ else if (isset($_POST['show_block']) && $editor_pick_count == 3)
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
 
-	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
+	if ($_POST['check'] == 'Draft')
 	{
 		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=toomanypicks&temp_tagline=$temp_tagline";
 	}
 
 	else
 	{
-		$url = "admin.php?module=articles&view=add&aid={$_POST['article_id']}&error=toomanypicks&temp_tagline=$temp_tagline";
+		$url = "admin.php?module=articles&view=add&error=toomanypicks&temp_tagline=$temp_tagline";
 	}
 
 	header("Location: $url");
@@ -134,7 +134,7 @@ else if (isset($_POST['show_block']) && $editor_pick_count == 3)
 }
 
 // if they aren't uploading a tagline image on a brand new article
-else if (!isset($_SESSION['uploads_tagline']) && !isset($_POST['check']))
+else if (!isset($_SESSION['uploads_tagline']) && $_POST['check'] == 'Add')
 {
 	$_SESSION['atitle'] = $_POST['title'];
 	$_SESSION['aslug'] = $slug;
@@ -142,14 +142,14 @@ else if (!isset($_SESSION['uploads_tagline']) && !isset($_POST['check']))
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
 
-	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
+	if ($_POST['check'] == 'Draft')
 	{
 		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=noimageselected&temp_tagline=$temp_tagline";
 	}
 
 	else
 	{
-		$url = "admin.php?module=articles&view=add&aid={$_POST['article_id']}&error=noimageselected&temp_tagline=$temp_tagline";
+		$url = "admin.php?module=articles&view=add&error=noimageselected&temp_tagline=$temp_tagline";
 	}
 
 	header("Location: $url");

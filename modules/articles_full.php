@@ -977,7 +977,6 @@ else if (isset($_GET['go']))
 
 						// clear any comment or name left from errors
 						unset($_SESSION['acomment']);
-						unset($_SESSION['bad']);
 
 						if (core::config('pretty_urls') == 1)
 						{
@@ -1018,7 +1017,6 @@ else if (isset($_GET['go']))
 			// update comment
 			else
 			{
-				unset($_SESSION['bad']);
 				$comment_text = htmlspecialchars($comment_text, ENT_QUOTES);
 
 				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], $core->date, $_POST['comment_id']));

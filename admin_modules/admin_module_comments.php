@@ -474,7 +474,6 @@ if (isset($_POST['act']))
 
 		// clear any comment or name left from errors
 		unset($_SESSION['acomment']);
-		unset($_SESSION['bad']);
 
 		header("Location: {$config['website_url']}admin.php?module=comments&aid=$article_id");
 
@@ -506,7 +505,6 @@ if (isset($_POST['act']))
 			// update comment
 			else
 			{
-				unset($_SESSION['bad']);
 				$comment_text = htmlspecialchars($comment_text, ENT_QUOTES);
 
 				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ? WHERE `comment_id` = ?", array($comment_text, $_POST['comment_id']));

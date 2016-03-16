@@ -74,7 +74,6 @@ class user
 						$_SESSION['user_group'] = $user['user_group'];
 						$_SESSION['secondary_user_group'] = $user['secondary_user_group'];
 						$_SESSION['theme'] = $user['theme'];
-						$_SESSION['bad'] = 0;
 						$_SESSION['new_login'] = 1;
 						$_SESSION['activated'] = $user['activated'];
 						$_SESSION['in_mod_queue'] = $user['in_mod_queue'];
@@ -203,7 +202,6 @@ class user
 					$_SESSION['user_group'] = $user['user_group'];
 					$_SESSION['secondary_user_group'] = $user['secondary_user_group'];
 					$_SESSION['theme'] = $user['theme'];
-					$_SESSION['bad'] = 0;
 					$_SESSION['new_login'] = 1;
 					$_SESSION['activated'] = $user['activated'];
 					$_SESSION['in_mod_queue'] = $user['in_mod_queue'];
@@ -249,7 +247,6 @@ class user
 		unset($_SESSION['secondary_user_group']);
 		unset($_SESSION['theme']);
 		unset($_SESSION['uploads']);
-		unset($_SESSION['bad']);
 		unset($_SESSION['new_login']);
 		unset($_SESSION['activated']);
 		unset($_SESSION['in_mod_queue']);

@@ -510,7 +510,6 @@ if (isset($_POST['act']))
 
 			// clear any comment or name left from errors
 			unset($_SESSION['acomment']);
-			unset($_SESSION['bad']);
 
 			header("Location: {$config['website_url']}admin.php?module=articles&view=Submitted&aid=$article_id#comments");
 

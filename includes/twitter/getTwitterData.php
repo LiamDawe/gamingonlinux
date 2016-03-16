@@ -93,7 +93,6 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 			$_SESSION['secondary_user_group'] = $userdata['secondary_user_group'];
 			$_SESSION['theme'] = $userdata['theme'];
 			$_SESSION['infinite_scroll'] = $userdata['infinite_scroll'];
-			$_SESSION['bad'] = 0;
 			$_SESSION['logged_in'] = 1;
 
         	header("Location: /");

@@ -116,7 +116,6 @@ class steam_user
 					$_SESSION['user_group'] = $userdata['user_group'];
 					$_SESSION['secondary_user_group'] = $userdata['secondary_user_group'];
 					$_SESSION['theme'] = $userdata['theme'];
-					$_SESSION['bad'] = 0;
 					$_SESSION['in_mod_queue'] = $userdata['in_mod_queue'];
 					$_SESSION['logged_in'] = 1;
 
@@ -129,7 +128,6 @@ class steam_user
 					$get_info = $this->GetPlayerSummaries($matches[1]);
 					$_SESSION['steam_id'] = $get_info->steamid;
 					$_SESSION['steam_username'] = $get_info->personaname;
-					$_SESSION['bad'] = 0;
 					header("Location: /index.php?module=register&steam_new");
 				}
 			}

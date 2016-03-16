@@ -82,7 +82,6 @@ if ($_SESSION['user_id'] != 0)
 		$_SESSION['user_group'] = 4;
 		$_SESSION['secondary_user_group'] = 4;
 		$_SESSION['infinite_scroll'] = 1;
-		$_SESSION['bad'] = 0;
 		header("Location: /index.php");
 	}
 }

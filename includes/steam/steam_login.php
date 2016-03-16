@@ -68,16 +68,48 @@ class steam_user
 						exit;
 					}
 
+					$device_id = '';
+					// register the new device to their account, could probably add a small hook here to allow people to turn this email off at their own peril
+					if ($new_device == 1)
+					{
+						$device_id = md5(mt_rand() . $user['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
+						setcookie('gol-device', $device_id, time()+31556926, '/', 'gamingonlinux.com');
+
+						if ($user['login_emails'] == 1)
+						{
+							// send email about new device
+							$message = "<p>Hello <strong>{$user['username']}</strong>,</p>
+							<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the GamingOnLinux website you may want to let TheBoss and Levi know and change your password immediately.</p>
+							<div>
+							<hr>
+							Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "
+							<hr>
+							<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:contact@gamingonlinux.com\" target=\"_blank\">contact@gamingonlinux.com</a> with some info about what you want us to do about it.</p>
+							<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
+							<p>-----------------------------------------------------------------------------------------------------------</p>
+							</div>";
+
+							$plain_message = "Hello {$user['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the GamingOnLinux (https://www.gamingonlinux.com) website you may want to let TheBoss and Levi know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
+
+							$mail = new mail($user['email'], "GamingOnLinux: New Login Notification", $message, $plain_message);
+							$mail->send();
+						}
+					}
+					else
+					{
+						$device_id = $_COOKIE['gol-device'];
+					}
+
+					$generated_session = md5(mt_rand  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
 					if ($_COOKIE['request_stay'] == 1)
 					{
-						$generated_session = md5(mt_rand  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
 						setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', 'gamingonlinux.com');
 						setcookie('gol_session', $generated_session,  time()+31556926, '/', 'gamingonlinux.com');
-
-						$db->sqlquery("DELETE FROM `saved_sessions` WHERE `user_id` = ?", array($userdata['user_id']), 'steam_login.php');
-						$db->sqlquery("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?", array($userdata['user_id'], $generated_session), 'steam_login.php');
 					}
+
+					$db->sqlquery("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($userdata['user_id'], $generated_session, $_SERVER['HTTP_USER_AGENT'], $device_id, date("Y-m-d")));
 
 					$_SESSION['user_id'] = $userdata['user_id'];
 					$_SESSION['username'] = $userdata['username'];
@@ -86,6 +118,7 @@ class steam_user
 					$_SESSION['theme'] = $userdata['theme'];
 					$_SESSION['bad'] = 0;
 					$_SESSION['in_mod_queue'] = $userdata['in_mod_queue'];
+					$_SESSION['logged_in'] = 1;
 
 					header("Location: {$_GET['real_return']}");
 				}

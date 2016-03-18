@@ -28,7 +28,7 @@ if (isset($_POST['action']))
 			if ($_SESSION['user_id'] != 0)
 			{
 				// first make sure it's not reported already, so we don't double up notifications
-				$db->sqlquery("SELECT `reported` FROM `game_sales` WHERE `id` = ?", array($_POST['id']), 'sales.php');
+				$db->sqlquery("SELECT `reported` FROM `game_sales` WHERE `id` = ?", array($_POST['id']));
 				$reported_check = $db->fetch();
 
 				if ($reported_check['reported'] == 1)
@@ -40,7 +40,7 @@ if (isset($_POST['action']))
 					// update admin notifications
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `sale_id` = ?", array("{$_SESSION['username']} reporteda sale.", core::$date, $_POST['id']));
 
-					$db->sqlquery("UPDATE `game_sales` SET `reported` = 1 WHERE `id` = ?", array($_POST['id']), 'sales.php');
+					$db->sqlquery("UPDATE `game_sales` SET `reported` = 1 WHERE `id` = ?", array($_POST['id']));
 
 					header("Location: /sales/message=reported");
 				}
@@ -133,7 +133,7 @@ if (isset($_POST['action']))
 				}
 
 				$info_sanatized = htmlspecialchars($_POST['info']);
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = ?, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `pwyw` = ?, `beat_average` = ?, `savings` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, `euros_original` = ?, `expires` = ?, `submitted_by_id` = ?, `pre-order` = ?", array($info_sanatized, $_POST['website'], core::$date, $accepted, $_POST['provider'], $drmfree, $pr_key, $steam, $pwyw, $beat_average, $_POST['savings'], $_POST['pounds'],$_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'],$_POST['euros'], $_POST['euros_original'],$expires, $_SESSION['user_id'], $preorder), 'sales.php');
+				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = ?, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `pwyw` = ?, `beat_average` = ?, `savings` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, `euros_original` = ?, `expires` = ?, `submitted_by_id` = ?, `pre-order` = ?", array($info_sanatized, $_POST['website'], core::$date, $accepted, $_POST['provider'], $drmfree, $pr_key, $steam, $pwyw, $beat_average, $_POST['savings'], $_POST['pounds'],$_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'],$_POST['euros'], $_POST['euros_original'],$expires, $_SESSION['user_id'], $preorder));
 
 				$sale_id = $db->grab_id();
 				// if they are not an editor or admin add a notification and set accepted status to 0

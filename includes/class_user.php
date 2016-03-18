@@ -175,7 +175,7 @@ class user
 
 		// keeping a log of logins, to review at anytime
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-		$db->sqlquery("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $_SERVER['HTTP_USER_AGENT'], $device_id, date("Y-m-d")));
+		$db->sqlquery("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $_SERVER['HTTP_USER_AGENT'], $device_id, date("Y-m-d")), '', debug_backtrace());
 
 		$_SESSION['user_id'] = $user_data['user_id'];
 		$_SESSION['username'] = $user_data['username'];
@@ -199,7 +199,7 @@ class user
 		if ($db->num_rows() == 1)
 		{
 			// login then
-			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email` FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']), 'class_user.php');
+			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email` FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
 			$user = $db->fetch();
 
 			if ($user['banned'] == 0)
@@ -216,7 +216,7 @@ class user
 				else
 				{
 					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']), 'class_user.php');
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']));
 
 					$_SESSION['user_id'] = $user['user_id'];
 					$_SESSION['username'] = $user['username'];

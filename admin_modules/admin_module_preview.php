@@ -28,11 +28,11 @@ if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
 
 else if ($article['locked'] == 0)
 {
-	$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], $core->date, $article_id));
+	$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article_id));
 }
 
 // make date human readable
-$date = $core->format_date($core->date);
+$date = $core->format_date(core::$date);
 
 // get the article row template
 $templating->block('preview_row', 'admin_modules/admin_module_articles');

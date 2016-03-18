@@ -16,9 +16,10 @@ class user
 		return $salt;
 	}
 
+	// normal login form
 	function login($username, $password, $remember_username, $stay)
 	{
-		global $db, $core;
+		global $db;
 
 		$db->sqlquery("SELECT `password_salt` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
 		if ($db->num_rows() > 0)
@@ -31,127 +32,27 @@ class user
 			{
 				$user = $db->fetch();
 
-				// Check if the user is banned
-				if ($user['banned'] == 0)
+				$this->check_banned($user);
+
+				$generated_session = md5(mt_rand() . $user['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
+				// update IP address and last login
+				$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']));
+
+				$this->register_session($user, $generated_session);
+
+				if ($remember_username == 1)
 				{
-					// now check IP ban
-					$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array($core->ip), 'class_user.php');
-					if ($db->num_rows() == 1)
-					{
-						setcookie('gol_stay', "",  time()-60, '/');
-						$this->message = "You are banned!";
-						return false;
-					}
-
-					else
-					{
-						// check if it's a new device straight away
-						$new_device = 0;
-						if (!isset($_COOKIE['gol-device']))
-						{
-							$new_device = 1;
-						}
-
-						// they have a device cookie, let's check it bitches
-						if (isset($_COOKIE['gol-device']))
-						{
-							$db->sqlquery("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ?", array($user['user_id']));
-							$get_device = $db->fetch();
-
-							// cookie didn't match, don't let them in, hacking attempt probable
-							if ($get_device['device-id'] != $_COOKIE['gol-device'])
-							{
-								$new_device = 1;
-								setcookie('gol-device', "",  time()-60, '/');
-							}
-						}
-
-						// update IP address and last login
-						$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array($core->ip, $core->date, $user['user_id']), 'class_user.php');
-
-						$_SESSION['user_id'] = $user['user_id'];
-						$_SESSION['username'] = $user['username'];
-						$_SESSION['user_group'] = $user['user_group'];
-						$_SESSION['secondary_user_group'] = $user['secondary_user_group'];
-						$_SESSION['theme'] = $user['theme'];
-						$_SESSION['new_login'] = 1;
-						$_SESSION['activated'] = $user['activated'];
-						$_SESSION['in_mod_queue'] = $user['in_mod_queue'];
-						$_SESSION['logged_in'] = 1;
-
-						$generated_session = md5(mt_rand() . $user['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
-						if ($remember_username == 1)
-						{
-							setcookie('remember_username', $username,  time()+60*60*24*30, '/', 'gamingonlinux.com');
-						}
-
-						if ($stay == 1)
-						{
-							setcookie('gol_stay', $user['user_id'], time()+31556926, '/', 'gamingonlinux.com');
-							setcookie('gol_session', $generated_session, time()+31556926, '/', 'gamingonlinux.com');
-						}
-
-						$device_id = '';
-						// register the new device to their account, could probably add a small hook here to allow people to turn this email off at their own peril
-						if ($new_device == 1)
-						{
-							$device_id = md5(mt_rand() . $user['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
-							setcookie('gol-device', $device_id, time()+31556926, '/', 'gamingonlinux.com');
-
-							if ($user['login_emails'] == 1)
-							{
-								// send email about new device
-								$message = "<p>Hello <strong>{$user['username']}</strong>,</p>
-								<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the GamingOnLinux website you may want to let TheBoss and Levi know and change your password immediately.</p>
-								<div>
-								<hr>
-								Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "
-								<hr>
-								<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:contact@gamingonlinux.com\" target=\"_blank\">contact@gamingonlinux.com</a> with some info about what you want us to do about it.</p>
-								<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-								<p>-----------------------------------------------------------------------------------------------------------</p>
-								</div>";
-
-								$plain_message = "Hello {$user['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the GamingOnLinux (https://www.gamingonlinux.com) website you may want to let TheBoss and Levi know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
-
-								$mail = new mail($user['email'], "GamingOnLinux: New Login Notification", $message, $plain_message);
-								$mail->send();
-							}
-						}
-						else
-						{
-							$device_id = $_COOKIE['gol-device'];
-						}
-
-						// keeping a log of logins, to review at anytime
-						// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-						$db->sqlquery("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user['user_id'], $generated_session, $_SERVER['HTTP_USER_AGENT'], $device_id, date("Y-m-d")));
-
-						return true;
-					}
+					setcookie('remember_username', $username,  time()+60*60*24*30, '/', 'gamingonlinux.com');
 				}
 
-				else
+				if ($stay == 1)
 				{
-					setcookie('gol_stay', "",  time()-60, '/');
-					setcookie('gol_session', "",  time()-60, '/');
-					setcookie('gol-device', "",  time()-60, '/');
-
-					// update their ip in the user table
-					$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array($core->ip, $user['user_id']));
-
-					// search the ip list, if it's not on it then add it in
-					$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array($core->ip));
-					if ($db->num_rows() == 0)
-					{
-						$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($core->ip));
-					}
-
-					$this->message = "You are banned!";
-					return false;
+					setcookie('gol_stay', $user['user_id'], time()+31556926, '/', 'gamingonlinux.com');
+					setcookie('gol_session', $generated_session, time()+31556926, '/', 'gamingonlinux.com');
 				}
+
+				return true;
 			}
 
 			else
@@ -165,6 +66,126 @@ class user
 			$this->message = "Couldn't find username!";
 			return false;
 		}
+	}
+
+	public static function check_banned($user_data)
+	{
+		global $db;
+
+		$banned = 0;
+
+		// now check IP ban
+		$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
+		if ($db->num_rows() == 1)
+		{
+			$banned = 1;
+		}
+
+		if ($user_data['banned'] == 1)
+		{
+			$banned = 1;
+		}
+
+		if ($banned == 1)
+		{
+			setcookie('gol_stay', "",  time()-60, '/');
+			setcookie('gol_session', "",  time()-60, '/');
+			setcookie('gol-device', "",  time()-60, '/');
+
+			// update their ip in the user table
+			$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array(core::$ip, $user_data['user_id']));
+
+			// search the ip list, if it's not on it then add it in
+			$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
+			if ($db->num_rows() == 0)
+			{
+				$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array(core::$ip));
+			}
+
+			if (core::config('pretty_urls') == 1)
+			{
+				header("Location: /home/banned");
+			}
+			else
+			{
+				header("Location: index.php?module=home&message=banned");
+			}
+			exit;
+		}
+	}
+
+	// check if it's a new device, then set the session up
+	public static function register_session($user_data, $generated_session)
+	{
+		global $db;
+
+		// check if it's a new device straight away
+		$new_device = 0;
+		if (!isset($_COOKIE['gol-device']))
+		{
+			$new_device = 1;
+		}
+
+		// they have a device cookie, let's check it bitches
+		if (isset($_COOKIE['gol-device']))
+		{
+			$db->sqlquery("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ?", array($user_data['user_id']));
+			$get_device = $db->fetch();
+
+			// cookie didn't match, don't let them in, hacking attempt probable
+			if ($get_device['device-id'] != $_COOKIE['gol-device'])
+			{
+				$new_device = 1;
+				setcookie('gol-device', "",  time()-60, '/');
+			}
+		}
+
+		$device_id = '';
+		// register the new device to their account, could probably add a small hook here to allow people to turn this email off at their own peril
+		if ($new_device == 1)
+		{
+			$device_id = md5(mt_rand() . $user_data['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
+			setcookie('gol-device', $device_id, time()+31556926, '/', 'gamingonlinux.com');
+
+			if ($user_data['login_emails'] == 1)
+			{
+				// send email about new device
+				$message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
+				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the GamingOnLinux website you may want to let TheBoss and Levi know and change your password immediately.</p>
+				<div>
+				<hr>
+				Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "
+				<hr>
+				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:contact@gamingonlinux.com\" target=\"_blank\">contact@gamingonlinux.com</a> with some info about what you want us to do about it.</p>
+				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
+				<p>-----------------------------------------------------------------------------------------------------------</p>
+				</div>";
+
+				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the GamingOnLinux (https://www.gamingonlinux.com) website you may want to let TheBoss and Levi know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
+
+				$mail = new mail($user_data['email'], "GamingOnLinux: New Login Notification", $message, $plain_message);
+				$mail->send();
+			}
+		}
+		else
+		{
+			$device_id = $_COOKIE['gol-device'];
+		}
+
+		// keeping a log of logins, to review at anytime
+		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
+		$db->sqlquery("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $_SERVER['HTTP_USER_AGENT'], $device_id, date("Y-m-d")));
+
+		$_SESSION['user_id'] = $user_data['user_id'];
+		$_SESSION['username'] = $user_data['username'];
+		$_SESSION['user_group'] = $user_data['user_group'];
+		$_SESSION['secondary_user_group'] = $user_data['secondary_user_group'];
+		$_SESSION['theme'] = $user_data['theme'];
+		$_SESSION['new_login'] = 1;
+		$_SESSION['activated'] = $user_data['activated'];
+		$_SESSION['in_mod_queue'] = $user_data['in_mod_queue'];
+		$_SESSION['logged_in'] = 1;
 	}
 
 	// if they have a stay logged in cookie log them in!
@@ -184,7 +205,7 @@ class user
 			if ($user['banned'] == 0)
 			{
 				// now check IP ban
-				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array($core->ip));
+				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
 				if ($db->num_rows() == 1)
 				{
 					setcookie('gol_stay', "",  time()-60, '/');
@@ -195,7 +216,7 @@ class user
 				else
 				{
 					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array($core->ip, $core->date, $user['user_id']), 'class_user.php');
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']), 'class_user.php');
 
 					$_SESSION['user_id'] = $user['user_id'];
 					$_SESSION['username'] = $user['username'];
@@ -216,13 +237,13 @@ class user
 				setcookie('gol_stay', "",  time()-60, '/');
 
 				// update their ip in the user table
-				$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array($core->ip, $user['user_id']));
+				$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array(core::$ip, $user['user_id']));
 
 				// search the ip list, if it's not on it then add it in
-				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array($core->ip));
+				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
 				if ($db->num_rows() == 0)
 				{
-					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($core->ip));
+					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array(core::$ip));
 				}
 				$this->message = "You are banned!";
 				return false;
@@ -239,7 +260,10 @@ class user
 	{
 		global $db;
 
-		$db->sqlquery("DELETE FROM `saved_sessions` WHERE `user_id` = ? and `device-id` = ?", array($_SESSION['user_id'], $_COOKIE['gol-device']));
+		if (isset($_COOKIE['gol-device']))
+		{
+			$db->sqlquery("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($_SESSION['user_id'], $_COOKIE['gol-device']));
+		}
 
 		unset($_SESSION['user_id']);
 		unset($_SESSION['username']);

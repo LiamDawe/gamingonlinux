@@ -13,7 +13,7 @@ class check_user
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
-			$db->sqlquery("SELECT `username`, `user_id`, `user_group`, `secondary_user_group`, `theme`, `in_mod_queue` FROM `users` WHERE `steam_id` = ?", array($steam_id));
+			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE `steam_id` = ?", array($steam_id));
 			$result = $db->fetch();
 			if (!empty($result))
 			{

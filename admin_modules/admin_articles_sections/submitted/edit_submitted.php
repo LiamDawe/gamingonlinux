@@ -76,7 +76,7 @@ else
 	}
 
 	// update history
-	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], $core->date));
+	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date));
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 	unset($_SESSION['atitle']);

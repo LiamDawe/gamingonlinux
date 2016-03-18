@@ -123,7 +123,7 @@ $page2 .= $donate_text . "\r\nWe hope you enjoy all the news we bring you!";
 echo bbcode($text);
 echo bbcode($page2);
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `tagline` = ?, `text` = ?, `page2` = ?, `show_in_menu` = 0, `tagline_image` = 'weeklyoverview.jpg'", array($core->date, $title, $tagline, $text, $page2));
+$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `tagline` = ?, `text` = ?, `page2` = ?, `show_in_menu` = 0, `tagline_image` = 'weeklyoverview.jpg'", array(core::$date, $title, $tagline, $text, $page2));
 
 $article_id = $db->grab_id();
 

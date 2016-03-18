@@ -67,12 +67,12 @@ else
 {
 	$title = strip_tags($_POST['title']);
 
-	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, $core->date, core::random_id()));
+	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, core::$date, core::random_id()));
 
 	$article_id = $db->grab_id();
 
 	// update admin notifications
-	$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("{$_SESSION['username']} sent a new article to the admin review queue.", $core->date, $article_id));
+	$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("{$_SESSION['username']} sent a new article to the admin review queue.", core::$date, $article_id));
 
 	// update any uploaded images to have this article id, stop any images not being attached to an article
 	if (isset($_SESSION['uploads']))

@@ -363,7 +363,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$db->sqlquery("UPDATE `forum_topics` SET `reported` = 0 WHERE `topic_id` = ?", array($_GET['topic_id']));
 			
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `topic_id` = ?", array("{$_SESSION['username']} deleted a topic report.", $core->date, $_GET['topic_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `topic_id` = ?", array("{$_SESSION['username']} deleted a topic report.", core::$date, $_GET['topic_id']));
 			
 			header("Location: /admin.php?module=forum&view=reportedtopics&message=done");
 		}
@@ -384,7 +384,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$db->sqlquery("UPDATE `forum_replies` SET `reported` = 0 WHERE `post_id` = ?", array($_GET['post_id']));
 			
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `reply_id` = ?", array("{$_SESSION['username']} deleted a forum topic reply report.", $core->date, $_GET['post_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `reply_id` = ?", array("{$_SESSION['username']} deleted a forum topic reply report.", core::$date, $_GET['post_id']));
 			
 			header("Location: /admin.php?module=forum&view=reportedreplies&message=done");
 		}

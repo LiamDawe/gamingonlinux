@@ -90,16 +90,16 @@ else if (isset($_POST['act']))
 				}
 
 				// update forums post counter and last post info
-				$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, $core->date, $topic_id, $forum_id));
+				$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $forum_id));
 
 				// update user post counter
 				$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
 
 				// update topic reply count and last post info
-				$db->sqlquery("UPDATE `forum_topics` SET `replys` = (replys + 1), `last_post_date` = ?, $mod_sql `last_post_id` = ? WHERE `topic_id` = ?", array($core->date, $author, $topic_id));
+				$db->sqlquery("UPDATE `forum_topics` SET `replys` = (replys + 1), `last_post_date` = ?, $mod_sql `last_post_id` = ? WHERE `topic_id` = ?", array(core::$date, $author, $topic_id));
 
 				// add the reply
-				$db->sqlquery("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?", array($topic_id, $author, $message, $core->date));
+				$db->sqlquery("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?", array($topic_id, $author, $message, core::$date));
 				$post_id = $db->grab_id();
 				// find what page and where in the page the link needs to go!
 				$db->sqlquery("SELECT `replys` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id));

@@ -420,7 +420,7 @@ foreach ($Games as $game)
 			$bundle = 1;
 		}
 		
-		$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 1, `pounds_original` = ?, `pounds` = ?, `dollars_original` = ?, `dollars` = ?, `euros_original` = ?, `euros` = ?, `steam` = 1, `bundle` = ?, `imported_image_link` = ?", array($game['name'], "http://store.steampowered.com/app/{$game['steam_appid']}/", $core->date, $pounds_original, $pounds_sale, $dollars_original, $dollars_sale, $euros_original, $euros_sale, $bundle, $header_image));
+		$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 1, `pounds_original` = ?, `pounds` = ?, `dollars_original` = ?, `dollars` = ?, `euros_original` = ?, `euros` = ?, `steam` = 1, `bundle` = ?, `imported_image_link` = ?", array($game['name'], "http://store.steampowered.com/app/{$game['steam_appid']}/", core::$date, $pounds_original, $pounds_sale, $dollars_original, $dollars_sale, $euros_original, $euros_sale, $bundle, $header_image));
 
 		$sale_id = $db->grab_id();
 			

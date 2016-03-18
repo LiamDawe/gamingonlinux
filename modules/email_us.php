@@ -34,7 +34,7 @@ if (isset($_POST['act']))
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";
 			$secret='6LcT0gATAAAAAJrRJK0USGyFE4pFo-GdRTYcR-vg';
-			$ip=$core->ip;
+			$ip=core::$ip;
 			$url=$google_url."?secret=".$secret."&response=".$recaptcha."&remoteip=".$ip;
 			$res=getCurlData($url);
 			$res= json_decode($res, true);

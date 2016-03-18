@@ -56,7 +56,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					{
 						$article_id = $_POST['article_id'];
 					}
-					$db->sqlquery("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?", array($image_name, $_SESSION['user_id'], $core->date, $article_id));
+					$db->sqlquery("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?", array($image_name, $_SESSION['user_id'], core::$date, $article_id));
 					$image_id = $db->grab_id();
 
 					// if they aren't adding the image to an existing article, store it in the session

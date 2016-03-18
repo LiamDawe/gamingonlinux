@@ -27,7 +27,7 @@ else
 	{
 		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `article_id` = ?", array($_GET['article_id']));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `article_id` = ?", array("{$_SESSION['username']} denied a user submitted article.", $core->date, $core->date, $_GET['article_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `article_id` = ?", array("{$_SESSION['username']} denied a user submitted article.", core::$date, core::$date, $_GET['article_id']));
 
 		// delete it
 		$db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));

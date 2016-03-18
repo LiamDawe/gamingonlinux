@@ -91,7 +91,7 @@ $text .= "<br />What was your favourite Linux Gaming news for the past month?";
 // DEBUG
 //echo $text;
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'monthlyoverview.png'", array($core->date, $title, $tagline, $text));
+$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'monthlyoverview.png'", array(core::$date, $title, $tagline, $text));
 
 $article_id = $db->grab_id();
 

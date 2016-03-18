@@ -14,7 +14,7 @@ if($_POST)
 {
 	if (core::config('goty_voting_open') == 1)
 	{
-		$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array($core->ip, $_POST['category_id']));
+		$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $_POST['category_id']));
 		if ($db->num_rows() == 0)
 		{
 			$db->sqlquery("SELECT `game` FROM `goty_games` WHERE `id` = ?", array($_POST['game_id']));
@@ -24,7 +24,7 @@ if($_POST)
 
 			$db->sqlquery("UPDATE `config` SET `data_value` = (data_value +1) WHERE `data_key` = 'goty_total_votes'");
 
-			$db->sqlquery("INSERT INTO `goty_votes` SET `ip` = ?, `game_id` = ?, `category_id` = ?", array($core->ip, $_POST['game_id'], $_POST['category_id']));
+			$db->sqlquery("INSERT INTO `goty_votes` SET `ip` = ?, `game_id` = ?, `category_id` = ?", array(core::$ip, $_POST['game_id'], $_POST['category_id']));
 			echo json_encode(array("result" => 1));
 			return;
 		}

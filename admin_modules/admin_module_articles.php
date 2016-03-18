@@ -4,7 +4,7 @@ $templating->set('article_css', 'articleadmin');
 
 if (!isset($_GET['view']) && !isset($_POST['act']))
 {
-	core::message("Looks like you took a wrong turn!");
+	$core->message("Looks like you took a wrong turn!");
 }
 
 if (isset($_GET['view']))
@@ -55,7 +55,7 @@ if (isset($_GET['view']))
 
 		$templating->merge('admin_modules/article_form');
 		$templating->block('full_editor', 'admin_modules/article_form');
-		$templating->set('main_formaction', '<form method="post" action="'.$config['website_url'].'admin.php?module=articles" enctype="multipart/form-data" id="something">');
+		$templating->set('main_formaction', '<form method="post" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 		$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 
 		// get categorys
@@ -189,7 +189,7 @@ if (isset($_GET['view']))
 
 			if ($article['locked'] == 0 && $_GET['lock'] == 1)
 			{
-				$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], $core->date, $article['article_id']));
+				$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 				// we need to re-catch the article info as we have changed lock status
 				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id), 'view_articles.php admin review');
@@ -964,7 +964,7 @@ else if (isset($_POST['act']))
 				$comment = htmlspecialchars($_POST['text'], ENT_QUOTES);
 				$article_id = $_POST['aid'];
 
-				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], $core->date, $comment));
+				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
 
 				$new_comment_id = $db->grab_id();
 
@@ -1240,7 +1240,7 @@ else if (isset($_POST['act']))
 			}
 
 			// update history
-			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], $core->date));
+			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date));
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 			unset($_SESSION['atitle']);
@@ -1338,7 +1338,7 @@ else if (isset($_POST['act']))
 						$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_GET['article_id']));
 						$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_GET['article_id']));
 						$db->sqlquery("DELETE FROM `admin_notifications` WHERE `article_id` = ?", array($_GET['article_id']));
-						$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `article_id` = ?, `action` = ?, `created` = ?, `completed_date` = ?", array($_GET['article_id'], "{$_SESSION['username']} deleted the article: {$check['title']}", $core->date, $core->date));
+						$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `article_id` = ?, `action` = ?, `created` = ?, `completed_date` = ?", array($_GET['article_id'], "{$_SESSION['username']} deleted the article: {$check['title']}", core::$date, core::$date));
 
 						// remove old article's image
 						if ($check['article_top_image'] == 1)
@@ -1485,7 +1485,7 @@ else if (isset($_POST['act']))
 			}
 
 			// update history
-			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], $core->date));
+			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date));
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 			unset($_SESSION['atitle']);
@@ -1613,7 +1613,7 @@ else if (isset($_POST['act']))
 			$db->sqlquery("SELECT `comment_text` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
 			$get_comment = $db->fetch();
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ?, `content` = ? WHERE `comment_id` = ?", array("{$_SESSION['username']} deleted a comment report.", $core->date, $get_comment['comment_text'], $_GET['comment_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ?, `content` = ? WHERE `comment_id` = ?", array("{$_SESSION['username']} deleted a comment report.", core::$date, $get_comment['comment_text'], $_GET['comment_id']));
 
 			$db->sqlquery("UPDATE `articles_comments` SET `spam` = 0 WHERE `comment_id` = ?", array($_GET['comment_id']));
 

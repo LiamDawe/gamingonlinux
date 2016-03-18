@@ -779,7 +779,7 @@ else if (isset($_GET['go']))
 		else
 		{
 			// check to make sure their IP isn't banned
-			$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array($core->ip));
+			$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
 			if ($db->num_rows() >= 1)
 			{
 				header("Location: /home/banned");
@@ -854,7 +854,7 @@ else if (isset($_GET['go']))
 						$article_id = $_POST['aid'];
 
 						// add the comment
-						$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], $core->date, $comment));
+						$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
 
 						$new_comment_id = $db->grab_id();
 
@@ -1019,7 +1019,7 @@ else if (isset($_GET['go']))
 			{
 				$comment_text = htmlspecialchars($comment_text, ENT_QUOTES);
 
-				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], $core->date, $_POST['comment_id']));
+				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], core::$date, $_POST['comment_id']));
 
 				$nice_title = $core->nice_title($comment['title']);
 
@@ -1095,7 +1095,7 @@ else if (isset($_GET['go']))
 						$db->sqlquery("DELETE FROM `admin_notifications` WHERE `comment_id` = ?", array($_GET['comment_id']));
 					}
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `comment_id` = ?, `content` = ?", array($core->date, "{$_SESSION['username']} deleted a comment.", $core->date, $_GET['comment_id'], $comment['comment_text']));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `comment_id` = ?, `content` = ?", array(core::$date, "{$_SESSION['username']} deleted a comment.", core::$date, $_GET['comment_id'], $comment['comment_text']));
 
 					// delete comment and update comments counter
 					$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
@@ -1190,7 +1190,7 @@ else if (isset($_GET['go']))
 			if ($_SESSION['user_group'] != 4)
 			{
 				// update admin notifications
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `comment_id` = ?, `reported_comment` = 1", array("{$_SESSION['username']} reported an article comment.", $core->date, $_GET['comment_id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `comment_id` = ?, `reported_comment` = 1", array("{$_SESSION['username']} reported an article comment.", core::$date, $_GET['comment_id']));
 
 				$db->sqlquery("UPDATE `articles_comments` SET `spam` = 1, `spam_report_by` = ? WHERE `comment_id` = ?", array($_SESSION['user_id'], $_GET['comment_id']));
 			}
@@ -1225,7 +1225,7 @@ else if (isset($_GET['go']))
 				$db->sqlquery("UPDATE `articles` SET `comments_open` = 1 WHERE `article_id` = ?", array($_GET['article_id']));
 			}
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Opened the comments on {$title['title']}", $core->date, $_GET['article_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Opened the comments on {$title['title']}", core::$date, $_GET['article_id']));
 
 			header("Location: /articles/{$title_nice}.{$_GET['article_id']}#comments");
 		}
@@ -1257,7 +1257,7 @@ else if (isset($_GET['go']))
 				$db->sqlquery("UPDATE `articles` SET `comments_open` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
 			}
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Closed the comments on {$title['title']}", $core->date, $_GET['article_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Closed the comments on {$title['title']}", core::$date, $_GET['article_id']));
 
 			header("Location: /articles/{$title_nice}.{$_GET['article_id']}#comments");
 		}

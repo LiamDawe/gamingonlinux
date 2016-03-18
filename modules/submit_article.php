@@ -8,7 +8,7 @@ if (isset($_GET['view']))
     if ($_GET['view'] == 'Submit')
     {
         // check for ipban (spammers) and don't let them submit
-        $db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array($core->ip));
+        $db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
         $get_ip = $db->fetch();
         if ($db->num_rows() > 0)
         {
@@ -16,7 +16,7 @@ if (isset($_GET['view']))
             die();
         }
 
-        $data = file_get_contents("http://api.stopforumspam.org/api?ip=" . $core->ip);
+        $data = file_get_contents("http://api.stopforumspam.org/api?ip=" . core::$ip);
         if (strpos($data, "<appears>yes</appears>") !== false)
         {
             header('Location: /index.php?module=home&message=spam');
@@ -137,14 +137,14 @@ if (isset($_POST['act']))
     if ($_POST['act'] == 'Submit')
     {
         // check for ipban (spammers) and don't let them submit
-        $db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array($core->ip));
+        $db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
         $get_ip = $db->fetch();
         if ($db->num_rows() > 0)
         {
             header('Location: /index.php');
         }
 
-        $data = file_get_contents("http://api.stopforumspam.org/api?ip=" . $core->ip);
+        $data = file_get_contents("http://api.stopforumspam.org/api?ip=" . core::$ip);
         if (strpos($data, "<appears>yes</appears>") !== false)
         {
             header('Location: /index.php?module=home&message=spam');
@@ -184,7 +184,7 @@ if (isset($_POST['act']))
                 $recaptcha=$_POST['g-recaptcha-response'];
                 $google_url="https://www.google.com/recaptcha/api/siteverify";
                 $secret='6LcT0gATAAAAAJrRJK0USGyFE4pFo-GdRTYcR-vg';
-                $ip=$core->ip;
+                $ip=core::$ip;
                 $url=$google_url."?secret=".$secret."&response=".$recaptcha."&remoteip=".$ip;
                 $res=getCurlData($url);
                 $res= json_decode($res, true);
@@ -236,11 +236,11 @@ if (isset($_POST['act']))
                 $title_slug = $core->nice_title($_POST['title']);
 
                 // insert the article itself
-                $db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, $core->ip, $core->date, $core->date, $title, $title_slug, $text, core::random_id()));
+                $db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
 
                 $article_id = $db->grab_id();
 
-                $db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("A submitted article was sent for review.", $core->date, $article_id), 'articles.php');
+                $db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("A submitted article was sent for review.", core::$date, $article_id), 'articles.php');
 
                 // check if they are subscribing
                 if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
@@ -312,7 +312,7 @@ if (isset($_POST['act']))
         $templating->set_previous('title', 'Submit An Article Preview', 1);
 
         // make date human readable
-        $date = $core->format_date($core->date);
+        $date = $core->format_date(core::$date);
 
         // get the article row template
         $templating->block('preview_row');

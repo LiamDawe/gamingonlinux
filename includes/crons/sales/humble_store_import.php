@@ -102,7 +102,7 @@ do
 					// if it does exist, make sure it's not from humble already
 					if ($db->num_rows() == 0)
 					{
-						$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game['human_name'], $website, $core->date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end));
+						$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game['human_name'], $website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end));
 
 						$sale_id = $db->grab_id();
 
@@ -116,7 +116,7 @@ do
 					// if we already have it, just update it
 					else
 					{
-						$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ? WHERE `provider_id` = 11 AND info = ?", array($website, $core->date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end, $game['human_name']));
+						$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ? WHERE `provider_id` = 11 AND info = ?", array($website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end, $game['human_name']));
 
 						echo "Updated {$game['human_name']} with the latest information<br />";
 					}

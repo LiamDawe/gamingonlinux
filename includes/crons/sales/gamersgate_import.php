@@ -123,7 +123,7 @@ foreach ($xml->item as $game)
 		// all checks out - insert into database here
 		if ($check == 0)
 		{
-			$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 12, `dollars` = ?, `dollars_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ?", array($new_title, $game->link, $core->date, $game->price, $game->srp, $drm_free, $steam_key, $sale_ends), 'gamersgate_import.php');
+			$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 12, `dollars` = ?, `dollars_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ?", array($new_title, $game->link, core::$date, $game->price, $game->srp, $drm_free, $steam_key, $sale_ends), 'gamersgate_import.php');
 
 			$sale_id = $db->grab_id();
 

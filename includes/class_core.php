@@ -2,10 +2,10 @@
 class core
 {
 	// the current date and time for the mysql
-	public $date;
+	public static $date;
 
-	// the users ip number
-	public $ip;
+	// the users ip address
+	public static $ip;
 
 	// how many pages their are in the pagination being done
 	public $pages;
@@ -20,8 +20,8 @@ class core
 
 	function __construct()
 	{
-		$this->date = strtotime(gmdate("d-n-Y H:i:s"));
-		$this->ip = $this->get_client_ip();
+		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
+		core::$ip = $this->get_client_ip();
 
 		// stop magic quotes! they add extra slashes
 		if (get_magic_quotes_gpc())

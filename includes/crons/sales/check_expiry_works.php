@@ -10,7 +10,7 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include('/home/gamingonlinux/public_html/includes/class_core.php');
 $core = new core();
 
-if (core::config('sales_expiry_lastrun') <= $core->date - 7200)
+if (core::config('sales_expiry_lastrun') <= core::$date - 7200)
 {
 	$to = 'liamdawe@gmail.com';
 	$subject = 'GOL Expiry Error';

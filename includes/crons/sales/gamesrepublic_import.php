@@ -146,7 +146,7 @@ foreach ($xml->group->o as $game)
 			// all checks out - insert into database here
 			if ($check == 0)
 			{
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 33, `savings` = ?, `dollars` = ?, `dollars_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ?", array($game->{'name'}, $game->attributes()->url, $core->date, "$discount% off", $game->attributes()->priceUSD, $game->attributes()->regularPriceUSD, $drm_free, $steam, $expires), 'gamesrepublic_import.php');
+				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 33, `savings` = ?, `dollars` = ?, `dollars_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ?", array($game->{'name'}, $game->attributes()->url, core::$date, "$discount% off", $game->attributes()->priceUSD, $game->attributes()->regularPriceUSD, $drm_free, $steam, $expires), 'gamesrepublic_import.php');
 
 				$sale_id = $db->grab_id();
 

@@ -120,7 +120,7 @@ else if (isset($_GET['aid']))
 
 	if ($article['locked'] == 0 && $_GET['lock'] == 1)
 	{
-		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], $core->date, $article['article_id']));
+		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 		// we need to re-catch the article info as we have changed lock status
 		$db->sqlquery("SELECT a.article_id, a.preview_code,a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
@@ -403,7 +403,7 @@ if (isset($_POST['act']))
 
 				$article_id = $_GET['aid'];
 
-				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_GET['aid'], $_SESSION['user_id'], $core->date, $comment), 'admin_module_comments.php');
+				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_GET['aid'], $_SESSION['user_id'], core::$date, $comment), 'admin_module_comments.php');
 
 				$new_comment_id = $db->grab_id();
 

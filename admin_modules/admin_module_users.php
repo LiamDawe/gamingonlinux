@@ -216,7 +216,7 @@ else
 					$db->sqlquery("UPDATE `users` SET `user_group` = ?, `secondary_user_group` = ? WHERE `user_id` = ?", array($_POST['user_group'], $_POST['secondary_user_group'], $_GET['user_id']));
 				}
 
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the user {$_POST['username']}.", $core->date, $core->date));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the user {$_POST['username']}.", core::$date, core::$date));
 
 				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=done");
 			}
@@ -243,7 +243,7 @@ else
 				{
 					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} plain banned {$ban_info['username']}.", $core->date, $core->date));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} plain banned {$ban_info['username']}.", core::$date, core::$date));
 
 					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=banned");
 				}
@@ -299,7 +299,7 @@ else
 					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($_SESSION['ban_ip']));
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} banned {$ban_info['username']} along with their IP.", $core->date, $core->date));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} banned {$ban_info['username']} along with their IP.", core::$date, core::$date));
 
 					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=banned");
 					unset($_SESSION['ban_ip']);
@@ -387,7 +387,7 @@ else
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['username']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($_GET['user_id']));
 
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} deleted the user '{$avatar['username']}'", $core->date, $core->date));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} deleted the user '{$avatar['username']}'", core::$date, core::$date));
 
 
 				header("Location: /admin.php?module=users&view=search&message=userdeleted");
@@ -438,7 +438,7 @@ else
 				$db->sqlquery("DELETE FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
 
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} deleted all forum content for user '{$localUsrThing['username']}'", $core->date, $core->date));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} deleted all forum content for user '{$localUsrThing['username']}'", core::$date, core::$date));
 
 
 				header("Location: /admin.php?module=users&view=search&message=usercontentdeleted");

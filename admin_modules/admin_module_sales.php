@@ -533,7 +533,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				$expires = strtotime(gmdate($_POST['expires']));
 			}
 
-			$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `savings` = ?, `pwyw` = ?, `beat_average` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, euros_original = ?, `expires` = ?, `pre-order` = ?", array($_POST['info'], $_POST['website'], $core->date, $_POST['provider'], $drmfree, $pr_key, $steam, $_POST['savings'], $pwyw, $beat_average, $_POST['pounds'], $_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'], $_POST['euros'], $_POST['euros_original'], $expires, $preorder));
+			$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `savings` = ?, `pwyw` = ?, `beat_average` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, euros_original = ?, `expires` = ?, `pre-order` = ?", array($_POST['info'], $_POST['website'], core::$date, $_POST['provider'], $drmfree, $pr_key, $steam, $_POST['savings'], $pwyw, $beat_average, $_POST['pounds'], $_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'], $_POST['euros'], $_POST['euros_original'], $expires, $preorder));
 
 			$sale_id = $db->grab_id();
 
@@ -664,7 +664,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 					$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` = ?", array($_GET['id']));
 
-					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `sale_id` = ?", array("{$_SESSION['username']} deleted a sale.", $core->date, $_GET['id']));
+					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `sale_id` = ?", array("{$_SESSION['username']} deleted a sale.", core::$date, $_GET['id']));
 
 					if ($check['has_screenshot'] == 1)
 					{
@@ -720,7 +720,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				{
 					$db->sqlquery("UPDATE `game_sales` SET `reported` = 0 WHERE `id` = ?", array($_GET['id']));
 
-					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `sale_id` = ?", array("{$_SESSION['username']} removed a sale ended report.", $core->date, $_GET['id']));
+					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `sale_id` = ?", array("{$_SESSION['username']} removed a sale ended report.", core::$date, $_GET['id']));
 
 					$core->message('That sale ended notification has now been deleted! Options: <a href="admin.php?module=sales&view=manage">Go back</a>.');
 				}
@@ -736,9 +736,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 		if ($sale_check['accepted'] == 0)
 		{
-			$db->sqlquery("UPDATE `game_sales` SET `accepted` = 1, `date` = ? WHERE `id` = ?", array($core->date, $_POST['id']));
+			$db->sqlquery("UPDATE `game_sales` SET `accepted` = 1, `date` = ? WHERE `id` = ?", array(core::$date, $_POST['id']));
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `sale_id` = ?", array("{$_SESSION['username']} approved a submitted sale.", $core->date, $_POST['id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `sale_id` = ?", array("{$_SESSION['username']} approved a submitted sale.", core::$date, $_POST['id']));
 
 			header("Location: /admin.php?module=sales&view=submitted&accepted");
 		}
@@ -843,7 +843,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 					// set any sales from this provider to no category
 					$db->sqlquery("UPDATE `game_sales` SET `provider_id` = 0 WHERE `provider_id` = ?", array($_GET['provider_id']));
 
-					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Deleted a sale provider.", $core->date, $_GET['article_id']));
+					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Deleted a sale provider.", core::$date, $_GET['article_id']));
 
 					header("Location: /admin.php?module=sales&view=providers&message=deleted");
 				}
@@ -875,7 +875,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				}
 				$db->sqlquery("INSERT INTO `steam_list` SET `steam_appid` = ?, `bundle` = ?, `name` = ?", array($_POST['id'],$bundle,$_POST['name']), 'admin_module_sales.php');
 
-				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} added '{$_POST['name']}' to the Steam sales list", $core->date, $_GET['article_id']));
+				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} added '{$_POST['name']}' to the Steam sales list", core::$date, $_GET['article_id']));
 
 				header("Location: /admin.php?module=sales&view=managesteam&message=added&name={$_POST['name']}");
 			}
@@ -899,7 +899,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			}
 			$db->sqlquery("UPDATE `steam_list` SET `name` = ?, `steam_appid` = ?, `bundle` = ? WHERE `local_id` = ?", array($_POST['name'], $_POST['id'], $bundle, $_POST['local_id']));
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} updated '{$_POST['name']}' on the Steam sales list", $core->date, $_GET['article_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} updated '{$_POST['name']}' on the Steam sales list", core::$date, $_GET['article_id']));
 
 			header("Location: /admin.php?module=sales&view=managesteam&message=updated&name={$_POST['name']}");
 		}
@@ -939,7 +939,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				{
 					$db->sqlquery("DELETE FROM `steam_list` WHERE `steam_appid` = ?", array($_GET['steam_id']));
 
-					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} deleted '{$grab_info['name']}' from the Steam sales list", $core->date, $_GET['article_id']));
+					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} deleted '{$grab_info['name']}' from the Steam sales list", core::$date, $_GET['article_id']));
 
 					header("Location: /admin.php?module=sales&view=managesteam&message=deleted");
 				}

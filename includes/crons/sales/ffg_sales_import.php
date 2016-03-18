@@ -139,7 +139,7 @@ foreach($products as $product)
 			echo "Test the info:<br />
 			$product->title,<br />
 			$product->url,<br />
-			$core->date,<br />
+			core::$date,<br />
 			$product->price,<br />
 			$product->sale_price,<br />
 			$product->drm_free<br />
@@ -149,7 +149,7 @@ foreach($products as $product)
 				array(
 					$product->title,
 					$product->url,
-					$core->date,
+					core::$date,
 					$product->sale_price,
 					$product->price,
 					$product->drm_free,
@@ -168,7 +168,7 @@ foreach($products as $product)
 			$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `euros` = ?, `euros_original` = ?, `drmfree` = ?, `imported_image_link` = ? WHERE `info` = ? AND `provider_id` = 9",
 				array(
 					$product->url,
-					$core->date,
+					core::$date,
 					$product->sale_price,
 					$product->price,
 					$product->drm_free,

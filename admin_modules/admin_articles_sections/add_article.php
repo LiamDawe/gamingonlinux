@@ -10,7 +10,7 @@ $db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
 $editor_pick_count = $db->num_rows();
 
 $draft_tagline['tagline_image'] = '';
-if (isset($_POST['check']) && $_POST['check'] == 'Draft')
+if ($_POST['check'] == 'Draft')
 {
 	$db->sqlquery("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 	$draft_tagline = $db->fetch();
@@ -134,7 +134,7 @@ else if (isset($_POST['show_block']) && $editor_pick_count == 3)
 }
 
 // if they aren't uploading a tagline image on a brand new article
-else if (!isset($_SESSION['uploads_tagline']) && $_POST['check'] == 'Add')
+else if ($_POST['check'] == 'Add' && !isset($_SESSION['uploads_tagline']))
 {
 	$_SESSION['atitle'] = $_POST['title'];
 	$_SESSION['aslug'] = $slug;
@@ -157,7 +157,7 @@ else if (!isset($_SESSION['uploads_tagline']) && $_POST['check'] == 'Add')
 }
 
 // if it's a draft and there's no uploaded tagline image, and no stored image already
-else if (empty($draft_tagline['tagline_image']) && !isset($_SESSION['uploads_tagline']) && isset($_POST['draft']) && $_POST['draft'] == 1)
+else if ($_POST['check'] == 'Draft' && empty($draft_tagline['tagline_image']) && !isset($_SESSION['uploads_tagline']))
 {
 	$_SESSION['atitle'] = $_POST['title'];
 	$_SESSION['aslug'] = $slug;
@@ -187,13 +187,13 @@ else
 	$title = strip_tags($_POST['title']);
 
 	// doubly make sure it's nice
-	$slug = core::nice_title($_POST['slug']);
+	$slug = $core->nice_title($_POST['slug']);
 
-	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `tagline_image` = ?", array($_SESSION['user_id'], $title, $slug, $tagline, $text, $block, $core->date, $draft_tagline['tagline_image']));
+	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `tagline_image` = ?", array($_SESSION['user_id'], $title, $slug, $tagline, $text, $block, core::$date, $draft_tagline['tagline_image']));
 
 	$article_id = $db->grab_id();
 
-	$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array($core->date, "{$_SESSION['username']} published a new article.", $core->date, $article_id));
+	$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array(core::$date, "{$_SESSION['username']} published a new article.", core::$date, $article_id));
 
 	// upload attached images
 	if (isset($_SESSION['uploads']))
@@ -236,22 +236,28 @@ else
 	unset($_SESSION['image_rand']);
 	unset($_SESSION['uploads_tagline']);
 
+	include(core::config('path') . 'includes/telegram_poster.php');
+
 	if (core::config('pretty_urls') == 1 && !isset($_POST['show_block']))
 	{
+		telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $article_id);
 		header("Location: /articles/" . $_POST['slug'] . '.' . $article_id);
 	}
 	else if (core::config('pretty_urls') == 1 && isset($_POST['show_block']))
 	{
+		telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $article_id);
 		header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
 	}
 	else
 	{
 		if (!isset($_POST['show_block']))
 		{
+			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
 			header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
 		}
 		else
 		{
+			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
 			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
 		}
 	}

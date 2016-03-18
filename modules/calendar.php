@@ -205,7 +205,7 @@ if (isset($_POST['act']))
 
 		$new_id = $db->grab_id();
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `calendar_id` = ?", array("{$_SESSION['username']} added a new game to the release calendar.", $core->date, $new_id));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `calendar_id` = ?", array("{$_SESSION['username']} added a new game to the release calendar.", core::$date, $new_id));
 
 		header("Location: /index.php?module=calendar&message=sent");
 	}

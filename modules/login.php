@@ -94,7 +94,7 @@ if (!isset($_POST['action']))
 		$twitteroauth = new TwitterOAuth($config['tw_consumer_key'], $config['tw_consumer_skey']);
 
 		// Requesting authentication tokens, the parameter is the URL we will be redirected to
-		$request_token = $twitteroauth->getRequestToken($config['website_url'] . '/includes/twitter/getTwitterData.php');
+		$request_token = $twitteroauth->getRequestToken(core::config('website_url') . 'includes/twitter/getTwitterData.php');
 
 		// Saving them into the session
 

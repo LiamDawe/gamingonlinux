@@ -98,7 +98,7 @@ do {
 			// if it does exist, make sure it's not from GOG already
 			if ($db->num_rows() == 0)
 			{
-				$db->sqlquery("INSERT INTO `game_sales` SET `list_id` = ?, `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 34, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `drmfree` = 1", array($game_list['local_id'], $games['title'], $website, $core->date, $current_price, $original_price, $image));
+				$db->sqlquery("INSERT INTO `game_sales` SET `list_id` = ?, `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 34, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `drmfree` = 1", array($game_list['local_id'], $games['title'], $website, core::$date, $current_price, $original_price, $image));
 
 				$sale_id = $db->grab_id();
 

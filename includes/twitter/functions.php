@@ -1,42 +1,42 @@
 <?php
-class User 
+class twitter_user
 {
 	// 0 = linking from usercp
 	// 1 = logging in using twitter that has already been setup
 	// 2 = making a new user
 	public $new = 0;
-	
-	function checkUser($uid, $oauth_provider, $username) 
+
+	function checkUser($uid, $oauth_provider, $username)
 	{
 		global $db, $core;
-		
+
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
-			$db->sqlquery("SELECT * FROM `users` WHERE oauth_uid = ? and oauth_provider = ? AND `twitter_username` = ?", array($uid, $oauth_provider, $username));
+			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE oauth_uid = ? and oauth_provider = ? AND `twitter_username` = ?", array($uid, $oauth_provider, $username));
 			$result = $db->fetch();
-			if (!empty($result)) 
+			if (!empty($result))
 			{
 				$this->new = 1;
 				return $result;
-			} 
-		
-			else 
+			}
+
+			else
 			{
 				$this->new = 2;
-				
+
 				$result = array();
-				
+
 				$result['uid'] = $uid;
 				$result['oauth_provider'] = $oauth_provider;
 				$result['twitter_username'] = $username;
-				
+
 				return $result;
 			}
-			
-			
+
+
 		}
-		
+
 		// if they are linking via usercp to a logged in account
 		else
 		{

@@ -63,11 +63,11 @@ $text .= "\r\nWhat was your favourite Linux Gaming news for the past year? So mu
 //echo bbcode($text);
 //echo bbcode($page2);
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1, `date` = ?, `title` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = '2015.png', `active` = 0, `admin_review` = 1", array($core->date, $title, $tagline, $text));
+$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1, `date` = ?, `title` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = '2015.png', `active` = 0, `admin_review` = 1", array(core::$date, $title, $tagline, $text));
 
 $article_id = $db->grab_id();
 
 $db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 63", array($article_id));
 
-$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("TheBoss sent a new article to the admin review queue.", $core->date, $article_id));
+$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("TheBoss sent a new article to the admin review queue.", core::$date, $article_id));
 ?>

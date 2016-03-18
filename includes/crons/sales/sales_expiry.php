@@ -22,7 +22,7 @@ $core = new core();
 $removed_counter = 0;
 $games = '';
 
-$db->sqlquery("SELECT `has_screenshot`,`screenshot_filename` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array($core->date));
+$db->sqlquery("SELECT `has_screenshot`,`screenshot_filename` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date));
 $get_all = $db->fetch_all_rows();
 
 foreach($get_all as $sale)
@@ -34,7 +34,7 @@ foreach($get_all as $sale)
 }
 
 // remove old sales but keep sales with no date on them
-$db->sqlquery("SELECT `info`, `list_id` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array($core->date), 'sales_expiry.php');
+$db->sqlquery("SELECT `info`, `list_id` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date), 'sales_expiry.php');
 $removing_now = $db->fetch_all_rows();
 
 foreach ($removing_now as $remove)
@@ -44,7 +44,7 @@ foreach ($removing_now as $remove)
 	$removed_counter++;
 }
 
-$db->sqlquery("DELETE FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array($core->date), 'sales_expiry.php');
+$db->sqlquery("DELETE FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date), 'sales_expiry.php');
 
 //
 // remove indiegamestand sales that are no longer listed (for ones that had no end date)
@@ -423,6 +423,6 @@ if ($removed_counter == 0)
 }*/
 
 // update the time it was last run
-$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'sales_expiry_lastrun'", array($core->date));
+$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'sales_expiry_lastrun'", array(core::$date));
 
 echo "\n\n<br />End of sales expiry cron @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

@@ -554,7 +554,7 @@ else
 			}
 
 			// make the new message
-			$db->sqlquery("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, $core->date, $_SESSION['user_id'], $_SESSION['user_id'], $core->date, $_SESSION['user_id']));
+			$db->sqlquery("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
 
 			$conversation_id = $db->grab_id();
 
@@ -562,7 +562,7 @@ else
 			foreach ($user_id_list as $user_id)
 			{
 				// make the duplicate message for other participants
-				$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, $core->date, $_SESSION['user_id'], $user_id, $core->date, $_SESSION['user_id']));
+				$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));
 
 				// Add all the participants
 				$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
@@ -630,7 +630,7 @@ else
 				}
 			}
 
-			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], $core->date, $text));
+			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
 
 			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
 
@@ -749,11 +749,11 @@ else
 			$position = $last['position'] + 1;
 
 			// add the new reply
-			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = ?", array($_POST['conversation_id'], $_SESSION['user_id'], $core->date, $text, $position));
+			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = ?", array($_POST['conversation_id'], $_SESSION['user_id'], core::$date, $text, $position));
 			$post_id = $db->grab_id();
 
 			// update conversation info
-			$db->sqlquery("UPDATE `user_conversations_info` SET `replies` = (replies + 1), `last_reply_date` = ?, `last_reply_id` = ? WHERE `conversation_id` = ?", array($core->date, $_SESSION['user_id'], $_POST['conversation_id']));
+			$db->sqlquery("UPDATE `user_conversations_info` SET `replies` = (replies + 1), `last_reply_date` = ?, `last_reply_id` = ? WHERE `conversation_id` = ?", array(core::$date, $_SESSION['user_id'], $_POST['conversation_id']));
 
 			// make unread notifications
 			$db->sqlquery("SELECT `participant_id` FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` != ?", array($_POST['conversation_id'], $_SESSION['user_id']));

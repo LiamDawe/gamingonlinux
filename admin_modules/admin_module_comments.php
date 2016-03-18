@@ -367,7 +367,7 @@ if (isset($_POST['act']))
 
 				$article_id = $_GET['aid'];
 
-				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_GET['aid'], $_SESSION['user_id'], $core->date, $comment), 'admin_module_comments.php');
+				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_GET['aid'], $_SESSION['user_id'], core::$date, $comment), 'admin_module_comments.php');
 
 				$new_comment_id = $db->grab_id();
 

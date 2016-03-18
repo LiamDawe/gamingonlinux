@@ -38,7 +38,7 @@ if (isset($_POST['action']))
 				else
 				{
 					// update admin notifications
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `sale_id` = ?", array("{$_SESSION['username']} reporteda sale.", $core->date, $_POST['id']));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `sale_id` = ?", array("{$_SESSION['username']} reporteda sale.", core::$date, $_POST['id']));
 
 					$db->sqlquery("UPDATE `game_sales` SET `reported` = 1 WHERE `id` = ?", array($_POST['id']), 'sales.php');
 
@@ -68,7 +68,7 @@ if (isset($_POST['action']))
 				$recaptcha=$_POST['g-recaptcha-response'];
 				$google_url="https://www.google.com/recaptcha/api/siteverify";
 				$secret='6LcT0gATAAAAAJrRJK0USGyFE4pFo-GdRTYcR-vg';
-				$ip=$core->ip;
+				$ip=core::$ip;
 				$url=$google_url."?secret=".$secret."&response=".$recaptcha."&remoteip=".$ip;
 				$res=getCurlData($url);
 				$res= json_decode($res, true);
@@ -133,13 +133,13 @@ if (isset($_POST['action']))
 				}
 
 				$info_sanatized = htmlspecialchars($_POST['info']);
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = ?, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `pwyw` = ?, `beat_average` = ?, `savings` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, `euros_original` = ?, `expires` = ?, `submitted_by_id` = ?, `pre-order` = ?", array($info_sanatized, $_POST['website'], $core->date, $accepted, $_POST['provider'], $drmfree, $pr_key, $steam, $pwyw, $beat_average, $_POST['savings'], $_POST['pounds'],$_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'],$_POST['euros'], $_POST['euros_original'],$expires, $_SESSION['user_id'], $preorder), 'sales.php');
+				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = ?, `provider_id` = ?, `drmfree` = ?, `pr_key` = ?, `steam` = ?, `pwyw` = ?, `beat_average` = ?, `savings` = ?, `pounds` = ?, `pounds_original` = ?, `dollars` = ?, `dollars_original` = ?, `euros` = ?, `euros_original` = ?, `expires` = ?, `submitted_by_id` = ?, `pre-order` = ?", array($info_sanatized, $_POST['website'], core::$date, $accepted, $_POST['provider'], $drmfree, $pr_key, $steam, $pwyw, $beat_average, $_POST['savings'], $_POST['pounds'],$_POST['pounds_original'], $_POST['dollars'], $_POST['dollars_original'],$_POST['euros'], $_POST['euros_original'],$expires, $_SESSION['user_id'], $preorder), 'sales.php');
 
 				$sale_id = $db->grab_id();
 				// if they are not an editor or admin add a notification and set accepted status to 0
 				if ($user->check_group(1,2) == false)
 				{
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `sale_id` = ?", array("A submitted sale.", $core->date, $sale_id));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `sale_id` = ?", array("A submitted sale.", core::$date, $sale_id));
 				}
 
 				if ($core->sale_image($sale_id, $_FILES['new_image']) == true)
@@ -588,7 +588,7 @@ while ($list = $db->fetch())
 	$expires = '';
 	if ($list['expires'] > 0)
 	{
-		$expires = $core->getRemaining($core->date, $list['expires']);
+		$expires = $core->getRemaining(core::$date, $list['expires']);
 	}
 	$templating->set('expires', $expires);
 

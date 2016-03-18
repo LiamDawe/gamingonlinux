@@ -240,7 +240,7 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `comment` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['comment'], $_POST['link'], $guess, date("Y-m-d")));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} added a new game to the release calendar.", $core->date, $core->date));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} added a new game to the release calendar.", core::$date, core::$date));
 
 		header("Location: /admin.php?module=calendar&view=manage&message=added");
 	}
@@ -269,7 +269,7 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `comment` = ?, `link` = ?, `best_guess` = ?, `edit_date` = ? WHERE `id` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['comment'], $_POST['link'], $guess, date('Y-m-d'), $_POST['id']));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited ' . $_POST['name'] . ' in the release calendar.', $core->date, $core->date));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited ' . $_POST['name'] . ' in the release calendar.', core::$date, core::$date));
 
 		header("Location: /admin.php?module=calendar&view=manage&message=edited");
 	}
@@ -300,7 +300,7 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `calendar_id` = ?", array($_POST['id']));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `calendar_id` = ?", array($_SESSION['username'] . ' approved ' . $_POST['name'] . ' for the release calendar.', $core->date, $core->date, $_POST['id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `calendar_id` = ?", array($_SESSION['username'] . ' approved ' . $_POST['name'] . ' for the release calendar.', core::$date, core::$date, $_POST['id']));
 
 		header("Location: /admin.php?module=calendar&view=submitted&message=approved");
 	}
@@ -336,7 +336,7 @@ if (isset($_POST['act']))
 
 			$db->sqlquery("DELETE FROM `admin_notifications` WHERE `calendar_id` = ?", array($_GET['id']));
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `calendar_id` = ?", array($_SESSION['username'] . ' removed ' . $name['name'] . ' from the release calendar.', $core->date, $core->date, $_GET['id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `calendar_id` = ?", array($_SESSION['username'] . ' removed ' . $name['name'] . ' from the release calendar.', core::$date, core::$date, $_GET['id']));
 
 			if (isset($_POST['submitted']) && $_POST['submitted'] == 1)
 			{

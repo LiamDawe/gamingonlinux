@@ -161,16 +161,17 @@ else
 		}
 		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `article_id` = ?", array($_POST['article_id']));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `article_id` = ?", array("{$_SESSION['username']} approved a user submitted article.", $core->date, $core->date, $_POST['article_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `article_id` = ?", array("{$_SESSION['username']} approved a user submitted article.", core::$date, core::$date, $_POST['article_id']));
 
 		// remove all the comments made by admins
 		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
 
 		$title = strip_tags($_POST['title']);
+
 		// doubly make sure it's nice
 		$slug = core::nice_title($_POST['slug']);
 
-		$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $title, $slug, $tagline, $text, $block, $core->date, $submission_date, $_POST['article_id']));
+		$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $title, $slug, $tagline, $text, $block, core::$date, $submission_date, $_POST['article_id']));
 
 		if (isset($_SESSION['uploads']))
 		{
@@ -235,7 +236,7 @@ else
 		<body>
 		<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 		<br />
-		<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/$nice_title.{$_POST['article_id']}/\">{$title}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>
+		<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/$slug.{$_POST['article_id']}/\">{$title}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>
 		</body>
 		</html>";
 
@@ -246,6 +247,8 @@ else
 
 		// Mail it
 		mail($to, $subject, $message, $headers);
+
+		telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $_POST['article_id']);
 
 		if (!isset($_POST['show_block']))
 		{

@@ -296,7 +296,7 @@ if (isset($_POST['act']))
 			{
 				$db->sqlquery("UPDATE `goty_games` SET `game` = ?, `accepted` = 1 WHERE `id` = ?", array($_POST['name'], $_POST['id']));
 				$db->sqlquery("DELETE FROM `admin_notifications` WHERE `goty_game_id` = ?", array($_POST['id']));
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `goty_game_id` = ?", array($_SESSION['username'] . ' accepted a user submitted GOTY game.', $core->date, $core->date, $_POST['id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `goty_game_id` = ?", array($_SESSION['username'] . ' accepted a user submitted GOTY game.', core::$date, core::$date, $_POST['id']));
 				header("Location: {$config['path']}admin.php?module=goty&view=submitted&message=added");
 			}
 
@@ -323,7 +323,7 @@ if (isset($_POST['act']))
 			{
 				$db->sqlquery("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 				$db->sqlquery("DELETE FROM `admin_notifications` WHERE `goty_game_id` = ?", array($_POST['id']));
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `goty_game_id` = ?", array($_SESSION['username'] . ' denied a user submitted GOTY game.', $core->date, $core->date, $_POST['id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `goty_game_id` = ?", array($_SESSION['username'] . ' denied a user submitted GOTY game.', core::$date, core::$date, $_POST['id']));
 				header("Location: {$config['path']}admin.php?module=goty&view=submitted&message=deleted");
 			}
 
@@ -365,7 +365,7 @@ if (isset($_POST['act']))
 			$db->sqlquery("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_voting_open'");
 			$db->sqlquery("UPDATE `config` SET `data_value` = 1 WHERE `data_key` = 'goty_finished'");
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} closed the GOTY Awards.", $core->date, $core->date));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} closed the GOTY Awards.", core::$date, core::$date));
 
 			// make the chart for each category
 			$result = $db->sqlquery("SELECT `category_name`, `category_id` FROM `goty_category` ORDER BY `category_id` ASC");

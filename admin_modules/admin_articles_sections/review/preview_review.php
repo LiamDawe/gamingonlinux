@@ -24,7 +24,7 @@ if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
 
 else if ($article['locked'] == 0 && $_GET['lock'] == 1)
 {
-	$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], $core->date, $article['article_id']));
+	$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 	$core->message("This post is now locked by yourself while you edit, please click Edit to unlock it once finished.", NULL, 1);
 }
 
@@ -50,7 +50,7 @@ else
 $author_id = $article['author_id'];
 
 // make date human readable
-$date = $core->format_date($core->date);
+$date = $core->format_date(core::$date);
 
 $templating->block('review_top', 'admin_modules/admin_articles_sections/admin_review');
 

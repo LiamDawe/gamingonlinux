@@ -71,7 +71,7 @@ if (isset($_POST['act']))
 			exit;
 		}
 
-		$date = $core->date;
+		$date = core::$date;
 		$db->sqlquery("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
 		$db->sqlquery("SELECT `username`, `email` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));

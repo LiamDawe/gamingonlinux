@@ -173,13 +173,13 @@ else if (isset($_POST['act']))
 			}
 
 			// add the topic
-			$db->sqlquery("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($forum_id, $author, $title, $message, $core->date, $core->date, $author, $approved));
+			$db->sqlquery("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($forum_id, $author, $title, $message, core::$date, core::$date, $author, $approved));
 			$topic_id = $db->grab_id();
 
 			// update forums post counter and last post info
 			if ($approved == 1)
 			{
-				$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, $core->date, $topic_id, $forum_id));
+				$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $forum_id));
 			}
 
 			// if they are subscribing
@@ -237,7 +237,7 @@ else if (isset($_POST['act']))
 
 			else if ($approved == 0)
 			{
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `topic_id` = ?, `mod_queue` = 1", array("A new forum topic was added to the moderation queue", $core->date, $topic_id));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `topic_id` = ?, `mod_queue` = 1", array("A new forum topic was added to the moderation queue", core::$date, $topic_id));
 
 				header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id=$forum_id&message=queue");
 			}

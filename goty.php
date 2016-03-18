@@ -155,7 +155,7 @@ if (!isset($_POST['act']))
 		$templating->set('game_id', $game['id']);
 		$templating->set('url', core::config('path'));
 
-		$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array($core->ip, $_GET['category_id']));
+		$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $_GET['category_id']));
 		if ($db->num_rows() == 0 && core::config('goty_voting_open') == 1)
 		{
 			$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
@@ -244,7 +244,7 @@ if (!isset($_POST['act']))
 				$templating->set('category_name', $cat['category_name']);
 
 				$tick = '';
-				$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array($core->ip, $cat['category_id']));
+				$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $cat['category_id']));
 				if ($db->num_rows() == 1)
 				{
 					$tick = '&#10004;';
@@ -346,7 +346,7 @@ if (!isset($_POST['act']))
 					$templating->set('game_id', $game['id']);
 					$templating->set('url', core::config('path'));
 
-					$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array($core->ip, $_GET['category_id']));
+					$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $_GET['category_id']));
 					if ($db->num_rows() == 0 && core::config('goty_voting_open') == 1)
 					{
 						$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
@@ -407,7 +407,7 @@ if (isset($_POST['act']))
 						$db->sqlquery("INSERT INTO `goty_games` SET `game` = ?, `category_id` = ?", array($_POST['name'], $_POST['category']));
 						$game_id = $db->grab_id();
 
-						$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 0, `created` = ?, `goty_game_id` = ?", array('A user has submitted a GOTY game for review.', $core->date, $game_id));
+						$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 0, `created` = ?, `goty_game_id` = ?", array('A user has submitted a GOTY game for review.', core::$date, $game_id));
 						header("Location: {$config['path']}goty.php?message=added");
 					}
 					else if ($user->check_group(1,2) == true || $user->check_group(5) == true)
@@ -415,7 +415,7 @@ if (isset($_POST['act']))
 						$db->sqlquery("INSERT INTO `goty_games` SET `game` = ?, `category_id` = ?, `accepted` = 1", array($_POST['name'], $_POST['category']));
 						$game_id = $db->grab_id();
 
-						$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `goty_game_id` = ?", array($_SESSION['username'] . ' added a GOTY game.', $core->date, $core->date, $game_id));
+						$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `goty_game_id` = ?", array($_SESSION['username'] . ' added a GOTY game.', core::$date, core::$date, $game_id));
 						header("Location: {$config['path']}goty.php?message=added_editor");
 					}
 				}

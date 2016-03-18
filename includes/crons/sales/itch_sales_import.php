@@ -155,7 +155,7 @@ foreach ($xml->item as $game)
 
 				$expires = $timestamp;
 
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 28, `savings` = ?, `{$currency}` = ?, `{$currency}_original` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = 1", array($title, $game->{'link'}, $core->date, "$discount% off", $price, $price_original, $expires, $game->imageurl));
+				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 28, `savings` = ?, `{$currency}` = ?, `{$currency}_original` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = 1", array($title, $game->{'link'}, core::$date, "$discount% off", $price, $price_original, $expires, $game->imageurl));
 
 				$sale_id = $db->grab_id();
 

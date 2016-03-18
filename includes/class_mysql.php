@@ -85,7 +85,7 @@ class mysql
 
 			if ($page == NULL)
 			{
-				$page = core::current_page_path();
+				$page = $core->current_page_path();
 			}
 
 			$core->message( $e->getMessage() . "<br>" . $sql );
@@ -133,7 +133,7 @@ class mysql
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>
-		<img src=\"{$config['path']}/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+		<img src=\"" . core::config('website_url') . "$templates/default/images/logo.png\" alt=\"Gaming On Linux\">
 		<br />
 		$exception on page $page<br />
 		SQL QUERY<br />

@@ -137,7 +137,7 @@ foreach ($xml->channel->item as $game)
 				//Change the timezone to UTC, this converts it
 				//$timestamp->setTimezone(new DateTimeZone("UTC"));
 
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 22, `savings` = ?, `dollars` = ?, `steam` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = ?", array($title, $game->{'link'}, $core->date, "$discount% off", $game->price, $steam, $timestamp->getTimestamp(), $game->imageurl, $game->drmfree), 'igs_import.php');
+				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 22, `savings` = ?, `dollars` = ?, `steam` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = ?", array($title, $game->{'link'}, core::$date, "$discount% off", $game->price, $steam, $timestamp->getTimestamp(), $game->imageurl, $game->drmfree), 'igs_import.php');
 
 				$sale_id = $db->grab_id();
 

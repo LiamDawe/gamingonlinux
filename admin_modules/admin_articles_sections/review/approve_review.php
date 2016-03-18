@@ -113,7 +113,7 @@ else
 		$tagline = trim($_POST['tagline']);
 		$slug = core::nice_title($_POST['slug']);
 
-		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} approved an article from the admin review queue.", $core->date, $_POST['article_id']));
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} approved an article from the admin review queue.", core::$date, $_POST['article_id']));
 
 		// remove all the comments made by admins
 		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
@@ -123,7 +123,7 @@ else
 
 		$title = strip_tags($_POST['title']);
 
-		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, $core->date, $_SESSION['user_id'], $_POST['article_id']));
+		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 
 		if (isset($_SESSION['uploads']))
 		{
@@ -199,6 +199,7 @@ else
 			}
 		}
 
+		telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $_POST['article_id']);
 		header("Location: /admin.php?module=reviewqueue&accepted");
 	}
 }

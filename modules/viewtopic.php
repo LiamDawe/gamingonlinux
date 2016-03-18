@@ -23,7 +23,7 @@ else
 		else
 		{
 			// update admin notifications
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `topic_id` = ?", array("{$_SESSION['username']} reported a forum topic.", $core->date, $_GET['topic_id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `topic_id` = ?", array("{$_SESSION['username']} reported a forum topic.", core::$date, $_GET['topic_id']));
 
 			// give it a report
 			$db->sqlquery("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
@@ -48,7 +48,7 @@ else
 		else
 		{
 			// update admin notifications
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `reply_id` = ?", array("{$_SESSION['username']} reported a forum topic reply.", $core->date, $_GET['post_id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `reply_id` = ?", array("{$_SESSION['username']} reported a forum topic reply.", core::$date, $_GET['post_id']));
 
 			// give it a report
 			$db->sqlquery("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));
@@ -81,7 +81,7 @@ else
 					$db->sqlquery("DELETE FROM `admin_notifications` WHERE `reply_id` = ?", array($_GET['post_id']));
 				}
 
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `reply_id` = ?", array("{$_SESSION['username']} deleted a forum reply.", $core->date, $core->date, $_GET['post_id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `reply_id` = ?", array("{$_SESSION['username']} deleted a forum reply.", core::$date, core::$date, $_GET['post_id']));
 
 				// update the authors post count
 				if ($post_info['author_id'] != 0)
@@ -969,7 +969,7 @@ else
 					}
 
 					// add to editor tracking
-					$db->sqlquery("INSERT INTO `editor_tracking` SET `action` = ?, `time` = ?", array("{$_SESSION['username']} moved a forum topic.", $core->date));
+					$db->sqlquery("INSERT INTO `editor_tracking` SET `action` = ?, `time` = ?", array("{$_SESSION['username']} moved a forum topic.", core::$date));
 
 					$core->message("The topic has been moved! Options: <a href=\"index.php?module=viewforum&amp;forum_id={$_POST['new_forum']}\">View Forum</a> or <a href=\"index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}\">View Topic</a>");
 				}
@@ -1011,7 +1011,7 @@ else
 						}
 					}
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} deleted a forum topic.", $core->date, $core->date, $_GET['topic_id']));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} deleted a forum topic.", core::$date, core::$date, $_GET['topic_id']));
 
 					// count all posts including the topic
 					$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
@@ -1120,7 +1120,7 @@ else
 				$db->sqlquery("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// add to editor tracking
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} performed \"{$action}\" on a forum topic.", $core->date, $core->date, $_GET['topic_id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} performed \"{$action}\" on a forum topic.", core::$date, core::$date, $_GET['topic_id']));
 
 				$core->message("You have {$action} the topic! <a href=\"/forum/topic/{$_GET['topic_id']}\">Click here to return.</a>");
 			}

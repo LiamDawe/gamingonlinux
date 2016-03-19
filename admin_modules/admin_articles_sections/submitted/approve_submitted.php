@@ -169,7 +169,7 @@ else
 		$title = strip_tags($_POST['title']);
 
 		// doubly make sure it's nice
-		$slug = core::nice_title($_POST['slug']);
+		$slug = $core->nice_title($_POST['slug']);
 
 		$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $title, $slug, $tagline, $text, $block, core::$date, $submission_date, $_POST['article_id']));
 
@@ -244,6 +244,8 @@ else
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+
+		include(core::config('path') . 'includes/telegram_poster.php');
 
 		// Mail it
 		mail($to, $subject, $message, $headers);

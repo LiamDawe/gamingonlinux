@@ -111,7 +111,7 @@ else
 
 		$text = trim($_POST['text']);
 		$tagline = trim($_POST['tagline']);
-		$slug = core::nice_title($_POST['slug']);
+		$slug = $core->nice_title($_POST['slug']);
 
 		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} approved an article from the admin review queue.", core::$date, $_POST['article_id']));
 
@@ -198,6 +198,8 @@ else
 				mail($to, $subject, $message, $headers);
 			}
 		}
+
+		include(core::config('path') . 'includes/telegram_poster.php');
 
 		telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $_POST['article_id']);
 		header("Location: /admin.php?module=reviewqueue&accepted");

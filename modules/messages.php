@@ -205,7 +205,15 @@ else
 				$p_list .= "<a href=\"/profiles/{$participants['user_id']}/\">{$participants['username']}</a> ";
 			}
 
+			// count them for pagination
+			$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_messages` WHERE `conversation_id` = ? AND position > 0", array($_GET['id']));
+			$total = $db->num_rows();
+
+			// sort out the pagination link
+			$pagination = $core->pagination_link(9, $total, "/private-messages/{$_GET['id']}/", $page);
+
 			$templating->block('view_top', 'private_messages');
+			$templating->set('pagination', $pagination);
 
 			if (core::config('pretty_urls') == 1)
 			{
@@ -220,13 +228,6 @@ else
 
 			$templating->set('conversation_list', $p_list);
 
-			// count them for pagination
-			$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_messages` WHERE `conversation_id` = ? AND position > 0", array($_GET['id']));
-			$total = $db->num_rows();
-
-			// sort out the pagination link
-			$pagination = $core->pagination_link(9, $total, "/private-messages/{$_GET['id']}/", $page);
-
 			// user profile fields
 			$db_grab_fields = '';
 			foreach ($profile_fields as $field)
@@ -238,13 +239,11 @@ else
 			$start = $db->fetch();
 
 			$templating->block('view_row', 'private_messages');
-			$templating->set('pagination', $pagination);
 			$templating->set('title', $start['title']);
 			$templating->set('post_id', $start['message_id']);
 			$templating->set('message_date', $core->format_date($start['creation_date']));
 			$templating->set('tzdate', date('c',$start['creation_date']) ); //piratelv timeago
 			$templating->set('plain_username',$start['username']);
-			$templating->set('text_plain', $start['message']);
 
 			// sort out the avatar
 			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
@@ -342,7 +341,6 @@ else
 				$templating->set('tzdate', date('c',$replies['creation_date']) ); //piratelv timeago
 				$templating->set('post_id', $replies['message_id']);
 				$templating->set('plain_username',$replies['username']);
-				$templating->set('text_plain', $replies['message']);
 
 				// sort out the avatar
 				// either no avatar (gets no avatar from gravatars redirect) or gravatar set

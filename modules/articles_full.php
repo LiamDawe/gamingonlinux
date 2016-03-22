@@ -249,7 +249,7 @@ if (!isset($_GET['go']))
 					// sort out the avatar
 					if ($article['avatar_gravatar'] == 1)
 					{
-						$avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode($config['website_url'] . 'uploads/avatars/no_avatar.png') . '&size=125';
+						$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . '&size=125';
 					}
 
 					// either uploaded or linked an avatar
@@ -440,7 +440,7 @@ if (!isset($_GET['go']))
 						// either no avatar (gets no avatar from gravatars redirect) or gravatar set
 						if ($comments['avatar_gravatar'] == 1)
 						{
-							$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=" . urlencode('//www.gamingonlinux.com/uploads/avatars/no_avatar.png') . '&size=125';
+							$comment_avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . '&size=125';
 						}
 
 						// either uploaded or linked an avatar
@@ -1158,7 +1158,7 @@ else if (isset($_GET['go']))
 			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
 			if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
 			{
-				$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=//www.gamingonlinux.com/uploads/avatars/no_avatar.png&size=125";
+				$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
 			}
 
 			// either uploaded or linked an avatar

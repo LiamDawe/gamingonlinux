@@ -386,7 +386,7 @@ else
 					// either no avatar (gets no avatar from gravatars redirect) or gravatar set
 					if ($topic['avatar_gravatar'] == 1)
 					{
-						$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $topic['gravatar_email'] ) ) ) . "?d={$config['website_url']}uploads/avatars/no_avatar.png&size=125";
+						$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $topic['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
 					}
 
 					// either uploaded or linked an avatar
@@ -554,7 +554,7 @@ else
 						$avatar = '';
 						if ($post['avatar_gravatar'] == 1)
 						{
-							$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $post['gravatar_email'] ) ) ) . "?d={$config['website_url']}uploads/avatars/no_avatar.png&size=125";
+							$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $post['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
 						}
 
 						else if (!empty($post['avatar']) && $post['avatar_gravatar'] == 0)

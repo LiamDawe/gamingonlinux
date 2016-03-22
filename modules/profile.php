@@ -76,7 +76,7 @@ if (isset($_GET['user_id']))
 			// if they manually picked gravatar
 			if ($profile['avatar_gravatar'] == 1)
 			{
-				$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $profile['gravatar_email'] ) ) ) . "?d={$config['website_url']}{$config['path']}/uploads/avatars/no_avatar.png&size=125";
+				$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $profile['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
 			}
 
 			// either uploaded or linked an avatar

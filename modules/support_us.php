@@ -30,7 +30,7 @@ foreach ($chucks as $row)
 		}
 		else if ($rowuser['avatar_gravatar'] == "1")
 		{
-			$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $rowuser['gravatar_email'] ) ) ) . "?d=https://www.gamingonlinux.com/uploads/avatars/no_avatar.png&size=125";
+			$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $rowuser['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
 		}
 		$templating->set('avatarurl', $avatar);
 

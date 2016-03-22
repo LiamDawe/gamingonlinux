@@ -658,7 +658,7 @@ if (!isset($_GET['go']))
 							if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 							{
 								// find if they have auto subscribe on
-								$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']), 'articles_full.php');
+								$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 								$subscribe_info = $db->fetch();
 
 								$subscribe_check = '';
@@ -685,7 +685,7 @@ if (!isset($_GET['go']))
 
 								$templating->block('comment_buttons', 'articles_full');
 								$templating->set('url', core::config('website_url'));
-								$templating->set('subsribe_check', $subscribe_check);
+								$templating->set('subscribe_check', $subscribe_check);
 								$templating->set('subscribe_email_check', $subscribe_email_check);
 								$templating->set('aid', $_GET['aid']);
 

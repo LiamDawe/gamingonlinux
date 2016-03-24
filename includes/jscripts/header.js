@@ -49,7 +49,6 @@ function countchars()
 }
 var slug_enabled=false;
 var current_url = $(location).attr('pathname') + $(location).attr('search');
-//alert(current_url);
 if (current_url == '/admin.php?module=articles&view=add')
 {
 	var slug_enabled=true;

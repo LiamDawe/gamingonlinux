@@ -11,6 +11,7 @@ if(isset($_POST))
 {
     include('../bbcode.php');
     $text = $_POST['text'];
+    $text = htmlspecialchars($text, ENT_QUOTES);
     $text = bbcode($text);
 
     echo $text;

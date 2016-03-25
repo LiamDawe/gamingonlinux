@@ -26,8 +26,12 @@ else
 
 if ($module == 'home')
 {
+	if (!isset($_SESSION['last_featured_id']))
+	{
+		$_SESSION['last_featured_id'] = 0;
+	}
 	// pick a random editors pick
-	$db->sqlquery("SELECT a.article_id, a.`title`, a.active, a.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND a.show_in_menu = 1 AND a.featured_image <> '' ORDER BY RAND() LIMIT 1");
+	$db->sqlquery("SELECT a.article_id, a.`title`, a.active, a.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND a.show_in_menu = 1 AND a.featured_image <> '' AND a.article_id != ? ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
 	$featured = $db->fetch();
 	if ($db->num_rows() >= 1)
 	{
@@ -78,6 +82,8 @@ if ($module == 'home')
 			$templating->set('edit_link', '');
 			$templating->set('editors_pick_link', '');
 		}
+
+		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
 }
 

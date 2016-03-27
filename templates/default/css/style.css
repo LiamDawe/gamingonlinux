@@ -1536,10 +1536,14 @@ div.cal:nth-child(odd) {background: #FFF}
     color: black;
 }
 
-div.announce:nth-of-type(odd) {background: #CECE51; margin-bottom: 7px;}
-div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px;}
-.dark div.announce:nth-of-type(odd) {background: #B9B948; margin-bottom: 7px;}
-.dark div.announce:nth-of-type(even) {background: #89B7E5; margin-bottom: 7px;}
+div.announce:nth-of-type(odd) {background: #609FA9; margin-bottom: 7px; color: #000}
+div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: #000}
+.dark div.announce:nth-of-type(odd) {background: #609FA9; margin-bottom: 7px; color: #000}
+.dark div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: #000}
+.announce a {color: #323232; font-style: italic;}
+.announce a:link {color: #323232; font-style: italic;}
+.dark .announce a {color: #191919; font-style: italic;}
+.dark .announce a:link {color: #191919; font-style: italic;}
 .dark svg.svggraph rect {fill: #000; stroke: grey;}
 svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;}
 .dark svg.svggraph text {fill: #eee; font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;}

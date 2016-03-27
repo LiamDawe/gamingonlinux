@@ -28,6 +28,10 @@ Options +SymLinksifOwnerMatch
 
   RewriteCond %{SCRIPT_FILENAME} !-f
   
+  RewriteRule ^crowdfunding/?(index.php/?)?(.*)$ /wiki/$2 [R=301,NC,L]
+
+  RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
+  
   RewriteRule ^home/?$ /index.php?module=home [N]
 
   RewriteRule ^articles/?$ /index.php?module=home [N]

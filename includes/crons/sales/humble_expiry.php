@@ -12,6 +12,8 @@ $core = new core();
 $removed_counter = 0;
 $games = '';
 
+$game_ids = array();
+
 //
 // remove Humble Store sales that are no longer listed (for ones that had no end date)
 //
@@ -47,11 +49,14 @@ if ($json == true)
 			{
 				//echo '<pre>';
 				//print_r($game);
-
-				if ($game['current_price'][0] != $game['full_price'][0])
+				
+				if (isset($game['current_price']))
 				{
-					//echo $game['human_name'];
-					$on_sale[] = $game['human_name'];
+					if ($game['current_price'][0] != $game['full_price'][0])
+					{
+						//echo $game['human_name'];
+						$on_sale[] = $game['human_name'];
+					}
 				}
 			}
 		}
@@ -59,7 +64,7 @@ if ($json == true)
 	} while ($stop == 0);
 
 	// now search our database for all humble sales and match them up with current sales, if it doesn't match then it's no longer on sale so remove it!
-	$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `provider_id` = 11 AND `accepted` = 1");
+	$db->sqlquery("SELECT `id`, `info` FROM `game_sales` WHERE `provider_id` = 11 AND `accepted` = 1");
 	$currently_in_db = $db->fetch_all_rows();
 
 	//echo 'CURRENTLY ON SALE<br />';
@@ -87,6 +92,7 @@ if ($json == true)
 			$removed_counter_humble++;
 			$removed_counter++;
 			$games .= " {$in_db['info']} from Humble<br />";
+			$game_ids[] = $in_db['id'];
 		}
 	}
 	if ($removed_counter_humble == 0)
@@ -98,4 +104,8 @@ else
 {
 	echo "Couldn't access the Humble feed.<br />\r\n";
 }
+
+// remove any admin notifications for ended sales that have been removed
+$game_ids_removed = implode(',', $game_ids);
+$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?)", array($game_ids_removed));
 ?>

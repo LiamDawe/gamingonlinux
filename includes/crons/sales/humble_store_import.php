@@ -70,55 +70,57 @@ do
 				$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game['human_name']));
 
 				//print_r($game);
-
-				if ($game['current_price'][0] != $game['full_price'][0])
+				if (isset($game['current_price']))
 				{
-					echo '<img src="https://www.humblebundle.com'. $game['storefront_featured_image_small'] .' " alt=""/><br />Link: https://www.humblebundle.com/store/p/' . $game['machine_name'] . '<br />' .  $game['human_name'] . ' Current Price: $' . $game['current_price'][0]  .  ', Full Price: $' . $game['full_price'][0] . '<br />';
-
-					$website = 'https://www.humblebundle.com/store/p/' . $game['machine_name'];
-					$image = 'https://www.humblebundle.com' . $game['storefront_featured_image_small'];
-					$drm_free = 0;
-					$steam = 0;
-
-					if (in_array('download', $game['delivery_methods']))
+					if ($game['current_price'][0] != $game['full_price'][0])
 					{
-						$drm_free = 1;
-					}
+						echo '<img src="https://www.humblebundle.com'. $game['storefront_featured_image_small'] .' " alt=""/><br />Link: https://www.humblebundle.com/store/p/' . $game['machine_name'] . '<br />' .  $game['human_name'] . ' Current Price: $' . $game['current_price'][0]  .  ', Full Price: $' . $game['full_price'][0] . '<br />';
 
-					if (in_array('steam', $game['delivery_methods']))
-					{
-						$steam = 1;
-					}
+						$website = 'https://www.humblebundle.com/store/p/' . $game['machine_name'];
+						$image = 'https://www.humblebundle.com' . $game['storefront_featured_image_small'];
+						$drm_free = 0;
+						$steam = 0;
 
-					echo 'DRM Free: ' . $drm_free . '<br />';
-					echo 'Steam Key: ' . $steam . '<br />';
+						if (in_array('download', $game['delivery_methods']))
+						{
+							$drm_free = 1;
+						}
 
-					$sale_end = $game['sale_end']+3600;
+						if (in_array('steam', $game['delivery_methods']))
+						{
+							$steam = 1;
+						}
 
-					// need to check if we already have it to insert it
-					// search if that title exists
-					$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `info` = ? AND `provider_id` = 11", array($game['human_name']));
+						echo 'DRM Free: ' . $drm_free . '<br />';
+						echo 'Steam Key: ' . $steam . '<br />';
 
-					// if it does exist, make sure it's not from humble already
-					if ($db->num_rows() == 0)
-					{
-						$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game['human_name'], $website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end));
+						$sale_end = $game['sale_end']+3600;
 
-						$sale_id = $db->grab_id();
+						// need to check if we already have it to insert it
+						// search if that title exists
+						$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `info` = ? AND `provider_id` = 11", array($game['human_name']));
 
-						echo "\tAdded this game to the sales DB with id: " . $sale_id . ".\n";
+						// if it does exist, make sure it's not from humble already
+						if ($db->num_rows() == 0)
+						{
+							$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game['human_name'], $website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end));
 
-						$games .= $game['human_name'] . '<br />';
+							$sale_id = $db->grab_id();
 
-						$email = 1;
-					}
+							echo "\tAdded this game to the sales DB with id: " . $sale_id . ".\n";
 
-					// if we already have it, just update it
-					else
-					{
-						$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ? WHERE `provider_id` = 11 AND info = ?", array($website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end, $game['human_name']));
+							$games .= $game['human_name'] . '<br />';
 
-						echo "Updated {$game['human_name']} with the latest information<br />";
+							$email = 1;
+						}
+
+						// if we already have it, just update it
+						else
+						{
+							$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ? WHERE `provider_id` = 11 AND info = ?", array($website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end, $game['human_name']));
+
+							echo "Updated {$game['human_name']} with the latest information<br />";
+						}
 					}
 				}
 			}

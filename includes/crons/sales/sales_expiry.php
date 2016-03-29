@@ -6,21 +6,12 @@ include('/home/gamingonlinux/public_html/includes/config.php');
 include('/home/gamingonlinux/public_html/includes/class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
-// get config
-$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-$fetch_config = $db->fetch_all_rows();
-
-$config = array();
-foreach ($fetch_config as $config_set)
-{
-	$config[$config_set['data_key']] = $config_set['data_value'];
-}
-
 include('/home/gamingonlinux/public_html/includes/class_core.php');
 $core = new core();
 
 $removed_counter = 0;
 $games = '';
+$game_ids = array();
 
 $db->sqlquery("SELECT `has_screenshot`,`screenshot_filename` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date));
 $get_all = $db->fetch_all_rows();
@@ -34,7 +25,7 @@ foreach($get_all as $sale)
 }
 
 // remove old sales but keep sales with no date on them
-$db->sqlquery("SELECT `info`, `list_id` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date), 'sales_expiry.php');
+$db->sqlquery("SELECT `id`, `info`, `list_id` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date), 'sales_expiry.php');
 $removing_now = $db->fetch_all_rows();
 
 foreach ($removing_now as $remove)
@@ -42,6 +33,7 @@ foreach ($removing_now as $remove)
 	echo "{$remove['info']} for reaching expiry time<br />";
 	$games .= "{$remove['info']} for reaching expiry time<br />";
 	$removed_counter++;
+	$game_ids[] = $remove['id'];
 }
 
 $db->sqlquery("DELETE FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date), 'sales_expiry.php');
@@ -62,7 +54,7 @@ foreach ($xml->channel->item as $game)
 }
 
 // now search our database for all indiegamestand sales and match them up with current sales, if it doesn't match then it's no longer on sale so remove it!
-$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `provider_id` = 22 AND `accepted` = 1");
+$db->sqlquery("SELECT `id`, `info` FROM `game_sales` WHERE `provider_id` = 22 AND `accepted` = 1");
 $igs_currently_in_db = $db->fetch_all_rows();
 
 //print_r($currently_in_db);
@@ -87,6 +79,7 @@ foreach ($igs_currently_in_db as $value=> $in_db)
 			$removed_counter_igs++;
 			$removed_counter++;
 			$games .= "{$in_db['info']} from IndieGameStand<br />";
+			$game_ids[] = $in_db['id'];
 		}
 }
 
@@ -117,7 +110,7 @@ foreach ($xml->item as $game)
 }
 
 // now search our database for all indiegamestand sales and match them up with current sales, if it doesn't match then it's no longer on sale so remove it!
-$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `provider_id` = 12 AND `accepted` = 1");
+$db->sqlquery("SELECT `id`, `info` FROM `game_sales` WHERE `provider_id` = 12 AND `accepted` = 1");
 $gg_currently_in_db = $db->fetch_all_rows();
 
 //print_r($currently_in_db);
@@ -142,6 +135,7 @@ foreach ($gg_currently_in_db as $value=> $in_db)
 		$removed_counter_gg++;
 		$removed_counter++;
 		$games .= "{$in_db['info']} from GamersGate<br />";
+		$game_ids[] = $in_db['id'];
 	}
 }
 
@@ -168,7 +162,7 @@ if (file_get_contents($url) == true)
 	}
 
 	// now search our database for all desura sales and match them up with current sales, if it doesn't match then it's no longer on sale so remove it!
-	$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `provider_id` = 33 AND `accepted` = 1");
+	$db->sqlquery("SELECT `id`, `info` FROM `game_sales` WHERE `provider_id` = 33 AND `accepted` = 1");
 	$currently_in_db = $db->fetch_all_rows();
 
 	//print_r($currently_in_db);
@@ -193,6 +187,7 @@ if (file_get_contents($url) == true)
 			$removed_counter_gamesrepublic++;
 			$removed_counter++;
 			$games .= " {$in_db['info']} from GamesRepublic<br />";
+			$game_ids[] = $in_db['id'];
 		}
 	}
 	if ($removed_counter_gamesrepublic == 0)
@@ -232,7 +227,7 @@ if (file_get_contents(sprintf($urlMask, 1)) == true)
 	} while ($count > 0);
 
 		// now search our database for all desura sales and match them up with current sales, if it doesn't match then it's no longer on sale so remove it!
-		$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `provider_id` = 34 AND `accepted` = 1");
+		$db->sqlquery("SELECT `id`, `info` FROM `game_sales` WHERE `provider_id` = 34 AND `accepted` = 1");
 		$currently_in_db = $db->fetch_all_rows();
 
 		//print_r($gog_on_sale);
@@ -258,6 +253,7 @@ if (file_get_contents(sprintf($urlMask, 1)) == true)
 				$removed_counter_gog++;
 				$removed_counter++;
 				$games .= " {$in_db['info']} from GOG<br />";
+				$game_ids[] = $in_db['id'];
 			}
 		}
 		if ($removed_counter_gog == 0)
@@ -286,7 +282,7 @@ foreach ($xml->item as $game)
 }
 
 // now search our database for all desura sales and match them up with current sales, if it doesn't match then it's no longer on sale so remove it!
-$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `provider_id` = 28 AND `accepted` = 1");
+$db->sqlquery("SELECT `id`, `info` FROM `game_sales` WHERE `provider_id` = 28 AND `accepted` = 1");
 $currently_in_db = $db->fetch_all_rows();
 
 //print_r($currently_in_db);
@@ -311,6 +307,7 @@ foreach ($currently_in_db as $value=> $in_db)
 		$removed_counter_itch++;
 		$removed_counter++;
 		$games .= " {$in_db['info']} from Itch.io<br />";
+		$game_ids[] = $in_db['id'];
 	}
 }
 if ($removed_counter_itch == 0)
@@ -366,7 +363,7 @@ $feed = new FireFlowerFeed();
 $on_sale = $feed->get_products();
 
 // now search our database for all desura sales and match them up with current sales, if it doesn't match then it's no longer on sale so remove it!
-$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `provider_id` = 9 AND `accepted` = 1");
+$db->sqlquery("SELECT `id`, `info` FROM `game_sales` WHERE `provider_id` = 9 AND `accepted` = 1");
 $currently_in_db = $db->fetch_all_rows();
 
 //print_r($currently_in_db);
@@ -393,6 +390,7 @@ foreach ($currently_in_db as $value=> $in_db)
 			$removed_counter_ffg++;
 			$removed_counter++;
 			$games .= " {$in_db['info']} from Fireflower Games<br />";
+			$game_ids[] = $in_db['id'];
 		}
 }
 
@@ -400,27 +398,10 @@ if ($removed_counter_ffg == 0)
 {
 	echo "No games to remove from FireFlower Games<br />\r\n";
 }
-/*
-// THIS HAS BEEN PHASED OUT IN FAVOUR OF ANOTHER CRON ONLY EMAILING ME IF THIS CRON HASN'T RUN RECENTLY
-if ($removed_counter > 0)
-{
-	$to = 'liamdawe@gmail.com';
-	$subject = 'GOL Contact Us - Main expiry cron sales removed';
 
-	// To send HTML mail, the Content-type header must be set
-	$headers  = 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-	$headers .= "From: GOL Contact Us <noreply@gamingonlinux.com>\r\n";
-
-	mail($to, $subject, "<a href=\"http://www.gamingonlinux.com/sales/\">Sales Page</a> - The sales expiry cron has removed<br />$games<br />", $headers);
-
-	echo "Mail sent!";
-}
-
-if ($removed_counter == 0)
-{
-	echo "\n<br />No sales to remove\n";
-}*/
+// remove any admin notifications for ended sales that have been removed
+$game_ids_removed = implode(',', $game_ids);
+$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?)", array($game_ids_removed));
 
 // update the time it was last run
 $db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'sales_expiry_lastrun'", array(core::$date));

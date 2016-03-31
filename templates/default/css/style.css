@@ -51,6 +51,7 @@ cursor: default;
 a {
 	color: #428BCA;
 }
+.content a:hover {text-decoration: underline;}
 .fnone {
     float: none;
 }

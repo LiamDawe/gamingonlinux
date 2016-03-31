@@ -294,7 +294,7 @@ if (isset($_SESSION['uploads']))
 if (isset($_POST['check']))
 {
 	// add in uploaded images from database
-	$db->sqlquery("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($_POST['article_id']));
+	$db->sqlquery("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? AND `article_id` != 0 ORDER BY `id` ASC", array($_POST['article_id']));
 	$article_images = $db->fetch_all_rows();
 
 	foreach($article_images as $value)

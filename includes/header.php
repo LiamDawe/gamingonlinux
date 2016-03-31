@@ -159,6 +159,20 @@ $templating->merge('mainpage');
 $templating->block('top');
 $templating->set('url', url);
 
+// april fools, because why not
+if (date('dm') == '0104')
+{
+	$icon = 'windows_logo.png';
+	$site_title = 'Gaming On Windows 10';
+}
+else
+{
+	$icon = 'icon.svg';
+	$site_title = 'Gaming On Linux';
+}
+$templating->set('icon', $icon);
+$templating->set('site_title', $site_title);
+
 // sort the links out
 if (core::config('pretty_urls') == 1)
 {

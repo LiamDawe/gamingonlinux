@@ -2,6 +2,7 @@
 ini_set('display_errors',1);
 
 //define('path', '/home/gamingonlinux/public_html/includes/');
+define('path', '/mnt/storage/public_html/includes/');
 
 include(path . 'config.php');
 
@@ -406,7 +407,7 @@ if ($removed_counter_ffg == 0)
 $game_ids_removed = implode(',', $game_ids);
 if (!empty($game_ids_removed))
 {
-	$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?)", array($game_ids_removed));
+	$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?) AND `sale_id` != 0", array($game_ids_removed));
 }
 
 // update the time it was last run

@@ -49,7 +49,7 @@ if ($json == true)
 			{
 				//echo '<pre>';
 				//print_r($game);
-				
+
 				if (isset($game['current_price']))
 				{
 					if ($game['current_price'][0] != $game['full_price'][0])
@@ -107,5 +107,8 @@ else
 
 // remove any admin notifications for ended sales that have been removed
 $game_ids_removed = implode(',', $game_ids);
-$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?)", array($game_ids_removed));
+if (!empty($game_ids_removed))
+{
+	$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?) AND `sale_id` != 0", array($game_ids_removed));
+}
 ?>

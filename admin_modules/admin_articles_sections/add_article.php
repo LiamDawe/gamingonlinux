@@ -193,13 +193,9 @@ else
 
 	$article_id = $db->grab_id();
 
-	echo core::$date;
-	echo "<br />{$_SESSION['username']} published a new article.";
-	echo "$article_id";
-
 	$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array(core::$date, "{$_SESSION['username']} published a new article.", core::$date, $article_id));
 
-	/*
+
 	// upload attached images
 	if (isset($_SESSION['uploads']))
 	{
@@ -265,5 +261,5 @@ else
 			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
 			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
 		}
-	}*/
+	}
 }

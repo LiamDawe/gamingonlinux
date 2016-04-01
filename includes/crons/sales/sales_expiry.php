@@ -1,8 +1,7 @@
 <?php
 ini_set('display_errors',1);
 
-//define('path', '/home/gamingonlinux/public_html/includes/');
-define('path', '/mnt/storage/public_html/includes/');
+define('path', '/home/gamingonlinux/public_html/includes/');
 
 include(path . 'config.php');
 

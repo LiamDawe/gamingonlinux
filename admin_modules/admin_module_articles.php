@@ -1069,7 +1069,7 @@ else if (isset($_POST['act']))
 		$title = strip_tags($_POST['title']);
 		$text = trim($_POST['text']);
 		$tagline = trim($_POST['tagline']);
-		$slug = core::nice_title($_POST['slug']);
+		$slug = $core->nice_title($_POST['slug']);
 
 		// count how many editors picks we have
 		$editor_picks = array();

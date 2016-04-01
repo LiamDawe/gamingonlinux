@@ -1,12 +1,14 @@
 <?php
 ini_set('display_errors',1);
 
-include('/home/gamingonlinux/public_html/includes/config.php');
+//define('path', '/home/gamingonlinux/public_html/includes/');
 
-include('/home/gamingonlinux/public_html/includes/class_mysql.php');
+include(path . 'config.php');
+
+include(path . 'class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
-include('/home/gamingonlinux/public_html/includes/class_core.php');
+include(path . 'class_core.php');
 $core = new core();
 
 $removed_counter = 0;
@@ -266,6 +268,7 @@ else
 	echo "Couldn't access the GOG feed.<br />\r\n";
 }
 
+/*
 //
 // Remove Itch.io sales
 //
@@ -313,12 +316,12 @@ foreach ($currently_in_db as $value=> $in_db)
 if ($removed_counter_itch == 0)
 {
 	echo "No games to remove from Itch.io<br />\r\n";
-}
+}*/
 
 //
 // remove Fireflower Games sales that are no longer listed (for ones that had no end date)
 //
-require_once('/home/gamingonlinux/public_html/includes/simplepie/autoloader.php');
+require_once(path . 'simplepie/autoloader.php');
 class FireFlowerFeed {
 	const PROVIDER_ID = 99;
 	public $feed;
@@ -401,7 +404,10 @@ if ($removed_counter_ffg == 0)
 
 // remove any admin notifications for ended sales that have been removed
 $game_ids_removed = implode(',', $game_ids);
-$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?)", array($game_ids_removed));
+if (!empty($game_ids_removed))
+{
+	$db->sqlquery("DELETE FROM `admin_notifications` WHERE `sale_id` IN (?)", array($game_ids_removed));
+}
 
 // update the time it was last run
 $db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'sales_expiry_lastrun'", array(core::$date));

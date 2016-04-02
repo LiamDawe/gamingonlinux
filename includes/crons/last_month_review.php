@@ -20,11 +20,11 @@ $counter = $db->fetch();
 
 $prevmonth = date('F Y', strtotime('-1 months'));
 
-$title = "The most popular Linux gaming articles for $prevmonth, {$counter['counter']} in total";
+$title = "The most popular Linux & SteamOS gaming articles for $prevmonth, {$counter['counter']} in total";
 
-$tagline = "Here is a look back at the 15 most popular articles on GamingOnLinux for $prevmonth, an easy way to for you to keep up to date on what has happened in the past month for Linux Gaming!";
+$tagline = "Here is a look back at the 15 most popular articles on GamingOnLinux for $prevmonth, an easy way to for you to keep up to date on what has happened in the past month for Linux & SteamOS Gaming!";
 
-$text = "Here is a look back at the 15 most popular articles on GamingOnLinux for $prevmonth, an easy way to for you to keep up to date on what has happened in the past month for Linux Gaming! Sorted from lowest to highest to make sure you don't miss the smaller news stories. Also if you wish to keep track of these overview posts you can with our <a href=\"http://www.gamingonlinux.com/article_rss.php?section=overviews\">Overview RSS</a>.<br /><br />We published a total of <strong>{$counter['counter']} articles last month</strong>, wow!<br />";
+$text = "Here is a look back at the 15 most popular articles on GamingOnLinux for $prevmonth, an easy way to for you to keep up to date on what has happened in the past month for Linux & SteamOS Gaming! Sorted from lowest to highest to make sure you don't miss the smaller news stories. Also if you wish to keep track of these overview posts you can with our <a href=\"http://www.gamingonlinux.com/article_rss.php?section=overviews\">Overview RSS</a>.<br /><br />We published a total of <strong>{$counter['counter']} articles last month</strong>, wow!<br />";
 
 // sub query = grab the highest ones, then the outer query sorts them in ascending order, so we get the highest viewed articles, and then sorted from lowest to highest
 $db->sqlquery("SELECT a.*
@@ -84,16 +84,21 @@ $sales .= "</ul><br /><br />";
 
 $text .= "<br />Also remember to check out our [url=/sales/]Game Sales[/url] page where we syndicate game sales from GOG, Humble Store, Itch.io, IndieGameStand and many more stores!<br /><br />See the latest few sales here:<br />$sales";
 
-$text .= "No need to tip us, as we do it because we love what we do!<br />";
+$text .= "<br />All of this is possible thanks to <a href=\"http://patreon.com/liamdawe\">my Patreon campaign</a>, and our Supporters!<br />";
 
-$text .= "<br />What was your favourite Linux Gaming news for the past month?";
+$text .= "<br />What was your favourite Linux Gaming news from $prevmonth?";
 
 // DEBUG
 //echo $text;
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'monthlyoverview.png'", array(core::$date, $title, $tagline, $text));
+$slug = $core->nice_title($title);
+
+$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'monthlyoverview.png'", array(core::$date, $title, $slug, $tagline, $text));
 
 $article_id = $db->grab_id();
 
 $db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 63", array($article_id));
+
+include(core::config('path') . 'includes/telegram_poster.php');
+telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $article_id);
 ?>

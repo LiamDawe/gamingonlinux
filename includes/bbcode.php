@@ -237,7 +237,9 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 	 	"/\[justify\](.+?)\[\/justify\]/is",
 	 	"/\[code\](.+?)\[\/code\]/is",
 	 	"/\[sup\](.+?)\[\/sup\]/is",
-	 	"/\[spoiler](.+?)\[\/spoiler\]/is"
+	 	"/\[spoiler](.+?)\[\/spoiler\]/is",
+		"/\[mp3](.+?)\[\/mp3\]/is",
+		"/\[ogg](.+?)\[\/ogg\]/is"
 	);
 
 	$replace = array(
@@ -269,7 +271,9 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 		'$1',
 		'Code:<br /><code>$1</code>',
 		'<sup>$1</sup>',
-		'<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>'
+		'<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
+		'<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
+		'<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
 	);
 
 	$smilies = array(

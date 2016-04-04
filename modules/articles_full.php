@@ -158,7 +158,7 @@ if (!isset($_GET['go']))
 				else
 				{
 					$username = "<a rel=\"author\" href=\"/profiles/{$article['author_id']}\"><span class=\"glyphicon glyphicon-user\"></span> {$article['username']}</a>";
-					$view_more = "<a href=\"/index.php?module=search&amp;author_id={$article['author_id']}\"><span class=\"glyphicon glyphicon-search\"></span> View more articles from {$article['username']}</a>";
+					$view_more = " | <a href=\"/index.php?module=search&amp;author_id={$article['author_id']}\">View more articles from {$article['username']}</a>";
 				}
 
 				$templating->set('username', $username);

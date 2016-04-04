@@ -124,7 +124,8 @@ if (!isset($_GET['view']))
 
 			if ($article['show_in_menu'] == 0)
 			{
-				$templating->set('editors_pick_link', " <a href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
+				$editor_pick_expiry = $core->format_date(core::$date + 1209600, 'd/m/y');
+				$templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
 			}
 			else if ($article['show_in_menu'] == 1)
 			{

@@ -133,7 +133,7 @@ class mysql
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>
-		<img src=\"" . core::config('website_url') . "$templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"Gaming On Linux\">
 		<br />
 		$exception on page $page<br />
 		SQL QUERY<br />

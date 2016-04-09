@@ -53,15 +53,6 @@ foreach ($articles as $line)
 	// make date human readable
 	$date = date("D, d M Y H:i:s O", $line['date']);
 	$nice_title = preg_replace('/<[^>]+>/', '', $core->nice_title($line['title']) ); // ~~ Piratelv @ 28/08/13
-	$description = $line['text'];
-	if (!empty($line['page2']))
-	{
-		$description .= '<br /><strong>Page 2</strong><br />' . $line['page2'];
-	}
-	if (!empty($line['page3']))
-	{
-		$description .= '<br /><strong>Page 3</strong><br />' . $line['page3'];
-	}
 
 	if ($line['article_top_image'] == 1)
 	{
@@ -71,13 +62,13 @@ foreach ($articles as $line)
 	if (!empty($line['tagline_image']))
 	{
 		$tagline_bbcode  = $line['tagline_image'];
-	} else {
+	}
+	else
+	{
 		$tagline_bbcode = ""; //Piratelv @ 05/06/14 -- Some older articles didn't have this
 	}
 
-	$description = bbcode($description, 1, 1, $tagline_bbcode);
-
-	$description = $description;
+	$line['text'] = bbcode($line['text'], 1, 1, $tagline_bbcode, 1);
 
 	$title = str_replace("&#039;", '\'', $line['title']);
 	$title = str_replace("&", "&amp;", $title);
@@ -97,7 +88,7 @@ foreach ($articles as $line)
 		<item>
 			<title>{$title}</title>
 			<link>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</link>
-			<description><![CDATA[Tags:$cats<br />{$description}]]></description>
+			<description><![CDATA[Tags:$cats<br />{$line['text']}]]></description>
 			<pubDate>{$date}</pubDate>
 			<guid>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</guid>
 		</item>";

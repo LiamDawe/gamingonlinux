@@ -56,12 +56,19 @@ function remove_bbcode($string)
 	return preg_replace($pattern, $replace, $string);
 }
 
-function quotes($body)
+function quotes($body, $rss = 0)
 {
 	// Quoting an actual person, book or whatever
 	$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
 
-	$replace = "<blockquote><cite>$1</cite>$2</blockquote>";
+	if ($rss == 0)
+	{
+		$replace = "<blockquote><cite>$1</cite>$2</blockquote>";
+	}
+	else if ($rss == 1)
+	{
+		$replace = "<blockquote><cite>$1</cite><br />$2</blockquote>";
+	}
 
 	while(preg_match($pattern, $body))
 	{
@@ -70,9 +77,14 @@ function quotes($body)
 
 	// Quote on its own
 	$pattern = '/\[quote\](.+?)\[\/quote\]/is';
-
-	$replace = "<blockquote><cite>Quote</cite>$1</blockquote>";
-
+	if ($rss == 0)
+	{
+		$replace = "<blockquote><cite>Quote</cite>$1</blockquote>";
+	}
+	else if ($rss == 1)
+	{
+		$replace = "<blockquote><cite>Quote</cite><br />$1</blockquote>";
+	}
 	while(preg_match($pattern, $body))
 	{
 		$body = preg_replace($pattern, $replace, $body);
@@ -81,7 +93,7 @@ function quotes($body)
 	return $body;
 }
 
-function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
+function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $rss = 0)
 {
 	//  get rid of empty BBCode, is there a point in having excess markup?
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
@@ -188,7 +200,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 
 	$body = preg_replace($find_lines, $replace_lines, $body);
 
-	$body = quotes($body);
+	$body = quotes($body, $rss);
 
 	// replace images and youtube to the correct size if its a comment or forum post (less space!)
 	if ($article == 0)
@@ -371,21 +383,21 @@ function email_bbcode($body)
 	}
 
 	$find = array(
-        "/\[url\=(.+?)\](.+?)\[\/url\]/is",
+    "/\[url\=(.+?)\](.+?)\[\/url\]/is",
 	"/\[url\](.+?)\[\/url\]/is",
-        "/\[b\](.+?)\[\/b\]/is",
-        "/\[i\](.+?)\[\/i\]/is",
-        "/\[u\](.+?)\[\/u\]/is",
-        "/\[s\](.+?)\[\/s\]/is",
-        "/\[color\=(.+?)\](.+?)\[\/color\]/is",
-        "/\[font\=(.+?)\](.+?)\[\/font\]/is",
-        "/\[center\](.+?)\[\/center\]/is",
-        "/\[right\](.+?)\[\/right\]/is",
-        "/\[left\](.+?)\[\/left\]/is",
+    "/\[b\](.+?)\[\/b\]/is",
+    "/\[i\](.+?)\[\/i\]/is",
+    "/\[u\](.+?)\[\/u\]/is",
+    "/\[s\](.+?)\[\/s\]/is",
+    "/\[color\=(.+?)\](.+?)\[\/color\]/is",
+    "/\[font\=(.+?)\](.+?)\[\/font\]/is",
+    "/\[center\](.+?)\[\/center\]/is",
+    "/\[right\](.+?)\[\/right\]/is",
+    "/\[left\](.+?)\[\/left\]/is",
 	"/\[img\]http\:\/\/img\.youtube.com\/vi\/(.+?)\/0\.jpg\[\/img\]/is", //youtube videos done by the old tinymce plugin...
-        "/\[img\](.+?)\[\/img\]/is",
-        "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
-        "/\[email\](.+?)\[\/email\]/is",
+    "/\[img\](.+?)\[\/img\]/is",
+    "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
+    "/\[email\](.+?)\[\/email\]/is",
 	"/\[s\](.+?)\[\/s\]/is",
 	"/\[media=youtube\](.+?)\[\/media\]/is", // This is for videos done by xenforo...
 	"/\[youtube\](.+?)\[\/youtube\]/is",

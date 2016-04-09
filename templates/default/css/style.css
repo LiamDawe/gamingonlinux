@@ -345,6 +345,10 @@ margin-bottom: -3px;
 	border: none;
 }
 
+.body.list > ul li.list-group-item a {
+    display: inline;
+}
+
 #content .chatList ul li a {
 	display: inline-block;
 }

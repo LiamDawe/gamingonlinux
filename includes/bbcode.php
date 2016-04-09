@@ -51,7 +51,7 @@ function do_charts($body)
 
 function remove_bbcode($string)
 {
-	$pattern = '|[[\/\!]*?[^\[\]]*?]|si';
+	$pattern = '/\[[^\]]+\]/si'; //More effecient striping regex thx to tadzik
 	$replace = '';
 	return preg_replace($pattern, $replace, $string);
 }

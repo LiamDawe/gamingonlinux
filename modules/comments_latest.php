@@ -11,12 +11,17 @@ $db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, c.`comment_te
 while ($comments = $db->fetch())
 {
 	$date = $core->format_date($comments['time_posted']);
+
+	// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
+	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
+	$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
+
 	//Warp sentenses at 150 char-ish. So it only get's cut at a whole word
-	//Now don't go and use my keyword "apesapes" in any comment please. It will break this thing
-	$text = wordwrap(remove_bbcode($comments['comment_text']), 150, "apesapes", true);
-	if (strpos($text, "apesapes") !== FALSE) // Sometimes it's possible the comment was shorter then 150 char, it doesn't include the keyword then
+	//Now don't go and use the keyword "<!WRAP!>" in any comment please. It will break this thing
+	$text = wordwrap(remove_bbcode($text), 150, "<!WRAP!>", true);
+	if (strpos($text, "<!WRAP!>") !== FALSE) // Sometimes it's possible the comment was shorter then 150 char, it doesn't include the keyword then
 	{
-		$text = substr($text, $startpoint, strpos($text, "apesapes") + $startpoint);
+		$text = substr($text, $startpoint, strpos($text, "<!WRAP!>") + $startpoint);
 	}
 	$text = $text . '&hellip;'; //Use actual ellipsis char
 	$title = $comments['title'];

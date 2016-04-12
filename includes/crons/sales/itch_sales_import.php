@@ -13,7 +13,7 @@ $core = new core();
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
-$url = 'http://itch.io/browse/platform-linux/price-sale.xml';
+$url = 'https://itch.io/games/on-sale/platform-linux.xml';
 if (file_get_contents($url) == true)
 {
 	// magic
@@ -155,7 +155,9 @@ foreach ($xml->item as $game)
 
 				$expires = $timestamp;
 
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 28, `savings` = ?, `{$currency}` = ?, `{$currency}_original` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = 1", array($title, $game->{'link'}, core::$date, "$discount% off", $price, $price_original, $expires, $game->imageurl));
+				$link  = $game->{'link'} . '?ac=cJLATbQF';
+
+				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 28, `savings` = ?, `{$currency}` = ?, `{$currency}_original` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = 1", array($title, $link, core::$date, "$discount% off", $price, $price_original, $expires, $game->imageurl));
 
 				$sale_id = $db->grab_id();
 

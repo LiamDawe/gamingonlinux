@@ -271,8 +271,7 @@ else
 
 			if (($start['secondary_user_group'] == 6 || $start['secondary_user_group'] == 7) && $start['user_group'] != 1 && $start['user_group'] != 2)
 			{
-				$donator_badge = '<br />
-				<span class="label label-warning">GOL Supporter!</span><br /> ';
+				$donator_badge = '<li><span class="badge supporter">GOL Supporter</span></li>';
 			}
 			$templating->set('donator_badge', $donator_badge);
 
@@ -280,7 +279,12 @@ else
 			// check if editor or admin
 			if ($start['user_group'] == 1 || $start['user_group'] == 2)
 			{
-				$editor_bit = "<span class=\"label label-success\">Editor</span><br />";
+				$editor_bit = "<li><span class=\"badge editor\">Editor</span></li>";
+			}
+			// check if accepted submitter
+			if ($start['user_group'] == 5)
+			{
+				$editor_bit = "<li><span class=\"badge editor\">Contributing Editor</span></li>";
 			}
 			$templating->set('editor', $editor_bit);
 
@@ -368,8 +372,7 @@ else
 
 				if (($replies['secondary_user_group'] == 6 || $replies['secondary_user_group'] == 7) && $replies['user_group'] != 1 && $replies['user_group'] != 2)
 				{
-					$donator_badge = '<br />
-					<span class="label label-warning">GOL Supporter!</span><br /> ';
+					$donator_badge = '<li><span class="badge supporter">GOL Supporter</span></li>';
 				}
 				$templating->set('donator_badge', $donator_badge);
 
@@ -412,7 +415,12 @@ else
 				// check if editor or admin
 				if ($replies['user_group'] == 1 || $replies['user_group'] == 2)
 				{
-					$editor_bit = "<span class=\"label label-success\">Editor</span><br />";
+					$editor_bit = "<li><span class=\"badge editor\">Editor</span></li>";
+				}
+				// check if accepted submitter
+				if ($replies['user_group'] == 5)
+				{
+					$editor_bit = "<li><span class=\"badge editor\">Contributing Editor</span></li>";
 				}
 				$templating->set('editor', $editor_bit);
 

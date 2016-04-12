@@ -443,9 +443,6 @@ else
 				$templating->block('preview', 'private_messages');
 			}
 
-			$templating->block('delete', 'private_messages');
-			$templating->set('conversation_id', $start['conversation_id']);
-
 			$db->sqlquery("UPDATE `user_conversations_participants` SET `unread` = 0 WHERE `participant_id` = ? AND `conversation_id` = ?", array($_SESSION['user_id'], $_GET['id']));
 		}
 	}

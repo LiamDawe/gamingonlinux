@@ -123,8 +123,6 @@ foreach ($xml->group->o as $game)
 				echo "\nI didn't know about this game before.\n";
 			}
 
-			$discount = substr($game->attributes()->discount, -1);
-
 			$drm_free = 0;
 			if ($game->attributes()->isDrmFree == 'True')
 			{
@@ -146,7 +144,7 @@ foreach ($xml->group->o as $game)
 			// all checks out - insert into database here
 			if ($check == 0)
 			{
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 33, `savings` = ?, `dollars` = ?, `dollars_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ?", array($game->{'name'}, $game->attributes()->url, core::$date, "$discount% off", $game->attributes()->priceUSD, $game->attributes()->regularPriceUSD, $drm_free, $steam, $expires), 'gamesrepublic_import.php');
+				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 33, `dollars` = ?, `dollars_original` = ?, `pounds` = ?, `pounds_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ?", array($game->{'name'}, $game->attributes()->url, core::$date, $game->attributes()->priceUSD, $game->attributes()->regularPriceUSD, $game->attributes()->priceGBP, $game->attributes()->regularPriceGBP, $drm_free, $steam, $expires), 'gamesrepublic_import.php');
 
 				$sale_id = $db->grab_id();
 
@@ -161,7 +159,7 @@ foreach ($xml->group->o as $game)
 			// if we already have it, just set the price and % off to the current amount (in-case it's different) or if they now have steam/desura keys
 			else if ($check == 1)
 			{
-				$db->sqlquery("UPDATE `game_sales` SET `savings` = ?, `dollars` = ?, `dollars_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ? WHERE `info` = ? AND `provider_id` = 33", array("$discount% off", $game->attributes()->priceUSD, $game->attributes()->regularPriceUSD, $drm_free, $steam, $expires, $game->{'name'}), 'gamesrepublic_import.php');
+				$db->sqlquery("UPDATE `game_sales` SET `dollars` = ?, `dollars_original` = ?, `pounds` = ?, `pounds_original` = ?, `drmfree` = ?, `steam` = ?, `expires` = ? WHERE `info` = ? AND `provider_id` = 33", array($game->attributes()->priceUSD, $game->attributes()->regularPriceUSD, $game->attributes()->priceGBP, $game->attributes()->regularPriceGBP, $drm_free, $steam, $expires, $game->{'name'}), 'gamesrepublic_import.php');
 
 				echo "  Updated " . $game->{'name'} . " with current price and % off.\n";
 				echo "\r\n==================================================\r\n";

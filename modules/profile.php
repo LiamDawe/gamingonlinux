@@ -209,11 +209,11 @@ if (isset($_GET['user_id']))
 
 			$templating->set('comment_posts', $comment_posts);
 
-			$templating->block('end');
-
-			$admin_links = '';
-			if ($user->check_group(1,2) == true)
+			//Do not show end block if it's empty
+			if ($user->check_group(1,2))
 			{
+				$templating->block('end');
+
 				$admin_links = "<form method=\"post\" action=\"/admin.php?module=users&user_id={$profile['user_id']}\">
 				<button type=\"submit\" formaction=\"/admin.php?module=users&view=edituser&user_id={$profile['user_id']}\" class=\"btn btn-primary\">Edit User</button>
 				<button name=\"act\" value=\"ban\" class=\"btn btn-danger\">Ban User</button>
@@ -228,9 +228,8 @@ if (isset($_GET['user_id']))
 				}
 
 				$admin_links .= "</form>";
-
+				$templating->set('admin_links', $admin_links);
 			}
-			$templating->set('admin_links', $admin_links);
 		}
 	}
 }

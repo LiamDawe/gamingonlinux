@@ -11,9 +11,15 @@ $db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, c.`comment_te
 while ($comments = $db->fetch())
 {
 	$date = $core->format_date($comments['time_posted']);
-	$text = substr($comments['comment_text'], 0, 150);
+	//Warp sentenses at 150 char-ish. So it only get's cut at a whole word
+	//Now don't go and use my keyword "apesapes" in any comment please. It will break this thing
+	$text = wordwrap(remove_bbcode($comments['comment_text']), 150, "apesapes", true);
+	if (strpos($text, "apesapes") !== FALSE) // Sometimes it's possible the comment was shorter then 150 char, it doesn't include the keyword then
+	{
+		$text = substr($text, $startpoint, strpos($text, "apesapes") + $startpoint);
+	}
+	$text = $text . '&hellip;'; //Use actual ellipsis char
 	$title = $comments['title'];
-	$text = $text . '...';
 
 	$page = 1;
 	if ($comments['comment_count'] > 10)

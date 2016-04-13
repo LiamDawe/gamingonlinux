@@ -15,14 +15,14 @@
 		<br />
 		<form method="post" action="/index.php?module=register">
 			Username, please use plain text: <br />
-			<input type="text" class="form-control" name="username" /><br />
+			<input type="text" class="form-control ays-ignore" name="username" /><br />
 			Password: <br />
-			<input type="password" class="form-control" name="password" /><br />
+			<input type="password" class="form-control ays-ignore" name="password" /><br />
 			Verify Password: <br />
-			<input type="password" class="form-control" name="verify_password" /><br />
+			<input type="password" class="form-control ays-ignore" name="verify_password" /><br />
 			Email, <strong>Valid email address required for verification!</strong> <br />
-			<input type="text" class="form-control" name="uemail" /><br />
-			<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
+			<input type="text" class="form-control ays-ignore" name="uemail" /><br />
+			<div class="hideme"><input class="ays-ignore" type="text" name="email" autocomplete="off" /></div>
 			{:captcha}
 			<input type="submit" name="register" value="Register" class="btn btn-primary" />
 		</form>
@@ -45,13 +45,13 @@ You are about to create a new account with twitter, please enter the following d
 <strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>.</strong>
 	<form method="post" action="/index.php?module=register">
 	Username: <br />
-	<input type="text" name="username" /><br />
+	<input class="ays-ignore" type="text" name="username" /><br />
 	Password: <br />
-	<input type="password" name="password" /><br />
+	<input class="ays-ignore" type="password" name="password" /><br />
 	Verify Password: <br />
-	<input type="password" name="verify_password" /><br />
+	<input class="ays-ignore" type="password" name="verify_password" /><br />
 	Email, <strong>Valid email address required for verification!</strong> <br />
-	<input type="text" name="uemail" /><br />
+	<input class="ays-ignore" type="text" name="uemail" /><br />
 	<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
 	{:captcha}
 	<input type="submit" value="Register" class="btn btn-primary" />
@@ -75,13 +75,13 @@ If you want to link it to an existing account, you need to login normally and do
 <strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>.</strong>
 		<form method="post" action="/index.php?module=register">
 		Username: <br />
-		<input type="text" name="username" /><br />
+		<input class="ays-ignore" type="text" name="username" /><br />
 		Password: <br />
-		<input type="password" name="password" /><br />
+		<input class="ays-ignore" type="password" name="password" /><br />
 		Verify Password: <br />
-		<input type="password" name="verify_password" /><br />
+		<input class="ays-ignore" type="password" name="verify_password" /><br />
 		Email, <strong>Valid email address required for verification!</strong> <br />
-		<input type="text" name="uemail" /><br />
+		<input class="ays-ignore" type="text" name="uemail" /><br />
 		<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
 		{:captcha}
 		<input type="submit" value="Register" class="btn btn-primary" />

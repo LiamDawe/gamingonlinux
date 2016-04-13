@@ -128,10 +128,10 @@
 <div class="box">
 	<div class="body group">
 		<label class="checkbox">
-		<input type="checkbox" name="subscribe" {:subscribe_check} /> <strong>Subscribe to article to receive comment replies</strong>
+		<input type="checkbox" class="ays-ignore" name="subscribe" {:subscribe_check} /> <strong>Subscribe to article to receive comment replies</strong>
 		</label>
 		<label class="checkbox">
-		<input type="checkbox" name="emails" {:subscribe_email_check} /> <strong>Receive comment replies via email?</strong>
+		<input type="checkbox" class="ays-ignore" name="emails" {:subscribe_email_check} /> <strong>Receive comment replies via email?</strong>
 		</label>
 		<input type="hidden" name="aid" value="{:aid}" />
 		<button type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button>

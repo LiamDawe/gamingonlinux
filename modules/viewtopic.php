@@ -791,7 +791,7 @@ else
 
 					if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 					{
-						$core->editor('text', '');
+						$core->editor('text', '', $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
 					}
 
 					$templating->block('reply_buttons', 'viewtopic');

@@ -1,67 +1,67 @@
 [block: submit]
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <script language="javascript" type="text/javascript" src="/includes/jscripts/datetimepicker.min.js"></script>
-				<div class="box"><div class="head">Submit a new sale</div>
-					<div class="body group">
-					<form method="post" enctype="multipart/form-data">
-					<a name="addsale"></a>Sale Provider: <select class="form-control" name="provider">{:providers_list}</select><br />
-					Options:<br />
-					<label class="checkbox">
-						<input type="checkbox" name="drmfree" /> DRM Free
-					</label>
+<div class="box"><div class="head">Submit a new sale</div>
+		<div class="body group">
+			<form method="post" enctype="multipart/form-data">
+			<a name="addsale"></a>Sale Provider: <select class="form-control ays-ignore" name="provider">{:providers_list}</select><br />
+			Options:<br />
 			<label class="checkbox">
-				<input type="checkbox" name="pr_key" /> Requires Product Key?
+				<input class="ays-ignore" type="checkbox" name="drmfree" /> DRM Free
 			</label>
 			<label class="checkbox">
-				<input type="checkbox" name="pre-order" /> Sale is a Pre-order?
+				<input class="ays-ignore" type="checkbox" name="pr_key" /> Requires Product Key?
 			</label>
 			<label class="checkbox">
-				<input type="checkbox" name="steam" /> Steam
+				<input class="ays-ignore" type="checkbox" name="pre-order" /> Sale is a Pre-order?
 			</label>
 			<label class="checkbox">
-				<input type="checkbox" name="desura" /> Desura
+				<input class="ays-ignore" type="checkbox" name="steam" /> Steam
+			</label>
+			<label class="checkbox">
+				<input class="ays-ignore" type="checkbox" name="desura" /> Desura
 			</label>
 			<label>Game Name</label>
-			<input type="text" class="form-control" name="info"> <br />
+			<input class="ays-ignore" type="text" class="form-control" name="info"> <br />
 			We need <strong>at least one price</strong>, the more the better though!<br />
 			If it's pay what you want you only need to tick the first box leave others blank!<br />
 			<label class="checkbox">
-				<input type="checkbox" name="pwyw" /> Pay What You Want
+				<input class="ays-ignore" type="checkbox" name="pwyw" /> Pay What You Want
 			</label>
 			<label class="checkbox">
-				<input type="checkbox" name="beat_average" /> Beat The Average
+				<input class="ays-ignore" type="checkbox" name="beat_average" /> Beat The Average
 			</label>
 			Pound Price
 			<div class="form-group">
-				<span class="preinput">£</span><input type="text" class="form-control" name="pounds" />
+				<span class="preinput">£</span><input class="ays-ignore" type="text" class="form-control" name="pounds" />
 			</div>
 			Pound Original
 			<div class="form-group">
-				<span class="preinput">£</span><input type="text" class="form-control" name="pounds_original" />
+				<span class="preinput">£</span><input class="ays-ignore" type="text" class="form-control" name="pounds_original" />
 			</div><br />
 			Dollar Price
 			<div class="form-group">
-				<span class="preinput">$</span><input type="text" class="form-control" name="dollars" />
+				<span class="preinput">$</span><input class="ays-ignore" type="text" class="form-control" name="dollars" />
 			</div>
 			<label>Dollar Original</label>
 			<div class="form-group">
-				<span class="preinput">$</span><input type="text" class="form-control" name="dollars_original" />
+				<span class="preinput">$</span><input class="ays-ignore" type="text" class="form-control" name="dollars_original" />
 			</div><br />
 			Euro Price
 			<div class="form-group">
-				<input type="text" class="form-control-extra" name="euros" /><span class="extrainput">€</span>
+				<input type="text" class="form-control-extra ays-ignore" name="euros" /><span class="extrainput">€</span>
 			</div>
 			Euro Original
 			<div class="form-group">
-				<input type="text" class="form-control-extra" name="euros_original" /><span class="extrainput">€</span>
+				<input type="text" class="form-control-extra ays-ignore" name="euros_original" /><span class="extrainput">€</span>
 			</div><br />
 			<label>Savings (% off) - Only needed if you don't have the original price!</label>
-			<input type="text" name="savings" value="% off" /><br />
+			<input class="ays-ignore" type="text" name="savings" value="% off" /><br />
 			<label>Website Address</label>
-			<input type="text" name="website" /> <br />
+			<input class="ays-ignore" type="text" name="website" /> <br />
 			Sale thumbnail (Not Required, but helps identify the game, will be scaled to 110x110).<br />
-			<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
-			Expires: <input name="expires" id="datetimepicker" type="text" size="25"><br />
+			<input name="new_image" id="new_image" size="30" type="file" class="fileUpload ays-ignore" /><br />
+			Expires: <input class="ays-ignore" name="expires" id="datetimepicker" type="text" size="25"><br />
 			<script>
 			var timepicker = new Pikaday(
 			{

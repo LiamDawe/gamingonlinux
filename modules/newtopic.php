@@ -107,7 +107,7 @@ else if (!isset($_POST['act']))
 
 	if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 	{
-		$core->editor('text', $text);
+		$core->editor('text', $text, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
 	}
 
 	$templating->block('bottom', 'newtopic');

@@ -130,6 +130,9 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
+    // Enable on all forms
+    $('form').areYouSure();
+
 	var input_counter = 2;
 	$("#add-poll").click(function () {
 		$('#pquestion').prop("disabled", false);

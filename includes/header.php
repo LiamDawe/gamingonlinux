@@ -243,13 +243,13 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 	$user_menu = "<a href=\"/index.php?module=login\">Account</a>
 							<div>
 								<form method=\"post\" action=\"".url."index.php?module=login\">
-									<input name=\"username\" type=\"text\" value=\"$username\" placeholder=\"Username or Email\" />
-									<input name=\"password\" type=\"password\" placeholder=\"Password\" />
+									<input name=\"username\" class=\"ays-ignore\" type=\"text\" value=\"$username\" placeholder=\"Username or Email\" />
+									<input name=\"password\" class=\"ays-ignore\" type=\"password\" placeholder=\"Password\" />
 									<label>
-										<input name=\"remember_name\" type=\"checkbox\" $username_remembered/> Remember username
+										<input name=\"remember_name\" class=\"ays-ignore\" type=\"checkbox\" $username_remembered/> Remember username
 									</label>
 									<label>
-										<input name=\"stay\" checked=\"checked\" type=\"checkbox\" /> Stay logged in
+										<input name=\"stay\" class=\"ays-ignore\" checked=\"checked\" type=\"checkbox\" /> Stay logged in
 									</label>
 									<hr />
 									<input type=\"submit\" name=\"action\" value=\"Login\" />

@@ -951,7 +951,7 @@ class core
 	}
 
 	// include this anywhere to show the bbcode editor
-	function editor($name, $content, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox')
+	function editor($name, $content, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 0)
 	{
 		global $templating, $config;
 
@@ -977,6 +977,16 @@ class core
 			$page_button = '<li data-snippet="<*PAGE*>">page</li>';
 		}
 		$templating->set('page_button', $page_button);
+
+		if ($ays_ignore == 0)
+		{
+			$ays_check = '';
+		}
+		else if ($ays_ignore == 1)
+		{
+			$ays_check = 'class="ays-ignore"';
+		}
+		$templating->set('ays_ignore', $ays_check);
 	}
 
 	// convert bytes to human readable stuffs, only up to MB as we will never be uploading more than MB files directly

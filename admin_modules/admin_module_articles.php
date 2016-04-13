@@ -55,7 +55,7 @@ if (isset($_GET['view']))
 
 		$templating->merge('admin_modules/article_form');
 		$templating->block('full_editor', 'admin_modules/article_form');
-		$templating->set('main_formaction', '<form method="post" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+		$templating->set('main_formaction', '<form method="post" name="article-form" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 		$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
 
 		// get categorys

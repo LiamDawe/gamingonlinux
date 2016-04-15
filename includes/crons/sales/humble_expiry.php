@@ -1,13 +1,17 @@
 <?php
 ini_set('display_errors',1);
 
-include('/home/gamingonlinux/public_html/includes/config.php');
+define('path', '/home/gamingonlinux/public_html/');
 
-include('/home/gamingonlinux/public_html/includes/class_mysql.php');
+include(path . 'includes/config.php');
+
+include(path . 'includes/class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
-include('/home/gamingonlinux/public_html/includes/class_core.php');
+include(path . 'includes/class_core.php');
 $core = new core();
+
+include(path . 'includes/curl_data.php');
 
 $removed_counter = 0;
 $games = '';
@@ -30,32 +34,39 @@ $i = 0;
 
 //Only do one call to the API, no need to make 2 HTTP requests to their servers just so see if it's alive ~ Piratelv
 // A . combines 2 strings with each other
-$json = file_get_contents($api_endpoint."?request=3&page_size=20&sort=discount&page=0&platform=linux");
+$json = getCurlData($api_endpoint."?request=1&page_size=20&notabot=true&page=0&platform=linux");
 if ($json == true)
 {
-
 	do
 	{
-		$json = json_decode(file_get_contents($api_endpoint."?request=3&page_size=20&sort=discount&page=$i&platform=linux"), true);
+		$json = json_decode(getCurlData($api_endpoint."?request=1&page_size=20&notabot=true&page=$i&platform=linux"));
 
-		if (empty($json['results']))
+		if (empty($json->results))
 		{
 			$stop = 1;
 		}
 
-		else if (!empty($json['results']))
+		else if ($json->num_results != 0)
 		{
-			foreach ($json['results'] as $game)
+			$use_sale = 0;
+			foreach ($json->results as $game)
 			{
-				//echo '<pre>';
-				//print_r($game);
-
-				if (isset($game['current_price']))
+				if (isset($game->platforms))
 				{
-					if ($game['current_price'][0] != $game['full_price'][0])
+					if (in_array('linux', $game->platforms))
 					{
-						//echo $game['human_name'];
-						$on_sale[] = $game['human_name'];
+						$use_sale = 1;
+					}
+				}
+
+				if ($use_sale = 1)
+				{
+					if (isset($game->current_price))
+					{
+						if ($game->current_price[0] != $game->full_price[0])
+						{
+							$on_sale[] = $game->human_name;
+						}
 					}
 				}
 			}

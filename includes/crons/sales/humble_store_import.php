@@ -1,4 +1,5 @@
 <?php
+// IF THEY CHANGE THE API URL: F12 in chrome -> network tab, go to the store and click Linux, the url will appear
 echo "Humble Store importer started on " .date('d-m-Y H:m:s'). "\n";
 
 define('path', '/home/gamingonlinux/public_html/');
@@ -11,6 +12,8 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include(path . 'includes/class_core.php');
 $core = new core();
 
+include(path . 'includes/curl_data.php');
+
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
 //Their API endpoint
@@ -18,7 +21,7 @@ $api_endpoint = "https://www.humblebundle.com/store/api";
 
 //Only do one call to the API, no need to make 2 HTTP requests to their servers just so see if it's alive ~ Piratelv
 // A . combines 2 strings with each other
-$json = file_get_contents($api_endpoint."?request=3&page_size=20&sort=discount&page=0&platform=linux");
+$json = getCurlData($api_endpoint."?request=1&page_size=20&notabot=true&page=0&platform=linux");
 if ($json == false)
 {
 	$to = 'liamdawe@gmail.com';
@@ -30,7 +33,7 @@ if ($json == false)
 	$headers .= "From: GOL Contact Us <noreply@gamingonlinux.com>\r\n";
 
 	mail($to, $subject, "Could not reach the importer!", $headers);
-	die('Humble XML not available!');
+	die('Humble JSON not available!');
 }
 
 $email = 0;
@@ -43,50 +46,64 @@ $i = 0;
 
 do
 {
-	$json = json_decode(file_get_contents($api_endpoint."?request=3&page_size=20&sort=discount&page=$i&platform=linux"), true);
+	$json = json_decode(getCurlData($api_endpoint."?request=1&page_size=20&notabot=true&page=$i&platform=linux"));
 
-	if (empty($json['results']))
+	echo 'TEST' . $i . 'TEST';
+
+	//echo '<pre>';
+	//var_dump($json->results);
+
+	if (empty($json->results))
 	{
 		$stop = 1;
 	}
 
-	else if (!empty($json['results']))
+	else if ($json->num_results != 0)
 	{
-		foreach ($json['results'] as $game)
+		$use_sale = 0;
+		foreach ($json->results as $game)
 		{
-			if (in_array('linux', $game['platforms']))
+			//var_dump($game->icon_dict->download);
+			//echo '<pre>';
+			//var_dump($game);
+
+			if (isset($game->platforms))
 			{
+				if (in_array('linux', $game->platforms))
+				{
+					$use_sale = 1;
+				}
+			}
+
+			if ($use_sale == 1)
+			{
+				/* NOT CURRENTLY USING IT
 				// ADD IT TO THE GAMES DATABASE, FOR FUTURE USE
-				$db->sqlquery("SELECT `local_id`, `name` FROM `game_list` WHERE `name` = ?", array($game['human_name']));
+				$db->sqlquery("SELECT `local_id`, `name` FROM `game_list` WHERE `name` = ?", array($game->human_name));
 				if ($db->num_rows() == 0)
 				{
-					$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game['human_name']));
-
-					// need to grab it again
-					$db->sqlquery("SELECT `name`, `local_id` FROM `game_list` WHERE `name` = ?", array($games['title']));
-					$game_list = $db->fetch();
+					$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->human_name));
 				}
 
-				$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game['human_name']));
+				$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game->human_name));*/
 
-				//print_r($game);
-				if (isset($game['current_price']))
+				if (isset($game->current_price))
 				{
-					if ($game['current_price'][0] != $game['full_price'][0])
+					if ($game->current_price[0] != $game->full_price[0])
 					{
-						echo '<img src="https://www.humblebundle.com'. $game['storefront_featured_image_small'] .' " alt=""/><br />Link: https://www.humblebundle.com/store/p/' . $game['machine_name'] . '<br />' .  $game['human_name'] . ' Current Price: $' . $game['current_price'][0]  .  ', Full Price: $' . $game['full_price'][0] . '<br />';
 
-						$website = 'https://www.humblebundle.com/store/p/' . $game['machine_name'];
-						$image = 'https://www.humblebundle.com' . $game['storefront_featured_image_small'];
+						echo '<img src="' . $game->storefront_icon .' " alt=""/><br />Link: https://www.humblebundle.com/store/p/' . $game->machine_name . '<br />' .  $game->human_name . ' Current Price: $' . $game->current_price[0]  .  ', Full Price: $' . $game->full_price[0] . '<br />';
+
+						$website = 'https://www.humblebundle.com/store/p/' . $game->machine_name;
 						$drm_free = 0;
 						$steam = 0;
 
-						if (in_array('download', $game['delivery_methods']))
+						if (in_array('download', $game->delivery_methods))
 						{
 							$drm_free = 1;
 						}
 
-						if (in_array('steam', $game['delivery_methods']))
+						if (in_array('steam', $game->delivery_methods))
 						{
 							$steam = 1;
 						}
@@ -94,22 +111,22 @@ do
 						echo 'DRM Free: ' . $drm_free . '<br />';
 						echo 'Steam Key: ' . $steam . '<br />';
 
-						$sale_end = $game['sale_end']+3600;
+						$sale_end = $game->sale_end+3600;
 
 						// need to check if we already have it to insert it
 						// search if that title exists
-						$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `info` = ? AND `provider_id` = 11", array($game['human_name']));
+						$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `info` = ? AND `provider_id` = 11", array($game->human_name));
 
 						// if it does exist, make sure it's not from humble already
 						if ($db->num_rows() == 0)
 						{
-							$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game['human_name'], $website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end));
+							$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game->human_name, $website, core::$date, $game->current_price[0], $game->full_price[0], $steam, $drm_free, $sale_end));
 
 							$sale_id = $db->grab_id();
 
 							echo "\tAdded this game to the sales DB with id: " . $sale_id . ".\n";
 
-							$games .= $game['human_name'] . '<br />';
+							$games .= $game->human_name . '<br />';
 
 							$email = 1;
 						}
@@ -117,16 +134,15 @@ do
 						// if we already have it, just update it
 						else
 						{
-							$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `imported_image_link` = ?, `steam` = ?, `drmfree` = ?, `expires` = ? WHERE `provider_id` = 11 AND info = ?", array($website, core::$date, $game['current_price'][0], $game['full_price'][0], $image, $steam, $drm_free, $sale_end, $game['human_name']));
+							$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `steam` = ?, `drmfree` = ?, `expires` = ? WHERE `provider_id` = 11 AND info = ?", array($website, core::$date, $game->current_price[0], $game->full_price[0], $steam, $drm_free, $sale_end, $game->human_name));
 
-							echo "Updated {$game['human_name']} with the latest information<br />";
+							echo "Updated {$game->human_name} with the latest information<br />";
 						}
 					}
 				}
 			}
+			$use_sale = 0;
 		}
-
-		//print_r($json);
 	}
 	$i++;
 } while ($stop == 0);

@@ -48,8 +48,6 @@ do
 {
 	$json = json_decode(getCurlData($api_endpoint."?request=1&page_size=20&notabot=true&page=$i&platform=linux"));
 
-	echo 'TEST' . $i . 'TEST';
-
 	//echo '<pre>';
 	//var_dump($json->results);
 

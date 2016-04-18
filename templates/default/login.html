@@ -2,13 +2,13 @@
                 		<div class="box">
 					<div class="body group">
 						<form method="post" action="/index.php?module=login">
-							<input name="username" type="text" value="{:username}" placeholder="Username or Email" />
-							<input name="password" type="password" placeholder="Password" />
+							<input class="ays-ignore" name="username" type="text" value="{:username}" placeholder="Username or Email" />
+							<input class="ays-ignore" name="password" type="password" placeholder="Password" />
 							<label>
-								<input name="remember_name" type="checkbox" {:username_remembered:}/> Remember username
+								<input class="ays-ignore" name="remember_name" type="checkbox" {:username_remembered:}/> Remember username
 							</label>
 							<label>
-								<input name="stay" checked="checked" type="checkbox" /> Stay logged in
+								<input class="ays-ignore" name="stay" checked="checked" type="checkbox" /> Stay logged in
 							</label>
 							<hr />
 							<input type="submit" name="action" value="Login" />
@@ -43,13 +43,13 @@
 					<div class="body group">
 						<p>Due to spam you need to <a href="//www.gamingonlinux.com/register/">Register</a> and <a href="//www.gamingonlinux.com/index.php?module=login">Login</a> to comment.</p>
 						<form method="post" action="/index.php?module=login">
-							<input name="username" type="text" value="" placeholder="Username or Email" />
-							<input name="password" type="password" placeholder="Password" />
+							<input class="ays-ignore" name="username" type="text" value="" placeholder="Username or Email" />
+							<input class="ays-ignore" name="password" type="password" placeholder="Password" />
 							<label>
-								<input name="remember_name" type="checkbox"/> Remember username
+								<input class="ays-ignore" name="remember_name" type="checkbox"/> Remember username
 							</label>
 							<label>
-								<input name="stay" checked="checked" type="checkbox" /> Stay logged in
+								<input class="ays-ignore" name="stay" checked="checked" type="checkbox" /> Stay logged in
 							</label>
 							<hr />
 							<input type="submit" name="action" value="Login" />
@@ -84,7 +84,7 @@
 	<form method="post" action="index.php?module=login">
 	Here you can request your password.<br />
 	Email address
-	<input type="text" class="form-control" name="email" />
+	<input class="ays-ignore" type="text" class="form-control" name="email" />
 	<input type="submit" name="action" value="Send" class="btn btn-primary" />
 	</form>
 </div>
@@ -94,9 +94,9 @@
 <div class="well well-sm">
 	<form method="post" action="index.php?module=login&code={:code}&email={:email}">
 	New password<br />
-	<input type="password" name="password" /><br />
+	<input class="ays-ignore" type="password" name="password" /><br />
 	Password again<br />
-	<input type="password" name="password_again" /><br />
+	<input class="ays-ignore" type="password" name="password_again" /><br />
 	<br />
 	<input type="submit" name="action" value="Reset" class="btn btn-primary" />
 	</form>

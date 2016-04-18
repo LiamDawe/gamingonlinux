@@ -1120,7 +1120,7 @@ else
 				$db->sqlquery("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// add to editor tracking
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} performed \"{$action}\" on a forum topic.", core::$date, core::$date, $_GET['topic_id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `completed` = 1, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} performed \"{$action}\" on a forum topic.", core::$date, core::$date, $_GET['topic_id']));
 
 				$core->message("You have {$action} the topic! <a href=\"/forum/topic/{$_GET['topic_id']}\">Click here to return.</a>");
 			}

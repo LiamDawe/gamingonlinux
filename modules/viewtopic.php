@@ -1071,13 +1071,13 @@ else
 				if ($_POST['moderator_options'] == 'sticky')
 				{
 					$mod_sql = '`is_sticky` = 1';
-					$action = 'Sticky';
+					$action = 'Stuck';
 				}
 
 				if ($_POST['moderator_options'] == 'unsticky')
 				{
 					$mod_sql = '`is_sticky` = 0';
-					$action = 'Unsticky';
+					$action = 'Unstuck';
 				}
 
 				if ($_POST['moderator_options'] == 'lock')
@@ -1095,32 +1095,32 @@ else
 				if ($_POST['moderator_options'] == 'bothunlock')
 				{
 					$mod_sql = '`is_locked` = 0,`is_sticky` = 1';
-					$action = 'Unlocked and Sticky';
+					$action = 'Unlocked and Stuck';
 				}
 
 				if ($_POST['moderator_options'] == 'bothunsticky')
 				{
 					$mod_sql = '`is_locked` = 1,`is_sticky` = 0';
-					$action = 'Locked and Unsticky';
+					$action = 'Locked and Unstuck';
 				}
 
 				if ($_POST['moderator_options'] == 'bothundo')
 				{
 					$mod_sql = '`is_locked` = 0,`is_sticky` = 0';
-					$action = 'Unlocked and Unsticky';
+					$action = 'Unlocked and Unstuck';
 				}
 
 				if ($_POST['moderator_options'] == 'both')
 				{
 					$mod_sql = '`is_locked` = 1,`is_sticky` = 1';
-					$action = 'Locked and Sticky';
+					$action = 'Locked and Stuck';
 				}
 
 				// do the lock/stick action
 				$db->sqlquery("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// add to editor tracking
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `completed` = 1, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} performed \"{$action}\" on a forum topic.", core::$date, core::$date, $_GET['topic_id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `completed` = 1, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} \"{$action}\" a forum topic.", core::$date, core::$date, $_GET['topic_id']));
 
 				$core->message("You have {$action} the topic! <a href=\"/forum/topic/{$_GET['topic_id']}\">Click here to return.</a>");
 			}

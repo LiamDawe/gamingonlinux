@@ -219,7 +219,7 @@ class core
 
 			$pagination .= "</div> <div class=\"fnone\">
 			<form name=\"form2\" class=\"form-inline\">
-			 &nbsp; Go to: <select class=\"wrap\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
+			 &nbsp; Go to: <select class=\"wrap ays-ignore\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
 
 			for ($i = 1; $i <= $lastpage; $i++)
 			{

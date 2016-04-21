@@ -116,16 +116,21 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 		// sort out the categories (tags)
 		$categories_list = '';
-		$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ?", array($found['article_id']));
+		$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']));
 		while ($get_categories = $db->fetch())
 		{
-			$categories_list .= " <a href=\"/articles/category/{$get_categories['category_id']}\"><span class=\"label label-info\">{$get_categories['category_name']}</span></a> ";
+			if ($get_categories['category_id'] == 60)
+			{
+				$categories_list .= " <li class=\"ea\"><a href=\"/articles/category/{$get_categories['category_id']}\">{$get_categories['category_name']}</a></li> ";
+			}
+
+			else
+			{
+				$categories_list .= " <li><a href=\"/articles/category/{$get_categories['category_id']}\">{$get_categories['category_name']}</a></li> ";
+			}
 		}
 
-		if (!empty($categories_list))
-		{
-			$categories_list = '<div class="small muted">In: ' . $categories_list . '</div>';
-		}
+
 		$templating->set('categories_list', $categories_list);
 	}
 

@@ -169,7 +169,7 @@ if (!isset($_GET['go']))
 
 				$categories_list = '';
 				// sort out the categories (tags)
-				$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ?", array($article['article_id']), 'articles_full.php');
+				$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($article['article_id']), 'articles_full.php');
 				while ($get_categories = $db->fetch())
 				{
 					if ($get_categories['category_id'] == 60)

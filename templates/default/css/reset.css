@@ -2,11 +2,11 @@
  * -------------------------------------------------------
  * FireDart's CSS Reset
  * -------------------------------------------------------
- * 
+ *
  * Version: 4.0
  * Author:  FireDart
  * Source:  http://www.firedartstudios.com/
- * 
+ *
  */
 /* Reset */
 	html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,input,textarea,table,caption,tbody,tfoot,thead,tr,th,td {
@@ -14,7 +14,6 @@
 		font-weight: inherit;
 		font-style: inherit;
 		font-size: 100%;
-		font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
 		vertical-align: baseline;
 		margin: 0px;
 		padding: 0px;
@@ -69,19 +68,19 @@
 	em {font-style: italic;}
 	strong {font-weight: bold; color: #333;}
 	small {font-size: 80%;}
-	
+
 	hr {height: 0px; clear: both; border: solid #dddddd; border-width: 1px 0 0}
-	
+
 	blockquote, blockquote p {color: #777; font-style: italic;}
 	blockquote {border-left: 7px solid #303030; margin: 0 0 21px 21px;  padding: 0px 14px 0px 14px;}
 	blockquote cite {display: block; font-size: 12px; color: #555;}
 	blockquote cite:before {content: "\2014 \0020";}
 	blockquote cite a, blockquote cite a:visited, blockquote cite a:visited {color: #555;}
-	
+
 	::-webkit-selection {background: #222222;color: #ffffff;}
 	   ::-moz-selection {background: #222222;color: #ffffff;}
 			::selection {background: #222222;color: #ffffff;}
-	
+
 /* Links */
 	a:link,a:visited {color: #104e8b; text-decoration: none;}
 	a:hover,a:active {color: #104e8b; text-decoration: none; outline: none;}
@@ -93,7 +92,7 @@
 	dt {font-weight: bold;margin: 0 0 7px 0px;}
 	dl {list-style: disc; padding: 0 0 0 0;}
 	dd {margin: 0 0 7px 21px;}
-	
+
 /* Images */
 	img {
 		border: 0;
@@ -103,7 +102,7 @@
 		border: 0px;
 		text-decoration: none;
 	}
-	
+
 /* Sub & Sup */
 	sub, sup {
 		font-size: 75%;
@@ -117,7 +116,7 @@
 	sub {
 		bottom: -0.25em;
 	}
-	
+
 /* Forms */
 	fieldset {
 		border-top: solid #dddddd 1px;
@@ -183,13 +182,13 @@
 		position: relative;
 		z-index: 1001;
 	}
-	
+
 	form .dropdown::after {
 		border-left: 7px solid transparent;
 		border-right: 7px solid transparent;
-		border-top: 7px solid #a5a5a5; 
+		border-top: 7px solid #a5a5a5;
 		content: '\0020';
-		height: 0; 
+		height: 0;
 		position: absolute;
 		bottom: 21px;
 		right: 14px;
@@ -233,13 +232,13 @@
 		margin: 0px 0px 14px 0px;
 		padding: 7px;
 		overflow: auto;
-		
+
 		-webkit-border-radius: 0px 3px 3px 0px;
 		 -khtml-border-radius: 0px 3px 3px 0px;
 		   -moz-border-radius: 0px 3px 3px 0px;
 		     -o-border-radius: 0px 3px 3px 0px;
 		        border-radius: 0px 3px 3px 0px;
-		
+
 		-webkit-overflow-scrolling: touch;
 				overflow-scrolling: touch;
 	}
@@ -264,7 +263,7 @@
 		line-height: 1em;
 		padding: 2px;
 	}
-	
+
 /* Table */
 	table {
 		width: 100%;
@@ -301,7 +300,7 @@
 	*:first-child+html .group { min-height: 1px; }
 
 	.clearer {clear:both}
-	
+
 /* Smooth Divs */
 	.smooth {
 		-webkit-transition: all .3s linear;
@@ -315,7 +314,7 @@
 		     -o-transition: all .8s linear;
 		        transition: all .8s linear;
 	}
-	
+
 /* Button */
 	.button, button, input[type=submit], input[type=reset], input[type=button] {
 		background: #f9f9f9;
@@ -392,7 +391,7 @@
 		border: 1px solid transparent;
 		color: #ffffff;
 	}
-	
+
 /* Notice */
 	.notice {
 		background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#fafafa));
@@ -401,17 +400,17 @@
 		background: #ffffff     -ms-linear-gradient(top, #ffffff, #fafafa);
 		background: #ffffff      -o-linear-gradient(top, #ffffff, #fafafa);
 		background: #ffffff         linear-gradient(top, #ffffff, #fafafa);
-			
+
 		border-top: 6px solid #05c9f0;
 		border-left: 1px solid #cccccc;
 		border-right: 1px solid #cccccc;
 		border-bottom: 1px solid #cccccc;
-		
+
 		font-size: 16px;
 		padding: 14px 14px 14px;
 		margin: 10px 0px 10px 0px;
-		
-		
+
+
 		-webkit-border-radius: 0px 0px 3px 3px;
 		 -khtml-border-radius: 0px 0px 3px 3px;
 		   -moz-border-radius: 0px 0px 3px 3px;
@@ -453,7 +452,7 @@
 	ul.pagination li:hover a, ul.pagination li.active a {
 		background: #f1f1f1;
 	}
-	
+
 /* 12 Column Responsive Fluid Grid */
 	.grid {
 		width: 100%;
@@ -472,7 +471,7 @@
 	}
 	* html ..grid .row { height: 1%; }
 	*:first-child+html .row { min-height: 1px; }
-	
+
 	.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
 		float: left;
 		margin-left: 1%;
@@ -481,21 +480,21 @@
 		*margin-left: .9%;
 		*margin-right: .9%;
 	}
-	
+
 	.col-1.right, .col-2.right, .col-3.right, .col-4.right, .col-5.right, .col-6.right, .col-7.right, .col-8.right, .col-9.right, .col-10.right, .col-11.right, .col-12 {
 		float: right;
 	}
-	
+
 	/*
 	-------------------------------------------------------------
 	The Math
 	-------------------------------------------------------------
-	
+
 	100% width minus (12 columns * 2% gutter) = 76%
 	100 - (12 * 2) = 76%;
-	
+
 	76 / 12 = 6.333%
-	
+
 	Col 1;  6.333%
 	Col 2;  6.333 * 2  + 2%  = 14.666%
 	Col 3;  6.333 * 3  + 4%  = 22.999%
@@ -508,9 +507,9 @@
 	Col 10; 6.333 * 10 + 18% = 81.33%
 	Col 11; 6.333 * 11 + 20% = 89.663%
 	Col 12; 6.333 * 12 + 22% = 97.996%
-	
+
 	*/
-	
+
 	.col-1 {
 		width: 6.333%;
 	}
@@ -547,12 +546,12 @@
 	.col-12 {
 		width: 97.996%;
 	}
-	
+
 	.col-center {
 		float: none;
 		margin: 0px auto;
 	}
-	
+
 /* Masonary */
 	/* Generic */
 	.masonary {
@@ -572,65 +571,65 @@
 	.masonary.c1 {
 		-webkit-column-count: 1;
 		   -moz-column-count: 1;
-				column-count: 1;	
+				column-count: 1;
 	}
 	.masonary.c2 {
 		-webkit-column-count: 2;
 		   -moz-column-count: 2;
-				column-count: 2;	
+				column-count: 2;
 	}
 	.masonary.c3 {
 		-webkit-column-count: 3;
 		   -moz-column-count: 3;
-				column-count: 3;	
+				column-count: 3;
 	}
 	.masonary.c4 {
 		-webkit-column-count: 4;
 		   -moz-column-count: 4;
-				column-count: 4;	
+				column-count: 4;
 	}
 	.masonary.c5 {
 		-webkit-column-count: 5;
 		   -moz-column-count: 5;
-				column-count: 5;	
+				column-count: 5;
 	}
 	.masonary.c6 {
 		-webkit-column-count: 6;
 		   -moz-column-count: 6;
-				column-count: 6;	
+				column-count: 6;
 	}
 	.masonary.c7 {
 		-webkit-column-count: 7;
 		   -moz-column-count: 7;
-				column-count: 7;	
+				column-count: 7;
 	}
 	.masonary.c8 {
 		-webkit-column-count: 8;
 		   -moz-column-count: 8;
-				column-count: 8;	
+				column-count: 8;
 	}
 	.masonary.c9 {
 		-webkit-column-count: 9;
 		   -moz-column-count: 9;
-				column-count: 9;	
+				column-count: 9;
 	}
 	.masonary.c10 {
 		-webkit-column-count: 10;
 		   -moz-column-count: 10;
-				column-count: 10;	
+				column-count: 10;
 	}
 	.masonary.c11 {
 		-webkit-column-count: 11;
 		   -moz-column-count: 11;
-				column-count: 11;	
+				column-count: 11;
 	}
 	.masonary.c12 {
 		-webkit-column-count: 12;
 		   -moz-column-count: 12;
-				column-count: 12;	
+				column-count: 12;
 	}
-	
-/* Fluid Video Container */	
+
+/* Fluid Video Container */
 	.video-container {
 		position: relative;
 		padding-bottom: 56.25%;

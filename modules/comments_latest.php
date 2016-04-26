@@ -21,7 +21,7 @@ while ($comments = $db->fetch())
 	$text = wordwrap(remove_bbcode($text), 150, "<!WRAP!>", true);
 	if (strpos($text, "<!WRAP!>") !== FALSE) // Sometimes it's possible the comment was shorter then 150 char, it doesn't include the keyword then
 	{
-		$text = substr($text, $startpoint, strpos($text, "<!WRAP!>") + $startpoint);
+		$text = substr($text, 0, strpos($text, "<!WRAP!>"));
 	}
 	$text = $text . '&hellip;'; //Use actual ellipsis char
 	$title = $comments['title'];

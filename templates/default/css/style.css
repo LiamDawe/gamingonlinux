@@ -28,9 +28,9 @@ input[type="button"]:disabled,
 input[type="submit"]:disabled,
 input[type="reset"]:disabled,
 {
-  background-color: #000;
-  color: red;
-cursor: default;
+	background-color: #000;
+	color: red;
+	cursor: default;
 }
 input[type="text"][disabled] {
 	 background-color: #ccc;

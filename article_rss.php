@@ -40,8 +40,8 @@ $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 		<pubDate>$last_date</pubDate>
 		<lastBuildDate>$last_date</lastBuildDate>";
 
-$db->sqlquery("SELECT a.*
-FROM `articles` a $sql_join
+$db->sqlquery("SELECT a.*, u.username
+FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id $sql_join
 WHERE a.`active` = 1 $sql_addition
 ORDER BY a.`date` DESC
 LIMIT 15");
@@ -84,9 +84,28 @@ foreach ($articles as $line)
 
 	$cats = implode(',', $categories_list);
 
+	if ($line['author_id'] == 0)
+	{
+		if (empty($line['guest_username']))
+		{
+			$username = 'Guest';
+		}
+
+		else
+		{
+			$username = $line['guest_username'];
+		}
+	}
+
+	else
+	{
+		$username = $line['username'];
+	}
+
 	$output .= "
 		<item>
 			<title>{$title}</title>
+			<author>$username</author>
 			<link>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</link>
 			<description><![CDATA[Tags:$cats<br />{$line['text']}]]></description>
 			<pubDate>{$date}</pubDate>

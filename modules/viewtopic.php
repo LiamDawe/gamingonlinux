@@ -299,6 +299,11 @@ else
 										$options .= '<li><button name="pollvote" class="poll_button" data-poll-id="'.$option['poll_id'].'" data-option-id="'.$option['option_id'].'">'.$option['option_title'].'</button></li>';
 									}
 									$options .= '<li><button name="pollresults" class="results_button" data-poll-id="'.$option['poll_id'].'">View Results</button></li>';
+
+									if ($_SESSION['user_id'] == $topic['author_id'])
+									{
+										$options .= '<li><button name="closepoll" class="close_poll" data-poll-id="'.$option['poll_id'].'">Close Poll</button></li>';
+									}
 									$templating->set('options', $options);
 								}
 							}

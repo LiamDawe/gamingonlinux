@@ -53,12 +53,12 @@ if($_POST)
         {
             $total_perc = round($option['votes'] / $total_votes * 100);
         }
-        
+
         $results .= '<div class="group"><div class="col-4">' . $star . $option['option_title'] . $star . '</div> <div class="col-4"><div style="background:#CCCCCC; border:1px solid #666666;"><div style="background: #28B8C0; width:'.$total_perc.'%;">&nbsp;</div></div></div> <div class="col-2">'.$option['votes'].' vote(s)</div> <div class="col-2">'.$total_perc.'%</div></div>';
         $star = '';
     }
 
-    if ($check_voted == 0)
+    if ($check_voted == 0 && $grab_poll['poll_open'] == 1)
     {
         $results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="pollresults" class="back_vote_button" data-poll-id="'.$grab_poll['poll_id'].'">Back to voting</button></li></ul>';
     }

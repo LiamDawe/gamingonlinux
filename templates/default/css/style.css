@@ -1560,8 +1560,8 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 .dark .vote_done {color: white; background-color: green;}
 .dark #wrap strong {color: black;}
 #create-poll{display: none;}
-.poll_button{float: none ;}
 .poll_content{padding: 4px;}
+.poll_content button {float: none ;}
 .patreon {
 	margin-top: 14px;
 	height: 30px;

@@ -142,6 +142,11 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 							$top_image = "<img class=\"img-responsive\" src=\"/uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"article-image\">";
 						}
 
+						if ($article['article_top_image'] == 0 && empty($article['tagline_image']))
+						{
+							$top_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
+						}
+
 						$templating->set('top_image', $top_image);
 
 						// set last bit to 0 so we don't parse links in the tagline

@@ -609,6 +609,7 @@ while ($list = $db->fetch())
 	$steam = '';
 	$game_assets = '';
 	$bundle = '';
+	$affiliate = '';
 
 	if ($list['pre-order'] == 1)
 	{
@@ -632,11 +633,17 @@ while ($list = $db->fetch())
 		$bundle = ' <span class="badge blue">Game Bundle</span> ';
 	}
 
+	if ($list['provider_id'] == 33)
+	{
+		$affiliate = ' <span class="badge green tooltip-top" title="We get a small cut from this store">Affiliate Sale</span> ';
+	}
+
 	$templating->set('pre-order', $preorder);
 	$templating->set('drmfree_check', $drmfree);
 	$templating->set('prkey_check', $pr_key);
 	$templating->set('steam_check', $steam);
 	$templating->set('bundle_check', $bundle);
+	$templating->set('affiliate', $affiliate);
 }
 
 $templating->block('bottom', 'sales');

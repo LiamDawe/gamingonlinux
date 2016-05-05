@@ -357,6 +357,14 @@ else
 						$star = '';
 					}
 
+					if ($grab_poll['poll_open'] == 1)
+					{
+						if ($_SESSION['user_id'] == $topic['author_id'])
+						{
+							$results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="closepoll" class="close_poll" data-poll-id="'.$grab_poll['poll_id'].'">Close Poll</button></li></ul>';
+						}
+					}
+
 					$templating->set('results', $results);
 					$templating->set('poll_question', $grab_poll['poll_question']);
 				}

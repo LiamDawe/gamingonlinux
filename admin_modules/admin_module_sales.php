@@ -144,7 +144,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$expires = '';
 			if ($item['expires'] != 0)
 			{
-				$expires = date("d-m-Y H:i:s", $item['expires']);
+				$expires = date("Y-m-d H:i:s", $item['expires']);
 			}
 
 			$templating->set('expires', $expires);

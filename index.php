@@ -30,8 +30,19 @@ if ($module == 'home')
 	{
 		$_SESSION['last_featured_id'] = 0;
 	}
+	// count how many editor picks we have right now (should probably add a config row for this sometime so we don't have to count it every time)
+	$db->sqlquery("SELECT count(article_id) as count FROM `articles` WHERE `show_in_menu` = 1");
+	$featured_ctotal = $db->fetch();
+
+	$last_featured_sql = '';
+	if ($featured_ctotal['count'] > 1)
+	{
+		$last_featured_sql = 'AND a.article_id != ?';
+	}
+
+	$db->sqlquery("SELECT a.article_id, a.`title`, a.active, a.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND a.show_in_menu = 1 AND a.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
+
 	// pick a random editors pick
-	$db->sqlquery("SELECT a.article_id, a.`title`, a.active, a.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND a.show_in_menu = 1 AND a.featured_image <> '' AND a.article_id != ? ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
 	$featured = $db->fetch();
 	if ($db->num_rows() >= 1)
 	{

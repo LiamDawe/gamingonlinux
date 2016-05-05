@@ -3,12 +3,14 @@ error_reporting(-1);
 
 echo "GOG importer started on " .date('d-m-Y H:m:s'). "\n";
 
-include('/home/gamingonlinux/public_html/includes/config.php');
+define('path', '/home/gamingonlinux/public_html/includes/');
 
-include('/home/gamingonlinux/public_html/includes/class_mysql.php');
+include(path . 'config.php');
+
+include(path . 'class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
-include('/home/gamingonlinux/public_html/includes/class_core.php');
+include(path . 'class_core.php');
 $core = new core();
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));

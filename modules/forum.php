@@ -81,7 +81,7 @@ foreach ($category_array as $category)
 		{
 			$templating->block('forum_row');
 
-			if ($config['pretty_urls'] == 1)
+			if (core::config('pretty_urls') == 1)
 			{
 				$forum_link = "/forum/" . $forum['id'] . '/';
 			}
@@ -120,7 +120,15 @@ foreach ($category_array as $category)
 					$postNumber = (($post_count - 1) % $rows_per_page) + 1;
 				}
 
-				$last_title = "<a href=\"/forum/topic/{$forum['last_post_topic_id']}?page={$postPage}\">{$forum['topic_title']}</a>";
+				if ($config['pretty_urls'] == 1)
+				{
+					$last_title = "<a href=\"/forum/topic/{$forum['last_post_topic_id']}?page={$postPage}\">{$forum['topic_title']}</a>";
+				}
+				else {
+					$last_title = "<a href=\"index.php?module=viewtopic&amp;topic_id={$forum['last_post_topic_id']}&amp;page={$postPage}\">{$forum['topic_title']}</a>";
+				}
+
+
 				$last_username = "<a href=\"/profiles/{$forum['last_post_id']}\">{$forum['last_post_username']}</a>";
 				$last_post_time = $core->format_date($forum['last_post_time']);
 			}

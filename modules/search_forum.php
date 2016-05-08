@@ -4,7 +4,7 @@ $templating->set_previous('meta_description', 'Search for Linux gaming forum top
 
 $templating->merge('forum_search');
 $templating->block('top');
-$templating->set('url', core::config('website_url').core::config('path'));
+$templating->set('url', core::config('website_url'));
 
 $strict_check = '';
 if (isset($_GET['strict']))

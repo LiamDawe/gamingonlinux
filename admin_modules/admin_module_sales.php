@@ -207,9 +207,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('pounds', $sale['pounds']);
 			$templating->set('dollars', $sale['dollars']);
 			$templating->set('euros', $sale['euros']);
-			$templating->set('pounds_original', $sale['pounds_original']);
-			$templating->set('dollars_original', $sale['dollars_original']);
-			$templating->set('euros_original', $sale['euros_original']);
+			$templating->set('pounds_original', '<strike>'.$sale['pounds_original'].'</strike><br />');
+			$templating->set('dollars_original', '<strike>'.$sale['dollars_original'].'</strike><br />');
+			$templating->set('euros_original', '<strike>'.$sale['euros_original'].'</strike><br />');
 
 			$templating->set('website', $sale['website']);
 

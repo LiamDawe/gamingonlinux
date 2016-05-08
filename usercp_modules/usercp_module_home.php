@@ -220,6 +220,117 @@ if (!isset($_POST['act']))
 	}
 
 	$templating->set('steam_button', $steam_button);
+
+	$templating->block('pcdeets');
+	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `gpu_vendor`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$additional = $db->fetch();
+
+	$arc_32 = '';
+	if ($additional['what_bits'] == '32bit')
+	{
+		$arc_32 = 'selected';
+	}
+	$arc_64 = '';
+	if ($additional['what_bits'] == '64bit')
+	{
+		$arc_64 = 'selected';
+	}
+	$what_bits_options = '<option value="32bit" ' . $arc_32 . '>32bit</option><option value="64bit" '.$arc_64.'>64bit</option>';
+	$templating->set('what_bits_options', $what_bits_options);
+
+	$intel = '';
+	if ($additional['cpu_vendor'] == 'Intel')
+	{
+		$intel = 'selected';
+	}
+	$amd = '';
+	if ($additional['cpu_vendor'] == 'AMD')
+	{
+		$amd = 'selected';
+	}
+	$cpu_options = '<option value="AMD" '.$amd.'>AMD</option><option value="Intel" '.$intel.'>Intel</option>';
+	$templating->set('cpu_options', $cpu_options);
+
+	$intel_gpu = '';
+	if ($additional['gpu_vendor'] == 'Intel')
+	{
+		$intel_gpu = 'selected';
+	}
+	$amd_gpu = '';
+	if ($additional['gpu_vendor'] == 'AMD')
+	{
+		$amd_gpu = 'selected';
+	}
+	$nvidia_gpu = '';
+	if ($additional['gpu_vendor'] == 'Nvidia')
+	{
+		$nvidia_gpu = 'selected';
+	}
+	$gpu_options = '<option value="AMD" '.$amd_gpu.'>AMD</option><option value="Intel" '.$intel_gpu.'>Intel</option><option value="Nvidia" '.$nvidia_gpu.'>Nvidia</option>';
+	$templating->set('gpu_options', $gpu_options);
+
+	$open = '';
+	if ($additional['gpu_driver'] == 'Open Source')
+	{
+		$open = 'selected';
+	}
+	$prop = '';
+	if ($additional['gpu_driver'] == 'Proprietary')
+	{
+		$prop = 'selected';
+	}
+	$gpu_driver = '<option value="Open Source" '.$open.'>Open Source</option><option value="Proprietary" '.$prop.'>Proprietary</option>';
+	$templating->set('gpu_driver', $gpu_driver);
+
+	// RAM
+	$ram_options = '';
+	$ram_selected = '';
+	for ($i = 1; $i <= 64; $i++)
+	{
+		if ($i == $additional['ram_count'])
+		{
+			$ram_selected = 'selected';
+		}
+    $ram_options .= '<option value="'.$i.'" '.$ram_selected.'>'.$i.'</a>';
+		$ram_selected = '';
+	}
+	$templating->set('ram_options', $ram_options);
+
+	// Monitors
+	$monitor_options = '';
+	$monitor_selected = '';
+	for ($i = 1; $i <= 5; $i++)
+	{
+		if ($i == $additional['monitor_count'])
+		{
+			$monitor_selected = 'selected';
+		}
+		$monitor_options .= '<option value="'.$i.'" '.$monitor_selected.'>'.$i.'</a>';
+		$monitor_selected = '';
+	}
+	$templating->set('monitor_options', $monitor_options);
+
+	// Type of machine
+	$desktop = '';
+	if ($additional['gaming_machine_type'] == 'Desktop')
+	{
+		$desktop = 'selected';
+	}
+
+	$laptop = '';
+	if ($additional['gaming_machine_type'] == 'Laptop')
+	{
+		$laptop = 'selected';
+	}
+
+	$sofa = '';
+	if ($additional['gaming_machine_type'] == 'Sofa/Console PC')
+	{
+		$sofa = 'selected';
+	}
+
+	$machine_options = '<option value="Desktop" '.$desktop.'>Desktop</option><option value="Laptop" '.$laptop.'>Laptop</option><option value="Sofa/Console PC" '.$sofa.'>Sofa/Console PC</option>';
+	$templating->set('machine_options', $machine_options);
 }
 
 else if (isset($_POST['act']))

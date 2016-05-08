@@ -38,7 +38,7 @@ class template
 			die("Error loading template folder ($template_folder). " . $_SERVER['DOCUMENT_ROOT'] . core::config('path') . "templates/" . $template_folder);
 		}
 
-		$this->template = "templates/{$template_folder}";
+		$this->template = core::config('path') . "templates/{$template_folder}";
 	}
 
 	public function load($file)

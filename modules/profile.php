@@ -147,7 +147,7 @@ if (isset($_GET['user_id']))
 			$message_link = '';
 			if ($_SESSION['user_id'] != 0)
 			{
-				$message_link = "<i class=\"icon-envelope\"></i> <a href=\"/private-messages/compose/user={$_GET['user_id']}\">Send Private Message</a><br />";
+				$message_link = "<a href=\"/private-messages/compose/user={$_GET['user_id']}\">Send Private Message</a><br />";
 			}
 			$templating->set('message_link', $message_link);
 
@@ -158,6 +158,17 @@ if (isset($_GET['user_id']))
 			}
 			$templating->set('email', $email);
 
+			// additional profile info
+			$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `gpu_vendor`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
+			$additionaldb = $db->fetch();
+
+			$templating->block('additional');
+			foreach($additionaldb as $key => $additional)
+			{
+				$templating->set($key, $additional);
+			}
+
+			// gather latest articles
 			$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']));
 			if ($db->num_rows() != 0)
 			{

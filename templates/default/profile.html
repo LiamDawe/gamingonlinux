@@ -20,14 +20,39 @@
 				</div>
 
 				<div class="box">
+					<div class="head">Findable On</div>
 					<div class="body group profile">
-						<strong>Findable On</strong><br />
 						{:profile_fields}
 						{:message_link}
 						{:email}
 					</div>
 				</div>
 [/block: main]
+
+[block: additional]
+<div class="box">
+	<div class="head">Computer info for <a href="{:profile_link}">{:username}</a></div>
+	<div class="body group profile">
+		<ul style="list-style: none; padding: 0;">
+		<li><strong>CPU Architecture:</strong> {:what_bits}</li>
+		<li><strong>CPU Vendor:</strong> {:cpu_vendor}</li>
+		<li><strong>GPU Vendor:</strong> {:gpu_vendor}</li>
+		<li><strong>GPU Driver:</strong> {:gpu_driver}</li>
+		<li><strong>RAM:</strong> {:ram_count}</li>
+		<li><strong>Monitors:</strong> {:monitor_count}</li>
+		<li><strong>Main gaming machine:</strong> {:gaming_machine_type}</li>
+		</ul>
+	</div>
+</div>
+[/block: additional]
+
+[block: view_full]
+<div class="box">
+	<div class="body group profile">
+		<a href="{:profile_link}">View full profile</a>
+	</div>
+</div>
+[/block: view_full]
 
 [block: articles_top]
 <div class="box">

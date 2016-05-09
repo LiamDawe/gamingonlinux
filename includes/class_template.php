@@ -43,9 +43,10 @@ class template
 
 	public function load($file)
 	{
-		if (!file_exists("{$this->template}/{$file}.html"))
+		$full_path = $this->template . '/' . $file . '.html';
+		if (!file_exists($full_path))
 		{
-			die("Error loading template file ($file) from template ({$this->template}).");
+			die("Error loading template file $full_path.");
 		}
 
 		$this->files[$file] = file_get_contents("{$this->template}/{$file}.html");

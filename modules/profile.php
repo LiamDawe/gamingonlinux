@@ -167,6 +167,7 @@ if (isset($_GET['user_id']))
 			{
 				$templating->set($key, $additional);
 			}
+			$templating->set('username', $profile['username']);
 
 			// gather latest articles
 			$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']));

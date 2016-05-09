@@ -221,7 +221,7 @@ if (!isset($_POST['act']))
 
 	$templating->set('steam_button', $steam_button);
 
-	$templating->block('pcdeets');
+	$templating->block('pcdeets', 'usercp_modules/usercp_module_home');
 	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `gpu_vendor`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$additional = $db->fetch();
 
@@ -374,6 +374,17 @@ else if (isset($_POST['act']))
 
 		// need to add theme updating back into here
 		$db->sqlquery("UPDATE `users` SET `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ? WHERE `user_id` = ?", array($subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_SESSION['user_id']), 'usercp_module_home.php');
+
+		// additional profile fields
+		$sql_additional = "UPDATE `user_profile_info` SET
+		`what_bits` = ?,
+		`cpu_vendor` = ?,
+		`gpu_vendor` = ?,
+		`gpu_driver` = ?,
+		`ram_count` = ?,
+		`monitor_count` = ?,
+		`gaming_machine_type` = ?";
+		$db->sqlquery($sql_additional, array($_POST['what_bits'], $_POST['cpu_vendor'], $_POST['gpu_vendor'], $_POST['gpu_driver'], $_POST['ram_count'], $_POST['monitor_count'], $_POST['gaming_machine_type']));
 
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)

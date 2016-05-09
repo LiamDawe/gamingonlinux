@@ -19,6 +19,8 @@
 [/block: premium]
 
 [block: main]
+{:twitter_button}
+{:steam_button}
 <div class="box">
 	<div class="body group">
 		<form method="post" action="{:url}usercp.php?module=home">
@@ -49,8 +51,6 @@
 			<textarea name="bio" cols="100" rows="10">{:bio}</textarea><br />
 	</div>
 </div>
-{:twitter_button}
-{:steam_button}
 [/block: main]
 
 [block: pcdeets]
@@ -65,11 +65,11 @@
 		<strong>GPU Vendor:</strong>
 		<select name="gpu_vendor"><option value=""></option>{:gpu_options}</select><br />
 		<strong>GPU Driver:</strong>
-		<select name="gpu_driver"<option value=""></option>>{:gpu_driver}</select><br />
+		<select name="gpu_driver"><option value=""></option>{:gpu_driver}</select><br />
 		<strong>RAM:</strong>
-		<select name="ram"><option value=""></option>{:ram_options}</select><br />
+		<select name="ram_count"><option value=""></option>{:ram_options}</select><br />
 		<strong>Monitors:</strong>
-		<select name="monitors"><option value=""></option>{:monitor_options}</select><br />
+		<select name="monitor_count"><option value=""></option>{:monitor_options}</select><br />
 		<strong>Main gaming machine:</strong>
 		<select name="gaming_machine_type"><option value=""></option>{:machine_options}</select><br />
 		</ul>

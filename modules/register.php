@@ -139,6 +139,8 @@ if (core::config('allow_registrations') == 1)
 
 							$last_id = $db->grab_id();
 
+							$db->sqlquery("INSERT INTO `user_profile_info` SET `user_id` = ?", array($last_id));
+
 							// add one to members count
 							$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
 

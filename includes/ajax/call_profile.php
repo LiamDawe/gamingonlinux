@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 include('../config.php');
 
 include('../class_mysql.php');
@@ -107,6 +109,13 @@ if(isset($_GET['user_id']))
 
     $templating->block('view_full');
     $templating->set('profile_link', $profile_link);
+
+    $edit_link = '';
+    if ($_SESSION['user_id'] == $_GET['user_id'])
+    {
+      $edit_link = ' | <a href="/usercp.php">Edit your profile</a>';
+    }
+    $templating->set('edit_link', $edit_link);
 
     echo $templating->output();
   }

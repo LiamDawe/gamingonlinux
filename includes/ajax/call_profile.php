@@ -23,7 +23,7 @@ if(isset($_GET['user_id']))
 	}
   else
   {
-    $additional_db = $db->fetch();
+    $grab_fields = $db->fetch_all_rows();
 
     $db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
     $user_info = $db->fetch();
@@ -42,7 +42,8 @@ if(isset($_GET['user_id']))
     $templating->set('profile_link', $profile_link);
 
     $counter = 0;
-    foreach ($additional_db as $additionaldb)
+
+    foreach ($grab_fields as $additionaldb)
     {
       $cpu_arc = '';
       if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))

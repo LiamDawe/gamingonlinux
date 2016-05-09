@@ -383,8 +383,20 @@ else if (isset($_POST['act']))
 		`gpu_driver` = ?,
 		`ram_count` = ?,
 		`monitor_count` = ?,
-		`gaming_machine_type` = ?";
-		$db->sqlquery($sql_additional, array($_POST['what_bits'], $_POST['cpu_vendor'], $_POST['gpu_vendor'], $_POST['gpu_driver'], $_POST['ram_count'], $_POST['monitor_count'], $_POST['gaming_machine_type']));
+		`gaming_machine_type` = ?,
+		`date_updated` = ?
+		WHERE
+		`user_id` = ?";
+		$db->sqlquery($sql_additional, array(
+		$_POST['what_bits'],
+		$_POST['cpu_vendor'],
+		$_POST['gpu_vendor'],
+		$_POST['gpu_driver'],
+		$_POST['ram_count'],
+		$_POST['monitor_count'],
+		$_POST['gaming_machine_type'],
+		gmdate("Y-n-d H:i:s"),
+		$_SESSION['user_id']));
 
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)

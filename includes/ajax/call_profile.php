@@ -64,7 +64,7 @@ if(isset($_GET['user_id']))
       $gpu_vendor = '';
       if ($additionaldb['gpu_vendor'] != NULL && !empty($additionaldb['gpu_vendor']))
       {
-        $cpu_vendor = '<li><strong>GPU Vendor:</strong> '.$additionaldb['gpu_vendor'].'</li>';
+        $gpu_vendor = '<li><strong>GPU Vendor:</strong> '.$additionaldb['gpu_vendor'].'</li>';
         $counter++;
       }
       $templating->set('gpu_vendor', $gpu_vendor);

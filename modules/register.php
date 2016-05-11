@@ -17,7 +17,7 @@ if (core::config('allow_registrations') == 1)
 {
 	if (core::config('register_captcha') == 1)
 	{
-		$captcha = '<strong>You must do a captcha to register</strong><br />If you don\'t see a captcha below, then <strong>please allow google repatcha in your privacy plugins</strong>. <div class="g-recaptcha" data-sitekey="6Les6RYTAAAAAGZVgAdkXbPQ7U8AuyqrWrHVbVq4"></div>';
+		$captcha = '<strong>You must do a captcha to register</strong><br />If you don\'t see a captcha below, then <strong>please allow google reCAPTCHA in your privacy plugins</strong>. <div class="g-recaptcha" data-sitekey="6Les6RYTAAAAAGZVgAdkXbPQ7U8AuyqrWrHVbVq4"></div>';
 	}
 
 	else

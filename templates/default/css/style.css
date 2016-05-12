@@ -854,9 +854,10 @@ ul.social-networks li > a {
     cursor: pointer;
 }
 .icon.inline {
-	/* FIXME: All icons should be inline block, but that appears to mess with margines*/
+	/* FIXME: All icons should be inline block, but that appears to mess with margins*/
 	display: inline-block;
 	top: 3px;
+	left: 1px;
 	position: relative;
 	margin-right: 3px;
 }

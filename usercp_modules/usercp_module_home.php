@@ -222,7 +222,7 @@ if (!isset($_POST['act']))
 	$templating->set('steam_button', $steam_button);
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_home');
-	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `gpu_vendor`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$additional = $db->fetch();
 
 	$arc_32 = '';
@@ -251,6 +251,8 @@ if (!isset($_POST['act']))
 	$cpu_options = '<option value="AMD" '.$amd.'>AMD</option><option value="Intel" '.$intel.'>Intel</option>';
 	$templating->set('cpu_options', $cpu_options);
 
+	$templating->set('cpu_model', $additional['cpu_model']);
+
 	$intel_gpu = '';
 	if ($additional['gpu_vendor'] == 'Intel')
 	{
@@ -268,6 +270,8 @@ if (!isset($_POST['act']))
 	}
 	$gpu_options = '<option value="AMD" '.$amd_gpu.'>AMD</option><option value="Intel" '.$intel_gpu.'>Intel</option><option value="Nvidia" '.$nvidia_gpu.'>Nvidia</option>';
 	$templating->set('gpu_options', $gpu_options);
+
+	$templating->set('gpu_model', $additional['gpu_model']);
 
 	$open = '';
 	if ($additional['gpu_driver'] == 'Open Source')
@@ -379,7 +383,9 @@ else if (isset($_POST['act']))
 		$sql_additional = "UPDATE `user_profile_info` SET
 		`what_bits` = ?,
 		`cpu_vendor` = ?,
+		`cpu_model` = ?,
 		`gpu_vendor` = ?,
+		`gpu_model` = ?,
 		`gpu_driver` = ?,
 		`ram_count` = ?,
 		`monitor_count` = ?,
@@ -390,7 +396,9 @@ else if (isset($_POST['act']))
 		$db->sqlquery($sql_additional, array(
 		$_POST['what_bits'],
 		$_POST['cpu_vendor'],
+		$_POST['cpu_model'],
 		$_POST['gpu_vendor'],
+		$_POST['gpu_model'],
 		$_POST['gpu_driver'],
 		$_POST['ram_count'],
 		$_POST['monitor_count'],

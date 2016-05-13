@@ -16,7 +16,7 @@ $templating = new template('default');
 
 if(isset($_GET['user_id']))
 {
-  $db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `gpu_vendor`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_GET['user_id']));
+  $db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_GET['user_id']));
   if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -61,6 +61,14 @@ if(isset($_GET['user_id']))
       }
       $templating->set('cpu_vendor', $cpu_vendor);
 
+      $cpu_model = '';
+      if ($additionaldb['cpu_model'] != NULL && !empty($additionaldb['cpu_model']))
+      {
+        $cpu_model = '<li><strong>CPU Model:</strong> '.$additionaldb['cpu_model'].'</li>';
+        $counter++;
+      }
+      $templating->set('cpu_model', $cpu_model);
+
       $gpu_vendor = '';
       if ($additionaldb['gpu_vendor'] != NULL && !empty($additionaldb['gpu_vendor']))
       {
@@ -68,6 +76,14 @@ if(isset($_GET['user_id']))
         $counter++;
       }
       $templating->set('gpu_vendor', $gpu_vendor);
+
+      $gpu_model = '';
+      if ($additionaldb['gpu_model'] != NULL && !empty($additionaldb['gpu_model']))
+      {
+        $gpu_model = '<li><strong>GPU Model:</strong> '.$additionaldb['gpu_model'].'</li>';
+        $counter++;
+      }
+      $templating->set('gpu_model', $gpu_model);
 
       $gpu_driver = '';
       if ($additionaldb['gpu_driver'] != NULL && !empty($additionaldb['gpu_driver']))

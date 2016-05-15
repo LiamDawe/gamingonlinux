@@ -161,4 +161,8 @@ if ($email == 1)
 
 	echo "Mail sent!";
 }*/
+
+// update the time it was last run
+$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'humble_import_lastrun'", array(core::$date));
+
 echo "End of Humble Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

@@ -14,7 +14,7 @@ include('/home/gamingonlinux/public_html/includes/class_template.php');
 
 $templating = new template();
 
-$db->sqlquery("SELECT count(DISTINCT a.article_id) as `counter` FROM `articles` a LEFT JOIN `article_category_reference` c ON a.article_id = c.article_id WHERE MONTH(FROM_UNIXTIME(a.`date`)) = MONTH(DATE_SUB(NOW(), INTERVAL 1 WEEK)) AND YEAR(FROM_UNIXTIME(`date`)) = YEAR(CURRENT_DATE) AND c.category_id NOT IN (63) AND a.active = 1");
+$db->sqlquery("SELECT count(DISTINCT a.article_id) as `counter` FROM `articles` a LEFT JOIN `article_category_reference` c ON a.article_id = c.article_id WHERE a.date >= UNIX_TIMESTAMP(CURRENT_DATE - INTERVAL 7 DAY) AND c.category_id NOT IN (63) AND a.active = 1");
 
 $counter = $db->fetch();
 
@@ -32,7 +32,9 @@ FROM (SELECT a.article_id, a.date, a.tagline_image, a.article_top_image_filename
 	LEFT JOIN
 		`article_category_reference` c ON a.article_id = c.article_id
 	WHERE
-		MONTH(FROM_UNIXTIME(a.`date`)) = MONTH(DATE_SUB(NOW(), INTERVAL 1 WEEK)) AND YEAR(FROM_UNIXTIME(`date`)) = YEAR(CURRENT_DATE) AND c.category_id NOT IN (63, 92) AND a.active = 1 group by `a`.`article_id`
+		a.date >= UNIX_TIMESTAMP(CURRENT_DATE - INTERVAL 7 DAY)
+	AND
+		c.category_id NOT IN (63, 92) AND a.active = 1 group by `a`.`article_id`
 	ORDER BY
 		a.views DESC
 	LIMIT 15

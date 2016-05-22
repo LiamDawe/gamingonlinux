@@ -22,7 +22,7 @@ $title = "A recap of the most popular Linux & SteamOS gaming articles for the la
 
 $tagline = "Here is a look back at the 15 most popular articles on GamingOnLinux for the past week, an easy way to for you to keep up to date on what has happened in the past month for Linux & SteamOS Gaming!";
 
-$text = "Here is a look back at the 15 most popular articles on GamingOnLinux for the past week, an easy way to for you to keep up to date on what has happened in the past week for Linux & SteamOS Gaming! Sorted from lowest to highest to make sure you don't miss the smaller news stories. Also if you wish to keep track of these overview posts you can with our <a href=\"http://www.gamingonlinux.com/article_rss.php?section=overviews\">Overview RSS</a>.<br /><br />We published a total of <strong>{$counter['counter']} articles last week!</strong><br />";
+$text = "Here is a look back at the 15 most popular articles on GamingOnLinux for the past week, an easy way to for you to keep up to date on what has happened in the past week for Linux & SteamOS Gaming! If you wish to keep track of these overview posts you can with our <a href=\"http://www.gamingonlinux.com/article_rss.php?section=overviews\">Overview RSS</a>.<br /><br />We published a total of <strong>{$counter['counter']} articles last week!</strong><br />";
 
 // sub query = grab the highest ones, then the outer query sorts them in ascending order, so we get the highest viewed articles, and then sorted from lowest to highest
 $db->sqlquery("SELECT a.*
@@ -39,7 +39,7 @@ FROM (SELECT a.article_id, a.date, a.tagline_image, a.article_top_image_filename
 		a.views DESC
 	LIMIT 15
      ) a
-ORDER BY views ASC");
+ORDER BY views DESC");
 
 while ($articles = $db->fetch())
 {

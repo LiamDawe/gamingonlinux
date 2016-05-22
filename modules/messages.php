@@ -244,6 +244,7 @@ else
 			$templating->set('message_date', $core->format_date($start['creation_date']));
 			$templating->set('tzdate', date('c',$start['creation_date']) ); //piratelv timeago
 			$templating->set('plain_username',$start['username']);
+			$templating->set('text_plain', htmlspecialchars($start['message'], ENT_QUOTES));
 
 			// sort out the avatar
 			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
@@ -345,6 +346,7 @@ else
 				$templating->set('tzdate', date('c',$replies['creation_date']) ); //piratelv timeago
 				$templating->set('post_id', $replies['message_id']);
 				$templating->set('plain_username',$replies['username']);
+				$templating->set('text_plain', htmlspecialchars($replies['message'], ENT_QUOTES));
 
 				// sort out the avatar
 				// either no avatar (gets no avatar from gravatars redirect) or gravatar set

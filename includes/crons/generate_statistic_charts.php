@@ -1,4 +1,5 @@
 <?php
+//define('path', '/home/gamingonlinux/public_html/includes/');
 define('path', '/mnt/storage/public_html/includes/');
 include(path . 'config.php');
 
@@ -68,6 +69,92 @@ foreach ($cpu_vendors as $cpu_vendor)
 	{
 			$labels[] = $cpu_vendor['cpu_vendor'];
 			$data[] = $cpu_vendor['total'];
+	}
+}
+
+$label_counter = 0;
+foreach ($labels as $label)
+{
+	$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+
+	// get the first id
+	if ($label_counter == 0)
+	{
+		$label_counter++;
+
+		$new_label_id = $db->grab_id();
+	}
+
+	echo "Label $label added!<br />";
+}
+$set_label_id = $new_label_id;
+// put in the data
+foreach ($data as $dat)
+{
+	$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
+	$set_label_id++;
+	echo "Data $dat added!<br />";
+}
+
+unset($data);
+
+// GPU VENDOR CHOICE
+$grab_users = $db->sqlquery("SELECT gpu_vendor, count(*) as 'total' FROM user_profile_info GROUP BY gpu_vendor ORDER BY `total` DESC");
+$gpu_vendors = $db->fetch_all_rows();
+$labels = array();
+
+$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array(1, 'Total Users', 'GPU Vendor'));
+
+$new_chart_id = $db->grab_id();
+foreach ($gpu_vendors as $gpu_vendor)
+{
+	if ($gpu_vendor['gpu_vendor'] != '')
+	{
+			$labels[] = $gpu_vendor['gpu_vendor'];
+			$data[] = $gpu_vendor['total'];
+	}
+}
+
+$label_counter = 0;
+foreach ($labels as $label)
+{
+	$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+
+	// get the first id
+	if ($label_counter == 0)
+	{
+		$label_counter++;
+
+		$new_label_id = $db->grab_id();
+	}
+
+	echo "Label $label added!<br />";
+}
+$set_label_id = $new_label_id;
+// put in the data
+foreach ($data as $dat)
+{
+	$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
+	$set_label_id++;
+	echo "Data $dat added!<br />";
+}
+
+unset($data);
+
+// GPU DRIVER CHOICE
+$grab_users = $db->sqlquery("SELECT gpu_driver, count(*) as 'total' FROM user_profile_info GROUP BY gpu_driver ORDER BY `total` DESC");
+$gpu_drivers = $db->fetch_all_rows();
+$labels = array();
+
+$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array(1, 'Total Users', 'GPU Driver'));
+
+$new_chart_id = $db->grab_id();
+foreach ($gpu_drivers as $gpu_driver)
+{
+	if ($gpu_driver['gpu_driver'] != '')
+	{
+			$labels[] = $gpu_driver['gpu_driver'];
+			$data[] = $gpu_driver['total'];
 	}
 }
 

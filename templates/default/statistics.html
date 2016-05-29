@@ -1,7 +1,7 @@
 [block: users]
 <div class="box">
   <div class="body group">
-    There are {:total_users} registered users on GamingOnLinux. These statistics are gathered using their manually entered data on their profiles. Please <a href="https://www.gamingonlinux.com/usercp.php">update your profile here</a> to make this as accurate as possible.
+    There are {:total_users} registered users on GamingOnLinux. These statistics are gathered using their manually entered data on their profiles. <strong>Please <a href="https://www.gamingonlinux.com/usercp.php">update your profile here</a> to make this as accurate as possible</strong>.
   </div>
 </div>
 [/block: users]
@@ -38,7 +38,18 @@
     The most popular GPU vendor choice
   </div>
   <div class="body group">
-    {:gpu_vendor_graph}
+    {:graph}
   </div>
 </div>
 [/block: gpu_vendor]
+
+[block: gpu_driver]
+<div class="box">
+  <div class="head">
+    What GPU driver people are using
+  </div>
+  <div class="body group">
+    {:graph}
+  </div>
+</div>
+[/block: gpu_driver]

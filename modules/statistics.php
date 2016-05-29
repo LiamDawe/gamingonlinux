@@ -26,7 +26,7 @@ $templating->set('graph', $distro_chart['graph']);
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'CPU Vendor' ORDER BY `id` DESC LIMIT 1");
 $get_cpu_chart = $db->fetch();
 
-$cpu_chart = $core->stat_chart($get_cpu_chart['id']);
+$cpu_chart = $core->stat_chart($get_cpu_chart['id'], 'cpu_vendor');
 
 $templating->block('cpu_vendor');
 $templating->set('graph', $cpu_chart['graph']);
@@ -35,7 +35,7 @@ $templating->set('graph', $cpu_chart['graph']);
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Vendor' ORDER BY `id` DESC LIMIT 1");
 $get_gpu_chart = $db->fetch();
 
-$gpu_chart = $core->stat_chart($get_gpu_chart['id']);
+$gpu_chart = $core->stat_chart($get_gpu_chart['id'], 'gpu_vendor');
 
 $templating->block('gpu_vendor');
 $templating->set('graph', $gpu_chart['graph']);

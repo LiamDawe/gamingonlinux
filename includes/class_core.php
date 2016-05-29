@@ -1029,7 +1029,7 @@ class core
     	return $random_string;
 	}
 
-	function stat_chart($id)
+	function stat_chart($id, $colour_change = NULL)
 	{
 		global $db;
 
@@ -1057,7 +1057,18 @@ class core
 
 		$settings = array('minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
 		$graph = new SVGGraph(400, 300, $settings);
-		$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
+		if ($colour_change == 'gpu_vendor')
+		{
+			$colours = array(array('rgb(0,255,100):0.90','rgb(0,100,0):0.90'), array('rgb(255,0,0):0.90','rgb(100,0,0):0.90'), array('rgb(0,187,205):0.90','rgb(0,100,205):0.90'));
+		}
+		else if ($colour_change == 'cpu_vendor')
+		{
+			$colours = array(array('rgb(0,187,205):0.90','rgb(0,100,205):0.90'), array('rgb(255,0,0):0.90','rgb(100,0,0):0.90'));
+		}
+		else
+		{
+			$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
+		}
 		$graph->colours = $colours;
 
 	  $graph->Values($labels);

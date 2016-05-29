@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2011-2015 Graham Breach
+ * Copyright (C) 2011-2016 Graham Breach
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -26,7 +26,6 @@ class HorizontalBarGraph extends GridGraph {
   protected $flip_axes = true;
   protected $label_centre = true;
   protected $legend_reverse = true;
-  protected $bar_styles = array();
 
   public function __construct($w, $h, $settings = NULL)
   {
@@ -52,8 +51,7 @@ class HorizontalBarGraph extends GridGraph {
       if($this->legend_show_empty || $item->value != 0) {
         $bar_style = array('fill' => $this->GetColour($item, $bnum));
         $this->SetStroke($bar_style, $item);
-      } else {
-        $bar_style = NULL;
+        $this->SetLegendEntry(0, $bnum, $item, $bar_style);
       }
 
       if(!is_null($item->value) && !is_null($bar_pos)) {
@@ -72,7 +70,6 @@ class HorizontalBarGraph extends GridGraph {
           $series .= $this->GetLink($item, $item->key, $rect);
         }
       }
-      $this->bar_styles[] = $bar_style;
       ++$bnum;
     }
 
@@ -92,7 +89,8 @@ class HorizontalBarGraph extends GridGraph {
     if(is_numeric($this->bar_width) && $this->bar_width >= 1)
       return $this->bar_width;
     $unit_h = $this->y_axes[$this->main_y_axis]->Unit();
-    return $this->bar_space >= $unit_h ? '1' : $unit_h - $this->bar_space;
+    $bh = $unit_h - $this->bar_space;
+    return max(1, $bh, $this->bar_width_min);
   }
 
   /**
@@ -185,13 +183,10 @@ class HorizontalBarGraph extends GridGraph {
   /**
    * Return box for legend
    */
-  protected function DrawLegendEntry($set, $x, $y, $w, $h)
+  public function DrawLegendEntry($x, $y, $w, $h, $entry)
   {
-    if(!isset($this->bar_styles[$set]))
-      return '';
-
     $bar = array('x' => $x, 'y' => $y, 'width' => $w, 'height' => $h);
-    return $this->Element('rect', $bar, $this->bar_styles[$set]);
+    return $this->Element('rect', $bar, $entry->style);
   }
 
 }

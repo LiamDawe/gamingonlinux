@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Graham Breach
+ * Copyright (C) 2015-2016 Graham Breach
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -159,7 +159,7 @@ class Histogram extends BarGraph {
     if(is_numeric($this->bar_width) && $this->bar_width >= 1)
       return $this->bar_width;
     $unit_w = $this->increment * $this->x_axes[$this->main_x_axis]->Unit();
-    return $this->bar_space >= $unit_w ? '1' : $unit_w - $this->bar_space;
+    return max(1, $unit_w - $this->bar_space);
   }
 
   /**
@@ -170,5 +170,17 @@ class Histogram extends BarGraph {
     $uwidth = $this->increment * $this->x_axes[$this->main_x_axis]->Unit();
     return max(0, ($uwidth - $bar_width) / 2);
   }
+
+  /**
+   * Override to prevent drawing an entry past the last bar
+   */
+  protected function SetLegendEntry($dataset, $index, $item, $style_info)
+  {
+    // the last entry is a blank to wangle the numbering
+    if($item->key >= $this->GetMaxKey())
+      return;
+    parent::SetLegendEntry($dataset, $index, $item, $style_info);
+  }
+
 }
 

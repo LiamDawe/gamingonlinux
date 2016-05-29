@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2015 Graham Breach
+ * Copyright (C) 2014-2016 Graham Breach
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -40,7 +40,7 @@ class StackedGroupedBarGraph extends StackedBarGraph {
 
     $group_count = count($this->groups);
     list($group_width, $bspace, $group_unit_width) =
-      GroupedBarGraph::BarPosition($this->bar_width, 
+      GroupedBarGraph::BarPosition($this->bar_width, $this->bar_width_min,
       $this->x_axes[$this->main_x_axis]->Unit(), $group_count, $this->bar_space,
       $this->group_space);
     $bar_style = array();
@@ -48,7 +48,6 @@ class StackedGroupedBarGraph extends StackedBarGraph {
 
     $bnum = 0;
     $bar_count = count($this->multi_graph);
-    $bars_shown = array_fill(0, $bar_count, 0); // for legend yes/no
     $bars = '';
     $this->ColourSetup($this->multi_graph->ItemsCount(-1), $bar_count);
 
@@ -86,8 +85,6 @@ class StackedGroupedBarGraph extends StackedBarGraph {
                 $ypos += $item->value;
 
               if($bar['height'] > 0) {
-                ++$bars_shown[$j];
-
                 $show_label = $this->AddDataLabel($j, $bnum, $bar, $item,
                   $bar['x'], $bar['y'], $bar['width'], $bar['height']);
                 if($this->show_tooltips)
@@ -100,7 +97,7 @@ class StackedGroupedBarGraph extends StackedBarGraph {
                 unset($bar['id']); // clear for next value
               }
             }
-            $this->bar_styles[$j] = $bar_style;
+            $this->SetLegendEntry($j, $bnum, $item, $bar_style);
           }
           if($this->show_bar_totals) {
             if($ypos) {
@@ -130,12 +127,6 @@ class StackedGroupedBarGraph extends StackedBarGraph {
         }
       }
       ++$bnum;
-    }
-    if(!$this->legend_show_empty) {
-      foreach($bars_shown as $j => $bar) {
-        if(!$bar)
-          $this->bar_styles[$j] = NULL;
-      }
     }
 
     if($this->semantic_classes)

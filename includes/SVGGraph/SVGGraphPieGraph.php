@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2009-2015 Graham Breach
+ * Copyright (C) 2009-2016 Graham Breach
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -28,9 +28,9 @@ class PieGraph extends Graph {
   protected $radius_y;
   protected $s_angle; // start_angle in radians
   protected $calc_done;
-  protected $slice_styles = array();
   protected $slice_info = array();
   protected $total = 0;
+  protected $repeated_keys = 'accept';
 
   private $sub_total = 0;
 
@@ -100,10 +100,9 @@ class PieGraph extends Graph {
 
     // need to store the original position of each value, because the
     // sorted list must still refer to the relevant legend entries
-    $position = 0;
     $values = array();
-    foreach($this->values[0] as $item) {
-      $values[$item->key] = array($position++, $item->value, $item);
+    foreach($this->values[0] as $position => $item) {
+      $values[] = array($position, $item->value, $item);
       if(!is_null($item->value))
         ++$vcount;
     }
@@ -114,19 +113,20 @@ class PieGraph extends Graph {
     $slice = 0;
     $slices = array();
     $slice_no = 0;
-    foreach($values as $key => $value) {
+    foreach($values as $value) {
 
       // get the original array position of the value
       $original_position = $value[0];
       $item = $value[2];
       $value = $value[1];
+      $key = $item->key;
       if($this->legend_show_empty || $item->value != 0) {
         $attr = array('fill' => $this->GetColour($item, $slice, NULL, true,
           true));
         $this->SetStroke($attr, $item, 0, 'round');
-
-        // store the current style referenced by the original position
-        $this->slice_styles[$original_position] = $attr;
+        
+        // use the original position for legend index
+        $this->SetLegendEntry(0, $original_position, $item, $attr);
         ++$slice;
       }
 
@@ -281,13 +281,10 @@ class PieGraph extends Graph {
   /**
    * Return box for legend
    */
-  protected function DrawLegendEntry($set, $x, $y, $w, $h)
+  public function DrawLegendEntry($x, $y, $w, $h, $entry)
   {
-    if(!isset($this->slice_styles[$set]))
-      return '';
-
     $bar = array('x' => $x, 'y' => $y, 'width' => $w, 'height' => $h);
-    return $this->Element('rect', $bar, $this->slice_styles[$set]);
+    return $this->Element('rect', $bar, $entry->style);
   }
 
   /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2011-2015 Graham Breach
+ * Copyright (C) 2011-2016 Graham Breach
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -30,7 +30,7 @@ class GroupedBarGraph extends BarGraph {
 
     $chunk_count = count($this->multi_graph);
     list($chunk_width, $bspace, $chunk_unit_width) =
-      GroupedBarGraph::BarPosition($this->bar_width, 
+      GroupedBarGraph::BarPosition($this->bar_width, $this->bar_width_min,
       $this->x_axes[$this->main_x_axis]->Unit(), $chunk_count, $this->bar_space,
       $this->group_space);
 
@@ -39,7 +39,6 @@ class GroupedBarGraph extends BarGraph {
     $this->ColourSetup($this->multi_graph->ItemsCount(-1), $chunk_count);
 
     $bnum = 0;
-    $bars_shown = array_fill(0, $chunk_count, 0);
     $bars = '';
     foreach($this->multi_graph as $itemlist) {
       $k = $itemlist[0]->key;
@@ -55,8 +54,6 @@ class GroupedBarGraph extends BarGraph {
             $this->Bar($item->value, $bar, NULL, $this->DatasetYAxis($j));
 
             if($bar['height'] > 0) {
-              ++$bars_shown[$j];
-
               $show_label = $this->AddDataLabel($j, $bnum, $bar, $item,
                 $bar['x'], $bar['y'], $bar['width'], $bar['height']);
               if($this->show_tooltips)
@@ -69,16 +66,10 @@ class GroupedBarGraph extends BarGraph {
               unset($bar['id']); // clear for next generated value
             }
           }
-          $this->bar_styles[$j] = $bar_style;
+          $this->SetLegendEntry($j, $bnum, $item, $bar_style);
         }
       }
       ++$bnum;
-    }
-    if(!$this->legend_show_empty) {
-      foreach($bars_shown as $j => $bar) {
-        if(!$bar)
-          $this->bar_styles[$j] = NULL;
-      }
     }
 
     if($this->semantic_classes)
@@ -104,34 +95,49 @@ class GroupedBarGraph extends BarGraph {
    * Calculates the bar width, gap to first bar, gap between bars
    * returns an array containing all three
    */
-  static function BarPosition($bar_width, $unit_width, $group_size, $bar_space,
-    $group_space)
+  static function BarPosition($bar_width, $bar_width_min, $unit_width, 
+    $group_size, $bar_space, $group_space)
   {
-    $gap_count = $group_size - 1;
-    $gap = $gap_count > 0 ? $group_space : 0;
     if(is_numeric($bar_width) && $bar_width >= 1) {
-      // fixed bar width
-      if($group_size > 1 && ($bar_width + $gap) * $group_size > $unit_width) {
-
-        // bars don't fit with group_space option, so they must overlap
-        // (and make sure the bars are at least 1 pixel apart)
-        $spacing = max(1, ($unit_width - $bar_width) / 
-          ($group_size - 1));
-        $offset = 0;
-      } else {
-        // space the bars group_space apart, centred in unit space
-        $spacing = $bar_width + $gap;
-        $offset = max(0, ($unit_width - ($spacing * $group_size)) / 2);
-      }
+      return GroupedBarGraph::BarPositionFixed($bar_width, $unit_width,
+        $group_size, $group_space);
     } else {
       // bar width dependent on space
+      $gap_count = $group_size - 1;
+      $gap = $gap_count > 0 ? $group_space : 0;
+
       $bar_width = $bar_space >= $unit_width ? '1' : $unit_width - $bar_space;
       if($gap_count > 0 && $gap * $gap_count > $bar_width - $group_size)
         $gap = ($bar_width - $group_size) / $gap_count;
       $bar_width = ($bar_width - ($gap * ($group_size - 1)))
         / $group_size;
+
+      if($bar_width < $bar_width_min)
+        return GroupedBarGraph::BarPositionFixed($bar_width_min, $unit_width,
+          $group_size, $group_space);
       $spacing = $bar_width + $gap;
       $offset = $bar_space / 2;
+    }
+    return array($bar_width, $offset, $spacing);
+  }
+
+  /**
+   * Calculate bar width, gaps, using fixed bar width
+   */
+  static function BarPositionFixed($bar_width, $unit_width, $group_size,
+    $group_space)
+  {
+    $gap = $group_size > 1 ? $group_space : 0;
+    if($group_size > 1 && ($bar_width + $gap) * $group_size > $unit_width) {
+
+      // bars don't fit with group_space option, so they must overlap
+      // (and make sure the bars are at least 1 pixel apart)
+      $spacing = max(1, ($unit_width - $bar_width) / ($group_size - 1));
+      $offset = 0;
+    } else {
+      // space the bars group_space apart, centred in unit space
+      $spacing = $bar_width + $gap;
+      $offset = max(0, ($unit_width - ($spacing * $group_size)) / 2);
     }
     return array($bar_width, $offset, $spacing);
   }

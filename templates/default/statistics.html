@@ -1,13 +1,19 @@
+[block: users]
+<div class="box">
+  <div class="body group">
+    There are {:total_users} registered users on GamingOnLinux. These statistics are gathered using their manually entered data on the profiles. Please <a href="https://www.gamingonlinux.com/usercp.php">update your profile here</a> to make this as accurate as possible.
+  </div>
+</div>
+[/block: users]
+
 [block: distribution]
 <div class="box">
   <div class="head">
     The most popular distributions from GOL users
   </div>
   <div class="body group">
-    <ul>
-      {:distro_list}
-    </ul>
-    A total of {:not_set} users have not set the distribution, and {:not_listed} users selected their distribution is not Listed. <a href="https://www.gamingonlinux.com/forum/2/">Submit a request in the forum here</a> to have yours listed.
+    {:graph}
+    A total of {:not_set} users have not set their distribution, and {:not_listed} users selected their distribution is not Listed. <a href="https://www.gamingonlinux.com/forum/2/">Submit a request in the forum here</a> to have yours listed.
   </div>
 </div>
 [/block: distribution]

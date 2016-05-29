@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Graham Breach
+ * Copyright (C) 2015-2016 Graham Breach
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -45,7 +45,7 @@ class BarAndLineGraph extends GroupedBarGraph {
 
     // LineGraph has not been initialised, need to copy in details
     $copy = array('colours', 'links', 'x_axes', 'y_axes', 'main_x_axis', 
-      'main_y_axis');
+      'main_y_axis', 'legend');
     foreach($copy as $member)
       $this->linegraph->{$member} = $this->{$member};
 
@@ -74,7 +74,7 @@ class BarAndLineGraph extends GroupedBarGraph {
     } else {
       // this would have problems if there are no bars
       list($chunk_width, $bspace, $chunk_unit_width) =
-        GroupedBarGraph::BarPosition($this->bar_width, 
+        GroupedBarGraph::BarPosition($this->bar_width, $this->bar_width_min,
         $this->x_axes[$this->main_x_axis]->Unit(), $bar_count, $this->bar_space,
         $this->group_space);
     }
@@ -129,7 +129,7 @@ class BarAndLineGraph extends GroupedBarGraph {
               }
               ++$b;
             }
-            $this->bar_styles[$j] = $bar_style;
+            $this->SetLegendEntry($j, $bnum, $item, $bar_style);
           }
         }
       }
@@ -148,13 +148,6 @@ class BarAndLineGraph extends GroupedBarGraph {
       $bars = $this->Element('g', array('class' => 'series'), NULL, $bars);
     $body .= $bars;
 
-    if(!$this->legend_show_empty) {
-      foreach($bars_shown as $j => $bar) {
-        if(!$bar)
-          $this->bar_styles[$j] = NULL;
-      }
-    }
-
     $body .= $this->OverShapes();
     $body .= $this->Axes();
 
@@ -167,12 +160,11 @@ class BarAndLineGraph extends GroupedBarGraph {
   /**
    * Return box or line for legend
    */
-  protected function DrawLegendEntry($set, $x, $y, $w, $h)
+  public function DrawLegendEntry($x, $y, $w, $h, $entry)
   {
-    if(isset($this->bar_styles[$set]))
-      return parent::DrawLegendEntry($set, $x, $y, $w, $h);
-
-    return $this->linegraph->DrawLegendEntry($set, $x, $y, $w, $h);
+    if(isset($entry->style['line_style']))
+      return $this->linegraph->DrawLegendEntry($x, $y, $w, $h, $entry);
+    return parent::DrawLegendEntry($x, $y, $w, $h, $entry);
   }
 
   /**

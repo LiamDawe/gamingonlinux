@@ -1028,5 +1028,43 @@ class core
 		}
     	return $random_string;
 	}
+
+	function stat_chart($id)
+	{
+		global $db;
+
+		require_once(core::config('path') . 'includes/SVGGraph/SVGGraph.php');
+
+		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `charts` WHERE `id` = ?", array($id));
+		$chart_info = $db->fetch();
+
+		// set the right labels to the right data
+		$labels = array();
+		$db->sqlquery("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ?", array($id));
+		$get_labels = $db->fetch_all_rows();
+
+	  foreach ($get_labels as $label_loop)
+	  {
+	      $db->sqlquery("SELECT `data`, `label_id` FROM `charts_data` WHERE `chart_id` = ?", array($id));
+	      while ($get_data = $db->fetch())
+	      {
+	          if ($label_loop['label_id'] == $get_data['label_id'])
+	          {
+	              $labels[$label_loop['name']] = $get_data['data'];
+	          }
+	      }
+	  }
+
+		$settings = array('minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
+		$graph = new SVGGraph(400, 300, $settings);
+		$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
+		$graph->colours = $colours;
+
+	  $graph->Values($labels);
+	  $get_graph['graph'] = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
+		$get_graph['date'] = $chart_info['generated_date'];
+
+		return $get_graph;
+	}
 }
 ?>

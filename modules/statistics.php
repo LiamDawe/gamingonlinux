@@ -19,46 +19,19 @@ $distro_chart = $core->stat_chart($get_distro_chart['id']);
 $templating->block('info');
 $templating->set('date', $distro_chart['date']);
 
-
 $templating->block('distribution');
 $templating->set('graph', $distro_chart['graph']);
 
-/*
-// CPU VENDOR
-$cpu_total_not_set = 0;
-$cpu_not_set = 0;
-$cpu_null = 0;
-$cpu_labels = array();
-$db->sqlquery("SELECT `cpu_vendor`, count(*) as `total` FROM `user_profile_info` GROUP BY `cpu_vendor` ORDER BY `total` DESC");
-while ($cpu_vendor = $db->fetch())
-{
-	if ($cpu_vendor['cpu_vendor'] == '')
-	{
-		$cpu_not_set = $cpu_vendor['total'];
-	}
-	if ($cpu_vendor['cpu_vendor'] === NULL)
-	{
-		$cpu_null = $cpu_vendor['total'];
-	}
+// CPU VENDOR CHOICE
+$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'CPU Venfor' ORDER BY `id` DESC LIMIT 1");
+$get_cpu_chart = $db->fetch();
 
-	if ($cpu_vendor['cpu_vendor'] != '' && $cpu_vendor['cpu_vendor'] != NULL)
-	{
-			$cpu_labels[$cpu_vendor['cpu_vendor']] = $cpu_vendor['total'];
-	}
-
-	$settings = array('minimum_grid_spacing_h'=> 20, 'bar_width_min'=> 10, 'graph_title' => 'CPU Vendor', 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => 'Total Users');
-	$graph = new SVGGraph(400, 300, $settings);
-	$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
-	$graph->colours = $colours;
-}
-$graph->Values($cpu_labels);
-$cpu_vendor_graph = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
+$cpu_chart = $core->stat_chart($get_cpu_chart['id']);
 
 $templating->block('cpu_vendor');
-$templating->set('cpu_vendor_graph', $cpu_vendor_graph);
-$cpu_total_not_set = $cpu_null+$cpu_not_set;
-$templating->set('cpu_total_not_set', $cpu_total_not_set);
+$templating->set('graph', $cpu_chart['graph']);
 
+/*
 // GPU VENDOR
 $gpu_total_not_set = 0;
 $gpu_not_set = 0;

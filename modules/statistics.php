@@ -48,3 +48,12 @@ $gpud_chart = $core->stat_chart($get_gpud_chart['id']);
 
 $templating->block('gpu_driver');
 $templating->set('graph', $gpud_chart['graph']);
+
+// RAM
+$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'RAM' ORDER BY `id` DESC LIMIT 1");
+$get_ram_chart = $db->fetch();
+
+$ram_chart = $core->stat_chart($get_ram_chart['id']);
+
+$templating->block('ram');
+$templating->set('graph', $ram_chart['graph']);

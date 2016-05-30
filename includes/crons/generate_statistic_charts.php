@@ -1,6 +1,6 @@
 <?php
-//define('path', '/home/gamingonlinux/public_html/includes/');
-define('path', '/mnt/storage/public_html/includes/');
+define('path', '/home/gamingonlinux/public_html/includes/');
+//define('path', '/mnt/storage/public_html/includes/');
 include(path . 'config.php');
 
 include(path . 'class_mysql.php');
@@ -155,6 +155,49 @@ foreach ($gpu_drivers as $gpu_driver)
 	{
 			$labels[] = $gpu_driver['gpu_driver'];
 			$data[] = $gpu_driver['total'];
+	}
+}
+
+$label_counter = 0;
+foreach ($labels as $label)
+{
+	$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+
+	// get the first id
+	if ($label_counter == 0)
+	{
+		$label_counter++;
+
+		$new_label_id = $db->grab_id();
+	}
+
+	echo "Label $label added!<br />";
+}
+$set_label_id = $new_label_id;
+// put in the data
+foreach ($data as $dat)
+{
+	$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
+	$set_label_id++;
+	echo "Data $dat added!<br />";
+}
+
+unset($data);
+
+// RAM
+$grab_users = $db->sqlquery("SELECT ram_count, count(*) as 'total' FROM user_profile_info WHERE `ram_count` != '' GROUP BY ram_count ORDER BY `total` DESC LIMIT 10");
+$ram_count = $db->fetch_all_rows();
+$labels = array();
+
+$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array(1, 'Total Users', 'RAM'));
+
+$new_chart_id = $db->grab_id();
+foreach ($ram_count as $ram)
+{
+	if ($ram['ram_count'] != '')
+	{
+			$labels[] = $ram['ram_count'];
+			$data[] = $ram['total'];
 	}
 }
 

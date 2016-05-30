@@ -1056,11 +1056,15 @@ class core
 								$labels[$last_id]['total'] = $get_data['data'];
 								if ($label_loop['name'] == 'Intel')
 								{
-									$labels[$last_id]['colour'] = array("#00FFFF", "#0DC2FF");
+									$labels[$last_id]['colour'] = array("#0DC2FF", "#00FFFF");
 								}
 								if ($label_loop['name'] == 'AMD')
 								{
 									$labels[$last_id]['colour'] = array("#FF0000", "#FC4444");
+								}
+								if ($label_loop['name'] == 'Nvidia')
+								{
+									$labels[$last_id]['colour'] = array("#00ED10", "#6FF278");
 								}
 	          }
 	      }

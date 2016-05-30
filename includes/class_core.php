@@ -1038,36 +1038,29 @@ class core
 		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `charts` WHERE `id` = ?", array($id));
 		$chart_info = $db->fetch();
 
-		// set the right labels to the right data
+		// set the right labels to the right data NEED A LEFT JOIN TO GET DATA AT SAME TIME AND SORT BY DATA
 		$labels = array();
-		$db->sqlquery("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ?", array($id));
+		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` DESC", array($id));
 		$get_labels = $db->fetch_all_rows();
 
 	  foreach ($get_labels as $label_loop)
 	  {
-	      $db->sqlquery("SELECT `data`, `label_id` FROM `charts_data` WHERE `chart_id` = ?", array($id));
-	      while ($get_data = $db->fetch())
-	      {
-	          if ($label_loop['label_id'] == $get_data['label_id'])
-	          {
-	              $labels[]['name'] = $label_loop['name'];
-								end($labels);
-								$last_id=key($labels);
-								$labels[$last_id]['total'] = $get_data['data'];
-								if ($label_loop['name'] == 'Intel')
-								{
-									$labels[$last_id]['colour'] = array("#0DC2FF", "#00FFFF");
-								}
-								if ($label_loop['name'] == 'AMD')
-								{
-									$labels[$last_id]['colour'] = array("#FF0000", "#FC4444");
-								}
-								if ($label_loop['name'] == 'Nvidia')
-								{
-									$labels[$last_id]['colour'] = array("#00ED10", "#6FF278");
-								}
-	          }
-	      }
+	      $labels[]['name'] = $label_loop['name'];
+				end($labels);
+				$last_id=key($labels);
+				$labels[$last_id]['total'] = $label_loop['data'];
+				if ($label_loop['name'] == 'Intel')
+				{
+					$labels[$last_id]['colour'] = array("#0DC2FF", "#00FFFF");
+				}
+				if ($label_loop['name'] == 'AMD')
+				{
+					$labels[$last_id]['colour'] = array("#FF0000", "#FC4444");
+				}
+				if ($label_loop['name'] == 'Nvidia')
+				{
+					$labels[$last_id]['colour'] = array("#00ED10", "#6FF278");
+				}
 	  }
 
 		$settings = array('minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
@@ -1078,9 +1071,6 @@ class core
 		'colour' => 'colour'
 		);
 
-		echo '<pre>';
-		print_r($labels);
-		echo '</pre>';
 		$graph = new SVGGraph(400, 300, $settings);
 		/*
 		if ($colour_change == 'gpu_vendor')

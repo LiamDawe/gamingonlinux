@@ -1,31 +1,23 @@
 <?php
-define('path', '/home/gamingonlinux/public_html/includes/');
-//define('path', '/mnt/storage/public_html/includes/');
+//define('path', '/home/gamingonlinux/public_html/includes/');
+define('path', '/mnt/storage/public_html/includes/');
 include(path . 'config.php');
 
 include(path . 'class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
 // DISTRIBUTION CHOICE
-$grab_users = $db->sqlquery("SELECT distro, count(*) as 'total' FROM users GROUP BY distro ORDER BY `total` DESC");
+$grab_users = $db->sqlquery("SELECT distro, count(*) as 'total' FROM users WHERE `distro` != '' AND `distro` != 'Not Listed' GROUP BY distro ORDER BY `total` DESC LIMIT 10");
 $distro_choices = $db->fetch_all_rows();
 $labels = array();
 
 $db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array(1, 'Total Users', 'Linux Distributions'));
 
 $new_chart_id = $db->grab_id();
-$graph_counter = 0;
 foreach ($distro_choices as $distro)
 {
-	if ($distro['distro'] != '' && $distro['distro'] != 'Not Listed')
-	{
-		$graph_counter++;
-		if ($graph_counter <= 10)
-		{
-			$labels[$distro['distro']] = $distro['distro'];
-			$data[$distro['distro']] = $distro['total'];
-		}
-	}
+		$labels[$distro['distro']] = $distro['distro'];
+		$data[$distro['distro']] = $distro['total'];
 }
 
 $label_counter = 0;
@@ -198,6 +190,49 @@ foreach ($ram_count as $ram)
 	{
 			$labels[] = $ram['ram_count'];
 			$data[] = $ram['total'];
+	}
+}
+
+$label_counter = 0;
+foreach ($labels as $label)
+{
+	$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+
+	// get the first id
+	if ($label_counter == 0)
+	{
+		$label_counter++;
+
+		$new_label_id = $db->grab_id();
+	}
+
+	echo "Label $label added!<br />";
+}
+$set_label_id = $new_label_id;
+// put in the data
+foreach ($data as $dat)
+{
+	$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
+	$set_label_id++;
+	echo "Data $dat added!<br />";
+}
+
+unset($data);
+
+// MONITORS
+$grab_users = $db->sqlquery("SELECT monitor_count, count(*) as 'total' FROM user_profile_info WHERE `monitor_count` != '' GROUP BY monitor_count ORDER BY `total` DESC LIMIT 10");
+$monitor_count = $db->fetch_all_rows();
+$labels = array();
+
+$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array(1, 'Total Users', 'Monitors'));
+
+$new_chart_id = $db->grab_id();
+foreach ($monitor_count as $monitors)
+{
+	if ($monitors['monitor_count'] != '')
+	{
+			$labels[] = $monitors['monitor_count'];
+			$data[] = $monitors['total'];
 	}
 }
 

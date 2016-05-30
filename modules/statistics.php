@@ -57,3 +57,12 @@ $ram_chart = $core->stat_chart($get_ram_chart['id']);
 
 $templating->block('ram');
 $templating->set('graph', $ram_chart['graph']);
+
+// MONITORS
+$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'Monitors' ORDER BY `id` DESC LIMIT 1");
+$get_monitor_chart = $db->fetch();
+
+$monitor_chart = $core->stat_chart($get_monitor_chart['id']);
+
+$templating->block('monitors');
+$templating->set('graph', $monitor_chart['graph']);

@@ -1056,7 +1056,11 @@ class core
 								$labels[$last_id]['total'] = $get_data['data'];
 								if ($label_loop['name'] == 'Intel')
 								{
-									$labels[$last_id]['colour'] = array("#00FFFF", "#00FFFF");
+									$labels[$last_id]['colour'] = array("#00FFFF", "#0DC2FF");
+								}
+								if ($label_loop['name'] == 'AMD')
+								{
+									$labels[$last_id]['colour'] = array("#FF0000", "#FC4444");
 								}
 	          }
 	      }
@@ -1066,9 +1070,10 @@ class core
 		$settings['structured_data'] = true;
 		$settings['structure'] = array(
 		'key' => 'name',
-		'value' => 'total'
+		'value' => 'total',
+		'colour' => 'colour'
 		);
-		
+
 		echo '<pre>';
 		print_r($labels);
 		echo '</pre>';

@@ -17,7 +17,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `twitter_username`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `twitter_username`, `distro`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
@@ -91,39 +91,17 @@ if (!isset($_POST['act']))
 			$description = ' - ' . $field['description'];
 		}
 
-		if (isset($field['dropdown']) && $field['dropdown'] == 1)
+		$form_input = "";
+		if ($field['db_field'] == 'steam')
 		{
-			$form_input = "<select class=\"form-control\" name=\"{$field['db_field']}\">";
-			foreach($field['option'] as $value)
-			{
-				$selected = '';
-				if ($usercpcp[$field['db_field']] == $value)
-				{
-					$selected = 'selected';
-				}
-				$form_input .= "<option value=\"{$value}\" $selected>{$value}</option>";
-			}
-			$form_input .= '</select>';
+			$form_input  .= "<div class=\"form-group\"><span class=\"preinput\">http://steamcommunity.com/id/</span>";
 		}
 		else
 		{
-			// $steam_url = '';
-			// if ($field['db_field'] == 'steam' && empty($usercpcp[$field['db_field']]))
-			// {
-			// 	$steam_url = 'http://steamcommunity.com/id/';
-			// }
-			$form_input = "";
-			if ($field['db_field'] == 'steam')
-			{
-				$form_input  .= "<div class=\"form-group\"><span class=\"preinput\">http://steamcommunity.com/id/</span>";
-			}
-			else
-			{
-				$form_input .= "<div style=\"display:inline;\">";
-			}
-			$form_input .= "<input id=\"{$field['db_field']}_field\" type=\"text\" name=\"{$field['db_field']}\" class=\"form-control\" value=\"{$usercpcp[$field['db_field']]}\" />";
-			$form_input .= "</div>";
+			$form_input .= "<div style=\"display:inline;\">";
 		}
+		$form_input .= "<input id=\"{$field['db_field']}_field\" type=\"text\" name=\"{$field['db_field']}\" class=\"form-control\" value=\"{$usercpcp[$field['db_field']]}\" />";
+		$form_input .= "</div>";
 
 		$profile_fields_output .= "<label for=\"{$field['name']}\">$image $span {$field['name']} $form_input <small>$description</small></label><br />";
 	}
@@ -222,6 +200,21 @@ if (!isset($_POST['act']))
 	$templating->set('steam_button', $steam_button);
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_home');
+
+	// grab distros
+	$distro_list = '';
+	$db->sqlquery("SELECT `name` FROM `distributions` ORDER BY `name` ASC");
+	while ($distros = $db->fetch())
+	{
+			$selected = '';
+			if ($usercpcp['distro'] == $distros['name'])
+			{
+				$selected = 'selected';
+			}
+			$distro_list .= "<option value=\"{$distros['name']}\" $selected>{$distros['name']}</option>";
+	}
+	$templating->set('distro_list', $distro_list);
+
 	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$additional = $db->fetch();
 
@@ -376,8 +369,7 @@ else if (isset($_POST['act']))
 		// no nasty html grr
 		$bio = htmlspecialchars($_POST['bio'], ENT_QUOTES);
 
-		// need to add theme updating back into here
-		$db->sqlquery("UPDATE `users` SET `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ? WHERE `user_id` = ?", array($subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_SESSION['user_id']), 'usercp_module_home.php');
+		$db->sqlquery("UPDATE `users` SET `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ? WHERE `user_id` = ?", array($subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $_SESSION['user_id']), 'usercp_module_home.php');
 
 		// additional profile fields
 		$sql_additional = "UPDATE `user_profile_info` SET

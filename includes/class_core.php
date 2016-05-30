@@ -1040,7 +1040,7 @@ class core
 
 		// set the right labels to the right data
 		$labels = array();
-		$db->sqlquery("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ? ORDER BY `name` ASC", array($id));
+		$db->sqlquery("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ?", array($id));
 		$get_labels = $db->fetch_all_rows();
 
 	  foreach ($get_labels as $label_loop)

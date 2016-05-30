@@ -44,13 +44,24 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 	if ($_GET['view'] == 'manage')
 	{
-		$templating->block('manage_charts');
+		if (isset($_GET['message']))
+		{
+			if ($_GET['message'] == 'deleted')
+			{
+				$core->message('Chart Deleted!');
+			}
+		}
+		$templating->block('manage_charts', 'admin_modules/admin_module_charts');
 
 		$chart_list = '';
 		$db->sqlquery("SELECT * FROM `charts` WHERE `owner` = ? ORDER BY `id` DESC", array($_SESSION['user_id']));
 		while($charts = $db->fetch())
 		{
-			$chart_list .= '<a href="/admin.php?module=charts&view=edit&id='.$charts['id'].'">'.$charts['name'].'</a> - [chart]'.$charts['id'].'[/chart]<br />';
+			$chart_list .= '<div class="box"><div class="body group"><a href="/admin.php?module=charts&view=edit&id='.$charts['id'].'">'.$charts['name'].'</a> - [chart]'.$charts['id'].'[/chart] - Generated: '.$charts['generated_date'].'<br />
+			<form method="post">
+			<button type="submit" name="act" value="Delete" formaction="/admin.php?module=charts">Delete</button>
+			<input type="hidden" name="id" value="'.$charts['id'].'" />
+			</form></div></div>';
 		}
 
 		$templating->set('chart_list', $chart_list);
@@ -120,6 +131,26 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			}
 
 			header("Location: /admin.php?module=charts&view=add&message=done");
+		}
+	}
+
+	if ($_POST['act'] == 'Delete')
+	{
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$core->yes_no('Are you sure you want to delete that article?', '/admin.php?module=charts&id='.$_POST['id'], "Delete");
+		}
+		else if (isset($_POST['no']))
+		{
+			header("Location: /admin.php?module=charts&view=manage");
+		}
+		else if (isset($_POST['yes']))
+		{
+			$db->sqlquery("DELETE FROM `charts` WHERE `id` = ?", array($_GET['id']));
+			$db->sqlquery("DELETE FROM `charts_data` WHERE `chart_id` = ?", array($_GET['id']));
+			$db->sqlquery("DELETE FROM `charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
+
+			header("Location: /admin.php?module=charts&view=manage&message=deleted");
 		}
 	}
 }

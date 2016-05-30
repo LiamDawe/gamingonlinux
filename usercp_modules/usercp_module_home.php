@@ -276,7 +276,12 @@ if (!isset($_POST['act']))
 	{
 		$prop = 'selected';
 	}
-	$gpu_driver = '<option value="Open Source" '.$open.'>Open Source</option><option value="Proprietary" '.$prop.'>Proprietary</option>';
+	$hybrid = '';
+	if ($additional['gpu_driver'] == 'Hybrid Driver')
+	{
+		$hybrid = 'selected';
+	}
+	$gpu_driver = '<option value="Open Source" '.$open.'>Open Source</option><option value="Proprietary" '.$prop.'>Proprietary</option><option value="Hybrid Driver" '.$hybrid.'>Hybrid Driver</option>';
 	$templating->set('gpu_driver', $gpu_driver);
 
 	// RAM

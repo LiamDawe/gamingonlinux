@@ -8,14 +8,21 @@ class user
 	{
 		global $db;
 
-		$db->sqlquery("SELECT `password_salt` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+		$db->sqlquery("SELECT `password_salt`, `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
 		if ($db->num_rows() > 0)
 		{
 			$info = $db->fetch();
 			$old_safe_password = hash('sha256', $info['password_salt'] . $password);
-			$new_safe_password = password_hash($password, PASSWORD_BCRYPT);
 
-			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?) AND (`password` = ? OR `password` = ?)", array($username, $username, $old_safe_password, $new_safe_password));
+			if (password_verify($password, $info['password']))
+			{
+				$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+			}
+			else
+			{
+				$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $old_safe_password));
+			}
+
 			if ($db->num_rows() == 1)
 			{
 				$user = $db->fetch();
@@ -28,8 +35,6 @@ class user
 
 						$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_hash, $user['user_id']));
 				}
-
-				$safe_password = password_verify($password, $new_password_hash);
 
 				$this->check_banned($user);
 

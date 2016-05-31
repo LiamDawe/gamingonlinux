@@ -103,6 +103,13 @@ if (core::config('allow_registrations') == 1)
 						$core->message('Sorry but that username is taken, please try another! <a href="index.php?module=register">Try again</a> or <a href="index.php">Return to home page</a>.', NULL, 1);
 					}
 
+					// dont allow dupe emails
+					$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['uemail']));
+					if ($db->fetch())
+					{
+						$core->message('Sorry but that email is taken, please try another (you may already have an account under that email)! <a href="index.php?module=register">Try again</a> or <a href="index.php">Return to home page</a>.', NULL, 1);
+					}
+
 					// check passwords match
 					else if ($_POST['password'] != $_POST['verify_password'])
 					{

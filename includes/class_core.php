@@ -1051,15 +1051,15 @@ class core
 				$labels[$last_id]['total'] = $label_loop['data'];
 				if ($label_loop['name'] == 'Intel')
 				{
-					$labels[$last_id]['colour'] = array("#0DC2FF", "#00FFFF");
+					$labels[$last_id]['colour'] = "#a6cee3";
 				}
 				if ($label_loop['name'] == 'AMD')
 				{
-					$labels[$last_id]['colour'] = array("#FF0000", "#FC4444");
+					$labels[$last_id]['colour'] = "#e31a1c";
 				}
 				if ($label_loop['name'] == 'Nvidia')
 				{
-					$labels[$last_id]['colour'] = array("#00ED10", "#6FF278");
+					$labels[$last_id]['colour'] = "#33a02c";
 				}
 	  }
 
@@ -1088,6 +1088,21 @@ class core
 		$graph->colours = $colours;*/
 
 	  $graph->Values($labels);
+
+		$colours = array(
+    '#a6cee3',
+    '#1f78b4',
+    '#b2df8a',
+    '#33a02c',
+    '#fb9a99',
+    '#e31a1c',
+    '#fdbf6f',
+    '#ff7f00',
+		'#cab2d6',
+		'#6a3d9a'
+ 		);
+ 		$graph->Colours($colours);
+
 	  $get_graph['graph'] = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
 		$get_graph['date'] = $chart_info['generated_date'];
 

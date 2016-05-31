@@ -395,7 +395,7 @@ if (!isset($_GET['go']))
 						$db_grab_fields .= "u.`{$field['db_field']}`,";
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, 10", array($_GET['aid'], $core->start), 'articles_full.php comments');
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, 10", array($_GET['aid'], $core->start), 'articles_full.php comments');
 
 					$comments_get = $db->fetch_all_rows();
 
@@ -434,6 +434,12 @@ if (!isset($_GET['go']))
 						{
 							$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
 							$quote_username = preg_replace('/[^A-Za-z0-9 -]+/', "", $comments['username']);
+						}
+
+						$pc_info = '';
+						if ($comments['pc_info_public'] == 1)
+						{
+							$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/call_profile.php?user_id='.$comments['user_id'].'">View PC info</a>';
 						}
 
 						// sort out the avatar
@@ -485,6 +491,7 @@ if (!isset($_GET['go']))
 						$templating->set('comment_avatar', $comment_avatar);
 						$templating->set('date', $comment_date);
 						$templating->set('tzdate', date('c',$comments['time_posted']) ); //piratelv timeago
+						$templating->set('pc_info_link', $pc_info);
 
 						$last_edited = '';
 						if ($comments['last_edited'] != 0)

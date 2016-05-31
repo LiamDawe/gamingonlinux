@@ -66,3 +66,12 @@ $monitor_chart = $core->stat_chart($get_monitor_chart['id']);
 
 $templating->block('monitors');
 $templating->set('graph', $monitor_chart['graph']);
+
+// MACHINE TYPE
+$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'Main Gaming Machine' ORDER BY `id` DESC LIMIT 1");
+$get_machine = $db->fetch();
+
+$machine_chart = $core->stat_chart($get_machine['id']);
+
+$templating->block('machine');
+$templating->set('graph', $machine_chart['graph']);

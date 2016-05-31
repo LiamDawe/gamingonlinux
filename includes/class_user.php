@@ -3,19 +3,6 @@ class user
 {
 	public $message;
 
-	function salt($max = 15)
-	{
-		$characterList = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?";
-		$i = 0;
-		$salt = "";
-		while ($i < $max)
-		{
-			$salt .= $characterList{mt_rand(0, (strlen($characterList) - 1))};
-			$i++;
-		}
-		return $salt;
-	}
-
 	// normal login form
 	function login($username, $password, $remember_username, $stay)
 	{
@@ -25,12 +12,24 @@ class user
 		if ($db->num_rows() > 0)
 		{
 			$info = $db->fetch();
-			$safe_password = hash('sha256', $info['password_salt'] . $password);
+			$old_safe_password = hash('sha256', $info['password_salt'] . $password);
+			$new_safe_password = password_hash($password, PASSWORD_BCRYPT);
 
-			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $safe_password));
+			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?) AND (`password` = ? OR `password` = ?)", array($username, $username, $old_safe_password, $new_safe_password));
 			if ($db->num_rows() == 1)
 			{
 				$user = $db->fetch();
+
+				// sort old passwords to new
+				$old_password = hash('sha256', $info['password_salt'] . $password);
+				if ($old_password[0] != '$')
+				{
+						$new_password_hash = password_hash($password, PASSWORD_BCRYPT);
+
+						$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_hash, $user['user_id']));
+				}
+
+				$safe_password = password_verify($password, $new_password_hash);
 
 				$this->check_banned($user);
 

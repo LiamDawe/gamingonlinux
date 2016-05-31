@@ -316,11 +316,10 @@ else if (isset($_POST['action']))
 				// change the password
 				else
 				{
-					$salt = $user->salt();
-					$new_password = hash('sha256', $salt . $_POST['password']);
+					$new_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
 					// new password
-					$db->sqlquery("UPDATE `users` SET `password` = ?, `password_salt` = ? WHERE `email` = ?", array($new_password, $salt, $email));
+					$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `email` = ?", array($new_password, $email));
 
 					// drop any previous requested
 					$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));

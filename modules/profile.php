@@ -12,7 +12,7 @@ if (isset($_GET['user_id']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT `user_id`, `username`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+	$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 	if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -159,91 +159,94 @@ if (isset($_GET['user_id']))
 			$templating->set('email', $email);
 
 			// additional profile info
-			$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
-
-			$counter = 0;
-			$templating->block('additional');
-			while ($additionaldb = $db->fetch())
+			if ($profile['pc_info_public'] == 1)
 			{
-				$cpu_arc = '';
-				if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))
-				{
-					$cpu_arc = '<li><strong>CPU Architecture:</strong> '.$additionaldb['what_bits'].'</li>';
-					$counter++;
-				}
-				$templating->set('cpu_arc', $cpu_arc);
+				$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
 
-				$cpu_vendor = '';
-				if ($additionaldb['cpu_vendor'] != NULL && !empty($additionaldb['cpu_vendor']))
+				$counter = 0;
+				$templating->block('additional');
+				while ($additionaldb = $db->fetch())
 				{
-					$cpu_vendor = '<li><strong>CPU Vendor:</strong> '.$additionaldb['cpu_vendor'].'</li>';
-					$counter++;
-				}
-				$templating->set('cpu_vendor', $cpu_vendor);
+					$cpu_arc = '';
+					if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))
+					{
+						$cpu_arc = '<li><strong>CPU Architecture:</strong> '.$additionaldb['what_bits'].'</li>';
+						$counter++;
+					}
+					$templating->set('cpu_arc', $cpu_arc);
 
-				$cpu_model = '';
-				if ($additionaldb['cpu_model'] != NULL && !empty($additionaldb['cpu_model']))
-				{
-					$cpu_model = '<li><strong>CPU Model:</strong> '.$additionaldb['cpu_model'].'</li>';
-					$counter++;
-				}
-				$templating->set('cpu_model', $cpu_model);
+					$cpu_vendor = '';
+					if ($additionaldb['cpu_vendor'] != NULL && !empty($additionaldb['cpu_vendor']))
+					{
+						$cpu_vendor = '<li><strong>CPU Vendor:</strong> '.$additionaldb['cpu_vendor'].'</li>';
+						$counter++;
+					}
+					$templating->set('cpu_vendor', $cpu_vendor);
 
-				$gpu_vendor = '';
-				if ($additionaldb['gpu_vendor'] != NULL && !empty($additionaldb['gpu_vendor']))
-				{
-					$gpu_vendor = '<li><strong>GPU Vendor:</strong> '.$additionaldb['gpu_vendor'].'</li>';
-					$counter++;
-				}
-				$templating->set('gpu_vendor', $gpu_vendor);
+					$cpu_model = '';
+					if ($additionaldb['cpu_model'] != NULL && !empty($additionaldb['cpu_model']))
+					{
+						$cpu_model = '<li><strong>CPU Model:</strong> '.$additionaldb['cpu_model'].'</li>';
+						$counter++;
+					}
+					$templating->set('cpu_model', $cpu_model);
 
-				$gpu_model = '';
-				if ($additionaldb['gpu_model'] != NULL && !empty($additionaldb['gpu_model']))
-				{
-					$gpu_model = '<li><strong>GPU Model:</strong> '.$additionaldb['gpu_model'].'</li>';
-					$counter++;
-				}
-				$templating->set('gpu_model', $gpu_model);
+					$gpu_vendor = '';
+					if ($additionaldb['gpu_vendor'] != NULL && !empty($additionaldb['gpu_vendor']))
+					{
+						$gpu_vendor = '<li><strong>GPU Vendor:</strong> '.$additionaldb['gpu_vendor'].'</li>';
+						$counter++;
+					}
+					$templating->set('gpu_vendor', $gpu_vendor);
 
-				$gpu_driver = '';
-				if ($additionaldb['gpu_driver'] != NULL && !empty($additionaldb['gpu_driver']))
-				{
-					$gpu_driver = '<li><strong>GPU Driver:</strong> '.$additionaldb['gpu_driver'].'</li>';
-					$counter++;
-				}
-				$templating->set('gpu_driver', $gpu_driver);
+					$gpu_model = '';
+					if ($additionaldb['gpu_model'] != NULL && !empty($additionaldb['gpu_model']))
+					{
+						$gpu_model = '<li><strong>GPU Model:</strong> '.$additionaldb['gpu_model'].'</li>';
+						$counter++;
+					}
+					$templating->set('gpu_model', $gpu_model);
 
-				$ram_count = '';
-				if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
-				{
-					$ram_count = '<li><strong>RAM:</strong> '.$additionaldb['ram_count'].'</li>';
-					$counter++;
-				}
-				$templating->set('ram_count', $ram_count);
+					$gpu_driver = '';
+					if ($additionaldb['gpu_driver'] != NULL && !empty($additionaldb['gpu_driver']))
+					{
+						$gpu_driver = '<li><strong>GPU Driver:</strong> '.$additionaldb['gpu_driver'].'</li>';
+						$counter++;
+					}
+					$templating->set('gpu_driver', $gpu_driver);
 
-				$monitor_count = '';
-				if ($additionaldb['monitor_count'] != NULL && !empty($additionaldb['monitor_count']))
-				{
-					$monitor_count = '<li><strong>Monitors:</strong> '.$additionaldb['monitor_count'].'</li>';
-					$counter++;
-				}
-				$templating->set('monitor_count', $monitor_count);
+					$ram_count = '';
+					if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
+					{
+						$ram_count = '<li><strong>RAM:</strong> '.$additionaldb['ram_count'].'</li>';
+						$counter++;
+					}
+					$templating->set('ram_count', $ram_count);
 
-				$gaming_machine_type = '';
-				if ($additionaldb['gaming_machine_type'] != NULL && !empty($additionaldb['gaming_machine_type']))
-				{
-					$gaming_machine_type = '<li><strong>Main gaming machine:</strong> '.$additionaldb['gaming_machine_type'].'</li>';
-					$counter++;
+					$monitor_count = '';
+					if ($additionaldb['monitor_count'] != NULL && !empty($additionaldb['monitor_count']))
+					{
+						$monitor_count = '<li><strong>Monitors:</strong> '.$additionaldb['monitor_count'].'</li>';
+						$counter++;
+					}
+					$templating->set('monitor_count', $monitor_count);
+
+					$gaming_machine_type = '';
+					if ($additionaldb['gaming_machine_type'] != NULL && !empty($additionaldb['gaming_machine_type']))
+					{
+						$gaming_machine_type = '<li><strong>Main gaming machine:</strong> '.$additionaldb['gaming_machine_type'].'</li>';
+						$counter++;
+					}
+					$templating->set('gaming_machine_type', $gaming_machine_type);
 				}
-				$templating->set('gaming_machine_type', $gaming_machine_type);
+				$additional_empty = '';
+				if ($counter == 0)
+				{
+					$additional_empty = '<li><em>This user has not filled out their PC info!</em></li>';
+				}
+				$templating->set('additional_empty', $additional_empty);
+				$templating->set('username', $profile['username']);
 			}
-			$additional_empty = '';
-			if ($counter == 0)
-			{
-				$additional_empty = '<li><em>This user has not filled out their PC info!</em></li>';
-			}
-			$templating->set('additional_empty', $additional_empty);
-			$templating->set('username', $profile['username']);
 
 			// gather latest articles
 			$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']));

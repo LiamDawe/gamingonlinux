@@ -17,7 +17,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `twitter_username`, `distro`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `pc_info_public`, `twitter_username`, `distro`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
@@ -201,6 +201,13 @@ if (!isset($_POST['act']))
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_home');
 
+	$public_info = '';
+	if ($usercpcp['pc_info_public'] == 1)
+	{
+		$public_info = 'checked';
+	}
+	$templating->set('public_check', $public_info);
+
 	// grab distros
 	$distro_list = '';
 	$db->sqlquery("SELECT `name` FROM `distributions` ORDER BY `name` ASC");
@@ -345,6 +352,7 @@ else if (isset($_POST['act']))
 		$email_on_pm = 0;
 		$email_on_login = 0;
 		$hide_developer_status = 0;
+		$public = 0;
 
 		if (isset($_POST['subscribe']))
 		{
@@ -371,10 +379,15 @@ else if (isset($_POST['act']))
 			$email_on_login = 1;
 		}
 
+		if (isset($_POST['public']))
+		{
+			$public = 1;
+		}
+
 		// no nasty html grr
 		$bio = htmlspecialchars($_POST['bio'], ENT_QUOTES);
 
-		$db->sqlquery("UPDATE `users` SET `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ? WHERE `user_id` = ?", array($subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $_SESSION['user_id']), 'usercp_module_home.php');
+		$db->sqlquery("UPDATE `users` SET `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ?, `pc_info_public` = ? WHERE `user_id` = ?", array($subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $public, $_SESSION['user_id']));
 
 		// additional profile fields
 		$sql_additional = "UPDATE `user_profile_info` SET

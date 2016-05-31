@@ -57,6 +57,7 @@
 <div class="box">
 	<div class="head">Computer info</div>
 	<div class="body group profile">
+		<label>Make public? <input type="checkbox" name="public" {:public_check}/></label><br />
 		<strong><img src="/templates/default/images/distros/linux_icon.png" alt="linux icon" /> Distribution:</strong><br />
 		<select name="distribution"><option value="Not Listed">Not Listed</option>{:distro_list}</select><br />
 		<strong>CPU Architecture:</strong><br />

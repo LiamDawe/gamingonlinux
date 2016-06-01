@@ -1029,7 +1029,7 @@ class core
     	return $random_string;
 	}
 
-	function stat_chart($id, $colour_change = NULL)
+	function stat_chart($id, $order = '')
 	{
 		global $db;
 
@@ -1038,9 +1038,15 @@ class core
 		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `charts` WHERE `id` = ?", array($id));
 		$chart_info = $db->fetch();
 
-		// set the right labels to the right data NEED A LEFT JOIN TO GET DATA AT SAME TIME AND SORT BY DATA
+		// set the right labels to the right data
+		$order_sql = 'd.`data` DESC';
+		if ($order == 'drivers')
+		{
+				$order_sql = "l.name DESC";
+		}
+
 		$labels = array();
-		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` DESC", array($id));
+		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
 
 	  foreach ($get_labels as $label_loop)
@@ -1072,20 +1078,6 @@ class core
 		);
 
 		$graph = new SVGGraph(400, 300, $settings);
-		/*
-		if ($colour_change == 'gpu_vendor')
-		{
-			$colours = array(array('rgb(0,255,100):0.90','rgb(0,100,0):0.90'), array('rgb(255,0,0):0.90','rgb(100,0,0):0.90'), array('rgb(0,187,205):0.90','rgb(0,100,205):0.90'));
-		}
-		else if ($colour_change == 'cpu_vendor')
-		{
-			$colours = array(array('rgb(0,187,205):0.90','rgb(0,100,205):0.90'), array('rgb(255,0,0):0.90','rgb(100,0,0):0.90'));
-		}
-		else
-		{
-			$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
-		}
-		$graph->colours = $colours;*/
 
 	  $graph->Values($labels);
 

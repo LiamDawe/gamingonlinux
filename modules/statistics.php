@@ -26,7 +26,7 @@ $templating->set('graph', $distro_chart['graph']);
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'CPU Vendor' ORDER BY `id` DESC LIMIT 1");
 $get_cpu_chart = $db->fetch();
 
-$cpu_chart = $core->stat_chart($get_cpu_chart['id'], 'cpu_vendor');
+$cpu_chart = $core->stat_chart($get_cpu_chart['id']);
 
 $templating->block('cpu_vendor');
 $templating->set('graph', $cpu_chart['graph']);
@@ -35,7 +35,7 @@ $templating->set('graph', $cpu_chart['graph']);
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Vendor' ORDER BY `id` DESC LIMIT 1");
 $get_gpu_chart = $db->fetch();
 
-$gpu_chart = $core->stat_chart($get_gpu_chart['id'], 'gpu_vendor');
+$gpu_chart = $core->stat_chart($get_gpu_chart['id']);
 
 $templating->block('gpu_vendor');
 $templating->set('graph', $gpu_chart['graph']);
@@ -44,7 +44,7 @@ $templating->set('graph', $gpu_chart['graph']);
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver' ORDER BY `id` DESC LIMIT 1");
 $get_gpud_chart = $db->fetch();
 
-$gpud_chart = $core->stat_chart($get_gpud_chart['id']);
+$gpud_chart = $core->stat_chart($get_gpud_chart['id'], 'drivers');
 
 $templating->block('gpu_driver');
 $templating->set('graph', $gpud_chart['graph']);
@@ -53,7 +53,7 @@ $templating->set('graph', $gpud_chart['graph']);
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver (Nvidia)' ORDER BY `id` DESC LIMIT 1");
 $get_gpud_chart = $db->fetch();
 
-$gpud_chart = $core->stat_chart($get_gpud_chart['id']);
+$gpud_chart = $core->stat_chart($get_gpud_chart['id'], 'drivers');
 
 $templating->block('gpu_drivern');
 $templating->set('graph', $gpud_chart['graph']);
@@ -62,7 +62,7 @@ $templating->set('graph', $gpud_chart['graph']);
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver (AMD)' ORDER BY `id` DESC LIMIT 1");
 $get_gpud_chart = $db->fetch();
 
-$gpud_chart = $core->stat_chart($get_gpud_chart['id']);
+$gpud_chart = $core->stat_chart($get_gpud_chart['id'], 'drivers');
 
 $templating->block('gpu_drivera');
 $templating->set('graph', $gpud_chart['graph']);

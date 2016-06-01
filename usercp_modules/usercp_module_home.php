@@ -38,7 +38,7 @@ if (!isset($_POST['act']))
 		$supporter_link = '';
 		if ($usercpcp['secondary_user_group'] == 6 && $usercpcp['user_group'] != 1 && $usercpcp['user_group'] != 2)
 		{
-			$supporter_link = "<br />Donate Page Link <em>Here you may sit a link to sit beside your name on the donate page</em>:<br />
+			$supporter_link = "<br />Donate Page Link <em>Here you may enter a link to sit beside your name on the Support Us</em>:<br />
 			<input $state type=\"text\" name=\"supporter_link\" value=\"{$usercpcp['supporter_link']}\" /><br />";
 		}
 

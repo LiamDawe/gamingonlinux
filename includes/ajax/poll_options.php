@@ -35,7 +35,7 @@ if($_POST)
                         $grab_options = $db->sqlquery("SELECT `option_id`, `poll_id`, `option_title` FROM `poll_options` WHERE `poll_id` = ?", array($grab_poll['poll_id']));
                         foreach ($grab_options as $option)
                         {
-                            $options .= '<li><button name="pollvote" class="poll_button_vote" data-poll-id="'.$option['poll_id'].'" data-option-id="'.$option['option_id'].'">'.$option['option_title'].'</button></li>';
+                            $options .= '<li><button name="pollvote" class="poll_button_vote poll_button" data-poll-id="'.$option['poll_id'].'" data-option-id="'.$option['option_id'].'">'.$option['option_title'].'</button></li>';
                         }
                         $options .= '<li><button name="pollresults" class="poll_button results_button" data-poll-id="'.$grab_poll['poll_id'].'">View Results</button></li>';
 

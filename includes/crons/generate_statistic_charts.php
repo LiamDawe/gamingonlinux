@@ -181,6 +181,86 @@ foreach ($data as $dat)
 
 unset($data);
 
+// GPU DRIVER CHOICE // NVIDIA ONLY
+$grab_users = $db->sqlquery("SELECT gpu_driver, count(*) as 'total' FROM user_profile_info WHERE `gpu_vendor` = 'Nvidia' AND `gpu_driver` != '' AND `gpu_driver` IS NOT NULL GROUP BY gpu_driver ORDER BY `total` DESC");
+$gpu_drivers_nvidia = $db->fetch_all_rows();
+$labels = array();
+
+$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array(1, 'Total Users', 'GPU Driver (Nvidia)'));
+
+$new_chart_id = $db->grab_id();
+foreach ($gpu_drivers_nvidia as $gpu_drivern)
+{
+		$labels[] = $gpu_drivern['gpu_driver'];
+		$data[] = $gpu_drivern['total'];
+}
+
+$label_counter = 0;
+foreach ($labels as $label)
+{
+	$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+
+	// get the first id
+	if ($label_counter == 0)
+	{
+		$label_counter++;
+
+		$new_label_id = $db->grab_id();
+	}
+
+	echo "Label $label added!<br />";
+}
+$set_label_id = $new_label_id;
+// put in the data
+foreach ($data as $dat)
+{
+	$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
+	$set_label_id++;
+	echo "Data $dat added!<br />";
+}
+
+unset($data);
+
+// GPU DRIVER CHOICE // AMD ONLY
+$grab_users = $db->sqlquery("SELECT gpu_driver, count(*) as 'total' FROM user_profile_info WHERE `gpu_vendor` = 'AMD' AND `gpu_driver` != '' AND `gpu_driver` IS NOT NULL GROUP BY gpu_driver ORDER BY `total` DESC");
+$gpu_drivers_amd = $db->fetch_all_rows();
+$labels = array();
+
+$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array(1, 'Total Users', 'GPU Driver (AMD)'));
+
+$new_chart_id = $db->grab_id();
+foreach ($gpu_drivers_amd as $gpu_drivera)
+{
+		$labels[] = $gpu_drivera['gpu_driver'];
+		$data[] = $gpu_drivera['total'];
+}
+
+$label_counter = 0;
+foreach ($labels as $label)
+{
+	$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+
+	// get the first id
+	if ($label_counter == 0)
+	{
+		$label_counter++;
+
+		$new_label_id = $db->grab_id();
+	}
+
+	echo "Label $label added!<br />";
+}
+$set_label_id = $new_label_id;
+// put in the data
+foreach ($data as $dat)
+{
+	$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
+	$set_label_id++;
+	echo "Data $dat added!<br />";
+}
+
+unset($data);
+
 // RAM
 $grab_users = $db->sqlquery("SELECT ram_count, count(*) as 'total' FROM user_profile_info WHERE `ram_count` != '' GROUP BY ram_count ORDER BY `total` DESC LIMIT 10");
 $ram_count = $db->fetch_all_rows();

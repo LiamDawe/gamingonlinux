@@ -49,6 +49,24 @@ $gpud_chart = $core->stat_chart($get_gpud_chart['id']);
 $templating->block('gpu_driver');
 $templating->set('graph', $gpud_chart['graph']);
 
+// GPU DRIVER // NVIDIA
+$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver (Nvidia)' ORDER BY `id` DESC LIMIT 1");
+$get_gpud_chart = $db->fetch();
+
+$gpud_chart = $core->stat_chart($get_gpud_chart['id']);
+
+$templating->block('gpu_drivern');
+$templating->set('graph', $gpud_chart['graph']);
+
+// GPU DRIVER // AMD
+$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver (AMD)' ORDER BY `id` DESC LIMIT 1");
+$get_gpud_chart = $db->fetch();
+
+$gpud_chart = $core->stat_chart($get_gpud_chart['id']);
+
+$templating->block('gpu_drivera');
+$templating->set('graph', $gpud_chart['graph']);
+
 // RAM
 $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'RAM' ORDER BY `id` DESC LIMIT 1");
 $get_ram_chart = $db->fetch();

@@ -359,7 +359,7 @@ function(data){
   	$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
   });
 
-  $(".poll_content").on("click", ".poll_button", function(){
+  $(".poll_content").on("click", ".poll_button_vote", function(){
   	var button = $(this);
   	var poll_id = $(this).data('poll-id');
   	var option_id = $(this).data('option-id');

@@ -298,11 +298,11 @@ else
 									{
 										$options .= '<li><button name="pollvote" class="poll_button" data-poll-id="'.$option['poll_id'].'" data-option-id="'.$option['option_id'].'">'.$option['option_title'].'</button></li>';
 									}
-									$options .= '<li><button name="pollresults" class="results_button" data-poll-id="'.$option['poll_id'].'">View Results</button></li>';
+									$options .= '<li><button name="pollresults" class="poll_button results_button" data-poll-id="'.$option['poll_id'].'">View Results</button></li>';
 
 									if ($_SESSION['user_id'] == $topic['author_id'])
 									{
-										$options .= '<li><button name="closepoll" class="close_poll" data-poll-id="'.$option['poll_id'].'">Close Poll</button></li>';
+										$options .= '<li><button name="closepoll" class="poll_button close_poll" data-poll-id="'.$option['poll_id'].'">Close Poll</button></li>';
 									}
 									$templating->set('options', $options);
 								}
@@ -362,6 +362,14 @@ else
 						if ($_SESSION['user_id'] == $topic['author_id'])
 						{
 							$results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="closepoll" class="close_poll" data-poll-id="'.$grab_poll['poll_id'].'">Close Poll</button></li></ul>';
+						}
+					}
+
+					if ($grab_poll['poll_open'] == 0)
+					{
+						if ($_SESSION['user_id'] == $topic['author_id'])
+						{
+							$results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="openpoll" class="open_poll" data-poll-id="'.$grab_poll['poll_id'].'">Open Poll</button></li></ul>';
 						}
 					}
 

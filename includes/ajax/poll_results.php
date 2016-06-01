@@ -63,6 +63,22 @@ if($_POST)
         $results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="pollresults" class="back_vote_button" data-poll-id="'.$grab_poll['poll_id'].'">Back to voting</button></li></ul>';
     }
 
+    if ($grab_poll['poll_open'] == 1)
+    {
+      if ($_SESSION['user_id'] == $grab_poll['author_id'])
+      {
+        $results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="closepoll" class="close_poll" data-poll-id="'.$grab_poll['poll_id'].'">Close Poll</button></li></ul>';
+      }
+    }
+
+    if ($grab_poll['poll_open'] == 0)
+    {
+      if ($_SESSION['user_id'] == $grab_poll['author_id'])
+      {
+        $results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="openpoll" class="open_poll" data-poll-id="'.$grab_poll['poll_id'].'">Open Poll</button></li></ul>';
+      }
+    }
+
     echo $results;
 }
 else

@@ -118,7 +118,9 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^private-messages/([0-9]+)/page\=([0-9]+)?$ /index.php?module=messages&view=message&id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^profiles/([0-9]+)/?$ /index.php?module=profile&user_id=$1 [N,NC,QSA]
-
+  
+  RewriteRule ^users/stat(s|istics)/?$ /index.php?module=statistics [N,NC,QSA]
+  
   RewriteRule ^articles/category/([0-9]+)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA]
   
   RewriteRule ^articles/category/([0-9]+)/page\=([0-9]+)?$ /index.php?module=articles&view=cat&catid=$1&page=$2 [N,NC,QSA]

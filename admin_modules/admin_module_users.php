@@ -25,21 +25,30 @@ else
 
 			$templating->block('search','admin_modules/admin_module_users');
 
-			if (isset($_POST['username']))
+			if (isset($_POST['search']))
 			{
-				$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `username` LIKE ?", array('%'.$_POST['username'].'%'));
-			}
-			if (isset($_POST['email']))
-			{
-				$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `email` LIKE ?", array('%'.$_POST['email'].'%'));
-			}
-			$templating->block('search_row_top', 'admin_modules/admin_module_users');
-			while ($search = $db->fetch())
-			{
-				$templating->block('search_row','admin_modules/admin_module_users');
-				$templating->set('username', $search['username']);
-				$templating->set('user_id', $search['user_id']);
-				$templating->set('email', $search['email']);
+				$username = trim($_POST['username']);
+				$email = trim($_POST['email']);
+
+				if (!empty($username) || !empty($email))
+				{
+					if (isset($username) && !empty($username))
+					{
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `username` LIKE ?", array('%'.$username.'%'));
+					}
+					if (isset($email) && !empty($email))
+					{
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `email` LIKE ?", array('%'.$email.'%'));
+					}
+					$templating->block('search_row_top', 'admin_modules/admin_module_users');
+					while ($search = $db->fetch())
+					{
+						$templating->block('search_row','admin_modules/admin_module_users');
+						$templating->set('username', $search['username']);
+						$templating->set('user_id', $search['user_id']);
+						$templating->set('email', $search['email']);
+					}
+				}
 			}
 		}
 

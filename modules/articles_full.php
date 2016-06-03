@@ -303,7 +303,7 @@ if (!isset($_GET['go']))
 							}
 							else
 							{
-								$lastpage = ceil($total_pages/10);
+								$lastpage = ceil($total_pages/$_SESSION['per-page']);
 							}
 
 							// they have read all new comments (or we think they have since they are on the last page)

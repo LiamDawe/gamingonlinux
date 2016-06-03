@@ -32,6 +32,11 @@ define('url', core::config('website_url'));
 include('includes/class_user.php');
 $user = new user();
 
+if (!isset($_SESSION['per-page']))
+{
+	$_SESSION['per-page'] = 10;
+}
+
 // If they are not logged in make them a guest (group 4)
 if (!isset($_SESSION['logged_in']))
 {

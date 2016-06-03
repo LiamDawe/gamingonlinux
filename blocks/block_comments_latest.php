@@ -22,13 +22,13 @@ while ($comments = $db->fetch())
 	$title = $title . '...';
 
 	$page = 1;
-	if ($comments['comment_count'] > 10)
+	if ($comments['comment_count'] > $_SESSION['per-page'])
 	{
-		$page = ceil($comments['comment_count']/10);
+		$page = ceil($comments['comment_count']/$_SESSION['per-page']);
 	}
 
 	$comment_posts .= "<li class=\"list-group-item\">
-	<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#comments\">{$title}</a>
+	<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#{$comments['comment_id']}\">{$title}</a>
 	<small>{$date}</small>
 </li>";
 

@@ -27,9 +27,9 @@ while ($comments = $db->fetch())
 	$title = $comments['title'];
 
 	$page = 1;
-	if ($comments['comment_count'] > 10)
+	if ($comments['comment_count'] > $_SESSION['per-page'])
 	{
-		$page = ceil($comments['comment_count']/10);
+		$page = ceil($comments['comment_count']/$_SESSION['per-page']);
 	}
 
 	if (isset($comments['guest_username']) && !empty($comments['guest_username']))
@@ -42,7 +42,7 @@ while ($comments = $db->fetch())
 	}
 
 	$comment_posts .= "<li class=\"list-group-item\">
-	<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#comments\">{$title}</a><br />
+	<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#{$comments['comment_id']}\">{$title}</a><br />
 	$text<br />
 	<small>by {$username} {$date}</small>
 </li>";

@@ -16,11 +16,11 @@ class user
 
 			if (password_verify($password, $info['password']))
 			{
-				$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+				$db->sqlquery("SELECT `user_id`, `per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
 			}
 			else
 			{
-				$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $old_safe_password));
+				$db->sqlquery("SELECT `user_id`, `per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails` FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $old_safe_password));
 			}
 
 			if ($db->num_rows() == 1)
@@ -190,6 +190,7 @@ class user
 		$_SESSION['activated'] = $user_data['activated'];
 		$_SESSION['in_mod_queue'] = $user_data['in_mod_queue'];
 		$_SESSION['logged_in'] = 1;
+		$_SESSION['per-page'] = $user_date['per-page'];
 	}
 
 	// if they have a stay logged in cookie log them in!
@@ -203,7 +204,7 @@ class user
 		if ($db->num_rows() == 1)
 		{
 			// login then
-			$db->sqlquery("SELECT `user_id`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email` FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
+			$db->sqlquery("SELECT `user_id`, `per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email` FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
 			$user = $db->fetch();
 
 			if ($user['banned'] == 0)
@@ -231,6 +232,7 @@ class user
 					$_SESSION['activated'] = $user['activated'];
 					$_SESSION['in_mod_queue'] = $user['in_mod_queue'];
 					$_SESSION['logged_in'] = 1;
+					$_SESSION['per-page'] = $user_date['per-page'];
 
 					return true;
 				}
@@ -279,6 +281,7 @@ class user
 		unset($_SESSION['activated']);
 		unset($_SESSION['in_mod_queue']);
 		unset($_SESSION['logged_in']);
+		unset($_SESSION['per-page']);
 		setcookie('gol_stay', "",  time()-60, '/');
 		setcookie('gol_session', "",  time()-60, '/');
 		setcookie('gol-device', "",  time()-60, '/');

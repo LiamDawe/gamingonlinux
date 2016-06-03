@@ -17,7 +17,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `pc_info_public`, `twitter_username`, `distro`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `per-page`, `pc_info_public`, `twitter_username`, `distro`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
@@ -161,6 +161,19 @@ if (!isset($_POST['act']))
 	$templating->set('subscribe_email_check', $subscribe_email_check);
 	$templating->set('email_on_pm', $email_pm);
 	$templating->set('email_on_login', $email_login);
+
+	$page_options = '';
+	$per_page_selected = '';
+	for ($i = 10; $i <= 50; $i += 5)
+	{
+		if ($i == $usercpcp['per-page'])
+		{
+			$per_page_selected = 'selected';
+		}
+		$page_options .= '<option value="'.$i.'" '.$per_page_selected.'>'.$i.'</a>';
+		$per_page_selected = '';
+	}
+	$templating->set('per-page', $page_options);
 
 	if (!empty($usercpcp['twitter_username']))
 	{
@@ -383,11 +396,18 @@ else if (isset($_POST['act']))
 		{
 			$public = 1;
 		}
+		$per_page = 10;
+		if (is_numeric($_POST['per-page']))
+		{
+			$per_page = $_POST['per-page'];
+		}
 
 		// no nasty html grr
 		$bio = htmlspecialchars($_POST['bio'], ENT_QUOTES);
 
-		$db->sqlquery("UPDATE `users` SET `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ?, `pc_info_public` = ? WHERE `user_id` = ?", array($subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $public, $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `users` SET `per-page` = ?, `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ?, `pc_info_public` = ? WHERE `user_id` = ?", array($per_page, $subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $public, $_SESSION['user_id']));
+
+		$_SESSION['per-page'] = $per_page;
 
 		// additional profile fields
 		$sql_additional = "UPDATE `user_profile_info` SET

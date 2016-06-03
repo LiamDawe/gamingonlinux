@@ -46,8 +46,8 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['username'] = 'Guest'; // not even sure why I set this
 		$_SESSION['user_group'] = 4;
 		$_SESSION['secondary_user_group'] = 4;
-		$_SESSION['infinite_scroll'] = 1;
 		$_SESSION['theme'] = 'light';
+		$_SESSION['per-page'] = 10;
 	}
 }
 

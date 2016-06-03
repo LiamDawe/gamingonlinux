@@ -371,7 +371,7 @@ if (!isset($_GET['go']))
 					}
 
 					// sort out the pagination link
-					$pagination = $core->pagination_link(10, $total_pages, $pagination_linking, $page, '#comments');
+					$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, $pagination_linking, $page, '#comments');
 
 					if (isset($_GET['message']))
 					{
@@ -395,7 +395,7 @@ if (!isset($_GET['go']))
 						$db_grab_fields .= "u.`{$field['db_field']}`,";
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, 10", array($_GET['aid'], $core->start), 'articles_full.php comments');
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, {$_SESSION['per-page']}", array($_GET['aid'], $core->start));
 
 					$comments_get = $db->fetch_all_rows();
 

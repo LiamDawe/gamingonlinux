@@ -179,8 +179,8 @@ else
 					$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"/index.php?module=editpost&amp;topic_id={$topic['topic_id']}&page=$page\"><span class=\"icon edit\"></span></a></li>";
 				}
 
-				// count how many there is in total
-				$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']), 'viewtopic.php');
+				// count how many replies this topic has
+				$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
 				$total_pages = $db->num_rows();
 
 				// update their subscriptions if they are reading the last page
@@ -194,14 +194,14 @@ else
 
 					if ($check_user['email_options'] == 2 && $check_sub['send_email'] == 0)
 					{
-						//lastpage is = total pages / items per page, rounded up.
+						//lastpage = total pages / items per page, rounded up.
 						if ($total_pages < 9)
 						{
 							$lastpage = 1;
 						}
 						else
 						{
-							$lastpage = ceil($total_pages/9);
+							$lastpage = ceil($total_pages/$_SESSION['per-page']);
 						}
 
 						// they have read all new comments (or we think they have since they are on the last page)
@@ -214,7 +214,7 @@ else
 				}
 
 				// sort out the pagination link
-				$pagination = $core->pagination_link(9, $total_pages, "/forum/topic/{$_GET['topic_id']}/", $page);
+				$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/topic/{$_GET['topic_id']}/", $page);
 
 				// find out if this user has subscribed to the comments
 				if ($_SESSION['user_id'] != 0)
@@ -522,7 +522,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, $db_grab_fields u.forum_posts FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,9", array($_GET['topic_id'], $core->start), 'viewtopic.php');
+					$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, $db_grab_fields u.forum_posts FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
 					while ($post = $db->fetch())
 					{
 						if ($page > 1 && $reply_count == 0)

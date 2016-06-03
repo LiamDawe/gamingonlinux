@@ -70,20 +70,20 @@ else
 	$total_pages = $db->num_rows();
 
 	// sort out the pagination link
-	$pagination = $core->pagination_link(9, $total_pages, "/forum/{$forum_id}/", $page);
+	$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/{$forum_id}/", $page);
 
 	// get the posts for this forum
-	$db->sqlquery("SELECT t.*, u.`username`, u.`avatar`, u.`gravatar_email`, u.`avatar_gravatar`, u.`avatar_uploaded`, u2.`username` as `username_last`, u2.`user_id` as `user_id_last` FROM `forum_topics` t LEFT JOIN `users` u ON t.`author_id` = u.`user_id` LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id` WHERE t.`forum_id`= ? AND t.approved = 1 ORDER BY t.is_sticky DESC, t.`last_post_date` DESC LIMIT ?, 9", array($forum_id, $core->start));
+	$db->sqlquery("SELECT t.*, u.`username`, u.`avatar`, u.`gravatar_email`, u.`avatar_gravatar`, u.`avatar_uploaded`, u2.`username` as `username_last`, u2.`user_id` as `user_id_last` FROM `forum_topics` t LEFT JOIN `users` u ON t.`author_id` = u.`user_id` LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id` WHERE t.`forum_id`= ? AND t.approved = 1 ORDER BY t.is_sticky DESC, t.`last_post_date` DESC LIMIT ?, {$_SESSION['per-page']}", array($forum_id, $core->start));
 	while ($post = $db->fetch())
 	{
 		$pagination_post = '';
 
-		// if reply count is bigger than or equal to 6 (which would be 7 counting the topic itself)
-		if ($post['replys'] > 9)
+		// sort out the per-topic pagination shown beside the post title
+		if ($post['replys'] > $_SESSION['per-page'])
 		{
 
 			// This code uses the values in $rows_per_page and $numrows in order to identify the number of the last page.
-			$rows_per_page = 9;
+			$rows_per_page = $_SESSION['per-page'];
 			$lastpage = ceil($post['replys']/$rows_per_page);
 
 			// the numbers

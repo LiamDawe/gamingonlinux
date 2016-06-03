@@ -46,8 +46,10 @@
 			<label class="checkbox">
 				Get email's when receiving a Personal Message? <input type="checkbox" name="emailpm" {:email_on_pm} />
 			</label>
-			Comments &amp; forum posts per-page<br />
+			Comments &amp; forum posts per-page:<br />
 			<select name="per-page">{:per-page}</select><br />
+			Articles per-page, for homepage and category (tag) view:<br />
+			<select name="articles-per-page">{:aper-page}</select><br />
 			<br />
 			<label for="bio">Biography, for Editors this will show on articles you create, for normal users it will just show it on your profile, keep it short.</label>
 			<textarea name="bio" cols="100" rows="10">{:bio}</textarea><br />

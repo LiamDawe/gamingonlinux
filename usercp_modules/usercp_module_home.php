@@ -32,7 +32,6 @@ if (!isset($_POST['act']))
 		{
 			$state = '';
 		}
-		$templating->set('gol_premium', $premium);
 		$templating->set('state', $state);
 
 		$supporter_link = '';

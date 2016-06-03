@@ -815,10 +815,10 @@ else if (isset($_GET['go']))
 				{
 					// sort out what page the new comment is on, if current is 9, the next comment is on page 2, otherwise round up for the correct page
 					$comment_page = 1;
-					if ($title['comment_count'] >= 10)
+					if ($title['comment_count'] >= $_SESSION['per-page'])
 					{
 						$new_total = $title['comment_count']+1;
-						$comment_page = ceil($new_total/10);
+						$comment_page = ceil($new_total/$_SESSION['per-page']);
 					}
 
 					// check empty

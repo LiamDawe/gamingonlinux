@@ -38,9 +38,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$total_pages = $db->num_rows();
 
 				// sort out the pagination link
-				$pagination = $core->pagination_link(14, $total_pages, "/articles/category/$category_id/", $page);
+				$pagination = $core->pagination_link($_SESSION['articles-per-page'], $total_pages, "/articles/category/$category_id/", $page);
 
-				$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.slug, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.show_in_menu, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 14", array($category_id, $core->start), 'articles.php');
+				$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.slug, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.show_in_menu, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, {$_SESSION['articles-per-page']}", array($category_id, $core->start), 'articles.php');
 				$articles_get = $db->fetch_all_rows();
 
 				if ($db->num_rows() == 0)

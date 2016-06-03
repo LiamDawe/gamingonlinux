@@ -12,8 +12,6 @@ include('includes/bbcode.php');
 header("Content-Type: application/rss+xml");
 header("Cache-Control: max-age=3600");
 
-$last_date = gmdate("D, d M Y H:i:s O", $last_time['date']);
-
 $output = '<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xml:lang="en-GB">
 

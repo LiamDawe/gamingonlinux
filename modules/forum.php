@@ -101,7 +101,7 @@ foreach ($category_array as $category)
 			{
 				$post_count = $forum['topic_replies'];
 				// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-				if ($post_count <= 9)
+				if ($post_count <= $_SESSION['per-page'])
 				{
 					// it will be the first page
 					$postPage = 1;
@@ -109,9 +109,9 @@ foreach ($category_array as $category)
 				}
 
 				// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-				if ($post_count >= 10)
+				if ($post_count >= $_SESSION['per-page'])
 				{
-					$rows_per_page = 9;
+					$rows_per_page = $_SESSION['per-page'];
 
 					// page we are going to
 					$postPage = ceil($post_count / $rows_per_page);
@@ -151,7 +151,7 @@ while ($topics = $db->fetch())
 
 	$post_count = $topics['replys'];
 	// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-	if ($post_count <= 9)
+	if ($post_count <= $_SESSION['per-page'])
 	{
 		// it will be the first page
 		$postPage = 1;
@@ -159,9 +159,9 @@ while ($topics = $db->fetch())
 	}
 
 	// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-	if ($post_count >= 10)
+	if ($post_count >= $_SESSION['per-page'])
 	{
-		$rows_per_page = 9;
+		$rows_per_page = $_SESSION['per-page'];
 
 		// page we are going to
 		$postPage = ceil($post_count / $rows_per_page);

@@ -389,6 +389,44 @@ if (!isset($_GET['go']))
 
 					include('includes/profile_fields.php');
 
+					// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
+					if (isset($_GET['comment_id']) && is_numeric($_GET['comment_id']))
+					{
+						// see if we are above their set limit per-page
+						$db->sqlquery("SELECT `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
+						$count = $db->fetch();
+
+						if ($count['comment_count'] > $_SESSION['per-page'])
+						{
+							$db->sqlquery("SELECT `comment_number` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
+							$number = $db->fetch();
+
+							$last_page = ceil($number['comment_number']/$_SESSION['per-page']);
+
+							if (core::config('pretty_urls') == 1)
+							{
+								header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#{$_GET['comment_id']}");
+							}
+							else
+							{
+
+								header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#{$_GET['comment_id']}");
+							}
+						}
+						else
+						{
+							if (core::config('pretty_urls') == 1)
+							{
+								header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/#{$_GET['comment_id']}");
+							}
+							else
+							{
+
+								header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#{$_GET['comment_id']}");
+							}
+						}
+					}
+
 					$db_grab_fields = '';
 					foreach ($profile_fields as $field)
 					{
@@ -644,66 +682,72 @@ if (!isset($_GET['go']))
 					}
 
 					// only show comments box if the comments are turned on for this article
-
-					if (($article['comments_open'] == 1) || ($article['comments_open'] == 0 && $user->check_group(1,2) == true))
+					if (core::config('comments_open') == 1)
 					{
-						if ($_SESSION['user_group'] == 4)
+						if (($article['comments_open'] == 1) || ($article['comments_open'] == 0 && $user->check_group(1,2) == true))
 						{
-							$templating->merge('login');
-							$templating->block('small');
-						}
-
-						else
-						{
-							if (!isset($_SESSION['activated']))
+							if ($_SESSION['user_group'] == 4)
 							{
-								$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-								$get_active = $db->fetch();
-								$_SESSION['activated'] = $get_active['activated'];
-							}
-
-							if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
-							{
-								// find if they have auto subscribe on
-								$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-								$subscribe_info = $db->fetch();
-
-								$subscribe_check = '';
-								if ($subscribe_info['auto_subscribe'] == 1)
-								{
-									$subscribe_check = 'checked';
-								}
-
-								$subscribe_email_check = '';
-								if ($subscribe_info['auto_subscribe_email'] == 1)
-								{
-									$subscribe_email_check = 'checked';
-								}
-
-								$comment = '';
-								if (isset($_SESSION['acomment']))
-								{
-									$comment = $_SESSION['acomment'];
-								}
-								$templating->block('comments_box_top', 'articles_full');
-								$templating->set('url', core::config('website_url'));
-
-								$core->editor('text', $comment, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
-
-								$templating->block('comment_buttons', 'articles_full');
-								$templating->set('url', core::config('website_url'));
-								$templating->set('subscribe_check', $subscribe_check);
-								$templating->set('subscribe_email_check', $subscribe_email_check);
-								$templating->set('aid', $_GET['aid']);
-
-								$templating->block('preview', 'articles_full');
+								$templating->merge('login');
+								$templating->block('small');
 							}
 
 							else
 							{
-								$core->message('To comment you need to activate your account! You were sent an email with instructions on how to activate. <a href="/index.php?module=activate_user&redo=1">Click here to re-send a new activation key</a>');
+								if (!isset($_SESSION['activated']))
+								{
+									$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+									$get_active = $db->fetch();
+									$_SESSION['activated'] = $get_active['activated'];
+								}
+
+								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
+								{
+									// find if they have auto subscribe on
+									$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+									$subscribe_info = $db->fetch();
+
+									$subscribe_check = '';
+									if ($subscribe_info['auto_subscribe'] == 1)
+									{
+										$subscribe_check = 'checked';
+									}
+
+									$subscribe_email_check = '';
+									if ($subscribe_info['auto_subscribe_email'] == 1)
+									{
+										$subscribe_email_check = 'checked';
+									}
+
+									$comment = '';
+									if (isset($_SESSION['acomment']))
+									{
+										$comment = $_SESSION['acomment'];
+									}
+									$templating->block('comments_box_top', 'articles_full');
+									$templating->set('url', core::config('website_url'));
+
+									$core->editor('text', $comment, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+
+									$templating->block('comment_buttons', 'articles_full');
+									$templating->set('url', core::config('website_url'));
+									$templating->set('subscribe_check', $subscribe_check);
+									$templating->set('subscribe_email_check', $subscribe_email_check);
+									$templating->set('aid', $_GET['aid']);
+
+									$templating->block('preview', 'articles_full');
+								}
+
+								else
+								{
+									$core->message('To comment you need to activate your account! You were sent an email with instructions on how to activate. <a href="/index.php?module=activate_user&redo=1">Click here to re-send a new activation key</a>');
+								}
 							}
 						}
+					}
+					else if (core::config('comments_open') == 0)
+					{
+						$core->message('Commenting is currently down for maintenance.');
 					}
 				}
 			}
@@ -785,205 +829,227 @@ else if (isset($_GET['go']))
 
 		else
 		{
-			// check to make sure their IP isn't banned
-			$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-			if ($db->num_rows() >= 1)
+			if (core::config('comments_open') == 0)
 			{
-				header("Location: /home/banned");
+				$core->message('Commenting is currently down for maintenance.');
 			}
-
 			else
 			{
-				// get article name for the email and redirect
-				$db->sqlquery("SELECT `title`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
-				$title = $db->fetch();
-				$title_nice = $core->nice_title($title['title']);
-
-				if ($title['comments_open'] == 0)
+				// check to make sure their IP isn't banned
+				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
+				if ($db->num_rows() >= 1)
 				{
-					if (core::config('pretty_urls') == 1)
-					{
-						header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=locked#commentbox");
-					}
-					else {
-						header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=locked#commentbox");
-					}
-
-					die();
+					header("Location: /home/banned");
 				}
+
 				else
 				{
-					// check empty
-					$comment = trim($_POST['text']);
+					// get article name for the email and redirect
+					$db->sqlquery("SELECT `title`, `comment_count`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
+					$title = $db->fetch();
+					$title_nice = $core->nice_title($title['title']);
 
-					// check for double comment
-					$db->sqlquery("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array($_POST['aid']));
-					$check_comment = $db->fetch();
-
-					if ($check_comment['comment_text'] == $comment)
+					if ($title['comments_open'] == 0)
 					{
 						if (core::config('pretty_urls') == 1)
 						{
-							header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=doublecomment#commentbox");
+							header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=locked#commentbox");
 						}
 						else {
-							header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
+							header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=locked#commentbox");
 						}
 
 						die();
 					}
-
-					if (empty($comment))
-					{
-						if (core::config('pretty_urls') == 1)
-						{
-							header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=emptycomment#commentbox");
-						}
-						else {
-							header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
-						}
-
-						die();
-					}
-
 					else
 					{
-						$comment = htmlspecialchars($comment, ENT_QUOTES);
-
-						$article_id = $_POST['aid'];
-
-						// add the comment
-						$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
-
-						$new_comment_id = $db->grab_id();
-
-						// update the news items comment count
-						$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
-
-						// update the posting users comment count
-						$db->sqlquery("UPDATE `users` SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array($_SESSION['user_id']));
-
-						// check if they are subscribing
-						if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
+						// sort out what page the new comment is on, if current is 9, the next comment is on page 2, otherwise round up for the correct page
+						$comment_page = 1;
+						if ($title['comment_count'] >= $_SESSION['per-page'])
 						{
-							// make sure we don't make lots of doubles
-							$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+							$new_total = $title['comment_count']+1;
 
-							$emails = 0;
-							if (isset($_POST['emails']))
-							{
-								$emails = 1;
-							}
-
-							$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $article_id, $emails, $emails));
+							$comment_page = ceil($new_total/$_SESSION['per-page']);
 						}
 
-						// email anyone subscribed which isn't you
-						$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.send_email = 1 AND s.emails = 1", array($article_id));
-						$users_array = array();
-						while ($users = $db->fetch())
+						// check empty
+						$comment = trim($_POST['text']);
+
+						// check for double comment
+						$db->sqlquery("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array($_POST['aid']));
+						$check_comment = $db->fetch();
+
+						if ($check_comment['comment_text'] == $comment)
 						{
-							if ($users['user_id'] != $_SESSION['user_id'] && $users['emails'] == 1)
+							if (core::config('pretty_urls') == 1)
 							{
-								$users_array[$users['user_id']]['user_id'] = $users['user_id'];
-								$users_array[$users['user_id']]['email'] = $users['email'];
-								$users_array[$users['user_id']]['username'] = $users['username'];
+								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=doublecomment#commentbox");
 							}
-						}
-
-						// send the emails
-						foreach ($users_array as $email_user)
-						{
-							$to = $email_user['email'];
-
-							// set the title to upper case
-							$title_upper = $title['title'];
-
-							// subject
-							$subject = "New reply to article {$title_upper} on GamingOnLinux.com";
-
-							$username = $_SESSION['username'];
-
-							$comment_email = email_bbcode($comment);
-
-							$message = '';
-
-							// message
-							$html_message = "
-							<html>
-							<head>
-							<title>New reply to an article you follow on GamingOnLinux.com</title>
-							<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-							</head>
-							<body>
-							<img src=\"{$config['website_url']}templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-							<br />
-							<p>Hello <strong>{$email_user['username']}</strong>,</p>
-							<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/#r{$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
-							<div>
-						 	<hr>
-						 	{$comment_email}
-						 	<hr>
-						 	You can unsubscribe from this article by <a href=\"{$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"{$config['website_url']}usercp.php\">User Control Panel</a>.
-						 	<hr>
-						  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-						  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-						  	<p>-----------------------------------------------------------------------------------------------------------</p>
-							</div>
-							</body>
-							</html>
-							";
-
-							$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on {$config['website_url']}articles/$title_nice.$article_id/page=$comment_page#r{$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
-
-							$boundary = uniqid('np');
-
-							// To send HTML mail, the Content-type header must be set
-							$headers  = 'MIME-Version: 1.0' . "\r\n";
-							$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
-							$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress($article_id,'comment')."\r\n";
-
-							$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-							$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
-							$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-							$message .= $plain_message;
-
-							$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-							$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
-							$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-							$message .= "$html_message";
-
-							$message .= "\r\n\r\n--" . $boundary . "--";
-
-							// Mail it
-							if ($config['send_emails'] == 1)
-							{
-								mail($to, $subject, $message, $headers);
+							else {
+								header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
 							}
 
-							// remove anyones send_emails subscription setting if they have it set to email once
-							$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']));
-							$update_sub = $db->fetch();
-
-							if ($update_sub['email_options'] == 2)
-							{
-								$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($article_id, $email_user['user_id']));
-							}
+							die();
 						}
 
-						// try to stop double postings, clear text
-						unset($_POST['text']);
-
-						// clear any comment or name left from errors
-						unset($_SESSION['acomment']);
-
-						if (core::config('pretty_urls') == 1)
+						if (empty($comment))
 						{
-							header("Location: /articles/$title_nice.$article_id/page={$comment_page}#{$new_comment_id}");
+							if (core::config('pretty_urls') == 1)
+							{
+								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=emptycomment#commentbox");
+							}
+							else {
+								header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
+							}
+
+							die();
 						}
+
 						else
 						{
-							header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&page={$comment_page}#{$new_comment_id}");
+							$comment = htmlspecialchars($comment, ENT_QUOTES);
+
+							$article_id = $_POST['aid'];
+
+							// find the last comment number
+							$db->sqlquery("SELECT `comment_number` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_number` DESC LIMIT 1", array($_POST['aid']));
+							$comment_number = $db->fetch();
+
+							$this_comment_number = $comment_number['comment_number']+1;
+
+							// add the comment
+							$db->sqlquery("INSERT INTO `articles_comments` SET `comment_number` = ?, `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($this_comment_number, $_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
+
+							$new_comment_id = $db->grab_id();
+
+							// update the news items comment count
+							$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
+
+							// update the posting users comment count
+							$db->sqlquery("UPDATE `users` SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array($_SESSION['user_id']));
+
+							// check if they are subscribing
+							if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
+							{
+								// make sure we don't make lots of doubles
+								$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+
+								$emails = 0;
+								if (isset($_POST['emails']))
+								{
+									$emails = 1;
+								}
+
+								$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $article_id, $emails, $emails));
+							}
+
+							// email anyone subscribed which isn't you
+							$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.send_email = 1 AND s.emails = 1", array($article_id));
+							$users_array = array();
+							while ($users = $db->fetch())
+							{
+								if ($users['user_id'] != $_SESSION['user_id'] && $users['emails'] == 1)
+								{
+									$users_array[$users['user_id']]['user_id'] = $users['user_id'];
+									$users_array[$users['user_id']]['email'] = $users['email'];
+									$users_array[$users['user_id']]['username'] = $users['username'];
+								}
+							}
+
+							// send the emails
+							foreach ($users_array as $email_user)
+							{
+								$to = $email_user['email'];
+
+								// set the title to upper case
+								$title_upper = $title['title'];
+
+								// subject
+								$subject = "New reply to article {$title_upper} on GamingOnLinux.com";
+
+								$username = $_SESSION['username'];
+
+								$comment_email = email_bbcode($comment);
+
+								$message = '';
+
+								// message
+								$html_message = "
+								<html>
+								<head>
+								<title>New reply to an article you follow on GamingOnLinux.com</title>
+								<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
+								</head>
+								<body>
+								<img src=\"{$config['website_url']}templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+								<br />
+								<p>Hello <strong>{$email_user['username']}</strong>,</p>
+								<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+								<div>
+							 	<hr>
+							 	{$comment_email}
+							 	<hr>
+							 	You can unsubscribe from this article by <a href=\"{$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"{$config['website_url']}usercp.php\">User Control Panel</a>.
+							 	<hr>
+							  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+							  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
+							  	<p>-----------------------------------------------------------------------------------------------------------</p>
+								</div>
+								</body>
+								</html>
+								";
+
+								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on {$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+
+								$boundary = uniqid('np');
+
+								// To send HTML mail, the Content-type header must be set
+								$headers  = 'MIME-Version: 1.0' . "\r\n";
+								$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
+								$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress($article_id,'comment')."\r\n";
+
+								$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
+								$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
+								$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
+								$message .= $plain_message;
+
+								$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
+								$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
+								$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
+								$message .= "$html_message";
+
+								$message .= "\r\n\r\n--" . $boundary . "--";
+
+								// Mail it
+								if ($config['send_emails'] == 1)
+								{
+									mail($to, $subject, $message, $headers);
+								}
+
+								// remove anyones send_emails subscription setting if they have it set to email once
+								$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']));
+								$update_sub = $db->fetch();
+
+								if ($update_sub['email_options'] == 2)
+								{
+									$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($article_id, $email_user['user_id']));
+								}
+							}
+
+							// try to stop double postings, clear text
+							unset($_POST['text']);
+
+							// clear any comment or name left from errors
+							unset($_SESSION['acomment']);
+
+							if (core::config('pretty_urls') == 1)
+							{
+								header("Location: /articles/$title_nice.$article_id/page={$comment_page}#{$new_comment_id}");
+							}
+							else
+							{
+								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&page={$comment_page}#{$new_comment_id}");
+							}
 						}
 					}
 				}
@@ -1036,7 +1102,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'deletecomment')
 	{
-		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
+		$db->sqlquery("SELECT c.`author_id`, c.`comment_number`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
 		$comment = $db->fetch();
 
 		$nice_title = $core->nice_title($comment['title']);
@@ -1097,6 +1163,8 @@ else if (isset($_GET['go']))
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `comment_id` = ?, `content` = ?", array(core::$date, "{$_SESSION['username']} deleted a comment.", core::$date, $_GET['comment_id'], $comment['comment_text']));
 
 					// delete comment and update comments counter
+					$db->sqlquery("UPDATE `articles_comments` SET `comment_number` = (comment_number - 1) WHERE `comment_number` > ?", array($comment['comment_number']));
+
 					$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
 					$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
 					$db->sqlquery("DELETE FROM `likes` WHERE `comment_id` = ?", array($_GET['comment_id']));

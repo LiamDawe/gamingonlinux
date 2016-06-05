@@ -69,8 +69,10 @@ else
 			else
 			{
 				// Get the info from the post
-				$db->sqlquery("SELECT r.author_id, r.reported, t.forum_id FROM `forum_replies` r INNER JOIN `forum_topics` t ON r.topic_id = t.topic_id WHERE r.`post_id` = ?", array($_GET['post_id']));
+				$db->sqlquery("SELECT r.author_id, r.post_number, r.reported, t.forum_id FROM `forum_replies` r INNER JOIN `forum_topics` t ON r.topic_id = t.topic_id WHERE r.`post_id` = ?", array($_GET['post_id']));
 				$post_info = $db->fetch();
+
+				$db->sqlquery("UPDATE `forum_replies` SET `post_number` = (post_number - 1) WHERE `post_number` > ?", array($post_info['post_number']));
 
 				// remove the post
 				$db->sqlquery("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
@@ -513,6 +515,44 @@ else
 				REPLIES SECTION
 				*/
 
+				// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
+				if (isset($_GET['post_id']) && is_numeric($_GET['post_id']))
+				{
+					// see if we are above their set limit per-page
+					$db->sqlquery("SELECT `replys` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
+					$count = $db->fetch();
+
+					if ($count['replys'] > $_SESSION['per-page'])
+					{
+						$db->sqlquery("SELECT `post_number` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
+						$number = $db->fetch();
+
+						$last_page = ceil($number['post_number']/$_SESSION['per-page']);
+
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /forum/topic/{$_GET['topic_id']}/page=$last_page#{$_GET['post_id']}");
+						}
+						else
+						{
+
+							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}&page=$last_page#{$_GET['post_id']}");
+						}
+					}
+					else
+					{
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /forum/topic/{$_GET['topic_id']}#{$_GET['post_id']}");
+						}
+						else
+						{
+
+							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}#{$_GET['post_id']}");
+						}
+					}
+				}
+
 				if ($topic['replys'] > 0)
 				{
 
@@ -783,119 +823,124 @@ else
 					}
 				}
 
-				if ($reply_access == 1)
+				if (core::config('forum_posting_open') == 1)
 				{
-					// find if they have auto subscribe on
-					$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-					$subscribe_info = $db->fetch();
-
-					$subscribe_check = '';
-					if ($subscribe_info['auto_subscribe'] == 1)
+					if ($reply_access == 1)
 					{
-						$subscribe_check = 'checked';
-					}
+						// find if they have auto subscribe on
+						$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+						$subscribe_info = $db->fetch();
 
-					$subscribe_email_check = '';
-					if ($subscribe_info['auto_subscribe_email'] == 1)
-					{
-						$subscribe_email_check = 'checked';
-					}
-
-					if (!isset($_SESSION['activated']))
-					{
-						$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-						$get_active = $db->fetch();
-						$_SESSION['activated'] = $get_active['activated'];
-					}
-
-					$templating->block('reply_top', 'viewtopic');
-
-					if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
-					{
-						$core->editor('text', '', $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
-					}
-
-					$templating->block('reply_buttons', 'viewtopic');
-					$templating->set('subscribe_check', $subscribe_check);
-					$templating->set('subscribe_email_check', $subscribe_email_check);
-					$templating->set('url', url);
-					$templating->set('topic_id', $_GET['topic_id']);
-					$templating->set('forum_id', $topic['forum_id']);
-
-					$reply_options = 'Moderator options after posting: <select name="moderator_options"><option value=""></option>';
-					$options_count = 0;
-
-					if ($parray['sticky'] == 1)
-					{
-						if ($topic['is_sticky'] == 1)
+						$subscribe_check = '';
+						if ($subscribe_info['auto_subscribe'] == 1)
 						{
-							$reply_options .= '<option value="unsticky">Unsticky Topic</option>';
+							$subscribe_check = 'checked';
 						}
 
+						$subscribe_email_check = '';
+						if ($subscribe_info['auto_subscribe_email'] == 1)
+						{
+							$subscribe_email_check = 'checked';
+						}
+
+						if (!isset($_SESSION['activated']))
+						{
+							$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+							$get_active = $db->fetch();
+							$_SESSION['activated'] = $get_active['activated'];
+						}
+
+						$templating->block('reply_top', 'viewtopic');
+
+						if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
+						{
+							$core->editor('text', '', $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+						}
+
+						$templating->block('reply_buttons', 'viewtopic');
+						$templating->set('subscribe_check', $subscribe_check);
+						$templating->set('subscribe_email_check', $subscribe_email_check);
+						$templating->set('url', url);
+						$templating->set('topic_id', $_GET['topic_id']);
+						$templating->set('forum_id', $topic['forum_id']);
+
+						$reply_options = 'Moderator options after posting: <select name="moderator_options"><option value=""></option>';
+						$options_count = 0;
+
+						if ($parray['sticky'] == 1)
+						{
+							if ($topic['is_sticky'] == 1)
+							{
+								$reply_options .= '<option value="unsticky">Unsticky Topic</option>';
+							}
+
+							else
+							{
+								$reply_options .= '<option value="sticky">Sticky Topic</option>';
+							}
+							$options_count++;
+						}
+
+						if ($parray['lock'] == 1)
+						{
+							if ($topic['is_locked'] == 1)
+							{
+								$reply_options .= '<option value="unlock">Unlock Topic</option>';
+							}
+
+							else
+							{
+								$reply_options .= '<option value="lock">Lock Topic</option>';
+							}
+							$options_count++;
+						}
+
+						if ($parray['sticky'] == 1 && $parray['lock'] == 1)
+						{
+							if ($topic['is_locked'] == 1 && $topic['is_sticky'] == 0)
+							{
+								$reply_options .= '<option value="bothunlock">Unlock & Sticky Topic</option>';
+							}
+
+							if ($topic['is_sticky'] == 1 && $topic['is_locked'] == 0)
+							{
+								$reply_options .= '<option value="bothunsticky">Lock & Unsticky Topic</option>';
+							}
+
+							if ($topic['is_sticky'] == 1 && $topic['is_locked'] == 1)
+							{
+								$reply_options .= '<option value="bothundo">Unlock & Unsticky Topic</option>';
+							}
+
+							if ($topic['is_sticky'] == 0 && $topic['is_locked'] == 0)
+							{
+								$reply_options .= '<option value="both">Lock & Sticky Topic</option>';
+							}
+
+							$options_count++;
+						}
+
+						if ($options_count > 0)
+						{
+							$reply_options .= '</select><br />';
+						}
+
+						// if they have no moderator abilitys then remove the select box altogether
 						else
 						{
-							$reply_options .= '<option value="sticky">Sticky Topic</option>';
-
+							$reply_options = '';
 						}
-						$options_count++;
+
+						$templating->set('moderator_options', $reply_options);
 					}
 
-					if ($parray['lock'] == 1)
-					{
-						if ($topic['is_locked'] == 1)
-						{
-							$reply_options .= '<option value="unlock">Unlock Topic</option>';
-						}
-
-						else
-						{
-							$reply_options .= '<option value="lock">Lock Topic</option>';
-
-						}
-						$options_count++;
-					}
-
-					if ($parray['sticky'] == 1 && $parray['lock'] == 1)
-					{
-						if ($topic['is_locked'] == 1 && $topic['is_sticky'] == 0)
-						{
-							$reply_options .= '<option value="bothunlock">Unlock & Sticky Topic</option>';
-						}
-
-						if ($topic['is_sticky'] == 1 && $topic['is_locked'] == 0)
-						{
-							$reply_options .= '<option value="bothunsticky">Lock & Unsticky Topic</option>';
-						}
-
-						if ($topic['is_sticky'] == 1 && $topic['is_locked'] == 1)
-						{
-							$reply_options .= '<option value="bothundo">Unlock & Unsticky Topic</option>';
-						}
-
-						if ($topic['is_sticky'] == 0 && $topic['is_locked'] == 0)
-						{
-							$reply_options .= '<option value="both">Lock & Sticky Topic</option>';
-						}
-
-						$options_count++;
-					}
-
-					if ($options_count > 0)
-					{
-						$reply_options .= '</select><br />';
-					}
-
-					// if they have no moderator abilitys then remove the select box altogether
-					else
-					{
-						$reply_options = '';
-					}
-
-					$templating->set('moderator_options', $reply_options);
+					$templating->block('options', 'viewtopic');
+					$templating->set('moderator_options', $options);
 				}
-
-				$templating->block('options', 'viewtopic');
-				$templating->set('moderator_options', $options);
+				else if (core::config('forum_posting_open') == 0)
+				{
+					$core->message('Posting is currently down for maintenance.');
+				}
 			}
 		}
 	}

@@ -1101,7 +1101,7 @@ else
 					$users_posts = array();
 					foreach ($posts as $post)
 					{
-						$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `author_id` = ?", array($post['author_id']));
+						$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `author_id` = ? AND `topic_id` = ?", array($post['author_id'], $_GET['topic_id']));
 						$user_post_count = $db->num_rows();
 
 						$users_posts[$post['author_id']]['author_id'] = $post['author_id'];
@@ -1113,6 +1113,9 @@ else
 
 					// now we can remove all replys
 					$db->sqlquery("DELETE FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
+
+					print_r($users_posts);
+					die();
 
 					// now update each users post count
 					foreach($users_posts as $post)

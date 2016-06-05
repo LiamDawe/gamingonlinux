@@ -101,26 +101,6 @@ else if (isset($_POST['act']))
 				// add the reply
 				$db->sqlquery("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?", array($topic_id, $author, $message, core::$date));
 				$post_id = $db->grab_id();
-				// find what page and where in the page the link needs to go!
-				$db->sqlquery("SELECT `replys` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id));
-				$reply = $db->fetch();
-				$post_count = $reply['replys'];
-
-				// if we have already 9 or under replies its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-				if ($post_count <= $_SESSION['per-page'])
-				{
-					// it will be the first page
-					$postPage = 1;
-				}
-
-				// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-				if ($post_count >= $_SESSION['per-page'])
-				{
-					$rows_per_page = $_SESSION['per-page'];
-
-					// page we are going to
-					$postPage = ceil($post_count / $rows_per_page);
-				}
 
 				// get article name for the email and redirect
 				$db->sqlquery("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id));
@@ -174,7 +154,7 @@ else if (isset($_POST['act']))
 					<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 					<br />
 					<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$topic_id}?page={$postPage}#{$post_id}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$topic_id}#{$post_id}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 					<div>
 					<hr>
 			 		{$email_message}

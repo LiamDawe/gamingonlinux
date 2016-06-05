@@ -795,7 +795,7 @@ else if (isset($_GET['go']))
 			else
 			{
 				// get article name for the email and redirect
-				$db->sqlquery("SELECT `title`, `comment_count`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
+				$db->sqlquery("SELECT `title`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
 				$title = $db->fetch();
 				$title_nice = $core->nice_title($title['title']);
 
@@ -813,14 +813,6 @@ else if (isset($_GET['go']))
 				}
 				else
 				{
-					// sort out what page the new comment is on, if current is 9, the next comment is on page 2, otherwise round up for the correct page
-					$comment_page = 1;
-					if ($title['comment_count'] >= $_SESSION['per-page'])
-					{
-						$new_total = $title['comment_count']+1;
-						$comment_page = ceil($new_total/$_SESSION['per-page']);
-					}
-
 					// check empty
 					$comment = trim($_POST['text']);
 
@@ -927,7 +919,7 @@ else if (isset($_GET['go']))
 							<img src=\"{$config['website_url']}templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 							<br />
 							<p>Hello <strong>{$email_user['username']}</strong>,</p>
-							<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/page=$comment_page#r{$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+							<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/#r{$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 							<div>
 						 	<hr>
 						 	{$comment_email}

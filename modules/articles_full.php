@@ -22,7 +22,7 @@ if (!isset($_GET['go']))
 		else
 		{
 			// get the article
-			$db->sqlquery("SELECT a.`article_id`, a.`preview_code`, a.`title`, a.`text`, a.`tagline`, a.`date`, a.`date_submitted`, a.`author_id`, a.`active`, a.`guest_username`, a.`views`, a.`article_top_image`, a.`article_top_image_filename`, a.`tagline_image`, a.`comments_open`, u.`username`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`article_bio`, u.`user_group`, u.`twitter_on_profile` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE a.`article_id` = ?", array($_GET['aid']));
+			$db->sqlquery("SELECT a.`article_id`, a.`slug`, a.`preview_code`, a.`title`, a.`text`, a.`tagline`, a.`date`, a.`date_submitted`, a.`author_id`, a.`active`, a.`guest_username`, a.`views`, a.`article_top_image`, a.`article_top_image_filename`, a.`tagline_image`, a.`comments_open`, u.`username`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`article_bio`, u.`user_group`, u.`twitter_on_profile` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE a.`article_id` = ?", array($_GET['aid']));
 			$article = $db->fetch();
 
 			if ($db->num_rows() == 0)
@@ -540,6 +540,15 @@ if (!isset($_GET['go']))
 						$templating->set('text', bbcode($comments['comment_text'] . $last_edited, 0));
 						$templating->set('article_id', $_GET['aid']);
 						$templating->set('comment_id', $comments['comment_id']);
+						if (core::config('pretty_urls') == 1)
+						{
+							$comment_link = '/articles/'.$article['slug'].'.'.$_GET['aid'].'/comment_id=' . $comments['comment_id'];
+						}
+						else
+						{
+							$comment_link = '/index.php?module=articles_full&aid='.$_GET['aid'].'&title='.$article['slug'].'&comment_id=' . $comments['comment_id'];
+						}
+						$templating->set('comment_link', $comment_link);
 
 						// Total number of likes for the status message
 						$qtotallikes = $db->sqlquery("SELECT COUNT(comment_id) as `total` FROM likes WHERE comment_id = ?", array($comments['comment_id']));

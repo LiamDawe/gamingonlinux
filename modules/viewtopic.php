@@ -713,6 +713,17 @@ else
 						}
 						$templating->set('user_options', $user_options);
 
+						if (core::config('pretty_urls') == 1)
+						{
+							$post_link = '/forum/topic/' . $_GET['topic_id'] . '/post_id=' . $post['post_id'];
+						}
+						else
+						{
+							$post_link = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'] . '&post_id=' . $post['post_id'];;
+
+						}
+						$templating->set('post_link', $post_link);
+
 						$reply_count++;
 					}
 				}

@@ -8,7 +8,7 @@ $templating->block('main');
 $templating->block('list_top');
 
 // get supporter list Sorted by last login
-$res = $db->sqlquery("SELECT `username`, `user_id`, `avatar`, `gravatar_email`, `avatar_uploaded`,`avatar_gravatar`, `supporter_link` FROM `users` WHERE `secondary_user_group` IN (6,7) AND `user_group` != 1 AND `user_group` != 2 ORDER BY last_login DESC LIMIT 9");
+$res = $db->sqlquery("SELECT `username`, `user_id`, `avatar`, `gravatar_email`, `avatar_uploaded`,`avatar_gravatar`, `supporter_link` FROM `users` WHERE `secondary_user_group` IN (6,7) AND `user_group` != 1 AND `user_group` != 2 ORDER BY RAND() DESC LIMIT 9");
 
 //Chop the results up in arrays of 3 users per row
 $chucks = array_chunk($res->fetch_all_rows(), 3);

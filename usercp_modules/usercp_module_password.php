@@ -5,10 +5,10 @@ $templating->block('main');
 if (isset($_POST['Update']))
 {
 	// find current password
-	$db->sqlquery("SELECT `password`, `password_salt` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `password` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$grab_current_password = $db->fetch();
 
-	$current_password_test = password_hash($_POST['current_password'], PASSWORD_BCRYPT);
+	$current_password_test = password_verify($_POST['current_password'], $grab_current_password['password']);
 	$new_password_safe = password_hash($_POST['new_password'], PASSWORD_BCRYPT);
 
 	if (empty($_POST['current_password']) || empty($_POST['new_password']) || empty($_POST['new_password_check']))

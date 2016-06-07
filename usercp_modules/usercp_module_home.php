@@ -191,7 +191,7 @@ if (!isset($_POST['act']))
 	{
 		$twitter_button = "<div class=\"box\"><div class=\"body group\"><form method=\"post\" action=\"/usercp.php?module=home\">
 		Current twitter handle linked: @{$usercpcp['twitter_username']}<br />
-		<button type=\"submit\">Removed Linked twitter account</button>
+		<button type=\"submit\">Remove linked Twitter account</button>
 		<input type=\"hidden\" name=\"act\" value=\"twitter_remove\" />
 		</form></div></div>";
 	}
@@ -199,7 +199,7 @@ if (!isset($_POST['act']))
 	else
 	{
 		$twitter_button = '<div class="box"><div class="body group"><form method="post" action="/index.php?module=login&twitter">
-		<button type="submit">Link twitter account</button>
+		<button type="submit">Link a Twitter account</button>
 		</form></div></div>';
 	}
 
@@ -210,7 +210,7 @@ if (!isset($_POST['act']))
 		$steam_button = "<div class=\"box\"><div class=\"body group\"><form method=\"post\" action=\"/usercp.php?module=home\">
 		Current Steam user linked: {$usercpcp['steam_username']}<br />
 		If this username is old it doesn't matter!<br />
-		<button type=\"submit\" class=\"btn btn-danger\">Removed Linked Steam account</button>
+		<button type=\"submit\" class=\"btn btn-danger\">Remove a linked Steam account</button>
 		<input type=\"hidden\" name=\"act\" value=\"steam_remove\" />
 		</form></div></div>";
 	}

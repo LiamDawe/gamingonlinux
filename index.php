@@ -31,7 +31,7 @@ if ($module == 'home')
 		$_SESSION['last_featured_id'] = 0;
 	}
 	// count how many editor picks we have right now (should probably add a config row for this sometime so we don't have to count it every time)
-	$db->sqlquery("SELECT count(article_id) as count FROM `articles` WHERE `show_in_menu` = 1");
+	$db->sqlquery("SELECT count(article_id.) as count FROM `articles` WHERE `show_in_menu` = 1");
 	$featured_ctotal = $db->fetch();
 
 	$last_featured_sql = '';

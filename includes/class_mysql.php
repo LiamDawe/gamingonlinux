@@ -88,9 +88,12 @@ class mysql
 				$page = $core->current_page_path();
 			}
 
-			$core->message( $error->getMessage() . "<br>" . $sql );
+			if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
+			{
+				$core->message( $error->getMessage() . "<br>" . $sql );
+			}
 
-			$core->message("Something went wrong. The admin will be notified and punished muhahaha for I am an evil overlord...I'm sure I will be fixed soon.$message", NULL, 1);
+			$core->message("Something went wrong. The admin will be notified. $message", NULL, 1);
 			$this->pdo_error($error->getMessage(), $page, $sql, $referrer);
 		}
 	}

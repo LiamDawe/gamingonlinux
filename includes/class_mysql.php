@@ -137,7 +137,7 @@ class mysql
 		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"Gaming On Linux\">
 		<br />
 		$exception on page <br />
-		<strong>File:</strong> $page
+		<strong>File:</strong> $page<br />
 		SQL QUERY<br />
 		$sql<br />
 		Referring Page<br />

@@ -83,18 +83,16 @@ class mysql
 				$message = '<br />'.$error->getMessage().'<br />'.$sql;
 			}
 
-			if ($page == NULL)
-			{
-				$page = $core->current_page_path();
-			}
-
 			if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
 			{
-				$core->message( $error->getMessage() . "<br>" . $sql );
+				$trace = $error->getTrace();
+				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br />" . '<strong>Query:</strong> ' . $sql, NULL, 1);
 			}
-
-			$core->message("Something went wrong. The admin will be notified. $message", NULL, 1);
-			$this->pdo_error($error->getMessage(), $page, $sql, $referrer);
+			else
+			{
+				$core->message("Something went wrong. The admin will be notified", NULL, 1);
+				$this->pdo_error($error->getMessage(), $trace[2]['file'], $sql, $referrer);
+			}
 		}
 	}
 
@@ -138,7 +136,8 @@ class mysql
 		<body>
 		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"Gaming On Linux\">
 		<br />
-		$exception on page $page<br />
+		$exception on page <br />
+		<strong>File:</strong> $page
 		SQL QUERY<br />
 		$sql<br />
 		Referring Page<br />

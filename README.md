@@ -2,6 +2,7 @@
 
 The awesome [Gamingonlinux](https://gamingonlinux.com) news site source code.
 
+Please read first: The entire codebase is probably a mess, it was started years ago and tons needs updating for standards, newer PHP versions etc. It was started as a learning experience for Liam and still is to this day. Remember this before making any smart-arsed comments ;)
 
 ## Requirements
 

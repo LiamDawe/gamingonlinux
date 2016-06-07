@@ -75,12 +75,12 @@ class mysql
 			return $this->last;
 		}
 
-		catch (Exception $e)
+		catch (Exception $error)
 		{
 			$message = '';
 			if (isset($_SESSION) && $_SESSION['user_group'] == 1)
 			{
-				$message = '<br />'.$e->getMessage().'<br />'.$sql;
+				$message = '<br />'.$error->getMessage().'<br />'.$sql;
 			}
 
 			if ($page == NULL)
@@ -88,10 +88,10 @@ class mysql
 				$page = $core->current_page_path();
 			}
 
-			$core->message( $e->getMessage() . "<br>" . $sql );
+			$core->message( $error->getMessage() . "<br>" . $sql );
 
 			$core->message("Something went wrong. The admin will be notified and punished muhahaha for I am an evil overlord...I'm sure I will be fixed soon.$message", NULL, 1);
-			$this->pdo_error($e->getMessage(), $page, $sql, $referrer);
+			$this->pdo_error($error->getMessage(), $page, $sql, $referrer);
 		}
 	}
 

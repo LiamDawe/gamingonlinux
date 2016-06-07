@@ -129,7 +129,7 @@ else
 		}
 
 		// get topic info/make sure it exists
-		$db->sqlquery("SELECT t.*, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.forum_posts, $db_grab_fields f.name as forum_name FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id INNER JOIN `forums` f ON t.forum_id = f.forum_id WHERE t.topic_id = ?", array($_GET['topic_id']), 'viewtopic.php');
+		$db->sqlquery("SELECT t.*, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.forum_posts, $db_grab_fields f.name as forum_name FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id INNER JOIN `forums` f ON t.forum_id = f.forum_id WHERE t.topic_id = ?", array($_GET['topic_id']), 'viewtopic.php');
 		if ($db->num_rows() != 1)
 		{
 			$core->message('That is not a valid forum topic!');
@@ -406,29 +406,7 @@ else
 					$templating->set('username', $into_username . $username);
 
 					// sort out the avatar
-					// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-					if ($topic['avatar_gravatar'] == 1)
-					{
-						$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $topic['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
-					}
-
-					// either uploaded or linked an avatar
-					else if (!empty($topic['avatar']) && $topic['avatar_gravatar'] == 0)
-					{
-						$avatar = $topic['avatar'];
-						if ($topic['avatar_uploaded'] == 1)
-						{
-							$avatar = "/uploads/avatars/{$topic['avatar']}";
-						}
-					}
-
-
-					// else no avatar, then as a fallback use gravatar if they have an email left-over
-					else if (empty($topic['avatar']) && $topic['avatar_gravatar'] == 0)
-					{
-						$avatar = "/uploads/avatars/no_avatar.png";
-					}
-
+					$avatar = $user->sort_avatar($topic);
 					$templating->set('avatar', $avatar);
 
 					$editor_bit = '';
@@ -562,7 +540,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, $db_grab_fields u.forum_posts FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
+					$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
 					while ($post = $db->fetch())
 					{
 						if ($page > 1 && $reply_count == 0)
@@ -612,27 +590,7 @@ else
 
 						$templating->set('username', $into_username . $username);
 
-						$avatar = '';
-						if ($post['avatar_gravatar'] == 1)
-						{
-							$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $post['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
-						}
-
-						else if (!empty($post['avatar']) && $post['avatar_gravatar'] == 0)
-						{
-							$avatar = $post['avatar'];
-							if ($post['avatar_uploaded'] == 1)
-							{
-								$avatar = "/uploads/avatars/{$post['avatar']}";
-							}
-						}
-
-						// else no avatar, then as a fallback use gravatar if they have an email left-over
-						else if (empty($post['avatar']) && $post['avatar_gravatar'] == 0)
-						{
-							$avatar = "/uploads/avatars/no_avatar.png";
-						}
-
+						$avatar = $user->sort_avatar($post);
 						$templating->set('avatar', $avatar);
 
 						$editor_bit = '';

@@ -7,29 +7,42 @@
 		<img src="{:current_avatar}" height="125" width="125" alt="users avatar" />
 	</div>
 </div>
+
 <div class="box">
+	<div class="head">Pick from the gallery</div>
 	<div class="body group">
-		<form method="post" action="/usercp.php?module=avatar" role="form">
-		Here you can use a <a href="https://en.gravatar.com/" target="_blank">Gravatar</a>.<br />
-		Gravatar Email: <input type="text" name="gravatar_email" value="{:gravatar_email}" /><br />
-		<button type="submit" class="btn btn-primary"><i class="icon-globe"></i> Use Gravatar</button>
-		<input type="hidden" name="action" value="Gravatar" />
+		<form action="/usercp.php?module=avatar" method="post">
+			<ul style="list-style: none; padding:5px; margin: 0;">
+				{:avatar_gallery}
+			</ul>
+			<button style="clear: both" name="action" value="gallery">Pick</button>
 		</form>
 	</div>
 </div>
 
 <div class="box">
+	<div class="head">Here you can use a <a href="https://en.gravatar.com/" target="_blank">Gravatar</a></div>
+	<div class="body group">
+		<form method="post" action="/usercp.php?module=avatar" role="form">
+		Gravatar Email: <input type="text" name="gravatar_email" value="{:gravatar_email}" /><br />
+		<button type="submit" name="action" value="Gravatar" class="btn btn-primary"><i class="icon-globe"></i> Use Gravatar</button>
+		</form>
+	</div>
+</div>
+
+<div class="box">
+	<div class="head">Set avatar from an url</div>
 	<div class="body group">
 		<form method="post" action="/usercp.php?module=avatar">
-		Set avatar from an url <input type="text" name="avatar_url" /><br />
+		URL: <input type="text" name="avatar_url" /><br />
 		<button type="submit" class="btn btn-primary"><i class="icon-globe"></i> Change Avatar</button>
 		<input type="hidden" name="action" value="url" />
 		</form>
 	</div>
 </div>
 <div class="box">
+	<div class="head">Upload an avatar</div>
 	<div class="body group">
-		Upload an avatar<br />
 		<form method="post" action="/usercp.php?module=avatar" enctype="multipart/form-data" id="something">
 		<input name="new_image" id="new_image" size="30" type="file" class="form-control" class="button" /><br />
 		<button type="submit" name="action" value="Upload" class="btn btn-primary"><i class="icon-upload"></i> Upload</button>

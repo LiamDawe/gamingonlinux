@@ -12,7 +12,7 @@ if (isset($_GET['user_id']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+	$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 	if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -73,27 +73,7 @@ if (isset($_GET['user_id']))
 			$registered_date = $core->format_date($profile['register_date']);
 			$templating->set('registered_date', $registered_date);
 
-			// if they manually picked gravatar
-			if ($profile['avatar_gravatar'] == 1)
-			{
-				$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $profile['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
-			}
-
-			// either uploaded or linked an avatar
-			else if (!empty($profile['avatar']) && $profile['avatar_gravatar'] == 0)
-			{
-				$avatar = $profile['avatar'];
-				if ($profile['avatar_uploaded'] == 1)
-				{
-					$avatar = "/uploads/avatars/{$profile['avatar']}";
-				}
-			}
-
-			// else no avatar, then as a fallback use gravatar if they have an email left-over
-			else if (empty($profile['avatar']) && $profile['avatar_gravatar'] == 0)
-			{
-				$avatar = "/uploads/avatars/no_avatar.png";
-			}
+			$avatar = $user->sort_avatar($profile);
 
 			$templating->set('avatar', $avatar);
 			$templating->set('article_comments', $profile['comment_count']);

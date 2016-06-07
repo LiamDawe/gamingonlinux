@@ -375,7 +375,7 @@ class user
 					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $avatar['avatar']);
 				}
 
-				$db->sqlquery("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
+				$db->sqlquery("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
 				return true;
 			}
 
@@ -427,5 +427,36 @@ class user
 		{
 			return false;
 		}
+	}
+
+	function sort_avatar($user_data)
+	{
+		if ($user_data['avatar_gravatar'] == 1)
+		{
+			$avatar = 'http://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. core::config('website_url') . '/uploads/avatars/no_avatar.png';
+		}
+
+		else if ($user_data['avatar_gallery'] != NULL)
+		{
+			$avatar = "/uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
+		}
+
+		// either uploaded or linked an avatar
+		else if (!empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0)
+		{
+			$avatar = $user_data['avatar'];
+			if ($user_data['avatar_uploaded'] == 1)
+			{
+				$avatar = "/uploads/avatars/{$user_data['avatar']}";
+			}
+		}
+
+		// else no avatar, then as a fallback use gravatar if they have an email left-over
+		else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
+		{
+			$avatar = "/uploads/avatars/no_avatar.png";
+		}
+
+		return $avatar;
 	}
 }

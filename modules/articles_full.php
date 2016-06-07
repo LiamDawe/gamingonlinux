@@ -22,7 +22,7 @@ if (!isset($_GET['go']))
 		else
 		{
 			// get the article
-			$db->sqlquery("SELECT a.`article_id`, a.`slug`, a.`preview_code`, a.`title`, a.`text`, a.`tagline`, a.`date`, a.`date_submitted`, a.`author_id`, a.`active`, a.`guest_username`, a.`views`, a.`article_top_image`, a.`article_top_image_filename`, a.`tagline_image`, a.`comments_open`, u.`username`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`article_bio`, u.`user_group`, u.`twitter_on_profile` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE a.`article_id` = ?", array($_GET['aid']));
+			$db->sqlquery("SELECT a.`article_id`, a.`slug`, a.`preview_code`, a.`title`, a.`text`, a.`tagline`, a.`date`, a.`date_submitted`, a.`author_id`, a.`active`, a.`guest_username`, a.`views`, a.`article_top_image`, a.`article_top_image_filename`, a.`tagline_image`, a.`comments_open`, u.`username`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`article_bio`, u.`user_group`, u.`twitter_on_profile` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE a.`article_id` = ?", array($_GET['aid']));
 			$article = $db->fetch();
 
 			if ($db->num_rows() == 0)
@@ -246,27 +246,7 @@ if (!isset($_GET['go']))
 				{
 					$templating->block('bio', 'articles_full');
 
-					// sort out the avatar
-					if ($article['avatar_gravatar'] == 1)
-					{
-						$avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . '&size=125';
-					}
-
-					// either uploaded or linked an avatar
-					else if (!empty($article['avatar']) && $article['avatar_gravatar'] == 0)
-					{
-						$avatar = $article['avatar'];
-						if ($article['avatar_uploaded'] == 1)
-						{
-							$avatar = "/uploads/avatars/{$article['avatar']}";
-						}
-					}
-
-					// else no avatar
-					else if (empty($article['avatar']) && $article['avatar_gravatar'] == 0)
-					{
-						$avatar = "/uploads/avatars/no_avatar.png";
-					}
+					$avatar = $user->sort_avatar($article);
 					$templating->set('avatar', $avatar);
 
 					$templating->set('username', $username);
@@ -433,7 +413,7 @@ if (!isset($_GET['go']))
 						$db_grab_fields .= "u.`{$field['db_field']}`,";
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, {$_SESSION['per-page']}", array($_GET['aid'], $core->start));
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, {$_SESSION['per-page']}", array($_GET['aid'], $core->start));
 
 					$comments_get = $db->fetch_all_rows();
 
@@ -481,27 +461,7 @@ if (!isset($_GET['go']))
 						}
 
 						// sort out the avatar
-						// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-						if ($comments['avatar_gravatar'] == 1)
-						{
-							$comment_avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . '&size=125';
-						}
-
-						// either uploaded or linked an avatar
-						if (!empty($comments['avatar']) && $comments['avatar_gravatar'] == 0)
-						{
-							$comment_avatar = $comments['avatar'];
-							if ($comments['avatar_uploaded'] == 1)
-							{
-								$comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-							}
-						}
-
-						// else no avatar, then as a fallback use gravatar if they have an email left-over
-						else if (empty($comments['avatar']) && $comments['avatar_gravatar'] == 0)
-						{
-							$comment_avatar = "/uploads/avatars/no_avatar.png";
-						}
+						$comment_avatar = $user->sort_avatar($comments);
 
 						$editor_bit = '';
 						// check if editor or admin

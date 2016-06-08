@@ -2,6 +2,8 @@
 // TODO
 // ?cc=us for dollars, lets get pounds working first eh boyos!
 
+// With thanks to http://steamsales.rhekua.com/, they explain directly on their website how they do it
+
 echo "Steam Store importer started on " .date('d-m-Y H:m:s'). "\n";
 
 // http://simplehtmldom.sourceforge.net/
@@ -21,7 +23,7 @@ $page = 1;
 $stop = 0;
 $titles = array();
 
-$url = "http://store.steampowered.com/search/?specials=1&os=linux&page=";
+$url = "http://store.steampowered.com/search/?specials=1&os=linux&cc=GB&page=";
 
 do
 {

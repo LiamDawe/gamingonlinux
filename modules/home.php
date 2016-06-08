@@ -105,8 +105,9 @@ if (!isset($_GET['view']))
 
 	$db->sqlquery("SELECT count(article_id) as count FROM `articles` WHERE `show_in_menu` = 1");
 	$featured_ctotal = $db->fetch();
+	
 	// latest news
-	$db->sqlquery("SELECT a.article_id, a.author_id, a.guest_username, a.title, a.tagline, a.text, a.date, a.comment_count, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.show_in_menu, a.slug, u.username  FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 ORDER BY a.`date` DESC LIMIT ?, {$_SESSION['articles-per-page']}", array($core->start));
+	$db->sqlquery("SELECT a.article_id, a.author_id, a.guest_username, a.title, a.tagline, a.text, a.date, a.comment_count, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.show_in_menu, a.slug, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 ORDER BY a.`date` DESC LIMIT ?, {$_SESSION['articles-per-page']}", array($core->start));
 	$articles_get = $db->fetch_all_rows();
 
 	$count_rows = $db->num_rows();

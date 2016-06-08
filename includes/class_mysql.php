@@ -77,12 +77,6 @@ class mysql
 
 		catch (Exception $error)
 		{
-			$message = '';
-			if (isset($_SESSION) && $_SESSION['user_group'] == 1)
-			{
-				$message = '<br />'.$error->getMessage().'<br />'.$sql;
-			}
-
 			if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
 			{
 				$trace = $error->getTrace();

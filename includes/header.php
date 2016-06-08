@@ -32,6 +32,11 @@ define('url', core::config('website_url'));
 include('includes/class_user.php');
 $user = new user();
 
+if (isset($_GET['act']) && $_GET['act'] == 'Logout')
+{
+	$user->logout();
+}
+
 if (!isset($_SESSION['per-page']))
 {
 	$_SESSION['per-page'] = 10;
@@ -149,11 +154,6 @@ $templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" t
 if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'articles_full' || $_GET['module'] == 'articles_full' && isset($_GET['go']))
 {
 	$templating->set('meta_data', '');;
-}
-
-if (isset($_GET['act']) && $_GET['act'] == 'Logout')
-{
-	$user->logout();
 }
 
 if (($core->current_page() == 'admin.php') || (isset($_GET['module']) && $_GET['module'] == 'articles'))

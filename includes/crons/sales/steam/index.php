@@ -7,8 +7,8 @@ echo "Steam Store importer started on " .date('d-m-Y H:m:s'). "\n";
 // http://simplehtmldom.sourceforge.net/
 include('simple_html_dom.php');
 
-//define('path', '/home/gamingonlinux/public_html/');
-define('path', '/mnt/storage/public_html/');
+define('path', '/home/gamingonlinux/public_html/');
+//define('path', '/mnt/storage/public_html/');
 include(path . 'includes/config.php');
 
 include(path . 'includes/class_mysql.php');

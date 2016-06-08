@@ -47,13 +47,13 @@ class user
 
 				if ($remember_username == 1)
 				{
-					setcookie('remember_username', $username,  time()+60*60*24*30, '/', 'gamingonlinux.com');
+					setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
 				}
 
 				if ($stay == 1)
 				{
-					setcookie('gol_stay', $user['user_id'], time()+31556926, '/', 'gamingonlinux.com');
-					setcookie('gol_session', $generated_session, time()+31556926, '/', 'gamingonlinux.com');
+					setcookie('gol_stay', $user['user_id'], time()+31556926, '/', core::config('cookie_domain'));
+					setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
 				}
 
 				return true;
@@ -150,7 +150,7 @@ class user
 		{
 			$device_id = md5(mt_rand() . $user_data['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
-			setcookie('gol-device', $device_id, time()+31556926, '/', 'gamingonlinux.com');
+			setcookie('gol-device', $device_id, time()+31556926, '/', core::config('cookie_domain'));
 
 			if ($user_data['login_emails'] == 1)
 			{

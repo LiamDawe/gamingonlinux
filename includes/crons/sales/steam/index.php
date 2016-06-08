@@ -61,6 +61,13 @@ do
         echo 'Original price: ' . $original_price . '<br />';
         echo 'Price now: ' . $price_now  . '<br />';
 
+        // ADD IT TO THE GAMES DATABASE, FOR FUTURE USE
+        $db->sqlquery("SELECT `name` FROM `game_list` WHERE `name` = ?", array($title));
+        if ($db->num_rows() == 0)
+        {
+          $db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($title));
+        }
+
         // need to check if we already have it to insert it
         // search if that title exists
         $db->sqlquery("SELECT `info` FROM `game_sales` WHERE `info` = ? AND `provider_id` = 1", array($title));

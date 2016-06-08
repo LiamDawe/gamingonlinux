@@ -80,8 +80,6 @@ do {
 			echo "* Price Now: $" . $current_price . "\n";
 
 			// ADD IT TO THE GAMES DATABASE, FOR FUTURE USE
-			$games['title'] = $games['title'];
-
 			$db->sqlquery("SELECT `name`, `local_id` FROM `game_list` WHERE `name` = ?", array($games['title']));
 			$game_list = $db->fetch();
 			if ($db->num_rows() == 0)

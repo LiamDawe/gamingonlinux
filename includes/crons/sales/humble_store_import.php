@@ -75,7 +75,6 @@ do
 
 			if ($use_sale == 1)
 			{
-				/* NOT CURRENTLY USING IT
 				// ADD IT TO THE GAMES DATABASE, FOR FUTURE USE
 				$db->sqlquery("SELECT `local_id`, `name` FROM `game_list` WHERE `name` = ?", array($game->human_name));
 				if ($db->num_rows() == 0)
@@ -83,7 +82,7 @@ do
 					$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->human_name));
 				}
 
-				$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game->human_name));*/
+				$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game->human_name));
 
 				if (isset($game->current_price))
 				{

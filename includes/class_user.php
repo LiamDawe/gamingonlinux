@@ -433,7 +433,7 @@ class user
 	{
 		if ($user_data['avatar_gravatar'] == 1)
 		{
-			$avatar = 'http://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. core::config('website_url') . '/uploads/avatars/no_avatar.png';
+			$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. core::config('website_url') . '/uploads/avatars/no_avatar.png';
 		}
 
 		else if ($user_data['avatar_gallery'] != NULL)

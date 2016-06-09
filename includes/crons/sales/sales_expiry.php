@@ -15,19 +15,8 @@ $removed_counter = 0;
 $games = '';
 $game_ids = array();
 
-$db->sqlquery("SELECT `has_screenshot`,`screenshot_filename` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date));
-$get_all = $db->fetch_all_rows();
-
-foreach($get_all as $sale)
-{
-	if ($sale['has_screenshot'] == 1)
-	{
-		unlink('/home/gamingonlinux/public_html/uploads/sales/' . $sale['screenshot_filename']);
-	}
-}
-
 // remove old sales but keep sales with no date on them
-$db->sqlquery("SELECT `id`, `info`, `list_id` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date), 'sales_expiry.php');
+$db->sqlquery("SELECT `id`, `info`, `list_id` FROM `game_sales` WHERE `expires` <= ? AND `expires` > 0", array(core::$date));
 $removing_now = $db->fetch_all_rows();
 
 foreach ($removing_now as $remove)

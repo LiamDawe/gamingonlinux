@@ -91,8 +91,6 @@ do {
 				$game_list = $db->fetch();
 			}
 
-			$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($games['title']));
-
 			$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `info` = ? AND `provider_id` = 34", array($games['title']));
 
 			// if it does exist, make sure it's not from GOG already

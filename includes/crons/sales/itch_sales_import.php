@@ -72,8 +72,6 @@ foreach ($xml->item as $game)
 			$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->plainTitle));
 		}
 
-		$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game->plainTitle));
-
 		echo "* Starting import of ".$game->plainTitle."\n";
 
 		echo "\n Linux: {$game->{'platforms'}->linux}, Windows: {$game->{'platforms'}->windows}, Mac: {$game->{'platforms'}->mac}\n\n";

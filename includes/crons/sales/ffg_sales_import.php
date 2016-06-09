@@ -107,8 +107,6 @@ foreach($products as $product)
 			$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($product->title));
 		}
 
-		$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($product->title));
-
 		$ok_to_import = true;
 		$db->sqlquery("SELECT `info`, `provider_id`, `accepted` FROM `game_sales` WHERE `info` = ?", array($product->title));
 		if ($db->num_rows() >= 1)

@@ -69,8 +69,6 @@ foreach ($xml->channel->item as $game)
 			$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->{'title'}));
 		}
 
-		$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game->{'title'}));
-
 		if ($game->{'discountpercent'} != 0)
 		{
 			//for testing output

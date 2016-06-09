@@ -82,8 +82,6 @@ do
 					$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->human_name));
 				}
 
-				$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game->human_name));
-
 				if (isset($game->current_price))
 				{
 					if ($game->current_price[0] != $game->full_price[0])

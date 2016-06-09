@@ -91,8 +91,6 @@ foreach ($xml->group->o as $game)
 			$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->{'name'}));
 		}
 
-		$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($game->{'name'}));
-
 		// search if that title exists
 		$db->sqlquery("SELECT `info`, `provider_id` FROM `game_sales` WHERE `info` = ?", array($game->{'name'}), 'gamesrepublic_import.php');
 

@@ -67,8 +67,6 @@ foreach ($xml->item as $game)
 		$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($new_title));
 	}
 
-	$db->sqlquery("UPDATE `game_list` SET `on_sale` = 1 WHERE `name` = ?", array($new_title));
-
 	// they are cet (UTC+1), so add one hour, but they also use CEST in summer, because they are idiots and take their system timestamps, not UTC
 	$date = new DateTime(null, new DateTimeZone('Europe/Stockholm'));
 	$cet = ($date->getTimestamp()+ $date->getOffset()).'<br />'."\r\n";

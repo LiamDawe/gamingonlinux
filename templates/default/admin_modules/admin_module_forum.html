@@ -230,13 +230,11 @@
 [/block: reply_top]
 
 [block: topic]
+				<a href="{:topic_link}"><strong>{:topic_title}</strong></a> {:post_date}
 				<div class="box">
 				<div class="body group">
 				Reported by {:reporter}<br />
 					<table class="table table-bordered">
-					<thead>
-						<th class="alert alert-info no-bottom-margin no-rounded-corners" colspan="2"><strong>{:topic_title}</strong> {:topic_date}</th>
-					</thead>
 					<tbody>
 					<tr>
 					<td valign="top" width="120px">
@@ -247,7 +245,7 @@
 						{:post_text}<br />
 					</td>
 					</tr>
-					</tbody> 
+					</tbody>
 					</table>
 
 				<form method="post" action="">
@@ -258,13 +256,11 @@
 [/block: topic]
 
 [block: reply]
+				<a href="{:topic_link}"><strong>{:topic_title}</strong></a> {:post_date}
 				<div class="box">
 				<div class="body group">
 				Reported by {:reporter}<br />
 					<table class="table table-bordered">
-					<thead>
-						<th class="alert alert-info no-bottom-margin no-rounded-corners" colspan="2"><strong>{:topic_title}</strong> {:post_date}</th>
-					</thead>
 					<tbody>
 					<tr>
 					<td valign="top" width="120px">
@@ -275,7 +271,7 @@
 						{:post_text}<br />
 					</td>
 					</tr>
-					</tbody> 
+					</tbody>
 					</table>
 
 				<form method="post" action="">

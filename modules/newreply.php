@@ -219,6 +219,9 @@ if (core::config('forum_posting_open') == 1)
 						}
 					}
 
+					// help stop double postings
+					unset($message);
+
 					if (core::config('pretty_urls') == 1)
 					{
 						header("Location: /forum/topic/{$topic_id}?page={$postPage}#r{$post_id}");

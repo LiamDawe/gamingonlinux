@@ -135,7 +135,7 @@
 		<input type="checkbox" class="ays-ignore" name="emails" {:subscribe_email_check} /> <strong>Receive comment replies via email?</strong>
 		</label>
 		<input type="hidden" name="aid" value="{:aid}" />
-		<button type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button>
+		<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button>
 	</div>
 </div>
 </form>

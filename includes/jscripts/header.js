@@ -37,6 +37,10 @@ jQuery.fn.highlight = function () {
     });
 }
 
+function disableFunction() {
+    document.getElementById("send").disabled = 'true';
+}
+
 function resetFormElement(e)
 {
   e.wrap('<form>').closest('form').get(0).reset();

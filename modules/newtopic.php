@@ -107,6 +107,22 @@ if (core::config('forum_posting_open') == 1)
 
 		$templating->block('top', 'newtopic');
 
+		$cat_options = '';
+		$db->sqlquery("SELECT `name`, `forum_id` FROM `forums` WHERE `is_category` = 0");
+		while ($cats = $db->fetch())
+		{
+			$selected = '';
+			if (isset($_GET['forum_id']))
+			{
+				if ($_GET['forum_id'] == $cats['forum_id'])
+				{
+					$selected = 'selected';
+				}
+			}
+			$cat_options .= '<option value="'.$cats['forum_id'].'" '.$selected.'>'.$cats['name'].'</option>';
+		}
+		$templating->set('category_options', $cat_options);
+
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{
 			$core->editor('text', $text, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
@@ -175,7 +191,7 @@ if (core::config('forum_posting_open') == 1)
 				}
 
 				// add the topic
-				$db->sqlquery("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($forum_id, $author, $title, $message, core::$date, core::$date, $author, $approved));
+				$db->sqlquery("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($_POST['category'], $author, $title, $message, core::$date, core::$date, $author, $approved));
 				$topic_id = $db->grab_id();
 
 				// update forums post counter and last post info
@@ -241,7 +257,7 @@ if (core::config('forum_posting_open') == 1)
 				{
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `topic_id` = ?, `mod_queue` = 1", array("A new forum topic was added to the moderation queue", core::$date, $topic_id));
 
-					header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id=$forum_id&message=queue");
+					header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id={$_POST['category']}&message=queue");
 				}
 			}
 		}

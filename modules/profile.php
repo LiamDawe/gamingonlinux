@@ -264,18 +264,11 @@ if (isset($_GET['user_id']))
 				$date = $core->format_date($comments['time_posted']);
 				$title = $comments['title'];
 
-
-				$db->sqlquery("SELECT `comment_id` FROM `articles_comments` WHERE `article_id` = ? AND `comment_id` <= ?", array($comments['article_id'], $comments['comment_id']));
-				$counter = $db->num_rows();
-				$page = ceil($counter / 10);
-
 				$comment_posts .= "<li class=\"list-group-item\">
-			<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#r{$comments['comment_id']}\">{$title}</a>
+			<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">{$title}</a>
 			<div>".substr(strip_tags(bbcode($comments['comment_text'])), 0, 63)."&hellip;</div>
 			<small>{$date}</small>
 		</li>";
-
-
 			}
 
 			$templating->set('comment_posts', $comment_posts);

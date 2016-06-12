@@ -3,6 +3,10 @@ $templating->merge('admin_modules/admin_module_featured');
 
 if (isset($_GET['message']))
 {
+	if ($_GET['message'] == 'accepted')
+	{
+		$core->message('The article has been published! You set it as an editors pick so it needs a featured banner uploaded here.');
+	}
 	if ($_GET['message'] == 'added')
 	{
 		$core->message('Added that carousel item!');

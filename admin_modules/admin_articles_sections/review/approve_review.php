@@ -67,7 +67,7 @@ else
 		header("Location: admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttitle&self={$_POST['submit_as_self']}&temp_tagline=$temp_tagline");
 	}
 
-	else if (isset($_POST['show_block']) && $editor_pick_count == 3)
+	else if (isset($_POST['show_block']) && $editor_pick_count == core::config('editor_picks_limit'))
 	{
 		$_SESSION['atitle'] = $_POST['title'];
 		$_SESSION['atagline'] = $_POST['tagline'];
@@ -201,7 +201,30 @@ else
 
 		include(core::config('path') . 'includes/telegram_poster.php');
 
-		telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $_POST['article_id']);
-		header("Location: /admin.php?module=reviewqueue&accepted");
+		if (core::config('pretty_urls') == 1 && !isset($_POST['show_block']))
+		{
+			$telegram_url = core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $_POST['article_id'];
+			header("Location: " . $telegram_url);
+		}
+		else if (core::config('pretty_urls') == 1 && isset($_POST['show_block']))
+		{
+			$telegram_url = core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $_POST['article_id'];
+			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}&message=accepted");
+		}
+		else
+		{
+			if (!isset($_POST['show_block']))
+			{
+				$telegram_url = core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}";
+				header("Location: " . $telegram_url);
+			}
+			else
+			{
+				$telegram_url = core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}";
+				header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}&message=accepted");
+			}
+		}
+
+		telegram($title . ' ' . $telegram_url);
 	}
 }

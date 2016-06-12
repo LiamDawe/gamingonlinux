@@ -111,7 +111,7 @@ else if (strlen($_POST['title']) < 10)
 }
 
 // if they try to make it an editor pick, and there's too many already
-else if (isset($_POST['show_block']) && $editor_pick_count == 3)
+else if (isset($_POST['show_block']) && $editor_pick_count == core::config('editor_picks_limit'))
 {
 	$_SESSION['atitle'] = $_POST['title'];
 	$_SESSION['aslug'] = $slug;

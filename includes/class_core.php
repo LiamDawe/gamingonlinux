@@ -673,12 +673,30 @@ class core
 	{
 		global $db, $config;
 
+		if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 4)
+		{
+			return 'nofile';
+		}
+
+		$allowed =  array('gif', 'png' ,'jpg');
+		$filename = $_FILES['new_image']['name'];
+		$ext = pathinfo($filename, PATHINFO_EXTENSION);
+		if(!in_array($ext,$allowed) )
+		{
+    	return 'filetype';
+		}
+
+		// this will make sure it is an image file, if it cant get an image size then its not an image
+		if (!getimagesize($_FILES['new_image']['tmp_name']))
+		{
+			return 'filetype';
+		}
+
 		if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 0)
 		{
 			if (!@fopen($_FILES['new_image']['tmp_name'], 'r'))
 			{
-				$this->error_message = "Could not find image, did you select one to upload?";
-				return false;
+				return 'nofile';
 			}
 
 			else
@@ -702,8 +720,7 @@ class core
 					list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
 					if ($width != $config['carousel_image_width'] || $height != $config['carousel_image_height'])
 					{
-						$this->error_message = 'It was not the correct size!';
-						return false;
+						return 'dimensions';
 					}
 				}
 
@@ -721,8 +738,7 @@ class core
 					// cannot compress gifs so it's just too big
 					else if( $image_type == IMAGETYPE_GIF )
 					{
-						$this->error_message = 'File size too big! The max is 300kb, try to use some more compression on it, or find another image.';
-						return false;
+						return 'File size too big! The max is 300kb, try to use some more compression on it, or find another image.';
 					}
 
 					else if( $image_type == IMAGETYPE_PNG )
@@ -747,25 +763,16 @@ class core
 							// still too big
 							if (filesize($_FILES['new_image']['tmp_name']) > 305900)
 							{
-								$this->error_message = 'File size too big! The max is 300kb, try to use some more compression on it, or find another image. The image you used is ' . filesize($_FILES['new_image']['tmp_name']);
-								return false;
+								return 'toobig';
 							}
 						}
 
 						// gif so can't reduce it
 						else
 						{
-							$this->error_message = 'File size too big! The max is 300kb, try to use some more compression on it, or find another image. The image you used is ' . filesize($_FILES['new_image']['tmp_name']);
-							return false;
+							return 'toobig';
 						}
 					}
-				}
-
-				// this will make sure it is an image file, if it cant get an image size then its not an image
-				if (!getimagesize($_FILES['new_image']['tmp_name']))
-				{
-					$this->error_message = 'Not an image!';
-					return false;
 				}
 			}
 
@@ -814,8 +821,7 @@ class core
 
 			else
 			{
-				$this->error_message = 'Could not upload file!';
-				return false;
+				return 'cantmove';
 			}
 
 			return true;

@@ -1,22 +1,57 @@
 <?php
 $templating->merge('admin_modules/admin_module_featured');
 
+if (isset($_GET['message']))
+{
+	if ($_GET['message'] == 'added')
+	{
+		$core->message('Added that carousel item!');
+	}
+
+	if ($_GET['message'] == 'empty')
+	{
+		$core->message('You must fill out all fields!', 1, NULL);
+	}
+
+	if ($_GET['message'] == 'nofile')
+	{
+		$core->message("No file was selected to upload!", NULL, 1);
+	}
+
+	if ($_GET['message'] == 'filetype')
+	{
+		$core->message("You can only upload gif jpg and png files for featured images.", NULL, 1);
+	}
+
+	if ($_GET['message'] == 'dimensions')
+	{
+		$core->message('It was not the correct size!', NULL, 1);
+	}
+
+	if ($_GET['message'] == 'toobig')
+	{
+		$core->message('File size too big! The max is 300kb, try to use some more compression on it, or find another image.', NULL, 1);
+	}
+
+	if ($_GET['message'] == 'cantmove')
+	{
+		$core->message('Could not upload file! Upload folders may not have correct permissions.', NULL, 1);
+	}
+	if ($_GET['message'] == 'edited')
+	{
+		$core->message('You edited that carousel item!');
+	}
+
+	if ($_GET['message'] == 'deleted')
+	{
+		$core->message('You have deleted that carousel item!');
+	}
+}
+
 if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'add')
 	{
-		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'added')
-			{
-				$core->message('Added that carousel item!');
-			}
-
-			if ($_GET['message'] == 'empty')
-			{
-				$core->message('You must fill out all fields!', 1, NULL);
-			}
-		}
 		$templating->block('add', 'admin_modules/admin_module_featured');
 		$templating->set('max_width', $config['carousel_image_width']);
 		$templating->set('max_height', $config['carousel_image_height']);
@@ -59,19 +94,6 @@ if (isset($_GET['view']))
 
 	if ($_GET['view'] == 'manage')
 	{
-		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'edited')
-			{
-				$core->message('You edited that carousel item!');
-			}
-
-			if ($_GET['message'] == 'deleted')
-			{
-				$core->message('You have deleted that carousel item!');
-			}
-		}
-
 		$templating->block('manage_top', 'admin_modules/admin_module_featured');
 
 		$db->sqlquery("SELECT `featured_image`, `title`, `article_id` FROM `articles` WHERE `show_in_menu` = 1");
@@ -105,20 +127,20 @@ if (isset($_POST['act']))
 		}
 		else
 		{
-			$core->message($core->error_message, NULL, 1);
+			header("Location: /admin.php?module=featured&view=manage&message=$upload");
 		}
-
 	}
 
 	if ($_POST['act'] == 'edit')
 	{
-		if ($core->carousel_image($_POST['article_id']) == true)
+		$upload = $core->carousel_image($_POST['article_id']);
+		if ($upload === true)
 		{
 			header("Location: /admin.php?module=featured&view=manage&message=edited");
 		}
 		else
 		{
-			$core->message($core->error_message, NULL, 1);
+			header("Location: /admin.php?module=featured&view=manage&message=$upload");
 		}
 	}
 

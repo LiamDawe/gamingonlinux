@@ -94,9 +94,9 @@ if (!empty($article['tagline_image']))
 }
 if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 {
-	$top_image_nobbcode = "<img src=\"{$config['path']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\">";
-	$top_image = "<img src=\"{$config['path']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-	BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
+	$top_image_nobbcode = '<img src="' . core::config('website_url') . 'uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name'] . '" alt="[articleimage]">';
+	$top_image = '<img src="' . core::config('website_url') . 'uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name'] . '" alt="[articleimage]" class="imgList"><br />
+	BBCode: <input type="text" class="form-control input-sm" value="[img]tagline-image[/img]" /><br />';
 }
 
 if (isset($article))

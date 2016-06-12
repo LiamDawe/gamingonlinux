@@ -95,9 +95,9 @@ class mysql
 		return $this->last->fetch();
 	}
 
-	public function fetch_all_rows()
+	public function fetch_all_rows($mode = NULL)
 	{
-		return $this->last->fetch_all_rows();
+		return $this->last->fetch_all_rows($mode);
 	}
 
 	public function num_rows()
@@ -183,10 +183,10 @@ class db_result implements ArrayAccess,Iterator
 		return $this->statement->fetch();
 	}
 
-	public function fetch_all_rows()
+	public function fetch_all_rows($mode)
 	{
 		if (!isset($this->data)){
-			$this->data = $this->statement->fetchAll();;
+			$this->data = $this->statement->fetchAll($mode);
 		}
 		return $this->data;
 	}

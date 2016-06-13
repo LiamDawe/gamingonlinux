@@ -818,7 +818,7 @@ else if (isset($_GET['go']))
 					$title = $db->fetch();
 					$title_nice = $core->nice_title($title['title']);
 
-					if ($title['comments_open'] == 0)
+					if ($title['comments_open'] == 0 && $user->check_group(1,2) == false)
 					{
 						if (core::config('pretty_urls') == 1)
 						{

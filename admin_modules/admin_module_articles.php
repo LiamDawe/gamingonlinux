@@ -95,6 +95,7 @@ if (isset($_GET['view']))
 			$title = $_SESSION['atitle'];
 			$tagline = $_SESSION['atagline'];
 			$text = $_SESSION['atext'];
+			$slug = $_SESSION['aslug'];
 
 			if ($_GET['temp_tagline'] == 1)
 			{
@@ -131,6 +132,7 @@ if (isset($_GET['view']))
 		$templating->set('temp_tagline_image', $temp_tagline_image);
 
 		$templating->set('title', $title);
+		$templating->set('slug', $slug);
 		$templating->set('tagline', $tagline);
 		$templating->set('text', $text);
 

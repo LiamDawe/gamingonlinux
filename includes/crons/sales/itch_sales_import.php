@@ -1,7 +1,8 @@
 <?php
 echo "Itch importer started on " .date('d-m-Y H:m:s'). "\n";
 
-define('path', '/home/gamingonlinux/public_html/');
+//define('path', '/home/gamingonlinux/public_html/');
+define('path', '/mnt/storage/public_html/');
 
 include(path . 'includes/config.php');
 
@@ -50,6 +51,7 @@ foreach ($fetch_config as $config_set)
 
 $games = '';
 $email = 0;
+$new_games = array();
 
 foreach ($xml->item as $game)
 {
@@ -61,18 +63,28 @@ foreach ($xml->item as $game)
 	*/
 
 	$game->plainTitle = html_entity_decode($game->plainTitle, ENT_QUOTES);
+	$title = trim($game->plainTitle);
 
 	// put Operating Systems into an array so we can loop through the Linux ones
 	if ($game->{'platforms'}->linux == 'yes')
 	{
 		// ADD IT TO THE GAMES DATABASE, FOR FUTURE USE
-		$db->sqlquery("SELECT `name` FROM `game_list` WHERE `name` = ?", array($game->plainTitle));
+		$db->sqlquery("SELECT `local_id`, `name` FROM `game_list` WHERE `name` = ?", array($title));
 		if ($db->num_rows() == 0)
 		{
-			$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->plainTitle));
-		}
+			$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($title));
 
-		echo "* Starting import of ".$game->plainTitle."\n";
+			// okay now get the info for it to use later
+			$db->sqlquery("SELECT `local_id`, `name` FROM `game_list` WHERE `name` = ?", array($title));
+			$game_list = $db->fetch();
+		}
+		else
+		{
+			$game_list = $db->fetch();
+		}
+		$new_games[] = $game_list['local_id'];
+
+		echo "* Starting import of ".$title."\n";
 
 		echo "\n Linux: {$game->{'platforms'}->linux}, Windows: {$game->{'platforms'}->windows}, Mac: {$game->{'platforms'}->mac}\n\n";
 
@@ -108,7 +120,7 @@ foreach ($xml->item as $game)
 
 			//for testing output
 			/*
-			echo "Title: ", $game->{'plainTitle'}, "<br />\n";
+			echo "Title: ", $title, "<br />\n";
 			echo "URL: ", $game->{'link'}, "<br />\n";
 			echo "Currency: " . $currency . "<br />\n";
 			echo "Price: $" . $price . "<br />\n";
@@ -116,38 +128,14 @@ foreach ($xml->item as $game)
 			echo "% off: ", $game->{'discountpercent'}, "%<br />\n";
 			echo "<br />==================================================<br />";*/
 
-			$title = $game->{'plainTitle'};
 			$discount = $game->{'discountpercent'};
 
+			// need to check if we already have it to insert it
 			// search if that title exists
-			$db->sqlquery("SELECT `info`, `provider_id` FROM `game_sales` WHERE `info` = ?", array($game->{'plainTitle'}));
+			$db->sqlquery("SELECT `id` FROM `game_sales` WHERE `list_id` = ? AND `provider_id` = 28", array($game_list['local_id']));
 
-			// if it does exist, make sure it's not from indiegamestand already
-			$check = 1;
-			if ($db->num_rows() >= 1)
-			{
-				while ($test = $db->fetch())
-				{
-					if ($test['provider_id'] == 28)
-					{
-						$check = 0;
-						echo "\tI already know about this game, and itch told me about it\n";
-					}
-
-					else
-					{
-						echo "\tI already know about this game, however itch wasn't the one who told me about it\n";
-					}
-				}
-			}
-
-			else
-			{
-				echo "\tI didn't know about this game before.\n";
-			}
-
-			// all checks out - insert into database here
-			if ($check == 1)
+			// if it does exist, make sure it's not from itch already
+			if ($db->num_rows() == 0)
 			{
 				$timestamp = strtotime($game->saleends);
 
@@ -155,7 +143,7 @@ foreach ($xml->item as $game)
 
 				$link  = $game->{'link'} . '?ac=cJLATbQF';
 
-				$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 28, `savings` = ?, `{$currency}` = ?, `{$currency}_original` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = 1", array($title, $link, core::$date, "$discount% off", $price, $price_original, $expires, $game->imageurl));
+				$db->sqlquery("INSERT INTO `game_sales` SET `list_id` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 28, `{$currency}` = ?, `{$currency}_original` = ?, `drmfree` = 1, `expires` = ?", array($game_list['local_id'], $link, core::$date, $price, $price_original, $expires));
 
 				$sale_id = $db->grab_id();
 
@@ -166,17 +154,22 @@ foreach ($xml->item as $game)
 				$email = 1;
 			}
 
-			// if we already have it, just set the price and % off to the current amount (in-case it's different) or if they now have steam/desura keys
+			// if we already have it, just update it
 			else
 			{
+				$current_sale = $db->fetch();
+
 				$timestamp = strtotime($game->saleends);
 
 				$expires = $timestamp;
 
-				$db->sqlquery("UPDATE `game_sales` SET `savings` = ?, `{$currency}` = ?, `{$currency}_original` = ?, `expires` = ?, `imported_image_link` = ?, `drmfree` = 1 WHERE `info` = ? AND `provider_id` = 28", array("$discount% off", $price, $price_original, $expires, $game->imageurl, $title));
+				$db->sqlquery("UPDATE `game_sales` SET `savings` = ?, `{$currency}` = ?, `{$currency}_original` = ?, `expires` = ?, `drmfree` = 1 WHERE `provider_id` = 28 AND id = ?", array("$discount% off", $price, $price_original, $expires, $current_sale['id']));
+
+				echo "Updated {$game->human_name} with the latest information<br />";
 
 				echo "  Updated " .$game->{'plainTitle'} . " with current price and % off.\n";
 			}
+
 		} // end of if not free anyway
 	} //End of if [linux]
 	else

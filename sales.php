@@ -222,31 +222,31 @@ else if (isset($_GET['order']) && $_GET['order'] == 'asc')
 $templating->block('main2', 'sales');
 $templating->set('url', $config['website_url']);
 
-$db->sqlquery("SELECT DISTINCT(`info`) FROM `game_sales`");
+$db->sqlquery("SELECT DISTINCT(`list_id`) FROM `game_sales`");
 $total_count = $db->num_rows();
 
 $templating->set('total_count', $total_count);
 
 // Get the providers jump list
 $provider_jump_list = '';
-$db->sqlquery("SELECT `provider_id`, `name` FROM `game_sales_provider` ORDER BY `name` ASC");
+$db->sqlquery("SELECT `provider_id`, `store_name` FROM `game_sales_provider` ORDER BY `store_name` ASC");
 while ($provider_query = $db->fetch())
 {
 	if (isset($_GET['stores']) && isset($_GET['search']))
 	{
 		if (in_array($provider_query['provider_id'], $_GET['stores']))
 		{
-			$provider_jump_list .= "<option value=\"{$provider_query['provider_id']}\" selected>{$provider_query['name']}</option>";
+			$provider_jump_list .= "<option value=\"{$provider_query['provider_id']}\" selected>{$provider_query['store_name']}</option>";
 		}
 		else
 		{
-			$provider_jump_list .= "<option value=\"{$provider_query['provider_id']}\">{$provider_query['name']}</option>\r\n";
+			$provider_jump_list .= "<option value=\"{$provider_query['provider_id']}\">{$provider_query['store_name']}</option>\r\n";
 		}
 	}
 
 	else
 	{
-		$provider_jump_list .= "<option value=\"{$provider_query['provider_id']}\">{$provider_query['name']}</option>\r\n";
+		$provider_jump_list .= "<option value=\"{$provider_query['provider_id']}\">{$provider_query['store_name']}</option>\r\n";
 	}
 }
 
@@ -259,6 +259,30 @@ $list = '';
 $filter_sql  = '';
 $price_sql = '';
 $stores_sql = '';
+$prices_sql = '';
+
+if ($_SESSION['user_id'] != 0)
+{
+	$db->sqlquery("SELECT `sale_currency` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$currency_select = $db->fetch();
+	if ($currency_select['sale_currency'] == 'pounds')
+	{
+		$prices_sql = 's.pounds, s.pounds_original,';
+	}
+	else if ($currency_select['sale_currency'] == 'dollars')
+	{
+		$prices_sql = 's.dollars, s.dollars_original,';
+	}
+	else if ($currency_select['sale_currency'] == 'euros')
+	{
+		$prices_sql = 's.euros, s.euros_original,';
+	}
+}
+else
+{
+	$prices_sql = 's.pounds, s.pounds_original,';
+}
+
 // do the actual queries
 if (isset($_GET['search']) && $_GET['search'] == 'on')
 {
@@ -358,35 +382,69 @@ if (isset($_GET['search']) && $_GET['search'] == 'on')
 			$stores_sql = "AND s.provider_id IN ($stores)";
 		}
 
-		$db->sqlquery("SELECT s.`id`,s.`info`, s.`website`, s.`date`, s.`provider_id`, s.`drmfree`, s.`pr_key`, s.`steam`, s.savings, s.pwyw, s.beat_average, s.pounds, s.pounds_original, s.dollars, s.dollars_original, s.euros, s.euros_original, s.has_screenshot, s.screenshot_filename, s.`expires`, s.`pre-order`, s.`bundle`, p.`name` FROM `game_sales` s LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id WHERE s.`accepted` = 1  $filter_sql $price_sql $stores_sql ORDER BY s.date $order");
+		$db->sqlquery("SELECT s.`list_id`, s.`id`, s.`website`, s.`date`, s.`provider_id`, s.`drmfree`, s.`pr_key`, s.`steam`, s.savings, s.pwyw, s.beat_average, $prices_sql s.`pre-order`, p.`store_name`, l.`name` FROM `game_sales` s INNER JOIN `game_list` l ON s.`list_id` = l.`local_id` LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id WHERE s.`accepted` = 1  $filter_sql $price_sql $stores_sql ORDER BY s.date $order");
 	}
 }
 
 else if (!isset($_GET['search']) && !isset($_GET['sale_id']))
 {
-	$db->sqlquery("SELECT s.`id`,s.`info`, s.`website`, s.`date`, s.`provider_id`, s.`pr_key`, s.`drmfree`, s.`steam`, s.savings, s.pwyw, s.beat_average, s.`pounds`,s.pounds_original, s.dollars,s.dollars_original, s.euros,s.euros_original, s.has_screenshot, s.screenshot_filename, s.`expires`, s.`pre-order`, s.`bundle`, p.`name` FROM `game_sales` s LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id WHERE s.`accepted` = 1 ORDER BY s.id $order");
+	$db->sqlquery("SELECT s.`list_id`, s.`id`, s.`website`, s.`date`, s.`provider_id`, s.`drmfree`, s.`pr_key`, s.`steam`, s.savings, s.pwyw, s.beat_average, $prices_sql s.`pre-order`, p.`store_name`, l.`name` FROM `game_sales` s INNER JOIN `game_list` l ON s.`list_id` = l.`local_id` LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id WHERE s.`accepted` = 1 ORDER BY s.id $order");
 }
-
+/* TO FIX UP FOR NEW SYSTEM
 else if (!isset($_GET['search']) && isset($_GET['sale_id']))
 {
 	$db->sqlquery("SELECT s.`id`,s.`info`, s.`website`, s.`date`, s.`provider_id`, s.`pr_key`, s.`drmfree`, s.`steam`, s.savings, s.pwyw, s.beat_average, s.`pounds`,s.pounds_original, s.dollars,s.dollars_original, s.euros,s.euros_original, s.has_screenshot, s.screenshot_filename, s.`expires`, s.`pre-order`, s.`bundle`, p.`name` FROM `game_sales` s LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id WHERE s.`accepted` = 1 AND s.id = ?", array($_GET['sale_id']));
-}
+}*/
 
-$count = $db->num_rows();
-
-$counter = 0;
+$sales_list = array();
 
 while ($list = $db->fetch())
 {
-	$counter++;
+	$symbol = '';
+	$symbol_euro = '';
+	if ($currency_select['sale_currency'] == 'pounds')
+	{
+		$price = $list['pounds'];
+		$original_price = $list['pounds_original'];
+		$symbol = '£';
+	}
+	else if ($currency_select['sale_currency'] == 'dollars')
+	{
+		$price = $list['dollars'];
+		$original_price = $list['dollars_original'];
+		$symbol = '$';
+	}
+	else if ($currency_select['sale_currency'] == 'euros')
+	{
+		$price = $list['euros'];
+		$original_price = $list['euros_original'];
+		$symbol_euro = '€';
+	}
 
+	// sort out the proper array of data
+	$sales_list[$list['name']][] = array('id' => $list['list_id'], 'store' => $list['store_name'], 'website' => $list['website'], 'price' => $price, 'original_price' => $original_price, 'drmfree' => $list['drmfree']);
+}
+
+foreach ($sales_list as $key => $sales)
+{
+	$actual_sales = '';
+	foreach ($sales as $sale)
+	{
+		$badge_colour = 'blue';
+		if ($sale['store'] == 'Steam')
+		{
+			$badge_colour = 'black';
+		}
+		$actual_sales .= '<a href="'.$sale['website'].'"><span class="badge '.$badge_colour.'">'. $sale['store'] . '</span> <strike>' . $symbol . $sale['original_price'] . $symbol_euro . '</strike> ' . $sale['price'] . $symbol_euro . ' </a>';
+	}
 	$templating->block('row', 'sales');
+	$templating->set('actual_sales', $actual_sales);
 
 	// check to see if we need to put in the category name or not
 	$provider = '';
 	if ($list['provider_id'] != 0)
 	{
-		$provider = $list['name'];
+		$provider = $list['store_name'];
 	}
 
 	$templating->set('provider', $provider);
@@ -459,90 +517,7 @@ while ($list = $db->fetch())
 		{
 			$savings_euros = "<span class=\"badge blue\">{$list['savings']}</span>";
 		}
-
-		if ($list['pounds_original'] == 0)
-		{
-			$templating->set('pounds_original', '');
-		}
-
-		else
-		{
-			$templating->set('pounds_original', '<strike>£' . $list['pounds_original'] . '</strike><br />');
-		}
-
-		if ($list['pounds'] == 0)
-		{
-			if ($list['pounds_original'] == 0)
-			{
-				$templating->set('pounds', '');
-			}
-
-			else
-			{
-				$templating->set('pounds', '£0.00<br />' . $savings_pounds);
-			}
-		}
-		else
-		{
-			$templating->set('pounds', '£' . $list['pounds'] . '<br />' . $savings_pounds);
-		}
-
-		if ($list['dollars_original'] == 0)
-		{
-			$templating->set('dollars_original', '');
-		}
-		else
-		{
-			$templating->set('dollars_original', '<strike>$' . $list['dollars_original'] . '</strike><br />');
-		}
-
-		if ($list['dollars'] == 0)
-		{
-			if ($list['dollars_original'] == 0)
-			{
-				$templating->set('dollars', '');
-			}
-
-			else
-			{
-				$templating->set('dollars', '$0.00<br />' . $savings_dollars);
-			}
-		}
-		else
-		{
-			$templating->set('dollars', '$' . $list['dollars'] . '<br />' . $savings_dollars);
-		}
-
-		if ($list['euros_original'] == 0)
-		{
-			$templating->set('euros_original', '');
-		}
-		else
-		{
-			$templating->set('euros_original', '<strike>' . $list['euros_original'] . '€</strike><br />');
-		}
-
-		if ($list['euros'] == 0)
-		{
-			if ($list['euros_original'] == 0)
-			{
-				$templating->set('euros', '');
-			}
-
-			else
-			{
-				$templating->set('euros', '0.00€<br />' . $savings_euros);
-			}
-		}
-		else
-		{
-			$templating->set('euros', $list['euros'] . '€' . '<br />' . $savings_euros);
-		}
 	}
-
-	$templating->set('pound_plain', $list['pounds']);
-	$templating->set('dollar_plain', $list['dollars']);
-	$templating->set('euro_plain', $list['euros']);
 
 	// give an edit link if editor or admin
 	$edit_link = '';
@@ -574,34 +549,7 @@ while ($list = $db->fetch())
 
 	$templating->set('sale_id', $list['id']);
 
-	$website = $list['website'];
-	if ($list['provider_id'] == 1 && $list['bundle'] == 1)
-	{
-		$steam_appid = filter_var($list['website'], FILTER_SANITIZE_NUMBER_INT);
-		$website = "http://store.steampowsiered.com/sub/{$steam_appid}/";
-	}
-	$info = "<a href=\"{$website}\" target=\"_blank\">" . $list['info'] . "</a>";
-
-	$templating->set('info', $info);
-	$templating->set('name', $list['info']);
-
-	$expires = '';
-	if ($list['expires'] > 0)
-	{
-		$expires = $core->getRemaining(core::$date, $list['expires']);
-	}
-	$templating->set('expires', $expires);
-
-	// if there is no expire time, set it really high so they are displayed after games with an expire time
-	if ($list['expires'] == 0)
-	{
-		$expire_data = 99999999999;
-	}
-	else
-	{
-		$expire_data = $list['expires'];
-	}
-	$templating->set('expire_time', $expire_data);
+	$templating->set('game_name', $key);
 
 	$preorder = '';
 	$drmfree = '';
@@ -645,18 +593,10 @@ while ($list = $db->fetch())
 	$templating->set('bundle_check', $bundle);
 	$templating->set('affiliate', $affiliate);
 }
-
+//echo '<pre>';
+//print_r($sales_list);
+//echo '</pre>';
 $templating->block('bottom', 'sales');
-$templating->set('url', $config['website_url']);
-
-// get providers
-$providers_list = '';
-$db->sqlquery("SELECT `provider_id`, `name` FROM `game_sales_provider` ORDER BY `name` ASC");
-while ($providers = $db->fetch())
-{
-	$providers_list .= "<option value=\"{$providers['provider_id']}\">{$providers['name']}</option>";
-}
-
-$templating->set('providers_list', $providers_list);
+$templating->set('url', core::config('website_url'));
 
 include('includes/footer.php');

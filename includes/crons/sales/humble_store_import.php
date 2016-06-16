@@ -1,8 +1,9 @@
 <?php
 // IF THEY CHANGE THE API URL: F12 in chrome -> network tab, go to the store and click Linux, the url will appear
-echo "Humble Store importer started on " .date('d-m-Y H:m:s'). "\n";
+echo "Humble Store importer started on " . date('d-m-Y H:m:s'). "\n";
 
-define('path', '/home/gamingonlinux/public_html/');
+//define('path', '/home/gamingonlinux/public_html/');
+define('path', '/mnt/storage/public_html/');
 
 include(path . 'includes/config.php');
 
@@ -37,6 +38,8 @@ if ($json == false)
 }
 
 $email = 0;
+
+$new_games = array();
 
 $games = '';
 
@@ -80,7 +83,16 @@ do
 				if ($db->num_rows() == 0)
 				{
 					$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($game->human_name));
+
+					// okay now get the info for it to use later
+					$db->sqlquery("SELECT `local_id`, `name` FROM `game_list` WHERE `name` = ?", array($game->human_name));
+					$game_list = $db->fetch();
 				}
+				else
+				{
+					$game_list = $db->fetch();
+				}
+				$new_games[] = $game_list['local_id'];
 
 				if (isset($game->current_price))
 				{
@@ -110,12 +122,12 @@ do
 
 						// need to check if we already have it to insert it
 						// search if that title exists
-						$db->sqlquery("SELECT `info` FROM `game_sales` WHERE `info` = ? AND `provider_id` = 11", array($game->human_name));
+						$db->sqlquery("SELECT `id` FROM `game_sales` WHERE `list_id` = ? AND `provider_id` = 11", array($game_list['local_id']));
 
 						// if it does exist, make sure it's not from humble already
 						if ($db->num_rows() == 0)
 						{
-							$db->sqlquery("INSERT INTO `game_sales` SET `info` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game->human_name, $website, core::$date, $game->current_price[0], $game->full_price[0], $steam, $drm_free, $sale_end));
+							$db->sqlquery("INSERT INTO `game_sales` SET `list_id` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `steam` = ?, `drmfree` = ?, `expires` = ?", array($game_list['local_id'], $website, core::$date, $game->current_price[0], $game->full_price[0], $steam, $drm_free, $sale_end));
 
 							$sale_id = $db->grab_id();
 
@@ -129,7 +141,9 @@ do
 						// if we already have it, just update it
 						else
 						{
-							$db->sqlquery("UPDATE `game_sales` SET `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 11, `dollars` = ?, `dollars_original` = ?, `steam` = ?, `drmfree` = ?, `expires` = ? WHERE `provider_id` = 11 AND info = ?", array($website, core::$date, $game->current_price[0], $game->full_price[0], $steam, $drm_free, $sale_end, $game->human_name));
+							$current_sale = $db->fetch();
+
+							$db->sqlquery("UPDATE `game_sales` SET `dollars` = ?, `dollars_original` = ?, `expires` = ? WHERE `provider_id` = 11 AND id = ?", array($game->current_price[0], $game->full_price[0], $sale_end, $current_sale['id']));
 
 							echo "Updated {$game->human_name} with the latest information<br />";
 						}

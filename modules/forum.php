@@ -5,149 +5,101 @@ $templating->set_previous('meta_description', 'GamingOnLinux forum', 1);
 $templating->merge('forum');
 $templating->block('top');
 
+// paging for pagination
+if (!isset($_GET['page']) || $_GET['page'] <= 0)
+{
+	$page = 1;
+}
+
+else if (is_numeric($_GET['page']))
+{
+	$page = $_GET['page'];
+}
+
+// get the forum ids this user is actually allowed to view
+$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `can_view` = 1 AND `group_id` IN ( ?, ? ) GROUP BY forum_id ORDER BY f.name ASC", array($_SESSION['user_group'], $_SESSION['secondary_user_group']));
+$forum_ids = $db->fetch_all_rows(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE);
+
+$sql_forum_ids = implode(', ', array_keys($forum_ids));
+
+$templating->block('options');
+$new_topic = '';
+if (isset($_SESSION['activated']))
+{
+	if ($_SESSION['activated'] == 1)
+	{
+		$new_topic = '<form method="post"><button formaction="/index.php?module=newtopic">New Topic</button></form>';
+	}
+}
+$templating->set('new_topic', $new_topic);
+
+$forum_list = '';
+$forum_address = '';
+if (core::config('pretty_urls') == 1)
+{
+	$forum_address = '/forum/';
+}
+else
+{
+	$forum_address = '/index.php?module=viewforum&forum_id=';
+}
+foreach ($forum_ids as $key => $forum)
+{
+	$forum_list .= '<option value="' . $forum_address . $key . '">' . $forum['name'] . '</option>';
+}
+$templating->set('forum_list', $forum_list);
+
+$templating->set('button', $button);
+
+// count how many there is in total
+$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1");
+$total_pages = $db->num_rows();
+
+// sort out the pagination link
+$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/", $page);
+
 $sql = "
 SELECT
-	category.forum_id as CategoryId,
-	category.name as CategoryName,
-	forum.forum_id as ForumId,
-	forum.name as ForumName,
-	forum.parent_id as ForumParent,
-	forum.description as ForumDescription,
-	forum.posts as ForumPosts,
-	forum.last_post_user_id as Forum_last_post_id,
-	forum.last_post_time,
-	forum.last_post_topic_id,
-	users.username,
-	topic.topic_title,
-	topic.replys
+	t.`topic_id`,
+	t.`forum_id`,
+	t.`topic_title`,
+	t.`creation_date`,
+	t.`replys`,
+	t.`views`,
+	t.`last_post_date`,
+	t.`last_post_id`,
+	f.name as forum_name,
+	u.`username`,
+	u2.`username` as username_last,
+	u.`avatar`,
+	u.`avatar_gravatar`,
+	u.`gravatar_email`,
+	u.`avatar_uploaded`,
+	u.`avatar_gallery`
 FROM
-	`forums` category
+	`forum_topics` t
+INNER JOIN
+	`forums` f ON t.forum_id = f.forum_id
+INNER JOIN
+	`users` u ON t.author_id = u.user_id
 LEFT JOIN
-	`forums` forum ON forum.parent_id = category.forum_id
-LEFT JOIN
-	`users` users ON forum.last_post_user_id = users.user_id
-LEFT JOIN
-	`forum_topics` topic ON topic.topic_id = forum.last_post_topic_id
+	`users` u2 ON t.last_post_id = u2.user_id
 WHERE
-	category.is_category = 1
+	t.`approved` = 1
+AND
+	f.forum_id IN ($sql_forum_ids)
 ORDER BY
-	category.order, forum.order";
+	t.`last_post_date`
+DESC LIMIT ?, {$_SESSION['per-page']}";
 
-$query_forums = $db->sqlquery($sql);
+$db->sqlquery($sql, array($core->start));
 
-// start the ids at 0
-$current_category_id = 0;
-$current_forum_id = 0;
-$category_array = array();
-$forum_array = array();
-
-// set the forum array so we can use it later and so we don't have to loop it just yet :)
-while ( $row = $db->fetch($query_forums) )
-{
-	// make an array of categorys
-	if ($current_category_id != $row['CategoryId'])
-	{
-		$category_array[$row['CategoryId']]['id'] = $row['CategoryId'];
-		$category_array[$row['CategoryId']]['name'] = $row['CategoryName'];
-		$current_category_id = $row['CategoryId'];
-	}
-
-	// make an array of forums
-	if ($current_forum_id != $row['ForumId'])
-	{
-		$forum_array[$row['ForumId']]['id'] = $row['ForumId'];
-		$forum_array[$row['ForumId']]['parent'] = $row['ForumParent'];
-		$forum_array[$row['ForumId']]['name'] = $row['ForumName'];
-		$forum_array[$row['ForumId']]['description'] = $row['ForumDescription'];
-		$forum_array[$row['ForumId']]['posts'] = $row['ForumPosts'];
-		$forum_array[$row['ForumId']]['last_post_id'] = $row['Forum_last_post_id'];
-		$forum_array[$row['ForumId']]['last_post_username'] = $row['username'];
-		$forum_array[$row['ForumId']]['last_post_time'] = $row['last_post_time'];
-		$forum_array[$row['ForumId']]['last_post_topic_id'] = $row['last_post_topic_id'];
-		$forum_array[$row['ForumId']]['topic_title'] = $row['topic_title'];
-		$forum_array[$row['ForumId']]['topic_replies'] = $row['replys'];
-	}
-}
-
-foreach ($category_array as $category)
-{
-	$templating->block('category_top');
-	$templating->set('category_name', $category['name']);
-
-	foreach ($forum_array as $forum)
-	{
-		// show this categorys forums
-		if ($forum['parent'] == $category['id'])
-		{
-			$templating->block('forum_row');
-
-			if (core::config('pretty_urls') == 1)
-			{
-				$forum_link = "/forum/" . $forum['id'] . '/';
-			}
-			else {
-				$forum_link = core::config('website_url') . 'index.php?module=viewforum&amp;forum_id=' . $forum['id'];
-			}
-			$templating->set('forum_link', $forum_link);
-
-			$templating->set('forum_name', $forum['name']);
-			$templating->set('forum_description', $forum['description']);
-			$templating->set('forum_posts', $forum['posts']);
-
-			$last_title = '';
-			$last_username = 'No one has posted yet!';
-			$last_post_time = 'Never';
-			if (!empty($forum['last_post_username']))
-			{
-				$post_count = $forum['topic_replies'];
-				// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-				if ($post_count <= $_SESSION['per-page'])
-				{
-					// it will be the first page
-					$postPage = 1;
-					$postNumber = 1;
-				}
-
-				// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-				if ($post_count >= $_SESSION['per-page'])
-				{
-					$rows_per_page = $_SESSION['per-page'];
-
-					// page we are going to
-					$postPage = ceil($post_count / $rows_per_page);
-
-					// the post we are going to
-					$postNumber = (($post_count - 1) % $rows_per_page) + 1;
-				}
-
-				if ($config['pretty_urls'] == 1)
-				{
-					$last_title = "<a href=\"/forum/topic/{$forum['last_post_topic_id']}?page={$postPage}\">{$forum['topic_title']}</a>";
-				}
-				else {
-					$last_title = "<a href=\"index.php?module=viewtopic&amp;topic_id={$forum['last_post_topic_id']}&amp;page={$postPage}\">{$forum['topic_title']}</a>";
-				}
-
-
-				$last_username = "<a href=\"/profiles/{$forum['last_post_id']}\">{$forum['last_post_username']}</a>";
-				$last_post_time = $core->format_date($forum['last_post_time']);
-			}
-			$templating->set('last_post_title', $last_title);
-			$templating->set('last_post_username', $last_username);
-			$templating->set('last_post_time', $last_post_time);
-		}
-	}
-	$templating->block('category_bottom');
-}
-
-$templating->block('latest');
-
-// lastest posts block below forums
-$forum_posts = '';
-$db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit 7");
 while ($topics = $db->fetch())
 {
-	$date = $core->format_date($topics['last_post_date']);
+	$templating->block('topics');
+
+	$last_date = $core->format_date($topics['last_post_date']);
+	$templating->set('tzdate', date('c',$topics['last_post_date']) );
 
 	$post_count = $topics['replys'];
 	// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
@@ -170,8 +122,40 @@ while ($topics = $db->fetch())
 		$postNumber = (($post_count - 1) % $rows_per_page) + 1;
 	}
 
-	$forum_posts .= "<a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\"><i class=\"icon-comment\"></i> {$topics['topic_title']}</a> {$date}<br />";
+	$avatar = $user->sort_avatar($topics);
+
+	if (core::config('pretty_urls') == 1)
+	{
+		$link = "/forum/topic/{$topics['topic_id']}";
+		$last_link = "/forum/topic/{$topics['topic_id']}?page={$postPage}";
+		$profile_link = "/profiles/{$topics['author_id']}";
+		$forum_link = '/forum/' . $topics['forum_id'];
+	}
+	else
+	{
+		$link = "/index.php?module=viewtopic&topic_id={$topics['topic_id']}";
+		$last_link = "/index.php?module=viewtopic&topic_id={$topics['topic_id']}&page={$postPage}";
+		$profile_link = "/index.php?module=profile&user_id={$topics['author_id']}";
+		$forum_link = '/index.php?module=viewforum&forum_id=' . $topics['forum_id'];
+	}
+
+	$templating->set('title', $topics['topic_title']);
+	$templating->set('link', $link);
+	$templating->set('date', $date);
+	$templating->set('views', $topics['views']);
+	$templating->set('replies', $topics['replys']);
+	$templating->set('avatar', $avatar);
+	$templating->set('username', $topics['username']);
+	$templating->set('last_link', $last_link);
+	$templating->set('last_username', $topics['username_last']);
+	$templating->set('last_date', $last_date);
+	$templating->set('forum_name', $topics['forum_name']);
+	$templating->set('forum_link', $forum_link);
 }
 
-$templating->set('forum_posts', $forum_posts);
+$templating->block('options');
+$templating->set('new_topic', $new_topic);
+
+$templating->block('bottom');
+$templating->set('pagination', $pagination);
 ?>

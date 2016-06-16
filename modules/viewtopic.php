@@ -245,6 +245,16 @@ else
 				$templating->set('forum_id', $topic['forum_id']);
 				$templating->set('forum_name', $topic['forum_name']);
 
+				if (core::config('pretty_urls') == 1)
+				{
+					$forum_index = '/forum/';
+				}
+				else
+				{
+					$forum_index = '/index.php?module=forum';
+				}
+				$templating->set('forum_index', $forum_index);
+
 				// check notices
 				$notices = array();
 				if ($topic['is_locked'] == 1)

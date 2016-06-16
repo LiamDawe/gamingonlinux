@@ -839,6 +839,15 @@ ul.social-networks li > a {
 
 /*
  * ------------------------------
+ * Forum
+ * ------------------------------
+ */
+
+.index_avatar{vertical-align:middle; max-width: 50px;}
+.forum-badge a {color: #fff;}
+
+/*
+ * ------------------------------
  * Icons
  * ------------------------------
  */
@@ -1239,6 +1248,8 @@ body.dark {
 }
 /* TABLET/NETBOOK */
 @media only screen and (max-width: 768px) {
+	.last_post{display: none;visibility: hidden;}
+	.index_avatar{display: none;visibility: hidden;}
 	.container {
 		width: 100%;
 	}
@@ -1381,7 +1392,8 @@ body.dark {
 
 }
 /* MOBILE PORTRAIT */
-@media only screen and (max-width: 320px) {
+@media only screen and (max-width: 320px) 
+{
 
 }
 /* LANDSCAPE ORIENTATION */

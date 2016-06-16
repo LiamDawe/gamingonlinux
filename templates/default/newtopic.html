@@ -1,8 +1,8 @@
 [block: main]
 			<!-- new topic page -->
 				<ul class="breadcrumb">
-					<li><a href="/forum/">Forum</a></li>
-					<li><a href="/forum/{:forum_id}/">{:forum_name}</a></li>
+					<li><a href="{:forum_index}">Forum</a></li>
+					{:crumbs}
 					<li class="active">Creating a new topic</li>
 				</ul>
 				<form method="post">
@@ -35,7 +35,7 @@ Topic Title: <input type="text" name="title" /><br />
 [block: bottom]
 						<label>Subscribe to topic to receive replies via email <input type="checkbox" name="subscribe" checked /></label><br />
 						{:options}
-						<button type="submit" name="act" value="Add" formaction="index.php?module=newtopic&amp;forum_id={:forum_id}">Add</button>
+						<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" name="act" value="Add" formaction="index.php?module=newtopic&amp;forum_id={:forum_id}">Add</button>
 					</div>
 				</div>
 			</form>

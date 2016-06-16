@@ -16,7 +16,7 @@ $grab_users = $db->sqlquery("SELECT distro, count(*) as 'total' FROM users WHERE
 $distro_choices = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'Linux Distributions'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'Linux Distributions'));
 
 $new_chart_id = $db->grab_id();
 foreach ($distro_choices as $distro)
@@ -57,7 +57,7 @@ $grab_users = $db->sqlquery("SELECT cpu_vendor, count(*) as 'total' FROM user_pr
 $cpu_vendors = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'CPU Vendor'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'CPU Vendor'));
 
 $new_chart_id = $db->grab_id();
 foreach ($cpu_vendors as $cpu_vendor)
@@ -100,7 +100,7 @@ $grab_users = $db->sqlquery("SELECT gpu_vendor, count(*) as 'total' FROM user_pr
 $gpu_vendors = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'GPU Vendor'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'GPU Vendor'));
 
 $new_chart_id = $db->grab_id();
 foreach ($gpu_vendors as $gpu_vendor)
@@ -143,7 +143,7 @@ $grab_users = $db->sqlquery("SELECT gpu_driver, count(*) as 'total' FROM user_pr
 $gpu_drivers = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'GPU Driver'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'GPU Driver'));
 
 $new_chart_id = $db->grab_id();
 foreach ($gpu_drivers as $gpu_driver)
@@ -186,7 +186,7 @@ $grab_users = $db->sqlquery("SELECT gpu_driver, count(*) as 'total' FROM user_pr
 $gpu_drivers_nvidia = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'GPU Driver (Nvidia)'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'GPU Driver (Nvidia)'));
 
 $new_chart_id = $db->grab_id();
 foreach ($gpu_drivers_nvidia as $gpu_drivern)
@@ -226,7 +226,7 @@ $grab_users = $db->sqlquery("SELECT gpu_driver, count(*) as 'total' FROM user_pr
 $gpu_drivers_amd = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'GPU Driver (AMD)'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'GPU Driver (AMD)'));
 
 $new_chart_id = $db->grab_id();
 foreach ($gpu_drivers_amd as $gpu_drivera)
@@ -266,7 +266,7 @@ $grab_users = $db->sqlquery("SELECT ram_count, count(*) as 'total' FROM user_pro
 $ram_count = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'RAM'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'RAM'));
 
 $new_chart_id = $db->grab_id();
 foreach ($ram_count as $ram)
@@ -309,7 +309,7 @@ $grab_users = $db->sqlquery("SELECT monitor_count, count(*) as 'total' FROM user
 $monitor_count = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'Monitors'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'Monitors'));
 
 $new_chart_id = $db->grab_id();
 foreach ($monitor_count as $monitors)
@@ -352,7 +352,7 @@ $grab_users = $db->sqlquery("SELECT gaming_machine_type, count(*) as 'total' FRO
 $gaming_machine_type = $db->fetch_all_rows();
 $labels = array();
 
-$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array(1, 'Total Users', 'Main Gaming Machine'));
+$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', 'Main Gaming Machine'));
 
 $new_chart_id = $db->grab_id();
 foreach ($gaming_machine_type as $machine)

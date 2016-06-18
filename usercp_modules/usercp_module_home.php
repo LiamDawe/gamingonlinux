@@ -247,7 +247,7 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('distro_list', $distro_list);
 
-	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$additional = $db->fetch();
 
 	$arc_32 = '';
@@ -344,6 +344,40 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('monitor_options', $monitor_options);
 
+	// Resolution
+	$resolution_options = '';
+	$resolution_selected = '';
+	$resolution_options = array(
+		"800x600",
+		"1024x600",
+		"1024x768",
+		"1152x864",
+		"1280x720",
+		"1280x768",
+		"1280x800",
+		"1280x1024",
+		"1360x768",
+		"1366x768",
+		"1440x900",
+		"1600x900",
+		"1600x1200",
+		"1680x1050",
+		"1920x1080",
+		"1920x1200",
+		"2560x1440",
+		"2560x1600",
+		"3840x2160");
+	foreach ($resolution_options as $res)
+	{
+		if ($res == $additional['resolution'])
+		{
+			$resolution_selected = 'selected';
+		}
+		$resolution_options .= '<option value="'.$res.'" '.$resolution_selected.'>'.$res.'</a>';
+		$resolution_selected = '';
+	}
+	$templating->set('resolution_options', $resolution_options);
+
 	// Type of machine
 	$desktop = '';
 	if ($additional['gaming_machine_type'] == 'Desktop')
@@ -439,6 +473,7 @@ else if (isset($_POST['act']))
 		`gpu_driver` = ?,
 		`ram_count` = ?,
 		`monitor_count` = ?,
+		`resolution` = ?,
 		`gaming_machine_type` = ?,
 		`date_updated` = ?
 		WHERE
@@ -452,6 +487,7 @@ else if (isset($_POST['act']))
 		$_POST['gpu_driver'],
 		$_POST['ram_count'],
 		$_POST['monitor_count'],
+		$_POST['resolution'],
 		$_POST['gaming_machine_type'],
 		gmdate("Y-n-d H:i:s"),
 		$_SESSION['user_id']));

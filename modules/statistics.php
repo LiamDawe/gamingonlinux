@@ -10,86 +10,44 @@ $templating->load('statistics');
 $templating->block('users');
 $templating->set('total_users', core::config('total_users'));
 
-// DISTRIBUTION CHOICE
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'Linux Distributions' ORDER BY `id` DESC LIMIT 1");
-$get_distro_chart = $db->fetch();
+$charts = array(
+  array("name" => "Linux Distributions"),
+  array("name" => "CPU Vendor"),
+  array("name" => "GPU Vendor"),
+  array("name" => "GPU Driver", "order" => "drivers"),
+  array("name" => "GPU Driver (Nvidia)", "order" => "drivers"),
+  array("name" => "GPU Driver (AMD)", "order" => "drivers"),
+  array("name" => "RAM"),
+  array("name" => "Monitors"),
+  array("name" => "Resolution"),
+  array("name" => "Main Gaming Machine")
+);
 
-$distro_chart = $core->stat_chart($get_distro_chart['id']);
+$counter = 0;
 
-$templating->block('info');
-$templating->set('date', $distro_chart['date']);
+foreach($charts as $chart)
+{
+  // DISTRIBUTION CHOICE
+  $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = '{$chart['name']}' ORDER BY `id` DESC LIMIT 1");
+  $get_distro_chart = $db->fetch();
 
-$templating->block('distribution');
-$templating->set('graph', $distro_chart['graph']);
+  $order = '';
+  if (isset($chart['order']))
+  {
+    $order = $chart['order'];
+  }
 
-// CPU VENDOR CHOICE
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'CPU Vendor' ORDER BY `id` DESC LIMIT 1");
-$get_cpu_chart = $db->fetch();
+  $grab_chart = $core->stat_chart($get_distro_chart['id'], $order);
 
-$cpu_chart = $core->stat_chart($get_cpu_chart['id']);
+  // only do this once
+  if ($counter == 0)
+  {
+    $templating->block('info');
+    $templating->set('date', $grab_chart['date']);
+  }
 
-$templating->block('cpu_vendor');
-$templating->set('graph', $cpu_chart['graph']);
-
-// GPU VENDOR
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Vendor' ORDER BY `id` DESC LIMIT 1");
-$get_gpu_chart = $db->fetch();
-
-$gpu_chart = $core->stat_chart($get_gpu_chart['id']);
-
-$templating->block('gpu_vendor');
-$templating->set('graph', $gpu_chart['graph']);
-
-// GPU DRIVER
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver' ORDER BY `id` DESC LIMIT 1");
-$get_gpud_chart = $db->fetch();
-
-$gpud_chart = $core->stat_chart($get_gpud_chart['id'], 'drivers');
-
-$templating->block('gpu_driver');
-$templating->set('graph', $gpud_chart['graph']);
-
-// GPU DRIVER // NVIDIA
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver (Nvidia)' ORDER BY `id` DESC LIMIT 1");
-$get_gpud_chart = $db->fetch();
-
-$gpud_chart = $core->stat_chart($get_gpud_chart['id'], 'drivers');
-
-$templating->block('gpu_drivern');
-$templating->set('graph', $gpud_chart['graph']);
-
-// GPU DRIVER // AMD
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'GPU Driver (AMD)' ORDER BY `id` DESC LIMIT 1");
-$get_gpud_chart = $db->fetch();
-
-$gpud_chart = $core->stat_chart($get_gpud_chart['id'], 'drivers');
-
-$templating->block('gpu_drivera');
-$templating->set('graph', $gpud_chart['graph']);
-
-// RAM
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'RAM' ORDER BY `id` DESC LIMIT 1");
-$get_ram_chart = $db->fetch();
-
-$ram_chart = $core->stat_chart($get_ram_chart['id']);
-
-$templating->block('ram');
-$templating->set('graph', $ram_chart['graph']);
-
-// MONITORS
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'Monitors' ORDER BY `id` DESC LIMIT 1");
-$get_monitor_chart = $db->fetch();
-
-$monitor_chart = $core->stat_chart($get_monitor_chart['id']);
-
-$templating->block('monitors');
-$templating->set('graph', $monitor_chart['graph']);
-
-// MACHINE TYPE
-$db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = 'Main Gaming Machine' ORDER BY `id` DESC LIMIT 1");
-$get_machine = $db->fetch();
-
-$machine_chart = $core->stat_chart($get_machine['id']);
-
-$templating->block('machine');
-$templating->set('graph', $machine_chart['graph']);
+  $templating->block('chart_section');
+  $templating->set('title', $chart['name']);
+  $templating->set('graph', $grab_chart['graph']);
+  $counter++;
+}

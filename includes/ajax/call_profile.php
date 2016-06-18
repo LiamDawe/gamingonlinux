@@ -15,7 +15,7 @@ $templating = new template('default');
 
 if(isset($_GET['user_id']))
 {
-  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
+  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
   if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -105,6 +105,14 @@ if(isset($_GET['user_id']))
         $counter++;
       }
       $templating->set('monitor_count', $monitor_count);
+
+      $resolution = '';
+      if ($grab_fields['resolution'] != NULL && !empty($grab_fields['resolution']))
+      {
+        $resolution = '<li><strong>Resolution:</strong> '.$grab_fields['resolution'].'</li>';
+        $counter++;
+      }
+      $templating->set('resolution', $resolution);
 
       $gaming_machine_type = '';
       if ($grab_fields['gaming_machine_type'] != NULL && !empty($grab_fields['gaming_machine_type']))

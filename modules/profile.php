@@ -141,7 +141,7 @@ if (isset($_GET['user_id']))
 			// additional profile info
 			if ($profile['pc_info_public'] == 1)
 			{
-				$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
+				$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
 
 				$counter = 0;
 				$templating->block('additional');
@@ -210,6 +210,14 @@ if (isset($_GET['user_id']))
 						$counter++;
 					}
 					$templating->set('monitor_count', $monitor_count);
+
+					$resolution = '';
+					if ($additionaldb['resolution'] != NULL && !empty($additionaldb['resolution']))
+					{
+						$resolution = '<li><strong>Resolution:</strong> '.$additionaldb['resolution'].'</li>';
+						$counter++;
+					}
+					$templating->set('resolution', $resolution);
 
 					$gaming_machine_type = '';
 					if ($additionaldb['gaming_machine_type'] != NULL && !empty($additionaldb['gaming_machine_type']))

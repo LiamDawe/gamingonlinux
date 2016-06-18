@@ -1044,20 +1044,29 @@ class core
 		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `charts` WHERE `id` = ?", array($id));
 		$chart_info = $db->fetch();
 
-		// set the right labels to the right data
 		$order_sql = 'd.`data` DESC';
 		if ($order == 'drivers')
 		{
 				$order_sql = "l.name DESC";
 		}
+		if ($chart_info['name'] == "RAM")
+		{
+			$order_sql = "(0 + l.name) DESC";
+		}
 
+		// set the right labels to the right data
 		$labels = array();
 		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
 
 	  foreach ($get_labels as $label_loop)
 	  {
-	      $labels[]['name'] = $label_loop['name'];
+				$label_add = '';
+				if ($chart_info['name'] == 'RAM')
+				{
+					$label_add = 'GB';
+				}
+	      $labels[]['name'] = $label_loop['name'] . $label_add;
 				end($labels);
 				$last_id=key($labels);
 				$labels[$last_id]['total'] = $label_loop['data'];

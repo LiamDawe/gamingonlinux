@@ -18,6 +18,8 @@ $last_login = $core->date - $cutoff;
 
 $charts = array (
   array ("name" => "Linux Distributions", "db_field" => "distro", "table" => 'users'),
+  array ("name" => "Distro Architecture", "db_field" => "what_bits"),
+  array ("name" => "Dual Booting", "db_field" => "dual_boot"),
   array ("name" => "CPU Vendor", "db_field" => "cpu_vendor"),
 	array ("name" => "GPU Vendor", "db_field" => "gpu_vendor"),
 	array ("name" => "GPU Driver", "db_field" => "gpu_driver"),

@@ -247,7 +247,7 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('distro_list', $distro_list);
 
-	$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$additional = $db->fetch();
 
 	$arc_32 = '';
@@ -262,6 +262,27 @@ if (!isset($_POST['act']))
 	}
 	$what_bits_options = '<option value="32bit" ' . $arc_32 . '>32bit</option><option value="64bit" '.$arc_64.'>64bit</option>';
 	$templating->set('what_bits_options', $what_bits_options);
+
+
+
+	$windows = '';
+	$mac = '';
+	$nope = '';
+	if ($additional['dual_boot'] == 'Yes Windows')
+	{
+		$windows = 'selected';
+	}
+	if ($additional['dual_boot'] == 'Yes Mac')
+	{
+		$mac = 'selected';
+	}
+	if ($additional['dual_boot'] == 'No')
+	{
+		$nope = 'selected';
+	}
+
+	$dual_boot_options = '<option value="Yes Windows" '.$windows.'>Yes With Windows</option><option value="Yes Mac" '.$mac.'>Yes With Mac</option><option value="No" '.$nope.'>No</option>';
+	$templating->set('dual_boot_options', $dual_boot_options);
 
 	$intel = '';
 	if ($additional['cpu_vendor'] == 'Intel')
@@ -359,13 +380,16 @@ if (!isset($_POST['act']))
 		"1360x768",
 		"1366x768",
 		"1440x900",
+		"1400x1050",
 		"1600x900",
 		"1600x1200",
 		"1680x1050",
 		"1920x1080",
 		"1920x1200",
+		"2560x1080",
 		"2560x1440",
 		"2560x1600",
+		"3440x1440",
 		"3840x2160");
 	foreach ($resolution_options as $res)
 	{
@@ -466,6 +490,7 @@ else if (isset($_POST['act']))
 		// additional profile fields
 		$sql_additional = "UPDATE `user_profile_info` SET
 		`what_bits` = ?,
+		`dual_boot` = ?,
 		`cpu_vendor` = ?,
 		`cpu_model` = ?,
 		`gpu_vendor` = ?,
@@ -480,6 +505,7 @@ else if (isset($_POST['act']))
 		`user_id` = ?";
 		$db->sqlquery($sql_additional, array(
 		$_POST['what_bits'],
+		$_POST['dual_boot'],
 		$_POST['cpu_vendor'],
 		$_POST['cpu_model'],
 		$_POST['gpu_vendor'],

@@ -12,6 +12,8 @@ $templating->set('total_users', core::config('total_users'));
 
 $charts = array(
   array("name" => "Linux Distributions"),
+  array("name" => "Distro Architecture"),
+  array("name" => "Dual Booting"),
   array("name" => "CPU Vendor"),
   array("name" => "GPU Vendor"),
   array("name" => "GPU Driver", "order" => "drivers"),

@@ -1059,61 +1059,69 @@ class core
 		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
 
-	  foreach ($get_labels as $label_loop)
-	  {
-				$label_add = '';
-				if ($chart_info['name'] == 'RAM')
-				{
-					$label_add = 'GB';
-				}
-	      $labels[]['name'] = $label_loop['name'] . $label_add;
-				end($labels);
-				$last_id=key($labels);
-				$labels[$last_id]['total'] = $label_loop['data'];
-				if ($label_loop['name'] == 'Intel')
-				{
-					$labels[$last_id]['colour'] = "#a6cee3";
-				}
-				if ($label_loop['name'] == 'AMD')
-				{
-					$labels[$last_id]['colour'] = "#e31a1c";
-				}
-				if ($label_loop['name'] == 'Nvidia')
-				{
-					$labels[$last_id]['colour'] = "#33a02c";
-				}
-	  }
+		if ($db->num_rows() > 0)
+		{
+		  foreach ($get_labels as $label_loop)
+		  {
+					$label_add = '';
+					if ($chart_info['name'] == 'RAM')
+					{
+						$label_add = 'GB';
+					}
+		      $labels[]['name'] = $label_loop['name'] . $label_add;
+					end($labels);
+					$last_id=key($labels);
+					$labels[$last_id]['total'] = $label_loop['data'];
+					if ($label_loop['name'] == 'Intel')
+					{
+						$labels[$last_id]['colour'] = "#a6cee3";
+					}
+					if ($label_loop['name'] == 'AMD')
+					{
+						$labels[$last_id]['colour'] = "#e31a1c";
+					}
+					if ($label_loop['name'] == 'Nvidia')
+					{
+						$labels[$last_id]['colour'] = "#33a02c";
+					}
+		  }
 
-		$settings = array('show_tooltips' => false, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
-		$settings['structured_data'] = true;
-		$settings['structure'] = array(
-		'key' => 'name',
-		'value' => 'total',
-		'colour' => 'colour'
-		);
+			$settings = array('show_tooltips' => false, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
+			$settings['structured_data'] = true;
+			$settings['structure'] = array(
+			'key' => 'name',
+			'value' => 'total',
+			'colour' => 'colour'
+			);
 
-		$graph = new SVGGraph(400, 300, $settings);
+			$graph = new SVGGraph(400, 300, $settings);
 
-	  $graph->Values($labels);
+		  $graph->Values($labels);
 
-		$colours = array(
-    '#a6cee3',
-    '#1f78b4',
-    '#b2df8a',
-    '#33a02c',
-    '#fb9a99',
-    '#e31a1c',
-    '#fdbf6f',
-    '#ff7f00',
-		'#cab2d6',
-		'#6a3d9a'
- 		);
- 		$graph->Colours($colours);
+			$colours = array(
+	    '#a6cee3',
+	    '#1f78b4',
+	    '#b2df8a',
+	    '#33a02c',
+	    '#fb9a99',
+	    '#e31a1c',
+	    '#fdbf6f',
+	    '#ff7f00',
+			'#cab2d6',
+			'#6a3d9a'
+	 		);
+	 		$graph->Colours($colours);
 
-	  $get_graph['graph'] = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
-		$get_graph['date'] = $chart_info['generated_date'];
+		  $get_graph['graph'] = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
+			$get_graph['date'] = $chart_info['generated_date'];
 
-		return $get_graph;
+			return $get_graph;
+		}
+		else
+		{
+			$get_graph['graph'] = "Graph not generated yet, please stand by!";
+			return $get_graph;
+		}
 	}
 }
 ?>

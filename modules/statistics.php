@@ -51,5 +51,6 @@ foreach($charts as $chart)
   $templating->block('chart_section');
   $templating->set('title', $chart['name']);
   $templating->set('graph', $grab_chart['graph']);
+  $templating->set('total_users', $grab_chart['total_users_answered']);
   $counter++;
 }

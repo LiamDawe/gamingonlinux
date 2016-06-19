@@ -1061,6 +1061,7 @@ class core
 
 		if ($db->num_rows() > 0)
 		{
+			$get_graph['total_users_answered'] = 0;
 		  foreach ($get_labels as $label_loop)
 		  {
 					$label_add = '';
@@ -1084,6 +1085,7 @@ class core
 					{
 						$labels[$last_id]['colour'] = "#33a02c";
 					}
+					$get_graph['total_users_answered'] = $get_graph['total_users_answered'] + $label_loop['data'];
 		  }
 
 			$settings = array('show_tooltips' => false, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);

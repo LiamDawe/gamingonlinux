@@ -1044,6 +1044,7 @@ class core
 		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `charts` WHERE `id` = ?", array($id));
 		$chart_info = $db->fetch();
 
+		$res_sort = '';
 		$order_sql = 'd.`data` DESC';
 		if ($order == 'drivers')
 		{
@@ -1053,10 +1054,15 @@ class core
 		{
 			$order_sql = "(0 + l.name) DESC";
 		}
+		if ($chart_info['name'] == 'Resolution')
+		{
+			$res_sort = "REPLACE(l.`name`, 'x', '') as name_sort,";
+			$order_sql = "`name_sort` DESC";
+		}
 
 		// set the right labels to the right data
 		$labels = array();
-		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
+		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
 
 		if ($db->num_rows() > 0)

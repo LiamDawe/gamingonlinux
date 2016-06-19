@@ -39,14 +39,8 @@ if (isset($_GET['user_id']))
 			$templating->merge('profile');
 			$templating->block('main');
 
-			$distro = '';
-			if (!empty($profile['distro']) && $profile['distro'] != 'Not Listed')
-			{
-				$distro = "<br />Distribution: <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$profile['distro']}.svg\" alt=\"{$profile['distro']}\" /> {$profile['distro']}";
-			}
-
 			$templating->set('username', $profile['username']);
-			$templating->set('distro', $distro);
+
 
 			$donator_badge = '';
 			if (($profile['secondary_user_group'] == 6 || $profile['secondary_user_group'] == 7) && $profile['user_group'] != 1 && $profile['user_group'] != 2)
@@ -141,19 +135,36 @@ if (isset($_GET['user_id']))
 			// additional profile info
 			if ($profile['pc_info_public'] == 1)
 			{
-				$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
+				$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `dual_boot` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
 
 				$counter = 0;
 				$templating->block('additional');
+
+				$distro = '';
+				if (!empty($profile['distro']) && $profile['distro'] != 'Not Listed')
+				{
+					$distro = "<li><strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$profile['distro']}.svg\" alt=\"{$profile['distro']}\" /> {$profile['distro']}</li>";
+					$counter++;
+				}
+				$templating->set('distro', $distro);
+
 				while ($additionaldb = $db->fetch())
 				{
-					$cpu_arc = '';
+					$dist_arc = '';
 					if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))
 					{
-						$cpu_arc = '<li><strong>CPU Architecture:</strong> '.$additionaldb['what_bits'].'</li>';
+						$dist_arc = '<li><strong>Distribution Architecture:</strong> '.$additionaldb['what_bits'].'</li>';
 						$counter++;
 					}
-					$templating->set('cpu_arc', $cpu_arc);
+					$templating->set('dist_arc', $dist_arc);
+
+					$dual_boot = '';
+					if ($additionaldb['dual_boot'] != NULL && !empty($additionaldb['dual_boot']))
+					{
+						$dual_boot = '<li><strong>Do you dual-boot with a different operating system?</strong> '.$additionaldb['dual_boot'].'</li>';
+						$counter++;
+					}
+					$templating->set('dual_boot', $dual_boot);
 
 					$cpu_vendor = '';
 					if ($additionaldb['cpu_vendor'] != NULL && !empty($additionaldb['cpu_vendor']))

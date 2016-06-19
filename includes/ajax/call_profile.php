@@ -15,7 +15,7 @@ $templating = new template('default');
 
 if(isset($_GET['user_id']))
 {
-  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
+  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, u.`distro`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`dual_boot` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
   if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -42,13 +42,29 @@ if(isset($_GET['user_id']))
 
       $counter = 0;
 
-      $cpu_arc = '';
-      if ($grab_fields['what_bits'] != NULL && !empty($grab_fields['what_bits']))
+      $distro = '';
+      if (!empty($grab_fields['distro']) && $grab_fields['distro'] != 'Not Listed')
       {
-        $cpu_arc = '<li><strong>CPU Architecture:</strong> '.$grab_fields['what_bits'].'</li>';
+        $distro = "<li><strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$grab_fields['distro']}.svg\" alt=\"{$grab_fields['distro']}\" /> {$grab_fields['distro']}</li>";
         $counter++;
       }
-      $templating->set('cpu_arc', $cpu_arc);
+      $templating->set('distro', $distro);
+
+      $dist_arc = '';
+      if ($grab_fields['what_bits'] != NULL && !empty($grab_fields['what_bits']))
+      {
+        $dist_arc = '<li><strong>CPU Architecture:</strong> '.$grab_fields['what_bits'].'</li>';
+        $counter++;
+      }
+      $templating->set('dist_arc', $dist_arc);
+
+      $dual_boot = '';
+      if ($grab_fields['dual_boot'] != NULL && !empty($grab_fields['dual_boot']))
+      {
+        $dual_boot = '<li><strong>Do you dual-boot with a different operating system?</strong> '.$grab_fields['dual_boot'].'</li>';
+        $counter++;
+      }
+      $templating->set('dual_boot', $dual_boot);
 
       $cpu_vendor = '';
       if ($grab_fields['cpu_vendor'] != NULL && !empty($grab_fields['cpu_vendor']))

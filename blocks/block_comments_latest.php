@@ -12,6 +12,7 @@ else {
 }
 $templating->set('latest_link', $latest_link);
 
+$comments_per_page = (isset($_SESSION['per-page'])?$_SESSION['per-page']:20); //Prevent Devide by 0 without session
 $comment_posts = '';
 $db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, a.`title`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 ORDER BY `comment_id` DESC limit 5");
 while ($comments = $db->fetch())
@@ -22,9 +23,9 @@ while ($comments = $db->fetch())
 	$title = $title . '...';
 
 	$page = 1;
-	if ($comments['comment_count'] > $_SESSION['per-page'])
+	if ($comments['comment_count'] > $comments_per_page)
 	{
-		$page = ceil($comments['comment_count']/$_SESSION['per-page']);
+		$page = ceil($comments['comment_count'] / $comments_per_page);
 	}
 
 	$comment_posts .= "<li class=\"list-group-item\">

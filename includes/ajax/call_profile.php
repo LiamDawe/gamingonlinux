@@ -162,7 +162,7 @@ if(isset($_GET['user_id']))
       $edit_link = '';
       if (isset($_GET['user_id']))
       {
-        if ($_SESSION['user_id'] == $_GET['user_id'])
+        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $_GET['user_id'])
         {
           $edit_link = ' | <a href="/usercp.php">Edit your profile</a>';
         }

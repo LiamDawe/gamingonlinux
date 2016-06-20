@@ -366,7 +366,7 @@ if (!isset($_POST['act']))
 	$templating->set('monitor_options', $monitor_options);
 
 	// Resolution
-	$resolution_options = '';
+	$resolution_options_html = '';
 	$resolution_selected = '';
 	$resolution_options = array(
 		"800x600",
@@ -397,10 +397,10 @@ if (!isset($_POST['act']))
 		{
 			$resolution_selected = 'selected';
 		}
-		$resolution_options .= '<option value="'.$res.'" '.$resolution_selected.'>'.$res.'</a>';
+		$resolution_options_html .= '<option value="'.$res.'" '.$resolution_selected.'>'.$res.'</a>';
 		$resolution_selected = '';
 	}
-	$templating->set('resolution_options', $resolution_options);
+	$templating->set('resolution_options', $resolution_options_html);
 
 	// Type of machine
 	$desktop = '';

@@ -37,6 +37,12 @@ if (isset($_GET['user_id']))
 			$templating->set_previous('meta_description', "Viewing {$profile['username']} profile on GamingOnLinux.com", 1);
 
 			$templating->merge('profile');
+
+			if ($_SESSION['user_id'] == $_GET['user_id'])
+			{
+				$templating->block('top');
+			}
+
 			$templating->block('main');
 
 			$templating->set('username', $profile['username']);

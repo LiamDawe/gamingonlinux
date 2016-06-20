@@ -146,6 +146,17 @@ if(isset($_GET['user_id']))
       $templating->set('additional_empty', $additional_empty);
 
       $templating->block('view_full');
+
+      if (core::config('pretty_urls') == 1)
+      {
+        $stats_link = "/users/statistics";
+      }
+      else
+      {
+        $stats_link = "/index.php?module=statistics";
+      }
+      $templating->set('stats_link', $stats_link);
+
       $templating->set('profile_link', $profile_link);
 
       $edit_link = '';

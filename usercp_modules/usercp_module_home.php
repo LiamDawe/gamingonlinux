@@ -17,7 +17,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `per-page`, `articles-per-page`, `pc_info_public`, `twitter_username`, `distro`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `per-page`, `articles-per-page`, `pc_info_public`, `twitter_username`, `distro`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails`, `forum_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
@@ -108,6 +108,20 @@ if (!isset($_POST['act']))
 	$templating->set('profile_fields', $profile_fields_output);
 
 	$templating->set('bio', $usercpcp['article_bio']);
+
+	$normal_set = '';
+	$flat_set = '';
+	if ($usercpcp['forum_type'] == 'normal_forum')
+	{
+		$normal_set = 'selected';
+	}
+	if ($usercpcp['forum_type'] == 'flat_forum')
+	{
+		$flat_set = 'selected';
+	}
+
+	$forum_types = '<option value="normal_forum" '.$normal_set.'>Category view with forums</option><option value="flat_forum" '.$flat_set.'>A list of all topics</option>';
+	$templating->set('forum_types', $forum_types);
 
 	$subscribe_check = '';
 	if ($usercpcp['auto_subscribe'] == 1)
@@ -479,13 +493,20 @@ else if (isset($_POST['act']))
 			$aper_page = $_POST['articles-per-page'];
 		}
 
+		$forum_type_sql = $_POST['forum_type'];
+		if ($_POST['forum_type'] != 'normal_forum' && $_POST['forum_type'] != 'flat_forum')
+		{
+			$forum_type_sql = 'normal_forum';
+		}
+
 		// no nasty html grr
 		$bio = htmlspecialchars($_POST['bio'], ENT_QUOTES);
 
-		$db->sqlquery("UPDATE `users` SET `articles-per-page` = ?, `per-page` = ?, `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ?, `pc_info_public` = ? WHERE `user_id` = ?", array($aper_page, $per_page, $subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $public, $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `users` SET `articles-per-page` = ?, `per-page` = ?, `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ?, `pc_info_public` = ?, `forum_type` = ? WHERE `user_id` = ?", array($aper_page, $per_page, $subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $public, $forum_type_sql, $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;
+		$_SESSION['forum_type'] = $forum_type_sql;
 
 		// additional profile fields
 		$sql_additional = "UPDATE `user_profile_info` SET

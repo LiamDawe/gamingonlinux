@@ -25,6 +25,9 @@
 	<div class="body group">
 		<form method="post" action="{:url}usercp.php?module=home">
 			{:profile_fields}
+			<strong>Forum type</strong><br />
+			<em>What type of forum do you want displayed?</em><br />
+			<select name="forum_type">{:forum_types}</select><br />
 			<strong>Security</strong><br />
 			<label class="checkbox">
 				Get email's when we detect a new device logging in? <input type="checkbox" name="emaillogin" {:email_on_login} />

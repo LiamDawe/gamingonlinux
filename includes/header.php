@@ -64,6 +64,7 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['theme'] = 'light';
 		$_SESSION['per-page'] = 10;
 		$_SESSION['articles-per-page'] = 15;
+		$_SESSION['forum_type'] = 'normal_forum';
 	}
 }
 

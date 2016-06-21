@@ -845,6 +845,9 @@ ul.social-networks li > a {
 
 .index_avatar{vertical-align:middle; max-width: 50px;}
 .forum-badge a {color: #fff;}
+#create-poll{display: none;}
+.poll_button{float: none ;}
+.poll_content{padding: 4px;}
 
 /*
  * ------------------------------
@@ -918,8 +921,6 @@ ul.social-networks li > a {
 .icon.envelope-open {
     background-image: url('../images/comments/envelope-open.svg');
 }
-
-
 
 /*
  * ------------------------------
@@ -1549,9 +1550,6 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 .vote_done {color: white; background-color: green;}
 .dark .vote_done {color: white; background-color: green;}
 .dark #wrap strong {color: black;}
-#create-poll{display: none;}
-.poll_button{float: none ;}
-.poll_content{padding: 4px;}
 .patreon {
 	margin-top: 14px;
 	line-height: 30px;

@@ -1,0 +1,56 @@
+[block: top]
+			<!-- forum page -->
+				<div class="box">
+					<div class="head">Linux Gamers Forum <a href="/forum_rss.php"><img src="/templates/default/images/social/white/rss.svg" alt="" class="fright" width="23px"></a></div>
+				</div>
+
+				<div class="box">
+						<div class="collapse_container">
+							<div class="collapse_header">
+								<span>Click to open search</span>
+							</div>
+							<div class="collapse_content">
+								<form method="get" action="/index.php">
+									<input type="hidden" name="module" value="search_forum" />
+									<input class="ays-ignore" type="text" name="q" /> <br />
+									<button class="btn btn-primary">Search</button><br />
+									<br />
+									<strong>Search Options</strong><br />
+									<label class="checkbox">
+									Title has to include all the searched words? <input type="checkbox" name="strict" {:strict_check} />
+									</label>
+
+								</form>
+							</div>
+						</div>
+				</div>
+
+[/block: top]
+
+[block: options]
+<div class="box">
+	<div class="group">
+		{:new_topic} <select style="float:right;" class="wrap ays-ignore" name="category" onchange="window.open(this.options[this.selectedIndex].value, '_self')"><option value="">Jump to a category</option>{:forum_list}</select>
+	</div>
+</div>
+[/block: options]
+
+[block: topics]
+<div class="box">
+				<div class="body group" style="border-bottom: 1px solid #d3d3d3;">
+					<div class="col-7">
+						<div style="display:table;">
+						<img src="{:avatar}" class="index_avatar" alt="avatar" height="50" width="50" />
+						<span style="padding-left: 2px; vertical-align: middle; display: table-cell;"><a href="{:link}">{:title}</a><br />
+						<span class="badge forum-badge"><a href="{:forum_link}">{:forum_name}</a></span> <a href="{:profile_link}">{:username}</a></span>
+						</div>
+					</div>
+					<div class="col-2">Views: {:views}<br />Replies: {:replies}</div>
+					<div class="col-3 last_post"><a href="{:last_link}">Last post by {:last_username}</a><br /><abbr title="{:tzdate}" class="timeago">on {:last_date}</abbr></a></div>
+				</div>
+			</div>
+[/block: topics]
+
+[block: bottom]
+{:pagination}
+[/block: bottom]

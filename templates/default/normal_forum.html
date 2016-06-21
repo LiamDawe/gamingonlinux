@@ -1,0 +1,62 @@
+[block: top]
+			<!-- forum page -->
+				<div class="box">
+					<div class="head">Linux Gamers Forum</div>
+				</div>
+
+				<div class="box">
+						<div class="collapse_container">
+							<div class="collapse_header">
+								<span>Click to open search</span>
+							</div>
+							<div class="collapse_content">
+								<form method="get" action="/index.php">
+									<input type="hidden" name="module" value="search_forum" />
+									<input class="ays-ignore" type="text" name="q" /> <br />
+									<button class="btn btn-primary">Search</button><br />
+									<br />
+									<strong>Search Options</strong><br />
+									<label class="checkbox">
+									Title has to include all the searched words? <input type="checkbox" name="strict" {:strict_check} />
+									</label>
+
+								</form>
+							</div>
+						</div>
+				</div>
+[/block: top]
+
+[block: category_top]
+				<div class="box">
+					<div class="head">{:category_name}</div>
+				</div>
+	<table class="table table-bordered">
+[/block: category_top]
+
+[block: forum_row]
+	<tr>
+		<td width="60px" id="forum-post"><img src="/templates/default/images/forum_icon.png" alt="icon" /></td>
+		<td width="425px" id="forum-post"><a href="{:forum_link}" class="strong">{:forum_name}</a><br />
+		{:forum_description}<br />
+		Posts: {:forum_posts}</td>
+		<td width="35px" id="forum-post"><img src="/templates/default/images/last_post.png" alt="" /></td>
+		<td width="200px" id="forum-post"valign="top">Last Post: {:last_post_title}<br />
+		by {:last_post_username} <br />
+		{:last_post_time}</td>
+	</tr>
+[/block: forum_row]
+
+[block: category_bottom]
+	</table>
+[/block: category_bottom]
+
+[block: latest]
+				<div class="box">
+					<div class="head">Latest posts <a href="/forum_rss.php"><img src="/templates/default/images/social/white/rss.svg" alt="" class="fright" width="23px"></a></div>
+				</div>
+				<div class="box">
+					<div class="body group">
+						{:forum_posts}
+					</div>
+				</div>
+[/block: latest]

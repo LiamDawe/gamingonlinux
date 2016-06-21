@@ -1496,7 +1496,7 @@ display: inline-block;
 }
 .collapse_container .collapse_header {
     background-color:#d3d3d3;
-    padding: 7px 14px;
+    padding: 7px 10px;
     cursor: pointer;
     font-weight: bold;
 }

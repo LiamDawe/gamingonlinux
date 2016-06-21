@@ -52,6 +52,9 @@ else
 			{
 				$templating->merge('newtopic');
 
+				$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
+				$name = $db->fetch();
+
 				$title = '';
 				$text = '';
 				if (isset($_GET['error']))
@@ -89,9 +92,6 @@ else
 				$crumbs = '';
 				if ($show_forum_breadcrumb == 1)
 				{
-					$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
-					$name = $db->fetch();
-					
 					if (core::config('pretty_urls') == 1)
 					{
 						$forum_url = '/forum/' . $_GET['forum_id'] . '/';
@@ -104,8 +104,8 @@ else
 				}
 				$templating->set('crumbs', $crumbs);
 
-				// if this single one is set, they all will be so we can check
-				if (isset($parray['sticky']))
+
+				if (isset($parray) && !empty($parray))
 				{
 					$options = 'Moderator Options<br />
 					<select name="moderator_options"><option value=""></option>';

@@ -25,10 +25,8 @@ else if (is_numeric($_GET['page']))
 }
 
 // get the forum ids this user is actually allowed to view
-$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `can_view` = 1 AND `group_id` IN ( ?, ? ) GROUP BY forum_id ORDER BY f.name ASC", array($_SESSION['user_group'], $_SESSION['secondary_user_group']));
-$forum_ids = $db->fetch_all_rows(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE);
-
-$sql_forum_ids = implode(', ', array_keys($forum_ids));
+$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ( ?, ? ) GROUP BY forum_id ORDER BY f.name ASC", array($_SESSION['user_group'], $_SESSION['secondary_user_group']));
+$forum_ids = $db->fetch_all_rows();
 
 $templating->block('options');
 $new_topic = '';
@@ -51,11 +49,16 @@ else
 {
 	$forum_address = '/index.php?module=viewforum&forum_id=';
 }
-foreach ($forum_ids as $key => $forum)
+foreach ($forum_ids as $forum)
 {
-	$forum_list .= '<option value="' . $forum_address . $key . '">' . $forum['name'] . '</option>';
+	$forum_list .= '<option value="' . $forum_address . $forum['forum_id'] . '">' . $forum['name'] . '</option>';
+	$forum_id_list[] = $forum['forum_id'];
 }
 $templating->set('forum_list', $forum_list);
+
+$sql_forum_ids = implode(', ', $forum_id_list);
+
+$templating->set('button', $button);
 
 // count how many there is in total
 $db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1");
@@ -69,8 +72,8 @@ SELECT
 	t.`topic_id`,
 	t.`forum_id`,
 	t.`topic_title`,
-	t.`creation_date`,
 	t.`author_id`,
+	t.`creation_date`,
 	t.`replys`,
 	t.`views`,
 	t.`last_post_date`,
@@ -148,6 +151,7 @@ while ($topics = $db->fetch())
 
 	$templating->set('title', $topics['topic_title']);
 	$templating->set('link', $link);
+	$templating->set('date', $date);
 	$templating->set('views', $topics['views']);
 	$templating->set('replies', $topics['replys']);
 	$templating->set('avatar', $avatar);

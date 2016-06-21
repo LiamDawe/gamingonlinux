@@ -1472,23 +1472,6 @@ display: inline-block;
          -o-border-radius: 3px;
             border-radius: 3px;
 }
-.spoiler_container {
-    width:100%;
-    border:1px solid #d3d3d3;
-}
-.spoiler_container div {
-    width:100%;
-}
-.spoiler_container .spoiler_header {
-    background-color:#d3d3d3;
-    padding: 2px;
-    cursor: pointer;
-    font-weight: bold;
-}
-.spoiler_container .spoiler_content {
-    display: none;
-    padding : 5px;
-}
 .collapse_container {
     border:1px solid #d3d3d3;
 }

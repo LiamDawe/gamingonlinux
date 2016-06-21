@@ -58,8 +58,6 @@ $templating->set('forum_list', $forum_list);
 
 $sql_forum_ids = implode(', ', $forum_id_list);
 
-$templating->set('button', $button);
-
 // count how many there is in total
 $db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1");
 $total_pages = $db->num_rows();
@@ -151,7 +149,6 @@ while ($topics = $db->fetch())
 
 	$templating->set('title', $topics['topic_title']);
 	$templating->set('link', $link);
-	$templating->set('date', $date);
 	$templating->set('views', $topics['views']);
 	$templating->set('replies', $topics['replys']);
 	$templating->set('avatar', $avatar);

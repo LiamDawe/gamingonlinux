@@ -31,7 +31,7 @@ while ($topics = $db->fetch())
 
 
 	$title = substr($topics['topic_title'], 0, 55);
-	$title = $title . '&ellipsis;';
+	$title = $title . '&hellip;';
 
 	if (core::config('pretty_urls') == 1)
 	{

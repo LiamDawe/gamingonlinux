@@ -20,7 +20,7 @@ while ($comments = $db->fetch())
 	$date = $core->format_date($comments['time_posted']);
 	$title = substr($comments['title'], 0, 55);
 	$title = ucwords($title);
-	$title = $title . '...';
+	$title = $title . '&hellip;';
 
 	$page = 1;
 	if ($comments['comment_count'] > $comments_per_page)

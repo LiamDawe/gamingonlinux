@@ -29,16 +29,24 @@ while ($topics = $db->fetch())
 		$postNumber = (($post_count - 1) % $comments_per_page) + 1;
 	}
 
-
-	$title = substr($topics['topic_title'], 0, 55);
-	$title = $title . '&hellip;';
+	$title_length = strlen($topics['topic_title']);
+	if ($title_length >= 55)
+	{
+		$title = substr($topics['topic_title'], 0, 65);
+		$title = $title . '&hellip;';
+	}
+	else
+	{
+		$title = $topics['topic_title'];
+	}
 
 	if (core::config('pretty_urls') == 1)
 	{
-		$forum_posts .= "<li class=\"list-group-item\"><a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\">{$title}</a><small>{$date}</small></li>";
+		$forum_posts .= "<li class=\"list-group-item\"><a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\">{$title}</a><br /><small>{$date}</small></li>";
 	}
 	else {
-		$forum_posts .= '<li><a href="' . url . 'index.php?module=viewtopic&amp;topic_id=' . $topics['topic_id'] . '&amp;page=' . $postPage . '">' . $title . '</a><small>' . $date .'</small></li>';
+		$forum_posts .= '<li><a href="' . url . 'index.php?module=viewtopic&amp;topic_id=' . $topics['topic_id'] . '&amp;page=' . $postPage . '">' . $title . '</a><br />
+		<small>' . $date .'</small></li>';
 	}
 
 }

@@ -40,20 +40,17 @@ else
 			{
 				if (core::config('pretty_urls') == 1)
 				{
-					header("Location: /forum/{$_GET['forum_id']}/message=toomany");
+					header("Location: /forum/message=toomany");
 				}
 				else
 				{
-					header("Location: /index.php?module=viewforum&forum_id={$_GET['forum_id']}&message=toomany");
+					header("Location: /index.php?module=forum&message=toomany");
 				}
 			}
 
 			else if (!isset($_POST['act']))
 			{
 				$templating->merge('newtopic');
-
-				$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
-				$name = $db->fetch();
 
 				$title = '';
 				$text = '';
@@ -66,6 +63,10 @@ else
 					if ($_GET['error'] == 'moreoptions')
 					{
 						$core->message('Polls need at least two options!', NULL, 1);
+					}
+					if ($_GET['error'] == 'shorttitle')
+					{
+						$core->message('Title was too short!', NULL, 1);
 					}
 
 					$title = $_SESSION['atitle'];
@@ -88,6 +89,9 @@ else
 				$crumbs = '';
 				if ($show_forum_breadcrumb == 1)
 				{
+					$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
+					$name = $db->fetch();
+					
 					if (core::config('pretty_urls') == 1)
 					{
 						$forum_url = '/forum/' . $_GET['forum_id'] . '/';
@@ -100,39 +104,46 @@ else
 				}
 				$templating->set('crumbs', $crumbs);
 
-				$options = 'Moderator Options<br />
-				<select name="moderator_options"><option value=""></option>';
-				$options_count = 0;
-
-				if ($parray['sticky'] == 1)
+				// if this single one is set, they all will be so we can check
+				if (isset($parray['sticky']))
 				{
-					$options .= '<option value="sticky">Sticky Topic</option>';
-					$options_count++;
-				}
+					$options = 'Moderator Options<br />
+					<select name="moderator_options"><option value=""></option>';
+					$options_count = 0;
 
-				if ($parray['lock'] == 1)
-				{
-					$options .= '<option value="lock">Lock Topic</option>';
-					$options_count++;
-				}
+					if ($parray['sticky'] == 1)
+					{
+						$options .= '<option value="sticky">Sticky Topic</option>';
+						$options_count++;
+					}
 
-				if ($parray['sticky'] == 1 && $parray['lock'] == 1)
-				{
-					$options .= '<option value="both">Lock & Sticky Topic</option>';
-					$options_count++;
-				}
+					if ($parray['lock'] == 1)
+					{
+						$options .= '<option value="lock">Lock Topic</option>';
+						$options_count++;
+					}
 
-				if ($options_count > 0)
-				{
-					$options .= '</select><br />';
-				}
+					if ($parray['sticky'] == 1 && $parray['lock'] == 1)
+					{
+						$options .= '<option value="both">Lock & Sticky Topic</option>';
+						$options_count++;
+					}
 
-				// if they have no moderator ability then remove the select box altogether
+					if ($options_count > 0)
+					{
+						$options .= '</select><br />';
+					}
+
+					// if they have no moderator ability then remove the select box altogether
+					else
+					{
+						$options = '';
+					}
+				}
 				else
 				{
 					$options = '';
 				}
-
 				// see if we will allow them to make polls
 				$db->sqlquery("SELECT `in_mod_queue` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 				$check_queue = $db->fetch();
@@ -163,8 +174,6 @@ else
 
 				$templating->block('bottom', 'newtopic');
 				$templating->set('options', $options);
-				$templating->set('forum_id', $forum_id);
-
 			}
 
 			else if (isset($_POST['act']))
@@ -202,7 +211,15 @@ else
 						$_SESSION['atitle'] = $title;
 						$_SESSION['atext'] = $message;
 
-						header("Location: /index.php?module=newtopic&forum_id=$forum_id&error=missing");
+						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error=missing");
+					}
+
+					else if (strlen($title) < 4)
+					{
+						$_SESSION['atitle'] = $title;
+						$_SESSION['atext'] = $message;
+
+						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error=shorttitle");
 					}
 
 					else
@@ -230,7 +247,7 @@ else
 						// update forums post counter and last post info
 						if ($approved == 1)
 						{
-							$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $forum_id));
+							$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $_POST['category']));
 						}
 
 						// if they are subscribing
@@ -268,7 +285,7 @@ else
 										$_SESSION['atitle'] = $title;
 										$_SESSION['atext'] = $message;
 
-										header("Location: /index.php?module=newtopic&forum_id=$forum_id&error=moreoptions");
+										header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error=moreoptions");
 										die();
 									}
 								}

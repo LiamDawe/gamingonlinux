@@ -1,14 +1,14 @@
 Options +SymLinksifOwnerMatch
 
   RewriteEngine On
-  
+
   RewriteBase /
-  
+
   ErrorDocument 401 default
   ErrorDocument 403 default
   ErrorDocument 404 /404.php
   ErrorDocument 500 default
-  
+
   # BEGIN EXPIRES
 <IfModule mod_expires.c>
     ExpiresActive On
@@ -27,11 +27,11 @@ Options +SymLinksifOwnerMatch
   RewriteCond %{SCRIPT_FILENAME} !-d
 
   RewriteCond %{SCRIPT_FILENAME} !-f
-  
+
   RewriteRule ^crowdfunding/?(index.php/?)?(.*)$ /wiki/$2 [R=301,NC,L]
 
   RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
-  
+
   RewriteRule ^home/?$ /index.php?module=home [N]
 
   RewriteRule ^articles/?$ /index.php?module=home [N]
@@ -43,90 +43,92 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^home/banned?$ /index.php?module=home&message=banned [N]
 
   RewriteRule ^home/message=(.+?)/?$ /index.php?module=home&message=$1 [N,NC,QSA]
-  
+
   RewriteRule ^sales/?$ /sales.php [N]
-  
+
   RewriteRule ^irc/?$ /irc.php [N]
-  
+
   RewriteRule ^sales/page=([0-9]+)/?$ /sales.php?page=$1 [N,NC,QSA]
-  
+
   RewriteRule ^sales/([0-9]+)/?$ /sales.php?sale_id=$1 [N,NC,QSA]
-  
+
   RewriteRule ^sales/message=(.+?)/?$ /sales.php?message=$1 [N,NC,QSA]
-  
+
   RewriteRule ^register/?$ /index.php?module=register [N]
-  
+
   RewriteRule ^forum/?$ /index.php?module=forum [N]
-  
+
   RewriteRule ^about-us/?$ /index.php?module=about_us [N]
-  
+
   RewriteRule ^private-messages/?$ /index.php?module=messages [N]
-  
+
   RewriteRule ^submit-article/?$ /index.php?module=submit_article&view=Submit [N]
-  
+
   RewriteRule ^submit-article/error\=(.+?)?$ /index.php?module=submit_article&view=Submit&error=$1 [N,NC,QSA]
 
   RewriteRule ^contact-us/?$ /index.php?module=contact [N]
-  
+
   RewriteRule ^email-us/?$ /index.php?module=email_us [N]
-  
+
   RewriteRule ^email-us/message=(.+?)/?$ /index.php?module=email_us&message=$1 [N,NC,QSA]
-  
-  RewriteRule ^links/?$ /index.php?module=friend_links [N]    
+
+  RewriteRule ^links/?$ /index.php?module=friend_links [N]
 
   RewriteRule ^support-us/?$ /index.php?module=support_us [N]
-  
+
   RewriteRule ^community/?$ /index.php?module=community [N]
-  
+
   RewriteRule ^articles/?$ /index.php?module=home [N]
-  
+
   RewriteRule ^articles/(.+?)\.([0-9]+)/?$ /index.php?module=articles_full&title=$1&aid=$2 [N,NC,QSA]
-  
+
   RewriteRule ^articles/(.+?)\.([0-9]+)/error=(.+?)?$ /index.php?module=articles_full&aid=$2&title=$1&error=$3 [N,NC,QSA]
-  
+
   RewriteRule ^articles/(.+?)\.([0-9]+)/message=(.+?)?$ /index.php?module=articles_full&aid=$2&title=$1&message=$3 [N,NC,QSA]
 
   RewriteRule ^articles/(.+?)\.([0-9]+)/page\=([0-9]+)?$ /index.php?module=articles_full&aid=$2&title=$1&page=$3 [N,NC,QSA]
 
   RewriteRule ^articles/(.+?)\.([0-9]+)/comment_id\=([0-9]+)?$ /index.php?module=articles_full&aid=$2&title=$1&comment_id=$3 [N,NC,QSA]
-  
+
   RewriteRule ^articles/(.+?)\.([0-9]+)/article_page\=([0-9]+)/?$ /index.php?module=articles_full&aid=$2&title=$1&article_page=$3 [N,NC,QSA]
 
   RewriteRule ^home/page\=([0-9]+)?$ /index.php?module=home&page=$1 [N]
 
   RewriteRule ^forum/([0-9]+)/?$ /index.php?module=viewforum&forum_id=$1 [N,NC,QSA]
-  
+
+  RewriteRule ^forum/message=$1?$ /index.php?module=forum&message=$1 [N,NC,QSA]
+
   RewriteRule ^forum/([0-9]+)/page\=([0-9]+)?$ /index.php?module=viewforum&forum_id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^forum/topic/([0-9]+)/?$ /index.php?module=viewtopic&topic_id=$1 [N,NC,QSA]
-  
+
   RewriteRule ^forum/topic/([0-9]+)/page\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&page=$2 [N,NC,QSA]
-  
+
   RewriteRule ^forum/topic/([0-9]+)/post_id\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&post_id=$2 [N,NC,QSA]
-  
+
   RewriteRule ^forum/topic/([0-9]+)/message=(.+?)?$ /index.php?module=viewtopic&topic_id=$1&message=$2 [N,NC,QSA]
-  
+
   RewriteRule ^private-messages/page\=([0-9]+)?$ /index.php?module=messages&page=$1 [N,NC,QSA]
 
   RewriteRule ^private-messages/compose/(\d+)*$ /index.php?module=messages&view=compose [N]
-  
+
   RewriteRule ^private-messages/compose/message=(.+?)$ /index.php?module=messages&view=compose&message=$1 [N,NC,QSA]
-  
+
   RewriteRule ^private-messages/compose/user\=([0-9]+)?$ /index.php?module=messages&view=compose&user=$1 [N,NC,QSA]
 
   RewriteRule ^private-messages/([0-9]+)/?$ /index.php?module=messages&view=message&id=$1 [N,NC,QSA]
   RewriteRule ^private-messages/([0-9]+)/message=(.+?)?$ /index.php?module=messages&view=message&id=$1&message=$2 [N,NC,QSA]
 
   RewriteRule ^private-messages/message\=(.+?)$ /index.php?module=messages&message=$1 [N,NC,QSA]
-  
+
   RewriteRule ^private-messages/([0-9]+)/page\=([0-9]+)?$ /index.php?module=messages&view=message&id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^profiles/([0-9]+)/?$ /index.php?module=profile&user_id=$1 [N,NC,QSA]
-  
+
   RewriteRule ^users/stat(s|istics)/?$ /index.php?module=statistics [N,NC,QSA]
-  
+
   RewriteRule ^articles/category/([0-9]+)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA]
-  
+
   RewriteRule ^articles/category/([0-9]+)/page\=([0-9]+)?$ /index.php?module=articles&view=cat&catid=$1&page=$2 [N,NC,QSA]
 
   RewriteCond %{HTTP_HOST} !^www\. [NC]

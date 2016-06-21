@@ -2,6 +2,14 @@
 $templating->set_previous('title', 'Linux Gamers Forum', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux forum', 1);
 
+if (isset($_GET['message']))
+{
+	if ($_GET['message'] == 'toomany')
+	{
+		$core->message('Spam prevention: You have made too many forum topics in a really short time, please wait a few minutes.', NULL, 1);
+	}
+}
+
 $templating->merge('forum');
 $templating->block('top');
 
@@ -49,8 +57,6 @@ foreach ($forum_ids as $key => $forum)
 }
 $templating->set('forum_list', $forum_list);
 
-$templating->set('button', $button);
-
 // count how many there is in total
 $db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1");
 $total_pages = $db->num_rows();
@@ -64,6 +70,7 @@ SELECT
 	t.`forum_id`,
 	t.`topic_title`,
 	t.`creation_date`,
+	t.`author_id`,
 	t.`replys`,
 	t.`views`,
 	t.`last_post_date`,
@@ -141,7 +148,6 @@ while ($topics = $db->fetch())
 
 	$templating->set('title', $topics['topic_title']);
 	$templating->set('link', $link);
-	$templating->set('date', $date);
 	$templating->set('views', $topics['views']);
 	$templating->set('replies', $topics['replys']);
 	$templating->set('avatar', $avatar);
@@ -151,6 +157,7 @@ while ($topics = $db->fetch())
 	$templating->set('last_date', $last_date);
 	$templating->set('forum_name', $topics['forum_name']);
 	$templating->set('forum_link', $forum_link);
+	$templating->set('profile_link', $profile_link);
 }
 
 $templating->block('options');

@@ -55,7 +55,7 @@ if (isset($_POST['action']))
 	{
 		$db->sqlquery("UPDATE `forum_topics` SET `approved` = 1 WHERE `topic_id` = ?", array($_POST['topic_id']));
 
-		$db->sqlquery("UPDATE `users` SET `mod_approved` = (mod_approved + 1) WHERE `user_id` = ?", array($_POST['author_id']));
+		$db->sqlquery("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
 
 		$db->sqlquery("SELECT `mod_approved` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
 		$user_get = $db->fetch();

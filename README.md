@@ -22,10 +22,17 @@ Import the development SQL database from the stripped SQL file `includes/dev/db.
 
 ## Licensing
 
-The GOL site source is MIT licensed, but we also use other scripts which use different licenses
+The GOL site source is MIT licensed, but we also use other scripts which use different licenses:
 
 - /includes/jscripts/select2/ (APACHE 2/GPL)
+
 - /includes/jscripts/qTip2/ (MIT)
+
 - /includes/jscripts/Pikaday/ (MIT/BSD)
+
 - /includes/jscripts/fancybox/ (Creative Commons Attribution-NonCommercial 3.0)
+
 - /includes/jscripts/jquery.form.min.js (MIT/GPL)
+
+- /includes/E_PDOStatement.php (APACHE 2) 
+https://github.com/noahheck/E_PDOStatement

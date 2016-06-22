@@ -166,7 +166,7 @@ if (!isset($_POST['act']))
 		$one_check = 'selected';
 	}
 
-	$email_options = '<option value=1" '. $all_check .'>All - Get all replies to your email</option><option value=2" ' . $one_check . '>New reply only - Get the first new reply, then none until you visit the article/forum post or reply again.</option>';
+	$email_options = '<option value="1" '. $all_check .'>All - Get all replies to your email</option><option value="2" ' . $one_check . '>New reply only - Get the first new reply, then none until you visit the article/forum post or reply again.</option>';
 	$templating->set('email_options', $email_options);
 
 	$templating->set('subscribe_check', $subscribe_check);
@@ -502,7 +502,32 @@ else if (isset($_POST['act']))
 		// no nasty html grr
 		$bio = htmlspecialchars($_POST['bio'], ENT_QUOTES);
 
-		$db->sqlquery("UPDATE `users` SET `articles-per-page` = ?, `per-page` = ?, `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ?, `pc_info_public` = ?, `forum_type` = ? WHERE `user_id` = ?", array($aper_page, $per_page, $subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $public, $forum_type_sql, $_SESSION['user_id']));
+		$pc_info_filled = 0;
+
+		// check if the have set any of their pc info
+		$pc_info_fields = array(
+			$_POST['what_bits'],
+			$_POST['dual_boot'],
+			$_POST['cpu_vendor'],
+			$_POST['cpu_model'],
+			$_POST['gpu_vendor'],
+			$_POST['gpu_model'],
+			$_POST['gpu_driver'],
+			$_POST['ram_count'],
+			$_POST['monitor_count'],
+			$_POST['resolution'],
+			$_POST['gaming_machine_type']);
+		foreach ($pc_info_fields as $field)
+		{
+			if (isset($field) && !empty($field))
+			{
+				$pc_info_filled = 1;
+				break;
+			}
+		}
+
+		$user_update_sql = "UPDATE `users` SET `articles-per-page` = ?, `per-page` = ?, `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `distro` = ?, `pc_info_public` = ?, `pc_info_filled` = ?, `forum_type` = ? WHERE `user_id` = ?";
+		$user_update_query = $db->sqlquery($user_update_sql, array($aper_page, $per_page, $subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $_POST['distribution'], $public, $pc_info_filled, $forum_type_sql, $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;

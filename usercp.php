@@ -6,10 +6,8 @@ $templating->set_previous('title', ' - User Control Panel', 1);
 // what to show for the user text in the header
 if ($_SESSION['user_id'] == 0)
 {
-	$core->message('You do not have permissions to view this page! <a href="index.php">Please click here to return to the home page</a>.');
-	$templating->merge('footer');
-	$templating->block('end');
-	echo $templating->output();
+	$core->message('You do not have permissions to view this page! You need to be logged in. <a href="index.php">Please click here to return to the home page</a>.');
+	include('includes/footer.php');
 	die();
 }
 

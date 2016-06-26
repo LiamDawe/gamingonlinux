@@ -812,7 +812,7 @@ class core
 				// remove old avatar
 				if (!empty($image['featured_image']))
 				{
-					unlink($this->config('path') . 'uploads/carousel/' . $image['image']);
+					unlink($this->config('path') . 'uploads/carousel/' . $image['featured_image']);
 				}
 
 				$db->sqlquery("UPDATE `articles` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));

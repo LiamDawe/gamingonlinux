@@ -24,7 +24,7 @@ if (!isset($_POST['act']))
 
 	// grab distros
 	$distro_list = '';
-	$db->sqlquery("SELECT `name` FROM `distributions` ORDER BY `name` ASC");
+	$db->sqlquery("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC");
 	while ($distros = $db->fetch())
 	{
 			$selected = '';
@@ -36,8 +36,22 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('distro_list', $distro_list);
 
-	$db->sqlquery("SELECT `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$additional = $db->fetch();
+
+	// Desktop environment
+	$desktop_list = '';
+	$db->sqlquery("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC");
+	while ($desktops = $db->fetch())
+	{
+			$selected = '';
+			if ($additional['desktop_environment'] == $desktops['name'])
+			{
+				$selected = 'selected';
+			}
+			$desktop_list .= "<option value=\"{$desktops['name']}\" $selected>{$desktops['name']}</option>";
+	}
+	$templating->set('desktop_list', $desktop_list);
 
 	$arc_32 = '';
 	if ($additional['what_bits'] == '32bit')
@@ -225,6 +239,7 @@ else if (isset($_POST['act']))
 
 		// check if the have set any of their pc info
 		$pc_info_fields = array(
+			$_POST['desktop'],
 			$_POST['what_bits'],
 			$_POST['dual_boot'],
 			$_POST['cpu_vendor'],
@@ -247,6 +262,7 @@ else if (isset($_POST['act']))
 
 		// additional profile fields
 		$sql_additional = "UPDATE `user_profile_info` SET
+		`desktop_environment` = ?,
 		`what_bits` = ?,
 		`dual_boot` = ?,
 		`cpu_vendor` = ?,
@@ -262,6 +278,7 @@ else if (isset($_POST['act']))
 		WHERE
 		`user_id` = ?";
 		$db->sqlquery($sql_additional, array(
+		$_POST['desktop'],
 		$_POST['what_bits'],
 		$_POST['dual_boot'],
 		$_POST['cpu_vendor'],

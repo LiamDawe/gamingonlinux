@@ -1,6 +1,6 @@
 <?php
-define('path', '/home/gamingonlinux/public_html/includes/');
-//define('path', '/mnt/storage/public_html/includes/');
+//define('path', '/home/gamingonlinux/public_html/includes/');
+define('path', '/mnt/storage/public_html/includes/');
 include(path . 'config.php');
 
 include(path . 'class_core.php');
@@ -18,6 +18,7 @@ $last_login = $core->date - $cutoff;
 
 $charts = array (
   array ("name" => "Linux Distributions", "db_field" => "distro", "table" => 'users'),
+  array ("name" => "Desktop Environment", "db_field" => "desktop_environment"),
   array ("name" => "Distro Architecture", "db_field" => "what_bits"),
   array ("name" => "Dual Booting", "db_field" => "dual_boot"),
   array ("name" => "CPU Vendor", "db_field" => "cpu_vendor"),

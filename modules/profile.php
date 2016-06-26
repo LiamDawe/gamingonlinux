@@ -141,13 +141,13 @@ if (isset($_GET['user_id']))
 			// additional profile info
 			if ($profile['pc_info_public'] == 1)
 			{
-				$db->sqlquery("SELECT `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `dual_boot` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
+				$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `dual_boot` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
 
 				$counter = 0;
 				$templating->block('additional');
 
 				$distro = '';
-				if (!empty($profile['distro']) && $profile['distro'] != 'Not Listed')
+				if (!empty($profile['distro']))
 				{
 					$distro = "<li><strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$profile['distro']}.svg\" alt=\"{$profile['distro']}\" /> {$profile['distro']}</li>";
 					$counter++;
@@ -156,6 +156,14 @@ if (isset($_GET['user_id']))
 
 				while ($additionaldb = $db->fetch())
 				{
+					$desktop = '';
+					if (!empty($additionaldb['desktop_environment']))
+					{
+						$desktop = "<li><strong>Desktop Environment:</strong> {$additionaldb['desktop_environment']}</li>";
+						$counter++;
+					}
+					$templating->set('desktop', $desktop);
+
 					$dist_arc = '';
 					if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))
 					{

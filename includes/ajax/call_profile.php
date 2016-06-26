@@ -15,7 +15,7 @@ $templating = new template('default');
 
 if(isset($_GET['user_id']))
 {
-  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, u.`distro`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`dual_boot` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
+  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, u.`distro`, p.`desktop_environment`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`dual_boot` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
   if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -49,6 +49,14 @@ if(isset($_GET['user_id']))
         $counter++;
       }
       $templating->set('distro', $distro);
+
+      $desktop = '';
+      if (!empty($grab_fields['desktop_environment']))
+      {
+        $desktop = "<li><strong>Desktop Environment:</strong> {$grab_fields['desktop_environment']}</li>";
+        $counter++;
+      }
+      $templating->set('desktop', $desktop);
 
       $dist_arc = '';
       if ($grab_fields['what_bits'] != NULL && !empty($grab_fields['what_bits']))

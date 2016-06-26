@@ -5,7 +5,9 @@
 	<div class="body group profile">
 		<label>Make public? <input type="checkbox" name="public" {:public_check}/></label><br />
 		<strong><img src="/templates/default/images/distros/linux_icon.png" alt="linux icon" /> Distribution:</strong><br />
-		<select name="distribution"><option value=""></option><option value="Not Listed">Not Listed</option>{:distro_list}</select><br />
+		<select name="distribution"><option value=""></option>{:distro_list}</select><br />
+		<strong>Desktop Environment:</strong><br />
+		<select name="desktop"><option value=""></option>{:desktop_list}</select><br />
 		<strong>Distro Architecture:</strong><br />
 		<select name="what_bits"><option value=""></option>{:what_bits_options}</select><br />
 		<strong>Do you dual-boot with a different operating system?</strong><br />

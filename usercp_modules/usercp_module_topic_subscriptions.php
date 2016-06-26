@@ -13,7 +13,7 @@ if (!isset($_GET['go']))
 	{
 		$page = $_GET['page'];
 	}
-	
+
 	$templating->block('main_top');
 
 	// count how many there is in total
@@ -22,32 +22,17 @@ if (!isset($_GET['go']))
 
 	// sort out the pagination link
 	$pagination = $core->pagination_link(9, $total_pages, "usercp.php?module=topic_subscriptions&", $page);
-	
+
 	// get the posts for this forum
-	$db->sqlquery("SELECT t.*, s.user_id, u.`username`, u.avatar, u.gravatar_email, u.avatar_gravatar, u.avatar_uploaded, u2.`username` as `username_last`, u2.`user_id` as `user_id_last` FROM `forum_topics` t INNER JOIN `forum_topics_subscriptions` s ON t.topic_id = s.topic_id INNER JOIN `users` u ON t.`author_id` = u.`user_id` LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id` WHERE s.`user_id`= ? ORDER BY t.`last_post_date` DESC LIMIT ?, 9", array($_SESSION['user_id'], $core->start));
+	$db->sqlquery("SELECT t.*, s.user_id, u.`username`, u.avatar, u.gravatar_email, u.avatar_gravatar, u.avatar_uploaded, u.avatar_gallery, u2.`username` as `username_last`, u2.`user_id` as `user_id_last` FROM `forum_topics` t INNER JOIN `forum_topics_subscriptions` s ON t.topic_id = s.topic_id INNER JOIN `users` u ON t.`author_id` = u.`user_id` LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id` WHERE s.`user_id`= ? ORDER BY t.`last_post_date` DESC LIMIT ?, 9", array($_SESSION['user_id'], $core->start));
 
 	while ($post = $db->fetch())
 	{
 		$templating->block('post_row');
-		// sort out topic icon
 
-		// sort out the avatar
-		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-		if (empty($post['avatar']) || $post['avatar_gravatar'] == 1)
-		{
-			$topic_pip = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $post['gravatar_email'] ) ) ) . "?d={$config['website_url']}{$config['path']}/templates/default/images/topic_icon.png";
-		}
-		
-		// either uploaded or linked an avatar
-		else 
-		{
-			$topic_pip = $post['avatar'];
-			if ($post['avatar_uploaded'] == 1)
-			{
-				$topic_pip = "/uploads/avatars/{$post['avatar']}";
-			}
-		}
-		
+		// sort out topic icon
+		$topic_pip = $user->sort_avatar($post);
+
 		$templating->set('topic_pip', $topic_pip);
 		$templating->set('topic_id', $post['topic_id']);
 		$templating->set('post_title', $post['topic_title']);
@@ -56,7 +41,7 @@ if (!isset($_GET['go']))
 		$templating->set('post_author', $post['username']);
 		$templating->set('replies', $post['replys']);
 		$templating->set('views', $post['views']);
-		
+
 		$username_last = 'No replies!';
 		if (!empty($post['username_last']))
 		{
@@ -64,7 +49,7 @@ if (!isset($_GET['go']))
 			$username_last = "by <a href=\"/profiles/{$post['user_id_last']}\">{$post['username_last']}</a><br />
 			on {$date}";
 		}
-		
+
 		$templating->set('last_post_name', $username_last);
 	}
 

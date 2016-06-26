@@ -164,7 +164,7 @@ if(isset($_GET['user_id']))
       {
         if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $_GET['user_id'])
         {
-          $edit_link = ' | <a href="/usercp.php">Edit your profile</a>';
+          $edit_link = ' | <a href="/usercp.php?module=pcinfo">Edit your PC info</a>';
         }
       }
       $templating->set('edit_link', $edit_link);

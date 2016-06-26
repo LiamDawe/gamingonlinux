@@ -26,7 +26,7 @@ function currency($from, $to, $amount)
    return str_replace(' '.$to, '', $result);
 }
 
-// convert euros to dollars
+// convert pounds to dollars
 $db->sqlquery("SELECT `pounds`, `id` FROM `game_sales` WHERE `pounds` > 0 and `dollars` = 0");
 $get = $db->fetch_all_rows();
 foreach ($get as $price)
@@ -36,7 +36,7 @@ foreach ($get as $price)
 	$db->sqlquery("UPDATE `game_sales` SET `dollars` = ? WHERE `id` = ?", array($dollars, $price['id']));
 }
 
-// convert euros_original to dollars_original
+// convert pounds_original to dollars_original
 $db->sqlquery("SELECT `pounds_original`, `id` FROM `game_sales` WHERE `pounds_original` > 0 and `dollars_original` = 0");
 $get = $db->fetch_all_rows();
 foreach ($get as $price)

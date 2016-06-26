@@ -16,7 +16,6 @@ foreach ($fetch_config as $config_set)
 
 $timeout = 1209600; // 14 days
 
-
 $stamp = time() - $timeout;
 
 $db->sqlquery("SELECT `article_id`, `featured_image` FROM `articles` WHERE `date` < ?", array($stamp));
@@ -28,10 +27,15 @@ $_SERVER['DOCUMENT_ROOT'] = (isset($_SERVER['DOCUMENT_ROOT'])? $_SERVER['DOCUMEN
 foreach($featured as $row)
 {
 	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0, `featured_image` = '' WHERE `article_id` = ?", array($row['article_id']));
-	$image = $_SERVER['DOCUMENT_ROOT'] . $config['path'] . 'uploads/carousel/' . $row['featured_image'];
+	if (!empty($row['featured_image']))
+	{
+		$image = $_SERVER['DOCUMENT_ROOT'] . $config['path'] . 'uploads/carousel/' . $row['featured_image'];
 
-	if (file_exists($image))
-		unlink($image);
+		if (file_exists($image))
+		{
+			unlink($image);
+		}
+	}
 }
 
 // count how many there are

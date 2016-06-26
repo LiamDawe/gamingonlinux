@@ -26,10 +26,11 @@ $currencies = array("fr", "us", "gb");
 foreach ($currencies as $currency)
 {
   $page = 1;
-  $url = "http://store.steampowered.com/search/?specials=1&os=linux&cc=$currency&page=";
+  $url = "http://store.steampowered.com/search/?sort_by=Name_ASC&specials=1&os=linux&cc=$currency&page=";
 
   do
   {
+    echo 'Moving onto page ' . $page . '<br />';
     $html = file_get_html($url . $page);
 
     $get_sales = $html->find('a.search_result_row');
@@ -56,23 +57,23 @@ foreach ($currencies as $currency)
           $prices = trim($price->plaintext);
           $prices = explode(' ', $prices);
 
-          // wtf?
+          // turn them into the correct prices and set the currency
           if ($currency == 'gb')
           {
-            $original_price = substr($prices[0], 2);
-            $price_now = substr($prices[1], 4);
+            $original_price = (double) preg_replace("/[^0-9,.]/", "", $prices[0]);
+            $price_now = (double) preg_replace("/[^0-9,.]/", "", $prices[1]);
             $sql_currency = 'pounds';
           }
           else if ($currency == 'fr')
           {
-            $original_price = str_replace(',', '.', substr($prices[0], 0, -3));
-            $price_now = str_replace(',', '.', substr($prices[1], 0, -3));
+            $original_price = (double) str_replace(',', '.', preg_replace("/[^0-9,.]/", "", $prices[0]));
+            $price_now = (double) str_replace(',', '.', preg_replace("/[^0-9,.]/", "", $prices[1]));
             $sql_currency = 'euros';
           }
           else if ($currency == 'us')
           {
-            $original_price = substr($prices[0], 1);
-            $price_now = substr($prices[1], 3);
+            $original_price = (double) preg_replace("/[^0-9,.]/", "", $prices[0]);
+            $price_now = (double) preg_replace("/[^0-9,.]/", "", $prices[1]);
             $sql_currency = 'dollars';
           }
 
@@ -98,31 +99,38 @@ foreach ($currencies as $currency)
 
           echo 'Local ID: ' .  $game_list['local_id'] . '<br />';
 
-          // need to check if we already have it to insert it
-          // search if that title exists
-          $db->sqlquery("SELECT `id` FROM `game_sales` WHERE `list_id` = ? AND `provider_id` = 1", array($game_list['local_id']));
-
-          // if it does exist, make sure it's not from Steam already
-          if ($db->num_rows() == 0)
+          if (is_numeric($original_price) && is_numeric($price_now) && $original_price < 99.99)
           {
-            $db->sqlquery("INSERT INTO `game_sales` SET `list_id` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 1, `$sql_currency` = ?, `{$sql_currency}_original` = ?, `steam` = 1", array($game_list['local_id'], $link, core::$date, $price_now, $original_price));
+            // need to check if we already have it to insert it
+            // search if that title exists
+            $db->sqlquery("SELECT `id` FROM `game_sales` WHERE `list_id` = ? AND `provider_id` = 1", array($game_list['local_id']));
 
-            $sale_id = $db->grab_id();
+            // if it does exist, make sure it's not from Steam already
+            if ($db->num_rows() == 0)
+            {
+              $db->sqlquery("INSERT INTO `game_sales` SET `list_id` = ?, `website` = ?, `date` = ?, `accepted` = 1, `provider_id` = 1, `$sql_currency` = ?, `{$sql_currency}_original` = ?, `steam` = 1", array($game_list['local_id'], $link, core::$date, $price_now, $original_price));
 
-            echo "\tAdded this game to the sales DB with id: " . $sale_id . "<br />\n";
+              $sale_id = $db->grab_id();
 
-            $games .= $title . '<br />';
+              echo "\tAdded this game to the sales DB with id: " . $sale_id . "<br />\n";
 
-            $email = 1;
+              $games .= $title . '<br />';
+
+              $email = 1;
+            }
+
+            // if we already have it, just update it
+            else
+            {
+              $current_sale = $db->fetch();
+              $db->sqlquery("UPDATE `game_sales` SET `pounds` = ?, `pounds_original` = ? WHERE `provider_id` = 1 AND id = ?", array($price_now, $original_price, $current_sale['id']));
+
+              echo "Updated {$title} with the latest information<br />";
+            }
           }
-
-          // if we already have it, just update it
           else
           {
-            $current_sale = $db->fetch();
-            $db->sqlquery("UPDATE `game_sales` SET `pounds` = ?, `pounds_original` = ? WHERE `provider_id` = 1 AND id = ?", array($price_now, $original_price, $current_sale['id']));
-
-            echo "Updated {$title} with the latest information<br />";
+            echo '<br />' . $title . ' does not have an integer price!<br />';
           }
         }
         echo '<br />';
@@ -131,6 +139,8 @@ foreach ($currencies as $currency)
     }
   } while ($stop == 0);
 }
+
+echo '<br />Last page hit: ' . $page . '<br /><br />';
 
 $db->sqlquery("SELECT s.`list_id`, l.`name` FROM `game_sales` s INNER JOIN `game_list` l ON l.local_id = s.list_id WHERE s.`provider_id` = 1");
 $in_db = $db->fetch_all_rows();

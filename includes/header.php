@@ -189,7 +189,7 @@ $templating->set('site_title', $site_title);
 if (core::config('pretty_urls') == 1)
 {
 	$donate_link = '/support-us/';
-	$sales_link = '/sales/';
+	$statistics_link = '/users/statistics';
 	$forum_link = '/forum/';
 	$contact_link = '/contact-us/';
 	$submit_a = '/submit-article/';
@@ -204,7 +204,7 @@ if (core::config('pretty_urls') == 1)
 }
 else {
 	$donate_link = url . 'index.php?module=support_us';
-	$sales_link = url . 'sales.php';
+	$statistics_link = url . 'index.php?module=statistics';
 	$forum_link = url . 'index.php?module=forum';
 	$contact_link = url . 'index.php?module=contact';
 	$submit_a = url . 'index.php?module=submit_article&view=Submit';
@@ -218,7 +218,7 @@ else {
 	$submit_e = url . 'index.php?module=email_us';
 }
 $templating->set('donate_link', $donate_link);
-$templating->set('sales_link', $sales_link);
+$templating->set('statistics_link', $statistics_link);
 $templating->set('forum_link', $forum_link);
 $templating->set('contact_link', $contact_link);
 $templating->set('submit_a', $submit_a);

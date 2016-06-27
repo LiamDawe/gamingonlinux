@@ -168,16 +168,8 @@ if (core::config('allow_registrations') == 1)
 							$subject = 'Welcome to GamingOnLinux.com, activation needed!';
 
 							// message
-							$message = '
-							<html>
-							<head>
-							<title>Welcome email for GamingOnLinux.com, activation needed!</title>
-							</head>
-							<body>
-							<img src="'.core::config('website_url').'templates/default/images/icon.png" alt="Gaming On Linux">
-							<br />
-							<p>Hello '.$_POST['username'].',</p>
-							<p>Thanks for registering on <a href="'.core::config('website_url').'" target="_blank">'.core::config('website_url').'</a>, The best source for linux games and news.</p>
+							$html_message = '<p>Hello '.$_POST['username'].',</p>
+							<p>Thanks for registering on <a href="'.core::config('website_url').'" target="_blank">'.core::config('website_url').'</a>, the best source for linux games and news.</p>
 							<p><strong><a href="'.core::config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code.'">You need to activate your account before you can post! Click here to activate!</a></strong></p>
 							<p>If you&#39;re new, consider saying hello in the <a href="'.core::config('website_url').'forum/" target="_blank">forum</a>.</p>
 							<br style="clear:both">
@@ -185,18 +177,12 @@ if (core::config('allow_registrations') == 1)
 							<hr>
 							<p>If you haven&#39;t registered at <a href="'.core::config('website_url').'" target=\"_blank\">'.core::config('website_url').'</a>, Forward this mail to <a href=\"mailto:'.core::config('contact_email').'" target="_blank">'.core::config('contact_email').'</a> with some info about what you want us to do about it.</p>
 							<p>Please, Don&#39;t reply to this automated message, We do not read any emails recieved on this email address.</p>
-							</div>
-							</body>
-							</html>
-							';
+							</div>';
 
-							// To send HTML mail, the Content-type header must be set
-							$headers  = 'MIME-Version: 1.0' . "\r\n";
-							$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-							$headers .= "From: noreply@gamingonlinux.com\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+							$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on '.core::config('website_url').', the best source for linux games and news. You need to activate your account before you can post! Go here to activate: '.core::config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
 
-							// Mail it
-							mail($to, $subject, $message, $headers);
+							$mail = new mail($_POST['uemail'], $subject, $html_message, $plain_message);
+							$mail->send();
 						}
 
 						$core->message("Thank you for registering {$_POST['username']}, you are now logged in, <strong>but you need to confirm you email to continue using the website properly</strong>! <a href=\"index.php\">Click here if you are not redirected.</a>", "index.php");

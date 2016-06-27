@@ -931,32 +931,14 @@ else if (isset($_GET['go']))
 							// send the emails
 							foreach ($users_array as $email_user)
 							{
-								$to = $email_user['email'];
-
-								// set the title to upper case
-								$title_upper = $title['title'];
-
 								// subject
-								$subject = "New reply to article {$title_upper} on GamingOnLinux.com";
-
-								$username = $_SESSION['username'];
+								$subject = "New reply to article {$title['title']} on GamingOnLinux.com";
 
 								$comment_email = email_bbcode($comment);
 
-								$message = '';
-
 								// message
-								$html_message = "
-								<html>
-								<head>
-								<title>New reply to an article you follow on GamingOnLinux.com</title>
-								<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-								</head>
-								<body>
-								<img src=\"{$config['website_url']}templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-								<br />
-								<p>Hello <strong>{$email_user['username']}</strong>,</p>
-								<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+								$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
+								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 								<div>
 							 	<hr>
 							 	{$comment_email}
@@ -966,38 +948,16 @@ else if (isset($_GET['go']))
 							  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 							  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 							  	<p>-----------------------------------------------------------------------------------------------------------</p>
-								</div>
-								</body>
-								</html>
-								";
+								</div>";
 
-								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on {$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
-
-								$boundary = uniqid('np');
-
-								// To send HTML mail, the Content-type header must be set
-								$headers  = 'MIME-Version: 1.0' . "\r\n";
-								$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
-								$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress($article_id,'comment')."\r\n";
-
-								$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-								$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
-								$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-								$message .= $plain_message;
-
-								$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-								$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
-								$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-								$message .= "$html_message";
-
-								$message .= "\r\n\r\n--" . $boundary . "--";
+								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on {$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 								// Mail it
-								if ($config['send_emails'] == 1)
+								if (core::config('send_emails') == 1)
 								{
-									mail($to, $subject, $message, $headers);
+									$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
+									$mail->send();
 								}
-
 								// remove anyones send_emails subscription setting if they have it set to email once
 								$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']));
 								$update_sub = $db->fetch();

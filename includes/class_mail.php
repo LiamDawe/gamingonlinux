@@ -18,7 +18,7 @@ class mail
 	function __construct($to, $subject, $html_message, $plain_message, $headers_additional="")
 	{
 		$this->html_message = "<html><head>
-		<title>New reply to an article you follow on GamingOnLinux.com</title>
+		<title>$subject</title>
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>

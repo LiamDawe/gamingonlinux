@@ -95,6 +95,10 @@ if (!isset($_POST['act']))
 		{
 			$form_input  .= "<div class=\"form-group\"><span class=\"preinput\">http://steamcommunity.com/id/</span>";
 		}
+		else if ($field['db_field'] == 'twitter_on_profile')
+		{
+			$form_input  .= "<div class=\"form-group\"><span class=\"preinput\">https://twitter.com/</span>";
+		}
 		else
 		{
 			$form_input .= "<div style=\"display:inline;\">";

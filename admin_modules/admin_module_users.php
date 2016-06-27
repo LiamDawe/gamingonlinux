@@ -396,6 +396,7 @@ else
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['username']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($_GET['user_id']));
 
+				$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} deleted the user '{$avatar['username']}'", core::$date, core::$date));
 
 

@@ -161,9 +161,6 @@ if (core::config('allow_registrations') == 1)
 							$_SESSION['theme'] = 'light';
 							$_SESSION['activated'] = 0;
 
-							// sort out registration email
-							$to  = $_POST['uemail'];
-
 							// subject
 							$subject = 'Welcome to GamingOnLinux.com, activation needed!';
 

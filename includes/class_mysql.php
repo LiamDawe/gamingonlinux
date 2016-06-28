@@ -186,7 +186,7 @@ class db_result implements ArrayAccess,Iterator
 		return $this->statement->fetch();
 	}
 
-	public function fetch_all_rows($mode)
+	public function fetch_all_rows($mode = NULL)
 	{
 		if (!isset($this->data)){
 			$this->data = $this->statement->fetchAll($mode);

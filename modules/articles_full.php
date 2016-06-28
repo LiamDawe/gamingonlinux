@@ -938,7 +938,7 @@ else if (isset($_GET['go']))
 
 								// message
 								$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title_upper}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 								<div>
 							 	<hr>
 							 	{$comment_email}

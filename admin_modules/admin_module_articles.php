@@ -189,7 +189,7 @@ if (isset($_GET['view']))
 				$article = $db->fetch();
 			}
 
-			if ($article['locked'] == 0 && $_GET['lock'] == 1)
+			if (isset($_GET['lock']) && $_GET['lock'] == 1 && $article['locked'] == 0)
 			{
 				$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 

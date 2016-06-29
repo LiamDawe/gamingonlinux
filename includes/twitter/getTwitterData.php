@@ -42,19 +42,19 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 	else
 	{
 		$uid = $user_info->id;
-        $username = $user_info->screen_name;
-        $user = new twitter_user();
-        $userdata = $user->checkUser($uid, 'twitter', $username);
+    $username = $user_info->screen_name;
+    $user = new twitter_user();
+    $userdata = $user->checkUser($uid, 'twitter', $username);
 
 		// linking account via usercp
-        if ($user->new == 0)
-        {
+    if ($user->new == 0)
+    {
 			header("Location: /usercp.php");
-        }
+    }
 
     	// logging in via twitter
-        else if ($user->new == 1)
-        {
+    else if ($user->new == 1)
+    {
 			// update IP address and last login
 			$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
@@ -70,8 +70,8 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 				setcookie('gol_session', $generated_session,  time()+31556926, '/', 'gamingonlinux.com');
 			}
 
-        	header("Location: /");
-        }
+      header("Location: /");
+    }
 
 		// registering a new account with a twitter handle, send them to register with the twitter data
 		else if($user->new == 2)

@@ -226,11 +226,19 @@ if (!isset($_GET['go']))
 				}
 
 				// sort out the pages and pagination and only return the page requested
-				$pages_array = explode('<*PAGE*>', $article['text']);
-				$article_page_count = count($pages_array);
-				$pages_array = array_combine(range(1, count($pages_array)), $pages_array);
+				if ($_SESSION['single_article_page'] == 0)
+				{
+					$pages_array = explode('<*PAGE*>', $article['text']);
+					$article_page_count = count($pages_array);
+					$pages_array = array_combine(range(1, count($pages_array)), $pages_array);
 
-				$templating->set('text', bbcode($pages_array[$article_page], 1, 1, $tagline_bbcode) . $article_bottom);
+					$templating->set('text', bbcode($pages_array[$article_page], 1, 1, $tagline_bbcode) . $article_bottom);
+				}
+				else
+				{
+					$article['text'] = str_replace('<*PAGE*>', '', $article['text']);
+					$templating->set('text', bbcode($article['text'], 1, 1, $tagline_bbcode));
+				}
 
 				$article_link = "/articles/$nice_title.{$_GET['aid']}/";
 				if (isset($_GET['preview']))

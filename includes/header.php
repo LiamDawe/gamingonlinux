@@ -37,6 +37,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 	$user->logout();
 }
 
+// all three of these can be removed eventually, stop-gap to stop errors for people already logged in that don't get the new options
 if (!isset($_SESSION['per-page']))
 {
 	$_SESSION['per-page'] = 10;
@@ -45,6 +46,11 @@ if (!isset($_SESSION['per-page']))
 if (!isset($_SESSION['articles-per-page']))
 {
 	$_SESSION['articles-per-page'] = 15;
+}
+
+if (!isset($_SESSION['single_article_page']))
+{
+	$_SESSION['single_article_page'] = 0;
 }
 
 // If they are not logged in make them a guest (group 4)
@@ -65,6 +71,7 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['per-page'] = 10;
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
+		$_SESSION['single_article_page'] = 0;
 	}
 }
 

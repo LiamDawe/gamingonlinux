@@ -17,7 +17,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `per-page`, `articles-per-page`, `twitter_username`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails`, `forum_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `auto_subscribe_new_article`, `email_options`, `login_emails`, `forum_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
@@ -110,6 +110,20 @@ if (!isset($_POST['act']))
 	}
 
 	$templating->set('profile_fields', $profile_fields_output);
+
+	$single_article_yes = '';
+	if ($usercpcp['single_article_page'] == 1)
+	{
+		$single_article_yes = 'selected';
+	}
+	$templating->set('single_article_yes', $single_article_yes);
+
+	$single_article_no = '';
+	if ($usercpcp['single_article_page'] == 0)
+	{
+		$single_article_no = 'selected';
+	}
+	$templating->set('single_article_no', $single_article_no);
 
 	$templating->set('bio', $usercpcp['article_bio']);
 
@@ -297,15 +311,22 @@ else if (isset($_POST['act']))
 			$forum_type_sql = 'normal_forum';
 		}
 
+		$single_article_page = 0;
+		if ($_POST['single_article_page'] == 1 || $_POST['single_article_page'] == 0)
+		{
+			$single_article_page = $_POST['single_article_page'];
+		}
+
 		// no nasty html grr
 		$bio = htmlspecialchars($_POST['bio'], ENT_QUOTES);
 
-		$user_update_sql = "UPDATE `users` SET `articles-per-page` = ?, `per-page` = ?, `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `forum_type` = ? WHERE `user_id` = ?";
-		$user_update_query = $db->sqlquery($user_update_sql, array($aper_page, $per_page, $subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $forum_type_sql, $_SESSION['user_id']));
+		$user_update_sql = "UPDATE `users` SET `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `auto_subscribe` = ?, `auto_subscribe_email` = ?, `article_bio` = ?, `email_on_pm` = ?, `auto_subscribe_new_article` = ?, `email_options` = ?, `login_emails` = ?, `forum_type` = ? WHERE `user_id` = ?";
+		$user_update_query = $db->sqlquery($user_update_sql, array($single_article_page, $aper_page, $per_page, $subscribe, $subscribe_emails, $bio, $email_on_pm, $subscribe_article, $_POST['email_options'], $email_on_login, $forum_type_sql, $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;
 		$_SESSION['forum_type'] = $forum_type_sql;
+		$_SESSION['single_article_page'] = $single_article_page;
 
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)

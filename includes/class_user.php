@@ -16,11 +16,11 @@ class user
 
 			if (password_verify($password, $info['password']))
 			{
-				$db->sqlquery("SELECT `user_id`, `per-page`, `articles-per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`, `forum_type` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+				$db->sqlquery("SELECT `user_id`, `single_article_page`, `per-page`, `articles-per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`, `forum_type` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
 			}
 			else
 			{
-				$db->sqlquery("SELECT `user_id`, `per-page`, `articles-per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`, `forum_type` FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $old_safe_password));
+				$db->sqlquery("SELECT `user_id`, `single_article_page`, `per-page`, `articles-per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`, `forum_type` FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $old_safe_password));
 			}
 
 			if ($db->num_rows() == 1)
@@ -202,6 +202,7 @@ class user
 		$_SESSION['per-page'] = $user_data['per-page'];
 		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
 		$_SESSION['forum_type'] = $user_data['forum_type'];
+		$_SESSION['single_article_page'] = $user_data['single_article_page'];
 	}
 
 	// if they have a stay logged in cookie log them in!
@@ -215,7 +216,7 @@ class user
 		if ($db->num_rows() == 1)
 		{
 			// login then
-			$db->sqlquery("SELECT `user_id`, `per-page`, `articles-per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `forum_type` FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
+			$db->sqlquery("SELECT `user_id`, `single_article_page`, `per-page`, `articles-per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `forum_type` FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
 			$user = $db->fetch();
 
 			if ($user['banned'] == 0)
@@ -246,6 +247,7 @@ class user
 					$_SESSION['per-page'] = $user['per-page'];
 					$_SESSION['articles-per-page'] = $user['articles-per-page'];
 					$_SESSION['forum_type'] = $user['forum_type'];
+					$_SESSION['single_article_page'] = $user['single_article_page'];
 
 					return true;
 				}
@@ -297,6 +299,7 @@ class user
 		$_SESSION['per-page'] = 15;
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
+		$_SESSION['single_article_page'] = 0;
 		setcookie('gol_stay', "",  time()-60, '/');
 		setcookie('gol_session', "",  time()-60, '/');
 		setcookie('gol-device', "",  time()-60, '/');

@@ -33,6 +33,9 @@
 				Get email's when we detect a new device logging in? <input type="checkbox" name="emaillogin" {:email_on_login} />
 			</label><br />
 			<strong>Articles &amp; Forum topics</strong><br />
+			Article paging<br />
+			<em>Display articles meant for multiple pages as one single page?</em><br />
+			<select name="single_article_page"><option value="1" {:single_article_yes}>Yes</option><option value="0" {:single_article_no}>No</option></select><br />
 			<label class="checkbox">
 				Auto subscribe when replying? <input type="checkbox" name="subscribe" {:subscribe_check} />
 			</label>

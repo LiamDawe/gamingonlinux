@@ -97,7 +97,7 @@ if (isset($_GET['view']))
         }
 
         $templating->block('submit', 'submit_article');
-        $templating->set('url',$config['path']);
+        $templating->set('url', core::config('website_url'));
         $templating->set('guest_fields', $guest_fields);
         $templating->set('title', $title);
 
@@ -108,8 +108,8 @@ if (isset($_GET['view']))
         }
         $templating->set('tagline_image', $tagline_pic);
 
-        $templating->set('max_height', $config['article_image_max_height']);
-        $templating->set('max_width', $config['article_image_max_width']);
+        $templating->set('max_height', core::config('article_image_max_height'));
+        $templating->set('max_width', core::config('article_image_max_width'));
 
         $subscribe_box = '';
         if ($_SESSION['user_id'] != 0)
@@ -368,15 +368,15 @@ if (isset($_POST['act']))
         }
 
         $templating->block('submit', 'submit_article');
-        $templating->set('url',$config['path']);
+        $templating->set('url', core::config('website_url'));
         $templating->set('guest_fields', $guest_fields);
         $templating->set('title', $_POST['title']);
 
         $top_image = '';
         if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
         {
-            $top_image = "<img src=\"{$config['path']}uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-            BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
+            $top_image = '<img src="'.core::config('website_url').'uploads/articles/tagline_images/temp/thumbnails/'.$_SESSION['uploads_tagline']['image_name'].'" alt="[articleimage]" class="imgList"><br />
+            BBCode: <input type="text" class="form-control input-sm" value="[img]tagline-image[/img]" /><br />';
         }
 
         $tagline_bbcode = '';
@@ -386,8 +386,8 @@ if (isset($_POST['act']))
         }
         $templating->set('tagline_image', $top_image);
 
-        $templating->set('max_height', $config['article_image_max_height']);
-        $templating->set('max_width', $config['article_image_max_width']);
+        $templating->set('max_height', core::config('article_image_max_height'));
+        $templating->set('max_width', core::config('article_image_max_width'));
 
         $subscribe_box = '';
         if ($_SESSION['user_id'] != 0)

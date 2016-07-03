@@ -46,7 +46,7 @@ if ($config['articles_rss'] == 1)
 			<pubDate>$now</pubDate>
 			<lastBuildDate>$now</lastBuildDate>";
 
-	$db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` ORDER BY `last_post_date` DESC limit ?", array($limit));
+	$db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit ?", array($limit));
 
 	while ($line = $db->fetch())
 	{

@@ -129,7 +129,7 @@ else
 		}
 
 		// get topic info/make sure it exists
-		$db->sqlquery("SELECT t.*, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.forum_posts, $db_grab_fields f.name as forum_name FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id INNER JOIN `forums` f ON t.forum_id = f.forum_id WHERE t.topic_id = ?", array($_GET['topic_id']), 'viewtopic.php');
+		$db->sqlquery("SELECT t.*, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.forum_posts, $db_grab_fields f.name as forum_name FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id INNER JOIN `forums` f ON t.forum_id = f.forum_id WHERE t.topic_id = ? AND t.approved = 1", array($_GET['topic_id']), 'viewtopic.php');
 		if ($db->num_rows() != 1)
 		{
 			$core->message('That is not a valid forum topic!');

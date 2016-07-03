@@ -45,7 +45,7 @@ while ($topics = $db->fetch())
 		$forum_posts .= "<li class=\"list-group-item\"><a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\">{$title}</a><br /><small>{$date}</small></li>";
 	}
 	else {
-		$forum_posts .= '<li><a href="' . url . 'index.php?module=viewtopic&amp;topic_id=' . $topics['topic_id'] . '&amp;page=' . $postPage . '">' . $title . '</a><br />
+		$forum_posts .= '<li class="list-group-item"><a href="' . url . 'index.php?module=viewtopic&amp;topic_id=' . $topics['topic_id'] . '&amp;page=' . $postPage . '">' . $title . '</a><br />
 		<small>' . $date .'</small></li>';
 	}
 

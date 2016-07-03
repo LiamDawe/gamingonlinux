@@ -78,8 +78,6 @@ if (isset($_POST['action']))
 			$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($_POST['creation_date'], $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
 		}
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `topic_id` = ?, `mod_queue` = 1", array("{$_SESSION['username']} approved a forum topic to be visible.", core::$date, core::$date, $_POST['topic_id']));
-
 		header("Location: /admin.php?module=mod_queue&view=forum_topics&message=approved");
 	}
 

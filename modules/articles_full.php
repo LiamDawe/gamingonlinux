@@ -238,6 +238,7 @@ if (!isset($_GET['go']))
 				{
 					$article['text'] = str_replace('<*PAGE*>', '', $article['text']);
 					$templating->set('text', bbcode($article['text'], 1, 1, $tagline_bbcode));
+					$article_page_count = 1;
 				}
 
 				$article_link = "/articles/$nice_title.{$_GET['aid']}/";

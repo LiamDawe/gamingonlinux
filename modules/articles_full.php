@@ -231,15 +231,15 @@ if (!isset($_GET['go']))
 					$pages_array = explode('<*PAGE*>', $article['text']);
 					$article_page_count = count($pages_array);
 					$pages_array = array_combine(range(1, count($pages_array)), $pages_array);
-
-					$templating->set('text', bbcode($pages_array[$article_page], 1, 1, $tagline_bbcode) . $article_bottom);
+					$article_body = $pages_array[$article_page];
 				}
 				else
 				{
-					$article['text'] = str_replace('<*PAGE*>', '', $article['text']);
-					$templating->set('text', bbcode($article['text'], 1, 1, $tagline_bbcode));
+					$article_body = str_replace('<*PAGE*>', '', $article['text']);
 					$article_page_count = 1;
 				}
+
+				$templating->set('text', bbcode($article_body, 1, 1, $tagline_bbcode) . $article_bottom);
 
 				$article_link = "/articles/$nice_title.{$_GET['aid']}/";
 				if (isset($_GET['preview']))

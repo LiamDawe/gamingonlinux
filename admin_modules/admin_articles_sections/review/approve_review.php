@@ -20,7 +20,15 @@ else
 
 	$editor_pick_count = $db->num_rows();
 
-	$slug = trim($_POST['slug']);
+	// check its set, if not hard-set it based on the article title
+	if (isset($_POST['slug']) && !empty($_POST['slug']))
+	{
+		$slug = $core->nice_title($_POST['slug']);
+	}
+	else
+	{
+		$slug = $core->nice_title($_POST['title']);
+	}
 
 	// make sure its not empty
 	if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) || empty($_POST['article_id']) || empty($slug))
@@ -111,7 +119,6 @@ else
 
 		$text = trim($_POST['text']);
 		$tagline = trim($_POST['tagline']);
-		$slug = $core->nice_title($_POST['slug']);
 
 		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} approved an article from the admin review queue.", core::$date, $_POST['article_id']));
 

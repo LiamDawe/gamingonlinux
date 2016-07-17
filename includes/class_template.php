@@ -54,6 +54,7 @@ class template
 	}
 
 	// merge another template with the first loaded one
+	// NOTE: why is this exactly the same as load? what was I drinking?!
 	public function merge($file)
 	{
 		global $core;
@@ -146,7 +147,7 @@ class template
 		$this->values[$this->block][$key] = $value;
 	}
 
-	// set a value for a tag to be replaced in the current block
+	// set a value for a tag to be replaced in a previous block
 	public function set_previous($key, $value, $block)
 	{
 		$this->values[$block][$key] = $value;

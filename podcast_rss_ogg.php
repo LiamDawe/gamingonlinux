@@ -45,18 +45,18 @@ foreach ($articles as $line)
 	$title = str_replace("&", "&amp;", $title);
 	$title = $title;
 
-
 	preg_match("/\[ogg](.+?)\[\/ogg\]/is", $line['text'], $matches);
-	$get_ogg = preg_replace("/\[ogg](.+?)\[\/ogg\]/is", '$1', $matches[0]);
-
-	$output .= "
-	<item>
-	<title>$title</title>
-	<description>{$line['tagline']}</description>
-	<enclosure url=\"$get_ogg\" type=\"audio/ogg\" />
-	<pubDate>$date</pubDate>
-	<guid>https://www.gamingonlinux.com/$nice_title.{$line['article_id']}/</guid>
-	</item>";
+	if (isset($matches[1]))
+	{
+		$output .= "
+		<item>
+		<title>$title</title>
+		<description>{$line['tagline']}</description>
+		<enclosure url=\"{$matches[1]}\" type=\"audio/ogg\" />
+		<pubDate>$date</pubDate>
+		<guid>https://www.gamingonlinux.com/$nice_title.{$line['article_id']}/</guid>
+		</item>";
+	}
 }
 
 $output .= "

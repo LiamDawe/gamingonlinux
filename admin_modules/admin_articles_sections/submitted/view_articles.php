@@ -255,7 +255,14 @@ else if (isset($_GET['aid']))
 
 	$templating->set('username', $username);
 
-	$templating->set('ip_address', $article['guest_ip']);
+	if (!empty($article['guest_ip']))
+	{
+		$user_ip = $article['guest_ip'];
+	}
+	else {
+		$user_ip = 'No IP was found';
+	}
+	$templating->set('ip_address', $user_ip);
 
 	// if they have done it before set title, text and tagline
 	if (isset($_GET['error']))

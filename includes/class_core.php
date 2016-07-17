@@ -109,7 +109,10 @@ class core
 		elseif (isset ($_SERVER['REMOTE_ADDR']))
 		{
 			$clientIP = $_SERVER['REMOTE_ADDR'];
-		} else {
+		}
+
+		else
+		{
 			$clientIP = "127.10.10.1"; //We have no IP, maybe running from CLI?
 		}
 

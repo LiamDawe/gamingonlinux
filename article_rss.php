@@ -107,7 +107,7 @@ foreach ($articles as $line)
 			<title>{$title}</title>
 			<author>$username</author>
 			<link>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</link>
-			<description><![CDATA[Tags:$cats<br />{$line['text']}]]></description>
+			<description><![CDATA[Tags:$cats<br />{$line['text']}<br /><br />Content from <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>]]></description>
 			<pubDate>{$date}</pubDate>
 			<guid>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</guid>
 		</item>";

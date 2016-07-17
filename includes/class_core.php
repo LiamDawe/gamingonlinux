@@ -467,6 +467,7 @@ class core
 
 	function nice_title($title)
 	{
+		$clean = trim($title);
 		$clean = iconv('UTF-8', 'ASCII//TRANSLIT', $title);
 		$clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
 		$clean = strtolower(trim($clean, '-'));

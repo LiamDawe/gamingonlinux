@@ -13,6 +13,7 @@ if (!empty($_POST['temp_tagline_image']))
 if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['article_id']))
 {
 	$_SESSION['atitle'] = $_POST['title'];
+	$_SESSION['aslug'] = $_POST['slug'];
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
@@ -23,6 +24,7 @@ if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['a
 else if (strlen($_POST['tagline']) < 100)
 {
 	$_SESSION['atitle'] = $_POST['title'];
+	$_SESSION['aslug'] = $_POST['slug'];
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
@@ -33,6 +35,7 @@ else if (strlen($_POST['tagline']) < 100)
 else if (strlen($_POST['tagline']) > 400)
 {
 	$_SESSION['atitle'] = $_POST['title'];
+	$_SESSION['aslug'] = $_POST['slug'];
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
@@ -43,6 +46,7 @@ else if (strlen($_POST['tagline']) > 400)
 else if (strlen($_POST['title']) < 10)
 {
 	$_SESSION['atitle'] = $_POST['title'];
+	$_SESSION['aslug'] = $_POST['slug'];
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
@@ -80,6 +84,7 @@ else
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 	unset($_SESSION['atitle']);
+	unset($_SESSION['aslug']);
 	unset($_SESSION['atagline']);
 	unset($_SESSION['atext']);
 	unset($_SESSION['acategories']);

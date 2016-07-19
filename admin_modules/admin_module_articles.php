@@ -84,6 +84,7 @@ if (isset($_GET['view']))
 
 		// if they have done it before set text and tagline
 		$title = '';
+		$slug = '';
 		$text = '';
 		$tagline = '';
 		$tagline_image = '';

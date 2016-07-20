@@ -93,10 +93,33 @@ function quotes($body, $rss = 0)
 	return $body;
 }
 
+function logged_in_code($body)
+{
+	// Quoting an actual person, book or whatever
+	$pattern = '/\[users-only\](.+?)\[\/users-only\]/is';
+	$replace = "$1";
+
+	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+	{
+		while(preg_match($pattern, $body))
+		{
+			$body = preg_replace($pattern, $replace, $body);
+		}
+	}
+	else
+	{
+		$body = preg_replace($pattern, '<strong>You must be logged in to see this section!</strong>', $body);
+	}
+
+	return $body;
+}
+
 function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $rss = 0)
 {
 	//  get rid of empty BBCode, is there a point in having excess markup?
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
+
+	$body = logged_in_code($body);
 
 	// Array for tempory storing codeblock contents
 	$codeBlocks = [];

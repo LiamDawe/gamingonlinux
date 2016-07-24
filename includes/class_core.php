@@ -1056,7 +1056,7 @@ class core
 		}
 		if ($chart_info['name'] == "RAM")
 		{
-			$order_sql = "(0 + l.name) DESC";
+			$order_sql = "d.data DESC, (0 + l.name) DESC";
 		}
 		if ($chart_info['name'] == 'Resolution')
 		{

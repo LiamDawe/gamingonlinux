@@ -223,7 +223,7 @@ if (isset($_GET['user_id']))
 					$ram_count = '';
 					if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
 					{
-						$ram_count = '<li><strong>RAM:</strong> '.$additionaldb['ram_count'].'</li>';
+						$ram_count = '<li><strong>RAM:</strong> '.$additionaldb['ram_count'].'GB</li>';
 						$counter++;
 					}
 					$templating->set('ram_count', $ram_count);

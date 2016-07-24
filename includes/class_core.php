@@ -1049,36 +1049,23 @@ class core
 		$chart_info = $db->fetch();
 
 		$res_sort = '';
-		$order_sql = 'd.`data` DESC';
-		if ($order == 'drivers')
-		{
-				$order_sql = "l.name DESC";
-		}
-		if ($chart_info['name'] == "RAM")
-		{
-			$order_sql = "d.data DESC, (0 + l.name) DESC";
-		}
-		if ($chart_info['name'] == 'Resolution')
-		{
-			$res_sort = "REPLACE(l.`name`, 'x', '') as name_sort,";
-			$order_sql = "`name_sort` DESC";
-		}
+		$order_sql = 'd.`data` ASC';
 
 		// set the right labels to the right data
 		$labels = array();
 		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
 
-		$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
-
 		if ($db->num_rows() > 0)
 		{
-			$limit_counter = 0;
-		  foreach ($get_labels as $label_loop)
+			$top_10_labels = array_slice($get_labels, -10);
+
+			if ($chart_info['name'] == 'RAM' || $chart_info['name'] == 'Resolution')
+			{
+				uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
+			}
+		  foreach ($top_10_labels as $label_loop)
 		  {
-				$limit_counter++;
-				if ($limit_counter <= 10)
-				{
 					$label_add = '';
 					if ($chart_info['name'] == 'RAM')
 					{
@@ -1092,18 +1079,29 @@ class core
 					{
 						$labels[$last_id]['colour'] = "#a6cee3";
 					}
-					if ($label_loop['name'] == 'AMD')
+					if ($label_loop['name'] == 'AMD' || $label_loop['name'] == 'Proprietary')
 					{
 						$labels[$last_id]['colour'] = "#e31a1c";
 					}
-					if ($label_loop['name'] == 'Nvidia')
+					if ($label_loop['name'] == 'Nvidia' || $label_loop['name'] == 'Open Source')
 					{
 						$labels[$last_id]['colour'] = "#33a02c";
 					}
-				}
-				$percent = round(($label_loop['data'] / $chart_info['total_answers']) * 100, 2);
-				$full_info .= '<strong>' . $label_loop['name'] . $label_add . '</strong>: ' . $label_loop['data'] . ' (' . $percent . '%)<br />';
 		  }
+
+			// this is for the full info expand box, as charts only show 10 items, this expands to show them all
+			$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
+
+			// sort them from highest to lowest
+			usort($get_labels, function($b, $a)
+			{
+				return $a['data'] - $b['data'];
+			});
+			foreach ($get_labels as $all_labels)
+			{
+				$percent = round(($all_labels['data'] / $chart_info['total_answers']) * 100, 2);
+				$full_info .= '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)<br />';
+			}
 			$full_info .= '</div></div>';
 
 			$settings = array('show_tooltips' => false, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);

@@ -16,6 +16,15 @@ if ($user->check_group(1) == true && core::config('show_debug') == 1)
 }
 $templating->set('debug', $debug);
 
+if (!empty(core::$user_graphs_js) || isset(core::$user_graphs_js))
+{
+	$svg_js = core::$user_graphs_js;
+}
+else {
+	$svg_js = '';
+}
+$templating->set('svggraph_js', $svg_js);
+
 echo $templating->output();
 
 // close the mysql connection

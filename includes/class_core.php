@@ -16,6 +16,8 @@ class core
 	// any message for image uploader
 	public $error_message;
 
+	public static $user_graphs_js = '';
+
 	protected static $config = array();
 
 	function __construct()
@@ -1087,6 +1089,7 @@ class core
 					{
 						$labels[$last_id]['colour'] = "#33a02c";
 					}
+					$labels[$last_id]['percent'] = round(($label_loop['data'] / $chart_info['total_answers']) * 100, 2) . '%';
 		  }
 
 			// this is for the full info expand box, as charts only show 10 items, this expands to show them all
@@ -1104,12 +1107,13 @@ class core
 			}
 			$full_info .= '</div></div>';
 
-			$settings = array('show_tooltips' => false, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
+			$settings = array('show_tooltips' => true, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
 			$settings['structured_data'] = true;
 			$settings['structure'] = array(
 			'key' => 'name',
 			'value' => 'total',
-			'colour' => 'colour'
+			'colour' => 'colour',
+			'tooltip' => 'percent'
 			);
 
 			$graph = new SVGGraph(400, 300, $settings);
@@ -1134,6 +1138,8 @@ class core
 			$get_graph['full_info'] = $full_info;
 			$get_graph['date'] = $chart_info['generated_date'];
 			$get_graph['total_users_answered'] = $chart_info['total_answers'];
+
+			core::$user_graphs_js = $graph->FetchJavascript();
 
 			return $get_graph;
 		}

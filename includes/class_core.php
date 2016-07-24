@@ -1045,7 +1045,7 @@ class core
 
 		require_once(core::config('path') . 'includes/SVGGraph/SVGGraph.php');
 
-		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `charts` WHERE `id` = ?", array($id));
+		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `user_stats_charts` WHERE `id` = ?", array($id));
 		$chart_info = $db->fetch();
 
 		$res_sort = '';
@@ -1066,7 +1066,7 @@ class core
 
 		// set the right labels to the right data
 		$labels = array();
-		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
+		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
 
 		if ($db->num_rows() > 0)

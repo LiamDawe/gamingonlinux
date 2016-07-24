@@ -16,6 +16,18 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 $cutoff = 182*24*3600;
 $last_login = $core->date - $cutoff;
 
+// get the last grouping_id, this is how we group together each new generation for easy edits and deletions
+$db->sqlquery("SELECT `grouping_id` FROM `user_stats_charts` ORDER BY `id` DESC LIMIT 1");
+if ($db->num_rows() == 0)
+{
+  $grouping_id = 1;
+}
+else
+{
+    $get_grouping_id = $db->fetch();
+    $grouping_id = $get_grouping_id['grouping_id'] + 1;
+}
+
 $charts = array (
   array ("name" => "Linux Distributions", "db_field" => "distro", "table" => 'users'),
   array ("name" => "Desktop Environment", "db_field" => "desktop_environment"),
@@ -51,7 +63,7 @@ foreach ($charts as $chart)
 	$labels = array();
 	$data = array();
 
-	$db->sqlquery("INSERT INTO `charts` SET `h_label` = ?, `name` = ?, `user_stats_chart` = 1", array('Total Users', $chart['name']));
+	$db->sqlquery("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', $chart['name']));
 
 	$new_chart_id = $db->grab_id();
 	foreach ($users as $user)
@@ -63,7 +75,7 @@ foreach ($charts as $chart)
 	$label_counter = 0;
 	foreach ($labels as $label)
 	{
-		$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+		$db->sqlquery("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $label));
 
 		// get the first id
 		if ($label_counter == 0)
@@ -80,7 +92,7 @@ foreach ($charts as $chart)
 	// put in the data
 	foreach ($data as $dat)
 	{
-		$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
+		$db->sqlquery("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $set_label_id, $dat));
 		$set_label_id++;
 		echo "Data $dat added!<br />";
 	}

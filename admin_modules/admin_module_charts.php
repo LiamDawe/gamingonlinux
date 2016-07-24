@@ -66,7 +66,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->set('chart_list', $chart_list);
 	}
-	
+
 	if ($_GET['view'] == 'manage_stats')
 	{
 		if (isset($_GET['message']))
@@ -79,13 +79,22 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('manage_charts', 'admin_modules/admin_module_charts');
 
 		$chart_list = '';
-		$db->sqlquery("SELECT * FROM `charts` WHERE `user_stats_chart` = 1 ORDER BY `id` DESC", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT * FROM `user_stats_charts` ORDER BY `id` DESC", array($_SESSION['user_id']));
+		$grouping_id = '';
 		while($charts = $db->fetch())
 		{
+			$charts['generated_date'] = date("Y-m-d", strtotime($charts['generated_date']));
+			if ($grouping_id != $charts['grouping_id'])
+			{
+				$grouping_id = $charts['grouping_id'];
+				$chart_list .= '<div class="box"><div class="head">Group ID: '.$grouping_id.', Date: '. $charts['generated_date'] .' <form method="post" style="display:inline"><button type="submit" name="act" value="Delete_Full" formaction="/admin.php?module=charts" style="float: none;">Delete Group</button><input type="hidden" name="grouping_id" value="'.$charts['grouping_id'].'" /></form></div></div>';
+			}
+
 			$chart_list .= '<div class="box"><div class="body group"><a href="/admin.php?module=charts&view=edit&id='.$charts['id'].'">'.$charts['name'].'</a> - [chart]'.$charts['id'].'[/chart] - Generated: '.$charts['generated_date'].'<br />
 			<form method="post">
 			<button type="submit" name="act" value="Delete" formaction="/admin.php?module=charts">Delete</button>
 			<input type="hidden" name="id" value="'.$charts['id'].'" />
+			<input type="hidden" name="stat_chart" value="1" />
 			</form></div></div>';
 		}
 
@@ -163,19 +172,55 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$core->yes_no('Are you sure you want to delete that article?', '/admin.php?module=charts&id='.$_POST['id'], "Delete");
+			$core->yes_no('Are you sure you want to delete that chart?', '/admin.php?module=charts&id='.$_POST['id'], "Delete");
 		}
 		else if (isset($_POST['no']))
 		{
-			header("Location: /admin.php?module=charts&view=manage");
+			if (isset($_POST['stat_chart']) && $_POST['stat_chart'] == 1)
+			{
+				header("Location: /admin.php?module=charts&view=manage_stats");
+			}
+			else
+			{
+				header("Location: /admin.php?module=charts&view=manage");
+			}
 		}
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("DELETE FROM `charts` WHERE `id` = ?", array($_GET['id']));
-			$db->sqlquery("DELETE FROM `charts_data` WHERE `chart_id` = ?", array($_GET['id']));
-			$db->sqlquery("DELETE FROM `charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
+			if (isset($_POST['stat_chart']) && $_POST['stat_chart'] == 1)
+			{
+				$db->sqlquery("DELETE FROM `user_stats_charts` WHERE `id` = ?", array($_GET['id']));
+				$db->sqlquery("DELETE FROM `user_stats_charts_data` WHERE `chart_id` = ?", array($_GET['id']));
+				$db->sqlquery("DELETE FROM `user_stats_charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
+				header("Location: /admin.php?module=charts&view=manage_stats&message=deleted");
+			}
+			else
+			{
+				$db->sqlquery("DELETE FROM `charts` WHERE `id` = ?", array($_GET['id']));
+				$db->sqlquery("DELETE FROM `charts_data` WHERE `chart_id` = ?", array($_GET['id']));
+				$db->sqlquery("DELETE FROM `charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
+				header("Location: /admin.php?module=charts&view=manage&message=deleted");
+			}
+		}
+	}
 
-			header("Location: /admin.php?module=charts&view=manage&message=deleted");
+	if ($_POST['act'] == 'Delete_Full')
+	{
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$core->yes_no('Are you sure you want to delete that group of charts?', '/admin.php?module=charts&grouping_id='.$_POST['grouping_id'], "Delete_Full");
+		}
+		else if (isset($_POST['no']))
+		{
+			header("Location: /admin.php?module=charts&view=manage_stats");
+		}
+		else if (isset($_POST['yes']))
+		{
+			$db->sqlquery("DELETE FROM `user_stats_charts` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
+			$db->sqlquery("DELETE FROM `user_stats_charts_data` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
+			$db->sqlquery("DELETE FROM `user_stats_charts_labels` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
+
+			header("Location: /admin.php?module=charts&view=manage_stats&message=deleted");
 		}
 	}
 }

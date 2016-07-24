@@ -31,7 +31,7 @@ $counter = 0;
 foreach($charts as $chart)
 {
   // DISTRIBUTION CHOICE
-  $db->sqlquery("SELECT `id` FROM `charts` WHERE `name` = '{$chart['name']}' ORDER BY `id` DESC LIMIT 1");
+  $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = '{$chart['name']}' ORDER BY `id` DESC LIMIT 1");
   $get_distro_chart = $db->fetch();
 
   $order = '';

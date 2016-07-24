@@ -147,7 +147,7 @@ if (isset($_GET['user_id']))
 				$templating->block('additional');
 
 				$distro = '';
-				if (!empty($profile['distro']))
+				if (!empty($profile['distro']) && $profile['distro'] != 'Not Listed')
 				{
 					$distro = "<li><strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$profile['distro']}.svg\" alt=\"{$profile['distro']}\" /> {$profile['distro']}</li>";
 					$counter++;

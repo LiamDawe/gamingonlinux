@@ -1045,7 +1045,7 @@ class core
 
 		require_once(core::config('path') . 'includes/SVGGraph/SVGGraph.php');
 
-		$db->sqlquery("SELECT `name`, `h_label`, `generated_date` FROM `user_stats_charts` WHERE `id` = ?", array($id));
+		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($id));
 		$chart_info = $db->fetch();
 
 		$res_sort = '';
@@ -1069,11 +1069,16 @@ class core
 		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
 
+		$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
+
 		if ($db->num_rows() > 0)
 		{
-			$get_graph['total_users_answered'] = 0;
+			$limit_counter = 0;
 		  foreach ($get_labels as $label_loop)
 		  {
+				$limit_counter++;
+				if ($limit_counter <= 10)
+				{
 					$label_add = '';
 					if ($chart_info['name'] == 'RAM')
 					{
@@ -1095,8 +1100,11 @@ class core
 					{
 						$labels[$last_id]['colour'] = "#33a02c";
 					}
-					$get_graph['total_users_answered'] = $get_graph['total_users_answered'] + $label_loop['data'];
+				}
+				$percent = round(($label_loop['data'] / $chart_info['total_answers']) * 100, 2);
+				$full_info .= '<strong>' . $label_loop['name'] . $label_add . '</strong>: ' . $label_loop['data'] . ' (' . $percent . '%)<br />';
 		  }
+			$full_info .= '</div></div>';
 
 			$settings = array('show_tooltips' => false, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
 			$settings['structured_data'] = true;
@@ -1125,7 +1133,9 @@ class core
 	 		$graph->Colours($colours);
 
 		  $get_graph['graph'] = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
+			$get_graph['full_info'] = $full_info;
 			$get_graph['date'] = $chart_info['generated_date'];
+			$get_graph['total_users_answered'] = $chart_info['total_answers'];
 
 			return $get_graph;
 		}

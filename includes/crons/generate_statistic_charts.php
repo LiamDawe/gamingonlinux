@@ -58,7 +58,7 @@ foreach ($charts as $chart)
 		$sql_vendor = "`gpu_vendor` = '{$chart['gpu_vendor']}' AND";
 	}
 
-	$grab_users = $db->sqlquery("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor `{$chart['db_field']}` != '' AND `{$chart['db_field']}` != 'Not Listed' AND `{$chart['db_field']}` IS NOT NULL GROUP BY {$chart['db_field']} ORDER BY `total` DESC LIMIT 10");
+	$grab_users = $db->sqlquery("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor `{$chart['db_field']}` != '' AND `{$chart['db_field']}` != 'Not Listed' AND `{$chart['db_field']}` IS NOT NULL GROUP BY {$chart['db_field']} ORDER BY `total` DESC");
 	$users = $db->fetch_all_rows();
 	$labels = array();
 	$data = array();
@@ -89,19 +89,24 @@ foreach ($charts as $chart)
 	}
 
 	$set_label_id = $new_label_id;
+  $total_dat = 0;
 	// put in the data
 	foreach ($data as $dat)
 	{
 		$db->sqlquery("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $set_label_id, $dat));
 		$set_label_id++;
+    $total_dat = $total_dat + $dat;
 		echo "Data $dat added!<br />";
 	}
+
+  $db->sqlquery("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
 
 	unset($data);
 	unset($labels);
 	unset($label);
 	unset($users);
 	unset($user);
+  unset($dat);
 }
 
 echo "Generation Done";

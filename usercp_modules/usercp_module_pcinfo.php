@@ -253,7 +253,7 @@ else if (isset($_POST['act']))
 			$_POST['gaming_machine_type']);
 		foreach ($pc_info_fields as $field)
 		{
-			if (isset($field) && !empty($field))
+			if (isset($field) && !empty($field) && $field != 'Not Listed')
 			{
 				$pc_info_filled = 1;
 				break;

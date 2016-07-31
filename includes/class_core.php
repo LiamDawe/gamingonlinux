@@ -1102,8 +1102,29 @@ class core
 			});
 			foreach ($get_labels as $all_labels)
 			{
+				$icon = '';
+				if ($chart_info['name'] == "Linux Distributions (Split)")
+				{
+					$icon = '<img src="/templates/default/images/distros/'.$all_labels['name'].'.svg" alt="distro-icon" width="20" height="20" /> ';
+				}
+				if ($chart_info['name'] == "Linux Distributions (Combined)")
+				{
+					if ($all_labels['name'] == 'Ubuntu-based')
+					{
+						$icon_name = 'Ubuntu';
+					}
+					else if ($all_labels['name'] == 'Arch-based')
+					{
+						$icon_name = 'Arch';
+					}
+					else
+					{
+						$icon_name = $all_labels['name'];
+					}
+					$icon = '<img src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
+				}
 				$percent = round(($all_labels['data'] / $chart_info['total_answers']) * 100, 2);
-				$full_info .= '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)<br />';
+				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)<br />';
 			}
 			$full_info .= '</div></div>';
 

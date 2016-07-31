@@ -1,6 +1,6 @@
 <?php
-//define('path', '/home/gamingonlinux/public_html/includes/');
-define('path', '/mnt/storage/public_html/includes/');
+define('path', '/home/gamingonlinux/public_html/includes/');
+//define('path', '/mnt/storage/public_html/includes/');
 include(path . 'config.php');
 
 include(path . 'class_core.php');

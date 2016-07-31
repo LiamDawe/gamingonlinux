@@ -11,7 +11,8 @@ $templating->block('users');
 $templating->set('total_users', core::config('total_users'));
 
 $charts = array(
-  array("name" => "Linux Distributions"),
+  array("name" => "Linux Distributions (Combined)"),
+  array("name" => "Linux Distributions (Split)"),
   array("name" => "Desktop Environment"),
   array("name" => "Distro Architecture"),
   array("name" => "Dual Booting"),

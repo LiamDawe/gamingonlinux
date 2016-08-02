@@ -53,9 +53,11 @@ if ($config['articles_rss'] == 1)
 		// make date human readable
 		$date = date("D, d M Y H:i:s O", $line['last_post_date']);
 
+		$title = htmlspecialchars($line['topic_title'], ENT_QUOTES, 'UTF-8');
+
 		$output .= "
 			<item>
-				<title>{$line['topic_title']}</title>
+				<title>{$title}</title>
 				<link>". core::config('website_url') . "forum/topic/{$line['topic_id']}/</link>
 				<pubDate>{$date}</pubDate>
 				<guid>". core::config('website_url') . "forum/topic/{$line['topic_id']}/</guid>

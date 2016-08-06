@@ -253,49 +253,34 @@ if (isset($_POST['act']))
                     $core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
                 }
 
-                    $core->message('Article has been sent to the admins for review before it is posted! <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
+                $core->message('Article has been sent to the admins for review before it is posted! <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
 
-                    // get all the editor and admin emails apart from sinead
-                    $editor_emails = array();
-                    $db->sqlquery("SELECT `email` FROM `users` WHERE `user_group` IN (1,2) AND `user_id` != 431");
-                    while ($get_emails = $db->fetch())
-                    {
-                        $editor_emails[] = $get_emails['email'];
-                    }
+                // get all the editor and admin emails apart from sinead
+                $editor_emails = array();
+                $db->sqlquery("SELECT `email` FROM `users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5) AND `username` != 'gamingonlinux'");
+                while ($get_emails = $db->fetch())
+                {
+                    $editor_emails[] = $get_emails['email'];
+                }
 
-                    $to = implode(', ', $editor_emails);
+                $to = implode(', ', $editor_emails);
 
-                    // subject
-                    $subject = "GamingOnLinux.com article submission - {$username}";
+                // subject
+                $subject = "GamingOnLinux.com article submission from {$username}";
 
-                    // find what name to use
+                // message
+    						$html_message = "<p>Hello GOL editor,</p>
+                <p>A new article has been submitted that needs reviewing titled <a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\"><strong>{$title}</strong></a> from {$username}</p>
+                <p><a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\">Click here to review it</a>";
 
-                    // message
-                    $message = "
-                    <html>
-                    <head>
-                    <title>GamingOnLinux.com article submission</title>
-                    </head>
-                    <body>
-                    <img src=\"{$config['website_url']}{$config['path']}templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-                    <br />
-                    <p>Hello admin,</p>
-                    <p>A new article has been submitted that needs reviewing titled <a href=\"{$config['website_url']}{$config['path']}/admin.php?module=articles&view=Submitted\"><strong>{$title}</strong></a> from {$username}</p>
-                    <p><a href=\"{$config['website_url']}{$config['path']}/admin.php?module=articles&view=Submitted\">Click here to review it</a>
-                    </body>
-                    </html>
-                    ";
+    						$plain_message = PHP_EOL."Hello GOL editor, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review: " . core::config('website_url') . "admin.php?module=articles&view=Submitted";
 
-                    // To send HTML mail, the Content-type header must be set
-                    $headers  = 'MIME-Version: 1.0' . "\r\n";
-                    $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-                    $headers .= "From: GOL Notification of article submission <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-                    // Mail it
-                    if ($config['send_emails'] == 1)
-                    {
-                        @mail($to, $subject, $message, $headers);
-                    }
+                // Mail it
+                if (core::config('send_emails') == 1)
+                {
+                  $mail = new mail($to, $subject, $html_message, $plain_message);
+                  $mail->send();
+                }
 
                 unset($_SESSION['atitle']);
                 unset($_SESSION['atext']);

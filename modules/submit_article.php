@@ -273,10 +273,14 @@ if (isset($_POST['act']))
 
     						$plain_message = PHP_EOL."Hello GOL editor, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review: " . core::config('website_url') . "admin.php?module=articles&view=Submitted";
 
+                $first = array_shift($editor_emails);
+
+                $the_rest = implode(",", $editor_emails);
+
                 // Mail it
                 if (core::config('send_emails') == 1)
                 {
-                  $mail = new mail(implode(array_slice($editor_emails, 0, 1)), $subject, $html_message, $plain_message, "BCC: ". implode(",", array_shift($editor_emails)));
+                  $mail = new mail($first, $subject, $html_message, $plain_message, "BCC: ". $the_rest);
                   $mail->send();
                 }
 

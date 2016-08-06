@@ -201,7 +201,7 @@ if (isset($_POST['act']))
             }
 
             // carry on and submit the article
-            else if (($parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0)
+            if (($parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0)
             {
                 // setup category if empty
                 if (empty($_POST['category']) || !is_numeric($_POST['category']))
@@ -263,8 +263,6 @@ if (isset($_POST['act']))
                     $editor_emails[] = $get_emails['email'];
                 }
 
-                $to = implode(', ', $editor_emails);
-
                 // subject
                 $subject = "GamingOnLinux.com article submission from {$username}";
 
@@ -278,7 +276,7 @@ if (isset($_POST['act']))
                 // Mail it
                 if (core::config('send_emails') == 1)
                 {
-                  $mail = new mail($to, $subject, $html_message, $plain_message);
+                  $mail = new mail(implode(array_slice($editor_emails, 0, 1)), $subject, $html_message, $plain_message, "BCC: ". implode(",", array_shift($editor_emails)));
                   $mail->send();
                 }
 

@@ -44,10 +44,10 @@ class mail
 		{
 			$h = [];
 			$a = explode("\r\n", $headers_additional);
-			foreach ($a as $k => $v)
+			foreach ($a as $v)
 			{
 				$b = explode(": ", $v);
-				$h[$b[0]] = $b[1];
+				$h[$b[0]] = $v;
 			}
 			$this->headers = array_merge($this->headers, $h);
 		}

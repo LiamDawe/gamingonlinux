@@ -257,31 +257,25 @@ if (isset($_POST['act']))
 
                 // get all the editor and admin emails apart from sinead
                 $editor_emails = array();
-                $db->sqlquery("SELECT `email` FROM `users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5) AND `username` != 'gamingonlinux'");
-                while ($get_emails = $db->fetch())
-                {
-                    $editor_emails[] = $get_emails['email'];
-                }
 
-                // subject
                 $subject = "GamingOnLinux.com article submission from {$username}";
 
-                // message
-    						$html_message = "<p>Hello GOL editor,</p>
-                <p>A new article has been submitted that needs reviewing titled <a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\"><strong>{$title}</strong></a> from {$username}</p>
-                <p><a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\">Click here to review it</a>";
-
-    						$plain_message = PHP_EOL."Hello GOL editor, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review: " . core::config('website_url') . "admin.php?module=articles&view=Submitted";
-
-                $first = array_shift($editor_emails);
-
-                $the_rest = implode(",", $editor_emails);
-
-                // Mail it
-                if (core::config('send_emails') == 1)
+                $db->sqlquery("SELECT `email`, `username` FROM `users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5) AND `username` != 'gamingonlinux'");
+                while ($get_emails = $db->fetch())
                 {
-                  $mail = new mail($first, $subject, $html_message, $plain_message, "BCC: ". $the_rest);
-                  $mail->send();
+                  // message
+                  $html_message = "<p>Hello {$get_emails['username']},</p>
+                  <p>A new article has been submitted that needs reviewing titled <a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\"><strong>{$title}</strong></a> from {$username}</p>
+                  <p><a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\">Click here to review it</a>";
+
+                  $plain_message = PHP_EOL."Hello {$get_emails['username']}, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review: " . core::config('website_url') . "admin.php?module=articles&view=Submitted";
+
+                  // Mail it
+                  if (core::config('send_emails') == 1)
+                  {
+                    $mail = new mail($get_emails['email'], $subject, $html_message, $plain_message);
+                    $mail->send();
+                  }
                 }
 
                 unset($_SESSION['atitle']);

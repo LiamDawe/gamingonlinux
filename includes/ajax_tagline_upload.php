@@ -39,6 +39,8 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 
 			// if the image is just too small in dimensions
 			list($width, $height, $type, $attr) = $image_info;
+
+			// has to be at least 550 to work on social media websites for the image to be auto-included in posts like on G+ and Facebook
 			if ($width < 550 || $height < 250)
 			{
 				echo '<span class="imgList">Image was too small, we re-size it automatically for the home-page!</span>';

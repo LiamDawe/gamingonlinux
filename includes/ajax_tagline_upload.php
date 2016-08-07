@@ -73,6 +73,11 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 
 				else if( $image_type == IMAGETYPE_PNG )
 				{
+					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
+					$image_func->load($_FILES['photos2']['tmp_name']);
+					$image_func->scale(950);
+					$image_func->save($_FILES['photos2']['tmp_name']);
+					
 					$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
 					imagepng($oldImage, $_FILES['photos2']['tmp_name'], 7);
 				}

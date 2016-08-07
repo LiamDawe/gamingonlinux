@@ -37,6 +37,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			$image_info = getimagesize($_FILES['photos2']['tmp_name']);
 			$image_type = $image_info[2];
 
+			// if the image is just too small in dimensions
 			list($width, $height, $type, $attr) = $image_info;
 			if ($width < 550 || $height < 250)
 			{

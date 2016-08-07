@@ -80,7 +80,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				clearstatcache();
 
 				// check again
-				if (filesize($_FILES['photos2']['tmp_name']) > 85900)
+				if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
 				{
 					// try reducing it some more
 					if( $image_type == IMAGETYPE_JPEG )
@@ -91,7 +91,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						clearstatcache();
 
 						// still too big
-						if (filesize($_FILES['photos2']['tmp_name']) > 85900)
+						if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
 						{
 							echo '<span class="imgList">File size too big!</span>';
 							return;

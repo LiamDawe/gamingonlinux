@@ -9,6 +9,9 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include('class_core.php');
 $core = new core();
 
+include_once('class_image.php');
+$image_func = new SimpleImage();
+
 // get config
 $db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
 $fetch_config = $db->fetch_all_rows();
@@ -48,6 +51,12 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				$image_type = $image_info[2];
 				if( $image_type == IMAGETYPE_JPEG )
 				{
+					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
+					$image_func->load($_FILES['photos2']['tmp_name']);
+					$image_func->scale(950);
+					$image_func->save($_FILES['photos2']['tmp_name']);
+
+					// compress it a lil bit
 					$oldImage = imagecreatefromjpeg($_FILES['photos2']['tmp_name']);
 					imagejpeg($oldImage, $_FILES['photos2']['tmp_name'], 90);
 				}
@@ -130,10 +139,8 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		// where to upload to
 		$target = core::config('path') . "uploads/articles/tagline_images/temp/" . $imagename;
 
-		include(core::config('path') . 'includes/class_image.php');
-		$image_func = new SimpleImage();
 		$image_func->load($_FILES['photos2']['tmp_name']);
-		$image_func->resize(350,220);
+		$image_func->scale(350);
 		$image_func->save(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename, $image_type);
 
 		if (move_uploaded_file($source, $target))

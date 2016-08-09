@@ -35,42 +35,40 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		{
 			// check the dimensions
 			$image_info = getimagesize($_FILES['photos2']['tmp_name']);
-			$image_type = $image_info[2];
+			$image_func->image_type = $image_info[2];
 
 			// if the image is just too small in dimensions
 			list($width, $height, $type, $attr) = $image_info;
 
+			/* SCALING UP TO 550
 			// has to be at least 550 to work on social media websites for the image to be auto-included in posts like on G+ and Facebook
-			if ($width < 550 || $height < 250)
+			// Do this by itself first, so that we can try to preserve aspect ratio!
+			*/
+			if ($width < 550)
 			{
-				$image_info = getimagesize($_FILES['photos2']['tmp_name']);
-				$image_type = $image_info[2];
-				if( $image_type == IMAGETYPE_JPEG )
+				if( $image_func->image_type == IMAGETYPE_JPEG )
 				{
 					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
 					$image_func->load($_FILES['photos2']['tmp_name']);
 					$image_func->scale(550);
 					$image_func->save($_FILES['photos2']['tmp_name']);
-
-					// compress it a lil bit
-					$oldImage = imagecreatefromjpeg($_FILES['photos2']['tmp_name']);
-					imagejpeg($oldImage, $_FILES['photos2']['tmp_name'], 90);
 				}
 
 				// cannot compress gifs so it's just too big
-				else if( $image_type == IMAGETYPE_GIF )
+				else if( $image_func->image_type == IMAGETYPE_GIF )
 				{
 					echo '<span class="imgList">File size too big!</span>';
 					return;
 				}
 
-				else if( $image_type == IMAGETYPE_PNG )
+				else if( $image_func->image_type == IMAGETYPE_PNG )
 				{
 					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
 					$image_func->load($_FILES['photos2']['tmp_name']);
 					$image_func->scale(550);
 					$image_func->save($_FILES['photos2']['tmp_name']);
 
+					// compress it a bit
 					$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
 					imagepng($oldImage, $_FILES['photos2']['tmp_name'], 7);
 				}
@@ -78,64 +76,112 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				clearstatcache();
 			}
 
-			// check if its too big
+			/* RECHECK DIMENSIONS AFTER SCALING
+			It will now be the correct width, but we need to be sure on the height
+			*/
+			$image_info = getimagesize($_FILES['photos2']['tmp_name']);
+
+			// if the image is just too small in dimensions
+			list($width, $height, $type, $attr) = $image_info;
+			if ($height < 250)
+			{
+				echo '<span class="imgList">Image is just too small!</span>';
+				return;
+			}
+
+			/* CHECK FILE SIZE
+			So we know for sure it has the correct minimum dimensions
+			*/
 			if ($_FILES['photos2']['size'] > core::config('max_tagline_image_filesize'))
 			{
 				$image_info = getimagesize($_FILES['photos2']['tmp_name']);
-				$image_type = $image_info[2];
-				if( $image_type == IMAGETYPE_JPEG )
-				{
-					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
-					$image_func->load($_FILES['photos2']['tmp_name']);
-					$image_func->scale(950);
-					$image_func->save($_FILES['photos2']['tmp_name']);
 
-					// compress it a lil bit
-					$oldImage = imagecreatefromjpeg($_FILES['photos2']['tmp_name']);
-					imagejpeg($oldImage, $_FILES['photos2']['tmp_name'], 90);
+				// okay, so it's a rather big image you're trying to put up as a tagline image, let's make it no bigger than GOL's content area
+				if ($width > 950)
+				{
+					if( $image_func->image_type == IMAGETYPE_JPEG )
+					{
+						$image_func->load($_FILES['photos2']['tmp_name']);
+						$image_func->scale(950);
+						$image_func->save($_FILES['photos2']['tmp_name']);
+					}
+
+					// cannot compress gifs so it's just too big
+					else if( $image_func->image_type == IMAGETYPE_GIF )
+					{
+						echo '<span class="imgList">File size too big!</span>';
+						return;
+					}
+
+					else if( $image_func->image_type == IMAGETYPE_PNG )
+					{
+						$image_func->load($_FILES['photos2']['tmp_name']);
+						$image_func->scale(950);
+						$image_func->save($_FILES['photos2']['tmp_name']);
+
+						$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
+						imagepng($oldImage, $_FILES['photos2']['tmp_name'], 7);
+					}
 				}
 
-				// cannot compress gifs so it's just too big
-				else if( $image_type == IMAGETYPE_GIF )
+				// okay, so width is good, let's try compressing directly instead then
+				else if ($width < 950)
 				{
-					echo '<span class="imgList">File size too big!</span>';
-					return;
-				}
+					if( $image_func->image_type == IMAGETYPE_JPEG )
+					{
+						// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
+						$image_func->load($_FILES['photos2']['tmp_name']);
+						$image_func->save($_FILES['photos2']['tmp_name'], $image_func->image_type, 70);
+					}
 
-				else if( $image_type == IMAGETYPE_PNG )
-				{
-					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
-					$image_func->load($_FILES['photos2']['tmp_name']);
-					$image_func->scale(950);
-					$image_func->save($_FILES['photos2']['tmp_name']);
+					// cannot compress gifs so it's just too big
+					else if( $image_func->image_type == IMAGETYPE_GIF )
+					{
+						echo '<span class="imgList">File size too big!</span>';
+						return;
+					}
 
-					$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
-					imagepng($oldImage, $_FILES['photos2']['tmp_name'], 7);
+					else if( $image_func->image_type == IMAGETYPE_PNG )
+					{
+						// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
+						$image_func->load($_FILES['photos2']['tmp_name']);
+						$image_func->save($_FILES['photos2']['tmp_name']);
+
+						$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
+						imagepng($oldImage, $_FILES['photos2']['tmp_name'], 8);
+					}
 				}
 
 				clearstatcache();
 
-				// check again after scaling and downsmapling a bit
+				// check again after scaling and compressing a bit, try reducing it some more  as a last resort
 				if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
 				{
-					// try reducing it some more
-					if( $image_type == IMAGETYPE_JPEG )
+					if( $image_func->image_type == IMAGETYPE_JPEG )
 					{
-						$oldImage = imagecreatefromjpeg($_FILES['photos2']['tmp_name']);
-						imagejpeg($oldImage, $_FILES['photos2']['tmp_name'], 85);
-
-						clearstatcache();
-
-						// still too big
-						if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
-						{
-							echo '<span class="imgList">File size too big!</span>';
-							return;
-						}
+						$image_func->load($_FILES['photos2']['tmp_name']);
+						$image_func->save($_FILES['photos2']['tmp_name'], $image_func->image_type, 65);
 					}
 
-					// gif so can't reduce it
-					else
+					else if( $image_func->image_type == IMAGETYPE_GIF )
+					{
+						echo '<span class="imgList">File size too big!</span>';
+						return;
+					}
+
+					else if( $image_func->image_type == IMAGETYPE_PNG )
+					{
+						$image_func->load($_FILES['photos2']['tmp_name']);
+						$image_func->save($_FILES['photos2']['tmp_name']);
+
+						$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
+						imagepng($oldImage, $_FILES['photos2']['tmp_name'], 9);
+					}
+
+					clearstatcache();
+
+					// still too big, must be a fecking huge image they're trying to upload wtf
+					if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
 					{
 						echo '<span class="imgList">File size too big!</span>';
 						return;
@@ -143,7 +189,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				}
 			}
 
-			// this will make sure it is an image file, if it cant get an image size then its not an image
+			// this will make finally sure it is an image file (cant hurt to check one last time in another way), if it cant get an image size then its not an image
 			if (!getimagesize($_FILES['photos2']['tmp_name']))
 			{
 				echo '<span class="imgList">That was not an image!</span>';
@@ -152,19 +198,18 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		}
 
 		$image_info = getimagesize($_FILES['photos2']['tmp_name']);
-		$image_type = $image_info[2];
 		$file_ext = '';
-		if( $image_type == IMAGETYPE_JPEG )
+		if( $image_func->image_type == IMAGETYPE_JPEG )
 		{
 			$file_ext = 'jpg';
 		}
 
-		else if( $image_type == IMAGETYPE_GIF )
+		else if( $image_func->image_type == IMAGETYPE_GIF )
 		{
 			$file_ext = 'gif';
 		}
 
-		else if( $image_type == IMAGETYPE_PNG )
+		else if( $image_func->image_type == IMAGETYPE_PNG )
 		{
 			$file_ext = 'png';
 		}
@@ -178,9 +223,10 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		// where to upload to
 		$target = core::config('path') . "uploads/articles/tagline_images/temp/" . $imagename;
 
+		// make the thumbnail, nice and small
 		$image_func->load($_FILES['photos2']['tmp_name']);
 		$image_func->scale(350);
-		$image_func->save(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename, $image_type);
+		$image_func->save(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename);
 
 		if (move_uploaded_file($source, $target))
 		{

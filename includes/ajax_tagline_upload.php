@@ -92,7 +92,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			/* CHECK FILE SIZE
 			So we know for sure it has the correct minimum dimensions
 			*/
-			if ($_FILES['photos2']['size'] > core::config('max_tagline_image_filesize'))
+			if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
 			{
 				$image_info = getimagesize($_FILES['photos2']['tmp_name']);
 

@@ -64,7 +64,7 @@ if (!isset($_GET['view']))
 	// editor tracking
 	$templating->block('editor_tracking', 'admin_modules/admin_home');
 
-	$db->sqlquery("SELECT * FROM `admin_notifications` ORDER BY `id` DESC LIMIT 25");
+	$db->sqlquery("SELECT * FROM `admin_notifications` ORDER BY `id` DESC LIMIT 50");
 	while ($tracking = $db->fetch())
 	{
 		$date = $tracking['created'];

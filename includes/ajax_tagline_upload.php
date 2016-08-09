@@ -43,8 +43,39 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			// has to be at least 550 to work on social media websites for the image to be auto-included in posts like on G+ and Facebook
 			if ($width < 550 || $height < 250)
 			{
-				echo '<span class="imgList">Image was too small, we re-size it automatically for the home-page!</span>';
-				return;
+				$image_info = getimagesize($_FILES['photos2']['tmp_name']);
+				$image_type = $image_info[2];
+				if( $image_type == IMAGETYPE_JPEG )
+				{
+					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
+					$image_func->load($_FILES['photos2']['tmp_name']);
+					$image_func->scale(550);
+					$image_func->save($_FILES['photos2']['tmp_name']);
+
+					// compress it a lil bit
+					$oldImage = imagecreatefromjpeg($_FILES['photos2']['tmp_name']);
+					imagejpeg($oldImage, $_FILES['photos2']['tmp_name'], 90);
+				}
+
+				// cannot compress gifs so it's just too big
+				else if( $image_type == IMAGETYPE_GIF )
+				{
+					echo '<span class="imgList">File size too big!</span>';
+					return;
+				}
+
+				else if( $image_type == IMAGETYPE_PNG )
+				{
+					// so it's too big in filesize, let's make sure the image isn't bigger than our content section can fit to see if we can reduce filesize a bit
+					$image_func->load($_FILES['photos2']['tmp_name']);
+					$image_func->scale(550);
+					$image_func->save($_FILES['photos2']['tmp_name']);
+
+					$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
+					imagepng($oldImage, $_FILES['photos2']['tmp_name'], 7);
+				}
+
+				clearstatcache();
 			}
 
 			// check if its too big

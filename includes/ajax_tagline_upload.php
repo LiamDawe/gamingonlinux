@@ -77,14 +77,14 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$image_func->load($_FILES['photos2']['tmp_name']);
 					$image_func->scale(950);
 					$image_func->save($_FILES['photos2']['tmp_name']);
-					
+
 					$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
 					imagepng($oldImage, $_FILES['photos2']['tmp_name'], 7);
 				}
 
 				clearstatcache();
 
-				// check again
+				// check again after scaling and downsmapling a bit
 				if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
 				{
 					// try reducing it some more

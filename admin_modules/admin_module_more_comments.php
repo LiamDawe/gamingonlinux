@@ -2,7 +2,7 @@
 $templating->merge('admin_modules/admin_module_more_comments');
 
 if (isset($_GET['message']))
-{	
+{
 	if ($_GET['message'] == 'added')
 	{
 		$core->message('Added the comment!');
@@ -16,10 +16,30 @@ if (isset($_GET['message']))
 
 if (isset($_GET['view']) && $_GET['view'] == 'editors')
 {
+	// paging for pagination
+	if (!isset($_GET['page']) || $_GET['page'] == 0)
+	{
+		$page = 1;
+	}
+
+	else if (is_numeric($_GET['page']))
+	{
+		$page = $_GET['page'];
+	}
+
+	// count how many there is in total
+	$sql_count = "SELECT `id` FROM `editor_discussion`";
+	$db->sqlquery($sql_count, array($_GET['aid']));
+	$total_pages = $db->num_rows();
+
+	// sort out the pagination link
+	$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "admin.php?module=more_comments&view=editors&", $page);
+
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
+	$templating->set('pagination', $pagination);
 
-	$db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT 50");
+	$db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
 	while ($commentsall = $db->fetch())
 	{
 		$templating->block('commentall', 'admin_modules/admin_module_more_comments');
@@ -30,7 +50,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 		{
 			$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $commentsall['gravatar_email'] ) ) ) . "?d=" . urlencode('//www.gamingonlinux.com/uploads/avatars/no_avatar.png');
 		}
-			
+
 		// either uploaded or linked an avatar
 		if (!empty($commentsall['avatar']) && $commentsall['avatar_gravatar'] == 0)
 		{
@@ -46,7 +66,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 		{
 			$comment_avatar = "/uploads/avatars/no_avatar.png";
 		}
-		
+
 		$commentall_text = bbcode($commentsall['text'], 0, 1);
 		$dateall = $core->format_date($commentsall['date_posted']);
 		$templating->set('username', '<a href="/profiles/' . $commentsall['user_id'] . '">' . $commentsall['username'] . '</a>');
@@ -57,6 +77,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	}
 
 	$templating->block('comments_bottomall', 'admin_modules/admin_module_more_comments');
+	$templating->set('pagination', $pagination);
 }
 
 if (isset($_POST['act']))
@@ -109,7 +130,7 @@ if (isset($_POST['act']))
 				mail($to, $subject, $message, $headers);
 			}
 		}
-		
+
 		header('Location: /admin.php?module=more_comments&message=added');
 	}
 }

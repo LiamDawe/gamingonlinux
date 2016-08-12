@@ -133,14 +133,12 @@ class user
 		// they have a device cookie, let's check it bitches
 		if (isset($_COOKIE['gol-device']))
 		{
-			$db->sqlquery("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ?", array($user_data['user_id']));
-			$get_device = $db->fetch();
-
+			$db->sqlquery("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($user_data['user_id'], $_COOKIE['gol-device']));
 			// cookie didn't match, don't let them in, hacking attempt probable
-			if ($get_device['device-id'] != $_COOKIE['gol-device'])
+			if ($db->num_rows() == 0)
 			{
-				$new_device = 1;
 				setcookie('gol-device', "",  time()-60, '/');
+				$new_device = 1;
 			}
 		}
 

@@ -136,7 +136,7 @@ $counter = $db->fetch();
 
 $templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-$db->sqlquery("SELECT `id`, `date`, `name`, `comment`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
+$db->sqlquery("SELECT `id`, `date`, `name`, `comment`, `link`, `best_guess`, `gog_link` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
 while ($listing = $db->fetch())
 {
 	$get_date = date_parse($listing['date']);
@@ -163,6 +163,16 @@ while ($listing = $db->fetch())
 		$game_name = $today . '<a href="'.$listing['link'].'" target="_blank">'.$listing['name'].'</a>';
 	}
 	$templating->set('name', $game_name);
+
+
+	$gog_link = '';
+	/*
+	if (!empty($listing['gog_link']))
+	{
+		$gog_link = '<span class="badge green"><a href="'.$listing['gog_link'].'" style="color: white;">GOG Store</a></span>';
+	}
+	*/
+	$templating->set('gog_link', $gog_link);
 
 	$edit = '';
 	if ($user->check_group(1,2) == true)

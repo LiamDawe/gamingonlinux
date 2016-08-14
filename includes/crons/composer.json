@@ -1,7 +1,0 @@
-{
-    "require": {
-        "guzzlehttp/guzzle": "~5.0",
-        "guzzle/batch": "3.9.2",
-        "guzzle/http": "3.9.2"
-    }
-}

@@ -9,6 +9,22 @@ if (strpos($data, "<appears>yes</appears>") !== false)
 $templating->set_previous('title', 'Register', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com register page', 1);
 
+if (isset($_GET['message']))
+{
+	if ($_GET['message'] == 'username-taken')
+	{
+		$core->message('Sorry but that username is taken, please try another! If you have forgotten your password, <a href="https://www.gamingonlinux.com/index.php?module=login&forgot">click here to start a lost password request.</a>', NULL, 1);
+	}
+	if ($_GET['message'] == 'email-taken')
+	{
+		$core->message('Sorry but that email is taken, please try another! If you have forgotten your password, <a href="https://www.gamingonlinux.com/index.php?module=login&forgot">click here to start a lost password request.</a>', NULL, 1);
+	}
+	if ($_GET['message'] == 'password-match')
+	{
+		$core->message('Passwords did not match!', NULL, 1);
+	}
+}
+
 require_once("includes/curl_data.php");
 
 $templating->merge('register');
@@ -100,20 +116,44 @@ if (core::config('allow_registrations') == 1)
 					$db->sqlquery("SELECT `username` FROM `users` WHERE `username` = ?", array($username));
 					if ($db->fetch())
 					{
-						$core->message('Sorry but that username is taken, please try another! <a href="index.php?module=register">Try again</a> or <a href="index.php">Return to home page</a>.', NULL, 1);
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /register/message=username-taken");
+						}
+						else
+						{
+							header("Location: /index.php?module=register&message=username-taken");
+						}
+						die();
 					}
 
 					// dont allow dupe emails
 					$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['uemail']));
 					if ($db->fetch())
 					{
-						$core->message('Sorry but that email is taken, please try another (you may already have an account under that email)! <a href="index.php?module=register">Try again</a> or <a href="index.php">Return to home page</a>.', NULL, 1);
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /register/message=email-taken");
+						}
+						else
+						{
+							header("Location: /index.php?module=register&message=email-taken");
+						}
+						die();
 					}
 
 					// check passwords match
 					else if ($_POST['password'] != $_POST['verify_password'])
 					{
-						$core->message('Passwords did not match! <a href="index.php?module=register">Click here to go back and try again!</a>', NULL, 1);
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /register/message=password-match");
+						}
+						else
+						{
+							header("Location: /index.php?module=register&message=password-match");
+						}
+						die();
 					}
 
 					else

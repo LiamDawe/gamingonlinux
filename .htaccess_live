@@ -56,6 +56,8 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^register/?$ /index.php?module=register [N]
 
+  RewriteRule ^register/message=(.+?)/?$ /index.php?module=register&message=$1 [N,NC,QSA]
+
   RewriteRule ^forum/?$ /index.php?module=forum [N]
 
   RewriteRule ^about-us/?$ /index.php?module=about_us [N]

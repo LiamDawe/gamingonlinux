@@ -137,39 +137,6 @@ $templating->block('right', 'mainpage');
 $db->sqlquery('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`');
 $blocks = $db->fetch_all_rows();
 
-// Latest sales box on the main page
-$sales = '';
-$sale_counter = 0;
-$db->sqlquery("SELECT s.`id`,s.`info`, s.`website`, s.`provider_id`, p.`name` FROM `game_sales` s LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id WHERE s.`accepted` = 1 ORDER BY s.`id` DESC LIMIT 4");
-while ($home_list = $db->fetch())
-{
-	$sale_counter++;
-	$sale_name = $home_list['info'];
-	if (strlen($sale_name) > 50)
-	{
-		$sale_name = substr($sale_name,0,50)."...";
-	}
-
-	// check to see if we need to put in the category name or not
-	$provider = '';
-	if ($home_list['provider_id'] != 0)
-	{
-		$provider = "<span class=\"label label-info\">{$home_list['name']}</span>";
-	}
-
-	if ($sale_counter != 4)
-	{
-		$sales .= "<a href=\"/sales/{$home_list['id']}\">{$provider} {$sale_name}</a>, ";
-	}
-
-	else
-	{
-		$sales .= "<a href=\"/sales/{$home_list['id']}\">{$provider} {$sale_name}</a> ";
-	}
-}
-
-$templating->set('sale_list', $sales);
-
 foreach ($blocks as $block)
 {
 	// PHP BLOCKS

@@ -131,9 +131,9 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^users/stat(s|istics)/?$ /index.php?module=statistics [N,NC,QSA]
 
-  RewriteRule ^articles/category/([0-9]+)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA]
+  RewriteRule ^articles/category/(.+?)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA]
 
-  RewriteRule ^articles/category/([0-9]+)/page\=([0-9]+)?$ /index.php?module=articles&view=cat&catid=$1&page=$2 [N,NC,QSA]
+  RewriteRule ^articles/category/(.+?)/page\=([0-9]+)?$ /index.php?module=articles&view=cat&catid=$1&page=$2 [N,NC,QSA]
 
   RewriteCond %{HTTP_HOST} !^www\. [NC]
   RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

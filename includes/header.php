@@ -231,22 +231,6 @@ $templating->set('contact_link', $contact_link);
 $templating->set('submit_a', $submit_a);
 $templating->set('submit_e', $submit_e);
 
-// Get the categorys, for the jump list, also used in "block_article_categorys.php"
-$articles_categorys = '';
-$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
-while ($categorys = $db->fetch())
-{
-	if (core::config('pretty_urls') == 1)
-	{
-		$category_jump_link = "/articles/category/{$categorys['category_id']}";
-	}
-	else {
-		$category_jump_link = url . "index.php?module=articles&amp;view=cat&amp;catid={$categorys['category_id']}";
-	}
-	$articles_categorys .= "<option value=\"$category_jump_link\">{$categorys['category_name']}</option>\r\n";
-}
-$templating->set('category_links', $articles_categorys);
-
 // sort out user box
 if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESSION['user_id'])))
 {

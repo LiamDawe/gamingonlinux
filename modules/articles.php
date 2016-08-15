@@ -171,6 +171,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
+				$templating->set_previous('meta_description', 'GamingOnLinux category error does not exist', 1);
+				$templating->set_previous('title', 'Article category does not exist', 1);
+
 				$core->message('That category does not exist', NULL, 1);
 			}
 		}

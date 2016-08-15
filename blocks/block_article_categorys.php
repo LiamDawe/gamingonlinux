@@ -21,7 +21,21 @@ else if (isset($_SESSION['user_group']) && $_SESSION['user_group'] == 1 || $_SES
 
 $templating->set('submit_article_link', $submit_link);
 
-// set them
+// Get the categorys, for the jump list, also used in "block_article_categorys.php"
+$articles_categorys = '';
+$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
+while ($categorys = $db->fetch())
+{
+	$category_name = str_replace(' ', '-', $categorys['category_name']);
+	if (core::config('pretty_urls') == 1)
+	{
+		$category_jump_link = "/articles/category/$category_name";
+	}
+	else {
+		$category_jump_link = url . "index.php?module=articles&amp;view=cat&amp;catid=$category_name";
+	}
+	$articles_categorys .= "<option value=\"$category_jump_link\">{$categorys['category_name']}</option>\r\n";
+}
 $templating->set('category_links', $articles_categorys);
 
 /*

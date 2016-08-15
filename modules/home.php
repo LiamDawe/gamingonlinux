@@ -194,14 +194,15 @@ if (!isset($_GET['view']))
 		$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC LIMIT 4", array($article['article_id']));
 		while ($get_categories = $db->fetch())
 		{
+			$category_name = str_replace(' ', '-', $get_categories['category_name']);
 			if ($get_categories['category_id'] == 60)
 			{
-				$categories_list .= " <li class=\"ea\"><a href=\"/articles/category/{$get_categories['category_name']}\">{$get_categories['category_name']}</a></li> ";
+				$categories_list .= " <li class=\"ea\"><a href=\"/articles/category/$category_name\">{$get_categories['category_name']}</a></li> ";
 			}
 
 			else
 			{
-				$categories_list .= " <li><a href=\"/articles/category/{$get_categories['category_name']}\">{$get_categories['category_name']}</a></li> ";
+				$categories_list .= " <li><a href=\"/articles/category/$category_name\">{$get_categories['category_name']}</a></li> ";
 			}
 		}
 

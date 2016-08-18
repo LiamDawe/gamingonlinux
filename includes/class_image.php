@@ -49,17 +49,17 @@ class SimpleImage
 	// save the file
 	function save($filename, $image_type=IMAGETYPE_JPEG, $compression=75, $permissions=null)
 	{
-		if ( $image_type == IMAGETYPE_JPEG )
+		if ( $this->image_type == IMAGETYPE_JPEG )
 		{
 			imagejpeg($this->image,$filename,$compression);
 		}
 
-		else if ( $image_type == IMAGETYPE_GIF )
+		else if ( $this->image_type == IMAGETYPE_GIF )
 		{
 			imagegif($this->image,$filename);
 		}
 
-		else if( $image_type == IMAGETYPE_PNG )
+		else if( $this->image_type == IMAGETYPE_PNG )
 		{
 			imagepng($this->image,$filename);
 		}
@@ -112,7 +112,21 @@ class SimpleImage
 
 	function scale($width)
 	{
-		$this->image = imagescale($this->image, $width);
+		// Set a maximum height and width
+		$width = 350;
+		$height = 220;
+
+		$ratio_orig = $this->getWidth()/$this->getHeight();
+
+		if ($width/$height > $ratio_orig)
+		{
+   		$width = $height*$ratio_orig;
+		}
+		else
+		{
+			$height = $width/$ratio_orig;
+		}
+		$this->resize($width,$height);
 	}
 
 	function resize($width,$height)

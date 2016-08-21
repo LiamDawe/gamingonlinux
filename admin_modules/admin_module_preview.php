@@ -275,36 +275,12 @@ else
 
 // sort out previously uploaded images
 $previously_uploaded = '';
-if (isset($_SESSION['uploads']))
-{
-	foreach($_SESSION['uploads'] as $key)
-	{
-		if ($key['image_rand'] == $_SESSION['image_rand'])
-		{
-			$bbcode = "[img]{$config['path']}/uploads/articles/article_images/{$key['image_name']}[/img]";
-			$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$key['image_id']}\"><form>
-			<img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
-			BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
-			<button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$key['image_id']}\" class=\"trash\">Delete image</button>
-			</div></div></div>";
-		}
-	}
-}
+$previously_uploaded = $article_class->previous_uploads();
 
 if (isset($_POST['check']))
 {
 	// add in uploaded images from database
-	$db->sqlquery("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? AND `article_id` != 0 ORDER BY `id` ASC", array($_POST['article_id']));
-	$article_images = $db->fetch_all_rows();
-
-	foreach($article_images as $value)
-	{
-		$bbcode = "[img]{$config['path']}/uploads/articles/article_images/{$value['filename']}[/img]";
-		$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$value['id']}\"><img src=\"/uploads/articles/article_images/{$value['filename']}\" class='imgList'><br />
-		BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
-		<button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$value['id']}\" class=\"trash\">Delete image</button>
-		</div></div></div>";
-	}
+	$previously_uploaded	= $article_class->previous_uploads($article['article_id']);
 }
 
 $templating->set('previously_uploaded', $previously_uploaded);

@@ -25,6 +25,9 @@ foreach ($fetch_config as $config_set)
 include('includes/class_core.php');
 $core = new core();
 
+include('includes/class_article.php');
+$article_class = new article_class();
+
 include('includes/class_mail.php');
 
 define('url', core::config('website_url'));

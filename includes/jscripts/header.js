@@ -134,6 +134,8 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
+  var clipboard = new Clipboard('.btn');
+
 	$(".computer_deets").fancybox({
 		maxWidth	: 800,
 		maxHeight	: 600,

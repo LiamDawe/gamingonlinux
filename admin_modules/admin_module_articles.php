@@ -122,8 +122,8 @@ if (isset($_GET['view']))
 					if ($key['image_rand'] == $_SESSION['image_rand'])
 					{
 						$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div class=\"col-md-12\" id=\"{$key['image_id']}\"><img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
-						BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]{$config['website_url']}/uploads/articles/article_images/{$key['image_name']}[/img]\" /></div>
-						<a href=\"#\" id=\"{$key['image_id']}\" class=\"trash\">Delete Image</a></div></div></div>";
+						BBCode: <input id=\"img{$key['image_id']}\" type=\"text\" class=\"form-control\" value=\"[img]{$config['website_url']}/uploads/articles/article_images/{$key['image_name']}[/img]\" /></div>
+						<button class=\"btn\" data-clipboard-target=\"#img{$key['image_id']}\">Copy</button> <a href=\"#\" id=\"{$key['image_id']}\" class=\"trash\">Delete Image</a></div></div></div>";
 					}
 				}
 			}
@@ -423,8 +423,8 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 					{
 						$bbcode = "[img]{$config['website_url']}/uploads/articles/article_images/{$key['image_name']}[/img]";
 						$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$key['image_id']}\"><img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
-						BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /></div>
-						<button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$key['image_id']}\" class=\"trash\">Delete image</button>
+						BBCode: <input id=\"img{$key['image_id']}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /></div>
+						<button class=\"btn\" data-clipboard-target=\"#img{$key['image_id']}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$key['image_id']}\" class=\"trash\">Delete image</button>
 						</div></div></div>";
 					}
 				}
@@ -438,8 +438,8 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 			{
 				$bbcode = "[img]{$config['website_url']}/uploads/articles/article_images/{$value['filename']}[/img]";
 				$previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$value['id']}\"><img src=\"/uploads/articles/article_images/{$value['filename']}\" class='imgList'><br />
-				BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
-				<button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$value['id']}\" class=\"trash\">Delete image</button></div></div></div>";
+				BBCode: <input id=\"img{$value['id']}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
+				<button class=\"btn\" data-clipboard-target=\"#img{$value['id']}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$value['id']}\" class=\"trash\">Delete image</button></div></div></div>";
 			}
 
 			$templating->set('previously_uploaded', $previously_uploaded);

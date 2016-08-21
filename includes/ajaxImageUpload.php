@@ -70,7 +70,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$bbcode = "[img]{$config['website_url']}uploads/articles/article_images/{$image_name}[/img]";
 
 					echo "<div class=\"box\"><div class=\"body group\"><div id=\"{$image_id}\"><img src=\"/uploads/articles/article_images/$image_name\" class='imgList'><br />";
-					echo "BBCode: <input type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$image_id}\" class=\"trash\">Delete image</button>";
+					echo "BBCode: <input id=\"img{$image_id}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /> <button class=\"btn\" data-clipboard-target=\"#img{$image_id}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$image_id}\" class=\"trash\">Delete image</button>";
 					echo "</div></div></div>";
 				}
 

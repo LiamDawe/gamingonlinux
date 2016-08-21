@@ -35,4 +35,7 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 - /includes/jscripts/jquery.form.min.js (MIT/GPL)
 
 - /includes/E_PDOStatement.php (APACHE 2) 
-https://github.com/noahheck/E_PDOStatement
+- https://github.com/noahheck/E_PDOStatement
+
+- /includes/jscripts/clipboard (MIT)
+- https://clipboardjs.com/

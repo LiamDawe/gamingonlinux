@@ -160,24 +160,43 @@ else
 					$core->message('Thank you for reporting the post!');
 				}
 
-				// paging for pagination
-				if (!isset($_GET['page']) || $_GET['page'] <= 0)
-				{
-					$page = 1;
-				}
-
-				if (isset($_GET['page']) && !is_numeric($_GET['page']))
-				{
-					$page = 1;
-				}
-
-				else if (is_numeric($_GET['page']))
-				{
-					$page = $_GET['page'];
-				}
-
 				// update topic views
 				$db->sqlquery("UPDATE `forum_topics` SET `views` = (views +1) WHERE `topic_id` = ?", array($_GET['topic_id']));
+
+				// count how many replies this topic has
+				$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
+				$total_replies = $db->num_rows();
+
+				//lastpage = total pages / items per page, rounded up.
+				if ($total_replies < $_SESSION['per-page'])
+				{
+					$lastpage = 1;
+				}
+				else
+				{
+					$lastpage = ceil($total_replies/$_SESSION['per-page']);
+				}
+
+				// paging for pagination
+				if (isset($_GET['page']))
+				{
+					if ($_GET['page'] <= 0 || !is_numeric($_GET['page']))
+					{
+						$page = 1;
+					}
+					else if ($_GET['page'] <= $lastpage)
+					{
+						$page = $_GET['page'];
+					}
+					else
+					{
+						$page = $lastpage;
+					}
+				}
+				else if (!isset($_GET['page']))
+				{
+					$page = 1;
+				}
 
 				// sort out edit link if its allowed
 				$edit_link = '';
@@ -185,10 +204,6 @@ else
 				{
 					$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"/index.php?module=editpost&amp;topic_id={$topic['topic_id']}&page=$page\"><span class=\"icon edit\"></span></a></li>";
 				}
-
-				// count how many replies this topic has
-				$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-				$total_pages = $db->num_rows();
 
 				// update their subscriptions if they are reading the last page
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
@@ -201,16 +216,6 @@ else
 
 					if ($check_user['email_options'] == 2 && $check_sub['send_email'] == 0)
 					{
-						//lastpage = total pages / items per page, rounded up.
-						if ($total_pages < 9)
-						{
-							$lastpage = 1;
-						}
-						else
-						{
-							$lastpage = ceil($total_pages/$_SESSION['per-page']);
-						}
-
 						// they have read all new comments (or we think they have since they are on the last page)
 						if ($page == $lastpage)
 						{
@@ -221,7 +226,7 @@ else
 				}
 
 				// sort out the pagination link
-				$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/topic/{$_GET['topic_id']}/", $page);
+				$pagination = $core->pagination_link($_SESSION['per-page'], $total_replies, "/forum/topic/{$_GET['topic_id']}/", $page);
 
 				// find out if this user has subscribed to the comments
 				if ($_SESSION['user_id'] != 0)

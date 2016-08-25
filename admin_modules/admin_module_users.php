@@ -25,6 +25,8 @@ else
 
 			$templating->block('search','admin_modules/admin_module_users');
 
+			$username = '';
+			$email = '';
 			if (isset($_POST['search']))
 			{
 				$username = trim($_POST['username']);

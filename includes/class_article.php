@@ -5,6 +5,7 @@ class article_class
   {
     global $db;
 
+    $previously_uploaded = '';
     if ($article_id != NULL)
     {
       // add in uploaded images from database

@@ -15,7 +15,7 @@ include(path . 'includes/class_core.php');
 $core = new core();
 
 $stop = 0;
-$new_games = array();
+$games = '';
 
 $page = 1;
 $url = "http://store.steampowered.com/search/?os=linux&filter=comingsoon&page=";
@@ -48,21 +48,17 @@ do
 
           $parsed_release_date = date("Y-m-d", $parsed_release_date);
 
-          // thanks gnarface from IRC, check if they only give us month and year
-          preg_match('/^([[:alpha:]]+)?\W*(\d{1,2})?\W*(\d{4})$/', $remove_comma, $matches);
+          $has_day = DateTime::createFromFormat('F Y', $remove_comma);
 
-          if ($parsed_release_date != '1970-01-01' && $length != 4 && empty($matches))
+          if ($parsed_release_date != '1970-01-01' && $length != 4 && $has_day == FALSE)
           {
-            foreach($element->find('span.title') as $span)
-            {
-              $title = trim($span->plaintext);
-              echo 'Title: ' . $title . '<br />';
-            }
+            $title = $element->find('span.title', 0)->plaintext;
+            echo 'Title: ' . $element->find('span.title', 0)->plaintext . '<br />';
 
             echo 'Release date: ' . $parsed_release_date . ' original ('.$release_date->plaintext.')' . '<br />';
 
             $link = $element->href;
-            echo  'Link: ' . $link . '<br />';
+            echo  'Link: ' . $link . '<br /><br />';
 
             $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
 
@@ -71,9 +67,9 @@ do
             {
               $db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `steam_link` = ?, `date` = ?, `approved` = 1", array($title, $link, $parsed_release_date));
 
-              $sale_id = $db->grab_id();
+              $game_id = $db->grab_id();
 
-              echo "\tAdded this game to the calendar DB with id: " . $sale_id . "<br />\n";
+              echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
 
               $games .= $title . '<br />';
 
@@ -90,7 +86,6 @@ do
             }
           }
         }
-        echo '<br />';
       }
       $page++;
     }

@@ -71,7 +71,7 @@ $counter = $db->fetch();
 $templating->block('top');
 $templating->set('this_month', $counter['count']);
 
-if (isset($_SESSION['user_group']) && $_SESSION['user_group'] != 0)
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
 	$templating->block('submit');
 }

@@ -38,9 +38,17 @@ if (isset($_GET['message']))
 
 if (isset($_GET['error']))
 {
+	if ($_GET['error'] == 'notloggedin')
+	{
+		$core->message("You are not logged in! You must be logged in to be able to submit calendar games!", NULL, 1);
+	}
 	if ($_GET['error'] == 'missing')
 	{
-		$core->message("You have to put at least a name and date in!", NULL, 1);
+		$core->message("You have to put at least a name and date in! If you added a link, be sure it contains a valid URL!", NULL, 1);
+	}
+	if ($_GET['error'] == 'yearchecker')
+	{
+		$core->message("We aren't currently tracking that year for releases, please let us know if you think we should!", NULL, 1);
 	}
 	if ($_GET['error'] == 'exists')
 	{
@@ -188,13 +196,37 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'submit')
 	{
-		if (empty($_POST['name']) || empty($_POST['date']))
+		if (!isset($_SESSION['user_id']))
+		{
+			header("Location: /index.php?module=calendar&error=notloggedin");
+			exit;
+		}
+
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+		{
+			header("Location: /index.php?module=calendar&error=notloggedin");
+			exit;
+		}
+
+		$name = trim($_POST['name']);
+		$name = htmlspecialchars($name);
+
+		if (empty($name) || empty($_POST['date']))
 		{
 			header("Location: /index.php?module=calendar&error=missing");
 			exit;
 		}
 
-		$db->sqlquery("SELECT `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']));
+		if (!empty($_POST['link']))
+		{
+			if (strpos($_POST['link'], "www.") === false && strpos($_POST['link'], "http") === false)
+			{
+				header("Location: /index.php?module=calendar&error=missing");
+				exit;
+			}
+		}
+
+		$db->sqlquery("SELECT `name` FROM `calendar` WHERE `name` = ?", array($name));
 		if ($db->num_rows() == 1)
 		{
 			header("Location: /index.php?module=calendar&error=exists");
@@ -203,13 +235,17 @@ if (isset($_POST['act']))
 
 		$date = new DateTime($_POST['date']);
 
+		if (!in_array($date->format("Y"), $years_array))
+		{
+			header("Location: /index.php?module=calendar&error=yearchecker");
+			exit;
+		}
+
 		$guess = 0;
 		if (isset($_POST['guess']))
 		{
 			$guess = 1;
 		}
-
-		$name = htmlspecialchars($_POST['name']);
 
 		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 0", array($name, $date->format('Y-m-d'), $_POST['link'], $guess));
 

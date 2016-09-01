@@ -72,18 +72,6 @@ do {
 			echo $games['title'] . "<br />\n";
 			echo "* Original release date: ". $games['original_release_date'] ."<br />\n";
 
-			// ADD IT TO THE GAMES DATABASE, FOR FUTURE USE
-			$db->sqlquery("SELECT `name`, `local_id` FROM `game_list` WHERE `name` = ?", array($games['title']));
-			$game_list = $db->fetch();
-			if ($db->num_rows() == 0)
-			{
-				$db->sqlquery("INSERT INTO `game_list` SET `name` = ?", array($games['title']));
-
-				// need to grab it again
-				$db->sqlquery("SELECT `name`, `local_id` FROM `game_list` WHERE `name` = ?", array($games['title']));
-				$game_list = $db->fetch();
-			}
-
 			$db->sqlquery("SELECT `name`, `gog_link` FROM `calendar` WHERE `name` = ?", array($games['title']));
 			$grab_info = $db->fetch();
 
@@ -99,8 +87,6 @@ do {
 				echo "\tAdded this game to the calendar DB with id: " . $calendar_id . ".\n";
 
 				$games_added .= $games['title'] . '<br />';
-
-				$email = 1;
 			}
 
 			// if we already have it, just update it

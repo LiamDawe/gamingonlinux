@@ -62,8 +62,12 @@ do
 
             $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
 
+            $grab_info = $db->fetch();
+
+            $check_rows = $db->num_rows();
+
             // if it does exist, make sure it's not from Steam already
-            if ($db->num_rows() == 0)
+            if ($check_rows == 0)
             {
               $db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `steam_link` = ?, `date` = ?, `approved` = 1", array($title, $link, $parsed_release_date));
 
@@ -72,15 +76,12 @@ do
               echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
 
               $games .= $title . '<br />';
-
-              $email = 1;
             }
 
             // if we already have it, just update it
-            else
+            else if ($check_rows == 1 && $grab_info['steam_link'] == NULL)
             {
-              $current_game = $db->fetch();
-              $db->sqlquery("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $current_game['id']));
+              $db->sqlquery("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $grab_info['id']));
 
               echo "Updated {$title} with the latest information<br />";
             }

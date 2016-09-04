@@ -54,14 +54,23 @@ if (isset($_GET['view']))
 
 	if ($_GET['view'] == 'search')
 	{
+		$templating->block('search', 'admin_modules/admin_module_calendar');
 		$templating->block('search_result_top', 'admin_modules/admin_module_calendar');
 
-		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ?", array("%".$_POST['name']."%"));
-		while ($items = $db->fetch())
+		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ?", array('%'.$_POST['name'].'%'));
+		$total_found = $db->num_rows();
+		if ($total_found > 0)
 		{
-			$templating->block('search_items', 'admin_modules/admin_module_calendar');
-			$templating->set('id', $items['id']);
-			$templating->set('name', $items['name']);
+			while ($items = $db->fetch())
+			{
+				$templating->block('search_items', 'admin_modules/admin_module_calendar');
+				$templating->set('id', $items['id']);
+				$templating->set('name', $items['name']);
+			}
+		}
+		else
+		{
+			$core->message('None found.');
 		}
 
 		$templating->block('search_result_bottom', 'admin_modules/admin_module_calendar');

@@ -45,7 +45,7 @@ else if ($spam_count == 0)
 }
 
 // count any drafts you have
-$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `draft` = 1 AND `author_id` = ?", array($_SESSION['user_id']));
+$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `draft` = 1");
 $draft_count = $db->num_rows();
 
 if ($draft_count > 0)

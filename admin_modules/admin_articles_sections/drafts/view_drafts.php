@@ -31,7 +31,25 @@ if (!isset($_GET['aid']))
 		$templating->set('article_title', $article['title']);
 		$templating->set('username', $article['username']);
 
-		$templating->set('date_submitted', $core->format_date($article['date']));
+		$templating->set('date_created', $core->format_date($article['date']));
+		$templating->set('delete_button', '<button type="submit" name="act" value="delete_draft" formaction="'.core::config('website_url').'admin.php?module=articles">Delete</button>');
+		$templating->set('edit_button', '<button type="submit" class="btn btn-primary" formaction="'.core::config('website_url').'admin.php?module=articles&view=drafts&aid='.$article['article_id'].'">Edit</button>');
+	}
+
+	$templating->block('others_drafts', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
+
+	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `draft` = 1 AND `user_id` != ?", array($_SESSION['user_id']));
+	while ($article = $db->fetch())
+	{
+		$templating->block('drafts_row', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
+		$templating->set('url', core::config('website_url'));
+		$templating->set('article_id', $article['article_id']);
+		$templating->set('article_title', $article['title']);
+		$templating->set('username', $article['username']);
+
+		$templating->set('date_created', $core->format_date($article['date']));
+		$templating->set('delete_button', '');
+		$templating->set('edit_button', '');
 	}
 }
 

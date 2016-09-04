@@ -26,13 +26,6 @@ if (!isset($_GET['view']))
 			$core->message('Sorry but that article doesn\'t exist, if you have followed an old it link it may need updating for the new website.');
 		}
 
-		else if ($article['draft'] == 1 && $article['author_id'] != $_SESSION['user_id'])
-		{
-			$templating->set_previous('meta_description', 'Article error on GamingOnLinux', 1);
-			$templating->set_previous('title', 'Article Error', 1);
-			$core->message('That is not your draft.');
-		}
-
 		else
 		{
 			$templating->set_previous('meta_description', $article['tagline'], 1);
@@ -68,8 +61,14 @@ if (!isset($_GET['view']))
 				$page .= 'articles&amp;view=drafts';
 			}
 
+			// we are using the live article page, remove the normal live edit link
 			$templating->set('edit_link', '');
-			$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"{$config['website_url']}{$page}\">Back</button> <button type=\"submit\" formaction=\"{$config['website_url']}{$page}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
+			$edit_link = '';
+			if ($_SESSION['user_id'] == $article['author_id'])
+			{
+				$edit_link = ' <button type="submit" formaction="' . core::config('website_url') . $page . '&aid=' . $_GET['aid'] . '" class="btn btn-info">Edit</button></form>';
+			}
+			$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"{$config['website_url']}{$page}\">Back</button>$edit_link");
 
 			$templating->set('title', $article['title']);
 			$templating->set('user_id', $article['author_id']);
@@ -168,27 +167,7 @@ if (!isset($_GET['view']))
 			{
 				$templating->block('bio', 'articles_full');
 
-				// sort out the avatar
-				if ($article['avatar_gravatar'] == 1)
-				{
-					$avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $article['gravatar_email'] ) ) ) . "?d=" . urlencode($config['website_url'].'uploads/avatars/no_avatar.png');
-				}
-
-				// either uploaded or linked an avatar
-				else if (!empty($article['avatar']) && $article['avatar_gravatar'] == 0)
-				{
-					$avatar = $article['avatar'];
-					if ($article['avatar_uploaded'] == 1)
-					{
-						$avatar = "/uploads/avatars/{$article['avatar']}";
-					}
-				}
-
-				// else no avatar
-				else if (empty($article['avatar']) && $article['avatar_gravatar'] == 0)
-				{
-					$avatar = "/uploads/avatars/no_avatar.png";
-				}
+				$avatar = $user->sort_avatar($article);
 				$templating->set('avatar', $avatar);
 
 				$templating->set('username', $username);
@@ -213,106 +192,87 @@ if (!isset($_GET['view']))
 			/*
 			EDITOR COMMENTS
 			*/
+			$templating->merge('admin_modules/admin_module_comments');
+			$templating->block('comments_top', 'admin_modules/admin_module_comments');
 
-			if ($article['draft'] == 0)
+			$db->sqlquery("SELECT a.*, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.steam, u.twitter_on_profile, u.website FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC", array($_GET['aid']));
+			while ($comments = $db->fetch())
 			{
-				$templating->merge('admin_modules/admin_module_comments');
-				$templating->block('comments_top', 'admin_modules/admin_module_comments');
+				// make date human readable
+				$date = $core->format_date($comments['time_posted']);
 
-				$db->sqlquery("SELECT a.*, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.steam, u.twitter_on_profile, u.website FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC", array($_GET['aid']));
-				while ($comments = $db->fetch())
-				{
-					// make date human readable
-					$date = $core->format_date($comments['time_posted']);
+				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
+				$quote_username = $comments['username'];
 
-					$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
-					$quote_username = $comments['username'];
+				$comment_avatar = $user->sort_avatar($comments);
 
-					// sort out the avatar
-					// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-					if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
-					{
-						$comment_avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=http://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-					}
-
-					// either uploaded or linked an avatar
-					else
-					{
-						$comment_avatar = $comments['avatar'];
-						if ($comments['avatar_uploaded'] == 1)
-						{
-							$comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-						}
-					}
-
-					$templating->block('review_comments', 'admin_modules/admin_module_comments');
-					$templating->set('user_id', $comments['author_id']);
-					$templating->set('username', $username);
-					$templating->set('plain_username', $quote_username);
-					$templating->set('comment_avatar', $comment_avatar);
-					$templating->set('date', $date);
-					$templating->set('text', bbcode($comments['comment_text'], 0));
-					$templating->set('text_plain', $comments['comment_text']);
-					$templating->set('article_id', $_GET['aid']);
-					$templating->set('comment_id', $comments['comment_id']);
-
-					$comment_edit_link = '';
-					if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
-					{
-						$comment_edit_link = "<a href=\"/index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-edit\"></i> Edit</a>";
-					}
-					$templating->set('edit', $comment_edit_link);
-
-					$comment_delete_link = '';
-					if ($user->check_group(1,2) == true)
-					{
-						$comment_delete_link = "<a href=\"/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-remove\"></i> Delete</a>";
-					}
-					$templating->set('delete', $comment_delete_link);
-				}
-
-				$templating->block('bottom', 'admin_modules/admin_module_comments');
-
-				if (isset($_GET['error']))
-				{
-					if ($_GET['error'] == 'emptycomment')
-					{
-						$core->message('You cannot post an empty comment dummy!', NULL, 1);
-					}
-				}
-
-				// find if they have auto subscribe on
-				$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-				$subscribe_info = $db->fetch();
-
-				$subscribe_check = '';
-				if ($subscribe_info['auto_subscribe'] == 1)
-				{
-					$subscribe_check = 'checked';
-				}
-
-				$subscribe_email_check = '';
-				if ($subscribe_info['auto_subscribe_email'] == 1)
-				{
-					$subscribe_email_check = 'checked';
-				}
-
-				$comment = '';
-				if (isset($_SESSION['acomment']))
-				{
-					$comment = $_SESSION['acomment'];
-				}
-				$templating->set('comment', $comment);
-
-				$templating->block('form_top');
+				$templating->block('review_comments', 'admin_modules/admin_module_comments');
+				$templating->set('user_id', $comments['author_id']);
+				$templating->set('username', $username);
+				$templating->set('plain_username', $quote_username);
+				$templating->set('comment_avatar', $comment_avatar);
+				$templating->set('date', $date);
+				$templating->set('text', bbcode($comments['comment_text'], 0));
+				$templating->set('text_plain', $comments['comment_text']);
 				$templating->set('article_id', $_GET['aid']);
+				$templating->set('comment_id', $comments['comment_id']);
 
-				$core->editor('text', $comment);
+				$comment_edit_link = '';
+				if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
+				{
+					$comment_edit_link = "<a href=\"/index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-edit\"></i> Edit</a>";
+				}
+				$templating->set('edit', $comment_edit_link);
 
-				$templating->block('form_bottom', 'admin_modules/admin_module_comments');
-				$templating->set('subscribe_check', $subscribe_check);
-				$templating->set('subscribe_email_check', $subscribe_email_check);
+				$comment_delete_link = '';
+				if ($user->check_group(1,2) == true)
+				{
+					$comment_delete_link = "<a href=\"/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-remove\"></i> Delete</a>";
+				}
+				$templating->set('delete', $comment_delete_link);
 			}
+
+			$templating->block('bottom', 'admin_modules/admin_module_comments');
+
+			if (isset($_GET['error']))
+			{
+				if ($_GET['error'] == 'emptycomment')
+				{
+					$core->message('You cannot post an empty comment dummy!', NULL, 1);
+				}
+			}
+
+			// find if they have auto subscribe on
+			$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+			$subscribe_info = $db->fetch();
+
+			$subscribe_check = '';
+			if ($subscribe_info['auto_subscribe'] == 1)
+			{
+				$subscribe_check = 'checked';
+			}
+
+			$subscribe_email_check = '';
+			if ($subscribe_info['auto_subscribe_email'] == 1)
+			{
+				$subscribe_email_check = 'checked';
+			}
+
+			$comment = '';
+			if (isset($_SESSION['acomment']))
+			{
+				$comment = $_SESSION['acomment'];
+			}
+			$templating->set('comment', $comment);
+
+			$templating->block('form_top');
+			$templating->set('article_id', $_GET['aid']);
+
+			$core->editor('text', $comment);
+
+			$templating->block('form_bottom', 'admin_modules/admin_module_comments');
+			$templating->set('subscribe_check', $subscribe_check);
+			$templating->set('subscribe_email_check', $subscribe_email_check);
 		}
 	}
 }

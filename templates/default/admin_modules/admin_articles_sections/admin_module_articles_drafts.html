@@ -1,13 +1,21 @@
 [block: drafts_top]
 <div class="box">
-	<div class="head">Your Draft Articles</div>
 	<div class="body group">
 		<form method="post">
 			<button formaction="admin.php?module=articles&view=add" class="btn btn-sm btn-info">Make new article</button>
 		</form>
 	</div>
 </div>
+<div class="box">
+	<div class="head">Your Draft Articles</div>
+</div>
 [/block: drafts_top]
+
+[block: others_drafts]
+<div class="box">
+	<div class="head">Other editors drafts</div>
+</div>
+[/block: others_drafts]
 
 [block: single_draft_top]
 <div class="box"><div class="head">Viewing Draft Article</div></div>
@@ -17,10 +25,10 @@
 <div class="box">
 	<div class="body group">
 		<form method="post" role="form">
-			<strong>{:article_title}</strong> by created {:date_submitted} <br />
-			<button type="submit" class="btn btn-primary" formaction="{:url}admin.php?module=articles&view=drafts&aid={:article_id}">Edit</button>
+			<strong>{:article_title}</strong> by {:username} created {:date_created} <br />
+			{:edit_button}
 			<button type="submit" name="act" value="Preview" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview</button>
-			<button type="submit" name="act" value="delete_draft" formaction="{:url}admin.php?module=articles">Delete</button>
+			{:delete_button}
 			<input type="hidden" name="article_id" value="{:article_id}" />
 		</form>
 	</div>

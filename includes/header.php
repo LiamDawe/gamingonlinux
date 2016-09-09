@@ -114,8 +114,7 @@ if ($_SESSION['user_id'] != 0)
 }
 
 // get user group permissions
-$objects = array($_SESSION['user_group']);
-$get_permissions = $db->sqlquery("SELECT `name`,`value` FROM `group_permissions` WHERE `group` = ?", $objects, 'header.php');
+$get_permissions = $db->sqlquery("SELECT `name`,`value` FROM `group_permissions` WHERE `group` = ?", array($_SESSION['user_group']));
 $fetch_permissions = $db->fetch_all_rows();
 
 $parray = array();

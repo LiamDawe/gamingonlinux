@@ -376,6 +376,7 @@ if (!isset($_GET['go']))
 					//
 
 					$templating->block('comments_top', 'articles_full');
+					$templating->set('pagination', $pagination);
 
 					include('includes/profile_fields.php');
 

@@ -118,7 +118,7 @@ else
 			$compose_link = '/private-messages/compose/';
 		}
 		else {
-			$compose_link = "{$config['path']}index.php?module=messages&view=compose";
+			$compose_link = core::config('website_url') . 'index.php?module=messages&view=compose';
 		}
 		$templating->set('compose_link', $compose_link);
 		$templating->set('pagination', $pagination);
@@ -139,6 +139,13 @@ else
 
 		else
 		{
+			if (isset($_GET['message']))
+			{
+				if ($_GET['message'] == 'emptytext')
+				{
+					$core->message("Message text cannot be empty!", NULL, 1);
+				}
+			}
 			$db->sqlquery("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']));
 			$info = $db->fetch();
 
@@ -520,7 +527,7 @@ else
 			}
 			else
 			{
-				header("Location: {$config['path']}index.php?module=messages&view=compose&message=empty");
+				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose&message=empty');
 				die();
 			}
 		}
@@ -644,13 +651,16 @@ else
 				header("Location: /private-messages/");
 			}
 			else {
-				header("Location: {$config['path']}index.php?module=messages");
+				header("Location: " . core::config('website_url') . 'index.php?module=messages');
 			}
 		}
 	}
 
 	if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 	{
+		$text = trim($_POST['text']);
+		$text = htmlspecialchars($text);
+
 		if (!isset($_GET['message_id']) || !is_numeric($_GET['message_id']))
 		{
 			$core->message('No message ID!', NULL, 1);
@@ -661,6 +671,11 @@ else
 			$core->message('No conversation ID!', NULL, 1);
 		}
 
+		else if (empty($text))
+		{
+			header("Location: /index.php?module=messages&view=Edit&message_id=" . $_GET['message_id'] . "&conversation_id=" . $_GET['conversation_id'] . '&message=emptytext');
+		}
+
 		else
 		{
 			$db->sqlquery("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']));
@@ -668,8 +683,7 @@ else
 
 			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
 			{
-				$text = trim($_POST['text']);
-				$text = htmlspecialchars($text);
+
 				$db->sqlquery("UPDATE `user_conversations_messages` SET `message` = ? WHERE `message_id` = ?", array($text, $_GET['message_id']));
 
 				$page = '';

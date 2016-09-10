@@ -3,7 +3,9 @@ $text = trim($_POST['text']);
 
 $title = strip_tags($_POST['title']);
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `draft` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, core::$date, $core->random_id()));
+$slug = $core->nice_title($_POST['slug']);
+
+$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `draft` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $title, $slug, $_POST['tagline'], $text, core::$date, $core->random_id()));
 
 $article_id = $db->grab_id();
 

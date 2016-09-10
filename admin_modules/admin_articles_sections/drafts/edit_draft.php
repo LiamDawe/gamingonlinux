@@ -6,8 +6,9 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	$title = strip_tags($_POST['title']);
 	$tagline = trim($_POST['tagline']);
 	$text = trim($_POST['text']);
+	$slug = $core->nice_title($_POST['slug']);
 
-	$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $tagline, $text, $_POST['article_id']));
+	$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $_POST['article_id']));
 
 	$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
 

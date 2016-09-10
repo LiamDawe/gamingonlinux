@@ -1,21 +1,6 @@
 <?php
 $templating->set_previous('meta_description', 'GamingOnLinux is the home of Linux and SteamOS gaming. Covering Linux Games, SteamOS, Reviews and more.', 1);
 
-if (isset($_GET['user_id']))
-{
-	if (!isset($_SESSION['activated']) && $_SESSION['user_id'] != 0)
-	{
-		$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		$get_active = $db->fetch();
-		$_SESSION['activated'] = $get_active['activated'];
-	}
-}
-
-if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
-{
-	$core->message("Your account isn't activated, to begin posting you need to activate your account via email! <a href=\"/index.php?module=activate_user&redo=1\">Click here to re-send a new activation key</a>!");
-}
-
 if (isset($_GET['message']))
 {
 	if ($_GET['message'] == 'unsubscribed')

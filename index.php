@@ -103,7 +103,23 @@ if ($user->check_group(6,5) == false && $user->check_group(1,2) == false)
 	$templating->block('patreon');
 }
 
-$templating->block('left');
+// let them know they aren't activated yet
+if (isset($_GET['user_id']))
+{
+	if (!isset($_SESSION['activated']) && $_SESSION['user_id'] != 0)
+	{
+		$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$get_active = $db->fetch();
+		$_SESSION['activated'] = $get_active['activated'];
+	}
+}
+
+if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
+{
+	$templating->block('activation', 'mainpage');
+}
+
+$templating->block('left', 'mainpage');
 
 // so mainpage.html knows to put "articles" class in the left block or not
 if ($module == 'home' || ($module == 'articles' && isset($_GET['view']) && $_GET['view'] == 'cat'))

@@ -208,19 +208,19 @@ else
 				// update their subscriptions if they are reading the last page
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
-					$db->sqlquery("SELECT `send_email` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
-					$check_sub = $db->fetch();
-
-					$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-					$check_user = $db->fetch();
-
-					if ($check_user['email_options'] == 2 && $check_sub['send_email'] == 0)
+					$db->sqlquery("SELECT s.`send_email`, u.`email_options` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE u.`user_id` = ? AND s.`topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+					if ($db->num_rows() == 1)
 					{
-						// they have read all new comments (or we think they have since they are on the last page)
-						if ($page == $lastpage)
+						$check_sub = $db->fetch();
+
+						if ($check_sub['email_options'] == 2 && $check_sub['send_email'] == 0)
 						{
-							// send them an email on a new comment again
-							$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+							// they have read all new comments (or we think they have since they are on the last page)
+							if ($page == $lastpage)
+							{
+								// send them an email on a new comment again
+								$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+							}
 						}
 					}
 				}

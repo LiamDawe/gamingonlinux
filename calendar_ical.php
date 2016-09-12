@@ -33,7 +33,7 @@ function escapeString($string) {
 
 $output = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nVERSION:2.0\r\nPRODID:-//Gaming On Linux//Release Calendar//EN\r\n";
 
-$db->sqlquery("SELECT `id`, `date`, `name`, `comment`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND `approved` = 1 ORDER BY `date` ASC");
+$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND `approved` = 1 ORDER BY `date` ASC");
 
 // loop over events
 while ($item = $db->fetch())

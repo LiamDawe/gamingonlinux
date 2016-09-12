@@ -80,7 +80,7 @@ if (isset($_GET['view']))
 	{
 		$templating->block('edit_top', 'admin_modules/admin_module_calendar');
 
-		$db->sqlquery("SELECT `id`, `date`, `name`, `comment`, `link`, `best_guess` FROM `calendar` WHERE `id` = ?", array($_GET['id']));
+		$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE `id` = ?", array($_GET['id']));
 		$listing = $db->fetch();
 
 		$templating->block('edit_item', 'admin_modules/admin_module_calendar');
@@ -92,7 +92,6 @@ if (isset($_GET['view']))
 		$templating->set('guess_check', $guess_check);
 		$templating->set('link', $listing['link']);
 		$templating->set('name', $listing['name']);
-		$templating->set('comment', $listing['comment']);
 		$templating->set('id', $listing['id']);
 
 		$date = new DateTime($listing['date']);
@@ -131,7 +130,7 @@ if (isset($_GET['view']))
 
 			$templating->set('month', $month . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-			$db->sqlquery("SELECT `id`, `date`, `name`, `comment`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 0 ORDER BY `date` ASC");
+			$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 0 ORDER BY `date` ASC");
 			while ($listing = $db->fetch()) // loop through the items
 			{
 				$get_date = date_parse($listing['date']);
@@ -148,7 +147,6 @@ if (isset($_GET['view']))
 					$templating->set('guess_check', $guess_check);
 					$templating->set('link', $listing['link']);
 					$templating->set('name', $listing['name']);
-					$templating->set('comment', $listing['comment']);
 					$templating->set('id', $listing['id']);
 
 					$date = new DateTime($listing['date']);
@@ -192,7 +190,7 @@ if (isset($_GET['view']))
 
 			$templating->set('month', $month . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-			$db->sqlquery("SELECT `id`, `date`, `name`, `comment`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 1 ORDER BY `date` ASC");
+			$db->sqlquery("SELECT `id`, `date`, `name`, link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 1 ORDER BY `date` ASC");
 			while ($listing = $db->fetch()) // loop through the items
 			{
 				$get_date = date_parse($listing['date']);
@@ -209,7 +207,6 @@ if (isset($_GET['view']))
 					$templating->set('guess_check', $guess_check);
 					$templating->set('link', $listing['link']);
 					$templating->set('name', $listing['name']);
-					$templating->set('comment', $listing['comment']);
 					$templating->set('id', $listing['id']);
 
 					$date = new DateTime($listing['date']);
@@ -226,7 +223,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'Add')
 	{
-		if (empty($_POST['name']) || empty($_POST['date']))
+		if (empty($_POST['name']) || empty($_POST['date']) || empty($_POST['link']))
 		{
 			header("Location: /admin.php?module=calendar&view=manage&error=missing");
 			exit;
@@ -247,7 +244,7 @@ if (isset($_POST['act']))
 			$guess = 1;
 		}
 
-		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `comment` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['comment'], $_POST['link'], $guess, date("Y-m-d")));
+		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['link'], $guess, date("Y-m-d")));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} added a new game to the release calendar.", core::$date, core::$date));
 
@@ -262,7 +259,7 @@ if (isset($_POST['act']))
 			exit;
 		}
 
-		if (empty($_POST['name']) || empty($_POST['date']))
+		if (empty($_POST['name']) || empty($_POST['date']) || empty($_POST['link']))
 		{
 			header("Location: /admin.php?module=calendar&view=manage&error=missing");
 			exit;
@@ -276,7 +273,7 @@ if (isset($_POST['act']))
 			$guess = 1;
 		}
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `comment` = ?, `link` = ?, `best_guess` = ?, `edit_date` = ? WHERE `id` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['comment'], $_POST['link'], $guess, date('Y-m-d'), $_POST['id']));
+		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `edit_date` = ? WHERE `id` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['link'], $guess, date('Y-m-d'), $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited ' . $_POST['name'] . ' in the release calendar.', core::$date, core::$date));
 
@@ -305,7 +302,7 @@ if (isset($_POST['act']))
 			$guess = 1;
 		}
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `comment` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ? WHERE `id` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['comment'], $_POST['link'], $guess, date("Y-m-d"), $_POST['id']));
+		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ? WHERE `id` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['link'], $guess, date("Y-m-d"), $_POST['id']));
 
 		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `calendar_id` = ?", array($_POST['id']));
 

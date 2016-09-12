@@ -144,7 +144,7 @@ $counter = $db->fetch();
 
 $templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-$db->sqlquery("SELECT `id`, `date`, `name`, `comment`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
+$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
 while ($listing = $db->fetch())
 {
 	$get_date = date_parse($listing['date']);
@@ -165,7 +165,7 @@ while ($listing = $db->fetch())
 		$today = '<span class="badge green">Releasing Today!</span> ';
 	}
 
-	$game_name = $today . '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'" target="_blank">'.$listing['name'].'</a>';
+	$game_name = $today . '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
 
 	$templating->set('name', $game_name);
 

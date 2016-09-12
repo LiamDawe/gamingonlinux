@@ -335,7 +335,6 @@ margin-bottom: -3px;
 	padding: 10px;
 }
 .box .body.list ul li a {
-	display: block;
 	text-decoration: none;
 }
 .box .body.list.noblock ul li a {

@@ -52,7 +52,8 @@ if (isset($_GET['game-id']))
 		}
 		$templating->set('steam_link', $steam_link);
 
-		$db->sqlquery("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`title` LIKE ? ORDER BY a.`article_id` DESC LIMIT 4", array('%'.$game['name'].'%'));
+		$game['name'] = trim($game['name']);
+		$db->sqlquery("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`title` REGEXP concat('[[:space:],]+', ?, '[[:space:],]+') ORDER BY a.`article_id` DESC LIMIT 4", array($game['name']));
 		if ($db->num_rows() > 0)
 		{
 			$article_list = '';

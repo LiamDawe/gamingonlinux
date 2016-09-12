@@ -86,7 +86,7 @@
 	a:hover,a:active {color: #104e8b; text-decoration: none; outline: none;}
 
 /* Lists */
-	ul, ol {list-style: outside none square; padding: 0 0 21px 21px;}
+	ul, ol {list-style: outside none square; padding: 0 0 5px 21px;}
 	ol {list-style: decimal; padding: 0 0 21px 29px;}
 	li, dd {margin: 0px; padding: 0 0 7px 0;}
 	dt {font-weight: bold;margin: 0 0 7px 0px;}

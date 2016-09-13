@@ -177,6 +177,13 @@ while ($listing = $db->fetch())
 	$templating->set('edit', $edit);
 }
 
+$templating->block('head');
+$templating->set('prev', $prev_month);
+$templating->set('next', $next_month);
+$templating->set('prev_year', $prev_year);
+$templating->set('next_year', $next_year);
+$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
+
 $templating->block('bottom', 'calendar');
 
 if (isset($_POST['act']))

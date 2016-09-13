@@ -605,7 +605,7 @@ else
 					<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 					<br />
 					<p>Hello <strong>{$email_data['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
+					<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
 					<br style=\"clear:both\">
 					<div>
 					<hr>
@@ -807,7 +807,7 @@ else
 					<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 					<br />
 					<p>Hello <strong>{$email_data['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/{$_POST['conversation_id']}\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
 					<br style=\"clear:both\">
 					<div>
 				 	<hr>

@@ -15,7 +15,15 @@ if (!isset($_GET['go']))
 		$page = $_GET['page'];
 	}
 
-	$templating->block('main_top');
+	if (isset($_GET['message']))
+	{
+		if ($_GET['message'] == 'done')
+		{
+			$core->message('Subscription removed!');
+		}
+	}
+
+	$templating->block('main_top', 'usercp_modules/usercp_module_topic_subscriptions');
 
 	// count how many there is in total
 	$db->sqlquery("SELECT s.user_id, t.`topic_id` FROM `forum_topics` t INNER JOIN `forum_topics_subscriptions` s ON t.topic_id = s.topic_id WHERE s.`user_id` = ?", array($_SESSION['user_id']));
@@ -29,7 +37,7 @@ if (!isset($_GET['go']))
 
 	while ($post = $db->fetch())
 	{
-		$templating->block('post_row');
+		$templating->block('post_row', 'usercp_modules/usercp_module_topic_subscriptions');
 
 		// sort out topic icon
 		$topic_pip = $user->sort_avatar($post);
@@ -54,7 +62,7 @@ if (!isset($_GET['go']))
 		$templating->set('last_post_name', $username_last);
 	}
 
-	$templating->block('main_bottom');
+	$templating->block('main_bottom', 'usercp_modules/usercp_module_topic_subscriptions');
 	$templating->set('pagination', $pagination);
 }
 
@@ -62,9 +70,31 @@ else if (isset($_GET['go']))
 {
 	if ($_GET['go'] == 'unsubscribe')
 	{
-		$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+		if (isset($_GET['all']) && $_GET['all'] == 1)
+		{
+			if (!isset($_POST['yes']) && !isset($_POST['no']))
+			{
+				$templating->set_previous('title', 'Unsubscribing from all forum topics', 1);
+				$core->yes_no('Are you sure you want to unsubscribe from all forum topics?', url."usercp.php?module=topic_subscriptions&go=unsubscribe&all=1");
+			}
 
-		header("Location: /usercp.php?module=topic_subscriptions");
+			else if (isset($_POST['no']))
+			{
+				header("Location: ".url."/usercp.php?module=topic_subscriptions");
+			}
+
+			else if (isset($_POST['yes']))
+			{
+				$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ?", array($_SESSION['user_id']));
+				header("Location: /usercp.php?module=topic_subscriptions&message=done");
+			}
+		}
+		else
+		{
+			$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+
+			header("Location: /usercp.php?module=topic_subscriptions&message=done");
+		}
 	}
 }
 ?>

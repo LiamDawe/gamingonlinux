@@ -82,6 +82,9 @@ if (isset($_GET['view']))
 			}
 		}
 
+		// get games list
+		$games_list = $article_class->sort_game_assoc();
+
 		// if they have done it before set text and tagline
 		$title = '';
 		$slug = '';
@@ -127,6 +130,7 @@ if (isset($_GET['view']))
 		$templating->set('text', $text);
 
 		$templating->set('categories_list', $categorys_list);
+		$templating->set('games_list', $games_list);
 		$templating->set('max_height', $config['article_image_max_height']);
 		$templating->set('max_width', $config['article_image_max_width']);
 
@@ -331,6 +335,11 @@ if (isset($_GET['view']))
 			}
 
 			$templating->set('categories_list', $categorys_list);
+
+			// get games list
+			$games_list = $article_class->sort_game_assoc($article['article_id']);
+
+			$templating->set('games_list', $games_list);
 
 			// if they have done it before set title, text and tagline
 			if (isset($_GET['error']))
@@ -1063,6 +1072,8 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
 			if (isset($_POST['show_article']))
 			{
 				$_SESSION['aactive'] = 1;
@@ -1088,6 +1099,8 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
 			if (isset($_POST['show_article']))
 			{
 				$_SESSION['aactive'] = 1;
@@ -1113,6 +1126,8 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
 			if (isset($_POST['show_article']))
 			{
 				$_SESSION['aactive'] = 1;
@@ -1138,6 +1153,8 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
 			if (isset($_POST['show_article']))
 			{
 				$_SESSION['aactive'] = 1;
@@ -1163,6 +1180,8 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
 			if (isset($_POST['show_article']))
 			{
 				$_SESSION['aactive'] = 1;
@@ -1207,6 +1226,17 @@ else if (isset($_POST['act']))
 				}
 			}
 
+			// process game associations
+			$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
+			if (isset($_POST['games']))
+			{
+				foreach($_POST['games'] as $game)
+				{
+					$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
+				}
+			}
+
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
 				$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
@@ -1221,6 +1251,7 @@ else if (isset($_POST['act']))
 			unset($_SESSION['atagline']);
 			unset($_SESSION['atext']);
 			unset($_SESSION['acategories']);
+			unset($_SESSION['agames']);
 			unset($_SESSION['tagerror']);
 			unset($_SESSION['aactive']);
 			unset($_SESSION['uploads']);
@@ -1309,6 +1340,7 @@ else if (isset($_POST['act']))
 						$db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 						$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_GET['article_id']));
 						$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_GET['article_id']));
+						$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_GET['article_id']));
 						$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_GET['article_id']));
 						$db->sqlquery("DELETE FROM `admin_notifications` WHERE `article_id` = ?", array($_GET['article_id']));
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `article_id` = ?, `action` = ?, `created` = ?, `completed_date` = ?", array($_GET['article_id'], "{$_SESSION['username']} deleted the article: {$check['title']}", core::$date, core::$date));
@@ -1385,8 +1417,8 @@ else if (isset($_POST['act']))
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['aslug'] = $slug;
-
 			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
 
 			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
 		}
@@ -1396,8 +1428,9 @@ else if (isset($_POST['act']))
 			$_SESSION['atitle'] = $_POST['title'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
 			$_SESSION['aslug'] = $slug;
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
 
 			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
 		}
@@ -1407,8 +1440,9 @@ else if (isset($_POST['act']))
 			$_SESSION['atitle'] = $_POST['title'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
 			$_SESSION['aslug'] = $slug;
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
 
 			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
 		}
@@ -1418,8 +1452,9 @@ else if (isset($_POST['act']))
 			$_SESSION['atitle'] = $_POST['title'];
 			$_SESSION['atagline'] = $_POST['tagline'];
 			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
 			$_SESSION['aslug'] = $slug;
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
 
 			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
 		}
@@ -1435,20 +1470,31 @@ else if (isset($_POST['act']))
 			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
+			{
+				foreach($_SESSION['uploads'] as $key)
 				{
-					foreach($_SESSION['uploads'] as $key)
-					{
-						$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
-					}
+					$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
 				}
+			}
 
-				$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
 
 			if (isset($_POST['categories']))
 			{
 				foreach($_POST['categories'] as $category)
 				{
 					$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
+				}
+			}
+
+			// process game associations
+			$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
+			if (isset($_POST['games']))
+			{
+				foreach($_POST['games'] as $game)
+				{
+					$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
 				}
 			}
 
@@ -1465,6 +1511,7 @@ else if (isset($_POST['act']))
 			unset($_SESSION['atagline']);
 			unset($_SESSION['atext']);
 			unset($_SESSION['acategories']);
+			unset($_SESSION['agames']);
 			unset($_SESSION['tagerror']);
 			unset($_SESSION['aactive']);
 			unset($_SESSION['uploads']);

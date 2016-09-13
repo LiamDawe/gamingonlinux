@@ -17,6 +17,15 @@ if (isset($_POST['categories']))
 	}
 }
 
+// process game associations
+if (isset($_POST['games']))
+{
+	foreach($_POST['games'] as $game)
+	{
+		$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
+	}
+}
+
 // check if they are subscribing
 if (isset($_POST['subscribe']))
 {
@@ -42,6 +51,7 @@ unset($_SESSION['atitle']);
 unset($_SESSION['atagline']);
 unset($_SESSION['atext']);
 unset($_SESSION['acategories']);
+unset($_SESSION['agames']);
 unset($_SESSION['uploads_tagline']);
 unset($_SESSION['image_rand']);
 unset($_SESSION['uploads']);

@@ -15,6 +15,7 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=add&error=empty&temp_tagline=$temp_tagline");
 }
@@ -26,6 +27,7 @@ else if (strlen($_POST['tagline']) < 100)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=add&error=shorttagline&temp_tagline=$temp_tagline");
 }
@@ -37,6 +39,7 @@ else if (strlen($_POST['tagline']) > 400)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=add&error=taglinetoolong&temp_tagline=$temp_tagline");
 }
@@ -48,6 +51,7 @@ else if (strlen($_POST['title']) < 10)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=add&error=shorttitle&temp_tagline=$temp_tagline");
 }
@@ -59,6 +63,7 @@ else if (isset($_POST['show_block']) && $editor_pick_count == 3)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=add&error=toomanypicks&temp_tagline=$temp_tagline");
 }
@@ -92,6 +97,15 @@ else
 		}
 	}
 
+	// process game associations
+	if (isset($_POST['games']))
+	{
+		foreach($_POST['games'] as $game)
+		{
+			$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
+		}
+	}
+
 	// check if they are subscribing
 	if (isset($_POST['subscribe']))
 	{
@@ -110,6 +124,7 @@ else
 	unset($_SESSION['atagline']);
 	unset($_SESSION['atext']);
 	unset($_SESSION['acategories']);
+	unset($_SESSION['agames']);
 	unset($_SESSION['uploads_tagline']);
 	unset($_SESSION['image_rand']);
 

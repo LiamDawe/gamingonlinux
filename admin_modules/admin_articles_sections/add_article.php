@@ -26,6 +26,7 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) 
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	if ($_POST['check'] == 'Draft')
 	{
@@ -49,6 +50,7 @@ else if (strlen($_POST['tagline']) < 100)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	if ($_POST['check'] == 'Draft')
 	{
@@ -72,6 +74,7 @@ else if (strlen($_POST['tagline']) > 400)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
 	{
@@ -95,6 +98,7 @@ else if (strlen($_POST['title']) < 10)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	if ($_POST['check'] == 'Draft')
 	{
@@ -118,6 +122,7 @@ else if (isset($_POST['show_block']) && $editor_pick_count == core::config('edit
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	if ($_POST['check'] == 'Draft')
 	{
@@ -141,6 +146,7 @@ else if ($_POST['check'] == 'Add' && !isset($_SESSION['uploads_tagline']))
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	if ($_POST['check'] == 'Draft')
 	{
@@ -164,6 +170,7 @@ else if ($_POST['check'] == 'Draft' && empty($draft_tagline['tagline_image']) &&
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=noimageselected&temp_tagline=$temp_tagline");
 	die();
@@ -214,6 +221,15 @@ else
 		}
 	}
 
+	// process game associations
+	if (isset($_POST['games']))
+	{
+		foreach($_POST['games'] as $game)
+		{
+			$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
+		}
+	}
+
 	// move new uploaded tagline image, and save it to the article
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
@@ -232,6 +248,7 @@ else
 	unset($_SESSION['atagline']);
 	unset($_SESSION['atext']);
 	unset($_SESSION['acategories']);
+	unset($_SESSION['agame']);
 	unset($_SESSION['tagerror']);
 	unset($_SESSION['uploads']);
 	unset($_SESSION['image_rand']);

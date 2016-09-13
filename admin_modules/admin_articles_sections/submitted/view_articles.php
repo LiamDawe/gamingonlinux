@@ -235,6 +235,10 @@ else if (isset($_GET['aid']))
 
 	$templating->set('categories_list', $categorys_list);
 
+	$games_list = $article_class->sort_game_assoc($article['article_id']);
+
+	$templating->set('games_list', $games_list);
+
 	if (empty($article['username']))
 	{
 		if (empty($article['guest_username']))

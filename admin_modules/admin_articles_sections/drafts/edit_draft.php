@@ -20,6 +20,16 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		}
 	}
 
+	// process game associations
+	$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
+	if (isset($_POST['games']))
+	{
+		foreach($_POST['games'] as $game)
+		{
+			$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
+		}
+	}
 
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
@@ -32,6 +42,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	unset($_SESSION['atext2']);
 	unset($_SESSION['atext3']);
 	unset($_SESSION['acategories']);
+	unset($_SESSION['agames']);
 	unset($_SESSION['tagerror']);
 	unset($_SESSION['aactive']);
 	unset($_SESSION['uploads']);

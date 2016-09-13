@@ -12,11 +12,33 @@ if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_r
 	$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
 }
 
+$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+
+if (isset($_POST['categories']))
+{
+	foreach($_POST['categories'] as $category)
+	{
+		$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
+	}
+}
+
+// process game associations
+$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
+if (isset($_POST['games']))
+{
+	foreach($_POST['games'] as $game)
+	{
+		$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
+	}
+}
+
 // article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 unset($_SESSION['atitle']);
 unset($_SESSION['atagline']);
 unset($_SESSION['atext']);
 unset($_SESSION['acategories']);
+unset($_SESSION['agames']);
 unset($_SESSION['tagerror']);
 unset($_SESSION['aactive']);
 unset($_SESSION['uploads']);

@@ -34,6 +34,7 @@ else
 		$_SESSION['atext2'] = $_POST['text2'];
 		$_SESSION['atext3'] = $_POST['text3'];
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		$self = 0;
 		if (isset($_POST['submit_as_self']))
@@ -53,6 +54,7 @@ else
 		$_SESSION['atext2'] = $_POST['text2'];
 		$_SESSION['atext3'] = $_POST['text3'];
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		$self = 0;
 		if (isset($_POST['submit_as_self']))
@@ -72,6 +74,7 @@ else
 		$_SESSION['atext2'] = $_POST['text2'];
 		$_SESSION['atext3'] = $_POST['text3'];
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		$self = 0;
 		if (isset($_POST['submit_as_self']))
@@ -91,6 +94,7 @@ else
 		$_SESSION['atext2'] = $_POST['text2'];
 		$_SESSION['atext3'] = $_POST['text3'];
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		$self = 0;
 		if (isset($_POST['submit_as_self']))
@@ -110,6 +114,7 @@ else
 		$_SESSION['atext2'] = $_POST['text2'];
 		$_SESSION['atext3'] = $_POST['text3'];
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		$url = "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=noimageselected&self={$self}&temp_tagline=$temp_tagline";
 
@@ -125,6 +130,7 @@ else
 		$_SESSION['atext2'] = $_POST['text2'];
 		$_SESSION['atext3'] = $_POST['text3'];
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		$self = 0;
 		if (isset($_POST['submit_as_self']))
@@ -193,6 +199,17 @@ else
 			foreach($_POST['categories'] as $category)
 			{
 				$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
+			}
+		}
+
+		// process game associations
+		$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
+		if (isset($_POST['games']))
+		{
+			foreach($_POST['games'] as $game)
+			{
+				$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
 			}
 		}
 

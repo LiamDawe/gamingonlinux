@@ -38,6 +38,7 @@ else
 		$_SESSION['atext'] = $_POST['text'];
 		$_SESSION['aslug'] = $slug;
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		header("Location: admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=empty&self={$_POST['submit_as_self']}&temp_tagline=$temp_tagline");
 	}
@@ -49,6 +50,7 @@ else
 		$_SESSION['atext'] = $_POST['text'];
 		$_SESSION['aslug'] = $slug;
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		header("Location: admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttagline&self={$_POST['submit_as_self']}&temp_tagline=$temp_tagline");
 	}
@@ -60,6 +62,7 @@ else
 		$_SESSION['atext'] = $_POST['text'];
 		$_SESSION['aslug'] = $slug;
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		header("Location: admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=taglinetoolong&self={$_POST['submit_as_self']}&temp_tagline=$temp_tagline");
 	}
@@ -71,6 +74,7 @@ else
 		$_SESSION['atext'] = $_POST['text'];
 		$_SESSION['aslug'] = $slug;
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		header("Location: admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttitle&self={$_POST['submit_as_self']}&temp_tagline=$temp_tagline");
 	}
@@ -82,6 +86,7 @@ else
 		$_SESSION['atext'] = $_POST['text'];
 		$_SESSION['aslug'] = $slug;
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		header("Location: admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=toomanypicks&self={$_POST['submit_as_self']}&temp_tagline=$temp_tagline");
 	}
@@ -93,6 +98,7 @@ else
 		$_SESSION['atext'] = $_POST['text'];
 		$_SESSION['aslug'] = $slug;
 		$_SESSION['acategories'] = $_POST['categories'];
+		$_SESSION['agames'] = $_POST['games'];
 
 		$url = "admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=noimageselected&temp_tagline=$temp_tagline";
 
@@ -147,6 +153,17 @@ else
 			foreach($_POST['categories'] as $category)
 			{
 				$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
+			}
+		}
+
+		// process game associations
+		$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
+		if (isset($_POST['games']))
+		{
+			foreach($_POST['games'] as $game)
+			{
+				$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
 			}
 		}
 

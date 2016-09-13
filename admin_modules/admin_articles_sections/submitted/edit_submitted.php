@@ -17,6 +17,7 @@ if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['a
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
 }
@@ -28,6 +29,7 @@ else if (strlen($_POST['tagline']) < 100)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
 }
@@ -39,6 +41,7 @@ else if (strlen($_POST['tagline']) > 400)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
 }
@@ -50,6 +53,7 @@ else if (strlen($_POST['title']) < 10)
 	$_SESSION['atagline'] = $_POST['tagline'];
 	$_SESSION['atext'] = $_POST['text'];
 	$_SESSION['acategories'] = $_POST['categories'];
+	$_SESSION['agames'] = $_POST['games'];
 
 	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
 }
@@ -71,6 +75,17 @@ else
 		foreach($_POST['categories'] as $category)
 		{
 			$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
+		}
+	}
+
+	// process game associations
+	$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
+	if (isset($_POST['games']))
+	{
+		foreach($_POST['games'] as $game)
+		{
+			$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
 		}
 	}
 

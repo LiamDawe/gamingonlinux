@@ -41,5 +41,55 @@ class article_class
     }
     return $previously_uploaded;
   }
+
+  function sort_game_assoc($article_id = NULL)
+  {
+    global $db;
+
+    if ($article_id != NULL)
+    {
+      // get games list
+      $games_check_array = array();
+      $db->sqlquery("SELECT `game_id` FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
+      while($games_check = $db->fetch())
+      {
+        $games_check_array[] = $games_check['game_id'];
+      }
+    }
+
+    $games_list = '';
+    $db->sqlquery("SELECT * FROM `calendar` ORDER BY `name` ASC");
+    while ($games = $db->fetch())
+    {
+      if (isset($_GET['error']))
+      {
+        if (!empty($_SESSION['agames']) && in_array($games['id'], $_SESSION['agames']))
+        {
+          $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
+        }
+
+        else
+        {
+          $games_list .= "<option value=\"{$games['id']}\">{$games['name']}</option>";
+        }
+      }
+
+      else
+      {
+
+        if (($article_id != NULL) && isset($games_check_array) && in_array($games['id'], $games_check_array))
+        {
+          $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
+        }
+
+        else
+        {
+          $games_list .= "<option value=\"{$games['id']}\">{$games['name']}</option>";
+        }
+      }
+    }
+
+    return $games_list;
+  }
 }
 ?>

@@ -238,6 +238,10 @@ else
 
 	$templating->set('categories_list', $categorys_list);
 
+	$games_list = $article_class->sort_game_assoc($article['article_id']);
+
+	$templating->set('games_list', $games_list);
+
 	$templating->set('username', $article['username']);
 
 	// if they have done it before set title, text and tagline

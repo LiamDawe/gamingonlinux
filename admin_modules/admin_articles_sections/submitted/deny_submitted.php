@@ -32,6 +32,7 @@ else
 		// delete it
 		$db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 		$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_GET['article_id']));
+		$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_GET['article_id']));
 		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_GET['article_id']));
 
 		// remove old article's image

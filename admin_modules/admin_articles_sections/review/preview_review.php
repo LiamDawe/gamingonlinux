@@ -148,6 +148,24 @@ if (isset($article) && $article['article_top_image'] == 1)
 
 		$templating->set('categories_list', $categories_list);
 
+		// get games
+		$games_list = '';
+		$db->sqlquery("SELECT * FROM `article_game_assoc` ORDER BY `name` ASC");
+		while ($games = $db->fetch())
+		{
+			if (!empty($_POST['categories']) && in_array($games['id'], $_POST['games']))
+			{
+				$games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
+			}
+
+			else
+			{
+				$games_list .= "<option value=\"{$games['category_id']}\">{$games['name']}</option>";
+			}
+		}
+
+		$templating->set('games_list', $games_list);
+
 		$guest_username = '';
 		if ($_SESSION['user_id'] == 0)
 		{

@@ -25,11 +25,17 @@
 				<div class="box">
 					<div class="body group">
 							Categories:<br />
-						<select tabindex="-1" multiple="" name="categories[]" id="articleCategories" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:categories_list}</select>
+						<select tabindex="-1" multiple="" name="categories[]" id="articleCategories" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:categories_list}</select><br />
 						<script type="application/javascript">
 						    $("#articleCategories").select2()
 						    $('#content').on('keydown', '.select2-input', function(event) { if (event.which == 9){ event.preventDefault(); } });
 						</script>
+						Attach the article to a related game in the database:<br />
+					<select tabindex="-1" multiple="" name="games[]" id="articleGames" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:games_list}</select>
+					<script type="application/javascript">
+							$("#articleGames").select2()
+							$('#content').on('keydown', '.select2-input', function(event) { if (event.which == 9){ event.preventDefault(); } });
+					</script>
 					</div>
 				</div>
 					<div class="box">

@@ -820,16 +820,25 @@ else
 						$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 						$subscribe_info = $db->fetch();
 
+						// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+						$db->sqlquery("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic['topic_id']));
+						$sub_exists = $db->num_rows();
+
+						if ($sub_exists == 1)
+						{
+							$check_current_sub = $db->fetch();
+						}
+
 						$subscribe_check = '';
-						if ($subscribe_info['auto_subscribe'] == 1)
+						if ($subscribe_info['auto_subscribe'] == 1 || $sub_exists == 1)
 						{
 							$subscribe_check = 'checked';
 						}
 
 						$subscribe_email_check = '';
-						if ($subscribe_info['auto_subscribe_email'] == 1)
+						if ($subscribe_info['auto_subscribe_email'] == 1 || (isset($check_current_sub) && $check_current_sub['emails'] == 1))
 						{
-							$subscribe_email_check = 'checked';
+							$subscribe_email_check = 'selected';
 						}
 
 						if (!isset($_SESSION['activated']))

@@ -135,14 +135,24 @@ if (core::config('forum_posting_open') == 1)
 					$db->sqlquery("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id));
 					$title = $db->fetch();
 
+					// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+					$db->sqlquery("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
+					if ($db->num_rows() == 1)
+					{
+						if (!isset($_POST['subscribe']))
+						{
+							$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
+						}
+					}
+
 					// are we subscribing?
-					if (isset($_POST['subscribe']))
+					if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 					{
 						// make sure we aren't doubling up
 						$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
 
 						$emails = 0;
-						if (isset($_POST['emails']))
+						if ($_POST['subscribe-type'] == 'sub-emails')
 						{
 							$emails = 1;
 						}

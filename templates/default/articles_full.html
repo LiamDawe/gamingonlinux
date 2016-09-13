@@ -131,12 +131,12 @@
 [block: comment_buttons]
 <div class="box">
 	<div class="body group">
+		<strong>Subscribe to article comments?</strong><br />
+		<em>You can <a href="/usercp.php?module=article_subscriptions">see all watched articles here</a>.</em><br />
 		<label class="checkbox">
-		<input type="checkbox" class="ays-ignore" name="subscribe" {:subscribe_check} /> <strong>Subscribe to article to receive comment replies</strong>
+			<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to comments
 		</label>
-		<label class="checkbox">
-		<input type="checkbox" class="ays-ignore" name="emails" {:subscribe_email_check} /> <strong>Receive comment replies via email?</strong>
-		</label>
+		<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select><br />
 		<input type="hidden" name="aid" value="{:aid}" />
 		<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button>
 	</div>

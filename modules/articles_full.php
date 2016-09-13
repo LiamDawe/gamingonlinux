@@ -686,20 +686,29 @@ if (!isset($_GET['go']))
 
 								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 								{
+									// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+									$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
+									$sub_exists = $db->num_rows();
+
+									if ($sub_exists == 1)
+									{
+										$check_current_sub = $db->fetch();
+									}
+
 									// find if they have auto subscribe on
 									$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 									$subscribe_info = $db->fetch();
 
 									$subscribe_check = '';
-									if ($subscribe_info['auto_subscribe'] == 1)
+									if ($subscribe_info['auto_subscribe'] == 1 || $sub_exists == 1)
 									{
 										$subscribe_check = 'checked';
 									}
 
 									$subscribe_email_check = '';
-									if ($subscribe_info['auto_subscribe_email'] == 1)
+									if ($subscribe_info['auto_subscribe_email'] == 1 || (isset($check_current_sub) && $check_current_sub['emails'] == 1))
 									{
-										$subscribe_email_check = 'checked';
+										$subscribe_email_check = 'selected';
 									}
 
 									$comment = '';
@@ -911,6 +920,16 @@ else if (isset($_GET['go']))
 							// update the posting users comment count
 							$db->sqlquery("UPDATE `users` SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array($_SESSION['user_id']));
 
+							// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+							$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+							if ($db->num_rows() == 1)
+							{
+								if (!isset($_POST['subscribe']))
+								{
+									$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+								}
+							}
+
 							// check if they are subscribing
 							if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 							{
@@ -918,7 +937,7 @@ else if (isset($_GET['go']))
 								$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
 
 								$emails = 0;
-								if (isset($_POST['emails']))
+								if ($_POST['subscribe-type'] == 'sub-emails')
 								{
 									$emails = 1;
 								}

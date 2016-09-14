@@ -29,20 +29,20 @@
 [block: edit_top]
 <div class="box">
 	<div class="head">
-		Edit the game
+		Edit the game <span class="fright"><a href="/index.php?module=game&game-id={:id}">View in live database</a></span>
 	</div>
 [/block: edit_top]
 
 [block: edit_item]
-			<div class="body group cal">
+			<div class="body group">
 				<form method="post" action="admin.php?module=games">
 					Game Name: <input type="text" name="name" value="{:name}" /><br />
 					Official website:<br />
 					<input type="text" name="link" value="{:link}" /><br />
 					Steam Link:<br />
-					<input type="text" name="steam" value="{:steam}" /><br />
+					<input type="text" name="steam_link" value="{:steam_link}" /><br />
 					GOG Link:<br />
-					<input type="text" name="gog" value="{:gog}" /><br />
+					<input type="text" name="gog_link" value="{:gog_link}" /><br />
 					Release Date: <em>click the tiny calendar!</em> <br />
 					<input name="date" id="datepicker" type="text" value="{:date} "/>
 					<script>
@@ -52,13 +52,14 @@
 						showTime: false
 					});</script>
 					Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
-					<button formaction="admin.php?module=games" name="act" value="Edit" type="submit">Edit</button> <button formaction="admin.php?module=games" name="act" value="Delete" type="submit">Delete</button>
-					<input type="hidden" name="id" value="{:id}" />
-				</form>
-			</div>
+					<br />
 [/block: edit_item]
 
 [block: edit_bottom]
+<button formaction="admin.php?module=games" name="act" value="Edit" type="submit">Edit</button> <button formaction="admin.php?module=games" name="act" value="Delete" type="submit">Delete</button>
+<input type="hidden" name="id" value="{:id}" />
+</form>
+</div>
 </div>
 [/block: edit_bottom]
 

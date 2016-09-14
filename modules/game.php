@@ -2,7 +2,7 @@
 if (isset($_GET['game-id']))
 {
 	// make sure it exists
-	$db->sqlquery("SELECT `id`, `name`, `date`, `gog_link`, `steam_link`, `link` FROM `calendar` WHERE `id` = ? AND `approved` = 1", array($_GET['game-id']));
+	$db->sqlquery("SELECT `id`, `name`, `date`, `gog_link`, `steam_link`, `link`, `description` FROM `calendar` WHERE `id` = ? AND `approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
 		$game = $db->fetch();
@@ -30,6 +30,13 @@ if (isset($_GET['game-id']))
 			$date = $game['date'];
 		}
 		$templating->set('release-date', $date);
+
+		$description = '';
+		if (!empty($game['description']) && $game['description'] != NULL)
+		{
+			$description = '<strong>About this game</strong><br />' . $game['description'] . '<br /><br />';
+		}
+		$templating->set('description', bbcode($description));
 
 		$official_link = '';
 		if (!empty($game['link']))

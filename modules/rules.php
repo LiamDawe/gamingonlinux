@@ -5,5 +5,5 @@ $templating->set_previous('title', 'Posting rules', 1);
 $templating->merge('rules');
 $templating->block('main');
 
-$templating->set('rules',$config['rules']);
+$templating->set('rules',core::config('rules'));
 ?>

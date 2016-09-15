@@ -37,8 +37,8 @@ $user_avatar = $db->fetch();
 $avatar = $user->sort_avatar($user_avatar);
 $templating->set('current_avatar', $avatar);
 
-$templating->set('width', $config['avatar_width']);
-$templating->set('height', $config['avatar_height']);
+$templating->set('width', core::config('avatar_width'));
+$templating->set('height', core::config('avatar_height'));
 
 // AVATAR GALLERY
 $db->sqlquery("SELECT `id`, `filename` FROM `avatars_gallery` ORDER BY `id` ASC");
@@ -71,7 +71,7 @@ if (isset($_POST['action']))
 			// check dimensions
 			list($width, $height, $type, $attr) = getimagesize($_POST['avatar_url']);
 
-			if ($width > $config['avatar_width'] || $height > $config['avatar_height'])
+			if ($width > core::config('avatar_width') || $height > core::config('avatar_height'))
 			{
 				$core->message('The dimensions are too big!');
 			}

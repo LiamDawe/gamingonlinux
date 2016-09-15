@@ -304,7 +304,7 @@ if (isset($_POST['act']))
 
         // get the article row template
         $templating->block('preview_row');
-        $templating->set('url',$config['website_url']);
+        $templating->set('url',core::config('website_url'));
 
         $templating->set('title', $_POST['title']);
         $templating->set('user_id', $_SESSION['user_id']);

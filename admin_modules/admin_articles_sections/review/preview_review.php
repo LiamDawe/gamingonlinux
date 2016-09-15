@@ -176,8 +176,8 @@ if (isset($article) && $article['article_top_image'] == 1)
 		$templating->set('edit_title', htmlentities($_POST['title'], ENT_QUOTES));
 		$templating->set('edit_tagline', $_POST['tagline']);
 
-		$templating->set('max_height', $config['article_image_max_height']);
-		$templating->set('max_width', $config['article_image_max_width']);
+		$templating->set('max_height', core::config('article_image_max_height'));
+		$templating->set('max_width', core::config('article_image_max_width'));
 
 		$core->editor('text', $_POST['text'], 1);
 

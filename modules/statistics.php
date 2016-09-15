@@ -33,7 +33,7 @@ foreach($charts as $chart)
 {
   // DISTRIBUTION CHOICE
   $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = '{$chart['name']}' ORDER BY `id` DESC LIMIT 1");
-  $get_distro_chart = $db->fetch();
+  $get_chart_id = $db->fetch();
 
   $order = '';
   if (isset($chart['order']))
@@ -41,7 +41,7 @@ foreach($charts as $chart)
     $order = $chart['order'];
   }
 
-  $grab_chart = $core->stat_chart($get_distro_chart['id'], $order);
+  $grab_chart = $core->stat_chart($get_chart_id['id'], $order);
 
   // only do this once
   if ($counter == 0)
@@ -53,6 +53,7 @@ foreach($charts as $chart)
   $templating->block('chart_section');
   $templating->set('title', $chart['name']);
   $templating->set('graph', $grab_chart['graph']);
+  $templating->set('id', $get_chart_id['id']);
   $templating->set('total_users', $grab_chart['total_users_answered']);
   $templating->set('full_info', $grab_chart['full_info']);
   $counter++;

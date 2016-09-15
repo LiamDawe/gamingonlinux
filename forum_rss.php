@@ -7,22 +7,12 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include('includes/class_core.php');
 $core = new core();
 
-// get config
-$db->sqlquery("SELECT * FROM `config`");
-$fetch_config = $db->fetch_all_rows();
-
-$config = array();
-foreach ($fetch_config as $config_set)
-{
-	$config[$config_set['data_key']] = $config_set['data_value'];
-}
-
 include('includes/class_template.php');
-$templating = new template($config['template']);
+$templating = new template(core::config('template'));
 
-if ($config['articles_rss'] == 1)
+if (core::config('articles_rss') == 1)
 {
-	$limit = $config['rss_article_limit'];
+	$limit = core::config('rss_article_limit');
 	if (isset($_GET['limit']) && is_numeric($_GET['limit']))
 	{
 		$limit = $_GET['limit'];

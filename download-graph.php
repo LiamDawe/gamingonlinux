@@ -1,5 +1,5 @@
 <?php
-//header('Content-Type: image/png');
+session_start();
 
 include('includes/config.php');
 
@@ -8,6 +8,18 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 
 include('includes/class_core.php');
 $core = new core();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
+{
+  if (core::config('pretty_urls') == 1)
+  {
+    header("Location: /users/statistics");
+  }
+  else
+  {
+    header("Location: /index.php?module=statistics");
+  }
+}
 
 $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `id` = ?", array($_GET['id']));
 $get_chart_id = $db->fetch();

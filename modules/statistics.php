@@ -53,7 +53,12 @@ foreach($charts as $chart)
   $templating->block('chart_section');
   $templating->set('title', $chart['name']);
   $templating->set('graph', $grab_chart['graph']);
-  $templating->set('id', $get_chart_id['id']);
+  $download_link = '';
+  if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+  {
+    $download_link = '<div style="text-align: center;"><em>Download Graph: (<a href="/download-graph.php?id='.$get_chart_id['id'].'">SVG</a>)</em></div>';
+  }
+  $templating->set('download_link', $download_link);
   $templating->set('total_users', $grab_chart['total_users_answered']);
   $templating->set('full_info', $grab_chart['full_info']);
   $counter++;

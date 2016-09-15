@@ -116,7 +116,7 @@ class mysql
 
 	function pdo_error($exception, $page, $sql, $referrer = NULL)
 	{
-		global $config;
+		/*global $config;
 
 		$to = "liamdawe@gmail.com, levi.voorintholt@gmail.com";
 
@@ -148,7 +148,7 @@ class mysql
 		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 		// Mail it
-		mail($to, $subject, $message, $headers);
+		mail($to, $subject, $message, $headers);*/
 	}
 }
 

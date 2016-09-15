@@ -524,7 +524,12 @@ if (!isset($_GET['go']))
 						}
 						$templating->set('comment_link', $comment_link);
 
-						$templating->set('total_likes', $comments['total']);
+						// Total number of likes for the status message
+ 						$qtotallikes = $db->sqlquery("SELECT COUNT(comment_id) as `total` FROM likes WHERE comment_id = ?", array($comments['comment_id']));
+ 						$get_total = $db->fetch();
+ 						$total_likes = $get_total['total'];
+
+						$templating->set('total_likes', $total_likes);
 
 						$logged_in_options = '';
 						if ($_SESSION['user_group'] != 4)

@@ -585,7 +585,7 @@ else
 						$edit_link = '';
 						if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group(1,2) == true)
 						{
-							$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"{$config['website_url']}index.php?module=editpost&amp;post_id={$post['post_id']}&page={$page}\"><span class=\"icon edit\"></span></a></li>";
+							$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . core::config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
 						}
 						$templating->set('edit_link', $edit_link);
 
@@ -593,7 +593,7 @@ else
 						$delete_link = '';
 						if ($user->check_group(1,2) == true)
 						{
-							$delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"{$config['website_url']}index.php?module=viewtopic&amp;view=deletepost&amp;post_id={$post['post_id']}&amp;topic_id={$topic['topic_id']}\"><span class=\"icon delete\"></span></a>";
+							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '"><span class="icon delete"></span></a>';
 						}
 						$templating->set('delete_link', $delete_link);
 

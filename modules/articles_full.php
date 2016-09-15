@@ -424,7 +424,7 @@ if (!isset($_GET['go']))
 						$db_grab_fields .= "u.`{$field['db_field']}`,";
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, {$_SESSION['per-page']}", array($_GET['aid'], $core->start));
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, ul.username as username_edited, COUNT(l.comment_id) as `total` FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited LEFT JOIN `likes` l ON l.comment_id = a.comment_id WHERE a.`article_id` = ? GROUP BY a.comment_id ORDER BY a.`comment_id` ASC LIMIT ?, {$_SESSION['per-page']}", array($_GET['aid'], $core->start));
 
 					$comments_get = $db->fetch_all_rows();
 
@@ -524,12 +524,7 @@ if (!isset($_GET['go']))
 						}
 						$templating->set('comment_link', $comment_link);
 
-						// Total number of likes for the status message
-						$qtotallikes = $db->sqlquery("SELECT COUNT(comment_id) as `total` FROM likes WHERE comment_id = ?", array($comments['comment_id']));
-						$get_total = $db->fetch();
-						$total_likes = $get_total['total'];
-
-						$templating->set('total_likes', $total_likes);
+						$templating->set('total_likes', $comments['total']);
 
 						$logged_in_options = '';
 						if ($_SESSION['user_group'] != 4)

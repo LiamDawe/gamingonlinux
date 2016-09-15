@@ -162,7 +162,7 @@ if (isset($_POST['act']))
 			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress(66,'admin')."\r\n";
 
 			// Mail it
-			if ($config['send_emails'] == 1)
+			if (core::config('send_emails') == 1)
 			{
 				mail($to, $subject, $message, $headers);
 			}
@@ -217,7 +217,7 @@ if (isset($_POST['act']))
 			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress(365,'editor')."\r\n";
 
 			// Mail it
-			if ($config['send_emails'] == 1)
+			if (core::config('send_emails') == 1)
 			{
 				mail($to, $subject, $message, $headers);
 			}

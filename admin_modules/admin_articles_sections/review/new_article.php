@@ -149,20 +149,19 @@ else
 		$to = $email_user['email'];
 
 				// message
-				$message = "
+				$message = '
 				<html>
 				<head>
-				<title>GamingOnLinux.com article submitted for review by {$_SESSION['username']}</title>
-				<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
+				<title>GamingOnLinux.com article submitted for review by ' . $_SESSION['username'] . '</title>
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 				</head>
 				<body>
-				<img src=\"{$config['website_url']}templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+				<img src="' . core::config('website_url') . 'templates/default/images/logo.png" alt="Gaming On Linux">
 				<br />
-				<p>Hello <strong>{$email_user['username']}</strong>,</p>
-				<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"{$config['website_url']}admin.php?module=articles&view=adminreview&aid={$article_id}\">{$title}</a></strong>\".</p>
+				<p>Hello <strong>' . $email_user['username'] . '</strong>,</p>
+				<p><strong>' . $_SESSION['username'] . '</strong> has sent an article to be reviewed before publishing "<strong><a href="' . core::config('website_url') . 'admin.php?module=articles&view=adminreview&aid=' . $article_id . '">' . $title . '</a></strong>".</p>
 				</body>
-				</html>
-				";
+				</html>';
 
 				// To send HTML mail, the Content-type header must be set
 				$headers  = 'MIME-Version: 1.0' . "\r\n";

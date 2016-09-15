@@ -131,8 +131,8 @@ if (isset($_GET['view']))
 
 		$templating->set('categories_list', $categorys_list);
 		$templating->set('games_list', $games_list);
-		$templating->set('max_height', $config['article_image_max_height']);
-		$templating->set('max_width', $config['article_image_max_width']);
+		$templating->set('max_height', core::config('article_image_max_height'));
+		$templating->set('max_width', core::config('article_image_max_width'));
 
 		$db->sqlquery("SELECT `auto_subscribe_new_article` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 		$grab_subscribe = $db->fetch();

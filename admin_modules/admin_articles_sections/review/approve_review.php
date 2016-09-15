@@ -217,7 +217,7 @@ else
 			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 			// Mail it
-			if ($config['send_emails'] == 1)
+			if (core::config('send_emails') == 1)
 			{
 				mail($to, $subject, $message, $headers);
 			}

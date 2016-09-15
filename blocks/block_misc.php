@@ -3,13 +3,13 @@
 $templating->merge('blocks/block_bottom_info');
 $templating->block('list');
 
-if ($config['pretty_urls'] == 1)
+if (core::config('pretty_urls') == 1)
 {
 	$about_link = '/about-us/';
 }
 else
 {
-	$about_link = $config['path'] . 'index.php?module=about_us';
+	$about_link = core::config('webite_url') . 'index.php?module=about_us';
 }
 $templating->set('about_link', $about_link);
 

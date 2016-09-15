@@ -12,7 +12,7 @@ if ($_SESSION['user_id'] == 0)
 		$username = $_COOKIE['remember_username'];
 		$username_remembered = 'checked';
 	}
-		
+
 	$templating->set('username', $username);
 	$templating->set('username_remembered', $username_remembered);
 }
@@ -41,11 +41,11 @@ else if ($_SESSION['user_id'] > 0)
 	if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
 	{
 		// now we set if we need to show notifications or not
-		if ($config['admin_notifications'] > 0)
+		if (core::config('admin_notifications') > 0)
 		{
-			$notifications_link = "<span class=\"pm-count\">{$config['admin_notifications']}</a>";
+			$notifications_link = '<span class="pm-count">' . core::config('admin_notifications') . '</a>';
 		}
-		
+
 		$admin_link = "<li><a href=\"/admin.php\">Admin CP</a> $notifications_link</li>";
 	}
 

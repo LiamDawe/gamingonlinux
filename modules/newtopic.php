@@ -294,7 +294,7 @@ else
 							unset($_SESSION['atitle']);
 							unset($_SESSION['atext']);
 
-							if ($config['pretty_urls'] == 1)
+							if (core::config('pretty_urls') == 1)
 							{
 								header("Location: /forum/topic/{$topic_id}");
 							}

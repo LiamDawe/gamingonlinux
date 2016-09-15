@@ -34,7 +34,7 @@ else
 	{
 		$templating->block('top');
 
-		if ($config['pretty_urls'] == 1)
+		if (core::config('pretty_urls') == 1)
 		{
 			$compose_link = '/private-messages/compose/';
 		}
@@ -80,7 +80,7 @@ else
 		{
 			$templating->block('message_row');
 
-			if ($config['pretty_urls'] == 1)
+			if (core::config('pretty_urls') == 1)
 			{
 				$pm_url = "/private-messages/{$message['conversation_id']}/";
 			}
@@ -113,7 +113,7 @@ else
 		}
 
 		$templating->block('bottom');
-		if ($config['pretty_urls'] == 1)
+		if (core::config('pretty_urls') == 1)
 		{
 			$compose_link = '/private-messages/compose/';
 		}
@@ -520,7 +520,7 @@ else
 			$_SESSION['mtitle'] = $title;
 			$_SESSION['mtext'] = $text;
 
-			if ($config['pretty_urls'] == 1)
+			if (core::config('pretty_urls') == 1)
 			{
 				header("Location: /private-messages/compose/message=empty");
 				die();
@@ -553,7 +553,7 @@ else
 
 			if (empty($user_id))
 			{
-				if ($config['pretty_urls'] == 1)
+				if (core::config('pretty_urls') == 1)
 				{
 					header("Location:" . core::config('website_url') . "private-messages/compose/message=notfound");
 					die();
@@ -646,7 +646,7 @@ else
 
 			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
 
-			if ($config['pretty_urls'] == 1)
+			if (core::config('pretty_urls') == 1)
 			{
 				header("Location: /private-messages/");
 			}
@@ -692,7 +692,7 @@ else
 					$page = "page={$_GET['page']}";
 				}
 
-				if ($config['pretty_urls'] == 1)
+				if (core::config('pretty_urls') == 1)
 				{
 					header("Location: /private-messages/{$_GET['conversation_id']}/$page");
 				}
@@ -853,7 +853,7 @@ else
 				$page = ceil($get_info['replies']/9);
 			}
 
-			if ($config['pretty_urls'] == 1)
+			if (core::config('pretty_urls') == 1)
 			{
 				header("Location: /private-messages/{$_POST['conversation_id']}/page=$page");
 			}

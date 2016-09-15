@@ -22,9 +22,7 @@ if (!isset($_GET['view']))
 	$templating->set('username', $_SESSION['username']);
 	$templating->set('featured_max', core::config('editor_picks_limit'));
 
-	$db->sqlquery("SELECT count(article_id) as count FROM `articles` WHERE `show_in_menu` = 1");
-	$featured_ctotal = $db->fetch();
-	$templating->set('featured_ctotal', $featured_ctotal['count']);
+	$templating->set('featured_ctotal', core::config('total_featured'));
 
 	// only show admin/editor comments to admins and editors
 	if ($user->check_group(1,2) == true)

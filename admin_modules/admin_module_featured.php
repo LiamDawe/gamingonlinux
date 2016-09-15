@@ -57,8 +57,8 @@ if (isset($_GET['view']))
 	if ($_GET['view'] == 'add')
 	{
 		$templating->block('add', 'admin_modules/admin_module_featured');
-		$templating->set('max_width', $config['carousel_image_width']);
-		$templating->set('max_height', $config['carousel_image_height']);
+		$templating->set('max_width', core::config('carousel_image_width'));
+		$templating->set('max_height', core::config('carousel_image_height'));
 
 		// get articles that are new enough and populate the list
 		$timeout = 777600; // 9 days
@@ -79,8 +79,8 @@ if (isset($_GET['view']))
 
 		// current editor picks
 		$templating->block('add_existing', 'admin_modules/admin_module_featured');
-		$templating->set('max_width', $config['carousel_image_width']);
-		$templating->set('max_height', $config['carousel_image_height']);
+		$templating->set('max_width', core::config('carousel_image_width'));
+		$templating->set('max_height', core::config('carousel_image_height'));
 
 		$options = '';
 		$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `show_in_menu` = 1");
@@ -115,8 +115,8 @@ if (isset($_GET['view']))
 			}
 
 			$templating->set('current_image', $image);
-			$templating->set('max_width', $config['carousel_image_width']);
-			$templating->set('max_height', $config['carousel_image_height']);
+			$templating->set('max_width', core::config('carousel_image_width'));
+			$templating->set('max_height', core::config('carousel_image_height'));
 		}
 	}
 }

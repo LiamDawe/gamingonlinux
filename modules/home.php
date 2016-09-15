@@ -88,9 +88,6 @@ if (!isset($_GET['view']))
 	// sort out the pagination link
 	$pagination = $core->pagination_link($_SESSION['articles-per-page'], $total, $pagination_linky, $page);
 
-	$db->sqlquery("SELECT count(article_id) as count FROM `articles` WHERE `show_in_menu` = 1");
-	$featured_ctotal = $db->fetch();
-
 	// latest news
 	$db->sqlquery("SELECT a.article_id, a.author_id, a.guest_username, a.title, a.tagline, a.text, a.date, a.comment_count, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.show_in_menu, a.slug, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 ORDER BY a.`date` DESC LIMIT ?, {$_SESSION['articles-per-page']}", array($core->start));
 	$articles_get = $db->fetch_all_rows();
@@ -112,12 +109,12 @@ if (!isset($_GET['view']))
 
 			if ($article['show_in_menu'] == 0)
 			{
-				if ($featured_ctotal['count'] < 5)
+				if (core::config('total_featured') < 5)
 				{
 					$editor_pick_expiry = $core->format_date($article['date'] + 1209600, 'd/m/y');
 					$templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
 				}
-				else if ($featured_ctotal['count'] == 5)
+				else if (core::config('total_featured') == 5)
 				{
 					$templating->set('editors_pick_link', "");
 				}
@@ -235,6 +232,8 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	{
 		$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 1 WHERE `article_id` = ?", array($_GET['article_id']));
 
+		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
+
 		header("Location: ".url."admin.php?module=featured&view=add&article_id={$_GET['article_id']}");
 	}
 }
@@ -246,6 +245,8 @@ if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 
 	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0, `featured_image` = '' WHERE `article_id` = ?", array($_GET['article_id']));
 	unlink($_SERVER['DOCUMENT_ROOT'] . url . 'uploads/carousel/' . $featured['featured_image']);
+
+	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 
 	header("Location: ".url."index.php?module=home&message=unpicked");
 }

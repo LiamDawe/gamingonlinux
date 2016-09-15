@@ -24,6 +24,7 @@ $featured = $db->fetch_all_rows();
 // $_SERVER['DOCUMENT_ROOT'] does not exist in CLI mode
 $_SERVER['DOCUMENT_ROOT'] = (isset($_SERVER['DOCUMENT_ROOT'])? $_SERVER['DOCUMENT_ROOT'] : "/home/gamingonlinux/public_html");
 
+$total_to_remove = 0;
 foreach($featured as $row)
 {
 	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0, `featured_image` = '' WHERE `article_id` = ?", array($row['article_id']));
@@ -36,6 +37,12 @@ foreach($featured as $row)
 			unlink($image);
 		}
 	}
+	$total_to_remove++;
+}
+
+if ($total_to_remove > 0)
+{
+	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - $total_to_remove) WHERE `data_key` = 'total_featured'");
 }
 
 // count how many there are

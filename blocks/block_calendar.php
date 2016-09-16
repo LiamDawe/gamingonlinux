@@ -5,34 +5,35 @@ $templating->block('list');
 
 $templating->set('url', core::config('website_url'));
 
-// count how many there is due this month
-$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1");
+// count how many there is due this month and today
+$count_query = "SELECT (select COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1) as this_month,
+(SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) = DAY(CURDATE()) AND `approved` = 1) as today";
+$db->sqlquery($count_query);
 $counter = $db->fetch();
 
-if ($counter['count'] == 0)
+// show due this month
+if ($counter['this_month'] == 0)
 {
 	$counter_output = '';
 }
-else if ($counter['count'] > 0)
+else if ($counter['this_month'] > 0)
 {
-	$counter_output = '<li>'.$counter['count'].' games due this month</li>';
+	$counter_output = '<li>'.$counter['this_month'].' games due this month</li>';
 }
 $templating->set('counter', $counter_output);
 
-// count how many there is due today
-$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) = DAY(CURDATE()) AND `approved` = 1");
-$counter_today = $db->fetch();
+// show due today
 
-if ($counter_today['count'] == 0)
+if ($counter['today'] == 0)
 {
 	$counter_today = '';
 }
-else if ($counter_today['count'] == 1)
+else if ($counter['today'] == 1)
 {
 	$counter_today = '<li>1 game due today</li>';
 }
-else if ($counter_today['count'] > 1)
+else if ($counter['today'] > 1)
 {
-	$counter_today = '<li>'.$counter_today['count'].' games due today</li>';
+	$counter_today = '<li>'.$counter['today'].' games due today</li>';
 }
 $templating->set('counter_today', $counter_today);

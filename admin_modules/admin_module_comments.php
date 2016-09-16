@@ -42,7 +42,7 @@ if (!isset($_GET['view']))
 			$date = $core->format_date($article['date']);
 
 			$templating->block('article', 'articles_full');
-			$templating->set('url', $config['website_url']);
+			$templating->set('url', core::config('website_url'));
 			$templating->set('share_url', "");
 
 			$templating->set('rules', $config['rules']);

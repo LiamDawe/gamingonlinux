@@ -9,7 +9,7 @@ if (core::config('pretty_urls') == 1)
 }
 else
 {
-	$about_link = core::config('webite_url') . 'index.php?module=about_us';
+	$about_link = core::config('website_url') . 'index.php?module=about_us';
 }
 $templating->set('about_link', $about_link);
 

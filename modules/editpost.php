@@ -134,7 +134,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group(1,2) == true)
 			{
 				// make sure that if its a reported post that we have been sent here via the report and that we are an admin/editor (so a user making a tiny edit won't remove the report)
-				if ($_GET['reported'] == 1 && $user->check_group(1,2) == true)
+				if (isset($_GET['reported']) && $_GET['reported'] == 1 && $user->check_group(1,2) == true)
 				{
 					// check if its been reported first so we can remove the report
 					$db->sqlquery("SELECT `reported` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));

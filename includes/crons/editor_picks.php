@@ -18,7 +18,7 @@ $timeout = 1209600; // 14 days
 
 $stamp = time() - $timeout;
 
-$db->sqlquery("SELECT `article_id`, `featured_image` FROM `articles` WHERE `date` < ?", array($stamp));
+$db->sqlquery("SELECT `article_id`, `featured_image` FROM `articles` WHERE `date` < ? AND `show_in_menu` = 1", array($stamp));
 $featured = $db->fetch_all_rows();
 
 // $_SERVER['DOCUMENT_ROOT'] does not exist in CLI mode

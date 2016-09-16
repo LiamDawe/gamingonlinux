@@ -16,7 +16,7 @@ if (isset($_GET['view']))
             die();
         }
 
-        $data = file_get_contents("http://api.stopforumspam.org/api?ip=" . core::$ip);
+        $data = $core->file_get_contents_curl("http://api.stopforumspam.org/api?ip=" . core::$ip);
         if (strpos($data, "<appears>yes</appears>") !== false)
         {
             header('Location: /index.php?module=home&message=spam');

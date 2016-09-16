@@ -100,7 +100,7 @@ if (isset($_GET['view']))
 	{
 		$templating->block('manage_top', 'admin_modules/admin_module_featured');
 
-		$db->sqlquery("SELECT p.`article_id`, p.featured_image, a.`title` FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id");
+		$db->sqlquery("SELECT p.`article_id`, p.featured_image, p.hits, a.`title` FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id");
 		$count = $db->num_rows();
 
 		while ($items = $db->fetch())
@@ -117,6 +117,7 @@ if (isset($_GET['view']))
 			$templating->set('current_image', $image);
 			$templating->set('max_width', core::config('carousel_image_width'));
 			$templating->set('max_height', core::config('carousel_image_height'));
+			$templating->set('hits', $items['hits']);
 		}
 	}
 }

@@ -19,12 +19,16 @@ $timeout = 1209600; // 14 days
 
 $stamp = time() - $timeout;
 
-$db->sqlquery("SELECT p.`article_id`, p.`featured_image`, a.date FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE a.`date` < ?", array($stamp));
+$db->sqlquery("SELECT p.`article_id`, p.`featured_image`, p.hits, a.date, a.title FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE a.`date` < ?", array($stamp));
 $featured = $db->fetch_all_rows();
+
+$games = '';
 
 $total_to_remove = 0;
 foreach($featured as $row)
 {
+	$games = $row['title'] . ' Hits: ' . $row['hits'] . '<br />';
+
 	$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($row['article_id']));
 	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($row['article_id']));
 
@@ -69,6 +73,8 @@ if ($editor_pick_count < $config['editor_picks_limit'])
 		<br />
 		<p>Hello <strong>liamdawe</strong>,</p>
 		<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to {$config['editor_picks_limit']}!</p>
+		<p>Games removed:</p>
+		<p>$games</p>
 		<div>
 
 	</body>

@@ -271,6 +271,8 @@ jQuery(document).ready(function()
     });
 	});
 
+    $(".like-button").show();
+
     $(".likebutton").click(function(){
     //Get our comment
     var comment = $(this).parents('.comment')[0];

@@ -218,33 +218,26 @@ if (!isset($_GET['view']))
 
 if (isset($_GET['view']) && $_GET['view'] == 'editors')
 {
-	// count how many editors picks we have
-	$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-
-	$editor_pick_count = $db->num_rows();
-
-	if ($editor_pick_count == core::config('editor_picks_limit'))
+	if (core::config('total_featured') == core::config('editor_picks_limit'))
 	{
 		header("Location: ".url."index.php?module=home&error=toomanypicks");
 	}
 
 	else
 	{
-		$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 1 WHERE `article_id` = ?", array($_GET['article_id']));
-
-		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
-
 		header("Location: ".url."admin.php?module=featured&view=add&article_id={$_GET['article_id']}");
 	}
 }
 
 if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 {
-	$db->sqlquery("SELECT `featured_image` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
+	$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
 	$featured = $db->fetch();
 
-	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0, `featured_image` = '' WHERE `article_id` = ?", array($_GET['article_id']));
-	unlink($_SERVER['DOCUMENT_ROOT'] . url . 'uploads/carousel/' . $featured['featured_image']);
+	$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
+	unlink(core::config('path') . 'uploads/carousel/' . $featured['featured_image']);
+
+	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
 
 	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 

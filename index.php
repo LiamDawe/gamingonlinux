@@ -3,6 +3,26 @@ error_reporting(E_ALL);
 
 include('includes/header.php');
 
+if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
+{
+	$db->sqlquery("SELECT `article_id`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
+	$featured_grabber = $db->fetch();
+
+	if (!empty($featured_grabber['article_id']))
+	{
+		$db->sqlquery("UPDATE `editor_picks` SET `hits` = (hits + 1) WHERE `article_id` = ?", array($_GET['aid']));
+
+		if (core::config('pretty_urls') == 1)
+		{
+			header("Location: /articles/" . $featured_grabber['slug'] . '.' . $featured_grabber['article_id']);
+		}
+		else
+		{
+			header("Location: " . url . 'index.php?module=articles_full&aid=' . $featured_grabber['article_id'] . '&amp;title=' . $featured_grabber['slug']);
+		}
+	}
+}
+
 // Here we sort out what modules we are allowed to load
 $modules_allowed = '';
 $module_links = '';
@@ -37,7 +57,7 @@ if ($module == 'home')
 		$last_featured_sql = 'AND a.article_id != ?';
 	}
 
-	$db->sqlquery("SELECT a.article_id, a.`title`, a.active, a.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND a.show_in_menu = 1 AND a.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
+	$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
 
 	// pick a random editors pick
 	$featured = $db->fetch();
@@ -67,14 +87,7 @@ if ($module == 'home')
 		$templating->set('username', $username);
 		$templating->set('comment_count', $featured['comment_count']);
 
-		if (core::config('pretty_urls') == 1)
-		{
-			$article_link = "/articles/" . $core->nice_title($featured['title']) . '.' . $featured['article_id'];
-		}
-		else
-		{
-			$article_link = url . 'index.php?module=articles_full&amp;aid=' . $featured['article_id'];
-		}
+		$article_link = url . 'index.php?featured&amp;aid=' . $featured['article_id'];
 
 		$templating->set('article_link', $article_link);
 		$templating->set('url', url);

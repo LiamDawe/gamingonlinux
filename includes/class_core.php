@@ -759,7 +759,7 @@ class core
 			}
 
 			// see if there is a current top image
-			$db->sqlquery("SELECT `featured_image` FROM `articles` WHERE `article_id` = ?", array($article_id));
+			$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id));
 			$image = $db->fetch();
 
 			$image_info = getimagesize($_FILES['new_image']['tmp_name']);
@@ -791,13 +791,24 @@ class core
 
 			if (move_uploaded_file($source, $target))
 			{
-				// remove old avatar
+				// remove old image
 				if (!empty($image['featured_image']))
 				{
 					unlink($this->config('path') . 'uploads/carousel/' . $image['featured_image']);
 				}
+				if (!empty($image['featured_image']))
+				{
+					$db->sqlquery("UPDATE `editor_picks` SET featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
+				}
+				else
+				{
+					$db->sqlquery("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?", array($article_id, $imagename));
+				}
 
-				$db->sqlquery("UPDATE `articles` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
+				$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 1 WHERE `article_id` = ?", array($article_id));
+
+				$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
+
 				return true;
 			}
 

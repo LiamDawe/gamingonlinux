@@ -83,7 +83,7 @@ if (isset($_GET['view']))
 		$templating->set('max_height', core::config('carousel_image_height'));
 
 		$options = '';
-		$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `show_in_menu` = 1");
+		$db->sqlquery("SELECT p.`article_id`, a.`title` FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id");
 		while ($list = $db->fetch())
 		{
 			$selected = '';
@@ -100,7 +100,7 @@ if (isset($_GET['view']))
 	{
 		$templating->block('manage_top', 'admin_modules/admin_module_featured');
 
-		$db->sqlquery("SELECT `featured_image`, `title`, `article_id` FROM `articles` WHERE `show_in_menu` = 1");
+		$db->sqlquery("SELECT p.`article_id`, p.featured_image, a.`title` FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id");
 		$count = $db->num_rows();
 
 		while ($items = $db->fetch())
@@ -111,7 +111,7 @@ if (isset($_GET['view']))
 			$image = '<strong>This Editors Pick currently has no featured image set!</strong><br />';
 			if (!empty($items['featured_image']))
 			{
-				$image = "<img src=\"{$config['website_url']}uploads/carousel/{$items['featured_image']}\" width=\"100%\" class=\"img-responsive\"/>";
+				$image = '<img src="' . core::config('website_url') . 'uploads/carousel/' . $items['featured_image'] . '" width="100%" class="img-responsive"/>';
 			}
 
 			$templating->set('current_image', $image);
@@ -150,9 +150,15 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'delete')
 	{
-		unlink(core::config('path') . 'uploads/carousel/' . $carousel['image']);
+		$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']));
+		$featured = $db->fetch();
 
-		$db->sqlquery("UPDATE `articles` SET `featured_image` = '' WHERE `article_id` = ?", array($_POST['article_id']));
+		$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']));
+		unlink(core::config('path') . 'uploads/carousel/' . $featured['featured_image']);
+
+		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
+
+		$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_POST['article_id']));
 
 		header("Location: /admin.php?module=featured&view=manage&message=deleted");
 	}

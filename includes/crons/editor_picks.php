@@ -1,7 +1,8 @@
 <?php
-include('/home/gamingonlinux/public_html/includes/config.php');
+$path = '/home/gamingonlinux/public_html/';
+include($path . 'includes/config.php');
 
-include('/home/gamingonlinux/public_html/includes/class_mysql.php');
+include('includes/class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
 // get config
@@ -18,19 +19,18 @@ $timeout = 1209600; // 14 days
 
 $stamp = time() - $timeout;
 
-$db->sqlquery("SELECT `article_id`, `featured_image` FROM `articles` WHERE `date` < ? AND `show_in_menu` = 1", array($stamp));
+$db->sqlquery("SELECT p.`article_id`, p.`featured_image`, a.date FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE a.`date` < ?", array($stamp));
 $featured = $db->fetch_all_rows();
-
-// $_SERVER['DOCUMENT_ROOT'] does not exist in CLI mode
-$_SERVER['DOCUMENT_ROOT'] = (isset($_SERVER['DOCUMENT_ROOT'])? $_SERVER['DOCUMENT_ROOT'] : "/home/gamingonlinux/public_html");
 
 $total_to_remove = 0;
 foreach($featured as $row)
 {
-	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0, `featured_image` = '' WHERE `article_id` = ?", array($row['article_id']));
+	$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($row['article_id']));
+	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($row['article_id']));
+
 	if (!empty($row['featured_image']))
 	{
-		$image = $_SERVER['DOCUMENT_ROOT'] . $config['path'] . 'uploads/carousel/' . $row['featured_image'];
+		$image = $path . 'uploads/carousel/' . $row['featured_image'];
 
 		if (file_exists($image))
 		{
@@ -46,7 +46,7 @@ if ($total_to_remove > 0)
 }
 
 // count how many there are
-$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
+$db->sqlquery("SELECT `article_id` FROM `editor_picks` WHERE `show_in_menu` = 1");
 
 $editor_pick_count = $db->num_rows();
 

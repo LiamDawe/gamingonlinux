@@ -17,7 +17,7 @@ $core = new core();
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
 $url = 'http://www.gog.com/games/feed?format=json&page=1';
-if (file_get_contents($url) == true)
+if ($core->file_get_contents_curl($url) == true)
 {
 	// magic
 }
@@ -53,7 +53,7 @@ $urlMask = 'http://www.gog.com/games/feed?format=json&page=%d';
 $page = 0;
 do {
 	$url = sprintf($urlMask, ++$page);
-	$array = json_decode(file_get_contents($url), true);
+	$array = json_decode($core->file_get_contents_curl($url), true);
 	$count = count($array['games']);
 	printf("Page #%d: %d product(s)\n", $page, $count);
 

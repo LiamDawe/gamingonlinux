@@ -10,6 +10,20 @@ $templating->load('statistics');
 $templating->block('users');
 $templating->set('total_users', core::config('total_users'));
 
+$options = '';
+$db->sqlquery("SELECT `grouping_id`, `generated_date` FROM `user_stats_grouping` ORDER BY `grouping_id` DESC LIMIT 12");
+while ($get_list = $db->fetch())
+{
+  $selected = '';
+  if (isset($_POST['picker']) && is_numeric($_POST['picker']) && $_POST['picker'] == $get_list['grouping_id'])
+  {
+    $selected = 'selected';
+  }
+  $options .= '<option value="' . $get_list['grouping_id'] . '" ' . $selected . '>'.$get_list['generated_date'].'</option>';
+}
+$templating->block('picker');
+$templating->set('options', $options);
+
 $charts = array(
   array("name" => "Linux Distributions (Combined)"),
   array("name" => "Linux Distributions (Split)"),
@@ -31,9 +45,25 @@ $counter = 0;
 
 foreach($charts as $chart)
 {
-  // DISTRIBUTION CHOICE
-  $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = '{$chart['name']}' ORDER BY `id` DESC LIMIT 1");
+  if (isset($_POST['picker']) && is_numeric($_POST['picker']))
+  {
+    $grouping_id = $_POST['picker'];
+  }
+  else
+  {
+    $db->sqlquery("SELECT grouping_id FROM user_stats_grouping ORDER BY `grouping_id` DESC LIMIT 1");
+    $default_grouping = $db->fetch();
+    $grouping_id = $default_grouping['grouping_id'];
+  }
+
+  $db->sqlquery("SELECT `id`, `grouping_id`,`name` FROM `user_stats_charts` WHERE `name` = '{$chart['name']}' AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($grouping_id));
   $get_chart_id = $db->fetch();
+
+  $db->sqlquery("SELECT `grouping_id` FROM `user_stats_charts` WHERE `grouping_id` < ? ORDER BY `id` DESC LIMIT 1", array($get_chart_id['grouping_id']));
+  $previous_group = $db->fetch();
+
+  $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = '{$chart['name']}' AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($previous_group['grouping_id']));
+  $get_last_chart_id = $db->fetch();
 
   $order = '';
   if (isset($chart['order']))
@@ -41,7 +71,7 @@ foreach($charts as $chart)
     $order = $chart['order'];
   }
 
-  $grab_chart = $core->stat_chart($get_chart_id['id'], $order);
+  $grab_chart = $core->stat_chart($get_chart_id['id'], $order, $get_last_chart_id['id']);
 
   // only do this once
   if ($counter == 0)

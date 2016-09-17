@@ -1043,19 +1043,51 @@ class core
     	return $random_string;
 	}
 
-	function stat_chart($id, $order = '')
+	function stat_chart($id, $order = '', $last_id = '')
 	{
 		global $db;
 
 		require_once(core::config('path') . 'includes/SVGGraph/SVGGraph.php');
 
-		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($id));
-		$chart_info = $db->fetch();
+		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($last_id));
+		$chart_info_old = $db->fetch();
 
 		$res_sort = '';
 		$order_sql = 'd.`data` ASC';
 
-		// set the right labels to the right data
+		// set the right labels to the right data (OLD DATA)
+		$labels_old = array();
+		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($last_id));
+		$get_labels_old = $db->fetch_all_rows();
+
+		if ($db->num_rows() > 0)
+		{
+			$top_10_labels = array_slice($get_labels_old, -10);
+
+			if ($chart_info_old['name'] == 'RAM' || $chart_info_old['name'] == 'Resolution')
+			{
+				uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
+			}
+			foreach ($top_10_labels as $label_loop_old)
+			{
+					$label_add = '';
+					if ($chart_info_old['name'] == 'RAM')
+					{
+						$label_add = 'GB';
+					}
+					$labels_old[]['name'] = $label_loop_old['name'] . $label_add;
+					end($labels_old);
+					$last_id_old=key($labels_old);
+					$labels_old[$last_id_old]['total'] = $label_loop_old['data'];
+
+					$labels_old[$last_id_old]['percent'] = round(($label_loop_old['data'] / $chart_info_old['total_answers']) * 100, 2) . '%';
+			}
+		}
+
+		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($id));
+		$chart_info = $db->fetch();
+
+		// set the right labels to the right data (This months data)
 		$labels = array();
 		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
 		$get_labels = $db->fetch_all_rows();
@@ -1102,7 +1134,7 @@ class core
 			{
 				return $a['data'] - $b['data'];
 			});
-			foreach ($get_labels as $all_labels)
+			foreach ($get_labels as $k => $all_labels)
 			{
 				$icon = '';
 				if ($chart_info['name'] == "Linux Distributions (Split)")
@@ -1126,7 +1158,31 @@ class core
 					$icon = '<img src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
 				}
 				$percent = round(($all_labels['data'] / $chart_info['total_answers']) * 100, 2);
-				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)<br />';
+
+				$old_info = '';
+				foreach ($get_labels_old as $all_old)
+				{
+					if ($all_old['name'] == $all_labels['name'])
+					{
+						$percent_old = round(($all_old['data'] / $chart_info_old['total_answers']) * 100, 2);
+						$difference_percentage = round($percent - $percent_old, 2);
+
+						$difference_people = $all_labels['data'] - $all_old['data'];
+
+						if (strpos($difference_percentage, '-') === FALSE)
+						{
+							$difference_percentage = '+' . $difference_percentage;
+						}
+
+						if ($difference_people > 0)
+						{
+							$difference_people = '+' . $difference_people;
+						}
+						$old_info = ' Difference: (' . $difference_percentage . '% overall, ' . $difference_people .' people)';
+					}
+				}
+
+				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)' . $old_info . '<br />';
 			}
 			$full_info .= '</div></div>';
 
@@ -1138,6 +1194,28 @@ class core
 			'colour' => 'colour',
 			'tooltip' => 'percent'
 			);
+
+			// to give labels a + or - over last months figures
+
+			/*$settings['data_label_callback'] = function($d, $k, $v)
+			{
+				if ($this_month > $last_month)
+				{
+					$delimiter = '+';
+				}
+				else if ($this_month < $last_month)
+				{
+					$delimiter = '-';
+				}
+				else
+				{
+					$delimiter = '';
+				}
+				$total = $this_month + $last_month;
+
+				return $v . '(' . $delimiter . ')';
+				return 'test';
+			}*/
 
 			$graph = new SVGGraph(400, 300, $settings);
 
@@ -1160,7 +1238,19 @@ class core
 		  $get_graph['graph'] = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
 			$get_graph['full_info'] = $full_info;
 			$get_graph['date'] = $chart_info['generated_date'];
-			$get_graph['total_users_answered'] = $chart_info['total_answers'];
+
+			$total_difference = '';
+			if (isset($chart_info_old['total_answers']))
+			{
+				$total_difference = $chart_info['total_answers'] - $chart_info_old['total_answers'];
+				if ($total_difference > 0)
+				{
+					$total_difference = '+' . $total_difference;
+				}
+				$total_difference = ' (' . $total_difference . ')';
+			}
+
+			$get_graph['total_users_answered'] = $chart_info['total_answers'] . $total_difference;
 
 			core::$user_graphs_js = $graph->FetchJavascript();
 

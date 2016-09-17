@@ -162,4 +162,6 @@ foreach ($charts as $chart)
   unset($dat);
 }
 
+$db->sqlquery("INSERT INTO `user_stats_grouping` SET `grouping_id` = ?", array($grouping_id));
+
 echo "Generation Done";

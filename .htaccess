@@ -7,7 +7,7 @@ Options +SymLinksifOwnerMatch
   ErrorDocument 401 default
   ErrorDocument 403 default
   ErrorDocument 404 /404.php
-  ErrorDocument 500 default
+  ErrorDocument 500 /down.html
 
   # BEGIN EXPIRES
 <IfModule mod_expires.c>

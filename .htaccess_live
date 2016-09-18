@@ -135,5 +135,7 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^articles/category/(.+?)/page\=([0-9]+)?$ /index.php?module=articles&view=cat&catid=$1&page=$2 [N,NC,QSA]
 
+  RewriteRule ^users/statsistics/?$ /index.php?module=statistics [N,NC,QSA]
+
   RewriteCond %{HTTP_HOST} !^www\. [NC]
   RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

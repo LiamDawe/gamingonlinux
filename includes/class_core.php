@@ -472,7 +472,7 @@ class core
 	// move previously uploaded tagline image to correct directory
 	function move_temp_image($article_id, $file)
 	{
-		global $db, $config;
+		global $db;
 
 		$types = array('jpg', 'png', 'gif');
 		$full_file_big = $this->config('path') . "uploads/articles/tagline_images/temp/" . $file;
@@ -556,119 +556,9 @@ class core
 		}
 	}
 
-	// this should probably be removed, we never use it, we dont even show sales images anymore
-	function sale_image($sale_id)
-	{
-		global $db, $config;
-
-		if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 0)
-		{
-			if (!@fopen($_FILES['new_image']['tmp_name'], 'r'))
-			{
-				$this->error_message = "Could not find image, did you select one to upload?";
-				return false;
-			}
-
-			else
-			{
-				// check the dimensions
-				list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
-
-				if ($width > 110 || $height > 110)
-				{
-					// include the image class to resize it as its too big
-					include('includes/class_image.php');
-					$image = new SimpleImage();
-					$image->load($_FILES['new_image']['tmp_name']);
-					$image->resize(110,110);
-					$image->save($_FILES['new_image']['tmp_name']);
-
-					// just double check it's now the right size (just a failsafe)
-					list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
-					if ($width > 110 || $height > 110)
-					{
-						$this->error_message = 'Too big!';
-						return false;
-					}
-				}
-
-				// check if its too big
-				if ($_FILES['new_image']['size'] > 20000)
-				{
-					$image_info = getimagesize($_FILES['new_image']['tmp_name']);
-					$image_type = $image_info[2];
-					if( $image_type == IMAGETYPE_JPEG )
-					{
-						$oldImage = imagecreatefromjpeg($_FILES['new_image']['tmp_name']);
-					}
-					else if( $image_type == IMAGETYPE_GIF )
-					{
-						$oldImage = imagecreatefromgif($_FILES['new_image']['tmp_name']);
-					}
-
-					else if( $image_type == IMAGETYPE_PNG )
-					{
-						$oldImage = imagecreatefrompng($_FILES['new_image']['tmp_name']);
-					}
-
-					imagejpeg($oldImage, $_FILES['new_image']['tmp_name'], 85);
-
-					clearstatcache();
-
-					// check again
-					if (filesize($_FILES['new_image']['tmp_name']) > 35900)
-					{
-						$this->error_message = 'File size too big! The max is 35kb, try to use some more compression on it, or find another image.';
-						return false;
-					}
-				}
-
-				// this will make sure it is an image file, if it cant get an image size then its not an image
-				if (!getimagesize($_FILES['new_image']['tmp_name']))
-				{
-					$this->error_message = 'Not an image!';
-					return false;
-				}
-			}
-
-			// see if they currently have an avatar set
-			$db->sqlquery("SELECT `has_screenshot`, `screenshot_filename`  FROM `game_sales` WHERE `id` = ?", array($sale_id));
-			$image = $db->fetch();
-
-			// give the image a random file name
-			$imagename = rand() . 'id' . $sale_id . 'gol.jpg';
-
-			// the actual image
-			$source = $_FILES['new_image']['tmp_name'];
-
-			// where to upload to
-			$target = $_SERVER['DOCUMENT_ROOT'] . url . "uploads/sales/" . $imagename;
-
-			if (move_uploaded_file($source, $target))
-			{
-				// remove old avatar
-				if ($image['has_screenshot'] == 1)
-				{
-					unlink($_SERVER['DOCUMENT_ROOT'] . url . 'uploads/sales/' . $image['screenshot_filename']);
-				}
-
-				$db->sqlquery("UPDATE `game_sales` SET `has_screenshot` = 1, `screenshot_filename` = ? WHERE `id` = ?", array($imagename, $sale_id));
-				return true;
-			}
-
-			else
-			{
-				$this->error_message = 'Could not upload file!';
-				return false;
-			}
-
-			return true;
-		}
-	}
-
 	function carousel_image($article_id)
 	{
-		global $db, $config;
+		global $db;
 
 		if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 4)
 		{
@@ -704,18 +594,18 @@ class core
 
 				list($width, $height, $type, $attr) = $image_info;
 
-				if ($width < $config['carousel_image_width'] || $height < $config['carousel_image_height'])
+				if ($width < $this->config('carousel_image_width') || $height < $this->config('carousel_image_height'))
 				{
 					// include the image class to resize it as its too big
 					include('includes/class_image.php');
 					$image = new SimpleImage();
 					$image->load($_FILES['new_image']['tmp_name']);
-					$image->resize($config['carousel_image_width'],$config['carousel_image_height']);
+					$image->resize(core::config('carousel_image_width'),core::config('carousel_image_height'));
 					$image->save($_FILES['new_image']['tmp_name'], $image_type);
 
 					// just double check it's now the right size (just a failsafe, should never happen but no harm in double checking resizing worked)
 					list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
-					if ($width != $config['carousel_image_width'] || $height != $config['carousel_image_height'])
+					if ($width != $this->config('carousel_image_width') || $height != $this->config('carousel_image_height'))
 					{
 						return 'dimensions';
 					}
@@ -836,6 +726,7 @@ class core
 		}
 	}
 
+	// don't think th is is used any more, think it was only for sales page
 	function getRemaining($now,$future)
 	{
 		global $config;
@@ -847,7 +738,7 @@ class core
 		}
 		else
 		{
-			if ($config['summer_time'] == 1)
+			if ($this->config('summer_time') == 1)
 			{
 				$offset=3600;
 
@@ -967,7 +858,7 @@ class core
 	// include this anywhere to show the bbcode editor
 	function editor($name, $content, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 0)
 	{
-		global $templating, $config;
+		global $templating;
 
 		$templating->merge('editor');
 		$templating->block('editor');
@@ -1006,41 +897,38 @@ class core
 	// convert bytes to human readable stuffs, only up to MB as we will never be uploading more than MB files directly
 	public static function readable_bytes($bytes, $decimals = 2)
 	{
-	    $kilobyte = 1024;
-	    $megabyte = $kilobyte * 1024;
+	  $kilobyte = 1024;
+	  $megabyte = $kilobyte * 1024;
 
-	    if (($bytes >= 0) && ($bytes < $kilobyte))
+	  if (($bytes >= 0) && ($bytes < $kilobyte))
 		{
-	        return $bytes . ' B';
-
-	    }
+	    return $bytes . ' B';
+	  }
 		else if (($bytes >= $kilobyte) && ($bytes < $megabyte))
 		{
-	        return round($bytes / $kilobyte, $decimals) . ' KB';
-
-	    }
+	    return round($bytes / $kilobyte, $decimals) . ' KB';
+	  }
 		else if (($bytes >= $megabyte))
 		{
-	        return round($bytes / $megabyte, $decimals) . ' MB';
-	    }
-
+	    return round($bytes / $megabyte, $decimals) . ' MB';
+	  }
 		// not really needed, but in case i accidentally don't put something to even 1KB on upload limits
 		else
 		{
-	        return $bytes . ' B';
-	    }
+	    return $bytes . ' B';
+	  }
 	}
 
 	function random_id($length = 10)
 	{
-    	$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    	$characters_length = strlen($characters);
-    	$random_string = '';
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters_length = strlen($characters);
+    $random_string = '';
 		for ($i = 0; $i < $length; $i++)
 		{
-        	$random_string .= $characters[rand(0, $characters_length - 1)];
+    	$random_string .= $characters[rand(0, $characters_length - 1)];
 		}
-    	return $random_string;
+    return $random_string;
 	}
 
 	function stat_chart($id, $order = '', $last_id = '')

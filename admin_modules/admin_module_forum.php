@@ -234,7 +234,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('topic_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email FROM `forum_topics` t INNER JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
+		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t INNER JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('topic', 'admin_modules/admin_module_forum');
@@ -262,21 +262,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-			if (empty($topic['avatar']) || $topic['avatar_gravatar'] == 1)
-			{
-				$avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $topic['gravatar_email'] ) ) ) . "?d={$config['path']}/uploads/avatars/no_avatar.png";
-			}
-
-			// either uploaded or linked an avatar
-			else
-			{
-				$avatar = $topic['avatar'];
-				if ($topic['avatar_uploaded'] == 1)
-				{
-					$avatar = "/uploads/avatars/{$topic['avatar']}";
-				}
-			}
+			$avatar = $user->sort_avatar($topic);
 
 			$templating->set('avatar', $avatar);
 
@@ -289,7 +275,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
-				$reported_by = "<a href=\"{$config['path']}profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
+				$reported_by = "<a href=\"" . core::config('website_url') . "profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
 			}
 			$templating->set('reporter', $reported_by);
 		}
@@ -309,7 +295,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('reply_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON p.author_id = u.user_id LEFT JOIN `users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
+		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON p.author_id = u.user_id LEFT JOIN `users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('reply', 'admin_modules/admin_module_forum');
@@ -337,21 +323,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-			if (empty($topic['avatar']) || $topic['avatar_gravatar'] == 1)
-			{
-				$avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $topic['gravatar_email'] ) ) ) . "?d={$config['path']}/uploads/avatars/no_avatar.png";
-			}
-
-			// either uploaded or linked an avatar
-			else
-			{
-				$avatar = $topic['avatar'];
-				if ($topic['avatar_uploaded'] == 1)
-				{
-					$avatar = "/uploads/avatars/{$topic['avatar']}";
-				}
-			}
+			$avatar = $user->sort_avatar($topic);
 
 			$templating->set('avatar', $avatar);
 
@@ -364,7 +336,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
-				$reported_by = "<a href=\"{$config['path']}profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
+				$reported_by = "<a href=\"" . core::config('website_url') . "profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
 			}
 			$templating->set('reporter', $reported_by);
 		}

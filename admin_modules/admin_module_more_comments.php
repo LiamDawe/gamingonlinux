@@ -29,7 +29,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 
 	// count how many there is in total
 	$sql_count = "SELECT `id` FROM `editor_discussion`";
-	$db->sqlquery($sql_count, array($_GET['aid']));
+	$db->sqlquery($sql_count);
 	$total_pages = $db->num_rows();
 
 	// sort out the pagination link
@@ -39,33 +39,14 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
 	$templating->set('pagination', $pagination);
 
-	$db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
+	$db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
 	while ($commentsall = $db->fetch())
 	{
 		$templating->block('commentall', 'admin_modules/admin_module_more_comments');
 
 		// sort out the avatar
 		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-		if ($commentsall['avatar_gravatar'] == 1)
-		{
-			$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $commentsall['gravatar_email'] ) ) ) . "?d=" . urlencode('//www.gamingonlinux.com/uploads/avatars/no_avatar.png');
-		}
-
-		// either uploaded or linked an avatar
-		if (!empty($commentsall['avatar']) && $commentsall['avatar_gravatar'] == 0)
-		{
-			$comment_avatar = $commentsall['avatar'];
-			if ($commentsall['avatar_uploaded'] == 1)
-			{
-				$comment_avatar = "/uploads/avatars/{$commentsall['avatar']}";
-			}
-		}
-
-		// else no avatar, then as a fallback use gravatar if they have an email left-over
-		else if (empty($commentsall['avatar']) && $commentsall['avatar_gravatar'] == 0)
-		{
-			$comment_avatar = "/uploads/avatars/no_avatar.png";
-		}
+		$comment_avatar = $user->sort_avatar($commentsall);
 
 		$commentall_text = bbcode($commentsall['text'], 0, 1);
 		$dateall = $core->format_date($commentsall['date_posted']);
@@ -103,34 +84,23 @@ if (isset($_POST['act']))
 
 			$subject = "A new editor area comment on GamingOnLinux.com";
 
-			// message
-			$message = "
-			<html>
-			<head>
-			<title>A new editor area comment on GamingOnLinux.com!</title>
-			</head>
-			<body>
-			<img src=\"https://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-			<br />
-			<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"http://www.gamingonlinux.com/admin.php\">editor panel</a>:</p>
-			<hr>
-			<p>{$text}</p>
-			</body>
-			</html>
-			";
+			$comment_email = email_bbcode($text);
 
-			// To send HTML mail, the Content-type header must be set
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+			// message
+			$html_message = "<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"" . core::config('website_url') . "admin.php\">editor panel</a>:</p>
+			<hr>
+			<p>{$text}</p>";
+
+			$plain_message = PHP_EOL."Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux editor panel: " . core::config('website_url') . "admin.php\r\n\r\n{$_POST['text']}\r\n\r\n";
 
 			// Mail it
 			if (core::config('send_emails') == 1)
 			{
-				mail($to, $subject, $message, $headers);
+				$mail = new mail($emailer['email'], $subject, $html_message, $plain_message);
+				$mail->send();
 			}
 		}
 
-		header('Location: /admin.php?module=more_comments&message=added');
+		header('Location: /admin.php?module=more_comments&view=editors&message=added');
 	}
 }

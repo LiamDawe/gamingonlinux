@@ -356,7 +356,7 @@ if (isset($_GET['view']))
 				$templating->set('slug', $article['slug']);
 			}
 
-			$templating->set('main_formaction', '<form method="post" action="'.$config['website_url'].'admin.php?module=articles" enctype="multipart/form-data">');
+			$templating->set('main_formaction', '<form method="post" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 
 			if (empty($article['username']))
 			{
@@ -425,8 +425,8 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 
 			$templating->set('temp_tagline_image', $temp_tagline_image);
 
-			$templating->set('max_height', $config['article_image_max_height']);
-			$templating->set('max_width', $config['article_image_max_width']);
+			$templating->set('max_height', core::config('article_image_max_height'));
+			$templating->set('max_width', core::config('article_image_max_width'));
 
 
 			// if they have done it before set title, text and tagline
@@ -820,7 +820,7 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 			/* get any spam reported comments in a paginated list here */
 			$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=article&amp;view=comments", $page);
 
-			$db->sqlquery("SELECT a.*, t.title, u.username, u.user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u2.username as reported_by_username FROM `articles_comments` a INNER JOIN `articles` t ON a.article_id = t.article_id LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` u2 on a.spam_report_by = u2.user_id WHERE a.guest_ip = ? ORDER BY a.`comment_id` ASC LIMIT ?, 9", array($get_that_ip['guest_ip'],$core->start));
+			$db->sqlquery("SELECT a.*, t.title, u.username, u.user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.avatar_gallery, u2.username as reported_by_username FROM `articles_comments` a INNER JOIN `articles` t ON a.article_id = t.article_id LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` u2 on a.spam_report_by = u2.user_id WHERE a.guest_ip = ? ORDER BY a.`comment_id` ASC LIMIT ?, 9", array($get_that_ip['guest_ip'],$core->start));
 			while ($comments = $db->fetch())
 			{
 				// make date human readable
@@ -838,21 +838,7 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 				}
 
 				// sort out the avatar
-				// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-				if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
-				{
-					$comment_avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-				}
-
-				// either uploaded or linked an avatar
-				else
-				{
-					$comment_avatar = $comments['avatar'];
-					if ($comments['avatar_uploaded'] == 1)
-					{
-						$comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-					}
-				}
+				$comment_avatar = $user->sort_avatar($comments);
 
 				$editor_bit = '';
 				// check if editor or admin
@@ -1001,17 +987,17 @@ else if (isset($_POST['act']))
 					<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 					</head>
 					<body>
-					<img src=\"{$config['website_url']}/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+					<img src=\"" . core::config('website_url') . "/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
 					<br />
 					<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$username}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"{$config['website_url']}/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title_upper}</a></strong>\".</p>
+					<p><strong>{$username}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"" . core::config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title_upper}</a></strong>\".</p>
 					<div>
 				 	<hr>
 				 	{$comment_email}
 				 	<hr>
-				 	You can manage your subscriptions anytime in your <a href=\"{$config['website_url']}/usercp.php\">User Control Panel</a>.
+				 	You can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "/usercp.php\">User Control Panel</a>.
 				 	<hr>
-				  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+				  	<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 				  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 					</div>
 					</body>
@@ -1024,7 +1010,7 @@ else if (isset($_POST['act']))
 					$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 					// Mail it
-					if ($config['send_emails'] == 1)
+					if (core::config('send_emails') == 1)
 					{
 						mail($to, $subject, $message, $headers);
 					}
@@ -1260,17 +1246,17 @@ else if (isset($_POST['act']))
 
 			$nice_title = $core->nice_title($_POST['title']);
 
-			if ($config['pretty_urls'] == 1)
+			if (core::config('pretty_urls') == 1)
 			{
 				header("Location: /articles/$slug.{$_POST['article_id']}/");
 			}
 			else {
 				if (!isset($_POST['show_block']))
 				{
-					header("Location: {$config['website_url']}index.php?module=articles_full&aid={$_POST['article_id']}");
+					header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}");
 				}
 				else {
-					header("Location: {$config['website_url']}admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
+					header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 				}
 			}
 
@@ -1553,7 +1539,7 @@ else if (isset($_POST['act']))
 					$headers .= "From: GamingOnLinux.com Editor Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 					// Mail it
-					if ($config['send_emails'] == 1)
+					if (core::config('send_emails') == 1)
 					{
 						mail($to, $subject, $message, $headers);
 					}

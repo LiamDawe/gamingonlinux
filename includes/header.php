@@ -12,16 +12,6 @@ include('includes/config.php');
 include('includes/class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
-// get config
-$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-$fetch_config = $db->fetch_all_rows();
-
-$config = array();
-foreach ($fetch_config as $config_set)
-{
-	$config[$config_set['data_key']] = $config_set['data_value'];
-}
-
 include('includes/class_core.php');
 $core = new core();
 

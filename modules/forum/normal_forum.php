@@ -120,7 +120,7 @@ foreach ($category_array as $category)
 					$postNumber = (($post_count - 1) % $rows_per_page) + 1;
 				}
 
-				if ($config['pretty_urls'] == 1)
+				if (core::config('pretty_urls') == 1)
 				{
 					$last_title = "<a href=\"/forum/topic/{$forum['last_post_topic_id']}?page={$postPage}\">{$forum['topic_title']}</a>";
 				}

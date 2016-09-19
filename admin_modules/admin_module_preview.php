@@ -36,7 +36,7 @@ $date = $core->format_date(core::$date);
 
 // get the article row template
 $templating->block('preview_row', 'admin_modules/admin_module_articles');
-$templating->set('url', $config['path']);
+$templating->set('url', core::config('website_url'));
 
 $templating->set('categories_list_preview', '<span class="label label-info">Categories Here</span>');
 
@@ -82,14 +82,14 @@ $top_image = '';
 $top_image_nobbcode='';
 if (isset($article) && $article['article_top_image'] == 1)
 {
-	$top_image_nobbcode = "<img src=\"{$config['path']}uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\">";
-	$top_image = "<img src=\"{$config['path']}uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\">";
+	$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 	BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
 }
 if (!empty($article['tagline_image']))
 {
-	$top_image_nobbcode = "<img src=\"{$config['path']}uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
-	$top_image = "<img src=\"{$config['path']}uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
+	$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 	BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
 }
 if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
@@ -168,7 +168,7 @@ $templating->set('article_bio', $bio);
 $templating->merge('admin_modules/article_form');
 $templating->block('full_editor', 'admin_modules/article_form');
 $templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
-$templating->set('main_formaction', '<form id="form" method="post" action="'.core::config('url').'admin.php?module=preview" enctype="multipart/form-data">');
+$templating->set('main_formaction', '<form id="form" method="post" action="'.core::config('website_url').'admin.php?module=preview" enctype="multipart/form-data">');
 $templating->set('tagline', $_POST['tagline']);
 $templating->set('tagline_image', $top_image);
 
@@ -194,8 +194,8 @@ $templating->set('categories_list', $categories_list);
 $templating->set('title', htmlentities($_POST['title'], ENT_QUOTES));
 $templating->set('slug', $_POST['slug']);
 
-$templating->set('max_height', $config['article_image_max_height']);
-$templating->set('max_width', $config['article_image_max_width']);
+$templating->set('max_height', core::config('article_image_max_height'));
+$templating->set('max_width', core::config('article_image_max_width'));
 
 $core->editor('text', $_POST['text'], 1);
 

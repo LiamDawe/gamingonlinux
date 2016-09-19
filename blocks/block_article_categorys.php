@@ -5,7 +5,7 @@ $templating->block('menu');
 
 if (!isset($_SESSION['user_group']) || ($_SESSION['user_group'] != 1 && $_SESSION['user_group'] != 2 && $_SESSION['user_group'] != 5))
 {
-	if ($config['pretty_urls'] == 1)
+	if (core::config('pretty_urls') == 1)
 	{
 		$submit_link = '/submit-article/';
 	}
@@ -49,7 +49,7 @@ while ($top_articles = $db->fetch())
 {
 	$top_title = ucwords($top_articles['title']);
 
-	if ($config['pretty_urls'] == 1)
+	if (core::config('pretty_urls') == 1)
 	{
 		$hot_articles .= "<li class=\"list-group-item\"><a href=\"/articles/{$core->nice_title($top_articles['title'])}.{$top_articles['article_id']}\">{$top_title}</a></li>";
 	}
@@ -60,7 +60,7 @@ while ($top_articles = $db->fetch())
 
 $templating->set('top_articles', $hot_articles);
 
-if ($config['pretty_urls'] == 1)
+if (core::config('pretty_urls') == 1)
 {
 	$email_link = "/email-us/";
 }

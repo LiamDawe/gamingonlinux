@@ -196,7 +196,7 @@ if (isset($_POST['act']))
 			exit;
 		}
 
-		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0)
 		{
 			header("Location: /index.php?module=calendar&error=notloggedin");
 			exit;

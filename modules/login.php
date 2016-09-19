@@ -91,7 +91,7 @@ if (!isset($_POST['action']))
 		}
 		setcookie('request_stay', $stay, time()+(60*60*24*7), '/'); // 1 week
 
-		$twitteroauth = new TwitterOAuth($config['tw_consumer_key'], $config['tw_consumer_skey']);
+		$twitteroauth = new TwitterOAuth(core::config('tw_consumer_key'), core::config('tw_consumer_skey'));
 
 		// Requesting authentication tokens, the parameter is the URL we will be redirected to
 		$request_token = $twitteroauth->getRequestToken(core::config('website_url') . 'includes/twitter/getTwitterData.php');

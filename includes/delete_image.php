@@ -9,24 +9,27 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include('class_core.php');
 $core = new core();
 
-// get the image article_top_image_filename
-$qry1 = "SELECT `id`, `filename` FROM `article_images` WHERE `id` = ?";
-$db->sqlquery($qry1, array($_POST['image_id']));
-$grabber = $db->fetch();
-
-$qry2 = "DELETE FROM `article_images` WHERE `id` = ?";
-$result=$db->sqlquery($qry2, array($_POST['image_id']));
-if(isset($result)) 
+if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 {
-	if(unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $grabber['filename']))
+	// get the image article_top_image_filename
+	$qry1 = "SELECT `id`, `filename` FROM `article_images` WHERE `id` = ?";
+	$db->sqlquery($qry1, array($_POST['image_id']));
+	$grabber = $db->fetch();
+
+	$qry2 = "DELETE FROM `article_images` WHERE `id` = ?";
+	$result=$db->sqlquery($qry2, array($_POST['image_id']));
+	if(isset($result))
 	{
-		unset($_SESSION['uploads'][$grabber['id']]);
-		echo "YES";
+		if(unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $grabber['filename']))
+		{
+			unset($_SESSION['uploads'][$grabber['id']]);
+			echo "YES";
+		}
 	}
-} 
 
-else
-{
-	echo "NO";
+	else
+	{
+		echo "NO";
+	}
 }
 ?>

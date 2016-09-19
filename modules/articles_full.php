@@ -100,7 +100,7 @@ if (!isset($_GET['go']))
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
 
 				// meta tags for g+, facebook and twitter images
-				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"{$config['website_url']}/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n$twitter_card", 1);
+				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . core::config('website_url') . "/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n$twitter_card", 1);
 
 				// make date human readable
 				$date = $core->format_date($article['date']);
@@ -109,7 +109,7 @@ if (!isset($_GET['go']))
 				$templating->set('url', core::config('website_url'));
 				$templating->set('share_url', "http://www.gamingonlinux.com/articles/$nice_title.{$_GET['aid']}/");
 
-				$templating->set('rules', $config['rules']);
+				$templating->set('rules', core::config('rules'));
 
 				if (($user->check_group(1,2) == true || $user->check_group(5) == true) && !isset($_GET['preview']))
 				{
@@ -129,7 +129,7 @@ if (!isset($_GET['go']))
 						$page ='admin.php?module=articles&view=drafts';
 					}
 					$templating->set('edit_link', '');
-					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"{$config['url']}{$page}\">Back</button> <button type=\"submit\" formaction=\"{$config['url']}{$page}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
+					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . core::config('website_url') . "{$page}\">Back</button> <button type=\"submit\" formaction=\"" . core::config('url') . "{$page}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
 				}
 
 				if ($user->check_group(1,2) == false && $user->check_group(5) == false)
@@ -619,21 +619,21 @@ if (!isset($_GET['go']))
 						$comment_edit_link = '';
 						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
 						{
-							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"{$config['website_url']}index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
+							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
 						}
 						$templating->set('edit', $comment_edit_link);
 
 						$comment_delete_link = '';
 						if ($user->check_group(1,2) == true)
 						{
-							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"{$config['website_url']}index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
+							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 						}
 						$templating->set('delete', $comment_delete_link);
 
 						$report_link = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$report_link = "<li><a class=\"tooltip-top\" href=\"{$config['website_url']}index.php?module=articles_full&amp;go=report_comment&amp;article_id={$_GET['aid']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
+							$report_link = "<li><a class=\"tooltip-top\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$_GET['aid']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
 						}
 						$templating->set('report_link', $report_link);
 					}
@@ -968,19 +968,19 @@ else if (isset($_GET['go']))
 
 								// message
 								$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 								<div>
 							 	<hr>
 							 	{$comment_email}
 							 	<hr>
-							 	You can unsubscribe from this article by <a href=\"{$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"{$config['website_url']}usercp.php\">User Control Panel</a>.
+							 	You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
 							 	<hr>
-							  	<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+							  	<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 							  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 							  	<p>-----------------------------------------------------------------------------------------------------------</p>
 								</div>";
 
-								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on {$config['website_url']}articles/$title_nice.$article_id/comment_id={$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . core::config('website_url') . "articles/$title_nice.$article_id/comment_id={$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 								// Mail it
 								if (core::config('send_emails') == 1)
@@ -1050,7 +1050,7 @@ else if (isset($_GET['go']))
 
 				$nice_title = $core->nice_title($comment['title']);
 
-				if ($config['pretty_urls'] == 1)
+				if (core::config('pretty_urls') == 1)
 				{
 					header("Location: /articles/$nice_title.{$comment['article_id']}/page={$_GET['page']}#comments");
 				}
@@ -1071,7 +1071,7 @@ else if (isset($_GET['go']))
 
 		if ($user->check_group(1,2) == false)
 		{
-			if ($config['pretty_urls'] == 1)
+			if (core::config('pretty_urls') == 1)
 			{
 				header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 			}
@@ -1085,7 +1085,7 @@ else if (isset($_GET['go']))
 		{
 			if ($comment['author_id'] == 1 && $_SESSION['user_id'] != 1)
 			{
-				if ($config['pretty_urls'] == 1)
+				if (core::config('pretty_urls') == 1)
 				{
 					header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 				}
@@ -1104,7 +1104,7 @@ else if (isset($_GET['go']))
 
 				else if (isset($_POST['no']))
 				{
-					if ($config['pretty_urls'] == 1)
+					if (core::config('pretty_urls') == 1)
 					{
 						header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 					}
@@ -1131,7 +1131,7 @@ else if (isset($_GET['go']))
 					$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
 					$db->sqlquery("DELETE FROM `likes` WHERE `comment_id` = ?", array($_GET['comment_id']));
 
-					if ($config['pretty_urls'] == 1)
+					if (core::config('pretty_urls') == 1)
 					{
 						header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 					}

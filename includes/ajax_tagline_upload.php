@@ -12,16 +12,6 @@ $core = new core();
 include_once('class_image.php');
 $image_func = new SimpleImage();
 
-// get config
-$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-$fetch_config = $db->fetch_all_rows();
-
-$config = array();
-foreach ($fetch_config as $config_set)
-{
-	$config[$config_set['data_key']] = $config_set['data_value'];
-}
-
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 {
 	if (isset($_FILES['photos2']) && $_FILES['photos2']['error'] == 0)

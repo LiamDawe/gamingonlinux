@@ -35,16 +35,6 @@ else
 	die('GOG XML not available!');
 }
 
-// get config
-$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-$fetch_config = $db->fetch_all_rows();
-
-$config = array();
-foreach ($fetch_config as $config_set)
-{
-	$config[$config_set['data_key']] = $config_set['data_value'];
-}
-
 $games_added = '';
 $email = 0;
 
@@ -57,14 +47,8 @@ do {
 	$count = count($array['games']);
 	printf("Page #%d: %d product(s)\n", $page, $count);
 
-	// DEBUG: Check whole array
-	//print_r($array['games']);
-
 	foreach ($array['games'] as $games)
 	{
-		//echo $games['title'] . "\n";
-		//echo "Linux Support: " . $games['linux_compatible'] . "\n";
-
 		if ($games['linux_compatible'] == 1)
 		{
 			$website = $games['short_link'];

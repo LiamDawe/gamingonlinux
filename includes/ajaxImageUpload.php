@@ -9,16 +9,6 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include('class_core.php');
 $core = new core();
 
-// get config
-$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-$fetch_config = $db->fetch_all_rows();
-
-$config = array();
-foreach ($fetch_config as $config_set)
-{
-	$config[$config_set['data_key']] = $config_set['data_value'];
-}
-
 define ("MAX_SIZE",9*1024*1024); // 9MB
 function getExtension($str)
 {
@@ -67,7 +57,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						$_SESSION['uploads'][$image_id]['image_rand'] = $_SESSION['image_rand'];
 					}
 
-					$bbcode = "[img]{$config['website_url']}uploads/articles/article_images/{$image_name}[/img]";
+					$bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$image_name}[/img]";
 
 					echo "<div class=\"box\"><div class=\"body group\"><div id=\"{$image_id}\"><img src=\"/uploads/articles/article_images/$image_name\" class='imgList'><br />";
 					echo "BBCode: <input id=\"img{$image_id}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /> <button class=\"btn\" data-clipboard-target=\"#img{$image_id}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$image_id}\" class=\"trash\">Delete image</button>";

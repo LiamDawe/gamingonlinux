@@ -61,7 +61,7 @@ if (!isset($_POST['act']))
 {
 	if (isset($_GET['view']) && $_GET['view'] == 'top10')
 	{
-		if ($config['goty_voting_open'] == 0 && core::config('goty_finished') == 1)
+		if (core::config('goty_voting_open') == 0 && core::config('goty_finished') == 1)
 		{
 			$templating->block('top10', 'goty');
 			$templating->set('category_name', $cat['category_name']);
@@ -153,7 +153,7 @@ if (!isset($_POST['act']))
 
 		$templating->set('votes', $votes);
 		$templating->set('game_id', $game['id']);
-		$templating->set('url', core::config('path'));
+		$templating->set('url', core::config('website_url'));
 
 		$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $_GET['category_id']));
 		if ($db->num_rows() == 0 && core::config('goty_voting_open') == 1)
@@ -274,7 +274,7 @@ if (!isset($_POST['act']))
 						$templating->set('game_name', $game['game']);
 						$templating->set('game_counter', $game['votes']);
 						$templating->set('game_id', $game['id']);
-						$templating->set('url', core::config('path'));
+						$templating->set('url', core::config('website_url'));
 						$templating->set('vote_button', '');
 
 						// work out the games total %
@@ -299,7 +299,7 @@ if (!isset($_POST['act']))
 			// games list
 			$templating->block('games_list', 'goty');
 			$templating->set('category_id', $_GET['category_id']);
-			$templating->set('url', core::config('path'));
+			$templating->set('url', core::config('website_url'));
 
 			// get the list
 			$filter_sql = '';
@@ -344,7 +344,7 @@ if (!isset($_POST['act']))
 
 					$templating->set('votes', $votes);
 					$templating->set('game_id', $game['id']);
-					$templating->set('url', core::config('path'));
+					$templating->set('url', core::config('website_url'));
 
 					$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $_GET['category_id']));
 					if ($db->num_rows() == 0 && core::config('goty_voting_open') == 1)
@@ -392,7 +392,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
-		if ($config['goty_games_open'] == 1)
+		if (core::config('goty_games_open') == 1)
 		{
 			if (!empty($_POST['name']))
 			{
@@ -408,7 +408,7 @@ if (isset($_POST['act']))
 						$game_id = $db->grab_id();
 
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 0, `created` = ?, `goty_game_id` = ?", array('A user has submitted a GOTY game for review.', core::$date, $game_id));
-						header("Location: {$config['path']}goty.php?message=added");
+						header("Location: " . core::config('website_url') . "goty.php?message=added");
 					}
 					else if ($user->check_group(1,2) == true || $user->check_group(5) == true)
 					{
@@ -416,24 +416,24 @@ if (isset($_POST['act']))
 						$game_id = $db->grab_id();
 
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `goty_game_id` = ?", array($_SESSION['username'] . ' added a GOTY game.', core::$date, core::$date, $game_id));
-						header("Location: {$config['path']}goty.php?message=added_editor");
+						header("Location: " . core::config('website_url') . "goty.php?message=added_editor");
 					}
 				}
 
 				else
 				{
-					header("Location: {$config['path']}goty.php?message=exists");
+					header("Location: " . core::config('website_url') . "goty.php?message=exists");
 				}
 			}
 			else
 			{
-				header("Location: {$config['path']}goty.php?message=empty");
+				header("Location: " . core::config('website_url') . "goty.php?message=empty");
 			}
 		}
 
 		else
 		{
-			header("Location: {$config['path']}goty.php");
+			header("Location: " . core::config('website_url') . "goty.php");
 		}
 	}
 }

@@ -28,7 +28,7 @@ if (!isset($_GET['aid']))
 	while ($article = $db->fetch())
 	{
 		$templating->block('submitted_row', 'admin_modules/admin_articles_sections/submitted_articles');
-		$templating->set('url', $config['website_url']);
+		$templating->set('url', core::config('website_url'));
 		$templating->set('article_id', $article['article_id']);
 		$templating->set('article_title', $article['title']);
 		if (empty($article['username']))
@@ -191,7 +191,7 @@ else if (isset($_GET['aid']))
 
 	$templating->block('full_editor', 'admin_modules/article_form');
 	$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
-	$templating->set('main_formaction', '<form method="post" action="'.$config['website_url'].'admin.php?module=articles" enctype="multipart/form-data">');
+	$templating->set('main_formaction', '<form method="post" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 	$templating->set('edit_state', $edit_state);
 	$templating->set('edit_state_textarea', $edit_state_textarea);
 
@@ -308,8 +308,8 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 
 	$templating->set('top_image_delete', $top_image_delete);
 
-	$templating->set('max_height', $config['article_image_max_height']);
-	$templating->set('max_width', $config['article_image_max_width']);
+	$templating->set('max_height', core::config('article_image_max_height'));
+	$templating->set('max_width', core::config('article_image_max_width'));
 
 	// if they have done it before set title, text and tagline
 	$text = $article['text'];
@@ -386,14 +386,14 @@ if (isset($_POST['act']))
 
 			if ($check_comment['comment_text'] == $comment)
 			{
-				header("Location: {$config['website_url']}admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=doublecomment#editor_comments");
+				header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=doublecomment#editor_comments");
 
 				die();
 			}
 
 			if (empty($comment))
 			{
-				header("Location: {$config['website_url']}admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=emptycomment#editor_comments");
+				header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=emptycomment#editor_comments");
 
 				die();
 			}
@@ -462,23 +462,23 @@ if (isset($_POST['act']))
 				<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 				</head>
 				<body>
-				<img src=\"{$config['website_url']}templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+				<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 				<br />
 				<p>Hello <strong>{$email_user['username']}</strong>,</p>
-				<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"{$config['website_url']}articles/$title_nice.$article_id#comments\">{$title_upper}</a></strong>\".</p>
+				<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "articles/$title_nice.$article_id#comments\">{$title_upper}</a></strong>\".</p>
 				<div>
 				<hr>
 				{$comment_email}
 				<hr>
-				You can unsubscribe from this article by <a href=\"{$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"{$config['website_url']}usercp.php\">User Control Panel</a>.
+				You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
 				<hr>
-				<p>If you haven&#39;t registered at <a href=\"{$config['website_url']}\" target=\"_blank\">{$config['website_url']}</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 				</div>
 				</body>
 				</html>";
 
-				$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on {$config['website_url']}articles/$title_nice.$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: {$config['website_url']}unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+				$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on " . core::config('website_url') . "articles/$title_nice.$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 				$boundary = uniqid('np');
 
@@ -500,7 +500,7 @@ if (isset($_POST['act']))
 				$message .= "\r\n\r\n--" . $boundary . "--";
 
 				// Mail it
-				if ($config['send_emails'] == 1)
+				if (core::config('send_emails') == 1)
 				{
 					mail($to, $subject, $message, $headers);
 				}
@@ -512,7 +512,7 @@ if (isset($_POST['act']))
 			// clear any comment or name left from errors
 			unset($_SESSION['acomment']);
 
-			header("Location: {$config['website_url']}admin.php?module=articles&view=Submitted&aid=$article_id#comments");
+			header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid=$article_id#comments");
 
 		}
 	}

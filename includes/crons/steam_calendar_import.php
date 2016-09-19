@@ -15,7 +15,7 @@ include(path . 'includes/class_core.php');
 $core = new core();
 
 $stop = 0;
-$games = '';
+$games_added_list = '';
 
 $page = 1;
 $url = "http://store.steampowered.com/search/?os=linux&filter=comingsoon&page=";
@@ -75,7 +75,7 @@ do
 
               echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
 
-              $games .= $title . '<br />';
+              $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br />';
             }
 
             // if we already have it, just update it
@@ -93,5 +93,14 @@ do
   } while ($stop == 0);
 
 echo '<br />Last page hit: ' . $page . '<br /><br />';
+
+if (!empty($games_added_list))
+{
+  if (core::config('send_emails') == 1)
+  {
+    $mail = new mail('liamdawe@gmail.com', 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar!</a><br />' . $games_added_list, '');
+    $mail->send();
+  }
+}
 
 echo "End of Steam Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

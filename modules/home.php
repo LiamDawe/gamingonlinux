@@ -177,14 +177,23 @@ if (!isset($_GET['view']))
 		while ($get_categories = $db->fetch())
 		{
 			$category_name = str_replace(' ', '-', $get_categories['category_name']);
+			if (core::config('pretty_urls') == 1)
+			{
+				$category_url = "/articles/category/$category_name/";
+			}
+			else
+			{
+				$category_url = "/index.php?module=articles&view=cat&catid=$category_name";
+			}
+
 			if ($get_categories['category_id'] == 60)
 			{
-				$categories_list .= " <li class=\"ea\"><a href=\"/articles/category/$category_name\">{$get_categories['category_name']}</a></li> ";
+				$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$get_categories['category_name']}</a></li> ";
 			}
 
 			else
 			{
-				$categories_list .= " <li><a href=\"/articles/category/$category_name\">{$get_categories['category_name']}</a></li> ";
+				$categories_list .= " <li><a href=\"$category_url\">{$get_categories['category_name']}</a></li> ";
 			}
 		}
 

@@ -877,11 +877,15 @@ class core
 		$templating->set('disabled', $disabled);
 
 		$page_button = '';
+		$timer_button = '';
 		if ($article_editor == 1)
 		{
 			$page_button = '<li data-snippet="<*PAGE*>">page</li>';
+			//$timer_button = '<li data-snippet="[timer=timer1]'.date('Y/m/d H:m:s').'[/timer]">timer</li>';
+			$timer_button = '<ul><li class="dropdown">Timer<ul class="timer"><li data-snippet="[timer=timer1*time-only]'.date('Y-m-d H:m:s').'[/timer]">time only</li><li data-snippet="[timer=timer1]'.date('Y-m-d H:m:s').'[/timer]">time and date</li></ul></li></ul>';
 		}
 		$templating->set('page_button', $page_button);
+		$templating->set('timer_button', $timer_button);
 
 		if ($ays_ignore == 0)
 		{

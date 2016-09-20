@@ -39,3 +39,6 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/clipboard (MIT)
 - https://clipboardjs.com/
+
+- /includes/jscripts/jquery.countdown.min.js (MIT)
+- http://hilios.github.io/jQuery.countdown/

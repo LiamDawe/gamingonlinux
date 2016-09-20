@@ -24,28 +24,48 @@ function do_charts($body)
 		$db->sqlquery("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ?", array($id));
 		$get_labels = $db->fetch_all_rows();
 
-        foreach ($get_labels as $label_loop)
+    foreach ($get_labels as $label_loop)
+    {
+        $db->sqlquery("SELECT `data`, `label_id` FROM `charts_data` WHERE `chart_id` = ?", array($id));
+        while ($get_data = $db->fetch())
         {
-            $db->sqlquery("SELECT `data`, `label_id` FROM `charts_data` WHERE `chart_id` = ?", array($id));
-            while ($get_data = $db->fetch())
+            if ($label_loop['label_id'] == $get_data['label_id'])
             {
-                if ($label_loop['label_id'] == $get_data['label_id'])
-                {
-                    $labels[$label_loop['name']] = $get_data['data'];
-                }
+                $labels[$label_loop['name']] = $get_data['data'];
             }
         }
+    }
 
 		$settings = array('graph_title' => $chart_info['name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
 		$graph = new SVGGraph(400, 300, $settings);
 		$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
 		$graph->colours = $colours;
 
-        $graph->Values($labels);
-        $get_graph = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
+    $graph->Values($labels);
+    $get_graph = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
 
 		$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", $get_graph, $body);
 	}
+	return $body;
+}
+
+function replace_timer($matches)
+{
+	if (preg_match("/\*time-only/is", $matches[0]))
+	{
+		$rest = substr($matches[1], 0, -10);
+		return '<div id="'.$rest.'"></div><script type="text/javascript">var ' . $rest . ' = moment.tz("'.$matches[2].'", "UTC"); $("#'.$rest.'").countdown('.$rest.'.toDate(),function(event) {$(this).text(event.strftime(\'%H:%M:%S\'));});</script>';
+	}
+	else
+	{
+		return '<div id="'.$matches[1].'"></div><script type="text/javascript">var ' . $matches[1] . ' = moment.tz("'.$matches[2].'", "UTC"); $("#'.$matches[1].'").countdown('.$matches[1].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+	}
+}
+
+function do_timers($body)
+{
+	$body = preg_replace_callback("/\[timer=(.+?)](.+?)\[\/timer]/is", 'replace_timer', $body);
+
 	return $body;
 }
 
@@ -120,6 +140,8 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $r
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
 
 	$body = logged_in_code($body);
+
+	$body = do_timers($body);
 
 	// Array for tempory storing codeblock contents
 	$codeBlocks = [];
@@ -244,71 +266,71 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $r
 	}
 
 	$find = array(
-        "/\[url\=(.+?)\](.+?)\[\/url\]/is",
-		"/\[url\](.+?)\[\/url\]/is",
-        "/\[b\](.+?)\[\/b\]/is",
-        "/\[i\](.+?)\[\/i\]/is",
-        "/\[u\](.+?)\[\/u\]/is",
-        "/\[s\](.+?)\[\/s\]/is",
-        "/\[color\=(.+?)\](.+?)\[\/color\]/is",
-        "/\[font\=(.+?)\](.+?)\[\/font\]/is",
-        "/\[center\](.+?)\[\/center\]/is",
-        "/\[right\](.+?)\[\/right\]/is",
-        "/\[left\](.+?)\[\/left\]/is",
-        "/\[img\](.+?)\[\/img\]/is",
-        "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
-        "/\[email\](.+?)\[\/email\]/is",
-		"/\[s\](.+?)\[\/s\]/is",
-		"/\[youtube\](.+?)\[\/youtube\]/is",
-		"/\[media=youtube\](.+?)\[\/media\]/is", // this one is for old articles, probably from xenforo, do not remove
-		'/\[list\](.*?)\[\/list\]/is',
-	 	'/\[\*\](.*?)(\n|\r\n?)/is',
-	 	'/\[ul\]/is',
-	 	'/\[\/ul\]/is',
-	 	'/\[li\]/is',
-	 	'/\[\/li\]/is',
-	 	"/\[size\=(.+?)\](.+?)\[\/size\]/is",
-	 	"/\[email\=(.+?)\](.+?)\[\/email\]/is",
-	 	"/\[justify\](.+?)\[\/justify\]/is",
-	 	"/\[code\](.+?)\[\/code\]/is",
-	 	"/\[sup\](.+?)\[\/sup\]/is",
-	 	"/\[spoiler](.+?)\[\/spoiler\]/is",
-		"/\[mp3](.+?)\[\/mp3\]/is",
-		"/\[ogg](.+?)\[\/ogg\]/is"
+  "/\[url\=(.+?)\](.+?)\[\/url\]/is",
+	"/\[url\](.+?)\[\/url\]/is",
+  "/\[b\](.+?)\[\/b\]/is",
+  "/\[i\](.+?)\[\/i\]/is",
+  "/\[u\](.+?)\[\/u\]/is",
+  "/\[s\](.+?)\[\/s\]/is",
+  "/\[color\=(.+?)\](.+?)\[\/color\]/is",
+  "/\[font\=(.+?)\](.+?)\[\/font\]/is",
+  "/\[center\](.+?)\[\/center\]/is",
+  "/\[right\](.+?)\[\/right\]/is",
+  "/\[left\](.+?)\[\/left\]/is",
+  "/\[img\](.+?)\[\/img\]/is",
+  "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
+  "/\[email\](.+?)\[\/email\]/is",
+	"/\[s\](.+?)\[\/s\]/is",
+	"/\[youtube\](.+?)\[\/youtube\]/is",
+	"/\[media=youtube\](.+?)\[\/media\]/is", // this one is for old articles, probably from xenforo, do not remove
+	'/\[list\](.*?)\[\/list\]/is',
+	'/\[\*\](.*?)(\n|\r\n?)/is',
+	'/\[ul\]/is',
+	'/\[\/ul\]/is',
+	'/\[li\]/is',
+	'/\[\/li\]/is',
+	"/\[size\=(.+?)\](.+?)\[\/size\]/is",
+	"/\[email\=(.+?)\](.+?)\[\/email\]/is",
+	"/\[justify\](.+?)\[\/justify\]/is",
+	"/\[code\](.+?)\[\/code\]/is",
+	"/\[sup\](.+?)\[\/sup\]/is",
+	"/\[spoiler](.+?)\[\/spoiler\]/is",
+	"/\[mp3](.+?)\[\/mp3\]/is",
+	"/\[ogg](.+?)\[\/ogg\]/is"
 	);
 
 	$replace = array(
-        "<a href=\"$1\" target=\"_blank\">$2</a>",
-		"<a href=\"$1\" target=\"_blank\">$1</a>",
-        "<strong>$1</strong>",
-        "<em>$1</em>",
-        "<span style=\"text-decoration:underline;\">$1</span>",
-        "<del>$1</del>",
-        "$2",
-        "$2",
-        "<div style=\"text-align:center;\">$1</div>",
-        "<div style=\"text-align:right;\">$1</div>",
-        "<div style=\"text-align:left;\">$1</div>",
-        "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
-        "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
-        "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
-		"<span style=\"text-decoration: line-through\">$1</span>",
-		"<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
-		"<iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe>",
-		'<ul>$1</ul>',
-		'<li>$1</li>',
-		'<ul>',
-		'</ul>',
-		'<li>',
-		'</li>',
-		'$2',
-		'<a href="mailto:$1">$2</a>',
-		'$1',
-		'Code:<br /><code>$1</code>',
-		'<sup>$1</sup>',
-		'<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
-		'<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
-		'<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
+  "<a href=\"$1\" target=\"_blank\">$2</a>",
+	"<a href=\"$1\" target=\"_blank\">$1</a>",
+  "<strong>$1</strong>",
+  "<em>$1</em>",
+  "<span style=\"text-decoration:underline;\">$1</span>",
+  "<del>$1</del>",
+  "$2",
+  "$2",
+  "<div style=\"text-align:center;\">$1</div>",
+  "<div style=\"text-align:right;\">$1</div>",
+  "<div style=\"text-align:left;\">$1</div>",
+  "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
+  "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
+  "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
+	"<span style=\"text-decoration: line-through\">$1</span>",
+	"<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
+	"<iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe>",
+	'<ul>$1</ul>',
+	'<li>$1</li>',
+	'<ul>',
+	'</ul>',
+	'<li>',
+	'</li>',
+	'$2',
+	'<a href="mailto:$1">$2</a>',
+	'$1',
+	'Code:<br /><code>$1</code>',
+	'<sup>$1</sup>',
+	'<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
+	'<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
+	'<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
 	);
 
 	$smilies = array(

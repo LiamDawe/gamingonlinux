@@ -14,7 +14,6 @@ It is also recommanded to have the following php extentions available:
 - GD
 - Json
 
-
 ## Setting up a dev enviroment
 
 Setup apache to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
@@ -42,3 +41,6 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/jquery.countdown.min.js (MIT)
 - http://hilios.github.io/jQuery.countdown/
+
+- /includes/jscripts/moment/ (MIT)
+- http://momentjs.com/timezone/

@@ -34,7 +34,7 @@ $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 	<channel>
 		<title>GamingOnLinux.com Latest Articles</title>
 		<link>http://www.gamingonlinux.com/</link>
-		<atom:link href=\"http://www.gamingonlinux.com/article_rss.php\" rel=\"self\" type=\"application/rss+xml\" />
+		<atom:link href=\"https://www.gamingonlinux.com/article_rss.php\" rel=\"self\" type=\"application/rss+xml\" />
 		<language>en-us</language>
 		<description></description>
 		<pubDate>$last_date</pubDate>

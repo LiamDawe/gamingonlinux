@@ -14,6 +14,8 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include(path . 'class_core.php');
 $core = new core();
 
+include(path . 'class_mail.php');
+
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
 $url = 'http://www.gog.com/games/feed?format=json&page=1';
@@ -86,5 +88,14 @@ do {
 
 
 echo "\n\n";//More whitespace, just to make the output look a bit more pretty
+
+if (!empty($games_added))
+{
+  if (core::config('send_emails') == 1)
+  {
+    $mail = new mail('liamdawe@gmail.com', 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar!</a><br />' . $games_added, '');
+    $mail->send();
+  }
+}
 
 echo "End of GOG import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

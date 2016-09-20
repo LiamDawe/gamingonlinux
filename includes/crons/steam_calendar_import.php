@@ -14,6 +14,8 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include(path . 'includes/class_core.php');
 $core = new core();
 
+include(path . 'includes/class_mail.php');
+
 $stop = 0;
 $games_added_list = '';
 

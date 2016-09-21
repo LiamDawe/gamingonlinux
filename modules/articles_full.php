@@ -25,6 +25,44 @@ if (!isset($_GET['go']))
 			$db->sqlquery("SELECT a.`article_id`, a.`slug`, a.`preview_code`, a.`title`, a.`text`, a.`tagline`, a.`date`, a.`date_submitted`, a.`author_id`, a.`active`, a.`guest_username`, a.`views`, a.`article_top_image`, a.`article_top_image_filename`, a.`tagline_image`, a.`comments_open`, u.`username`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`article_bio`, u.`user_group`, u.`twitter_on_profile` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE a.`article_id` = ?", array($_GET['aid']));
 			$article = $db->fetch();
 
+			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
+			if (isset($_GET['comment_id']) && is_numeric($_GET['comment_id']))
+			{
+				// see if we are above their set limit per-page
+				$db->sqlquery("SELECT `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
+				$count = $db->fetch();
+
+				if ($count['comment_count'] > $_SESSION['per-page'])
+				{
+					$db->sqlquery("SELECT `comment_number` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
+					$number = $db->fetch();
+
+					$last_page = ceil($number['comment_number']/$_SESSION['per-page']);
+
+					if (core::config('pretty_urls') == 1)
+					{
+						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#{$_GET['comment_id']}");
+					}
+					else
+					{
+
+						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#{$_GET['comment_id']}");
+					}
+				}
+				else
+				{
+					if (core::config('pretty_urls') == 1)
+					{
+						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/#{$_GET['comment_id']}");
+					}
+					else
+					{
+
+						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#{$_GET['comment_id']}");
+					}
+				}
+			}
+
 			if ($db->num_rows() == 0)
 			{
 				http_response_code(404);
@@ -119,17 +157,17 @@ if (!isset($_GET['go']))
 
 				else if (($user->check_group(1,2) == true || $user->check_group(5) == true) && isset($_GET['preview']))
 				{
-					$page = 'admin.php?module=adminreview';
+					$page_action = 'admin.php?module=adminreview';
 					if (isset($_GET['submitted']) && $_GET['submitted'] == 1)
 					{
-						$page ='admin.php?module=articles&view=Submitted';
+						$page_action ='admin.php?module=articles&view=Submitted';
 					}
 					if (isset($_GET['draft']) && $_GET['draft'] == 1)
 					{
-						$page ='admin.php?module=articles&view=drafts';
+						$page_action ='admin.php?module=articles&view=drafts';
 					}
 					$templating->set('edit_link', '');
-					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . core::config('website_url') . "{$page}\">Back</button> <button type=\"submit\" formaction=\"" . core::config('url') . "{$page}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
+					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . core::config('website_url') . "{$page_action}\">Back</button> <button type=\"submit\" formaction=\"" . core::config('url') . "{$page_action}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
 				}
 
 				if ($user->check_group(1,2) == false && $user->check_group(5) == false)
@@ -215,17 +253,6 @@ if (!isset($_GET['go']))
 					$article_page = $_GET['article_page'];
 				}
 
-				// paging for pagination
-				if (!isset($_GET['page']) || $_GET['page'] == 0)
-				{
-					$page = 1;
-				}
-
-				else if (is_numeric($_GET['page']))
-				{
-					$page = $_GET['page'];
-				}
-
 				// sort out the pages and pagination and only return the page requested
 				if ($_SESSION['single_article_page'] == 0)
 				{
@@ -273,7 +300,17 @@ if (!isset($_GET['go']))
 					// count how many there is in total
 					$sql_count = "SELECT `comment_id` FROM `articles_comments` WHERE `article_id` = ?";
 					$db->sqlquery($sql_count, array($_GET['aid']));
-					$total_pages = $db->num_rows();
+					$total_comments = $db->num_rows();
+
+					//lastpage is = total comments / items per page, rounded up.
+					if ($total_comments <= 10)
+					{
+						$lastpage = 1;
+					}
+					else
+					{
+						$lastpage = ceil($total_comments/$_SESSION['per-page']);
+					}
 
 					// update their subscriptions if they are reading the last page
 					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
@@ -286,16 +323,6 @@ if (!isset($_GET['go']))
 
 						if ($check_user['email_options'] == 2 && $check_sub['send_email'] == 0)
 						{
-							//lastpage is = total pages / items per page, rounded up.
-							if ($total_pages <= 10)
-							{
-								$lastpage = 1;
-							}
-							else
-							{
-								$lastpage = ceil($total_pages/$_SESSION['per-page']);
-							}
-
 							// they have read all new comments (or we think they have since they are on the last page)
 							if ($page == $lastpage)
 							{
@@ -360,8 +387,24 @@ if (!isset($_GET['go']))
 						$pagination_linking = core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $_GET['aid'] . '&amp;';
 					}
 
+					// paging for pagination
+					if (!isset($_GET['page']) || $_GET['page'] == 0)
+					{
+						$page = 1;
+					}
+
+					else if (is_numeric($_GET['page']))
+					{
+						$page = $_GET['page'];
+					}
+
+					if ($page > $lastpage)
+					{
+						$page = $lastpage;
+					}
+
 					// sort out the pagination link
-					$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, $pagination_linking, $page, '#comments');
+					$pagination = $core->pagination_link($_SESSION['per-page'], $total_comments, $pagination_linking, $page, '#comments');
 
 					if (isset($_GET['message']))
 					{
@@ -379,44 +422,6 @@ if (!isset($_GET['go']))
 					$templating->set('pagination', $pagination);
 
 					include('includes/profile_fields.php');
-
-					// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
-					if (isset($_GET['comment_id']) && is_numeric($_GET['comment_id']))
-					{
-						// see if we are above their set limit per-page
-						$db->sqlquery("SELECT `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
-						$count = $db->fetch();
-
-						if ($count['comment_count'] > $_SESSION['per-page'])
-						{
-							$db->sqlquery("SELECT `comment_number` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
-							$number = $db->fetch();
-
-							$last_page = ceil($number['comment_number']/$_SESSION['per-page']);
-
-							if (core::config('pretty_urls') == 1)
-							{
-								header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#{$_GET['comment_id']}");
-							}
-							else
-							{
-
-								header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#{$_GET['comment_id']}");
-							}
-						}
-						else
-						{
-							if (core::config('pretty_urls') == 1)
-							{
-								header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/#{$_GET['comment_id']}");
-							}
-							else
-							{
-
-								header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#{$_GET['comment_id']}");
-							}
-						}
-					}
 
 					$db_grab_fields = '';
 					foreach ($profile_fields as $field)

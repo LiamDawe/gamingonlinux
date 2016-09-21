@@ -115,7 +115,7 @@ if (!isset($_GET['view']))
 		ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
 	) AS a
 	WHERE rank < 5";
-	$db->sqlquery($category_tag_sql, array($category_id));
+	$db->sqlquery($category_tag_sql);
 	$get_categories = $db->fetch_all_rows();
 
 	foreach ($articles_get as $article)

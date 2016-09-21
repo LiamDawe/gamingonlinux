@@ -95,6 +95,29 @@ if (!isset($_GET['view']))
 	$count_rows = $db->num_rows();
 	$seperator_counter = 0;
 
+	$article_id_array = array();
+
+	foreach ($articles_get as $article)
+	{
+		$article_id_array[] = $article['article_id'];
+	}
+	$article_id_sql = implode(', ', $article_id_array);
+
+	// this is required to properly count up the rank for the tags
+	$db->sqlquery("SET @rank=null, @val=null");
+
+	$category_tag_sql = "SELECT * FROM (
+		SELECT r.article_id, c.`category_name` , c.`category_id` , @rank := IF( @val = r.article_id, @rank +1, 1 ) AS rank, @val := r.article_id
+		FROM  `article_category_reference` r
+		INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
+		WHERE r.article_id
+		IN ( $article_id_sql )
+		ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
+	) AS a
+	WHERE rank < 5";
+	$db->sqlquery($category_tag_sql, array($category_id));
+	$get_categories = $db->fetch_all_rows();
+
 	foreach ($articles_get as $article)
 	{
 		// make date human readable
@@ -170,31 +193,30 @@ if (!isset($_GET['view']))
 		{
 			$editors_pick = '<li><a href="#">Editors Pick</a></li>';
 		}
-
-		// sort out the categories (tags)
 		$categories_list = $editors_pick;
-		$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC LIMIT 4", array($article['article_id']));
-		while ($get_categories = $db->fetch())
+		foreach ($get_categories as $k => $category_list)
 		{
-			$category_name = str_replace(' ', '-', $get_categories['category_name']);
-			if (core::config('pretty_urls') == 1)
-			{
-				$category_url = "/articles/category/$category_name/";
-			}
-			else
-			{
-				$category_url = "/index.php?module=articles&view=cat&catid=$category_name";
-			}
+				if (in_array($article['article_id'], $category_list))
+				{
+					$category_name = str_replace(' ', '-', $category_list['category_name']);
+					if (core::config('pretty_urls') == 1)
+					{
+						$category_url = "/articles/category/{$category_name}/";
+					}
+					else
+					{
+						$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
+					}
+					if ($category_list['category_id'] == 60)
+					{
+						$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+					}
 
-			if ($get_categories['category_id'] == 60)
-			{
-				$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$get_categories['category_name']}</a></li> ";
-			}
-
-			else
-			{
-				$categories_list .= " <li><a href=\"$category_url\">{$get_categories['category_name']}</a></li> ";
-			}
+					else
+					{
+						$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+					}
+				}
 		}
 
 		$templating->set('categories_list', $categories_list);

@@ -80,7 +80,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$db->sqlquery("SET @rank=null, @val=null");
 
 					$category_tag_sql = "SELECT * FROM (
-						SELECT r.article_id, c.`category_name` , c.`category_id` , @rank := IF( @val = r.article_id, @rank +1, 1 ) AS rank, @val := r.article_id
+						SELECT r.article_id, c.`category_name` , c.`category_id`,
+						@rank := IF( @val = r.article_id, @rank +1, 1 ) AS rank, @val := r.article_id
 						FROM  `article_category_reference` r
 						INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
 						WHERE r.article_id

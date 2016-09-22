@@ -312,6 +312,22 @@ if (!isset($_GET['go']))
 						$lastpage = ceil($total_comments/$_SESSION['per-page']);
 					}
 
+					// paging for pagination
+					if (!isset($_GET['page']) || $_GET['page'] == 0)
+					{
+						$page = 1;
+					}
+
+					else if (is_numeric($_GET['page']))
+					{
+						$page = $_GET['page'];
+					}
+
+					if ($page > $lastpage)
+					{
+						$page = $lastpage;
+					}
+
 					// update their subscriptions if they are reading the last page
 					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 					{
@@ -385,22 +401,6 @@ if (!isset($_GET['go']))
 					else
 					{
 						$pagination_linking = core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $_GET['aid'] . '&amp;';
-					}
-
-					// paging for pagination
-					if (!isset($_GET['page']) || $_GET['page'] == 0)
-					{
-						$page = 1;
-					}
-
-					else if (is_numeric($_GET['page']))
-					{
-						$page = $_GET['page'];
-					}
-
-					if ($page > $lastpage)
-					{
-						$page = $lastpage;
 					}
 
 					// sort out the pagination link

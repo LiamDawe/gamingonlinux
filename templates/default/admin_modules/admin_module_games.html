@@ -26,6 +26,10 @@
 </div>
 [/block: search_result_bottom]
 
+[block: add_top]
+<div class="box"><div class="head">Adding a game to the games database</div>
+[/block: add_top]
+
 [block: edit_top]
 <div class="box">
 	<div class="head">
@@ -33,7 +37,7 @@
 	</div>
 [/block: edit_top]
 
-[block: edit_item]
+[block: item]
 			<div class="body group">
 				<form method="post" action="admin.php?module=games">
 					Game Name: <input type="text" name="name" value="{:name}" /><br />
@@ -43,7 +47,7 @@
 					<input type="text" name="steam_link" value="{:steam_link}" /><br />
 					GOG Link:<br />
 					<input type="text" name="gog_link" value="{:gog_link}" /><br />
-					Release Date: <em>click the tiny calendar!</em> <br />
+					Release Date: <br />
 					<input name="date" id="datepicker" type="text" value="{:date} "/>
 					<script>
 					var picker = new Pikaday({
@@ -53,7 +57,14 @@
 					});</script>
 					Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
 					<br />
-[/block: edit_item]
+[/block: item]
+
+[block: add_bottom]
+<button formaction="admin.php?module=games" name="act" value="Add" type="submit">Add</button>
+</form>
+</div>
+</div>
+[/block: add_bottom]
 
 [block: edit_bottom]
 <button formaction="admin.php?module=games" name="act" value="Edit" type="submit">Edit</button> <button formaction="admin.php?module=games" name="act" value="Delete" type="submit">Delete</button>

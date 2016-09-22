@@ -9,10 +9,6 @@ if (isset($_GET['error']))
 	{
 		$core->message("You have to put at least a name and date in!", NULL, 1);
 	}
-	if ($_GET['error'] == 'exists')
-	{
-		$core->message("That game already exists!", NULL, 1);
-	}
 	if ($_GET['error'] == 'missing_id')
 	{
 		$core->message("The game id was missing, this is likely a code error or hacking attempt, bug Liam!", NULL, 1);
@@ -21,16 +17,10 @@ if (isset($_GET['error']))
 
 if (isset($_GET['message']))
 {
-	if ($_GET['message'] == 'added')
-	{
-		$core->message("You have added the calendar item!");
-	}
-
 	if ($_GET['message'] == 'edited')
 	{
 		$core->message("You have edited that calendar item!");
 	}
-
 	if ($_GET['message'] == 'deleted')
 	{
 		$core->message("You have deleted that calendar item!");
@@ -162,8 +152,6 @@ if (isset($_GET['view']))
 	{
 		$templating->block('main', 'admin_modules/admin_module_calendar');
 		$templating->block('search', 'admin_modules/admin_module_calendar');
-		$templating->block('add', 'admin_modules/admin_module_calendar');
-
 		$templating->block('manage_top', 'admin_modules/admin_module_calendar');
 
 		$options = '';
@@ -221,36 +209,6 @@ if (isset($_GET['view']))
 
 if (isset($_POST['act']))
 {
-	if ($_POST['act'] == 'Add')
-	{
-		if (empty($_POST['name']) || empty($_POST['date']) || empty($_POST['link']))
-		{
-			header("Location: /admin.php?module=calendar&view=manage&error=missing");
-			exit;
-		}
-
-		$db->sqlquery("SELECT `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']));
-		if ($db->num_rows() == 1)
-		{
-			header("Location: /admin.php?module=calendar&view=manage&error=exists");
-			exit;
-		}
-
-		$date = new DateTime($_POST['date']);
-
-		$guess = 0;
-		if (isset($_POST['guess']))
-		{
-			$guess = 1;
-		}
-
-		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['link'], $guess, date("Y-m-d")));
-
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} added a new game to the release calendar.", core::$date, core::$date));
-
-		header("Location: /admin.php?module=calendar&view=manage&message=added");
-	}
-
 	if ($_POST['act'] == 'Edit')
 	{
 		if (empty($_POST['id']) || !is_numeric($_POST['id']))

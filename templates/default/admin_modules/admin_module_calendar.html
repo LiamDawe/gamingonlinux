@@ -1,5 +1,5 @@
 [block: main]
-<div class="box"><div class="head">Manage the release calendar here</div></div>
+<div class="box"><div class="head">Manage the release calendar here <span class="fright">Links: <a href="/admin.php?module=games&view=add">Add a game</a></span></div></div>
 [/block: main]
 
 [block: search]
@@ -61,31 +61,6 @@
 [block: edit_bottom]
 </div>
 [/block: edit_bottom]
-
-[block: add]
-<div class="box">
-	<div class="head">
-		Add a new game
-	</div>
-	<div class="body group">
-		<form method="post" action="admin.php?module=calendar">
-			Game Name: <input type="text" name="name"  /><br />
-			Official website:<br />
-			<input type="text" name="link" /><br />
-			Release Date: <em>click the tiny calendar!</em>
-			<input name="date" id="datepicker" type="text" />
-			<script>
-			var picker = new Pikaday({
-				field: document.getElementById('datepicker'),
-				format: "DD-MM-YYYY",
-				showTime: false
-			});</script>
-			Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" /><br />
-			<button formaction="admin.php?module=calendar" name="act" value="Add" type="submit">Add Game</button>
-		</form>
-	</div>
-</div>
-[/block: add]
 
 [block: manage_top]
 <script>

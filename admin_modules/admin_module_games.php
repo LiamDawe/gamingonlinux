@@ -7,71 +7,144 @@ if ($_SESSION['user_id'] != 1)
 	die();
 }
 
-if (isset($_GET['view']) && $_GET['view'] == 'edit' && !isset($_POST['act']))
+if (isset($_GET['view']) && !isset($_POST['act']))
 {
-	if (!isset($_GET['id']) || !is_numeric($_GET['id']))
+	if ($_GET['view'] == 'add')
 	{
-		$core->message('Not ID set, you shouldn\'t be here!');
-	}
-	else
-	{
-		$db->sqlquery("SELECT * FROM `calendar` WHERE `id` = ?", array($_GET['id']));
-		$count = $db->num_rows();
-
-		if ($count == 0)
+		if (isset($_GET['message']))
 		{
-			$core->message('That ID does not exist!');
+			if ($_GET['message'] == 'added')
+			{
+				$core->message("Game addition completed! <a href=\"/index.php?module=game&game-id={$_GET['id']}\">View in live database</a>.");
+			}
+			if ($_GET['message'] == 'missing')
+			{
+				$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
+			}
+			if ($_GET['message'] == 'exists')
+			{
+				$core->message('That game already exists! <a href=\"/index.php?module=game&game-id={$_GET['id']}\">View in live database</a>.', NULL, 1);
+			}
 		}
-		else if ($count == 1)
+
+		$templating->set_previous('meta_description', 'Adding a new game', 1);
+		$templating->set_previous('title', 'Adding a game to the database', 1);
+
+		$templating->block('add_top', 'admin_modules/admin_module_games');
+
+		$templating->block('item', 'admin_modules/admin_module_games');
+		$templating->set('id', '');
+		$templating->set('name', '');
+		$templating->set('link', '');
+		$templating->set('steam_link', '');
+		$templating->set('gog_link', '');
+		$templating->set('date', '');
+		$templating->set('guess_check', '');
+		$core->editor('text', '');
+
+		$templating->block('add_bottom', 'admin_modules/admin_module_games');
+	}
+	if ($_GET['view'] == 'edit')
+	{
+		if (!isset($_GET['id']) || !is_numeric($_GET['id']))
 		{
-			$game = $db->fetch();
+			$core->message('Not ID set, you shouldn\'t be here!');
+		}
+		else
+		{
+			$db->sqlquery("SELECT * FROM `calendar` WHERE `id` = ?", array($_GET['id']));
+			$count = $db->num_rows();
 
-			if (isset($_GET['message']))
+			if ($count == 0)
 			{
-				if ($_GET['message'] == 'edited')
-				{
-					$core->message('Game edit completed!');
-				}
-				if ($_GET['message'] == 'missing')
-				{
-					$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
-				}
+				$core->message('That ID does not exist!');
 			}
-
-			$templating->set_previous('meta_description', 'Editing: '.$game['name'], 1);
-			$templating->set_previous('title', 'Editing: ' . $game['name'], 1);
-
-			$templating->block('edit_top', 'admin_modules/admin_module_games');
-
-			$templating->block('edit_item', 'admin_modules/admin_module_games');
-			$templating->set('id', $game['id']);
-			$templating->set('name', $game['name']);
-			$templating->set('link', $game['link']);
-			$templating->set('steam_link', $game['steam_link']);
-			$templating->set('gog_link', $game['gog_link']);
-
-			$date = new DateTime($game['date']);
-			$templating->set('date', $date->format('d-m-Y'));
-
-			$guess = '';
-			if ($game['best_guess'] == 1)
+			else if ($count == 1)
 			{
-				$guess = 'checked';
+				$game = $db->fetch();
+
+				if (isset($_GET['message']))
+				{
+					if ($_GET['message'] == 'edited')
+					{
+						$core->message('Game edit completed!');
+					}
+					if ($_GET['message'] == 'missing')
+					{
+						$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
+					}
+				}
+
+				$templating->set_previous('meta_description', 'Editing: '.$game['name'], 1);
+				$templating->set_previous('title', 'Editing: ' . $game['name'], 1);
+
+				$templating->block('edit_top', 'admin_modules/admin_module_games');
+				$templating->set('id', $game['id']);
+
+				$templating->block('item', 'admin_modules/admin_module_games');
+				$templating->set('id', $game['id']);
+				$templating->set('name', $game['name']);
+				$templating->set('link', $game['link']);
+				$templating->set('steam_link', $game['steam_link']);
+				$templating->set('gog_link', $game['gog_link']);
+
+				$date = new DateTime($game['date']);
+				$templating->set('date', $date->format('d-m-Y'));
+
+				$guess = '';
+				if ($game['best_guess'] == 1)
+				{
+					$guess = 'checked';
+				}
+				$templating->set('guess_check', $guess);
+
+				$text = $game['description'];
+
+				$core->editor('text', $text);
+
+				$templating->block('edit_bottom', 'admin_modules/admin_module_games');
+				$templating->set('id', $game['id']);
 			}
-			$templating->set('guess_check', $guess);
-
-			$text = $game['description'];
-
-			$core->editor('text', $text);
-
-			$templating->block('edit_bottom', 'admin_modules/admin_module_games');
-			$templating->set('id', $game['id']);
 		}
 	}
 }
 
 if (isset($_POST['act']))
 {
+	if ($_POST['act'] == 'Add')
+	{
+		if (empty($_POST['name']) || empty($_POST['date']) || empty($_POST['link']))
+		{
+			header("Location: /admin.php?module=games&view=add&error=missing");
+			exit;
+		}
+
+		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']));
+		if ($db->num_rows() == 1)
+		{
+			$get_game = $db->fetch();
+			header("Location: /admin.php?module=games&view=add&message=exists&id={$get_game['id']}");
+			exit;
+		}
+
+		$date = new DateTime($_POST['date']);
+
+		$guess = 0;
+		if (isset($_POST['guess']))
+		{
+			$guess = 1;
+		}
+
+		$name = trim($_POST['name']);
+		$description = trim($_POST['text']);
+
+		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `approved` = 1", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess));
+		$new_id = $db->grab_id();
+
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' added ' . $_POST['name'] . ' to the games database.', core::$date, core::$date));
+
+		header("Location: /admin.php?module=games&view=add&&message=added&id={$new_id}");
+	}
 	if ($_POST['act'] == 'Edit')
 	{
 		if (empty($_POST['id']) || !is_numeric($_POST['id']))

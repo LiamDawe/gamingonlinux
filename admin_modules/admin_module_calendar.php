@@ -178,7 +178,7 @@ if (isset($_GET['view']))
 
 			$templating->set('month', $month . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-			$db->sqlquery("SELECT `id`, `date`, `name`, link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 1 ORDER BY `date` ASC");
+			$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 1 ORDER BY `date` ASC");
 			while ($listing = $db->fetch()) // loop through the items
 			{
 				$get_date = date_parse($listing['date']);

@@ -54,6 +54,10 @@ if (isset($_GET['error']))
 	{
 		$core->message("That game already exists! You can find it <a href=\"/index.php?module=game&game-id={$_GET['id']}\">by clicking here.</a>", NULL, 1);
 	}
+	if ($_GET['error'] == 'emptysearch')
+	{
+		$core->message("You cannot search for nothing dummy!", NULL, 1);
+	}
 }
 
 // cheers stack overflow http://stackoverflow.com/questions/3109978/php-display-number-with-ordinal-suffix
@@ -79,112 +83,152 @@ $counter = $db->fetch();
 $templating->block('top');
 $templating->set('this_month', $counter['count']);
 
-if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+if (isset($_GET['q']))
 {
-	$templating->block('submit');
-}
+	$search = trim($_GET['q']);
+	$search = str_replace('+', '', $search);
 
-$templating->block('picker');
-
-$years_array = range(2014, 2020);
-
-$options = '';
-foreach ($years_array as $what_year)
-{
-	$selected = '';
-	if ($what_year == $year)
+	if (empty($search))
 	{
-		$selected = 'SELECTED';
+		header("Location: /index.php?module=calendar&error=emptysearch");
+		die();
 	}
-	$options .= '<option value="'.$what_year.'" '.$selected.'>'.$what_year.'</option>';
-}
-$templating->set('options', $options);
+	$templating->block('search_bread');
+	$templating->block('search');
+	$templating->set('search_text', $search);
+	$templating->block('search_result_top');
 
-$months_array = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
-
-$month_options = '';
-foreach ($months_array as $key => $what_month)
-{
-	$month_selected = '';
-	if ($key == $month)
+	$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ?", array('%'.$search.'%'));
+	$total_found = $db->num_rows();
+	if ($total_found > 0)
 	{
-		$month_selected = 'SELECTED';
+		while ($items = $db->fetch())
+		{
+			$templating->block('search_items');
+			$templating->set('id', $items['id']);
+			$templating->set('name', $items['name']);
+		}
 	}
-	$month_options .= '<option value="'.$key.'" '.$month_selected.'>'.$what_month.'</option>';
-}
-$templating->set('month_options', $month_options);
-
-$templating->block('head');
-
-$prev_month = $month - 1;
-$next_month = $month + 1;
-$prev_year = $year;
-$next_year = $year;
-
-if ($month == 1)
-{
-	$prev_month = 12;
-	$prev_year = $year - 1;
-}
-
-if ($month == 12)
-{
-	$next_month = 1;
-	$next_year = $year + 1;
-}
-
-$templating->set('prev', $prev_month);
-$templating->set('next', $next_month);
-$templating->set('prev_year', $prev_year);
-$templating->set('next_year', $next_year);
-
-// count how many there is
-$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1");
-$counter = $db->fetch();
-
-$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
-
-$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
-while ($listing = $db->fetch())
-{
-	$get_date = date_parse($listing['date']);
-	$current_day = ordinal($get_date['day']);
-
-	$templating->block('item');
-	$best_guess = '';
-	if ($listing['best_guess'] == 1)
+	else
 	{
-		$best_guess = '<span class="tooltip-top badge blue" title="We haven\'t been given an exact date!">Best Guess</span>';
-	}
-	$templating->set('best_guess', $best_guess);
-	$templating->set('day', $current_day);
-
-	$today = '';
-	if ($get_date['day'] == date('d') && $get_date['month'] == date('m'))
-	{
-		$today = '<span class="badge green">Releasing Today!</span> ';
+		$core->message('None found.');
 	}
 
-	$game_name = $today . '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
-
-	$templating->set('name', $game_name);
-
-	$edit = '';
-	if ($user->check_group(1,2) == true)
-	{
-		$edit = ' - <a href="admin.php?module=calendar&view=edit&id='.$listing['id'].'">Edit</a>';
-	}
-	$templating->set('edit', $edit);
+	$templating->block('search_result_bottom', 'calendar');
 }
 
-$templating->block('head');
-$templating->set('prev', $prev_month);
-$templating->set('next', $next_month);
-$templating->set('prev_year', $prev_year);
-$templating->set('next_year', $next_year);
-$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
+if (!isset($_GET['q']))
+{
+	$templating->block('search');
+	$templating->set('search_text', '');
 
-$templating->block('bottom', 'calendar');
+	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+	{
+		$templating->block('submit');
+	}
+
+	$templating->block('picker');
+
+	$years_array = range(2014, 2020);
+
+	$options = '';
+	foreach ($years_array as $what_year)
+	{
+		$selected = '';
+		if ($what_year == $year)
+		{
+			$selected = 'SELECTED';
+		}
+		$options .= '<option value="'.$what_year.'" '.$selected.'>'.$what_year.'</option>';
+	}
+	$templating->set('options', $options);
+
+	$months_array = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
+
+	$month_options = '';
+	foreach ($months_array as $key => $what_month)
+	{
+		$month_selected = '';
+		if ($key == $month)
+		{
+			$month_selected = 'SELECTED';
+		}
+		$month_options .= '<option value="'.$key.'" '.$month_selected.'>'.$what_month.'</option>';
+	}
+	$templating->set('month_options', $month_options);
+
+	$templating->block('head');
+
+	$prev_month = $month - 1;
+	$next_month = $month + 1;
+	$prev_year = $year;
+	$next_year = $year;
+
+	if ($month == 1)
+	{
+		$prev_month = 12;
+		$prev_year = $year - 1;
+	}
+
+	if ($month == 12)
+	{
+		$next_month = 1;
+		$next_year = $year + 1;
+	}
+
+	$templating->set('prev', $prev_month);
+	$templating->set('next', $next_month);
+	$templating->set('prev_year', $prev_year);
+	$templating->set('next_year', $next_year);
+
+	// count how many there is
+	$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1");
+	$counter = $db->fetch();
+
+	$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
+
+	$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
+	while ($listing = $db->fetch())
+	{
+		$get_date = date_parse($listing['date']);
+		$current_day = ordinal($get_date['day']);
+
+		$templating->block('item');
+		$best_guess = '';
+		if ($listing['best_guess'] == 1)
+		{
+			$best_guess = '<span class="tooltip-top badge blue" title="We haven\'t been given an exact date!">Best Guess</span>';
+		}
+		$templating->set('best_guess', $best_guess);
+		$templating->set('day', $current_day);
+
+		$today = '';
+		if ($get_date['day'] == date('d') && $get_date['month'] == date('m'))
+		{
+			$today = '<span class="badge green">Releasing Today!</span> ';
+		}
+
+		$game_name = $today . '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
+
+		$templating->set('name', $game_name);
+
+		$edit = '';
+		if ($user->check_group(1,2) == true)
+		{
+			$edit = ' - <a href="admin.php?module=calendar&view=edit&id='.$listing['id'].'">Edit</a>';
+		}
+		$templating->set('edit', $edit);
+	}
+
+	$templating->block('head');
+	$templating->set('prev', $prev_month);
+	$templating->set('next', $next_month);
+	$templating->set('prev_year', $prev_year);
+	$templating->set('next_year', $next_year);
+	$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
+
+	$templating->block('bottom', 'calendar');
+}
 
 if (isset($_POST['act']))
 {

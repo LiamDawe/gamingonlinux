@@ -6,6 +6,44 @@
 </div>
 [/block: top]
 
+[block: search_bread]
+<div class="box">
+	<ul class="breadcrumb">
+		<li><a href="/index.php?module=calendar">Calendar</a></li>
+		<li class="active">Searching</li>
+	</ul>
+</div>
+[/block: search_bread]
+
+[block: search]
+<div class="box">
+	<div class="head">
+		Search for a specific game
+	</div>
+	<div class="body group">
+		<form method="get" action="/index.php?module=calendar">
+			<input type="hidden" name="module" value="calendar" />
+			Game Name: <input type="text" name="q" value="{:search_text}" /><br />
+			<button formaction="/index.php?module=calendar" type="submit">Search</button>
+		</form>
+	</div>
+</div>
+[/block: search]
+
+[block: search_result_top]
+<div class="box">
+[/block: search_result_top]
+
+[block: search_items]
+<div class="body group">
+<a href="/index.php?module=game&game-id={:id}">{:name}</a>
+</div>
+[/block: search_items]
+
+[block: search_result_bottom]
+</div>
+[/block: search_result_bottom]
+
 [block: submit]
 <div class="box">
 	<div class="collapse_container">

@@ -52,7 +52,7 @@ if (isset($_GET['error']))
 	}
 	if ($_GET['error'] == 'exists')
 	{
-		$core->message("That game already exists!", NULL, 1);
+		$core->message("That game already exists! You can find it <a href=\"/index.php?module=game&game-id={$_GET['id']}\">by clicking here.</a>", NULL, 1);
 	}
 }
 
@@ -220,10 +220,11 @@ if (isset($_POST['act']))
 			}
 		}
 
-		$db->sqlquery("SELECT `name` FROM `calendar` WHERE `name` = ?", array($name));
+		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($name));
 		if ($db->num_rows() == 1)
 		{
-			header("Location: /index.php?module=calendar&error=exists");
+			$game = $db->fetch();
+			header("Location: /index.php?module=calendar&error=exists&id=" . $game['id']);
 			exit;
 		}
 

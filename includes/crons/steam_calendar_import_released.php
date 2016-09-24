@@ -20,7 +20,7 @@ $stop = 0;
 $games_added_list = '';
 
 $page = 1;
-$url = "http://store.steampowered.com/search/?sort_by=Released_DESC&os=linux&page=";
+$url = "http://store.steampowered.com/search/?sort_by=Released_DESC&os=linux&category1=998%2C21&page=";
 
 do
 {
@@ -55,37 +55,44 @@ do
           if ($parsed_release_date != '1970-01-01' && $length != 4 && $has_day == FALSE)
           {
             $title = $element->find('span.title', 0)->plaintext;
-            echo 'Title: ' . $element->find('span.title', 0)->plaintext . '<br />';
 
-            echo 'Release date: ' . $parsed_release_date . ' original ('.$release_date->plaintext.')' . '<br />';
-
-            $link = $element->href;
-            echo  'Link: ' . $link . '<br /><br />';
-
-            $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
-
-            $grab_info = $db->fetch();
-
-            $check_rows = $db->num_rows();
-
-            // if it does exist, make sure it's not from Steam already
-            if ($check_rows == 0)
+            // don't give us soundtracks, they are DLC but we don't want them!
+            $soundtrack_search = strpos($title, 'Soundtrack');
+            $OST_search = strpos($title, ' OST'); //include space to not end up finding games with "OST" in the name
+            if ($soundtrack_search === false && $OST_search === false)
             {
-              $db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `steam_link` = ?, `date` = ?, `approved` = 1", array($title, $link, $parsed_release_date));
+              echo 'Title: ' . $element->find('span.title', 0)->plaintext . '<br />';
 
-              $game_id = $db->grab_id();
+              echo 'Release date: ' . $parsed_release_date . ' original ('.$release_date->plaintext.')' . '<br />';
 
-              echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
+              $link = $element->href;
+              echo  'Link: ' . $link . '<br /><br />';
 
-              $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br />';
-            }
+              $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
 
-            // if we already have it, just update it
-            else if ($check_rows == 1 && $grab_info['steam_link'] == NULL)
-            {
-              $db->sqlquery("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $grab_info['id']));
+              $grab_info = $db->fetch();
 
-              echo "Updated {$title} with the latest information<br />";
+              $check_rows = $db->num_rows();
+
+              // if it does exist, make sure it's not from Steam already
+              if ($check_rows == 0)
+              {
+                $db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `steam_link` = ?, `date` = ?, `approved` = 1", array($title, $link, $parsed_release_date));
+
+                $game_id = $db->grab_id();
+
+                echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
+
+                $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br />';
+              }
+
+              // if we already have it, just update it
+              else if ($check_rows == 1 && $grab_info['steam_link'] == NULL)
+              {
+                $db->sqlquery("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $grab_info['id']));
+
+                echo "Updated {$title} with the latest information<br />";
+              }
             }
           }
         }

@@ -1,12 +1,6 @@
 <?php
 $templating->merge('admin_modules/admin_module_games');
 
-if ($_SESSION['user_id'] != 1)
-{
-	$core->message('section not open yet');
-	die();
-}
-
 if (isset($_GET['view']) && !isset($_POST['act']))
 {
 	if ($_GET['view'] == 'add')
@@ -23,7 +17,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			if ($_GET['message'] == 'exists')
 			{
-				$core->message('That game already exists! <a href=\"/index.php?module=game&game-id={$_GET['id']}\">View in live database</a>.', NULL, 1);
+				$core->message('That game already exists! <a href="/index.php?module=game&game-id=' . $_GET['id'] . '">View in live database</a>.', NULL, 1);
 			}
 		}
 
@@ -82,6 +76,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set('id', $game['id']);
 
 				$templating->block('item', 'admin_modules/admin_module_games');
+
+				$return = '';
+				if (isset($_GET['return']))
+				{
+					$return = $_GET['return'];
+				}
+
 				$templating->set('id', $game['id']);
 				$templating->set('name', $game['name']);
 				$templating->set('link', $game['link']);
@@ -103,6 +104,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$core->editor('text', $text);
 
 				$templating->block('edit_bottom', 'admin_modules/admin_module_games');
+				$templating->set('return', $return);
 				$templating->set('id', $game['id']);
 			}
 		}
@@ -149,13 +151,13 @@ if (isset($_POST['act']))
 	{
 		if (empty($_POST['id']) || !is_numeric($_POST['id']))
 		{
-			header("Location: /admin.php?module=games&view=manage&error=missing_id");
+			header("Location: /admin.php?module=games&view=manage&message=missing_id");
 			exit;
 		}
 
 		if (empty($_POST['name']) || empty($_POST['date']) || empty($_POST['link']))
 		{
-			header("Location: /admin.php?module=games&view=edit&error=missing&id=" . $_POST['id']);
+			header("Location: /admin.php?module=games&view=edit&message=missing&id=" . $_POST['id']);
 			exit;
 		}
 
@@ -174,6 +176,92 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited ' . $_POST['name'] . ' in the games database.', core::$date, core::$date));
 
-		header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id'] . '&message=edited');
+		if (isset($_GET['return']) && !empty($_GET['return']))
+		{
+			if ($_GET['return'] == 'calendar')
+			{
+				header("Location: /index.php?module=calendar&message=edited");
+			}
+			if ($_GET['return'] == 'game')
+			{
+				header("Location: /index.php?module=game&game-id=" . $_POST['id'] . '&message=edited');
+			}
+		}
+		else
+		{
+			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id'] . '&message=edited');
+		}
+	}
+	if ($_POST['act'] == 'Delete')
+	{
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$db->sqlquery("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_POST['id']));
+			$name = $db->fetch();
+
+			$return = '';
+			if (isset($_GET['return']) && !empty($_GET['return']))
+			{
+				$return = $_GET['return'];
+			}
+
+			$core->yes_no('Are you sure you want to delete ' . $name['name'] . ' from the games database and calendar?', "admin.php?module=games&id={$_POST['id']}&return=" . $return, "Delete");
+		}
+
+		else if (isset($_POST['no']))
+		{
+			if (isset($_GET['return']) && !empty($_GET['return']))
+			{
+				if ($_GET['return'] == 'calendar')
+				{
+					header("Location: /index.php?module=calendar");
+					die();
+				}
+				if ($_GET['return'] == 'game')
+				{
+					header("Location: /index.php?module=game&game-id=" . $_GET['id']);
+					die();
+				}
+				if ($_GET['return'] == 'submitted')
+				{
+					header("Location: /admin.php?module=calendar&view=submitted");
+					die();
+				}
+			}
+			else
+			{
+				header("Location: /index.php?module=calendar");
+			}
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$db->sqlquery("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_GET['id']));
+			$name = $db->fetch();
+
+			$db->sqlquery("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
+
+			$db->sqlquery("DELETE FROM `admin_notifications` WHERE `calendar_id` = ?", array($_GET['id']));
+
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `calendar_id` = ?", array($_SESSION['username'] . ' removed ' . $name['name'] . ' from the games database and calendar.', core::$date, core::$date, $_GET['id']));
+
+			if (isset($_GET['return']) && !empty($_GET['return']))
+			{
+				if ($_GET['return'] == 'submitted')
+				{
+					header("Location: /admin.php?module=calendar&view=submitted&message=deleted");
+					die();
+				}
+				if ($_GET['return'] == 'game')
+				{
+					header("Location: /index.php?module=calendar&message=deleted");
+					die();
+				}
+			}
+			else
+			{
+				header("Location: /index.php?module=calendar&message=deleted");
+			}
+		}
 	}
 }

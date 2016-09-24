@@ -32,7 +32,15 @@ if (isset($_GET['message']))
 {
 	if ($_GET['message'] == 'sent')
 	{
-		$core->message("You have sent the a calendar item! Thanks for the help, much appreciated!");
+		$core->message("You have sent in a calendar item! Thanks for the help, much appreciated!");
+	}
+	if ($_GET['message'] == 'edited')
+	{
+		$core->message("You have edited the games database and calendar item!");
+	}
+	if ($_GET['message'] == 'deleted')
+	{
+		$core->message("You have deleted the games database and calendar item!");
 	}
 }
 
@@ -82,6 +90,13 @@ $counter = $db->fetch();
 
 $templating->block('top');
 $templating->set('this_month', $counter['count']);
+
+$editor_links = '';
+if ($user->check_group(1,2) || $user->check_group(5))
+{
+	$editor_links = '<span class="fright">Editor Links: <a href="/admin.php?module=games&view=add">Add a game</a></span>';
+}
+$templating->set('editor_links', $editor_links);
 
 if (isset($_GET['q']))
 {
@@ -215,7 +230,7 @@ if (!isset($_GET['q']))
 		$edit = '';
 		if ($user->check_group(1,2) == true)
 		{
-			$edit = ' - <a href="admin.php?module=calendar&view=edit&id='.$listing['id'].'">Edit</a>';
+			$edit = ' - <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar">Edit</a>';
 		}
 		$templating->set('edit', $edit);
 	}

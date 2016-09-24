@@ -10,6 +10,18 @@ if (isset($_GET['game-id']))
 		$templating->set_previous('meta_description', 'GamingOnLinux games database: '.$game['name'], 1);
 		$templating->set_previous('title', $game['name'], 1);
 
+		if (isset($_GET['message']))
+		{
+			if ($_GET['message'] == 'edited')
+			{
+				$core->message('Game edit completed!');
+			}
+			if ($_GET['message'] == 'missing')
+			{
+				$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
+			}
+		}
+
 		$templating->merge('game_database');
 
 		$templating->block('top');
@@ -18,7 +30,7 @@ if (isset($_GET['game-id']))
 		$edit_link = '';
 		if ($user->check_group(1,2) == TRUE)
 		{
-			$edit_link = '<a class="fright" href="/admin.php?module=games&amp;view=edit&amp;id=' . $game['id'] . '">Edit</a>';
+			$edit_link = '<a class="fright" href="/admin.php?module=games&amp;view=edit&amp;id=' . $game['id'] . '&return=game">Edit</a>';
 		}
 		$templating->set('edit-link', $edit_link);
 

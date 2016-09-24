@@ -782,11 +782,7 @@ ul.social-networks li > a {
 }
 
 
-/*
- * ------------------------------
- * GOTY
- * ------------------------------
- */
+/* GOTY */
 .goty .col-4 {
   width: 32.666666666666666666666666666667%;
   margin: 0;
@@ -836,23 +832,18 @@ ul.social-networks li > a {
 	content: "";
 }
 
-/*
- * ------------------------------
- * Forum
- * ------------------------------
- */
+/* Games Database */
+.database-latest{float: left; width: 49%;}
+.database-updated{float: right; width: 49%;}
 
+/* Forum */
 .index_avatar{vertical-align:middle; max-width: 50px;}
 .forum-badge a {color: #fff;}
 #create-poll{display: none;}
 .poll_button{float: none ;}
 .poll_content{padding: 4px;}
 
-/*
- * ------------------------------
- * Icons
- * ------------------------------
- */
+/* Icons */
 .icon {
     background-position: center center;
     background-repeat: no-repeat;
@@ -1350,6 +1341,8 @@ body.dark {
 		margin-bottom: 14px;
 	}
 
+	.database-latest{float: left; width: 100%; clear: both;}
+	.database-updated{float: left; width: 100%; clear: both;}
 
 	.article.individual.no-image .info {
 		padding: 14px;
@@ -1403,45 +1396,6 @@ body.dark {
 /* PORTRAIT ORIENTATION */
 @media only screen and (orientation: portrait) {
 
-}
-/* PRINT */
-@media print {
-	.container {
-		width: auto;
-		border: 0;
-		margin: 0 0;
-		padding: 0;
-		float: none !important;
-	}
-	pre {
-		white-space: pre-wrap;
-		white-space: -moz-pre-wrap;
-		white-space: -pre-wrap;
-		white-space: -o-pre-wrap;
-		word-wrap: break-word;
-	}
-	p a[href^="http://"]:after, a[href^="https://"]:after {
-		content: " (" attr(href) ")";
-	}
-	q:after {
-		content: " (Source: " attr(cite) ")";
-	}
-	.simg {
-		border-top: 1px solid #333333;
-		border-bottom: 1px solid #333333;
-		border-left: none;
-		border-right: none;
-		padding: 0;
-		margin: 21px 0;
-	}
-
-	/* Layout */
-	#navigation {
-		display: none;
-	}
-	#footer {
-		display: none;
-	}
 }
 
 /* liam additions */

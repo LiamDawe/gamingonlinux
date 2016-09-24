@@ -6,23 +6,43 @@ if (!isset($_GET['game-id']))
 	$templating->set_previous('meta_description', 'GamingOnLinux Linux games database', 1);
 	$templating->set_previous('title', 'GamingOnLinux Linux games database', 1);
 
-	$templating->block('main_top');
+	$templating->block('main_top', 'game_database');
 	$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1");
 	$total_games = $db->fetch();
 	$templating->set('total_games', $total_games['total']);
 
-	$templating->block('latest_top');
-	
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY RAND() LIMIT 1");
+	$random_item = $db->fetch();
+	$templating->block('random', 'game_database');
+	$templating->set('id', $random_item['id']);
+	$templating->set('name', $random_item['name']);
+	$templating->set('release_date', $random_item['date']);
+
+	$templating->block('latest_top', 'game_database');
+
 	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY `id` DESC LIMIT 10");
 	while ($latest = $db->fetch())
 	{
-		$templating->block('latest_item');
+		$templating->block('latest_item', 'game_database');
 		$templating->set('id', $latest['id']);
 		$templating->set('name', $latest['name']);
 		$templating->set('release_date', $latest['date']);
 	}
 
-	$templating->block('latest_bottom');
+	$templating->block('latest_bottom', 'game_database');
+
+	$templating->block('edits_top', 'game_database');
+
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY `edit_date` DESC LIMIT 10");
+	while ($latest = $db->fetch())
+	{
+		$templating->block('latest_item', 'game_database');
+		$templating->set('id', $latest['id']);
+		$templating->set('name', $latest['name']);
+		$templating->set('release_date', $latest['date']);
+	}
+
+	$templating->block('edits_bottom', 'game_database');
 }
 
 if (isset($_GET['game-id']))
@@ -48,7 +68,7 @@ if (isset($_GET['game-id']))
 			}
 		}
 
-		$templating->block('top');
+		$templating->block('top', 'game_database');
 		$templating->set('name', $game['name']);
 
 		$edit_link = '';
@@ -58,7 +78,7 @@ if (isset($_GET['game-id']))
 		}
 		$templating->set('edit-link', $edit_link);
 
-		$templating->block('main-info');
+		$templating->block('main-info', 'game_database');
 
 		$date = '';
 		if (!empty($game['date']))

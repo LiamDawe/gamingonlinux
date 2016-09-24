@@ -280,11 +280,7 @@ margin-bottom: -3px;
 }
 
 
- /*
- * ------------------------------
- * Page CSS
- * ------------------------------
- */
+ /* Page CSS */
 .head {
     background: #333333;
 }
@@ -302,7 +298,7 @@ margin-bottom: -3px;
 .box .head a {
 	color: #ffffff;
 }
-/** Piratelv : Added sub header style for forum links  @ 26/01/15 **/
+
 .box .subhead {
     margin-left: 10px;
     background: #f5f5f5;
@@ -350,6 +346,21 @@ margin-bottom: -3px;
 
 #content .chatList ul li a {
 	display: inline-block;
+}
+
+.breadcrumb {
+padding: 8px 15px;
+list-style: none;
+background-color: #f5f5f5;
+border-radius: 4px;
+}
+.breadcrumb>li {
+display: inline-block;
+}
+.breadcrumb > li + li:before {
+    color: #CCCCCC;
+    content: "/ ";
+    padding: 0 5px;
 }
 
 /* Articles */
@@ -800,6 +811,7 @@ ul.social-networks li > a {
 	float: right;
 }
 
+/* Support us page */
 .box.profile {
 	float: left;
 	margin: 6px;
@@ -912,11 +924,7 @@ ul.social-networks li > a {
     background-image: url('../images/comments/envelope-open.svg');
 }
 
-/*
- * ------------------------------
- * Dark CSS
- * ------------------------------
- */
+/* Dark CSS */
 body.dark {
 	background: #151515;
 	color: #ffffff;
@@ -1118,11 +1126,7 @@ body.dark {
 
 .dark strong {color: #ffffff}
 
-/*
- * ------------------------------
- * Responsive CSS
- * ------------------------------
- */
+/* Responsive CSS */
 /* DESKTOP */
 @media only screen and (min-width: 1200px) {
 	.container {
@@ -1400,20 +1404,6 @@ body.dark {
 
 /* liam additions */
 th, td { vertical-align: top; }
-.breadcrumb {
-padding: 8px 15px;
-list-style: none;
-background-color: #f5f5f5;
-border-radius: 4px;
-}
-.breadcrumb>li {
-display: inline-block;
-}
-.breadcrumb > li + li:before {
-    color: #CCCCCC;
-    content: "/ ";
-    padding: 0 5px;
-}
 .link_button {
     background: #333333;
     color: #ffffff;
@@ -1456,7 +1446,7 @@ text-decoration: none;
 width: auto;
 box-shadow: inset 0 -3px rgba(0, 0, 0, 0.1);}
 .article .info .meta .meta-date {display: inline-block;}
-/* release calendar admin section, to split up each item in the month */
+/* release calendar admin submitted items section, to split up each item in the month */
 div.cal:nth-child(even) {background: #CCC}
 div.cal:nth-child(odd) {background: #FFF}
 .bbcodeblock {

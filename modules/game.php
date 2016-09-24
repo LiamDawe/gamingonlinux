@@ -48,7 +48,7 @@ if (!isset($_GET['game-id']))
 if (isset($_GET['game-id']))
 {
 	// make sure it exists
-	$db->sqlquery("SELECT `id`, `name`, `date`, `gog_link`, `steam_link`, `link`, `description` FROM `calendar` WHERE `id` = ? AND `approved` = 1", array($_GET['game-id']));
+	$db->sqlquery("SELECT `id`, `name`, `date`, `gog_link`, `steam_link`, `link`, `description`, `best_guess` FROM `calendar` WHERE `id` = ? AND `approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
 		$game = $db->fetch();
@@ -72,7 +72,7 @@ if (isset($_GET['game-id']))
 		$templating->set('name', $game['name']);
 
 		$edit_link = '';
-		if ($user->check_group(1,2) == TRUE)
+		if ($user->check_group(1,2) == TRUE || $user->check_group(5) == TRUE)
 		{
 			$edit_link = '<a class="fright" href="/admin.php?module=games&amp;view=edit&amp;id=' . $game['id'] . '&return=game">Edit</a>';
 		}
@@ -86,6 +86,20 @@ if (isset($_GET['game-id']))
 			$date = $game['date'];
 		}
 		$templating->set('release-date', $date);
+
+		$unreleased = '';
+		if (isset($date) && !empty($date) && $date > date('Y-m-d'))
+		{
+			$unreleased = '<span class="badge blue">Unreleased!</span>';
+		}
+		$templating->set('unreleased', $unreleased);
+
+		$best_guess = '';
+		if ($game['best_guess'] == 1)
+		{
+			$best_guess = '<span class="badge blue">Best Guess Date!</span>';
+		}
+		$templating->set('best_guess', $best_guess);
 
 		$description = '';
 		if (!empty($game['description']) && $game['description'] != NULL)
@@ -146,6 +160,15 @@ if (isset($_GET['game-id']))
 			}
 			$templating->set('articles', $article_list);
 		}
+
+		if ($user->check_group(1,2) == TRUE || $user->check_group(5) == TRUE)
+		{
+			$templating->block('main_info_bottom', 'game_database');
+			$edit_link = '<a href="/admin.php?module=games&amp;view=edit&amp;id=' . $game['id'] . '&return=game">Edit</a>';
+			$templating->set('edit-link', $edit_link);
+		}
+
+
 	}
 	else
 	{

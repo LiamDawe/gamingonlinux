@@ -228,7 +228,7 @@ if (!isset($_GET['q']))
 		$templating->set('name', $game_name);
 
 		$edit = '';
-		if ($user->check_group(1,2) == true)
+		if ($user->check_group(1,2) == true || $user->check_group(5) == true)
 		{
 			$edit = ' - <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar">Edit</a>';
 		}

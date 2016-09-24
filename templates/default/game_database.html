@@ -1,4 +1,5 @@
 [block: main_top]
+<div class="box"><div class="body group">See also: <a href="/index.php?module=calendar">Release Calendar</a></div></div>
 <div class="box">
   <div class="head">The big GamingOnLinux games database!</div>
   <div class="body group">We have a total of {:total_games} items in the database!</div>
@@ -8,29 +9,33 @@
 [block: random]
 <div class="box">
   <div class="head">Random game spotlight</div>
-  <div class="body group"><a href="/index.php?module=game&amp;game-id={:id}">{:name}</a>  - Release date: {:release_date}</div>
+  <div class="body group"><a href="/index.php?module=game&amp;game-id={:id}">{:name}</a><br />Release date: {:release_date}</div>
 </div>
 [/block: random]
 
 [block: latest_top]
+<div class="col-6">
 <div class="box">
   <div class="head">Latest games</div>
 [/block: latest_top]
 
 [block: latest_item]
-  <div class="body group"><a href="/index.php?module=game&amp;game-id={:id}">{:name}</a> - Release date: {:release_date}</div>
+  <div class="body group"><a href="/index.php?module=game&amp;game-id={:id}">{:name}</a><br />Release date: {:release_date}</div>
 [/block: latest_item]
 
 [block: latest_bottom]
 </div>
+</div>
 [/block: latest_bottom]
 
 [block: edits_top]
+<div class="col-6">
 <div class="box">
   <div class="head">Latest games updated in the database</div>
 [/block: edits_top]
 
 [block: edits_bottom]
+</div>
 </div>
 [/block: edits_bottom]
 
@@ -46,7 +51,7 @@
 [block: main-info]
 <div class="box">
   <div class="body group">
-    Linux Release Date: {:release-date}<br />
+    Linux Release Date: {:release-date} {:unreleased} {:best_guess}<br />
     <br />
     {:description}
     <strong>External Links</strong><br />
@@ -54,6 +59,10 @@
   </div>
 </div>
 [/block: main-info]
+
+[block: main_info_bottom]
+<div class="box"><div class="body group">{:edit-link}</div></div>
+[/block: main_info_bottom]
 
 [block: articles]
 <div class="box">

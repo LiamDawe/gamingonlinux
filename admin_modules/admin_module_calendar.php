@@ -94,58 +94,24 @@ if (isset($_GET['view']))
 	{
 		$templating->block('submit_main', 'admin_modules/admin_module_calendar');
 
-		$templating->block('submit_top', 'admin_modules/admin_module_calendar');
-
-		$options = '';
-		foreach ($years_array as $what_year)
+		$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE `approved` = 0 ORDER BY `date` ASC");
+		while ($listing = $db->fetch()) // loop through the items
 		{
-			$selected = '';
-			if ($what_year == $year)
+			$templating->block('submit_item', 'admin_modules/admin_module_calendar');
+			$guess_check = '';
+			if ($listing['best_guess'] == 1)
 			{
-				$selected = 'SELECTED';
+				$guess_check = 'checked';
 			}
-			$options .= '<option value="'.$what_year.'" '.$selected.'>'.$what_year.'</option>';
+			$templating->set('guess_check', $guess_check);
+			$templating->set('link', $listing['link']);
+			$templating->set('name', $listing['name']);
+			$templating->set('id', $listing['id']);
+
+			$date = new DateTime($listing['date']);
+			$templating->set('date', $date->format('d-m-Y'));
 		}
-		$templating->set('options', $options);
-
-		$months = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
-
-		foreach ($months as $month_key => $month) // loop through each month
-		{
-			$templating->block('head', 'admin_modules/admin_module_calendar');
-
-			// count how many there is
-			$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 0");
-			$counter = $db->fetch();
-
-			$templating->set('month', $month . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
-
-			$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month_key AND `approved` = 0 ORDER BY `date` ASC");
-			while ($listing = $db->fetch()) // loop through the items
-			{
-				$get_date = date_parse($listing['date']);
-				$current_month = $get_date['month'];
-
-				if ($current_month == $month_key)
-				{
-					$templating->block('submit_item', 'admin_modules/admin_module_calendar');
-					$guess_check = '';
-					if ($listing['best_guess'] == 1)
-					{
-						$guess_check = 'checked';
-					}
-					$templating->set('guess_check', $guess_check);
-					$templating->set('link', $listing['link']);
-					$templating->set('name', $listing['name']);
-					$templating->set('id', $listing['id']);
-
-					$date = new DateTime($listing['date']);
-					$templating->set('date', $date->format('d-m-Y'));
-				}
-			}
-
-			$templating->block('bottom', 'admin_modules/admin_module_calendar');
-		}
+		$templating->block('submit_bottom', 'admin_modules/admin_module_calendar');
 	}
 
 	if ($_GET['view'] == 'manage')

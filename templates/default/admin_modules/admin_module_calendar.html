@@ -115,24 +115,8 @@
 [/block: bottom]
 
 [block: submit_main]
-<div class="box"><div class="head">Manage user submitted games for the release calendar here</div></div>
+<div class="box"><div class="head">Manage user submitted games for the release calendar here</div>
 [/block: submit_main]
-
-[block: submit_top]
-<script>
-    $(function(){
-      // bind change event to select
-      $('#year').bind('change', function () {
-          var year = $(this).val(); // get selected value
-          if (year) { // require a year
-              window.location = 'https://www.gamingonlinux.com/admin.php?module=calendar&view=submitted&year=' + year; // redirect
-          }
-          return false;
-      });
-    });
-</script>
-<div class="box"><div class="head">Pick a year:</div><div class="body group"><form><select id="year" name="year">{:options}</select></form></div></div>
-[/block: submit_top]
 
 [block: submit_item]
 		<div class="body group cal">
@@ -154,3 +138,7 @@
 			</form>
 		</div>
 [/block: submit_item]
+
+[block: submit_bottom]
+</div>
+[/block: submit_bottom]

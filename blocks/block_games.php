@@ -1,6 +1,6 @@
 <?php
 // Article categorys block
-$templating->merge('blocks/block_calendar');
+$templating->merge('blocks/block_games');
 $templating->block('list');
 
 $templating->set('url', core::config('website_url'));

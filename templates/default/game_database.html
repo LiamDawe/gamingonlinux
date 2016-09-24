@@ -1,3 +1,23 @@
+[block: main_top]
+<div class="box">
+  <div class="head">The big GamingOnLinux games database!</div>
+  <div class="body group">We have a total of {:total_games} items in the database!</div>
+</div>
+[/block: main_top]
+
+[block: latest_top]
+<div class="box">
+  <div class="head">Latest games</div>
+[/block: latest_top]
+
+[block: latest_item]
+  <div class="body group"><a href="/index.php?module=game&amp;game-id={:id}">{:name}</a> - Release date: {:release_date}</div>
+[/block: latest_item]
+
+[block: latest_bottom]
+</div>
+[/block: latest_bottom]
+
 [block: top]
 <div class="box"><div class="head">{:name} {:edit-link}</div></div>
 [/block: top]

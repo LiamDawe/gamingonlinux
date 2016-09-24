@@ -1,4 +1,30 @@
 <?php
+$templating->merge('game_database');
+
+if (!isset($_GET['game-id']))
+{
+	$templating->set_previous('meta_description', 'GamingOnLinux Linux games database', 1);
+	$templating->set_previous('title', 'GamingOnLinux Linux games database', 1);
+
+	$templating->block('main_top');
+	$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1");
+	$total_games = $db->fetch();
+	$templating->set('total_games', $total_games['total']);
+
+	$templating->block('latest_top');
+	
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY `id` DESC LIMIT 10");
+	while ($latest = $db->fetch())
+	{
+		$templating->block('latest_item');
+		$templating->set('id', $latest['id']);
+		$templating->set('name', $latest['name']);
+		$templating->set('release_date', $latest['date']);
+	}
+
+	$templating->block('latest_bottom');
+}
+
 if (isset($_GET['game-id']))
 {
 	// make sure it exists
@@ -21,8 +47,6 @@ if (isset($_GET['game-id']))
 				$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
 			}
 		}
-
-		$templating->merge('game_database');
 
 		$templating->block('top');
 		$templating->set('name', $game['name']);

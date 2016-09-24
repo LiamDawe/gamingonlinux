@@ -172,7 +172,7 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `edit_date` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, date('Y-m-d H:m:s'), $_POST['id']));
+		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `edit_date` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, date('Y-m-d H:i:s'), $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited ' . $_POST['name'] . ' in the games database.', core::$date, core::$date));
 

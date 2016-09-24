@@ -33,7 +33,7 @@ if (!isset($_GET['game-id']))
 
 	$templating->block('edits_top', 'game_database');
 
-	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY `edit_date` DESC LIMIT 10");
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY `edit_date` ASC LIMIT 10");
 	while ($latest = $db->fetch())
 	{
 		$templating->block('latest_item', 'game_database');

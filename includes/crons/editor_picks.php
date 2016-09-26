@@ -2,8 +2,11 @@
 $path = '/home/gamingonlinux/public_html/';
 include($path . 'includes/config.php');
 
-include('includes/class_mysql.php');
+include($path . 'includes/class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
+
+include($path . 'includes/class_core.php');
+$core = new core();
 
 // get config
 $db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
@@ -50,7 +53,7 @@ if ($total_to_remove > 0)
 }
 
 // count how many there are
-$db->sqlquery("SELECT `article_id` FROM `editor_picks` WHERE `show_in_menu` = 1");
+$db->sqlquery("SELECT `article_id` FROM `editor_picks`");
 
 $editor_pick_count = $db->num_rows();
 

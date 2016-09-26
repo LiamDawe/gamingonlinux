@@ -54,10 +54,6 @@ if (isset($_GET['error']))
 	{
 		$core->message("You have to put at least a name and date in! If you added a link, be sure it contains a valid URL!", NULL, 1);
 	}
-	if ($_GET['error'] == 'yearchecker')
-	{
-		$core->message("We aren't currently tracking that year for releases, please let us know if you think we should!", NULL, 1);
-	}
 	if ($_GET['error'] == 'exists')
 	{
 		$core->message("That game already exists! You can find it <a href=\"/index.php?module=game&game-id={$_GET['id']}\">by clicking here.</a>", NULL, 1);
@@ -288,12 +284,6 @@ if (isset($_POST['act']))
 		}
 
 		$date = new DateTime($_POST['date']);
-
-		if (!in_array($date->format("Y"), $years_array))
-		{
-			header("Location: /index.php?module=calendar&error=yearchecker");
-			exit;
-		}
 
 		$guess = 0;
 		if (isset($_POST['guess']))

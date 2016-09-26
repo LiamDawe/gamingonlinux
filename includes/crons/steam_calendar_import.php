@@ -56,10 +56,26 @@ do
           {
             $title = $element->find('span.title', 0)->plaintext;
 
+            $dont_use = 0;
             // don't give us soundtracks, they are DLC but we don't want them!
-            $soundtrack_search = strpos($title, 'Soundtrack');
-            $OST_search = strpos($title, ' OST'); //include space to not end up finding games with "OST" in the name
-            if ($soundtrack_search === false && $OST_search === false)
+            if (strpos($title, 'Soundtrack') !== false)
+            {
+              $dont_use = 1;
+            }
+            if (strpos($title, 'Soundtracks') !== false)
+            {
+              $dont_use = 1;
+            }
+            if (strpos($title, 'Sound Track') !== false)
+            {
+              $dont_use = 1;
+            }
+            //include space to not end up finding games with "OST" in the name
+            if (strpos($title, ' OST') !== false)
+            {
+              $dont_use = 1;
+            }
+            if ($dont_use == 0)
             {
               echo 'Title: ' . $element->find('span.title', 0)->plaintext . '<br />';
 
@@ -107,7 +123,7 @@ if (!empty($games_added_list))
 {
   if (core::config('send_emails') == 1)
   {
-    $mail = new mail('liamdawe@gmail.com', 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar!</a><br />' . $games_added_list, '');
+    $mail = new mail('liamdawe@gmail.com', 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from Steam!<br />' . $games_added_list, '');
     $mail->send();
   }
 }

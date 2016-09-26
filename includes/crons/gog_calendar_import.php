@@ -53,34 +53,57 @@ do {
 	{
 		if ($games['linux_compatible'] == 1)
 		{
-			$website = $games['short_link'];
-
-			echo $games['title'] . "<br />\n";
-			echo "* Original release date: ". $games['original_release_date'] ."<br />\n";
-
-			$db->sqlquery("SELECT `name`, `gog_link` FROM `calendar` WHERE `name` = ?", array($games['title']));
-			$grab_info = $db->fetch();
-
-			$check_rows = $db->num_rows();
-
-			// if it does exist, make sure it's not from GOG already
-			if ($check_rows == 0)
+			$dont_use = 0;
+			// don't give us soundtracks, they are DLC but we don't want them!
+			if (strpos($games['title'], 'Soundtrack') !== false)
 			{
-				$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `gog_link` = ?, `date` = ?, `approved` = 1", array($games['title'], $games['short_link'], $games['original_release_date']));
-
-				$calendar_id = $db->grab_id();
-
-				echo "\tAdded this game to the calendar DB with id: " . $calendar_id . ".\n";
-
-				$games_added .= $games['title'] . '<br />';
+				$dont_use = 1;
+			}
+			if (strpos($games['title'], 'Soundtracks') !== false)
+			{
+				$dont_use = 1;
+			}
+			if (strpos($games['title'], 'Sound Track') !== false)
+			{
+				$dont_use = 1;
+			}
+			//include space to not end up finding games with "OST" in the name
+			if (strpos($games['title'], ' OST') !== false)
+			{
+				$dont_use = 1;
 			}
 
-			// if we already have it, just update it
-			else if ($check_rows == 1 && $grab_info['gog_link'] == NULL)
+			if ($dont_use == 0)
 			{
-				$db->sqlquery("UPDATE `calendar` SET `gog_link` = ? WHERE `name` = ?", array($games['short_link'], $games['title']));
+				$website = $games['short_link'];
 
-				echo "Updated {$games['title']} with the latest information<br />";
+				echo $games['title'] . "<br />\n";
+				echo "* Original release date: ". $games['original_release_date'] ."<br />\n";
+
+				$db->sqlquery("SELECT `name`, `gog_link` FROM `calendar` WHERE `name` = ?", array($games['title']));
+				$grab_info = $db->fetch();
+
+				$check_rows = $db->num_rows();
+
+				// if it does exist, make sure it's not from GOG already
+				if ($check_rows == 0)
+				{
+					$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `gog_link` = ?, `date` = ?, `approved` = 1", array($games['title'], $games['short_link'], $games['original_release_date']));
+
+					$calendar_id = $db->grab_id();
+
+					echo "\tAdded this game to the calendar DB with id: " . $calendar_id . ".\n";
+
+					$games_added .= $games['title'] . '<br />';
+				}
+
+				// if we already have it, just update it
+				else if ($check_rows == 1 && $grab_info['gog_link'] == NULL)
+				{
+					$db->sqlquery("UPDATE `calendar` SET `gog_link` = ? WHERE `name` = ?", array($games['short_link'], $games['title']));
+
+					echo "Updated {$games['title']} with the latest information<br />";
+				}
 			}
 		}
 	}
@@ -93,7 +116,7 @@ if (!empty($games_added))
 {
   if (core::config('send_emails') == 1)
   {
-    $mail = new mail('liamdawe@gmail.com', 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar!</a><br />' . $games_added, '');
+    $mail = new mail('liamdawe@gmail.com', 'The GOG calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from GOG!<br />' . $games_added, '');
     $mail->send();
   }
 }

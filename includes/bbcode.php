@@ -165,7 +165,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $r
 	{
 		$find = "[img]tagline-image[/img]";
 
-		$replace = "<img itemprop=\"image\" src=\"" . core::config('webwebsite_url') . "uploads/articles/tagline_images/$tagline_image\" class=\"img-responsive\" alt=\"tagline-image\" />";
+		$replace = "<img itemprop=\"image\" src=\"" . core::config('website_url') . "uploads/articles/tagline_images/$tagline_image\" class=\"img-responsive\" alt=\"tagline-image\" />";
 
 		$body = str_replace($find, $replace, $body);
 	}

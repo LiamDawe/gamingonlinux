@@ -68,6 +68,8 @@ foreach ($articles as $line)
 		$tagline_bbcode = ""; //Piratelv @ 05/06/14 -- Some older articles didn't have this
 	}
 
+	$line['text'] = rss_stripping($line['text']);
+
 	$line['text'] = bbcode($line['text'], 1, 1, $tagline_bbcode, 1);
 
 	$title = str_replace("&#039;", '\'', $line['title']);

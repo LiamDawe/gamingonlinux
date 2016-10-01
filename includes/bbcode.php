@@ -535,4 +535,18 @@ function email_bbcode($body)
 
 	return $body;
 }
+
+// remove bits to make sure RSS validates, and to make sure hidden bits don't become available to all
+function rss_stripping($text)
+{
+	$text = str_replace('<*PAGE*>', '', $text);
+
+	$text = preg_replace("/\[youtube\](.+?)\[\/youtube\]/is", '', $text);
+
+	$text = preg_replace("/\[timer=(.+?)](.+?)\[\/timer]/is", ' Visit <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a> to see the timer ', $text);
+
+	$text = preg_replace('/\[users-only\](.+?)\[\/users-only\]/is', ' Visit <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a> to see this bit, this is for logged in users only ', $text);
+
+	return $text;
+}
 ?>

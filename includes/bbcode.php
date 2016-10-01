@@ -165,7 +165,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $r
 	{
 		$find = "[img]tagline-image[/img]";
 
-		$replace = "<img itemprop=\"image\" src=\"" . core::config('website_url') . "uploads/articles/tagline_images/$tagline_image\" class=\"img-responsive\" alt=\"tagline-image\" />";
+		$replace = "<img itemprop=\"image\" src=\"" . core::config('webwebsite_url') . "uploads/articles/tagline_images/$tagline_image\" class=\"img-responsive\" alt=\"tagline-image\" />";
 
 		$body = str_replace($find, $replace, $body);
 	}
@@ -333,31 +333,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $r
 	'<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
 	);
 
-	$smilies = array(
-		":><:" => '<img src="/templates/default/images/emoticons/angry.png" data-sceditor-emoticon=":><:" alt="" />',
-		":&gt;&lt;:" => '<img src="/templates/default/images/emoticons/angry.png" data-sceditor-emoticon=":&gt;&lt;:" alt="" />', // for comments as they are made html-safe
-		":'(" => '<img src="/templates/default/images/emoticons/cry.png" data-sceditor-emoticon=":\'(" alt="" />', // for comments as they are made html-safe
-		":&#039;(" => '<img src="/templates/default/images/emoticons/cry.png" data-sceditor-emoticon=":&#039;(" alt="" />',
-		":dizzy:" => '<img src="/templates/default/images/emoticons/dizzy.png" data-sceditor-emoticon=":dizzy:" alt="" />',
-		":D" => '<img src="/templates/default/images/emoticons/grin.png" data-sceditor-emoticon=":D" alt="" />',
-		"^_^" => '<img src="/templates/default/images/emoticons/happy.png" data-sceditor-emoticon="^_^" alt="" />',
-		"<3" => '<img src="/templates/default/images/emoticons/heart.png" data-sceditor-emoticon="<3" alt="" />',
-		"&lt;3" => '<img src="/templates/default/images/emoticons/heart.png" data-sceditor-emoticon="&lt;3" alt="" />', // for comments as they are made html-safe
-		":huh:" => '<img src="/templates/default/images/emoticons/huh.png" data-sceditor-emoticon=":huh:" alt="" />',
-		":|" => '<img src="/templates/default/images/emoticons/pouty.png" data-sceditor-emoticon=":|" alt="" />',
-		":(" => '<img src="/templates/default/images/emoticons/sad.png" data-sceditor-emoticon=":(" alt=""/>',
-		":O" => '<img src="/templates/default/images/emoticons/shocked.png" data-sceditor-emoticon=":O" alt="" />',
-		":sick:" => '<img src="/templates/default/images/emoticons/sick.png" data-sceditor-emoticon=":sick:" alt="" />',
-		":)" => '<img src="/templates/default/images/emoticons/smile.png" data-sceditor-emoticon=":)" alt="" />',
-		":P" => '<img src="/templates/default/images/emoticons/tongue.png" data-sceditor-emoticon=":P" alt="" />',
-		":S:" => '<img src="/templates/default/images/emoticons/unsure.png" data-sceditor-emoticon=":S" alt="" />',
-		":woot:" => '<img src="/templates/default/images/emoticons/w00t.png" data-sceditor-emoticon=":woot:" alt="" />',
-		":whistle:" => '<img src="/templates/default/images/emoticons/whistle.png" data-sceditor-emoticon=":whistle:" alt="" />',
-		";)" => '<img src="/templates/default/images/emoticons/wink.png" data-sceditor-emoticon=";)" alt="" />',
-		":wub:" => '<img src="/templates/default/images/emoticons/wub.png" data-sceditor-emoticon=":wub:" alt="" />'
-	);
-
-	$body = str_replace( array_keys( $smilies ), array_values( $smilies ), $body );
+	$body = emoticons($body);
 
 	$body = preg_replace($find, $replace, $body);
 
@@ -460,25 +436,23 @@ function email_bbcode($body)
 	);
 
 	$replace = array(
-        "<a href=\"$1\" target=\"_blank\">$2</a>",
+  "<a href=\"$1\" target=\"_blank\">$2</a>",
 	"<a href=\"$1\" target=\"_blank\">$1</a>",
-        "<strong>$1</strong>",
-        "<em>$1</em>",
-        "<span style=\"text-decoration:underline;\">$1</span>",
-        "<del>$1</del>",
-        "$2",
-        "$2",
-        "<div style=\"text-align:center;\">$1</div>",
-        "<div style=\"text-align:right;\">$1</div>",
-        "<div style=\"text-align:left;\">$1</div>",
-	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>
-</iframe>",
-        "<img src=\"$1\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
-        "<img width=\"$1\" height=\"$2\" src=\"$3\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
-        "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
+  "<strong>$1</strong>",
+  "<em>$1</em>",
+  "<span style=\"text-decoration:underline;\">$1</span>",
+  "<del>$1</del>",
+  "$2",
+  "$2",
+  "<div style=\"text-align:center;\">$1</div>",
+  "<div style=\"text-align:right;\">$1</div>",
+  "<div style=\"text-align:left;\">$1</div>",
+	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>",
+  "<img src=\"$1\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
+  "<img width=\"$1\" height=\"$2\" src=\"$3\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
+  "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 	"<span style=\"text-decoration: line-through\">$1</span>",
-	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>
-</iframe>", // for xenforo videos
+	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>", // for xenforo videos
 	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>
 	</iframe>",
 	'<ul>$1</ul>',
@@ -494,31 +468,7 @@ function email_bbcode($body)
 	'SPOILER: View the website if you wish to see it.'
 	);
 
-	$smilies = array(
-	":><:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/angry.png" alt="" />',
-	":&gt;&lt;:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/angry.png" alt="" />', // for comments as they are made html-safe
-	":'(" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/cry.png" alt="" />', // for comments as they are made html-safe
-	":&#039;(" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/cry.png" alt="" />',
-	":dizzy:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/dizzy.png" alt="" />',
-	":D" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/grin.png" alt="" />',
-	"^_^" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/happy.png" alt="" />',
-	"<3" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/heart.png" alt="" />',
-	"&lt;3" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/heart.png" alt="" />', // for comments as they are made html-safe
-	":huh:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/huh.png" alt="" />',
-	":|" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/pouty.png" alt="" />',
-	":(" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/sad.png" alt=""/>',
-	":O" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/shocked.png" alt="" />',
-	":sick:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/sick.png" alt="" />',
-	":)" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/smile.png" alt="" />',
-	":P" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/tongue.png" alt="" />',
-	":S:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/unsure.png" alt="" />',
-	":woot:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/w00t.png" alt="" />',
-	":whistle:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/whistle.png" alt="" />',
-	";)" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/wink.png" alt="" />',
-	":wub:" => '<img src="http://www.gamingonlinux.com/templates/default/images/emoticons/wub.png" alt="" />'
-	);
-
-	$body = str_replace( array_keys( $smilies ), array_values( $smilies ), $body );
+	$body = emoticons($body);
 
 	$body = preg_replace($find, $replace, $body);
 
@@ -534,6 +484,37 @@ function email_bbcode($body)
 	$body = str_replace('</script><br />', '</script>', $body);
 
 	return $body;
+}
+
+function emoticons($text)
+{
+	$smilies = array(
+	":><:" => '<img src="'.core::config('webwebsite_url').'templates/default/images/emoticons/angry.png" alt="" />',
+	":&gt;&lt;:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/angry.png" alt="" />', // for comments as they are made html-safe
+	":'(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/cry.png" alt="" />', // for comments as they are made html-safe
+	":&#039;(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/cry.png" alt="" />',
+	":dizzy:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/dizzy.png" alt="" />',
+	":D" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/grin.png" alt="" />',
+	"^_^" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/happy.png" alt="" />',
+	"<3" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/heart.png" alt="" />',
+	"&lt;3" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/heart.png" alt="" />', // for comments as they are made html-safe
+	":huh:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/huh.png" alt="" />',
+	":|" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/pouty.png" alt="" />',
+	":(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/sad.png" alt=""/>',
+	":O" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/shocked.png" alt="" />',
+	":sick:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/sick.png" alt="" />',
+	":)" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/smile.png" alt="" />',
+	":P" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/tongue.png" alt="" />',
+	":S:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/unsure.png" alt="" />',
+	":woot:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/w00t.png" alt="" />',
+	":whistle:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/whistle.png" alt="" />',
+	";)" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/wink.png" alt="" />',
+	":wub:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/wub.png" alt="" />'
+	);
+
+	$text = str_replace( array_keys( $smilies ), array_values( $smilies ), $text );
+
+	return $text;
 }
 
 // remove bits to make sure RSS validates, and to make sure hidden bits don't become available to all

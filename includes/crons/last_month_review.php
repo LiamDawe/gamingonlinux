@@ -62,27 +62,6 @@ while ($articles = $db->fetch())
 	$text .= "<br /><em>{$articles['tagline']}</em><br /><br />";
 }
 
-// Latest sales box on the main page
-$sales = '<ul>';
-$sale_counter = 0;
-$db->sqlquery("SELECT s.`id`,s.`info`, s.`website`, s.`provider_id`, p.`name` FROM `game_sales` s LEFT JOIN `game_sales_provider` p ON s.provider_id = p.provider_id WHERE s.`accepted` = 1 ORDER BY s.`id` DESC LIMIT 10");
-while ($home_list = $db->fetch())
-{
-	$sale_counter++;
-	$sale_name = $home_list['info'];
-
-	// check to see if we need to put in the category name or not
-	$provider = '';
-	if ($home_list['provider_id'] != 0)
-	{
-		$provider = "<strong>{$home_list['name']}</strong>";
-	}
-
-	$sales .= "<li><a href=\"/sales/{$home_list['id']}\">{$provider} - {$sale_name}</a></li>";
-}
-$sales .= "</ul><br /><br />";
-
-$text .= "<br />Also remember to check out our [url=/sales/]Game Sales[/url] page where we syndicate game sales from GOG, Humble Store, Itch.io, IndieGameStand and many more stores!<br /><br />See the latest few sales here:<br />$sales";
 
 $text .= "<br />All of this is possible thanks to <a href=\"http://patreon.com/liamdawe\">my Patreon campaign</a>, and our Supporters!<br />";
 

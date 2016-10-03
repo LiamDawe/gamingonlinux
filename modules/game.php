@@ -134,7 +134,7 @@ if (isset($_GET['game-id']))
 		if ($db->num_rows() > 0)
 		{
 			$article_list = '';
-			$templating->block('articles');
+			$templating->block('articles', 'game_database');
 			while ($articles = $db->fetch())
 			{
 				if (core::config('pretty_urls') == 1)

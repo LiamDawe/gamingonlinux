@@ -1,10 +1,13 @@
 <?php
-$templating->set_previous('title', 'Search linux gaming articles', 1);
-$templating->set_previous('meta_description', 'Search for Linux gaming articles on GamingOnLinux.com', 1);
-
 $templating->merge('search');
-$templating->block('top');
-$templating->set('url', core::config('website_url'));
+if (!isset($_GET['author_id']))
+{
+	$templating->set_previous('title', 'Search linux gaming articles', 1);
+	$templating->set_previous('meta_description', 'Search for Linux gaming articles on GamingOnLinux.com', 1);
+
+	$templating->block('top');
+	$templating->set('url', core::config('website_url'));
+}
 
 $search_text = '';
 if (isset($_GET['q']))
@@ -14,7 +17,7 @@ if (isset($_GET['q']))
 }
 $templating->set('search_text', $search_text);
 
-if (!isset($_GET['q']))
+if (!isset($_GET['q']) && !isset($_GET['author_id']))
 {
 	$templating->merge('articles');
 	$templating->block('multi', 'articles');
@@ -112,6 +115,22 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 	// do the search query
 	$db->sqlquery("SELECT a.article_id, a.`title`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start), 'search.php');
 	$found_search = $db->fetch_all_rows();
+
+	$templating->set_previous('title', 'Viewing articles by ' . $found_search[0]['username'], 1);
+	$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $found_search[0]['username'], 1);
+
+	$templating->block('author_top');
+	$templating->set('username', $found_search[0]['username']);
+
+	if (core::config('pretty_urls') == 1)
+	{
+		$profile_link = core::config('website_url') . 'profiles/' . $found_search[0]['author_id'];
+	}
+	else
+	{
+		$profile_link = core::config('website_url') . 'index.php?module=profile&user_id=' . $found_search[0]['author_id'];
+	}
+	$templating->set('profile_link', $profile_link);
 
 	// loop through results
 	foreach ($found_search as $found)

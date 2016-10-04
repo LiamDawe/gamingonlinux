@@ -132,7 +132,7 @@ if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
 $templating->block('left', 'mainpage');
 
 // so mainpage.html knows to put "articles" class in the left block or not
-if ($module == 'home' || ($module == 'articles' && isset($_GET['view']) && $_GET['view'] == 'cat'))
+if ($module == 'home' || ($module == 'articles' && isset($_GET['view']) && $_GET['view'] == 'cat' || $_GET['view'] == 'multiple'))
 {
 	$articles_css = 'articles';
 }

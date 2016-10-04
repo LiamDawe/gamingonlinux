@@ -14,6 +14,27 @@ if (isset($_GET['q']))
 }
 $templating->set('search_text', $search_text);
 
+if (!isset($_GET['q']))
+{
+	$templating->merge('articles');
+	$templating->block('multi', 'articles');
+
+	$templating->block('articles_top', 'articles');
+	$options = '';
+	$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
+	while ($get_cats = $db->fetch())
+	{
+		$options .= '<option value="'.$get_cats['category_id'].'">'.$get_cats['category_name'].'</option>';
+	}
+	$templating->set('options', $options);
+
+	$all_check = '';
+	$any_check = 'checked';
+
+	$templating->set('any_check', $any_check);
+	$templating->set('all_check', $all_check);
+}
+
 $search_array = array(explode(" ", $search_text));
 $search_through = '';
 foreach ($search_array[0] as $item)

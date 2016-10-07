@@ -224,6 +224,19 @@ if (!isset($_POST['act']))
 
 	$machine_options = '<option value="Desktop" '.$desktop.'>Desktop</option><option value="Laptop" '.$laptop.'>Laptop</option><option value="Sofa/Console PC" '.$sofa.'>Sofa/Console PC</option>';
 	$templating->set('machine_options', $machine_options);
+
+	$gamepad_options = '';
+	$gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Other");
+	foreach ($gamepads as $gamepad)
+	{
+		$selected = '';
+		if ($additional['gaming_machine_type'] == $gamepad)
+		{
+			$selected = 'selected';
+		}
+		$gamepad_options .= '<option value="gamepad" '.$selected.'>'.$gamepad.'</option>';
+	}
+	$templating->set('gamepad_options', $gamepad_options);
 }
 else if (isset($_POST['act']))
 {
@@ -250,7 +263,8 @@ else if (isset($_POST['act']))
 			$_POST['ram_count'],
 			$_POST['monitor_count'],
 			$_POST['resolution'],
-			$_POST['gaming_machine_type']);
+			$_POST['gaming_machine_type'],
+			$_POST['gamepad']);
 		foreach ($pc_info_fields as $field)
 		{
 			if (isset($field) && !empty($field) && $field != 'Not Listed')
@@ -274,6 +288,7 @@ else if (isset($_POST['act']))
 		`monitor_count` = ?,
 		`resolution` = ?,
 		`gaming_machine_type` = ?,
+		`gamepad` = ?,
 		`date_updated` = ?
 		WHERE
 		`user_id` = ?";
@@ -290,6 +305,7 @@ else if (isset($_POST['act']))
 		$_POST['monitor_count'],
 		$_POST['resolution'],
 		$_POST['gaming_machine_type'],
+		$_POST['gamepad'],
 		gmdate("Y-n-d H:i:s"),
 		$_SESSION['user_id']));
 

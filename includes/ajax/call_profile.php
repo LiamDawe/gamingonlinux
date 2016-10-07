@@ -15,7 +15,7 @@ $templating = new template('default');
 
 if(isset($_GET['user_id']))
 {
-  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, u.`distro`, p.`desktop_environment`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`dual_boot` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
+  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, u.`distro`, p.`desktop_environment`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`dual_boot`, p.`gamepad` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
   if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -145,6 +145,14 @@ if(isset($_GET['user_id']))
         $counter++;
       }
       $templating->set('gaming_machine_type', $gaming_machine_type);
+
+      $gamepad = '';
+      if ($grab_fields['gamepad'] != NULL && !empty($grab_fields['gamepad']))
+      {
+        $gamepad = '<li><strong>Gamepad:</strong> '.$grab_fields['gamepad'].'</li>';
+        $counter++;
+      }
+      $templating->set('gamepad', $gamepad);
 
       $additional_empty = '';
       if ($counter == 0)

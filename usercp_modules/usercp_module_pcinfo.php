@@ -36,7 +36,7 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('distro_list', $distro_list);
 
-	$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$additional = $db->fetch();
 
 	// Desktop environment
@@ -230,11 +230,11 @@ if (!isset($_POST['act']))
 	foreach ($gamepads as $gamepad)
 	{
 		$selected = '';
-		if ($additional['gaming_machine_type'] == $gamepad)
+		if ($additional['gamepad'] == $gamepad)
 		{
 			$selected = 'selected';
 		}
-		$gamepad_options .= '<option value="gamepad" '.$selected.'>'.$gamepad.'</option>';
+		$gamepad_options .= '<option value="'.$gamepad.'" '.$selected.'>'.$gamepad.'</option>';
 	}
 	$templating->set('gamepad_options', $gamepad_options);
 }

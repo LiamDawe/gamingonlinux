@@ -141,7 +141,7 @@ if (isset($_GET['user_id']))
 			// additional profile info
 			if ($profile['pc_info_public'] == 1)
 			{
-				$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `dual_boot` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
+				$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `dual_boot`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
 
 				$counter = 0;
 				$templating->block('additional');
@@ -251,6 +251,14 @@ if (isset($_GET['user_id']))
 						$counter++;
 					}
 					$templating->set('gaming_machine_type', $gaming_machine_type);
+
+					$gamepad = '';
+					if ($additionaldb['gamepad'] != NULL && !empty($additionaldb['gamepad']))
+					{
+						$gamepad = '<li><strong>Gamepad:</strong> '.$additionaldb['gamepad'].'</li>';
+						$counter++;
+					}
+					$templating->set('gamepad', $gamepad);
 				}
 				$additional_empty = '';
 				if ($counter == 0)

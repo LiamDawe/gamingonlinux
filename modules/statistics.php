@@ -38,7 +38,8 @@ $charts = array(
   array("name" => "RAM"),
   array("name" => "Monitors"),
   array("name" => "Resolution"),
-  array("name" => "Main Gaming Machine")
+  array("name" => "Main Gaming Machine"),
+  array("name" => "Main Gamepad")
 );
 
 $counter = 0;

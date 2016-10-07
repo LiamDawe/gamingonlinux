@@ -94,7 +94,8 @@ $charts = array (
 	array ("name" => "RAM", "db_field" => "ram_count"),
 	array ("name" => "Monitors", "db_field" => "monitor_count"),
 	array ("name" => "Resolution", "db_field" => "resolution"),
-	array ("name" => "Main Gaming Machine", "db_field" => "gaming_machine_type")
+	array ("name" => "Main Gaming Machine", "db_field" => "gaming_machine_type"),
+  array ("name" => "Main Gamepad", "db_field" => "gamepad")
 );
 
 foreach ($charts as $chart)

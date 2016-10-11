@@ -1,6 +1,4 @@
 <?php
-header('Content-Type: image/png');
-
 include('includes/config.php');
 
 include('includes/class_mysql.php');
@@ -17,36 +15,42 @@ if ($public['pc_info_public'] == 1)
   $db->sqlquery("SELECT u.`distro`, u.`username`, i.`desktop_environment`, i.`what_bits`, i.`gpu_vendor`, i.`gpu_model` FROM `users` u LEFT JOIN `user_profile_info` i ON u.user_id = i.user_id WHERE u.`user_id` = ?", array($_GET['id']));
   $user_info = $db->fetch();
 
-  $base = imagecreatefrompng('templates/default/images/signature.png');
+  $base_image = imagecreatefrompng('templates/default/images/signature.png');
 
-  $distro_image = 'linux_icon';
+  $distro_image_picker = 'linux_icon';
   if (!empty($user_info['distro']))
   {
-    $distro_image = $user_info['distro'];
+    $distro_image_picker = $user_info['distro'];
   }
-  $distro = imagecreatefrompng('templates/default/images/distros/' . $user_info['distro'] . '.png');
 
-  imagecopy($base, $distro, (imagesx($base)/2)-(imagesx($distro)/2), (imagesy($base)/2)-(imagesy($distro)/2), 0, 0, imagesx($distro), imagesy($distro));
+  $distro = @imagecreatefrompng('templates/default/images/distros/' . $distro_image_picker . '.png');
 
-  $white_colour = imagecolorallocate($base, 255, 255, 255);
-  $width = imagesx($base);
-  $height = imagesy($base);
+  if (!$distro)
+  {
+    die('Couldn\'t find your distro image');
+  }
+
+  imagecopy($base_image, $distro, (imagesx($base_image)/2)-(imagesx($distro)/2), (imagesy($base_image)/2)-(imagesy($distro)/2), 0, 0, imagesx($distro), imagesy($distro));
+
+  $text_colour = imagecolorallocate($base_image, 0, 0, 0);
+  $width = imagesx($base_image);
+  $height = imagesy($base_image);
   $font = 4;
 
   $username = $user_info['username'];
 
-  $distro = '';
+  $desktop_text = '';
   if (!empty($user_info['distro']))
   {
-    $distro = $user_info['distro'];
+    $desktop_text = $user_info['distro'];
     if (!empty($user_info['desktop_environment']))
     {
-      $distro .= ':' . $user_info['desktop_environment'];
+      $desktop_text .= ':' . $user_info['desktop_environment'];
     }
 
     if (!empty($user_info['what_bits']))
     {
-      $distro .= ':' . $user_info['what_bits'];
+      $desktop_text .= ':' . $user_info['what_bits'];
     }
   }
 
@@ -63,32 +67,12 @@ if ($public['pc_info_public'] == 1)
   // calculate the left position of the text:
   //$leftTextPos = ( $width - imagefontwidth($font)*strlen($text) )/2;
   // finally, write the string:
-  imagestring($base, $font, 1, $height-60, $username, $white_colour);
-  imagestring($base, $font, 1, $height-45, $distro, $white_colour);
-  imagestring($base, $font, 1, $height-30, $gpu, $white_colour);
+  imagestring($base_image, $font, 1, $height-70, $username, $text_colour);
+  imagestring($base_image, $font, 1, $height-45, $desktop_text, $text_colour);
+  imagestring($base_image, $font, 1, $height-20, $gpu, $text_colour);
+  imagestring($base_image, $font, 260, $height-20, "GamingOnLinux.com", $text_colour);
 
-  imagepng($base);
-
-/*
-  $img = imagecreatefrompng('templates/default/images/distros/' . $user_info['distro'] . '.png');
-
-  $white_colour = imagecolorallocate($img, 255, 255, 255);
-  $black = imagecolorallocate($im, 0, 0, 0);
-
-  $width = imagesx($img);
-  $height = imagesy($img);
-
-  // now we want to write in the centre of the rectangle:
-  $font = 4; // store the int ID of the system font we're using in $font
-  $text = $user_info['username']; // store the text we're going to write in $text
-  // calculate the left position of the text:
-  $leftTextPos = ( $width - imagefontwidth($font)*strlen($text) )/2;
-  // finally, write the string:
-  imagestring($img, $font, $leftTextPos, $height-18, $text, $white_colour);
-
-  // draw a black rectangle across the bottom, say, 20 pixels of the image:
-  imagefilledrectangle($img, 0, ($height+200) , $width, $height, $black);
-
-  imagepng($img);*/
+  header('Content-Type: image/png');
+  imagepng($base_image);
 }
 ?>

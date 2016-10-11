@@ -8,56 +8,7 @@ else
 {
 	$templating->merge('viewtopic');
 
-	if (isset($_GET['view']) && $_GET['view'] == 'reporttopic')
-	{
-		// first check it's not already reported
-		$db->sqlquery("SELECT `reported` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-		$check_report = $db->fetch();
-		// send them back
-		if ($check_report['reported'] == 1)
-		{
-			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
-		}
-
-		// do the report if it isn't already
-		else
-		{
-			// update admin notifications
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `topic_id` = ?", array("{$_SESSION['username']} reported a forum topic.", core::$date, $_GET['topic_id']));
-
-			// give it a report
-			$db->sqlquery("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
-
-			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
-		}
-	}
-
-
-	else if (isset($_GET['view']) && $_GET['view'] == 'reportreply')
-	{
-		// first check it's not already reported
-		$db->sqlquery("SELECT `reported` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-		$check_report = $db->fetch();
-		// send them back
-		if ($check_report['reported'] == 1)
-		{
-			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
-		}
-
-		// do the report if it isn't already
-		else
-		{
-			// update admin notifications
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `reply_id` = ?", array("{$_SESSION['username']} reported a forum topic reply.", core::$date, $_GET['post_id']));
-
-			// give it a report
-			$db->sqlquery("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));
-
-			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
-		}
-	}
-
-	else if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
+	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
 	{
 		if ($user->check_group(1,2) == true)
 		{
@@ -503,7 +454,7 @@ else
 					$user_options = '';
 					if ($_SESSION['user_id'] != 0)
 					{
-						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=viewtopic&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$topic['username']."\" data-comment=\"".htmlspecialchars($topic['topic_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
+						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$topic['username']."\" data-comment=\"".htmlspecialchars($topic['topic_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
 					}
 					$templating->set('user_options', $user_options);
 				}
@@ -687,7 +638,7 @@ else
 						$user_options = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=viewtopic&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$post['username']."\" data-comment=\"".htmlspecialchars($post['reply_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
+							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$post['username']."\" data-comment=\"".htmlspecialchars($post['reply_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
 						}
 						$templating->set('user_options', $user_options);
 

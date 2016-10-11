@@ -124,11 +124,6 @@ if (!isset($_POST['act']))
 	{
 		$prop = 'selected';
 	}
-	$hybrid = '';
-	if ($additional['gpu_driver'] == 'Hybrid Driver')
-	{
-		$hybrid = 'selected';
-	}
 	$gpu_driver = '<option value="Open Source" '.$open.'>Open Source</option><option value="Proprietary" '.$prop.'>Proprietary</option>';
 	$templating->set('gpu_driver', $gpu_driver);
 

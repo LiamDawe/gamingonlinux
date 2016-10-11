@@ -11,20 +11,22 @@ else
 	if (!isset($_POST['act']) && isset($_GET['view']))
 	{
 		if ($_GET['view'] == 'add')
-		{	
-			$templating->block('add');
-		
+		{
+			$templating->block('add', 'admin_modules/admin_module_blocks');
+			$core->editor('text', '', 1);
+			$templating->block('add_bottom', 'admin_modules/admin_module_blocks');
+
 			if (!isset($_GET['usercp']))
 			{
 				$templating->set('type', '');
 			}
-		
+
 			else
 			{
 				$templating->set('type', 'usercp');
 			}
 		}
-	
+
 		if ($_GET['view'] == 'manage')
 		{
 			$templating->block('manage_top');
@@ -32,72 +34,75 @@ else
 			{
 				$templating->set('type', '');
 			}
-		
+
 			else
 			{
 				$templating->set('type', 'usercp');
 			}
-		
+
 			if (!isset($_GET['usercp']))
 			{
-				$get_blocks = $db->sqlquery("SELECT * FROM `blocks`");
+				$get_blocks = $db->sqlquery("SELECT * FROM `blocks` ORDER BY `order` ASC");
 			}
-		
+
 			else
 			{
-				$get_blocks = $db->sqlquery("SELECT * FROM `usercp_blocks`");
+				$get_blocks = $db->sqlquery("SELECT * FROM `usercp_blocks` ORDER BY `order` ASC");
 			}
-		
+
 			while ($blocks = $db->fetch($get_blocks))
 			{
 				if ($blocks['block_link'] != NULL)
 				{
 					$templating->block('normal_row');
-				
+
 					if (!isset($_GET['usercp']))
 					{
 						$templating->set('type', '');
 					}
-		
+
 					else
 					{
 						$templating->set('type', '&amp;usercp');
 					}
-	
+
 					$templating->set('block_name', $blocks['block_name']);
 					$templating->set('block_title', $blocks['block_title']);
 					$templating->set('link', $blocks['block_title_link']);
 					$templating->set('block_link', $blocks['block_link']);
-				
+
 					$checked = '';
 					if ($blocks['activated'] == 1)
 					{
 						$checked = 'checked';
 					}
-				
+
 					$templating->set('checked', $checked);
-				
+
 					$templating->set('block_id', $blocks['block_id']);
 				}
-			
+
 				else
 				{
-					$templating->block('custom_row');
-				
+					$templating->block('custom_row', 'admin_modules/admin_module_blocks');
+
 					if (!isset($_GET['usercp']))
 					{
 						$templating->set('type', '');
 					}
-		
+
 					else
 					{
 						$templating->set('type', '&amp;usercp');
 					}
-				
+
 					$templating->set('block_name', $blocks['block_name']);
 					$templating->set('block_title', $blocks['block_title']);
 					$templating->set('link', $blocks['block_title_link']);
-					$templating->set('block_text', $blocks['block_custom_content']);
+
+					$core->editor('text', $blocks['block_custom_content'], 1);
+
+					$templating->block('custom_row_bottom', 'admin_modules/admin_module_blocks');
 
 					$block_selected = '';
 					if ($blocks['style'] == 'block')
@@ -113,13 +118,13 @@ else
 
 					$options = "<option value=\"block\" $block_selected>Standard style</option><option value=\"block_plain\" $block_plain>No style</option>";
 					$templating->set('options', $options);
-				
+
 					$checked = '';
 					if ($blocks['activated'] == 1)
 					{
 						$checked = 'checked';
 					}
-				
+
 					$templating->set('checked', $checked);
 
 					$nonpremium = '';
@@ -133,9 +138,9 @@ else
 					{
 						$homepage = 'checked';
 					}
-				
+
 					$templating->set('homepage_check', $homepage);
-				
+
 					$templating->set('block_id', $blocks['block_id']);
 				}
 			}
@@ -146,8 +151,8 @@ else
 	{
 		if ($_POST['act'] == 'Add')
 		{
-			$title = $_POST['title'];
-			$text = $_POST['text'];
+			$title = trim($_POST['title']);
+			$text = trim($_POST['text']);
 
 			// check empty
 			if (empty($_POST['name']) || empty($text))
@@ -177,7 +182,7 @@ else
 				{
 					$homepage = 1;
 				}
-			
+
 				// check if its a main or usercp block
 				$type = '';
 				if ($_POST['type'] == 'usercp')
@@ -185,20 +190,26 @@ else
 					$type = 'usercp_';
 				}
 
+				// get last order
+				$db->sqlquery("SELECT `order` FROM `blocks` ORDER BY `order` DESC LIMIT 1");
+				$get_order = $db->fetch();
+
+				$new_order = $get_order['order'] + 1;
+
 				// create block
-				$db->sqlquery("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `activated` = ?, `block_custom_content` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ?", array($_POST['name'], $title, $_POST['link'], $activated, $text, $_POST['style'], $nonpremium, $homepage));
-		
+				$db->sqlquery("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `activated` = ?, `block_custom_content` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ?, `order` = ?", array($_POST['name'], $title, $_POST['link'], $activated, $text, $_POST['style'], $nonpremium, $homepage, $new_order));
+
 				$core->message('You have succesfully made the new block! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=add">Create another block</a>?');
 			}
 		}
-		
+
 		if ($_POST['act'] == 'addmain')
 		{
 			if (empty($_POST['name']) || empty($_POST['file']))
 			{
 				$core->message("You have to fill in a title and filename!", NULL, 1);
 			}
-			
+
 			else
 			{
 				// check if activated
@@ -207,41 +218,41 @@ else
 				{
 					$activated = 1;
 				}
-				
+
 				// check if its a main or usercp block
 				$type = '';
 				if ($_POST['type'] == 'usercp')
 				{
 					$type = 'usercp_';
 				}
-				
+
 				// get last in order to add 1
 				$db->sqlquery("SELECT `order` FROM `{$type}blocks` ORDER BY `order` DESC LIMIT 1");
 				$order = $db->fetch();
-				
+
 				$new_order = $order['order'] + 1;
 
 				// create block
 				$db->sqlquery("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_link` = ?, `activated` = ?, `order` = ?", array($_POST['name'], $type . "block_" . $_POST['file'], $activated, $new_order));
-		
+
 				$core->message("You have succesfully added the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage&{$_POST['type']}\">Manage blocks</a>?");
 			}
 		}
-	
+
 		if ($_POST['act'] == 'Update')
 		{
 			if ($_POST['type'] == 'normal')
 			{
 				// make safe
 				$name = $_POST['name'];
-				$title = $_POST['title']; 
+				$title = $_POST['title'];
 				$id = $_POST['block_id'];
 
 				if (!is_numeric($id))
 				{
 					$core->message("Block ID was not a number!");
 				}
-			
+
 				// check empty
 				else if (empty($name) || empty($title) || empty($_POST['filename']))
 				{
@@ -255,7 +266,7 @@ else
 					{
 						$activated = 1;
 					}
-				
+
 					// Check if it's a user control panel block or not
 					$usercp = '';
 					$usercp_link = '';
@@ -264,25 +275,25 @@ else
 						$usercp = 'usercp_';
 						$usercp_link = '&amp;usercp';
 					}
-			
+
 					// update
 					$db->sqlquery("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_link` = ?, `activated` = ? WHERE `block_id` = ?", array($name, $title, $_POST['link'], $_POST['filename'], $activated, $id));
-			
+
 					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
 				}
 			}
-		
+
 			if ($_POST['type'] == 'custom')
 			{
-				$title = $_POST['title'];
-				$text = $_POST['block_text']; 
+				$title = trim($_POST['title']);
+				$text = trim($_POST['text']);
 				$id = $_POST['block_id'];
 
 				if (!is_numeric($id))
 				{
-					$core->message("Block ID was not a number!");
+					$core->message("Block ID was not a number! This is likely an error, let Liam know!");
 				}
-			
+
 				// check empty
 				else if (empty($_POST['name']) || empty($text))
 				{
@@ -310,7 +321,7 @@ else
 					{
 						$homepage = 1;
 					}
-				
+
 					// Check if it's a user control panel block or not
 					$usercp = '';
 					$usercp_link = '';
@@ -319,15 +330,15 @@ else
 						$usercp = 'usercp_';
 						$usercp_link = '&amp;usercp';
 					}
-			
+
 					// update
 					$db->sqlquery("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_custom_content` = ?, `activated` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ? WHERE `block_id` = ?", array($_POST['name'], $title, $_POST['link'], $text, $activated, $_POST['style'], $nonpremium, $homepage, $id));
-			
-					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");		
+
+					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
 				}
 			}
 		}
-		
+
 		if ($_POST['act'] == 'Delete')
 		{
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
@@ -338,7 +349,7 @@ else
 				{
 					$usercp = "&amp;usercp";
 				}
-			
+
 				$core->yes_no('Are you sure you want to delete that block?', "admin.php?module=blocks&amp;block_id={$_POST['block_id']}{$usercp}", "Delete");
 			}
 
@@ -355,14 +366,14 @@ else
 				{
 					$usercp = "usercp_";
 				}
-			
+
 				// check id is set
 				$id = $_GET['block_id'];
 				if (!is_numeric($id))
 				{
 					$core->message('That is not a correct id!');
 				}
-			
+
 				else
 				{
 					// check block exists
@@ -378,7 +389,7 @@ else
 						$db->sqlquery("DELETE FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id));
 
 						$core->message('That block has now been deleted! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=manage">Manage another block</a>?');
-					}			
+					}
 				}
 			}
 		}

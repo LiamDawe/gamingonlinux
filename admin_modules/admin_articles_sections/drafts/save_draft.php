@@ -26,11 +26,8 @@ if (isset($_POST['games']))
 	}
 }
 
-// check if they are subscribing
-if (isset($_POST['subscribe']))
-{
-	$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $article_id));
-}
+// force subscribe, so they don't lose editors comments
+$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
 
 // update any uploaded images to have this article id, stop any images not being attached to an article
 if (isset($_SESSION['uploads']))

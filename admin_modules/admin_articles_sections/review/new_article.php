@@ -106,11 +106,8 @@ else
 		}
 	}
 
-	// check if they are subscribing
-	if (isset($_POST['subscribe']))
-	{
-		$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $article_id));
-	}
+	// force subscribe, so they don't lose editors comments
+	$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
 
 	// upload tagline image
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

@@ -54,7 +54,7 @@ if (!isset($_GET['view']))
 		while ($announcement = $db->fetch())
 		{
 			$templating->block('announcement', 'home');
-			$templating->set('text', $announcement['text']);
+			$templating->set('text', bbcode($announcement['text']));
 		}
 
 		$templating->block('announcement_bottom', 'home');

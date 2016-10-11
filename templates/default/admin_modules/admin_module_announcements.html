@@ -1,0 +1,30 @@
+[block: add]
+				<div class="box">
+					<div class="head">Add a new announcement here.</div>
+					<div class="body group">Announcements are show in coloured boxes above the news on the homepage.</div>
+				</div>
+[/block: add]
+
+[block: manage]
+				<div class="box">
+					<div class="head">Manage existing announcements here.</div>
+				</div>
+[/block: manage]
+
+[block: row]
+<div class="box">
+	<div class="body group"><form method="post">Announcement text:<br />
+[/block: row]
+
+[block: bottom_add]
+		<button type="submit" formaction="/admin.php?module=announcements" name="act" value="add">Add</button></form>
+	</div>
+</div>
+[/block: bottom_add]
+
+[block: bottom_edit]
+		<input type="hidden" name="id" value="{:id}" />
+		<button type="submit" formaction="/admin.php?module=announcements" name="act" value="edit">Edit</button> <button type="submit" formaction="/admin.php?module=announcements" name="act" value="delete">Delete</button></form>
+	</div>
+</div>
+[/block: bottom_edit]

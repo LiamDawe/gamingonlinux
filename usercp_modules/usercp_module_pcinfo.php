@@ -66,23 +66,17 @@ if (!isset($_POST['act']))
 	$what_bits_options = '<option value="32bit" ' . $arc_32 . '>32bit</option><option value="64bit" '.$arc_64.'>64bit</option>';
 	$templating->set('what_bits_options', $what_bits_options);
 
-	$windows = '';
-	$mac = '';
-	$nope = '';
-	if ($additional['dual_boot'] == 'Yes Windows')
+	$dual_boot_options = '';
+	$systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other", "No");
+	foreach ($systems as $system)
 	{
-		$windows = 'selected';
+		$selected = '';
+		if ($additional['dual_boot'] == $system)
+		{
+			$selected = 'selected';
+		}
+		$dual_boot_options .= '<option value="'.$system.'" '.$selected.'>'.$system.'</option>';
 	}
-	if ($additional['dual_boot'] == 'Yes Mac')
-	{
-		$mac = 'selected';
-	}
-	if ($additional['dual_boot'] == 'No')
-	{
-		$nope = 'selected';
-	}
-
-	$dual_boot_options = '<option value="Yes Windows" '.$windows.'>Yes With Windows</option><option value="Yes Mac" '.$mac.'>Yes With Mac</option><option value="No" '.$nope.'>No</option>';
 	$templating->set('dual_boot_options', $dual_boot_options);
 
 	$intel = '';

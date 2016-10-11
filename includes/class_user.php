@@ -14,15 +14,10 @@ class user
 		if ($db->num_rows() > 0)
 		{
 			$info = $db->fetch();
-			$old_safe_password = hash('sha256', $info['password_salt'] . $password);
 
 			if (password_verify($password, $info['password']))
 			{
 				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
-			}
-			else
-			{
-				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?) AND `password` = ?", array($username, $username, $old_safe_password));
 			}
 
 			if ($db->num_rows() == 1)

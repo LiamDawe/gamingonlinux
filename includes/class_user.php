@@ -18,42 +18,42 @@ class user
 			if (password_verify($password, $info['password']))
 			{
 				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
-			}
 
-			if ($db->num_rows() == 1)
-			{
-				$user = $db->fetch();
-
-				// sort old passwords to new
-				$old_password = hash('sha256', $info['password_salt'] . $password);
-				if ($old_password[0] != '$')
+				if ($db->num_rows() == 1)
 				{
-						$new_password_hash = password_hash($password, PASSWORD_BCRYPT);
+					$user = $db->fetch();
 
-						$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_hash, $user['user_id']));
+					// sort old passwords to new
+					$old_password = hash('sha256', $info['password_salt'] . $password);
+					if ($old_password[0] != '$')
+					{
+							$new_password_hash = password_hash($password, PASSWORD_BCRYPT);
+
+							$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_hash, $user['user_id']));
+					}
+
+					$this->check_banned($user);
+
+					$generated_session = md5(mt_rand() . $user['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
+					// update IP address and last login
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']));
+
+					$this->register_session($user, $generated_session);
+
+					if ($remember_username == 1)
+					{
+						setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
+					}
+
+					if ($stay == 1)
+					{
+						setcookie('gol_stay', $user['user_id'], time()+31556926, '/', core::config('cookie_domain'));
+						setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
+					}
+
+					return true;
 				}
-
-				$this->check_banned($user);
-
-				$generated_session = md5(mt_rand() . $user['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
-				// update IP address and last login
-				$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']));
-
-				$this->register_session($user, $generated_session);
-
-				if ($remember_username == 1)
-				{
-					setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
-				}
-
-				if ($stay == 1)
-				{
-					setcookie('gol_stay', $user['user_id'], time()+31556926, '/', core::config('cookie_domain'));
-					setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
-				}
-
-				return true;
 			}
 
 			else

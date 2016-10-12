@@ -179,6 +179,7 @@ else
 		unset($_SESSION['atagline']);
 		unset($_SESSION['atext']);
 		unset($_SESSION['acategories']);
+		unset($_SESSION['agame']);
 		unset($_SESSION['tagerror']);
 		unset($_SESSION['uploads']);
 		unset($_SESSION['image_rand']);

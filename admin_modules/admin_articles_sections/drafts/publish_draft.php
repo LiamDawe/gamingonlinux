@@ -152,44 +152,44 @@ else
 
 		$title = strip_tags($_POST['title']);
 
-		$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `tagline_image` = ?", array($_SESSION['user_id'], $title, $slug, $tagline, $text, $block, core::$date, $draft_tagline['tagline_image']));
+		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 
 		$article_id = $db->grab_id();
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array(core::$date, "{$_SESSION['username']} published a new article.", core::$date, $article_id));
 
-
-		// upload attached images
 		if (isset($_SESSION['uploads']))
 		{
 			foreach($_SESSION['uploads'] as $key)
 			{
-				$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
+				$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
 			}
 		}
 
-		// process category tags
+		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+
 		if (isset($_POST['categories']))
 		{
 			foreach($_POST['categories'] as $category)
 			{
-				$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
+				$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
 			}
 		}
 
 		// process game associations
+		$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
+
 		if (isset($_POST['games']))
 		{
 			foreach($_POST['games'] as $game)
 			{
-				$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
+				$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
 			}
 		}
 
-		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{
-			$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
+			$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
 		}
 
 		// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)

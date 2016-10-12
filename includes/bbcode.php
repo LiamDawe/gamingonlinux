@@ -489,7 +489,7 @@ function email_bbcode($body)
 function emoticons($text)
 {
 	$smilies = array(
-	":><:" => '<img src="'.core::config('webwebsite_url').'templates/default/images/emoticons/angry.png" alt="" />',
+	":><:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/angry.png" alt="" />',
 	":&gt;&lt;:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/angry.png" alt="" />', // for comments as they are made html-safe
 	":'(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/cry.png" alt="" />', // for comments as they are made html-safe
 	":&#039;(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/cry.png" alt="" />',

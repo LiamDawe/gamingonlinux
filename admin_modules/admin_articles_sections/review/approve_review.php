@@ -114,6 +114,7 @@ else
 			$block = 1;
 		}
 
+		// clean up subscriptions from admin comments
 		if ($_SESSION['user_id'] == $_POST['author_id'])
 		{
 			$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));

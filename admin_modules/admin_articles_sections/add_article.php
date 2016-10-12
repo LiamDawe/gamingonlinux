@@ -9,14 +9,15 @@ if (!empty($_POST['temp_tagline_image']))
 $db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
 $editor_pick_count = $db->num_rows();
 
-$draft_tagline['tagline_image'] = '';
-if ($_POST['check'] == 'Draft')
+// check its set, if not hard-set it based on the article title
+if (isset($_POST['slug']) && !empty($_POST['slug']))
 {
-	$db->sqlquery("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-	$draft_tagline = $db->fetch();
+	$slug = $core->nice_title($_POST['slug']);
 }
-
-$slug = trim($_POST['slug']);
+else
+{
+	$slug = $core->nice_title($_POST['title']);
+}
 
 // make sure its not empty
 if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) || empty($slug))
@@ -28,15 +29,7 @@ if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) 
 	$_SESSION['acategories'] = $_POST['categories'];
 	$_SESSION['agames'] = $_POST['games'];
 
-	if ($_POST['check'] == 'Draft')
-	{
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline";
-	}
-
-	else
-	{
-		$url = "admin.php?module=articles&view=add&error=empty&temp_tagline=$temp_tagline";
-	}
+	$url = "admin.php?module=articles&view=add&error=empty&temp_tagline=$temp_tagline";
 
 	header("Location: $url");
 	die();
@@ -52,15 +45,7 @@ else if (strlen($_POST['tagline']) < 100)
 	$_SESSION['acategories'] = $_POST['categories'];
 	$_SESSION['agames'] = $_POST['games'];
 
-	if ($_POST['check'] == 'Draft')
-	{
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline";
-	}
-
-	else
-	{
-		$url = "admin.php?module=articles&view=add&error=shorttagline&temp_tagline=$temp_tagline";
-	}
+	$url = "admin.php?module=articles&view=add&error=shorttagline&temp_tagline=$temp_tagline";
 
 	header("Location: $url");
 	die();
@@ -76,15 +61,7 @@ else if (strlen($_POST['tagline']) > 400)
 	$_SESSION['acategories'] = $_POST['categories'];
 	$_SESSION['agames'] = $_POST['games'];
 
-	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
-	{
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline";
-	}
-
-	else
-	{
-		$url = "admin.php?module=articles&view=add&error=taglinetoolong&temp_tagline=$temp_tagline";
-	}
+	$url = "admin.php?module=articles&view=add&error=taglinetoolong&temp_tagline=$temp_tagline";
 
 	header("Location: $url");
 	die();
@@ -100,15 +77,7 @@ else if (strlen($_POST['title']) < 10)
 	$_SESSION['acategories'] = $_POST['categories'];
 	$_SESSION['agames'] = $_POST['games'];
 
-	if ($_POST['check'] == 'Draft')
-	{
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=shorttile&temp_tagline=$temp_tagline";
-	}
-
-	else
-	{
-		$url = "admin.php?module=articles&view=add&error=shorttile&temp_tagline=$temp_tagline";
-	}
+	$url = "admin.php?module=articles&view=add&error=shorttile&temp_tagline=$temp_tagline";
 
 	header("Location: $url");
 	die();
@@ -124,15 +93,7 @@ else if (isset($_POST['show_block']) && $editor_pick_count == core::config('edit
 	$_SESSION['acategories'] = $_POST['categories'];
 	$_SESSION['agames'] = $_POST['games'];
 
-	if ($_POST['check'] == 'Draft')
-	{
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=toomanypicks&temp_tagline=$temp_tagline";
-	}
-
-	else
-	{
-		$url = "admin.php?module=articles&view=add&error=toomanypicks&temp_tagline=$temp_tagline";
-	}
+	$url = "admin.php?module=articles&view=add&error=toomanypicks&temp_tagline=$temp_tagline";
 
 	header("Location: $url");
 	die();
@@ -148,31 +109,9 @@ else if ($_POST['check'] == 'Add' && !isset($_SESSION['uploads_tagline']))
 	$_SESSION['acategories'] = $_POST['categories'];
 	$_SESSION['agames'] = $_POST['games'];
 
-	if ($_POST['check'] == 'Draft')
-	{
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=noimageselected&temp_tagline=$temp_tagline";
-	}
-
-	else
-	{
-		$url = "admin.php?module=articles&view=add&error=noimageselected&temp_tagline=$temp_tagline";
-	}
+	$url = "admin.php?module=articles&view=add&error=noimageselected&temp_tagline=$temp_tagline";
 
 	header("Location: $url");
-	die();
-}
-
-// if it's a draft and there's no uploaded tagline image, and no stored image already
-else if ($_POST['check'] == 'Draft' && empty($draft_tagline['tagline_image']) && !isset($_SESSION['uploads_tagline']))
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $slug;
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=noimageselected&temp_tagline=$temp_tagline");
 	die();
 }
 
@@ -192,9 +131,6 @@ else
 	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
 
 	$title = strip_tags($_POST['title']);
-
-	// doubly make sure it's nice
-	$slug = $core->nice_title($_POST['slug']);
 
 	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `tagline_image` = ?", array($_SESSION['user_id'], $title, $slug, $tagline, $text, $block, core::$date, $draft_tagline['tagline_image']));
 
@@ -234,12 +170,6 @@ else
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
 		$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
-	}
-
-	// remove the draft article as we have published it from a draft and we created a new article
-	if (isset($_POST['check']) && $_POST['check'] == 'Draft')
-	{
-		$db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 	}
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)

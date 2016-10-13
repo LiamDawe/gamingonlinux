@@ -14,6 +14,7 @@ if (!isset($_POST['act']))
 	$usercpcp = $db->fetch();
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_pcinfo');
+	$templating->set('user_id', $_SESSION['user_id']);
 
 	$public_info = '';
 	if ($usercpcp['pc_info_public'] == 1)
@@ -285,10 +286,10 @@ else if (isset($_POST['act']))
 		$_POST['desktop'],
 		$_POST['what_bits'],
 		$_POST['dual_boot'],
-		$_POST['cpu_vendor'],
-		$_POST['cpu_model'],
-		$_POST['gpu_vendor'],
-		$_POST['gpu_model'],
+		trim($_POST['cpu_vendor']),
+		trim($_POST['cpu_model']),
+		trim($_POST['gpu_vendor']),
+		trim($_POST['gpu_model']),
 		$_POST['gpu_driver'],
 		$_POST['ram_count'],
 		$_POST['monitor_count'],

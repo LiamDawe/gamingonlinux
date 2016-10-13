@@ -27,10 +27,15 @@ if ($public['pc_info_public'] == 1)
 
   if (!$distro)
   {
-    die('Couldn\'t find your distro image');
+    // if it didn't work, they might have somehow picked a distro image we don't have, so force the standard Linux "tux" image
+    $distro = @imagecreatefrompng('templates/default/images/distros/linux_icon.png');
   }
 
-  imagecopy($base_image, $distro, (imagesx($base_image)/2)-(imagesx($distro)/2), (imagesy($base_image)/2)-(imagesy($distro)/2), 0, 0, imagesx($distro), imagesy($distro));
+  // only do this if it actually worked
+  if ($distro)
+  {
+    imagecopy($base_image, $distro, (imagesx($base_image)/2)-(imagesx($distro)/2), (imagesy($base_image)/2)-(imagesy($distro)/2), 0, 0, imagesx($distro), imagesy($distro));
+  }
 
   $text_colour = imagecolorallocate($base_image, 0, 0, 0);
   $width = imagesx($base_image);
@@ -47,11 +52,11 @@ if ($public['pc_info_public'] == 1)
     {
       $desktop_text .= ':' . $user_info['desktop_environment'];
     }
-
-    if (!empty($user_info['what_bits']))
-    {
-      $desktop_text .= ':' . $user_info['what_bits'];
-    }
+  }
+  $bits = '';
+  if (!empty($user_info['what_bits']))
+  {
+    $bits .= $user_info['what_bits'];
   }
 
   $gpu = '';
@@ -68,8 +73,18 @@ if ($public['pc_info_public'] == 1)
   //$leftTextPos = ( $width - imagefontwidth($font)*strlen($text) )/2;
   // finally, write the string:
   imagestring($base_image, $font, 1, $height-70, $username, $text_colour);
-  imagestring($base_image, $font, 1, $height-45, $desktop_text, $text_colour);
-  imagestring($base_image, $font, 1, $height-20, $gpu, $text_colour);
+  if (!empty($desktop_text))
+  {
+    imagestring($base_image, $font, 1, $height-50, $desktop_text, $text_colour);
+  }
+  if (!empty($bits))
+  {
+    imagestring($base_image, $font, 1, $height-35, $bits, $text_colour);
+  }
+  if (!empty($gpu))
+  {
+    imagestring($base_image, $font, 1, $height-20, $gpu, $text_colour);
+  }
   imagestring($base_image, $font, 260, $height-20, "GamingOnLinux.com", $text_colour);
 
   header('Content-Type: image/png');

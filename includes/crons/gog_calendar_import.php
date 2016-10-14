@@ -94,6 +94,8 @@ do {
 			{
 				$website = $games['short_link'];
 
+				$games['title'] = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $games['title']);
+
 				echo $games['title'] . "<br />\n";
 				echo "* Original release date: ". $games['original_release_date'] ."<br />\n";
 

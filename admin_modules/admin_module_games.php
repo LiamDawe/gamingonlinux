@@ -13,7 +13,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			if ($_GET['message'] == 'missing')
 			{
-				$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
+				$core->message('Please fill a name, a release date and at least one link at a minimum!', null, 1);
 			}
 			if ($_GET['message'] == 'exists')
 			{
@@ -65,7 +65,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					}
 					if ($_GET['message'] == 'missing')
 					{
-						$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
+						$core->message('Please fill a name, a release date and one link at a minimum!', null, 1);
 					}
 				}
 
@@ -115,7 +115,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'Add')
 	{
-		if (empty($_POST['name']) || empty($_POST['date']) || empty($_POST['link']))
+		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link'])))
 		{
 			header("Location: /admin.php?module=games&view=add&error=missing");
 			exit;
@@ -155,7 +155,7 @@ if (isset($_POST['act']))
 			exit;
 		}
 
-		if (empty($_POST['name']) || empty($_POST['date']) || empty($_POST['link']))
+		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link'])))
 		{
 			header("Location: /admin.php?module=games&view=edit&message=missing&id=" . $_POST['id']);
 			exit;

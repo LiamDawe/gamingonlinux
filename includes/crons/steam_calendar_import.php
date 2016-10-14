@@ -56,6 +56,8 @@ do
           {
             $title = $element->find('span.title', 0)->plaintext;
 
+            $title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title);
+
             $dont_use = 0;
             // don't give us soundtracks, they are DLC but we don't want them!
             if (strpos($title, 'Soundtrack') !== false)

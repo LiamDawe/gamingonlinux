@@ -17,6 +17,38 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
     $db->sqlquery("SELECT u.`distro`, u.`username`, i.`desktop_environment`, i.`gpu_vendor`, i.`gpu_model`, i.`cpu_vendor`, i.`cpu_model` FROM `users` u LEFT JOIN `user_profile_info` i ON u.user_id = i.user_id WHERE u.`user_id` = ?", array($_GET['id']));
     $user_info = $db->fetch();
 
+    $username = $user_info['username'];
+
+    $desktop_text = '';
+    if (!empty($user_info['distro']))
+    {
+      $desktop_text = $user_info['distro'];
+      if (!empty($user_info['desktop_environment']))
+      {
+        $desktop_text .= ' : ' . $user_info['desktop_environment'];
+      }
+    }
+
+    $gpu = '';
+    if (!empty($user_info['gpu_vendor']))
+    {
+      $gpu = $user_info['gpu_vendor'];
+      if (!empty($user_info['gpu_model']))
+      {
+        $gpu .= ' : ' . $user_info['gpu_model'];
+      }
+    }
+
+    $cpu = '';
+    if (!empty($user_info['cpu_vendor']))
+    {
+      $cpu = $user_info['cpu_vendor'];
+      if (!empty($user_info['cpu_model']))
+      {
+        $cpu .= ' : ' . $user_info['cpu_model'];
+      }
+    }
+
     $base_image = imagecreatefrompng('templates/default/images/signature.png');
 
     $distro_image_picker = 'linux_icon';
@@ -36,72 +68,30 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
     // only do this if it actually worked
     if ($distro)
     {
-      imagecopy($base_image, $distro, (imagesx($base_image)/2)-(imagesx($distro)/2), (imagesy($base_image)/2)-(imagesy($distro)/2), 0, 0, imagesx($distro), imagesy($distro));
+      imagecopy($base_image, $distro, 5, (imagesy($base_image)/2)-(imagesy($distro)/2)+5, 0, 0, imagesx($distro), imagesy($distro));
     }
 
     $text_colour = imagecolorallocate($base_image, 0, 0, 0);
     $width = imagesx($base_image);
     $height = imagesy($base_image);
-    $font = 4;
+    putenv('GDFONTPATH=' . realpath('.'));
+    $font = 'Ubuntu-L.ttf';
 
-    $username = $user_info['username'];
+    imagettftext($base_image, 11, 0, 257, 14, $text_colour, $font, "GamingOnLinux.com");
 
-    $desktop_text = '';
-    if (!empty($user_info['distro']))
-    {
-      $desktop_text = $user_info['distro'];
-    }
-
-    $environment = '';
-    if (!empty($user_info['desktop_environment']))
-    {
-      $environment .= $user_info['desktop_environment'];
-    }
-
-    $gpu = '';
-    if (!empty($user_info['gpu_vendor']))
-    {
-      $gpu = $user_info['gpu_vendor'];
-      if (!empty($user_info['gpu_model']))
-      {
-        $gpu .= ':' . $user_info['gpu_model'];
-      }
-    }
-
-    $cpu = '';
-    if (!empty($user_info['cpu_vendor']))
-    {
-      $cpu = $user_info['cpu_vendor'];
-      if (!empty($user_info['cpu_model']))
-      {
-        $cpu .= ':' . $user_info['cpu_model'];
-      }
-    }
-
-    // calculate the left position of the text:
-    $leftTextPos = ( $width - imagefontwidth($font)*strlen("Linux Gamer!") );
-    imagestring($base_image, $font, $leftTextPos, $height-70, "Linux Gamer!", $text_colour);
-    imagestring($base_image, $font, 2, $height-70, $username, $text_colour);
+    imagettftext($base_image, 11, 0, 3, 14, $text_colour, $font, $username);
     if (!empty($desktop_text))
     {
-      imagestring($base_image, $font, 2, $height-50, $desktop_text, $text_colour);
-    }
-    if (!empty($environment))
-    {
-      imagestring($base_image, $font, 2, $height-35, $environment, $text_colour);
+      imagettftext($base_image, 11, 0, 45, 30, $text_colour, $font, $desktop_text);
     }
     if (!empty($gpu))
     {
-      $leftTextPos = ( $width - imagefontwidth($font)*strlen($gpu) );
-      imagestring($base_image, $font, $leftTextPos, $height-35, $gpu, $text_colour);
+      imagettftext($base_image, 11, 0, 45, 45, $text_colour, $font, $gpu);
     }
     if (!empty($cpu))
     {
-      $leftTextPos = ( $width - imagefontwidth($font)*strlen($cpu) );
-      imagestring($base_image, $font, $leftTextPos, $height-50, $cpu, $text_colour);
+      imagettftext($base_image, 11, 0, 45, 60, $text_colour, $font, $cpu);
     }
-    $leftTextPos = ( $width - imagefontwidth($font)*strlen("GamingOnLinux.com") );
-    imagestring($base_image, $font, $leftTextPos-130, $height-18, "GamingOnLinux.com", $text_colour);
 
     header('Content-Type: image/png');
     imagepng($base_image);

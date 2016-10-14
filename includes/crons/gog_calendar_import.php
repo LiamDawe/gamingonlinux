@@ -72,6 +72,23 @@ do {
 			{
 				$dont_use = 1;
 			}
+			// don't include pre-order games, as GOG is an arse about them and changes the title and the url at release
+			if (strpos($games['title'], ' Pre-Order') !== false)
+			{
+				$dont_use = 1;
+			}
+
+			// what the fuck GOG, seriously, stop re-ordering the fucking "The"
+			if (strpos($games['title'], ', The - The') !== false)
+			{
+				$games['title'] = str_replace(', The - The', ' - The', $games['title']);
+				$games['title'] = 'The ' . $games['title'];
+			}
+			if (strpos($games['title'], ', The') !== false)
+			{
+				$games['title'] = str_replace(', The', '', $games['title']);
+				$games['title'] = 'The ' . $games['title'];
+			}
 
 			if ($dont_use == 0)
 			{

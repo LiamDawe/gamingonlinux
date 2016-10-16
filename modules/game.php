@@ -48,7 +48,7 @@ if (!isset($_GET['game-id']))
 if (isset($_GET['game-id']))
 {
 	// make sure it exists
-	$db->sqlquery("SELECT `id`, `name`, `date`, `gog_link`, `steam_link`, `link`, `description`, `best_guess` FROM `calendar` WHERE `id` = ? AND `approved` = 1", array($_GET['game-id']));
+	$db->sqlquery("SELECT `id`, `name`, `date`, `gog_link`, `steam_link`, `link`, `description`, `best_guess`, `is_dlc` FROM `calendar` WHERE `id` = ? AND `approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
 		$game = $db->fetch();
@@ -100,6 +100,13 @@ if (isset($_GET['game-id']))
 			$best_guess = '<span class="badge blue">Best Guess Date!</span>';
 		}
 		$templating->set('best_guess', $best_guess);
+
+		$dlc = '';
+		if ($game['is_dlc'] == 1)
+		{
+			$dlc = '<span class="badge yellow">DLC</span>';
+		}
+		$templating->set('dlc', $dlc);
 
 		$description = '';
 		if (!empty($game['description']) && $game['description'] != NULL)

@@ -675,6 +675,9 @@ display: inline-block;
 .badge.green {
     background: #04B404;
 }
+.badge.yellow {
+    background: #ccb845;
+}
 .badge-featured
 {
     background: #333333;

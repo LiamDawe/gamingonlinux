@@ -71,6 +71,11 @@ else
 		{
 			$core->message($_SESSION['tagerror'], NULL, 1);
 		}
+
+		if ($_GET['message'] == 'shorttile')
+		{
+			$core->message('The title was too short!', NULL, 1);
+		}
 	}
 	if (isset ($_GET['error']))
 	{

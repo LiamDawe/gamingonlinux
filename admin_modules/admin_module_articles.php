@@ -888,11 +888,19 @@ else if (isset($_POST['act']))
 	}
 
 	/*
-	// Publishing a fresh article, used by drafts and new article from admin for publishing directly
+	// Publishing a fresh article, used by article from admin for publishing directly
 	*/
 	if ($_POST['act'] == 'add')
 	{
 		include('admin_articles_sections/add_article.php');
+	}
+
+	/*
+	// Publishing a draft article, used by drafts for publishing directly
+	*/
+	if ($_POST['act'] == 'add_draft')
+	{
+		include('admin_articles_sections/drafts/publish_draft.php');
 	}
 
 	if ($_POST['act'] == 'Add_Review_Comment')

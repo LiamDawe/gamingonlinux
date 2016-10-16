@@ -86,7 +86,7 @@ else
 		$_SESSION['acategories'] = $_POST['categories'];
 		$_SESSION['agames'] = $_POST['games'];
 
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=shorttile&temp_tagline=$temp_tagline";
+		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&message=shorttile&temp_tagline=$temp_tagline";
 
 		header("Location: $url");
 		die();
@@ -166,11 +166,25 @@ else
 			}
 		}
 
-		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+		// delete any existing categories that aren't in the final list for publishing
+		$db->sqlquery("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+		$current_categories = $db->fetch_all_rows();
 
-		if (isset($_POST['categories']))
+		foreach ($current_categories as $current_category)
 		{
-			foreach($_POST['categories'] as $category)
+			if (!in_array($current_category['category_id'], $_POST['categories']))
+			{
+				$db->sqlquery("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
+			}
+		}
+
+		// get fresh list of categories, and insert any that don't exist
+		$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+		$current_categories = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
+
+		foreach($_POST['categories'] as $category)
+		{
+			if (!in_array($category, $current_categories))
 			{
 				$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
 			}

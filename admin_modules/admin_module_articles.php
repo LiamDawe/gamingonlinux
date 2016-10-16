@@ -1210,11 +1210,25 @@ else if (isset($_POST['act']))
 
 			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, $show, $_POST['article_id']));
 
-			$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+			// delete any existing categories that aren't in the final list for publishing
+			$db->sqlquery("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+			$current_categories = $db->fetch_all_rows();
 
-			if (isset($_POST['categories']))
+			foreach ($current_categories as $current_category)
 			{
-				foreach($_POST['categories'] as $category)
+				if (!in_array($current_category['category_id'], $_POST['categories']))
+				{
+					$db->sqlquery("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
+				}
+			}
+
+			// get fresh list of categories, and insert any that don't exist
+			$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+			$current_categories = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
+
+			foreach($_POST['categories'] as $category)
+			{
+				if (!in_array($category, $current_categories))
 				{
 					$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
 				}
@@ -1471,11 +1485,25 @@ else if (isset($_POST['act']))
 				}
 			}
 
-			$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+			// delete any existing categories that aren't in the final list for publishing
+			$db->sqlquery("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+			$current_categories = $db->fetch_all_rows();
 
-			if (isset($_POST['categories']))
+			foreach ($current_categories as $current_category)
 			{
-				foreach($_POST['categories'] as $category)
+				if (!in_array($current_category['category_id'], $_POST['categories']))
+				{
+					$db->sqlquery("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
+				}
+			}
+
+			// get fresh list of categories, and insert any that don't exist
+			$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
+			$current_categories = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
+
+			foreach($_POST['categories'] as $category)
+			{
+				if (!in_array($category, $current_categories))
 				{
 					$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
 				}

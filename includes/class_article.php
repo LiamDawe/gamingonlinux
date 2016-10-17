@@ -91,5 +91,71 @@ class article_class
 
     return $games_list;
   }
+
+  function process_categories($article_id = NULL)
+  {
+    global $db;
+
+    if (isset($article_id) && is_numeric($article_id))
+    {
+      // delete any existing categories that aren't in the final list for publishing
+      $db->sqlquery("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id));
+      $current_categories = $db->fetch_all_rows();
+
+      foreach ($current_categories as $current_category)
+      {
+      	if (!in_array($current_category['category_id'], $_POST['categories']))
+      	{
+      		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
+      	}
+      }
+
+      // get fresh list of categories, and insert any that don't exist
+      $db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id));
+      $current_categories = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
+
+      foreach($_POST['categories'] as $category)
+      {
+      	if (!in_array($category, $current_categories))
+      	{
+      		$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
+      	}
+      }
+    }
+  }
+
+  function delete_article($article)
+  {
+    global $db;
+    
+    $db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
+    $db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
+    $db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
+    $db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($article['article_id']));
+    $db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
+    $db->sqlquery("DELETE FROM `admin_notifications` WHERE `article_id` = ?", array($article['article_id']));
+    $db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `article_id` = ?, `action` = ?, `created` = ?, `completed_date` = ?", array($article_id, "{$_SESSION['username']} deleted the article: {$article['title']}", core::$date, core::$date));
+
+    // remove old article's image
+    if ($check['article_top_image'] == 1)
+    {
+      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/topimages/' . $article['article_top_image_filename']);
+    }
+
+    if (!empty($check['tagline_image']))
+    {
+      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
+      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
+    }
+
+    // find any uploaded images, and remove them
+    $db->sqlquery("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
+    while ($image_search = $db->fetch())
+    {
+      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $image_search['filename']);
+    }
+
+    $db->sqlquery("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
+  }
 }
 ?>

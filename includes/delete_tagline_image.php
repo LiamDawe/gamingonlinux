@@ -48,7 +48,7 @@ else
 {
 	if (isset($_SESSION['uploads_tagline']['image_name']))
 	{
-		if(unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $_SESSION['uploads_tagline']['image_name']) && unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $_SESSION['uploads_tagline']['image_name']))
+		if(unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name']) && unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name']))
 		{
 			unset($_SESSION['uploads_tagline']);
 			echo "YES";

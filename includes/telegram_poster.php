@@ -115,9 +115,9 @@ function processMessage($message) {
   }
 }
 
-if (!empty(core::config('telegram_bot_key')))
+function telegram($link)
 {
-  function telegram($link)
+  if (!empty(core::config('telegram_bot_key')))
   {
     $content = file_get_contents("php://input");
     $update = json_decode($content, true);

@@ -102,24 +102,30 @@ class article_class
       $db->sqlquery("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id));
       $current_categories = $db->fetch_all_rows();
 
-      foreach ($current_categories as $current_category)
+      if (!empty($current_categories))
       {
-      	if (!in_array($current_category['category_id'], $_POST['categories']))
-      	{
-      		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
-      	}
+        foreach ($current_categories as $current_category)
+        {
+        	if (!in_array($current_category['category_id'], $_POST['categories']))
+        	{
+        		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
+        	}
+        }
       }
 
       // get fresh list of categories, and insert any that don't exist
       $db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id));
       $current_categories = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
 
-      foreach($_POST['categories'] as $category)
+      if (isset($_POST['categories']) && !empty($_POST['categories']))
       {
-      	if (!in_array($category, $current_categories))
-      	{
-      		$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
-      	}
+        foreach($_POST['categories'] as $category)
+        {
+        	if (!in_array($category, $current_categories))
+        	{
+        		$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
+        	}
+        }
       }
     }
   }

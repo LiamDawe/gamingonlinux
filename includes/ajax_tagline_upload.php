@@ -224,7 +224,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			if (isset($_SESSION['uploads_tagline']))
 			{
 				unlink(core::config('path') . "uploads/articles/tagline_images/temp/" . $_SESSION['uploads_tagline']['image_name']);
-				unlink(core::config('path') . "uploads/articles/tagline_images/thumbnails/temp/" . $_SESSION['uploads_tagline']['image_name']);
+				unlink(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $_SESSION['uploads_tagline']['image_name']);
 			}
 
 			$_SESSION['uploads_tagline']['image_name'] = $imagename;

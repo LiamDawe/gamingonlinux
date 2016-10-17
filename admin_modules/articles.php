@@ -667,136 +667,10 @@ else if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'Edit')
 	{
-		$title = strip_tags($_POST['title']);
-		$text = trim($_POST['text']);
-		$tagline = trim($_POST['tagline']);
-		$slug = $core->nice_title($_POST['slug']);
-
-		// count how many editors picks we have
-		$editor_picks = array();
-
-		$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-		while($editor_get = $db->fetch())
+		if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&temp_tagline=$temp_tagline"))
 		{
-			$editor_picks[] = $editor_get['article_id'];
-		}
+			print_r($checked);
 
-		$editor_pick_count = $db->num_rows();
-
-		$temp_tagline = 0;
-		if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-		{
-			$temp_tagline = 1;
-		}
-
-		// make sure its not empty
-		if (empty($title) || empty($tagline) || empty($text) || empty($_POST['article_id']))
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
-		}
-
-		else if (strlen($_POST['tagline']) < 100)
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
-		}
-
-		else if (strlen($_POST['tagline']) > 400)
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
-		}
-
-		else if (strlen($_POST['title']) < 10)
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
-		}
-
-		else if (isset($_POST['show_block']) && $editor_pick_count == 3 && !in_array($_POST['article_id'], $editor_picks))
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=toomanypicks");
-		}
-
-		else
-		{
 			$block = 0;
 			if (isset($_POST['show_block']))
 			{
@@ -809,7 +683,15 @@ else if (isset($_POST['act']))
 				$show = 1;
 			}
 
-			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, $show, $_POST['article_id']));
+			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, $_POST['article_id']));
+
+			if (isset($_SESSION['uploads']))
+			{
+				foreach($_SESSION['uploads'] as $key)
+				{
+					$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
+				}
+			}
 
 			$article_class->process_categories($_POST['article_id']);
 
@@ -836,23 +718,21 @@ else if (isset($_POST['act']))
 			unset($_SESSION['uploads_tagline']);
 			unset($_SESSION['image_rand']);
 
-			$nice_title = $core->nice_title($_POST['title']);
-
 			if (core::config('pretty_urls') == 1)
 			{
 				header("Location: /articles/$slug.{$_POST['article_id']}/");
 			}
-			else {
+			else
+			{
 				if (!isset($_POST['show_block']))
 				{
 					header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}");
 				}
-				else {
+				else
+				{
 					header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 				}
 			}
-
-
 		}
 	}
 
@@ -950,67 +830,7 @@ else if (isset($_POST['act']))
 	// For editing a post from another admin in the review pool
 	if ($_POST['act'] == 'Edit_Admin')
 	{
-		$title = strip_tags($_POST['title']);
-		$tagline = trim($_POST['tagline']);
-		$text = trim($_POST['text']);
-		$slug = trim($_POST['slug']);
-
-		$temp_tagline = 0;
-	  if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-	  {
-	  	$temp_tagline = 1;
-	  }
-
-		// make sure its not empty
-		if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['article_id']) || empty($slug))
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['aslug'] = $slug;
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
-		}
-
-		else if (strlen($_POST['tagline']) < 100)
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['aslug'] = $slug;
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
-		}
-
-		else if (strlen($_POST['tagline']) > 400)
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['aslug'] = $slug;
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
-		}
-
-		else if (strlen($_POST['title']) < 10)
-		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['aslug'] = $slug;
-			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
-
-			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
-		}
-
-		else
+		if ($checked = $article_class->check_article_inputs("/admin.php?module=reviewqueue&aid={$_POST['article_id']}&temp_tagline=$temp_tagline"))
 		{
 			$block = 0;
 			if (isset($_POST['show_block']))
@@ -1018,7 +838,7 @@ else if (isset($_POST['act']))
 				$block = 1;
 			}
 
-			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, $_POST['article_id']));
+			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['slug'], $block, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
 			{

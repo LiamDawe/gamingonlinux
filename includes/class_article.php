@@ -240,15 +240,52 @@ class article_class
   // this function will check over everything necessary for an article to be correctly done
   function check_article_inputs($return_page)
   {
+    global $db, $core;
+
+    // count how many editors picks we have
+    $editor_picks = array();
+
+    $db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
+    while($editor_get = $db->fetch())
+    {
+      $editor_picks[] = $editor_get['article_id'];
+    }
+
+    $editor_pick_count = $db->num_rows();
+
+    $temp_tagline = 0;
+    if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+    {
+      $temp_tagline = 1;
+    }
+
+    $title = strip_tags($_POST['title']);
+    $tagline = trim($_POST['tagline']);
+    $text = trim($_POST['text']);
+
+    // check its set, if not hard-set it based on the article title
+    if (isset($_POST['slug']) && !empty($_POST['slug']))
+    {
+      $slug = $core->nice_title($_POST['slug']);
+    }
+    else
+    {
+      $slug = $core->nice_title($_POST['title']);
+    }
+
     // make sure its not empty
 		if (empty($title) || empty($tagline) || empty($text) || empty($_POST['article_id']))
 		{
-			$_SESSION['atitle'] = $_POST['title'];
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
-			$_SESSION['atext'] = $_POST['text'];
+			$_SESSION['atitle'] = $title;
+			$_SESSION['aslug'] = $slug;
+			$_SESSION['atagline'] = $tagline;
+			$_SESSION['atext'] = $text;
 			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
+
+      if (isset($_POST['games']) && !empty($_POST['games']))
+      {
+        $_SESSION['agames'] = $_POST['games'];
+      }
 
 			if (isset($_POST['show_article']))
 			{
@@ -259,18 +296,22 @@ class article_class
 				$_SESSION['aactive'] = 0;
 			}
 
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
+			header("Location: $return_page&error=empty");
       die();
 		}
 
-		else if (strlen($_POST['tagline']) < 100)
+		else if (strlen($tagline) < 100)
 		{
-			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['atitle'] = $title;
 			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atagline'] = $tagline;
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
+
+      if (isset($_POST['games']) && !empty($_POST['games']))
+      {
+        $_SESSION['agames'] = $_POST['games'];
+      }
 
 			if (isset($_POST['show_article']))
 			{
@@ -281,18 +322,22 @@ class article_class
 				$_SESSION['aactive'] = 0;
 			}
 
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
+			header("Location: $return_page&error=shorttagline");
       die();
 		}
 
-		else if (strlen($_POST['tagline']) > 400)
+		else if (strlen($tagline) > 400)
 		{
-			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['atitle'] = $title;
 			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atagline'] = $tagline;
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
+
+      if (isset($_POST['games']) && !empty($_POST['games']))
+      {
+        $_SESSION['agames'] = $_POST['games'];
+      }
 
 			if (isset($_POST['show_article']))
 			{
@@ -303,18 +348,22 @@ class article_class
 				$_SESSION['aactive'] = 0;
 			}
 
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
+			header("Location: $return_page&error=taglinetoolong");
       die();
 		}
 
-		else if (strlen($_POST['title']) < 10)
+		else if (strlen($title) < 10)
 		{
-			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['atitle'] = $title;
 			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atagline'] = $tagline;
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
+
+      if (isset($_POST['games']) && !empty($_POST['games']))
+      {
+        $_SESSION['agames'] = $_POST['games'];
+      }
 
 			if (isset($_POST['show_article']))
 			{
@@ -325,18 +374,22 @@ class article_class
 				$_SESSION['aactive'] = 0;
 			}
 
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
+			header("Location: $return_page&error=shorttitle");
       die();
 		}
 
 		else if (isset($_POST['show_block']) && $editor_pick_count == 3 && !in_array($_POST['article_id'], $editor_picks))
 		{
-			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['atitle'] = $title;
 			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atagline'] = $tagline;
 			$_SESSION['atext'] = $_POST['text'];
 			$_SESSION['acategories'] = $_POST['categories'];
-			$_SESSION['agames'] = $_POST['games'];
+
+      if (isset($_POST['games']) && !empty($_POST['games']))
+      {
+        $_SESSION['agames'] = $_POST['games'];
+      }
 
 			if (isset($_POST['show_article']))
 			{
@@ -347,11 +400,13 @@ class article_class
 				$_SESSION['aactive'] = 0;
 			}
 
-			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=toomanypicks");
+			header("Location: $return_page&error=toomanypicks");
       die();
     }
 
-    return true;
+    $content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug);
+
+    return $content_array;
   }
 }
 ?>

@@ -152,11 +152,9 @@ else
 
 		$title = strip_tags($_POST['title']);
 
-		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0, `draft` = 1 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
+		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0, `draft` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 
-		$article_id = $db->grab_id();
-
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array(core::$date, "{$_SESSION['username']} published a new article.", core::$date, $article_id));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array(core::$date, "{$_SESSION['username']} published a new article.", core::$date, $_POST['article_id']));
 
 		if (isset($_SESSION['uploads']))
 		{
@@ -191,25 +189,25 @@ else
 
 		if (core::config('pretty_urls') == 1 && !isset($_POST['show_block']))
 		{
-			telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $article_id);
-			header("Location: /articles/" . $_POST['slug'] . '.' . $article_id);
+			telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $_POST['article_id']);
+			header("Location: /articles/" . $_POST['slug'] . '.' . $_POST['article_id']);
 		}
 		else if (core::config('pretty_urls') == 1 && isset($_POST['show_block']))
 		{
-			telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $article_id);
-			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
+			telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $_POST['article_id']);
+			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 		}
 		else
 		{
 			if (!isset($_POST['show_block']))
 			{
-				telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
-				header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
+				telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}");
+				header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}");
 			}
 			else
 			{
-				telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$_POST['slug']}");
-				header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
+				telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}");
+				header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 			}
 		}
 	}

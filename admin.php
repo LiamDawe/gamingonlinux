@@ -25,14 +25,14 @@ $modules_allowed = '';
 $module_links = '';
 $get_modules_info = $db->sqlquery("SELECT `module_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `admin_modules` WHERE `activated` = 1 $sql_editor");
 while ($modules = $db->fetch($get_modules_info))
-{	
+{
 	// modules allowed for loading
 	$modules_allowed .= " {$modules['module_name']} ";
 
 	// links
 	if ($modules['show_in_sidebar'] == 1)
 	{
-		$module_links .= "<li><a href=\"{$modules['module_link']}\">{$modules['module_title']}</a></li>";	
+		$module_links .= "<li><a href=\"{$modules['module_link']}\">{$modules['module_title']}</a></li>";
 	}
 }
 
@@ -53,7 +53,7 @@ $modules_check = explode(" ", $modules_allowed);
 
 if (in_array($module, $modules_check))
 {
-	include("admin_modules/admin_module_$module.php");
+	include("admin_modules/$module.php");
 }
 
 else

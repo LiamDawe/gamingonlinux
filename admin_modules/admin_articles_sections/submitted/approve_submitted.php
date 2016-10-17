@@ -9,139 +9,8 @@ if ($check_article['active'] == 1)
 
 else
 {
-	// count how many editors picks we have
-	$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-
-	$editor_pick_count = $db->num_rows();
-
-	// check its set, if not hard-set it based on the article title
-	if (isset($_POST['slug']) && !empty($_POST['slug']))
-	{
-		$slug = $core->nice_title($_POST['slug']);
-	}
-	else
-	{
-		$slug = $core->nice_title($_POST['title']);
-	}
-
-	// make sure its not empty
-	if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) || empty($_POST['article_id']) || empty($slug))
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['atext2'] = $_POST['text2'];
-		$_SESSION['atext3'] = $_POST['text3'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$self = 0;
-		if (isset($_POST['submit_as_self']))
-		{
-			$self = 1;
-		}
-
-		header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=empty&self={$self}");
-	}
-
-	else if (strlen($_POST['tagline']) < 100)
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['atext2'] = $_POST['text2'];
-		$_SESSION['atext3'] = $_POST['text3'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$self = 0;
-		if (isset($_POST['submit_as_self']))
-		{
-			$self = 1;
-		}
-
-		header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=shorttagline&self={$self}&temp_tagline=$temp_tagline");
-	}
-
-	else if (strlen($_POST['tagline']) > 400)
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['atext2'] = $_POST['text2'];
-		$_SESSION['atext3'] = $_POST['text3'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$self = 0;
-		if (isset($_POST['submit_as_self']))
-		{
-			$self = 1;
-		}
-
-		header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=taglinetoolong&self={$self}&temp_tagline=$temp_tagline");
-	}
-
-	else if (strlen($_POST['title']) < 10)
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['atext2'] = $_POST['text2'];
-		$_SESSION['atext3'] = $_POST['text3'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$self = 0;
-		if (isset($_POST['submit_as_self']))
-		{
-			$self = 1;
-		}
-
-		header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=shorttitle&self={$self}&temp_tagline=$temp_tagline");
-	}
-
-	else if (!isset($_SESSION['uploads_tagline']) && $check_article['tagline_image'] == '')
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['atext2'] = $_POST['text2'];
-		$_SESSION['atext3'] = $_POST['text3'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$url = "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=noimageselected&self={$self}&temp_tagline=$temp_tagline";
-
-		header("Location: $url");
-	}
-
-	else if (isset($_POST['show_block']) && $editor_pick_count == 3)
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['atext2'] = $_POST['text2'];
-		$_SESSION['atext3'] = $_POST['text3'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$self = 0;
-		if (isset($_POST['submit_as_self']))
-		{
-			$self = 1;
-		}
-
-		header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=toomanypicks&self={$self}&temp_tagline=$temp_tagline");
-	}
-
-	else
+	$return_page = "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}";
+	if ($checked = $article_class->check_article_inputs($return_page))
 	{
 		// show in the editors pick block section
 		$block = 0;
@@ -150,11 +19,9 @@ else
 			$block = 1;
 		}
 
-		// if they are resetting the article to be published by themselves
-		$text = trim($_POST['text']);
+		// if the editor is submitting it as themselves, thank the submitter automatically
 		$author_id = $_POST['author_id'];
 		$submission_date = $check_article['date_submitted'];
-		$tagline = trim($_POST['tagline']);
 
 		if (isset($_POST['submit_as_self']))
 		{
@@ -171,7 +38,7 @@ else
 				$submitted_by_user = $check_article['guest_username'];
 			}
 
-			$text = $_POST['text'] . "\r\n\r\n[i]Thanks to " . $submitted_by_user . ' for letting us know![/i]';
+			$checked['text'] = $checked['text'] . "\r\n\r\n[i]Thanks to " . $submitted_by_user . ' for letting us know![/i]';
 		}
 		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `article_id` = ?", array($_POST['article_id']));
 
@@ -182,7 +49,7 @@ else
 
 		$title = strip_tags($_POST['title']);
 
-		$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $title, $slug, $tagline, $text, $block, core::$date, $submission_date, $_POST['article_id']));
+		$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date, $submission_date, $_POST['article_id']));
 
 		if (isset($_SESSION['uploads']))
 		{

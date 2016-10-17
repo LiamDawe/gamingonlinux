@@ -667,7 +667,7 @@ else if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'Edit')
 	{
-		if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&temp_tagline=$temp_tagline"))
+		if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}"))
 		{
 			print_r($checked);
 
@@ -830,7 +830,7 @@ else if (isset($_POST['act']))
 	// For editing a post from another admin in the review pool
 	if ($_POST['act'] == 'Edit_Admin')
 	{
-		if ($checked = $article_class->check_article_inputs("/admin.php?module=reviewqueue&aid={$_POST['article_id']}&temp_tagline=$temp_tagline"))
+		if ($checked = $article_class->check_article_inputs("/admin.php?module=reviewqueue&aid={$_POST['article_id']}"))
 		{
 			$block = 0;
 			if (isset($_POST['show_block']))
@@ -913,7 +913,7 @@ else if (isset($_POST['act']))
 					}
 				}
 
-				header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
+				header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0&message=editdone");
 		}
 	}
 

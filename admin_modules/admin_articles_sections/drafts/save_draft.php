@@ -3,7 +3,15 @@ $text = trim($_POST['text']);
 
 $title = strip_tags($_POST['title']);
 
-$slug = $core->nice_title($_POST['slug']);
+// check its set, if not hard-set it based on the article title
+if (isset($_POST['slug']) && !empty($_POST['slug']))
+{
+	$slug = $core->nice_title($_POST['slug']);
+}
+else
+{
+	$slug = $core->nice_title($_POST['title']);
+}
 
 $db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `draft` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $title, $slug, $_POST['tagline'], $text, core::$date, $core->random_id()));
 

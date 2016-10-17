@@ -1,64 +1,6 @@
 <?php
-$title = strip_tags($_POST['title']);
-$tagline = trim($_POST['tagline']);
-$text = trim($_POST['text']);
-
-$temp_tagline = 0;
-if (!empty($_POST['temp_tagline_image']))
-{
-	$temp_tagline = 1;
-}
-
-// make sure its not empty
-if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['article_id']))
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['slug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
-}
-
-else if (strlen($_POST['tagline']) < 100)
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['slug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
-}
-
-else if (strlen($_POST['tagline']) > 400)
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['slug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
-}
-
-else if (strlen($_POST['title']) < 10)
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['slug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
-}
-
-else
+$return_page = "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}";
+if ($checked = $article_class->check_article_inputs($return_page))
 {
 	$block = 0;
 	if (isset($_POST['show_block']))
@@ -66,7 +8,7 @@ else
 		$block = 1;
 	}
 
-	$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ? WHERE `article_id` = ?", array($title, $tagline, $text, $block, $_POST['article_id']));
+	$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ? WHERE `article_id` = ?", array($checked['title'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
 
 	$article_class->process_categories($_POST['article_id']);
 

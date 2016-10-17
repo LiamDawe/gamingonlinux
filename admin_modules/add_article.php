@@ -132,139 +132,8 @@ $templating->set('subscribe_check', $auto_subscribe);
 
 if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 {
-  $temp_tagline = 0;
-  if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-  {
-  	$temp_tagline = 1;
-  }
-
-  // count how many editors picks we have
-  $db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-  $editor_pick_count = $db->num_rows();
-
-  // check its set, if not hard-set it based on the article title
-  if (isset($_POST['slug']) && !empty($_POST['slug']))
-  {
-  	$slug = $core->nice_title($_POST['slug']);
-  }
-  else
-  {
-  	$slug = $core->nice_title($_POST['title']);
-  }
-
-  // make sure its not empty
-  if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) || empty($slug))
-  {
-  	$_SESSION['atitle'] = $_POST['title'];
-  	$_SESSION['aslug'] = $slug;
-  	$_SESSION['atagline'] = $_POST['tagline'];
-  	$_SESSION['atext'] = $_POST['text'];
-  	$_SESSION['acategories'] = $_POST['categories'];
-  	$_SESSION['agames'] = $_POST['games'];
-
-  	$url = "admin.php?module=add_article&error=empty&temp_tagline=$temp_tagline";
-
-  	header("Location: $url");
-  	die();
-  }
-
-  // make sure tagline isn't too short
-  else if (strlen($_POST['tagline']) < 100)
-  {
-  	$_SESSION['atitle'] = $_POST['title'];
-  	$_SESSION['aslug'] = $slug;
-  	$_SESSION['atagline'] = $_POST['tagline'];
-  	$_SESSION['atext'] = $_POST['text'];
-  	$_SESSION['acategories'] = $_POST['categories'];
-  	$_SESSION['agames'] = $_POST['games'];
-
-  	$url = "admin.php?module=add_article&error=shorttagline&temp_tagline=$temp_tagline";
-
-  	header("Location: $url");
-  	die();
-  }
-
-  // if tagline is too long
-  else if (strlen($_POST['tagline']) > 400)
-  {
-  	$_SESSION['atitle'] = $_POST['title'];
-  	$_SESSION['aslug'] = $slug;
-  	$_SESSION['atagline'] = $_POST['tagline'];
-  	$_SESSION['atext'] = $_POST['text'];
-  	$_SESSION['acategories'] = $_POST['categories'];
-  	$_SESSION['agames'] = $_POST['games'];
-
-  	$url = "admin.php?module=add_article&error=taglinetoolong&temp_tagline=$temp_tagline";
-
-  	header("Location: $url");
-  	die();
-  }
-
-  // if tagline is too long
-  else if (empty($_POST['categories']))
-  {
-    $_SESSION['atitle'] = $_POST['title'];
-    $_SESSION['aslug'] = $slug;
-    $_SESSION['atagline'] = $_POST['tagline'];
-    $_SESSION['atext'] = $_POST['text'];
-    $_SESSION['acategories'] = $_POST['categories'];
-    $_SESSION['agames'] = $_POST['games'];
-
-    $url = "admin.php?module=add_article&error=categories&temp_tagline=$temp_tagline";
-
-    header("Location: $url");
-    die();
-  }
-
-  // if title is too short
-  else if (strlen($_POST['title']) < 10)
-  {
-  	$_SESSION['atitle'] = $_POST['title'];
-  	$_SESSION['aslug'] = $slug;
-  	$_SESSION['atagline'] = $_POST['tagline'];
-  	$_SESSION['atext'] = $_POST['text'];
-  	$_SESSION['acategories'] = $_POST['categories'];
-  	$_SESSION['agames'] = $_POST['games'];
-
-  	$url = "admin.php?module=add_article&error=shorttile&temp_tagline=$temp_tagline";
-
-  	header("Location: $url");
-  	die();
-  }
-
-  // if they try to make it an editor pick, and there's too many already
-  else if (isset($_POST['show_block']) && $editor_pick_count == core::config('editor_picks_limit'))
-  {
-  	$_SESSION['atitle'] = $_POST['title'];
-  	$_SESSION['aslug'] = $slug;
-  	$_SESSION['atagline'] = $_POST['tagline'];
-  	$_SESSION['atext'] = $_POST['text'];
-  	$_SESSION['acategories'] = $_POST['categories'];
-  	$_SESSION['agames'] = $_POST['games'];
-
-  	$url = "admin.php?module=add_article&error=toomanypicks&temp_tagline=$temp_tagline";
-
-  	header("Location: $url");
-  	die();
-  }
-
-  // if they aren't uploading a tagline image on a brand new article
-  else if ((!isset($_SESSION['uploads_tagline'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
-  {
-  	$_SESSION['atitle'] = $_POST['title'];
-  	$_SESSION['aslug'] = $slug;
-  	$_SESSION['atagline'] = $_POST['tagline'];
-  	$_SESSION['atext'] = $_POST['text'];
-  	$_SESSION['acategories'] = $_POST['categories'];
-  	$_SESSION['agames'] = $_POST['games'];
-
-  	$url = "admin.php?module=add_article&error=noimageselected&temp_tagline=$temp_tagline";
-
-  	header("Location: $url");
-  	die();
-  }
-
-  else
+  $return_page = "admin.php?module=add_article&error=empty";
+  if ($checked = $article_class->check_article_inputs($return_page))
   {
   	// show in the editors pick block section
   	$block = 0;
@@ -273,15 +142,10 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   		$block = 1;
   	}
 
-  	$text = trim($_POST['text']);
-  	$tagline = trim($_POST['tagline']);
-
   	// since it's now up we need to add 1 to total article count, it now exists, yaay have a beer on me, just kidding get your wallet!
   	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
 
-  	$title = strip_tags($_POST['title']);
-
-  	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0", array($_SESSION['user_id'], $title, $slug, $tagline, $text, $block, core::$date));
+  	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date));
 
   	$article_id = $db->grab_id();
 
@@ -322,24 +186,24 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 
   	if (core::config('pretty_urls') == 1 && !isset($_POST['show_block']))
   	{
-  		telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $article_id);
-  		header("Location: /articles/" . $slug . '.' . $article_id);
+  		telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $article_id);
+  		header("Location: /articles/" . $checked['slug'] . '.' . $article_id);
   	}
   	else if (core::config('pretty_urls') == 1 && isset($_POST['show_block']))
   	{
-  		telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $article_id);
+  		telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $article_id);
   		header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
   	}
   	else
   	{
   		if (!isset($_POST['show_block']))
   		{
-  			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$slug}");
-  			header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$slug}");
+  			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$checked['slug']}");
+  			header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$checked['slug']}");
   		}
   		else
   		{
-  			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$slug}");
+  			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$checked['slug']}");
   			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
   		}
   	}

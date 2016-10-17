@@ -238,9 +238,13 @@ class article_class
   }
 
   // this function will check over everything necessary for an article to be correctly done
+  // THIS NEEDS ADJUSTING, AS ITS DUPLICATING SETTING THE SESSION STUFF EVERY TIME, DO IT ONCE, SET A VAR, IF VAR SET, DO IT
   function check_article_inputs($return_page)
   {
     global $db, $core;
+
+    // if this is set to 1, we've come across an issue, so redirect
+    $redirect = 0;
 
     // count how many editors picks we have
     $editor_picks = array();
@@ -259,6 +263,12 @@ class article_class
       $temp_tagline = 1;
     }
 
+    if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
+    {
+      $db->sqlquery("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+      $check_article = $db->fetch();
+    }
+
     $title = strip_tags($_POST['title']);
     $tagline = trim($_POST['tagline']);
     $text = trim($_POST['text']);
@@ -274,147 +284,92 @@ class article_class
     }
 
     // make sure its not empty
-		if (empty($title) || empty($tagline) || empty($text) || empty($_POST['article_id']))
+		if (empty($title) || empty($tagline) || empty($text))
 		{
-			$_SESSION['atitle'] = $title;
-			$_SESSION['aslug'] = $slug;
-			$_SESSION['atagline'] = $tagline;
-			$_SESSION['atext'] = $text;
-			$_SESSION['acategories'] = $_POST['categories'];
+      $redirect = 1;
 
-      if (isset($_POST['games']) && !empty($_POST['games']))
-      {
-        $_SESSION['agames'] = $_POST['games'];
-      }
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: $return_page&error=empty");
-      die();
+      $return_error = 'empty';
 		}
 
 		else if (strlen($tagline) < 100)
 		{
-			$_SESSION['atitle'] = $title;
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $tagline;
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
+      $redirect = 1;
 
-      if (isset($_POST['games']) && !empty($_POST['games']))
-      {
-        $_SESSION['agames'] = $_POST['games'];
-      }
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: $return_page&error=shorttagline");
-      die();
+      $return_error = 'shorttagline';
 		}
 
 		else if (strlen($tagline) > 400)
 		{
-			$_SESSION['atitle'] = $title;
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $tagline;
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
+      $redirect = 1;
 
-      if (isset($_POST['games']) && !empty($_POST['games']))
-      {
-        $_SESSION['agames'] = $_POST['games'];
-      }
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: $return_page&error=taglinetoolong");
-      die();
+      $return_error = 'taglinetoolong';
 		}
 
 		else if (strlen($title) < 10)
 		{
-			$_SESSION['atitle'] = $title;
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $tagline;
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
+      $redirect = 1;
 
-      if (isset($_POST['games']) && !empty($_POST['games']))
-      {
-        $_SESSION['agames'] = $_POST['games'];
-      }
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: $return_page&error=shorttitle");
-      die();
+      $return_error = 'shorttitle';
 		}
 
-		else if (isset($_POST['show_block']) && $editor_pick_count == 3 && !in_array($_POST['article_id'], $editor_picks))
+		else if (isset($_POST['show_block']) && $editor_pick_count == core::config('editor_picks_limit'))
 		{
-			$_SESSION['atitle'] = $title;
-			$_SESSION['aslug'] = $_POST['slug'];
-			$_SESSION['atagline'] = $tagline;
-			$_SESSION['atext'] = $_POST['text'];
-			$_SESSION['acategories'] = $_POST['categories'];
+      $redirect = 1;
 
-      if (isset($_POST['games']) && !empty($_POST['games']))
-      {
-        $_SESSION['agames'] = $_POST['games'];
-      }
-
-			if (isset($_POST['show_article']))
-			{
-				$_SESSION['aactive'] = 1;
-			}
-			else
-			{
-				$_SESSION['aactive'] = 0;
-			}
-
-			header("Location: $return_page&error=toomanypicks");
-      die();
+      $return_error = 'toomanypicks';
     }
 
-    // check for tagline image, don't let people publish without one!
-    else if ((!isset($_SESSION['uploads_tagline'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand'])  || (isset($check_article) && empty($check_article['tagline_image'])))
+    // if it's an existing article, check tagline image
+    // if database tagline_image is empty and there's no upload OR upload doesn't match (previous left over)
+    else if ((isset($_POST['article_id'])) && (empty($check_article['tagline_image']) && !isset($_SESSION['uploads_tagline']) || isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
+    {
+      $redirect = 1;
+
+      $return_error = 'noimageselected';
+    }
+
+    // if it's a new article, check for tagline image in a simpler way
+    // if there's no upload, or upload doesn't match
+    else if ((!isset($_POST['article_id'])) && (!isset($_SESSION['uploads_tagline'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
+    {
+      $redirect = 1;
+
+      $return_error = 'noimageselected';
+    }
+
+    if ($redirect == 1)
     {
       $_SESSION['atitle'] = $title;
       $_SESSION['aslug'] = $slug;
       $_SESSION['atagline'] = $tagline;
       $_SESSION['atext'] = $text;
-      $_SESSION['acategories'] = $_POST['categories'];
-      $_SESSION['agames'] = $_POST['games'];
 
-      header("Location: $return_page&error=noimageselected");
+      if (isset($_POST['categories']) && !empty($_POST['categories']))
+      {
+        $_SESSION['acategories'] = $_POST['categories'];
+      }
+
+      if (isset($_POST['games']) && !empty($_POST['games']))
+      {
+        $_SESSION['agames'] = $_POST['games'];
+      }
+
+      if (isset($_POST['show_article']))
+      {
+        $_SESSION['aactive'] = 1;
+      }
+      else
+      {
+        $_SESSION['aactive'] = 0;
+      }
+
+      $self = 0;
+      if (isset($_POST['submit_as_self']))
+      {
+        $self = 1;
+      }
+
+      header("Location: $return_page&error=$return_error&self=$self&temp_tagline=$temp_tagline");
       die();
     }
 

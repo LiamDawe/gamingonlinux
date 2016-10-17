@@ -1,78 +1,8 @@
 <?php
-// This file is for putting a new article directly into the admin review queue
-$text = trim($_POST['text']);
-
-// count how many editors picks we have
-$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-
-$editor_pick_count = $db->num_rows();
-
-// make sure its not empty
-if (empty($_POST['title']) || empty($_POST['tagline']) || empty($text))
+$return_page = "admin.php?module=add_article";
+if ($checked = $article_class->check_article_inputs($return_page))
 {
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['aslug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=add&error=empty&temp_tagline=$temp_tagline");
-}
-
-else if (strlen($_POST['tagline']) < 100)
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['aslug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=add&error=shorttagline&temp_tagline=$temp_tagline");
-}
-
-else if (strlen($_POST['tagline']) > 400)
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['aslug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=add&error=taglinetoolong&temp_tagline=$temp_tagline");
-}
-
-else if (strlen($_POST['title']) < 10)
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['aslug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=add&error=shorttitle&temp_tagline=$temp_tagline");
-}
-
-else if (isset($_POST['show_block']) && $editor_pick_count == 3)
-{
-	$_SESSION['atitle'] = $_POST['title'];
-	$_SESSION['aslug'] = $_POST['aslug'];
-	$_SESSION['atagline'] = $_POST['tagline'];
-	$_SESSION['atext'] = $_POST['text'];
-	$_SESSION['acategories'] = $_POST['categories'];
-	$_SESSION['agames'] = $_POST['games'];
-
-	header("Location: admin.php?module=articles&view=add&error=toomanypicks&temp_tagline=$temp_tagline");
-}
-
-else
-{
-	$title = strip_tags($_POST['title']);
-
-	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $title, $_POST['slug'], $_POST['tagline'], $text, core::$date, $core->random_id()));
+	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], core::$date, $core->random_id()));
 
 	$article_id = $db->grab_id();
 

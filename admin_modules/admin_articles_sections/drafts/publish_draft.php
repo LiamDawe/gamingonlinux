@@ -1,10 +1,4 @@
 <?php
-$temp_tagline = 0;
-if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-{
-	$temp_tagline = 1;
-}
-
 // check it hasn't been published already
 $db->sqlquery("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
 $check_article = $db->fetch();
@@ -14,7 +8,8 @@ if ($check_article['active'] == 1)
 }
 else
 {
-	if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&temp_tagline=$temp_tagline"))
+	$return_page = "/admin.php?module=articles&view=drafts&aid={$_POST['article_id']}";
+	if ($checked = $article_class->check_article_inputs($return_page))
 	{
 		// show in the editors pick block section
 		$block = 0;
@@ -81,24 +76,24 @@ else
 
 		if (core::config('pretty_urls') == 1 && !isset($_POST['show_block']))
 		{
-			telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $_POST['article_id']);
-			header("Location: /articles/" . $_POST['slug'] . '.' . $_POST['article_id']);
+			telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $_POST['article_id']);
+			header("Location: /articles/" . $checked['slug'] . '.' . $_POST['article_id']);
 		}
 		else if (core::config('pretty_urls') == 1 && isset($_POST['show_block']))
 		{
-			telegram($title . ' ' . core::config('website_url') . "articles/" . $_POST['slug'] . '.' . $_POST['article_id']);
+			telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $_POST['article_id']);
 			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 		}
 		else
 		{
 			if (!isset($_POST['show_block']))
 			{
-				telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}");
+				telegram($checked['title'] . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$checked['slug']}");
 				header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}");
 			}
 			else
 			{
-				telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$_POST['slug']}");
+				telegram($checked['title'] . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&title={$checked['slug']}");
 				header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 			}
 		}

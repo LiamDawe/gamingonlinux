@@ -66,16 +66,6 @@ while ($categorys = $db->fetch())
     {
       $categorys_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
     }
-
-    else
-    {
-      $categorys_list .= "<option value=\"{$categorys['category_id']}\">{$categorys['category_name']}</option>";
-    }
-  }
-
-  else
-  {
-    $categorys_list .= "<option value=\"{$categorys['category_id']}\">{$categorys['category_name']}</option>";
   }
 }
 

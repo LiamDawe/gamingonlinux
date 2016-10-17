@@ -27,8 +27,28 @@
 							Categories:<br />
 						<select tabindex="-1" multiple="" name="categories[]" id="articleCategories" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:categories_list}</select><br />
 						<script type="application/javascript">
-						    $("#articleCategories").select2()
-						    $('#content').on('keydown', '.select2-input', function(event) { if (event.which == 9){ event.preventDefault(); } });
+						$("#articleCategories").select2({
+							selectOnClose: true,
+							ajax: {
+								url: "/includes/ajax/categories_ajax.php",
+								dataType: 'json',
+								delay: 250,
+								data: function (params) {
+									return {
+										q: params.term // search term
+									};
+								},
+								processResults: function (data) {
+									return {
+										results: $.map(data, function(obj) {
+											return { id: obj.id, text: obj.text };
+										})
+									};
+								},
+								cache: true,
+							},
+							minimumInputLength: 2
+  				});
 						</script>
 						Attach the article to a related game in the database:<br />
 					<select tabindex="-1" multiple="" name="games[]" id="articleGames" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:games_list}</select>

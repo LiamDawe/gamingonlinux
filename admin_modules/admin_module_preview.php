@@ -225,7 +225,7 @@ if ($_POST['check'] == 'Edit')
 
 else if ($_POST['check'] == 'Draft')
 {
-	$templating->set('buttons', '<button type="submit" name="act" value="publish_now" formaction="/admin.php?module=add_article" class="btn">Publish Now</button> <button type="submit" name="act" value="Move_Draft" class="btn btn-info" formaction="/admin.php?module=articles" />Move to Admin Review Queue</button> <button type="submit" name="act" value="Edit_Draft" class="btn btn-primary" formaction="/admin.php?module=articles">Finish Edit</button> <button type="submit" name="act" value="Preview" class="btn btn-info" />Preview & Edit More</button>');
+	$templating->set('buttons', '<button type="submit" name="act" value="add_draft" formaction="/admin.php?module=articles" class="btn">Publish Now</button> <button type="submit" name="act" value="Move_Draft" class="btn btn-info" formaction="/admin.php?module=articles" />Move to Admin Review Queue</button> <button type="submit" name="act" value="Edit_Draft" class="btn btn-primary" formaction="/admin.php?module=articles">Finish Edit</button> <button type="submit" name="act" value="Preview" class="btn btn-info" />Preview & Edit More</button>');
 	$templating->set('check', 'Draft');
 	$templating->set('enable_article', '');
 	$templating->set('submit_as_self', '');

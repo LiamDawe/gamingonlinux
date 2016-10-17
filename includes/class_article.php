@@ -201,5 +201,40 @@ class article_class
 
     $db->sqlquery("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
   }
+
+  function display_tagline_image($article = NULL)
+  {
+    $tagline_image = '';
+
+    // if it's an existing article, see if there's a tagline image to grab
+    if ($article != NULL)
+    {
+      if (!empty($article['tagline_image']))
+      {
+        $tagline_image = "<div class=\"test\" id=\"{$article['tagline_image']}\"><img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+        BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
+        Full Image Url: <a href=\"" . core::config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a></div>";
+      }
+    }
+
+    if (isset($_GET['error']))
+    {
+      if ($_GET['temp_tagline'] == 1)
+      {
+        $file = core::config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
+        $image_load = false;
+
+        if (file_exists($file))
+        {
+          $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
+          BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
+          <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
+          <a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
+        }
+      }
+    }
+
+    return $tagline_image;
+  }
 }
 ?>

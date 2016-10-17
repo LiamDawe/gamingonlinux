@@ -99,15 +99,15 @@ if (isset($_GET['error']))
 
   if ($_GET['temp_tagline'] == 1)
   {
-    $file = core::config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['atagline_image'];
+    $file = core::config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
     $image_load = false;
 
     if (file_exists($file))
     {
-      $tagline_image = "<div class=\"test\" id=\"{$_SESSION['atagline_image']}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['atagline_image']}\" class='imgList'><br />
+      $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
       BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-      <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['atagline_image']}\" />
-      <a href=\"#\" id=\"{$_SESSION['atagline_image']}\" class=\"trash_tagline\">Delete Image</a></div>";
+      <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
+      <a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
     }
   }
   // sort out previously uploaded images
@@ -172,7 +172,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	$_SESSION['atext'] = $_POST['text'];
   	$_SESSION['acategories'] = $_POST['categories'];
   	$_SESSION['agames'] = $_POST['games'];
-    $_SESSION['atagline_image'] = $_SESSION['uploads_tagline']['image_name'];
 
   	$url = "admin.php?module=add_article&error=empty&temp_tagline=$temp_tagline";
 
@@ -189,7 +188,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	$_SESSION['atext'] = $_POST['text'];
   	$_SESSION['acategories'] = $_POST['categories'];
   	$_SESSION['agames'] = $_POST['games'];
-    $_SESSION['atagline_image'] = $_SESSION['uploads_tagline']['image_name'];
 
   	$url = "admin.php?module=add_article&error=shorttagline&temp_tagline=$temp_tagline";
 
@@ -206,7 +204,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	$_SESSION['atext'] = $_POST['text'];
   	$_SESSION['acategories'] = $_POST['categories'];
   	$_SESSION['agames'] = $_POST['games'];
-    $_SESSION['atagline_image'] = $_SESSION['uploads_tagline']['image_name'];
 
   	$url = "admin.php?module=add_article&error=taglinetoolong&temp_tagline=$temp_tagline";
 
@@ -223,7 +220,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
     $_SESSION['atext'] = $_POST['text'];
     $_SESSION['acategories'] = $_POST['categories'];
     $_SESSION['agames'] = $_POST['games'];
-    $_SESSION['atagline_image'] = $_SESSION['uploads_tagline']['image_name'];
 
     $url = "admin.php?module=add_article&error=categories&temp_tagline=$temp_tagline";
 
@@ -240,7 +236,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	$_SESSION['atext'] = $_POST['text'];
   	$_SESSION['acategories'] = $_POST['categories'];
   	$_SESSION['agames'] = $_POST['games'];
-    $_SESSION['atagline_image'] = $_SESSION['uploads_tagline']['image_name'];
 
   	$url = "admin.php?module=add_article&error=shorttile&temp_tagline=$temp_tagline";
 
@@ -257,7 +252,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	$_SESSION['atext'] = $_POST['text'];
   	$_SESSION['acategories'] = $_POST['categories'];
   	$_SESSION['agames'] = $_POST['games'];
-    $_SESSION['atagline_image'] = $_SESSION['uploads_tagline']['image_name'];
 
   	$url = "admin.php?module=add_article&error=toomanypicks&temp_tagline=$temp_tagline";
 
@@ -274,7 +268,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	$_SESSION['atext'] = $_POST['text'];
   	$_SESSION['acategories'] = $_POST['categories'];
   	$_SESSION['agames'] = $_POST['games'];
-    $_SESSION['atagline_image'] = $_SESSION['uploads_tagline']['image_name'];
 
   	$url = "admin.php?module=add_article&error=noimageselected&temp_tagline=$temp_tagline";
 

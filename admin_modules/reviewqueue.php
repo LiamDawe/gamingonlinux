@@ -129,7 +129,7 @@ else
 		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", NULL, 1);
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery($query, array($_GET['aid']), 'view_articles.php admin review');
+		$db->sqlquery($query, array($_GET['aid']));
 
 		$article = $db->fetch();
 	}
@@ -250,39 +250,22 @@ else
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
 		$templating->set('slug', $_SESSION['aslug']);
+		$text = $_SESSION['atext'];
 	}
 	else
 	{
 		$templating->set('title', htmlentities($article['title'], ENT_QUOTES));
 		$templating->set('tagline', $article['tagline']);
 		$templating->set('slug', $article['slug']);
+		$text = $article['text'];
 	}
 
-	$top_image = '';
-	$top_image_delete = '';
-	if ($article['article_top_image'] == 1)
-	{
-		$top_image = '<img src="'.core::config('website_url').'uploads/articles/topimages/'.$article['article_top_image_filename'].'" alt="[articleimage]" class="imgList"><br />';
-	}
-	if (!empty($article['tagline_image']))
-	{
-		$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-Full Image Url: <a href=\"" . core::config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a><br />";
-	}
+	$tagline_image = $article_class->display_tagline_image($article);
 
-	$templating->set('tagline_image', $top_image);
-	$templating->set('top_image_delete', $top_image_delete);
+	$templating->set('tagline_image', $tagline_image);
 
 	$templating->set('max_height', core::config('article_image_max_height'));
 	$templating->set('max_width', core::config('article_image_max_width'));
-
-	// if they have done it before set title, text and tagline
-	$text = $article['text'];
-	if (isset($_GET['error']))
-	{
-		$text = $_SESSION['atext'];
-	}
 
 	$core->editor('text', $text, 1, $editor_disabled);
 

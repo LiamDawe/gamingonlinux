@@ -1022,10 +1022,10 @@ else if (isset($_POST['act']))
 		$slug = trim($_POST['slug']);
 
 		$temp_tagline = 0;
-		if (!empty($_POST['temp_tagline_image']))
-		{
-			$temp_tagline = 1;
-		}
+	  if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+	  {
+	  	$temp_tagline = 1;
+	  }
 
 		// make sure its not empty
 		if (empty($title) || empty($tagline) || empty($_POST['text']) || empty($_POST['article_id']) || empty($slug))

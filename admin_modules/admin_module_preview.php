@@ -103,7 +103,7 @@ if (isset($article))
 {
 	$templating->set('article_id_field', "<input type=\"hidden\" name=\"article_id\" value=\"{$article['article_id']}\" />");
 }
-if ($_POST['check'] == 'Add')
+else
 {
 	$templating->set('article_id_field', "");
 }
@@ -215,16 +215,7 @@ if (isset($_POST['show_block']))
 $templating->set('pick_check', $pick_check);
 
 // Setup the correct form buttons
-if ($_POST['check'] == 'Add')
-{
-	$templating->set('buttons', '<button type="submit" name="act" value="add" class="btn btn-primary" formaction="/admin.php?module=articles">Publish Now</button> <button class="btn btn-primary" type="submit" name="act" value="review" formaction="/admin.php?module=articles">Submit For Review</button> <button type="submit" name="act" value="Preview" class="btn btn-info" />Preview & Edit More</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info" formaction="/admin.php?module=articles">Save as draft</button>');
-
-	$templating->set('check', 'Add');
-	$templating->set('enable_article', '');
-	$templating->set('submit_as_self', '');
-}
-
-else if ($_POST['check'] == 'Edit')
+if ($_POST['check'] == 'Edit')
 {
 	$templating->set('buttons', '<button type="submit" name="act" value="Edit" class="btn btn-primary" '.$edit_state.' formaction="/admin.php?module=articles">Edit Article</button> <button type="submit" name="act" value="Preview" class="btn btn-info" />Preview</button>');
 	$templating->set('check', 'Edit');
@@ -259,6 +250,14 @@ else if ($_POST['check'] == 'Submitted')
 	$templating->set('check', 'Submitted');
 	$templating->set('enable_article', '');
 	$templating->set('submit_as_self', '<label class="checkbox"><input type="checkbox" name="submit_as_self" '.$self_check.'/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em></label>');
+}
+else
+{
+	$templating->set('buttons', '<button type="submit" name="act" value="add" class="btn btn-primary" formaction="/admin.php?module=articles">Publish Now</button> <button class="btn btn-primary" type="submit" name="act" value="review" formaction="/admin.php?module=articles">Submit For Review</button> <button type="submit" name="act" value="Preview" class="btn btn-info" />Preview & Edit More</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info" formaction="/admin.php?module=articles">Save as draft</button>');
+
+	$templating->set('check', 'Add');
+	$templating->set('enable_article', '');
+	$templating->set('submit_as_self', '');
 }
 
 $templating->set('author_id', $author_id);

@@ -317,7 +317,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	$article_class->process_categories($article_id);
 
   	// process game associations
-  	if (isset($_POST['games']))
+  	if (isset($_POST['games']) && !empty($_POST['games']))
   	{
   		foreach($_POST['games'] as $game)
   		{

@@ -53,7 +53,7 @@ function countchars()
 }
 var slug_enabled=false;
 var current_url = $(location).attr('pathname') + $(location).attr('search');
-if (current_url == '/admin.php?module=articles&view=add')
+if (current_url == '/admin.php?module=add_article')
 {
 	var slug_enabled=true;
 }

@@ -236,5 +236,122 @@ class article_class
 
     return $tagline_image;
   }
+
+  // this function will check over everything necessary for an article to be correctly done
+  function check_article_inputs($return_page)
+  {
+    // make sure its not empty
+		if (empty($title) || empty($tagline) || empty($text) || empty($_POST['article_id']))
+		{
+			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['aslug'] = $_POST['slug'];
+			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atext'] = $_POST['text'];
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
+			if (isset($_POST['show_article']))
+			{
+				$_SESSION['aactive'] = 1;
+			}
+			else
+			{
+				$_SESSION['aactive'] = 0;
+			}
+
+			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
+      die();
+		}
+
+		else if (strlen($_POST['tagline']) < 100)
+		{
+			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['aslug'] = $_POST['slug'];
+			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atext'] = $_POST['text'];
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
+			if (isset($_POST['show_article']))
+			{
+				$_SESSION['aactive'] = 1;
+			}
+			else
+			{
+				$_SESSION['aactive'] = 0;
+			}
+
+			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
+      die();
+		}
+
+		else if (strlen($_POST['tagline']) > 400)
+		{
+			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['aslug'] = $_POST['slug'];
+			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atext'] = $_POST['text'];
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
+			if (isset($_POST['show_article']))
+			{
+				$_SESSION['aactive'] = 1;
+			}
+			else
+			{
+				$_SESSION['aactive'] = 0;
+			}
+
+			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
+      die();
+		}
+
+		else if (strlen($_POST['title']) < 10)
+		{
+			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['aslug'] = $_POST['slug'];
+			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atext'] = $_POST['text'];
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
+			if (isset($_POST['show_article']))
+			{
+				$_SESSION['aactive'] = 1;
+			}
+			else
+			{
+				$_SESSION['aactive'] = 0;
+			}
+
+			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
+      die();
+		}
+
+		else if (isset($_POST['show_block']) && $editor_pick_count == 3 && !in_array($_POST['article_id'], $editor_picks))
+		{
+			$_SESSION['atitle'] = $_POST['title'];
+			$_SESSION['aslug'] = $_POST['slug'];
+			$_SESSION['atagline'] = $_POST['tagline'];
+			$_SESSION['atext'] = $_POST['text'];
+			$_SESSION['acategories'] = $_POST['categories'];
+			$_SESSION['agames'] = $_POST['games'];
+
+			if (isset($_POST['show_article']))
+			{
+				$_SESSION['aactive'] = 1;
+			}
+			else
+			{
+				$_SESSION['aactive'] = 0;
+			}
+
+			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=toomanypicks");
+      die();
+    }
+
+    return true;
+  }
 }
 ?>

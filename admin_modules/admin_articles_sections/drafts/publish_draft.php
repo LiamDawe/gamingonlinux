@@ -1,6 +1,6 @@
 <?php
 $temp_tagline = 0;
-if (!empty($_POST['temp_tagline_image']))
+if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 {
 	$temp_tagline = 1;
 }

@@ -200,12 +200,19 @@ if (isset($_GET['view']))
 
 			$templating->set('games_list', $games_list);
 
+			$text = $article['text'];
+			$previously_uploaded = '';
 			// if they have done it before set title, text and tagline
 			if (isset($_GET['error']))
 			{
 				$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 				$templating->set('tagline', $_SESSION['atagline']);
 				$templating->set('slug', $_SESSION['aslug']);
+
+				$text = $_SESSION['atext'];
+
+				// sort out previously uploaded images
+				$previously_uploaded	= $article_class->previous_uploads();
 			}
 
 			else
@@ -229,53 +236,12 @@ if (isset($_GET['view']))
 
 			$templating->set('username', $username);
 
-			$top_image = '';
 			$top_image_delete = '';
-			if ($article['article_top_image'] == 1)
-			{
-				$top_image = "<img src=\"/uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />";
-				$top_image_delete = " <button class=\"btn btn-danger\" name=\"act\" value=\"deletetopimage\" $edit_state>Delete Top Image</button>";
-			}
-			if (!empty($article['tagline_image']))
-			{
-				$top_image = "<img src=\"/uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a><br />";
-				$top_image_delete = " <button class=\"btn btn-danger\" name=\"act\" value=\"deletetopimage\" $edit_state>Delete Top Image</button>";
-			}
-			$templating->set('tagline_image', $top_image);
+			$tagline_image = $article_class->display_tagline_image($article);
+			$templating->set('tagline_image', $tagline_image);
 
 			$tagline_image = '';
 			$temp_tagline_image = '';
-			$previously_uploaded = '';
-
-			if (isset($_GET['error']))
-			{
-				$title = $_SESSION['atitle'];
-				$tagline = $_SESSION['atagline'];
-				$text = $_SESSION['atext'];
-
-				if ($_GET['temp_tagline'] == 1)
-				{
-					$types = array('jpg', 'png', 'gif');
-					$file = $_SERVER['DOCUMENT_ROOT'] . "/uploads/articles/topimages/temp/{$_SESSION['username']}_article_tagline.";
-					$image_load = false;
-					foreach ($types as $type)
-					{
-						if (file_exists($file . $type))
-						{
-							$image_load = "/uploads/articles/topimages/temp/{$_SESSION['username']}_article_tagline." . $type;
-							$temp_tagline_image = "{$_SESSION['username']}_article_tagline." . $type;
-							break;
-						}
-					}
-					$tagline_image = "<img src=\"$image_load\">";
-					$templating->set('top_image', $tagline_image);
-				}
-
-				// sort out previously uploaded images
-				$previously_uploaded	= $article_class->previous_uploads();
-			}
 
 			// add in uploaded images from database
 			$previously_uploaded	= $article_class->previous_uploads($article['article_id']);
@@ -286,14 +252,6 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 
 			$templating->set('max_height', core::config('article_image_max_height'));
 			$templating->set('max_width', core::config('article_image_max_width'));
-
-
-			// if they have done it before set title, text and tagline
-			$text = $article['text'];
-			if (isset($_GET['error']))
-			{
-				$text = $_SESSION['atext'];
-			}
 
 			$core->editor('text', $text, 1, $editor_disabled);
 
@@ -725,6 +683,12 @@ else if (isset($_POST['act']))
 
 		$editor_pick_count = $db->num_rows();
 
+		$temp_tagline = 0;
+		if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+		{
+			$temp_tagline = 1;
+		}
+
 		// make sure its not empty
 		if (empty($title) || empty($tagline) || empty($text) || empty($_POST['article_id']))
 		{
@@ -742,12 +706,6 @@ else if (isset($_POST['act']))
 			else
 			{
 				$_SESSION['aactive'] = 0;
-			}
-
-			$temp_tagline = 0;
-			if (!empty($_POST['temp_tagline_image']))
-			{
-				$temp_tagline = 1;
 			}
 
 			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline");
@@ -771,12 +729,6 @@ else if (isset($_POST['act']))
 				$_SESSION['aactive'] = 0;
 			}
 
-			$temp_tagline = 0;
-			if (!empty($_POST['temp_tagline_image']))
-			{
-				$temp_tagline = 1;
-			}
-
 			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline");
 		}
 
@@ -796,12 +748,6 @@ else if (isset($_POST['act']))
 			else
 			{
 				$_SESSION['aactive'] = 0;
-			}
-
-			$temp_tagline = 0;
-			if (!empty($_POST['temp_tagline_image']))
-			{
-				$temp_tagline = 1;
 			}
 
 			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline");
@@ -825,12 +771,6 @@ else if (isset($_POST['act']))
 				$_SESSION['aactive'] = 0;
 			}
 
-			$temp_tagline = 0;
-			if (!empty($_POST['temp_tagline_image']))
-			{
-				$temp_tagline = 1;
-			}
-
 			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=shorttitle&temp_tagline=$temp_tagline");
 		}
 
@@ -850,12 +790,6 @@ else if (isset($_POST['act']))
 			else
 			{
 				$_SESSION['aactive'] = 0;
-			}
-
-			$temp_tagline = 0;
-			if (!empty($_POST['temp_tagline_image']))
-			{
-				$temp_tagline = 1;
 			}
 
 			header("Location: /admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}&error=toomanypicks");

@@ -97,22 +97,11 @@ if (isset($_GET['error']))
   $text = $_SESSION['atext'];
   $slug = $_SESSION['aslug'];
 
-  if ($_GET['temp_tagline'] == 1)
-  {
-    $file = core::config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
-    $image_load = false;
-
-    if (file_exists($file))
-    {
-      $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
-      BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-      <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
-      <a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
-    }
-  }
   // sort out previously uploaded images
   $previously_uploaded	= $article_class->previous_uploads();
 }
+
+$tagline_image = $article_class->display_tagline_image();
 
 $templating->set('tagline_image', $tagline_image);
 

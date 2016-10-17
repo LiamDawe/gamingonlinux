@@ -115,9 +115,8 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 	// do the search query
 	$db->sqlquery("SELECT a.article_id, a.`title`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start), 'search.php');
 	$found_search = $db->fetch_all_rows();
-	$total_found = $db->num_rows();
 
-	if ($total_found > 0)
+	if ($total > 0)
 	{
 		$templating->set_previous('title', 'Viewing articles by ' . $found_search[0]['username'], 1);
 		$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $found_search[0]['username'], 1);

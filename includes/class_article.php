@@ -92,7 +92,7 @@ class article_class
     return $games_list;
   }
 
-  function process_categories($article_id = NULL)
+  function process_categories($article_id)
   {
     global $db;
 
@@ -127,7 +127,7 @@ class article_class
   function delete_article($article)
   {
     global $db;
-    
+
     $db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
     $db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
     $db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));

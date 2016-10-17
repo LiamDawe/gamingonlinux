@@ -9,13 +9,7 @@ $db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` =
 
 $article_id = $db->grab_id();
 
-if (isset($_POST['categories']))
-{
-	foreach($_POST['categories'] as $category)
-	{
-		$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
-	}
-}
+$article_class->process_categories($article_id);
 
 // process game associations
 if (isset($_POST['games']))

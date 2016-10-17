@@ -192,15 +192,7 @@ else
 			}
 		}
 
-		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($_POST['article_id']));
-
-		if (isset($_POST['categories']))
-		{
-			foreach($_POST['categories'] as $category)
-			{
-				$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($_POST['article_id'], $category));
-			}
-		}
+		$article_class->process_categories($_POST['article_id']);
 
 		// process game associations
 		$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));

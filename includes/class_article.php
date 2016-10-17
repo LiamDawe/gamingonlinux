@@ -404,6 +404,20 @@ class article_class
       die();
     }
 
+    // check for tagline image, don't let people publish without one!
+    else if ((!isset($_SESSION['uploads_tagline'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand'])  || (isset($check_article) && empty($check_article['tagline_image'])))
+    {
+      $_SESSION['atitle'] = $title;
+      $_SESSION['aslug'] = $slug;
+      $_SESSION['atagline'] = $tagline;
+      $_SESSION['atext'] = $text;
+      $_SESSION['acategories'] = $_POST['categories'];
+      $_SESSION['agames'] = $_POST['games'];
+
+      header("Location: $return_page&error=noimageselected");
+      die();
+    }
+
     $content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug);
 
     return $content_array;

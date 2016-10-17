@@ -114,6 +114,11 @@ else
 
 			$core->message($_SESSION['tagerror'] . $brandnew, NULL, 1);
 		}
+
+		else if ($_GET['error'] == 'noimageselected')
+		{
+			$core->message('You didn\'t select a tagline image to upload with the article, all articles must have one!', NULL, 1);
+		}
 	}
 
 	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');

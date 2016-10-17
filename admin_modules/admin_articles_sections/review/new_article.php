@@ -131,32 +131,32 @@ else
 	{
 		$to = $email_user['email'];
 
-				// message
-				$message = '
-				<html>
-				<head>
-				<title>GamingOnLinux.com article submitted for review by ' . $_SESSION['username'] . '</title>
-				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-				</head>
-				<body>
-				<img src="' . core::config('website_url') . 'templates/default/images/logo.png" alt="Gaming On Linux">
-				<br />
-				<p>Hello <strong>' . $email_user['username'] . '</strong>,</p>
-				<p><strong>' . $_SESSION['username'] . '</strong> has sent an article to be reviewed before publishing "<strong><a href="' . core::config('website_url') . 'admin.php?module=articles&view=adminreview&aid=' . $article_id . '">' . $title . '</a></strong>".</p>
-				</body>
-				</html>';
+		// message
+		$message = '
+		<html>
+		<head>
+		<title>GamingOnLinux.com article submitted for review by ' . $_SESSION['username'] . '</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		</head>
+		<body>
+		<img src="' . core::config('website_url') . 'templates/default/images/logo.png" alt="Gaming On Linux">
+		<br />
+		<p>Hello <strong>' . $email_user['username'] . '</strong>,</p>
+		<p><strong>' . $_SESSION['username'] . '</strong> has sent an article to be reviewed before publishing "<strong><a href="' . core::config('website_url') . 'admin.php?module=articles&view=adminreview&aid=' . $article_id . '">' . $title . '</a></strong>".</p>
+		</body>
+		</html>';
 
-				// To send HTML mail, the Content-type header must be set
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+		// To send HTML mail, the Content-type header must be set
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
+		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
-				// Mail it
-				if (core::config('send_emails') == 1)
-				{
-					mail($to, $subject, $message, $headers);
-				}
-			}
-
-			header("Location: /admin.php?module=reviewqueue&message=sentforreview");
+		// Mail it
+		if (core::config('send_emails') == 1)
+		{
+			mail($to, $subject, $message, $headers);
 		}
+	}
+
+	header("Location: /admin.php?module=reviewqueue&message=sentforreview");
+}

@@ -16,19 +16,22 @@ if (isset($_POST['check']))
 	}
 }
 
-if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
+if (isset($article))
 {
-	$templating->block('edit_locked');
-	$templating->set('locked_username', $article['username_lock']);
+	if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
+	{
+		$templating->block('edit_locked');
+		$templating->set('locked_username', $article['username_lock']);
 
-	$lock_date = $core->format_date($article['locked_date']);
+		$lock_date = $core->format_date($article['locked_date']);
 
-	$templating->set('locked_date', $lock_date);
-}
+		$templating->set('locked_date', $lock_date);
+	}
 
-else if ($article['locked'] == 0)
-{
-	$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article_id));
+	else if ($article['locked'] == 0)
+	{
+		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article_id));
+	}
 }
 
 // make date human readable
@@ -182,14 +185,20 @@ while ($categorys = $db->fetch())
 	{
 		$categories_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
 	}
-
-	else
-	{
-		$categories_list .= "<option value=\"{$categorys['category_id']}\">{$categorys['category_name']}</option>";
-	}
 }
 
 $templating->set('categories_list', $categories_list);
+
+if (isset($article))
+{
+	$games_list = $article_class->sort_game_assoc($article['article_id']);
+}
+else {
+	$games_list = $article_class->sort_game_assoc();
+}
+
+$templating->set('categories_list', $categories_list);
+$templating->set('games_list', $games_list);
 
 $templating->set('title', htmlentities($_POST['title'], ENT_QUOTES));
 $templating->set('slug', $_POST['slug']);
@@ -251,10 +260,9 @@ else if ($_POST['check'] == 'Submitted')
 	$templating->set('enable_article', '');
 	$templating->set('submit_as_self', '<label class="checkbox"><input type="checkbox" name="submit_as_self" '.$self_check.'/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em></label>');
 }
-else if (!isset($_POST['check']))
+else if (isset($_POST['check']) == 'Add')
 {
 	$templating->set('buttons', '<button type="submit" name="act" value="publish_now" formaction="/admin.php?module=add_article" class="btn">Publish Now</button> <button class="btn" type="submit" name="act" value="review" formaction="/admin.php?module=articles">Submit For Review</button> <button type="submit" name="act" value="Preview" class="btn" />Preview & Edit More</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info" formaction="/admin.php?module=articles">Save as draft</button>');
-
 	$templating->set('check', 'Add');
 	$templating->set('enable_article', '');
 	$templating->set('submit_as_self', '');
@@ -293,13 +301,15 @@ $templating->set('subscribe_check', $auto_subscribe);
 
 $subscribe_check = '';
 $subscribe_box = '';
-if ($article['author_id'] == $_SESSION['user_id'])
+if (isset($article))
 {
-	if (isset($_POST['subscribe']))
+	if ($article['author_id'] == $_SESSION['user_id'])
 	{
-		$subscribe_check = 'checked';
+		if (isset($_POST['subscribe']))
+		{
+			$subscribe_check = 'checked';
+		}
 	}
-
-	$subscribe_box = '<label class="checkbox"><input type="checkbox" name="subscribe" '.$subscribe_check.' /> Subscribe to article to receive comment replies via email</label>';
 }
+$subscribe_box = '<label class="checkbox"><input type="checkbox" name="subscribe" '.$subscribe_check.' /> Subscribe to article to receive comment replies via email</label>';
 $templating->set('subscribe_box', $subscribe_box);

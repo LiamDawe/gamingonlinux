@@ -58,7 +58,7 @@ class article_class
     }
 
     $games_list = '';
-    $db->sqlquery("SELECT * FROM `calendar` ORDER BY `name` ASC");
+    $db->sqlquery("SELECT `id`, `name` FROM `calendar` ORDER BY `name` ASC");
     while ($games = $db->fetch())
     {
       if (isset($_GET['error']))
@@ -67,24 +67,18 @@ class article_class
         {
           $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
         }
-
-        else
-        {
-          $games_list .= "<option value=\"{$games['id']}\">{$games['name']}</option>";
-        }
       }
 
       else
       {
-
         if (($article_id != NULL) && isset($games_check_array) && in_array($games['id'], $games_check_array))
         {
           $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
         }
 
-        else
+        if (!empty($_POST['games']) && in_array($games['id'], $_POST['games']))
         {
-          $games_list .= "<option value=\"{$games['id']}\">{$games['name']}</option>";
+          $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
         }
       }
     }
@@ -238,7 +232,6 @@ class article_class
   }
 
   // this function will check over everything necessary for an article to be correctly done
-  // THIS NEEDS ADJUSTING, AS ITS DUPLICATING SETTING THE SESSION STUFF EVERY TIME, DO IT ONCE, SET A VAR, IF VAR SET, DO IT
   function check_article_inputs($return_page)
   {
     global $db, $core;

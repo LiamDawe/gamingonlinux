@@ -171,11 +171,6 @@ if (isset($_GET['view']))
 					{
 						$categorys_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
 					}
-
-					else
-					{
-						$categorys_list .= "<option value=\"{$categorys['category_id']}\">{$categorys['category_name']}</option>";
-					}
 				}
 
 				else
@@ -184,11 +179,6 @@ if (isset($_GET['view']))
 					if (isset($categories_check_array) && in_array($categorys['category_id'], $categories_check_array))
 					{
 						$categorys_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
-					}
-
-					else
-					{
-						$categorys_list .= "<option value=\"{$categorys['category_id']}\">{$categorys['category_name']}</option>";
 					}
 				}
 			}

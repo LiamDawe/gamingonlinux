@@ -19,6 +19,7 @@
 								<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to article to receive comment replies via email?
 							</label>
 							<button type="submit" name="act" value="publish_now" formaction="/admin.php?module=add_article" class="btn btn-primary">Publish Now</button> <button type="submit" name="act" value="Preview" formaction="/admin.php?module=preview">Preview</button> <button type="submit" name="act" value="review" class="btn btn-info">Submit for Review</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info">Save as draft</button>
+							<input type="hidden" name="check" value="Add" />
 							<input type="hidden" name="temp_tagline_image" value="{:temp_tagline_image}" />
 					</div>
 				</div>

@@ -14,115 +14,7 @@ if ($check_article['active'] == 1)
 }
 else
 {
-	// count how many editors picks we have
-	$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-	$editor_pick_count = $db->num_rows();
-
-	// check its set, if not hard-set it based on the article title
-	if (isset($_POST['slug']) && !empty($_POST['slug']))
-	{
-		$slug = $core->nice_title($_POST['slug']);
-	}
-	else
-	{
-		$slug = $core->nice_title($_POST['title']);
-	}
-
-	// make sure its not empty
-	if (empty($_POST['title']) || empty($_POST['tagline']) || empty($_POST['text']) || empty($slug))
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=empty&temp_tagline=$temp_tagline";
-
-		header("Location: $url");
-		die();
-	}
-
-	// make sure tagline isn't too short
-	else if (strlen($_POST['tagline']) < 100)
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=shorttagline&temp_tagline=$temp_tagline";
-
-		header("Location: $url");
-		die();
-	}
-
-	// if tagline is too long
-	else if (strlen($_POST['tagline']) > 400)
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=taglinetoolong&temp_tagline=$temp_tagline";
-
-		header("Location: $url");
-		die();
-	}
-
-	// if title is too short
-	else if (strlen($_POST['title']) < 10)
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&message=shorttile&temp_tagline=$temp_tagline";
-
-		header("Location: $url");
-		die();
-	}
-
-	// if they try to make it an editor pick, and there's too many already
-	else if (isset($_POST['show_block']) && $editor_pick_count == core::config('editor_picks_limit'))
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		$url = "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=toomanypicks&temp_tagline=$temp_tagline";
-
-		header("Location: $url");
-		die();
-	}
-
-	// if it's a draft and there's no uploaded tagline image, and no stored image already
-	else if (!isset($_SESSION['uploads_tagline']) && $check_article['tagline_image'] == '')
-	{
-		$_SESSION['atitle'] = $_POST['title'];
-		$_SESSION['aslug'] = $slug;
-		$_SESSION['atagline'] = $_POST['tagline'];
-		$_SESSION['atext'] = $_POST['text'];
-		$_SESSION['acategories'] = $_POST['categories'];
-		$_SESSION['agames'] = $_POST['games'];
-
-		header("Location: admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&error=noimageselected&temp_tagline=$temp_tagline");
-		die();
-	}
-
-	else
+	if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&temp_tagline=$temp_tagline"))
 	{
 		// show in the editors pick block section
 		$block = 0;
@@ -152,7 +44,7 @@ else
 
 		$title = strip_tags($_POST['title']);
 
-		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0, `draft` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
+		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0, `draft` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array(core::$date, "{$_SESSION['username']} published a new article.", core::$date, $_POST['article_id']));
 

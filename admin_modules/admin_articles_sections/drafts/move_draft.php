@@ -14,16 +14,7 @@ if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_r
 
 $article_class->process_categories($_POST['article_id']);
 
-// process game associations
-$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($_POST['article_id']));
-
-if (isset($_POST['games']))
-{
-	foreach($_POST['games'] as $game)
-	{
-		$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($_POST['article_id'], $game));
-	}
-}
+$article_class->article_game_assoc($_POST['article_id']);
 
 // article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 unset($_SESSION['atitle']);

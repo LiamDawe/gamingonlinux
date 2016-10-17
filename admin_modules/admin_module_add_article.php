@@ -316,14 +316,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 
   	$article_class->process_categories($article_id);
 
-  	// process game associations
-  	if (isset($_POST['games']) && !empty($_POST['games']))
-  	{
-  		foreach($_POST['games'] as $game)
-  		{
-  			$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
-  		}
-  	}
+  	$article_class->article_game_assoc($article_id);
 
   	// move new uploaded tagline image, and save it to the article
   	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

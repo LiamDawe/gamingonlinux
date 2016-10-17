@@ -90,14 +90,7 @@ else
 
 	$article_class->process_categories($article_id);
 
-	// process game associations
-	if (isset($_POST['games']))
-	{
-		foreach($_POST['games'] as $game)
-		{
-			$db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
-		}
-	}
+	$article_class->article_game_assoc($article_id);
 
 	// force subscribe, so they don't lose editors comments
 	$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));

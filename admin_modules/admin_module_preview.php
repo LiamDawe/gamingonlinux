@@ -253,7 +253,7 @@ else if ($_POST['check'] == 'Submitted')
 }
 else
 {
-	$templating->set('buttons', '<button type="submit" name="act" value="add" class="btn btn-primary" formaction="/admin.php?module=articles">Publish Now</button> <button class="btn btn-primary" type="submit" name="act" value="review" formaction="/admin.php?module=articles">Submit For Review</button> <button type="submit" name="act" value="Preview" class="btn btn-info" />Preview & Edit More</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info" formaction="/admin.php?module=articles">Save as draft</button>');
+	$templating->set('buttons', '<button type="submit" name="act" value="publish_now" formaction="/admin.php?module=add_article" class="btn">Publish Now</button> <button class="btn" type="submit" name="act" value="review" formaction="/admin.php?module=articles">Submit For Review</button> <button type="submit" name="act" value="Preview" class="btn" />Preview & Edit More</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info" formaction="/admin.php?module=articles">Save as draft</button>');
 
 	$templating->set('check', 'Add');
 	$templating->set('enable_article', '');

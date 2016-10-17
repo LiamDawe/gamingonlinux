@@ -130,6 +130,44 @@ class article_class
     }
   }
 
+  function article_game_assoc($article_id)
+  {
+    global $db;
+
+    if (isset($article_id) && is_numeric($article_id))
+    {
+      // delete any existing games that aren't in the final list for publishing
+      $db->sqlquery("SELECT `id`, `article_id`, `game_id` FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
+      $current_games = $db->fetch_all_rows();
+
+      if (!empty($current_games))
+      {
+        foreach ($current_games as $current_game)
+        {
+          if (!in_array($current_game['game_id'], $_POST['games']))
+          {
+            $db->sqlquery("DELETE FROM `article_game_assoc` WHERE `id` = ?", array($current_game['id']));
+          }
+        }
+      }
+
+      // get fresh list of games, and insert any that don't exist
+      $db->sqlquery("SELECT `game_id`, `id`, `article_id` FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
+      $current_games = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
+
+      if (isset($_POST['games']) && !empty($_POST['games']))
+      {
+        foreach($_POST['games'] as $game)
+        {
+          if (!in_array($game, $current_games))
+          {
+            $db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
+          }
+        }
+      }
+    }
+  }
+
   function delete_article($article)
   {
     global $db;

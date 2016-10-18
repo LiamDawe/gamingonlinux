@@ -88,7 +88,7 @@ if (isset($_GET['error']))
   $slug = $_SESSION['aslug'];
 
   // sort out previously uploaded images
-  $previously_uploaded	= $article_class->previous_uploads();
+  $previously_uploaded	= $article_class->display_previous_uploads();
 }
 
 $tagline_image = $article_class->display_tagline_image();

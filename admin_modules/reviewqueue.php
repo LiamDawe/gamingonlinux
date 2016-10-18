@@ -298,7 +298,7 @@ else
 
 	$previously_uploaded = '';
 	// add in uploaded images from database
-	$previously_uploaded	= $article_class->previous_uploads($article['article_id']);
+	$previously_uploaded	= $article_class->display_previous_uploads($article['article_id']);
 
 	$templating->set('previously_uploaded', $previously_uploaded);
 

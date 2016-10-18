@@ -1,7 +1,7 @@
 <?php
 class article_class
 {
-  function previous_uploads($article_id = NULL)
+  function display_previous_uploads($article_id = NULL)
   {
     global $db;
 

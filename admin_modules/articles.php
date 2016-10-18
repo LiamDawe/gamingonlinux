@@ -191,7 +191,7 @@ if (isset($_GET['view']))
 				$text = $_SESSION['atext'];
 
 				// sort out previously uploaded images
-				$previously_uploaded	= $article_class->previous_uploads();
+				$previously_uploaded	= $article_class->display_previous_uploads();
 			}
 
 			else
@@ -223,7 +223,7 @@ if (isset($_GET['view']))
 			$temp_tagline_image = '';
 
 			// add in uploaded images from database
-			$previously_uploaded	= $article_class->previous_uploads($article['article_id']);
+			$previously_uploaded	= $article_class->display_previous_uploads($article['article_id']);
 
 			$templating->set('previously_uploaded', $previously_uploaded);
 

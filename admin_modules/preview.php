@@ -30,7 +30,7 @@ if (isset($article))
 
 	else if ($article['locked'] == 0)
 	{
-		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article_id));
+		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 	}
 }
 
@@ -191,10 +191,10 @@ $templating->set('categories_list', $categories_list);
 
 if (isset($article))
 {
-	$games_list = $article_class->sort_game_assoc($article['article_id']);
+	$games_list = $article_class->display_game_assoc($article['article_id']);
 }
 else {
-	$games_list = $article_class->sort_game_assoc();
+	$games_list = $article_class->display_game_assoc();
 }
 
 $templating->set('categories_list', $categories_list);

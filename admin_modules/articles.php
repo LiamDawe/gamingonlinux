@@ -114,17 +114,6 @@ if (isset($_GET['view']))
 				{
 					$core->message('There are already 3 articles set as editor picks!', NULL, 1);
 				}
-
-				else if ($_GET['error'] == 'tagline_image')
-				{
-					$brandnew = '';
-					if (isset($_GET['brandnew']))
-					{
-						$brandnew = '<br /><strong>NOTE:</strong> The article has been posted, but <strong>it is not yet active</strong> because of this issue!';
-					}
-
-					$core->message($_SESSION['tagerror'] . $brandnew, NULL, 1);
-				}
 			}
 
 			$templating->block('edit_top', 'admin_modules/admin_module_articles');
@@ -186,7 +175,7 @@ if (isset($_GET['view']))
 			$templating->set('categories_list', $categorys_list);
 
 			// get games list
-			$games_list = $article_class->sort_game_assoc($article['article_id']);
+			$games_list = $article_class->display_game_assoc($article['article_id']);
 
 			$templating->set('games_list', $games_list);
 
@@ -685,7 +674,7 @@ else if (isset($_POST['act']))
 
 			$article_class->process_categories($_POST['article_id']);
 
-			$article_class->article_game_assoc($_POST['article_id']);
+			$article_class->process_game_assoc($_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
@@ -702,7 +691,6 @@ else if (isset($_POST['act']))
 			unset($_SESSION['atext']);
 			unset($_SESSION['acategories']);
 			unset($_SESSION['agames']);
-			unset($_SESSION['tagerror']);
 			unset($_SESSION['aactive']);
 			unset($_SESSION['uploads']);
 			unset($_SESSION['uploads_tagline']);
@@ -840,7 +828,7 @@ else if (isset($_POST['act']))
 
 			$article_class->process_categories($_POST['article_id']);
 
-			$article_class->article_game_assoc($_POST['article_id']);
+			$article_class->process_game_assoc($_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
@@ -856,7 +844,6 @@ else if (isset($_POST['act']))
 			unset($_SESSION['atext']);
 			unset($_SESSION['acategories']);
 			unset($_SESSION['agames']);
-			unset($_SESSION['tagerror']);
 			unset($_SESSION['aactive']);
 			unset($_SESSION['uploads']);
 			unset($_SESSION['uploads_tagline']);

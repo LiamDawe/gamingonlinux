@@ -61,7 +61,7 @@ else
 
 		$article_class->process_categories($_POST['article_id']);
 
-		$article_class->article_game_assoc($_POST['article_id']);
+		$article_class->process_game_assoc($_POST['article_id']);
 
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{
@@ -73,7 +73,6 @@ else
 		unset($_SESSION['atext']);
 		unset($_SESSION['aslug']);
 		unset($_SESSION['acategories']);
-		unset($_SESSION['tagerror']);
 		unset($_SESSION['aactive']);
 		unset($_SESSION['uploads']);
 		unset($_SESSION['uploads_tagline']);

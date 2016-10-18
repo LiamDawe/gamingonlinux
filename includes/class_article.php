@@ -42,7 +42,7 @@ class article_class
     return $previously_uploaded;
   }
 
-  function sort_game_assoc($article_id = NULL)
+  function display_game_assoc($article_id = NULL)
   {
     global $db;
 
@@ -61,6 +61,7 @@ class article_class
     $db->sqlquery("SELECT `id`, `name` FROM `calendar` ORDER BY `name` ASC");
     while ($games = $db->fetch())
     {
+      // if there was some sort of error, we use the games set on the error
       if (isset($_GET['error']))
       {
         if (!empty($_SESSION['agames']) && in_array($games['id'], $_SESSION['agames']))
@@ -69,17 +70,19 @@ class article_class
         }
       }
 
-      else
+      // otherwise if we are submitting a form, like on a preview
+      else if (!empty($_POST['games']) && !isset($_GET['error']))
       {
-        if (($article_id != NULL) && isset($games_check_array) && in_array($games['id'], $games_check_array))
+        if (in_array($games['id'], $_POST['games']))
         {
           $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
         }
+      }
 
-        if (!empty($_POST['games']) && in_array($games['id'], $_POST['games']))
-        {
-          $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
-        }
+      // lastly, if we are viewing an existing article
+      else if (($article_id != NULL) && isset($games_check_array) && in_array($games['id'], $games_check_array))
+      {
+        $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
       }
     }
 
@@ -124,7 +127,7 @@ class article_class
     }
   }
 
-  function article_game_assoc($article_id)
+  function process_game_assoc($article_id)
   {
     global $db;
 

@@ -19,7 +19,7 @@ $article_id = $db->grab_id();
 
 $article_class->process_categories($article_id);
 
-$article_class->article_game_assoc($article_id);
+$article_class->process_game_assoc($article_id);
 
 // force subscribe, so they don't lose editors comments
 $db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));

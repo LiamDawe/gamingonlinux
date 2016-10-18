@@ -12,7 +12,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 
 	$article_class->process_categories($_POST['article_id']);
 
-	$article_class->article_game_assoc($_POST['article_id']);
+	$article_class->process_game_assoc($_POST['article_id']);
 
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
@@ -28,7 +28,6 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	unset($_SESSION['atagline']);
 	unset($_SESSION['atext']);
 	unset($_SESSION['acategories']);
-	unset($_SESSION['tagerror']);
 	unset($_SESSION['aactive']);
 	unset($_SESSION['uploads']);
 	unset($_SESSION['uploads_tagline']);

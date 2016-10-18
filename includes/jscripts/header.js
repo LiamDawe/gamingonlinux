@@ -134,6 +134,53 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
+  $("#articleCategories").select2({
+    selectOnClose: true,
+    width: '100%',
+    ajax: {
+      url: "/includes/ajax/categories_ajax.php",
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term // search term
+        };
+      },
+      processResults: function (data) {
+        return {
+          results: $.map(data, function(obj) {
+            return { id: obj.id, text: obj.text };
+          })
+        };
+      },
+      cache: true,
+    },
+    minimumInputLength: 2
+  });
+  $("#articleGames").select2({
+  selectOnClose: true,
+  width: '100%',
+  ajax: {
+    url: "/includes/ajax/games_ajax.php",
+    dataType: 'json',
+    delay: 250,
+    data: function (params) {
+      return {
+        q: params.term // search term
+      };
+    },
+    processResults: function (data) {
+      return {
+        results: $.map(data, function(obj) {
+          return { id: obj.id, text: obj.text };
+        })
+      };
+    },
+    cache: true,
+  },
+  minimumInputLength: 2
+  });
+
   var clipboard = new Clipboard('.btn');
 
 	$(".computer_deets").fancybox({

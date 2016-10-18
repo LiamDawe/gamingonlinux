@@ -70,7 +70,7 @@ while ($categorys = $db->fetch())
 }
 
 // get games list
-$games_list = $article_class->sort_game_assoc();
+$games_list = $article_class->display_game_assoc();
 
 // if they have done it before set text and tagline
 $title = '';
@@ -152,7 +152,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 
   	$article_class->process_categories($article_id);
 
-  	$article_class->article_game_assoc($article_id);
+  	$article_class->process_game_assoc($article_id);
 
   	// move new uploaded tagline image, and save it to the article
   	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
@@ -167,7 +167,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	unset($_SESSION['atext']);
   	unset($_SESSION['acategories']);
   	unset($_SESSION['agame']);
-  	unset($_SESSION['tagerror']);
   	unset($_SESSION['uploads']);
   	unset($_SESSION['image_rand']);
   	unset($_SESSION['uploads_tagline']);

@@ -14,7 +14,7 @@ if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_r
 
 $article_class->process_categories($_POST['article_id']);
 
-$article_class->article_game_assoc($_POST['article_id']);
+$article_class->process_game_assoc($_POST['article_id']);
 
 // article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 unset($_SESSION['atitle']);
@@ -22,7 +22,6 @@ unset($_SESSION['atagline']);
 unset($_SESSION['atext']);
 unset($_SESSION['acategories']);
 unset($_SESSION['agames']);
-unset($_SESSION['tagerror']);
 unset($_SESSION['aactive']);
 unset($_SESSION['uploads']);
 unset($_SESSION['uploads_tagline']);

@@ -67,11 +67,6 @@ else
 			$core->message('Post Edited!');
 		}
 
-		else if ($_GET['message'] == 'tagline_image')
-		{
-			$core->message($_SESSION['tagerror'], NULL, 1);
-		}
-
 		if ($_GET['message'] == 'shorttile')
 		{
 			$core->message('The title was too short!', NULL, 1);
@@ -102,17 +97,6 @@ else
 		else if ($_GET['error'] == 'toomanypicks')
 		{
 			$core->message('There are already 3 articles set as editor picks!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'tagline_image')
-		{
-			$brandnew = '';
-			if (isset($_GET['brandnew']))
-			{
-				$brandnew = '<br /><strong>NOTE:</strong> The article has still been saved.';
-			}
-
-			$core->message($_SESSION['tagerror'] . $brandnew, NULL, 1);
 		}
 
 		else if ($_GET['error'] == 'noimageselected')
@@ -176,7 +160,7 @@ else
 
 	$templating->set('categories_list', $categorys_list);
 
-	$games_list = $article_class->sort_game_assoc($article['article_id']);
+	$games_list = $article_class->display_game_assoc($article['article_id']);
 
 	$templating->set('games_list', $games_list);
 

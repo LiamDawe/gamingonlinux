@@ -77,6 +77,10 @@ do {
 			{
 				$dont_use = 1;
 			}
+			if (strpos($games['title'], ' Demo') !== false)
+			{
+				$dont_use = 1;
+			}
 
 			// what the fuck GOG, seriously, stop re-ordering the fucking "The"
 			if (strpos($games['title'], ', The - The') !== false)

@@ -696,7 +696,7 @@ else if (isset($_POST['act']))
 
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: /articles/$slug.{$_POST['article_id']}/");
+				header("Location: /articles/{$checked['slug']}.{$_POST['article_id']}/");
 			}
 			else
 			{

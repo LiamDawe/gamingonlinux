@@ -648,8 +648,6 @@ else if (isset($_POST['act']))
 	{
 		if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}"))
 		{
-			print_r($checked);
-
 			$block = 0;
 			if (isset($_POST['show_block']))
 			{

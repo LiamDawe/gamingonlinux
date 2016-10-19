@@ -1,7 +1,3 @@
-// check if function exists (useful if loading in other files on specific pages)
-function isFunction(possibleFunction) {
-  return typeof(possibleFunction) === typeof(Function);
-}
 // scroll to an element if it's not in view, all other ways I could find completely sucked
 jQuery.fn.scrollMinimal = function(smooth) {
   var cTop = this.offset().top;
@@ -138,8 +134,7 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
-  if (isFunction('select2'))
-  {
+  if ( $.isFunction($.fn.select2) ) {
   $("#articleCategories").select2({
     selectOnClose: true,
     width: '100%',
@@ -186,8 +181,7 @@ jQuery(document).ready(function()
   },
   minimumInputLength: 2
   });
-  }
-
+}
   var clipboard = new Clipboard('.btn');
 
 	$(".computer_deets").fancybox({

@@ -22,7 +22,7 @@
 				<td valign="top">
 					<div id="{:comment_id}" class="forumpost">{:text}</div><br />
 					<form method="post" action="admin.php?module=articles">
-						<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=articles&comment_id={:comment_id}" class="btn btn-warning" /><i class="icon-remove-sign"></i> Delete Report</button>
+						<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=comment_reports&comment_id={:comment_id}" class="btn btn-warning" /><i class="icon-remove-sign"></i> Delete Report</button>
 						<button type="submit" formaction="/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={:comment_id}" class="btn btn-danger"><i class="icon-trash"></i> Delete Comment</button>
 						<button type="submit" formaction="/index.php?module=articles_full&amp;view=Edit&amp;comment_id={:comment_id}&page=1" class="btn btn-info"><i class="icon-pencil"></i> Edit</button
 					</form>

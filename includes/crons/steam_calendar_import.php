@@ -59,7 +59,7 @@ do
             $title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title);
 
             $dont_use = 0;
-            // don't give us soundtracks, they are DLC but we don't want them!
+            // don't give us this junk
             if (strpos($title, 'Soundtrack') !== false)
             {
               $dont_use = 1;
@@ -69,6 +69,10 @@ do
               $dont_use = 1;
             }
             if (strpos($title, 'Sound Track') !== false)
+            {
+              $dont_use = 1;
+            }
+            if (strpos($title, ' Wallpapers') !== false)
             {
               $dont_use = 1;
             }

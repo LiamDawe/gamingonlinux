@@ -72,6 +72,10 @@ do
             {
               $dont_use = 1;
             }
+            if (strpos($title, ' Wallpapers') !== false)
+            {
+              $dont_use = 1;
+            }
             //include space to not end up finding games with "OST" in the name
             if (strpos($title, ' OST') !== false)
             {

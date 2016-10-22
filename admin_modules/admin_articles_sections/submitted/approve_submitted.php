@@ -121,7 +121,7 @@ else
 		// Mail it
 		mail($to, $subject, $message, $headers);
 
-		telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $_POST['article_id']);
+		telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $_POST['article_id']);
 
 		if (!isset($_POST['show_block']))
 		{

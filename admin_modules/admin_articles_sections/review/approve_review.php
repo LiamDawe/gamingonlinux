@@ -133,6 +133,6 @@ else
 			}
 		}
 
-		telegram($title . ' ' . $telegram_url);
+		telegram($checked['title'] . ' ' . $telegram_url);
 	}
 }

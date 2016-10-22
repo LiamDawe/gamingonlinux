@@ -196,8 +196,8 @@ jQuery(document).ready(function()
 		closeEffect	: 'none'
 	});
 
-    // Enable on all forms
-    $('form').areYouSure();
+  // Enable on all forms
+  $('form').areYouSure();
 
 	var input_counter = 2;
 	$("#add-poll").click(function () {

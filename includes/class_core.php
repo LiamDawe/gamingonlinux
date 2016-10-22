@@ -181,17 +181,19 @@ class core
 
 			else
 			{
-				$pagination.= "<li class=\"disabled previouspage\"><a href=\"#\">&laquo;</a></li>";
+				$pagination.= "<li class=\"pagination-disabled previouspage\"><a href=\"#\">&laquo;</a></li>";
 			}
 
-			$pagination .= "<li class=\"disabled\"><a href=\"#\">$page</a></li>";
+			// current page
+			$pagination .= "<li class=\"pagination-disabled active\"><a href=\"#\">$page</a></li>";
 
-			$pagination .= "<li class=\"disabled\"><a href=\"#\">/</a></li>";
+			// seperator
+			$pagination .= "<li class=\"pagination-disabled\"><a href=\"#\">/</a></li>";
 
 			// sort out last page link, no link if on last page
 			if ($page == $lastpage)
 			{
-				$pagination .= "<li class=\"disabled\"><a href=\"#\">{$lastpage}</a></li>";
+				$pagination .= "<li class=\"pagination-disabled\"><a href=\"#\">{$lastpage}</a></li>";
 			}
 
 			else
@@ -207,11 +209,10 @@ class core
 
 			else
 			{
-				$pagination .= "<li class=\"disabled nextpage\"><a href=\"#\">&raquo;</a></li>";
+				$pagination .= "<li class=\"pagination-disabled nextpage\"><a href=\"#\">&raquo;</a></li>";
 			}
 
 			$pagination .= "</ul>";
-
 
 			$pagination .= "</div> <div class=\"fnone\">
 			<form name=\"form2\" class=\"form-inline\">

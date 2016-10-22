@@ -428,30 +428,35 @@
 	}
 
 /* Pagination */
-	ul.pagination {
-		float: left;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-	ul.pagination li {
-		background: #fcfcfc;
-		border: 1px solid #ddd;
-		float: left;
-		padding: 0;
-		margin-left: -1px;
-	}
-	ul.pagination li a, ul.pagination li span {
-		color: #444444;
-		padding: 7px 14px;
-		display: inherit;
-		-webkit-transition: background 0.15s ease-in-out 0s;
-		   -moz-transition: background 0.15s ease-in-out 0s;
-				transition: background 0.15s ease-in-out 0s;
-	}
-	ul.pagination li:hover a, ul.pagination li.active a {
-		background: #f1f1f1;
-	}
+.pagination-disabled {
+	background: #e6e6e6 !important;
+	pointer-events: none;
+}
+
+ul.pagination {
+	float: left;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+ul.pagination li {
+	background: #fcfcfc;
+	border: 1px solid #ddd;
+	float: left;
+	padding: 0;
+	margin-left: -1px;
+}
+ul.pagination li a {
+	color: #444444;
+	padding: 7px 14px;
+	display: inherit;
+	-webkit-transition: background 0.15s ease-in-out 0s;
+	-moz-transition: background 0.15s ease-in-out 0s;
+	transition: background 0.15s ease-in-out 0s;
+}
+ul.pagination li:hover a,  ul.pagination li.active a {
+	background: #e6e6e6;
+}
 
 /* 12 Column Responsive Fluid Grid */
 	.grid {

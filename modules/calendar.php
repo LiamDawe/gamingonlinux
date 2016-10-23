@@ -25,7 +25,7 @@ else if (isset($_GET['month']) && !is_numeric($_GET['month']))
 	$month = date("n");
 }
 
-$templating->set_previous('title', 'Linux Game Release Calendar | GamingOnLinux.com', 1);
+$templating->set_previous('title', 'Linux Game Release Calendar', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com maintained list of Linux game releases', 1);
 
 if (isset($_GET['message']))
@@ -94,81 +94,45 @@ if ($user->check_group(1,2) || $user->check_group(5))
 }
 $templating->set('editor_links', $editor_links);
 
-if (isset($_GET['q']))
+$templating->merge('game-search');
+$templating->block('search', 'game-search');
+$templating->set('search_text', $search);
+
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
-	$search = trim($_GET['q']);
-	$search = str_replace('+', '', $search);
-
-	if (empty($search))
-	{
-		header("Location: /index.php?module=calendar&error=emptysearch");
-		die();
-	}
-	$templating->block('search_bread');
-	$templating->block('search');
-	$templating->set('search_text', $search);
-	$templating->block('search_result_top');
-
-	$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ?", array('%'.$search.'%'));
-	$total_found = $db->num_rows();
-	if ($total_found > 0)
-	{
-		while ($items = $db->fetch())
-		{
-			$templating->block('search_items');
-			$templating->set('id', $items['id']);
-			$templating->set('name', $items['name']);
-		}
-	}
-	else
-	{
-		$core->message('None found.');
-	}
-
-	$templating->block('search_result_bottom', 'calendar');
+	$templating->block('submit', 'calendar');
 }
 
-if (!isset($_GET['q']))
+$templating->block('picker', 'calendar');
+
+$years_array = range(2014, 2020);
+$options = '';
+foreach ($years_array as $what_year)
 {
-	$templating->block('search');
-	$templating->set('search_text', '');
-
-	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+	$selected = '';
+	if ($what_year == $year)
 	{
-		$templating->block('submit');
+		$selected = 'SELECTED';
 	}
+	$options .= '<option value="'.$what_year.'" '.$selected.'>'.$what_year.'</option>';
+}
+$templating->set('options', $options);
 
-	$templating->block('picker');
+$months_array = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
 
-	$years_array = range(2014, 2020);
-
-	$options = '';
-	foreach ($years_array as $what_year)
+$month_options = '';
+foreach ($months_array as $key => $what_month)
+{
+	$month_selected = '';
+	if ($key == $month)
 	{
-		$selected = '';
-		if ($what_year == $year)
-		{
-			$selected = 'SELECTED';
-		}
-		$options .= '<option value="'.$what_year.'" '.$selected.'>'.$what_year.'</option>';
+		$month_selected = 'SELECTED';
 	}
-	$templating->set('options', $options);
+	$month_options .= '<option value="'.$key.'" '.$month_selected.'>'.$what_month.'</option>';
+}
+$templating->set('month_options', $month_options);
 
-	$months_array = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
-
-	$month_options = '';
-	foreach ($months_array as $key => $what_month)
-	{
-		$month_selected = '';
-		if ($key == $month)
-		{
-			$month_selected = 'SELECTED';
-		}
-		$month_options .= '<option value="'.$key.'" '.$month_selected.'>'.$what_month.'</option>';
-	}
-	$templating->set('month_options', $month_options);
-
-	$templating->block('head');
+$templating->block('head', 'calendar');
 
 	$prev_month = $month - 1;
 	$next_month = $month + 1;
@@ -204,7 +168,7 @@ if (!isset($_GET['q']))
 		$get_date = date_parse($listing['date']);
 		$current_day = ordinal($get_date['day']);
 
-		$templating->block('item');
+		$templating->block('item', 'calendar');
 		$best_guess = '';
 		if ($listing['best_guess'] == 1)
 		{
@@ -231,7 +195,7 @@ if (!isset($_GET['q']))
 		$templating->set('edit', $edit);
 	}
 
-	$templating->block('head');
+	$templating->block('head', 'calendar');
 	$templating->set('prev', $prev_month);
 	$templating->set('next', $next_month);
 	$templating->set('prev_year', $prev_year);
@@ -239,7 +203,6 @@ if (!isset($_GET['q']))
 	$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
 	$templating->block('bottom', 'calendar');
-}
 
 if (isset($_POST['act']))
 {

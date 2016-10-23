@@ -11,8 +11,8 @@ if (!isset($_GET['game-id']))
 	$total_games = $db->fetch();
 	$templating->set('total_games', $total_games['total']);
 
-	$templating->merge('calendar');
-	$templating->block('search', 'calendar');
+	$templating->merge('game-search');
+	$templating->block('search', 'game-search');
 	$templating->set('search_text', '');
 
 	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY RAND() LIMIT 1");

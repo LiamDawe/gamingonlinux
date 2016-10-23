@@ -47,14 +47,12 @@ $hot_articles = '';
 $db->sqlquery("SELECT `article_id`, `title`, `views`,`date` FROM `articles` WHERE `date` > ? AND `views` > 1000 AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4", array($timestamp));
 while ($top_articles = $db->fetch())
 {
-	$top_title = ucwords($top_articles['title']);
-
 	if (core::config('pretty_urls') == 1)
 	{
-		$hot_articles .= "<li class=\"list-group-item\"><a href=\"/articles/{$core->nice_title($top_articles['title'])}.{$top_articles['article_id']}\">{$top_title}</a></li>";
+		$hot_articles .= "<li class=\"list-group-item\"><a href=\"/articles/{$core->nice_title($top_articles['title'])}.{$top_articles['article_id']}\">{$top_articles['title']}</a></li>";
 	}
 	else {
-		$hot_articles .= '<li class="list-group-item"><a href="' . core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $top_articles['article_id'] . '">' . $top_title . '</a></li>';
+		$hot_articles .= '<li class="list-group-item"><a href="' . core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $top_articles['article_id'] . '">' . $top_articles['title'] . '</a></li>';
 	}
 }
 

@@ -96,7 +96,7 @@ $templating->set('editor_links', $editor_links);
 
 $templating->merge('game-search');
 $templating->block('search', 'game-search');
-$templating->set('search_text', $search);
+$templating->set('search_text', '');
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {

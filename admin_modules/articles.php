@@ -19,14 +19,14 @@ if (isset($_GET['view']))
 		$article_id = $_GET['article_id'];
 
 		// make sure its a number
-		if (!is_numeric($article_id))
+		if (!is_numeric($_GET['article_id']))
 		{
 			$core->message('That is not a correct Article ID!');
 		}
 
 		else
 		{
-			$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.tagline, a.text, a.show_in_menu, a.active, a.guest_username, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id));
+			$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.tagline, a.text, a.show_in_menu, a.active, a.guest_username, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['article_id']));
 
 			$article = $db->fetch();
 
@@ -37,7 +37,7 @@ if (isset($_GET['view']))
 				$core->message("You have unlocked the article for others to edit!");
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id), 'view_articles.php admin review');
+				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id));
 
 				$article = $db->fetch();
 			}
@@ -47,7 +47,7 @@ if (isset($_GET['view']))
 				$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id), 'view_articles.php admin review');
+				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id));
 
 				$article = $db->fetch();
 			}

@@ -189,11 +189,18 @@ while ($categorys = $db->fetch())
 
 $templating->set('categories_list', $categories_list);
 
+$edit_state = '';
 if (isset($article))
 {
 	$games_list = $article_class->display_game_assoc($article['article_id']);
+
+	if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
+	{
+		$edit_state = 'disabled';
+	}
 }
-else {
+else
+{
 	$games_list = $article_class->display_game_assoc();
 }
 
@@ -209,12 +216,6 @@ $templating->set('max_width', core::config('article_image_max_width'));
 $core->editor('text', $_POST['text'], 1);
 
 $templating->block('preview_bottom', 'admin_modules/admin_module_articles');
-
-$edit_state = '';
-if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
-{
-	$edit_state = 'disabled';
-}
 
 $pick_check = '';
 if (isset($_POST['show_block']))

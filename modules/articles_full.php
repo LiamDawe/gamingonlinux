@@ -569,7 +569,18 @@ if (!isset($_GET['go']))
 								}
 							}
 							$logged_in_options = $templating->block_store('logged_in_options', 'articles_full');
-							$logged_in_options = $templating->store_replace($logged_in_options, array('plain_username'=> $quote_username,'text_plain'=>htmlspecialchars($comments['comment_text'], ENT_QUOTES), 'like_text'=>$like_text, 'like_class'=>$like_class));
+
+							// don't let them like their own post
+							if ($comments['author_id'] == $_SESSION['user_id'])
+							{
+								$like_button = '';
+							}
+							else
+							{
+								$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+							}
+
+							$logged_in_options = $templating->store_replace($logged_in_options, array('plain_username'=> $quote_username,'text_plain'=>htmlspecialchars($comments['comment_text'], ENT_QUOTES), 'like_button'=>$like_button));
 						}
 						$templating->set('logged_in_options', $logged_in_options);
 

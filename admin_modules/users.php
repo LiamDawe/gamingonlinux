@@ -29,8 +29,15 @@ else
 			$email = '';
 			if (isset($_POST['search']))
 			{
-				$username = trim($_POST['username']);
-				$email = trim($_POST['email']);
+				if (isset($_POST['username']))
+				{
+					$username = trim($_POST['username']);
+				}
+
+				if (isset($_POST['email']))
+				{
+					$email = trim($_POST['email']);
+				}
 
 				if (!empty($username) || !empty($email))
 				{

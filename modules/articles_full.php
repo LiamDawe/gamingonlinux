@@ -546,6 +546,13 @@ if (!isset($_GET['go']))
 
 						$templating->set('total_likes', $total_likes);
 
+						$who_likes_link = '';
+						if ($total_likes > 0)
+						{
+							$who_likes_link = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
+						}
+						$templating->set('who_likes_link', $who_likes_link);
+
 						$logged_in_options = '';
 						if ($_SESSION['user_group'] != 4)
 						{

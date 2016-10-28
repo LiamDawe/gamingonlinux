@@ -196,6 +196,18 @@ jQuery(document).ready(function()
 		closeEffect	: 'none'
 	});
 
+  $(".who_likes").fancybox({
+    maxWidth	: 800,
+    maxHeight	: 600,
+    fitToView	: false,
+    width		: '70%',
+    height		: '60%',
+    autoSize	: false,
+    closeClick	: false,
+    openEffect	: 'none',
+    closeEffect	: 'none'
+  });
+
   // Enable on all forms
   $('form').areYouSure();
 

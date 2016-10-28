@@ -1,0 +1,48 @@
+<?php
+session_start();
+
+include('../config.php');
+
+include('../class_mysql.php');
+$db = new mysql($database_host, $database_username, $database_password, $database_db);
+
+include('../class_core.php');
+$core = new core();
+
+include('../class_template.php');
+
+$templating = new template('default');
+
+if(isset($_GET['comment_id']))
+{
+  $db->sqlquery("SELECT u.`username`, u.`user_id`, l.comment_id FROM `users` u INNER JOIN `likes` l ON u.`user_id` = l.`user_id` WHERE l.`comment_id` = ? ORDER BY u.`username` ASC LIMIT 50", array($_GET['comment_id']));
+  if ($db->num_rows() == 0)
+	{
+		$core->message('That comment does not exist here!');
+	}
+  else
+  {
+    $templating->load('who_likes');
+
+    $templating->block('top');
+
+    while($grab_users = $db->fetch())
+    {
+      if (core::config('pretty_urls') == 1)
+      {
+        $profile_link = '/profiles/' . $grab_users['user_id'];
+      }
+      else
+      {
+        $profile_link = '/index.php?module=profile&user_id=' . $grab_users['user_id'];
+      }
+
+      $templating->block('user_row');
+      $templating->set('username', $grab_users['username']);
+      $templating->set('profile_link', $profile_link);
+    }
+
+    $templating->block('end');
+    echo $templating->output();
+  }
+}

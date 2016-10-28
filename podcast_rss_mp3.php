@@ -53,7 +53,7 @@ foreach ($articles as $line)
 		<item>
 		<title>$title</title>
 		<description>{$line['tagline']}</description>
-		<enclosure url=\"{$matches[1]}\" type=\"audio/ogg\" />
+		<enclosure url=\"{$matches[1]}\" type=\"audio/mpeg\" />
 		<pubDate>$date</pubDate>
 		<guid>https://www.gamingonlinux.com/$nice_title.{$line['article_id']}/</guid>
 		</item>";

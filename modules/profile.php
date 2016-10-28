@@ -45,7 +45,7 @@ if (isset($_GET['user_id']))
 					$templating->block('top');
 				}
 
-				$templating->block('main');
+				$templating->block('main', 'profile');
 
 				$templating->set('username', $profile['username']);
 
@@ -146,7 +146,7 @@ if (isset($_GET['user_id']))
 					$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `dual_boot`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($profile['user_id']));
 
 					$counter = 0;
-					$templating->block('additional');
+					$templating->block('additional', 'profile');
 
 					$distro = '';
 					if (!empty($profile['distro']) && $profile['distro'] != 'Not Listed')
@@ -297,7 +297,7 @@ if (isset($_GET['user_id']))
 				}
 
 				// comments block
-				$templating->block('article_comments_list');
+				$templating->block('article_comments_list', 'profile');
 
 				$comment_posts = '';
 				$view_more_comments = '';
@@ -330,7 +330,7 @@ if (isset($_GET['user_id']))
 				//Do not show end block if it's empty
 				if ($user->check_group(1,2))
 				{
-					$templating->block('end');
+					$templating->block('end', 'profile');
 
 					$admin_links = "<form method=\"post\" action=\"/admin.php?module=users&user_id={$profile['user_id']}\">
 					<button type=\"submit\" formaction=\"/admin.php?module=users&view=edituser&user_id={$profile['user_id']}\" class=\"btn btn-primary\">Edit User</button>
@@ -356,58 +356,73 @@ if (isset($_GET['user_id']))
 	{
 		if ($_GET['view'] == 'more-comments')
 		{
-			// paging for pagination
-			if (!isset($_GET['page']) || $_GET['page'] <= 0)
+			if (isset($_GET['user_id']) && is_numeric($_GET['user_id']))
 			{
-				$page = 1;
-			}
+				$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$exists = $db->num_rows();
+				if ($exists == 1)
+				{
+					$get_username = $db->fetch();
 
-			else if (is_numeric($_GET['page']))
+					// count how many there is in total
+					$db->sqlquery("SELECT `comment_id` FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
+					$total = $db->num_rows();
+
+					// paging for pagination
+					if (!isset($_GET['page']) || $_GET['page'] <= 0)
+					{
+						$page = 1;
+					}
+
+					else if (is_numeric($_GET['page']))
+					{
+						$page = $_GET['page'];
+					}
+
+					$pagination_linky = url . "index.php?module=profile&amp;view=more-comments&amp;user_id=".$_GET['user_id']."&amp;";
+
+					// sort out the pagination link
+					$pagination = $core->pagination_link(10, $total, $pagination_linky, $page);
+
+					// get top of comments section
+					$templating->block('more_comments');
+					$templating->set('username', $get_username['username']);
+
+					if (core::config('pretty_urls') == 1)
+					{
+						$profile_link = "/profiles/" . $_GET['user_id'];
+					}
+					else {
+						$profile_link = url . "index.php?module=profile&amp;user_id=" . $_GET['user_id'];
+					}
+
+					$templating->set('profile_link', $profile_link);
+
+					$db->sqlquery("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start));
+					while ($comments = $db->fetch())
+					{
+						$date = $core->format_date($comments['time_posted']);
+						$title = $comments['title'];
+
+						$comment_posts .= "<li class=\"list-group-item\">
+					<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">{$title}</a>
+					<div>".substr(strip_tags(bbcode($comments['comment_text'])), 0, 63)."&hellip;</div>
+					<small>{$date}</small>
+				</li>";
+					}
+
+					$templating->set('comment_posts', $comment_posts);
+					$templating->set('pagination', $pagination);
+				}
+				else
+				{
+					$core->message('User does not exist!');
+				}
+			}
+			else
 			{
-				$page = $_GET['page'];
+				$core->message('User does not exist!');
 			}
-
-			$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
-			$get_username = $db->fetch();
-
-			// count how many there is in total
-			$db->sqlquery("SELECT `comment_id` FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
-			$total = $db->num_rows();
-
-			$pagination_linky = url . "index.php?module=profile&amp;view=more-comments&amp;user_id=".$_GET['user_id']."&amp;";
-
-			// sort out the pagination link
-			$pagination = $core->pagination_link(10, $total, $pagination_linky, $page);
-
-			// get top of comments section
-			$templating->block('more_comments');
-			$templating->set('username', $get_username['username']);
-
-			if (core::config('pretty_urls') == 1)
-			{
-				$profile_link = "/profiles/" . $_GET['user_id'];
-			}
-			else {
-				$profile_link = url . "index.php?module=profile&amp;user_id=" . $_GET['user_id'];
-			}
-
-			$templating->set('profile_link', $profile_link);
-
-			$db->sqlquery("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start));
-			while ($comments = $db->fetch())
-			{
-				$date = $core->format_date($comments['time_posted']);
-				$title = $comments['title'];
-
-				$comment_posts .= "<li class=\"list-group-item\">
-			<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">{$title}</a>
-			<div>".substr(strip_tags(bbcode($comments['comment_text'])), 0, 63)."&hellip;</div>
-			<small>{$date}</small>
-		</li>";
-			}
-
-			$templating->set('comment_posts', $comment_posts);
-			$templating->set('pagination', $pagination);
 		}
 	}
 }

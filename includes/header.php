@@ -196,7 +196,7 @@ if (core::config('pretty_urls') == 1)
 	{
 		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
 		{
-			$submit_a = url . 'admin.php?module=articles&amp;view=add';
+			$submit_a = url . 'admin.php?module=add_article';
 		}
 	}
 	$submit_e = '/email-us/';
@@ -211,7 +211,7 @@ else {
 	{
 		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
 		{
-			$submit_a = url . 'admin.php?module=articles&amp;view=add';
+			$submit_a = url . 'admin.php?module=add_article';
 		}
 	}
 	$submit_e = url . 'index.php?module=email_us';

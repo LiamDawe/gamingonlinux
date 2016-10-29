@@ -7,6 +7,10 @@ if (isset($_GET['message']))
 	{
 		$core->message("You have been unsubscribed!");
 	}
+	if ($_GET['message'] == 'unliked')
+	{
+		$core->message("You have unliked all articles and comments!");
+	}
 	if ($_GET['message'] == 'activated')
 	{
 		$core->message("Your account has been activated!");
@@ -14,6 +18,10 @@ if (isset($_GET['message']))
 	if ($_GET['message'] == 'cannotunsubscribe')
 	{
 		$core->message("Sorry your details didn't match up to unsubscribe you!", NULL, 1);
+	}
+	if ($_GET['message'] == 'cannotunlike')
+	{
+		$core->message("Sorry your details didn't match up to unlike!", NULL, 1);
 	}
 	if ($_GET['message'] == 'banned')
 	{

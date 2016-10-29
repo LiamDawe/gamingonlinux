@@ -234,6 +234,55 @@ if (!isset($_GET['go']))
 
 				$templating->set('categories_list', $categories_list);
 
+				// Total number of likes for the status message
+				$db->sqlquery("SELECT COUNT(article_id) as `total` FROM `article_likes` WHERE `article_id` = ?", array($article['article_id']));
+				$get_article_likes = $db->fetch();
+				$total_alikes = $get_article_likes['total'];
+
+				$templating->set('total_likes', $total_alikes);
+
+				$who_likes_alink = '';
+				if ($total_alikes > 0)
+				{
+					$who_likes_alink = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='.$article['article_id'].'">Who?</a>';
+				}
+				$templating->set('who_likes_alink', $who_likes_alink);
+
+				$like_button = '';
+				if ($_SESSION['user_group'] != 4)
+				{
+					$like_text = "Like";
+					$like_class = "like";
+					if ($_SESSION['user_id'] != 0)
+					{
+						// Checks current login user liked this status or not
+						$qnumlikes = $db->sqlquery("SELECT `like_id` FROM `article_likes` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article['article_id']));
+						$numlikes = $db->num_rows();
+
+						if ($numlikes == 0)
+						{
+							$like_text = "Like";
+							$like_class = "like";
+						}
+						else if ($numlikes >= 1)
+						{
+							$like_text = "Unlike";
+							$like_class = "unlike";
+						}
+					}
+
+					// don't let them like their own post
+					if ($article['author_id'] == $_SESSION['user_id'])
+					{
+						$like_button = '';
+					}
+					else
+					{
+						$like_button = '<a class="likearticle tooltip-top" data-id="'.$article['article_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a>';
+					}
+				}
+				$templating->set('like_button', $like_button);
+
 				$article_bottom = '';
 				if ($article['user_group'] != 1 && $article['user_group'] != 2 && $article['user_group'] != 5)
 				{
@@ -584,7 +633,7 @@ if (!isset($_GET['go']))
 							}
 							else
 							{
-								$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+								$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-id="'.$comments['comment_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 							}
 
 							$logged_in_options = $templating->store_replace($logged_in_options, array('plain_username'=> $quote_username,'text_plain'=>htmlspecialchars($comments['comment_text'], ENT_QUOTES), 'like_button'=>$like_button));

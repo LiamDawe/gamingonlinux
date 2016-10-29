@@ -337,7 +337,7 @@ jQuery(document).ready(function()
     //Get our comment
     var comment = $(this).parents('.comment')[0];
     //Get the comment ID
-    var sid = comment.id.slice(1);
+    var sid = $(this).attr("data-id");
     //Send of a like (needs a like/dislike check)
       var $that = $(this);
       $.post('/includes/like.php', {
@@ -349,7 +349,12 @@ jQuery(document).ready(function()
           var likeobj = $("#"+sid+" div.likes");
           var numlikes = likeobj.html().replace(" Likes","");
           numlikes = parseInt(numlikes) + 1;
-          likeobj.html(numlikes + " Likes");
+          var wholikes = "";
+          if (numlikes > 0)
+          {
+            wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+          }
+          likeobj.html(numlikes + " Likes" + wholikes);
           var button = $(comment).find(".likebutton span");
           button.text("Unlike").removeClass("like").addClass("unlike");
       }
@@ -358,7 +363,12 @@ jQuery(document).ready(function()
           var likeobj = $("#"+sid+" div.likes");
           var numlikes = likeobj.html().replace(" Likes","");
           numlikes = parseInt(numlikes) - 1;
-          likeobj.html(numlikes + " Likes");
+          var wholikes = "";
+          if (numlikes > 0)
+          {
+            wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+          }
+          likeobj.html(numlikes + " Likes" + wholikes);
           var button = $(comment).find(".likebutton span");
           button.text("Like").removeClass("unlike").addClass("like");
       }
@@ -382,6 +392,68 @@ jQuery(document).ready(function()
         }
       }); //end of .post callback
   }); //end of .click callback
+
+  $(".likearticle").click(function(){
+  // get this like link
+  var this_link = $(this).parents('.likes')[0];
+  //Get the comment ID
+  var sid = $(this).attr("data-id");
+  var likeobj = $("#article-likes");
+
+  //Send of a like (needs a like/dislike check)
+    var $that = $(this);
+    $.post('/includes/ajax/like-article.php', {
+     sid: sid,
+     sta: $that.find("span").text().toLowerCase()
+    }, function (returndata){
+      if(returndata === "liked")
+      {
+        var numlikes = likeobj.html().replace(" Likes","");
+        numlikes = parseInt(numlikes) + 1;
+        var wholikes = "";
+        if (numlikes > 0)
+        {
+          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+sid+'">Who?</a>';
+        }
+        $("#who-likes-article").html(wholikes);
+        likeobj.html(numlikes + " Likes");
+        var button = $(this_link).find(".likearticle span");
+        button.text("Unlike").removeClass("like").addClass("unlike");
+    }
+    else if(returndata === "unliked")
+    {
+        var numlikes = likeobj.html().replace(" Likes","");
+        numlikes = parseInt(numlikes) - 1;
+        var wholikes = "";
+        if (numlikes > 0)
+        {
+          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+sid+'">Who?</a>';
+        }
+        $("#who-likes-article").html(wholikes);
+        likeobj.html(numlikes + " Likes" );
+        var button = $(this_link).find(".likearticle span");
+        button.text("Like").removeClass("unlike").addClass("like");
+    }
+    else if ( returndata === "5" ) {
+        $that.qtip({
+          content: {
+            text: 'You need to be <a href="/index.php?module=login">logged in</a> to like a post. Or <a href="/index.php?module=register">register</a> to become a GOL member'
+          },
+          position: {
+              my: 'bottom center',
+              at: 'top center'
+          },
+          style: {
+              classes: 'qtip-bootstrap qtip-shadow'
+          },
+          hide: {
+              delay: 2000
+          },
+          show: true
+        });
+      }
+    }); //end of .post callback
+}); //end of .click callback
 
   $(".poll_content").on("click", ".close_poll", function()
   {

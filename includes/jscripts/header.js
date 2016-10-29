@@ -341,7 +341,7 @@ jQuery(document).ready(function()
     //Send of a like (needs a like/dislike check)
       var $that = $(this);
       $.post('/includes/ajax/like.php', {
-       sid: sid,
+       comment_id: sid,
        sta: $that.find("span").text().toLowerCase()
       }, function (returndata){
         if(returndata === "liked")
@@ -397,13 +397,13 @@ jQuery(document).ready(function()
   // get this like link
   var this_link = $(this).parents('.likes')[0];
   //Get the comment ID
-  var sid = $(this).attr("data-id");
+  var article_id = $(this).attr("data-id");
   var likeobj = $("#article-likes");
 
   //Send of a like (needs a like/dislike check)
     var $that = $(this);
-    $.post('/includes/ajax/like-article.php', {
-     sid: sid,
+    $.post('/includes/ajax/like.php', {
+     article_id: article_id,
      sta: $that.find("span").text().toLowerCase()
     }, function (returndata){
       if(returndata === "liked")
@@ -413,7 +413,7 @@ jQuery(document).ready(function()
         var wholikes = "";
         if (numlikes > 0)
         {
-          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+sid+'">Who?</a>';
+          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
         }
         $("#who-likes-article").html(wholikes);
         likeobj.html(numlikes + " Likes");
@@ -427,7 +427,7 @@ jQuery(document).ready(function()
         var wholikes = "";
         if (numlikes > 0)
         {
-          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+sid+'">Who?</a>';
+          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
         }
         $("#who-likes-article").html(wholikes);
         likeobj.html(numlikes + " Likes" );

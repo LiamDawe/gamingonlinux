@@ -14,33 +14,45 @@ $user = new user();
 
 if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
-    $pinsid=$_POST['sid'];
-    $status=$_POST['sta'];
-    $chkpinu = $db->sqlquery("SELECT * FROM likes WHERE comment_id = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
-    $chknum = $db->num_rows();
-    if($status=="like")
+  if (isset($_POST['comment_id']))
+  {
+    $pinsid = $_POST['comment_id'];
+    $table = 'likes';
+    $field = 'comment_id';
+  }
+  if (isset($_POST['article_id']))
+  {
+    $pinsid = $_POST['article_id'];
+    $table = 'article_likes';
+    $field = 'article_id';
+  }
+
+  $status=$_POST['sta'];
+  $chkpinu = $db->sqlquery("SELECT * FROM `$table` WHERE `$field` = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
+  $chknum = $db->num_rows();
+  if($status=="like")
+  {
+    if($chknum==0)
     {
-        if($chknum==0)
-        {
-            $add = $db->sqlquery("INSERT INTO `likes` SET `comment_id` = ?, `user_id` = ?", array($pinsid, $_SESSION['user_id']));
-            echo 'liked';
-            return true;
-        }
-        echo 2; //Bad Checknum
-        return true;
+      $add = $db->sqlquery("INSERT INTO `$table` SET `$field` = ?, `user_id` = ?", array($pinsid, $_SESSION['user_id']));
+      echo 'liked';
+      return true;
     }
-    else if($status=="unlike")
+    echo 2; //Bad Checknum
+    return true;
+  }
+  else if($status=="unlike")
+  {
+    if($chknum!=0)
     {
-        if($chknum!=0)
-        {
-            $rem=$db->sqlquery("DELETE FROM `likes` WHERE comment_id = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
-            echo 'unliked';
-            return true;
-        }
-        echo 2; //Bad Checknum
+      $rem=$db->sqlquery("DELETE FROM `$table` WHERE `$field` = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
+      echo 'unliked';
+      return true;
+    }
+    echo 2; //Bad Checknum
 		return true;
-    }
-    echo 3; //Bad Status
+  }
+  echo 3; //Bad Status
 	return true;
 }
 echo 5; //Bad Post or Session

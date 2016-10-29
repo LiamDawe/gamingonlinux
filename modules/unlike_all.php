@@ -1,9 +1,11 @@
 <?php
+$templating->set_previous('title', 'Unlike everything', 1);
+
 if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
 	if (!isset($_POST['yes']) && !isset($_POST['no']))
 	{
-		$core->yes_no('Are you sure you want to unlike all comments and articles?', 'index.php?module=unlike_all');
+		$core->yes_no('Are you sure you want to unlike all comments and articles? CANNOT BE UNDONE', 'index.php?module=unlike_all');
 	}
 
 	else if (isset($_POST['no']))

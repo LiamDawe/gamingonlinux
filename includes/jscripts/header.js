@@ -336,11 +336,11 @@ jQuery(document).ready(function()
     $(".likebutton").click(function(){
     //Get our comment
     var comment = $(this).parents('.comment')[0];
-    //Get the comment ID
+    //Get the post ID
     var sid = $(this).attr("data-id");
     //Send of a like (needs a like/dislike check)
       var $that = $(this);
-      $.post('/includes/like.php', {
+      $.post('/includes/ajax/like.php', {
        sid: sid,
        sta: $that.find("span").text().toLowerCase()
       }, function (returndata){

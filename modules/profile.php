@@ -292,7 +292,7 @@ if (isset($_GET['user_id']))
 
 				if (!empty($profile['article_bio']))
 				{
-					$templating->block('bio');
+					$templating->block('bio', 'profile');
 					$templating->set('bio_text', bbcode($profile['article_bio']));
 				}
 
@@ -304,7 +304,7 @@ if (isset($_GET['user_id']))
 				{
 					// comments block
 					$templating->block('article_comments_list', 'profile');
-					
+
 					$comments_execute = $db->fetch_all_rows();
 					foreach ($comments_execute as $comments)
 					{

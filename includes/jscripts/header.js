@@ -208,6 +208,18 @@ jQuery(document).ready(function()
     closeEffect	: 'none'
   });
 
+  $(".gallery_tagline").fancybox({
+    maxWidth	: 800,
+    maxHeight	: 600,
+    fitToView	: false,
+    width		: '70%',
+    height		: '70%',
+    autoSize	: false,
+    closeClick	: false,
+    openEffect	: 'none',
+    closeEffect	: 'none'
+  });
+
   // Enable on all forms
   $('form').areYouSure();
 
@@ -574,6 +586,39 @@ function(data){
       });
   });
 
+  // this controls the subscribe to comments link inside articles_full.php
+  $(document).on('click', '#subscribe-link', function(e)
+  {
+    e.preventDefault();
+
+    var type = $(this).attr('data-sub');
+    var article_id = $(this).attr('data-article-id');
+    $.post('/includes/ajax/subscribe-article.php', { 'type':type, 'article-id':article_id },
+    function(data)
+    {
+      var myData = JSON.parse(data);
+      if (myData.result == 'subscribed')
+      {
+        $('#subscribe-link').attr('data-sub','unsubscribe');
+        $("#subscribe-link").attr("href", "/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id=" + article_id);
+        $('#subscribe-link span').text('Unsubscribe from comments');
+      }
+      else if (myData.result == 'unsubscribed')
+      {
+        $('#subscribe-link').attr('data-sub','subscribe');
+        $("#subscribe-link").attr("href", "/index.php?module=articles_full&amp;go=subscribe&amp;article_id=" + article_id);
+        $('#subscribe-link span').text('Subscribe to comments');
+      }
+    });
+  });
+
+$(document).on('click', ".gallery_item", function() {
+    var filename = $(this).data('filename');
+    var id = $(this).data('id');
+    $('#preview2').html('<img src="/uploads/tagline_gallery/' + filename + '" alt="image" />');
+    $.fancybox.close();
+  });
+
   $('#preview_text_button').click(function() {
   var text = $('#editor_content').val();
   $('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
@@ -581,4 +626,5 @@ function(data){
   $('#preview').scrollMinimal();
   $(".preview_pm").highlight();
   });
+
 });

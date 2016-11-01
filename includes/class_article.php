@@ -373,5 +373,35 @@ class article_class
 
     return $content_array;
   }
+
+  function subscribe($article_id)
+  {
+    global $db;
+
+    if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+    {
+      $db->sqlquery("SELECT `user_id`, `article_id` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+      $count_subs = $db->num_rows();
+      if ($count_subs == 0)
+      {
+        $db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $article_id));
+      }
+    }
+  }
+
+  function unsubscribe($article_id)
+  {
+    global $db;
+
+    if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+    {
+      $db->sqlquery("SELECT `user_id`, `article_id` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+      $count_subs = $db->num_rows();
+      if ($count_subs == 1)
+      {
+        $db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+      }
+    }
+  }
 }
 ?>

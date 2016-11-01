@@ -412,15 +412,15 @@ if (!isset($_GET['go']))
 						// find out if this user has subscribed to the comments
 						if ($_SESSION['user_id'] != 0)
 						{
-							$db->sqlquery("SELECT `user_id` FROM `articles_subscriptions` WHERE `article_id` = ? AND `user_id` = ?", array($_GET['aid'], $_SESSION['user_id']), 'articles_full.php');
+							$db->sqlquery("SELECT `user_id` FROM `articles_subscriptions` WHERE `article_id` = ? AND `user_id` = ?", array($_GET['aid'], $_SESSION['user_id']));
 							if ($db->num_rows() == 1)
 							{
-								$subscribe_link = "<a href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe from comments</span></a>";
+								$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$_GET['aid']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe from comments</span></a>";
 							}
 
 							else
 							{
-								$subscribe_link = "<a href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Subscribe to comments</span></a>";
+								$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"subscribe\" data-article-id=\"{$_GET['aid']}\" href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Subscribe to comments</span></a>";
 							}
 						}
 
@@ -1227,11 +1227,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'subscribe')
 	{
-		// make sure we don't make lots of doubles
-		$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['article_id']));
-
-		// now subscribe
-		$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $_GET['article_id']));
+		$article_class->subscribe($_GET['article_id']);
 
 		// get info for title
 		$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
@@ -1243,7 +1239,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'unsubscribe')
 	{
-		$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['article_id']));
+		$article_class->unsubscribe($_GET['article_id']);
 
 		// get info for title
 		$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));

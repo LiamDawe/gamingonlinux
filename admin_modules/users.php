@@ -21,6 +21,10 @@ else
 				{
 					$core->message("You have deleted that user! Please let liamdawe know if the user was not a spammer, as he will wish to know why!", NULL, 1);
 				}
+				if ($_GET['message'] == 'usercontentdeleted')
+				{
+					$core->message("You have deleted that users content!", NULL, 1);
+				}
 			}
 
 			$templating->block('search','admin_modules/admin_module_users');

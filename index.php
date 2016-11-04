@@ -46,22 +46,34 @@ else
 
 if ($module == 'home')
 {
-	if (!isset($_SESSION['last_featured_id']))
+	$db->sqlquery("SELECT a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> ''");
+	$count_total = $db->num_rows();
+
+	if ($count_total == 1)
 	{
-		$_SESSION['last_featured_id'] = 0;
+		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> ''");
+		$featured = $db->fetch();
+	}
+	if ($count_total > 1)
+	{
+		if (!isset($_SESSION['last_featured_id']))
+		{
+			$_SESSION['last_featured_id'] = 0;
+		}
+
+		$last_featured_sql = '';
+		if (core::config('total_featured') > 1)
+		{
+			$last_featured_sql = 'AND a.article_id != ?';
+		}
+
+		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
+		$featured = $db->fetch();
+
+		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
 
-	$last_featured_sql = '';
-	if (core::config('total_featured') > 1)
-	{
-		$last_featured_sql = 'AND a.article_id != ?';
-	}
-
-	$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
-
-	// pick a random editors pick
-	$featured = $db->fetch();
-	if ($db->num_rows() >= 1)
+	if ($count_total >= 1)
 	{
 		$templating->block('featured', 'mainpage');
 		$templating->set('title', $featured['title']);
@@ -103,8 +115,6 @@ if ($module == 'home')
 			$templating->set('edit_link', '');
 			$templating->set('editors_pick_link', '');
 		}
-
-		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
 }
 

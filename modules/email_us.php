@@ -102,7 +102,7 @@ $templating->set('url', url);
 
 if ($parray['contact_captcha'] == 1)
 {
-	$captcha = '<div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
+	$captcha = '<noscript><strong>You need Javascript turned on to see the captcha, otherwise you won\'t be able to email us!</strong></noscript><div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
 }
 
 else

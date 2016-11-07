@@ -1,5 +1,5 @@
 <?php
-$templating->set_previous('title', 'GamingOnLinux livestreaming schedule', 1);
+$templating->set_previous('title', 'Livestreaming schedule', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux livestreaming schedule', 1);
 
 $templating->load('livestreams');

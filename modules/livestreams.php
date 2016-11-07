@@ -18,8 +18,17 @@ if ($db->num_rows() > 0)
 
     $countdown = '<span id="timer'.$streams['row_id'].'"></span><script type="text/javascript">var timer' . $streams['row_id'] . ' = moment.tz("'.$streams['date'].'", "UTC"); $("#timer'.$streams['row_id'].'").countdown(timer'.$streams['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
     $templating->set('countdown', $countdown);
+
+    if (core::config('pretty_urls') == 1)
+    {
+      $profile_link = '/profiles/' . $streams['user_id'];
+    }
+    else {
+      $profile_link = '/index.php?module=profile&user_id=' . $streams['user_id'];
+    }
+    $templating->set('profile_link', $profile_link);
   }
 }
 else {
-  $core->message('There are no livestreams currently planned, or we forgot to update this page. Please bug us to update it!');
+  $core->message('There are no livestreams currently planned, or we forgot to update this page. Please <a href="https://www.gamingonlinux.com/forum/2">bug us to update it</a>!');
 }

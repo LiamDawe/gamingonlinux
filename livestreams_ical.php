@@ -44,15 +44,11 @@ while ($item = $db->fetch())
 		$url = 'URL:' . escapeString($item['link']) . "\r\nDESCRIPTION:" . escapeString($item['link']) . "\r\n";
 	}
 
-	// make the name nice
-	$name = htmlspecialchars($item['title']);
-	$name = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $name);
-
-	$output .="BEGIN:VEVENT\r\nSUMMARY:GOL > " . $name . "\r\nUID:{$item['row_id']}\r\n" . $url . "DTSTART;VALUE=DATE:" . date("Ymd\THis", $item['date']) . "\r\n" . 'DTEND;VALUE=DATE:' . date("Ymd\THis", strtotime($item['date'] . '+ 1 hour')) . "\r\nEND:VEVENT\r\n";
+	$output .="BEGIN:VEVENT\r\nUID:{$item['row_id']}@gamingonlinux.com\r\n" . "DTSTART:" . date("Ymd\THis", strtotime($item['date'])) . "Z\r\n" . 'DTEND:' . date("Ymd\THis", strtotime($item['date'] . '+ 1 hour')) . "Z\r\nSUMMARY:GOL Livestream > " . $item['title'] . "\r\nEND:VEVENT";
 }
 
 // close calendar
-$output .= "END:VCALENDAR";
+$output .= "\r\nEND:VCALENDAR";
 
 echo $output;
 ?>

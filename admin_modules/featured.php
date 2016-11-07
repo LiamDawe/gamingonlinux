@@ -56,44 +56,28 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'add')
 	{
-		$templating->block('add', 'admin_modules/admin_module_featured');
-		$templating->set('max_width', core::config('carousel_image_width'));
-		$templating->set('max_height', core::config('carousel_image_height'));
-
-		// get articles that are new enough and populate the list
-		$timeout = 777600; // 9 days
-
-		$stamp = time() - $timeout;
-		$options = '';
-		$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `date` > $stamp");
-		while ($list = $db->fetch())
+		if (isset($_GET['article_id']))
 		{
-			$selected = '';
-			if (isset($_GET['article_id']) && $_GET['article_id'] == $list['article_id'])
+			$db->sqlquery("SELECT `title` FROM `articles`	WHERE `article_id` = ?", array($_GET['article_id']));
+			if ($db->num_rows() == 1)
 			{
-				$selected = 'selected';
+				$title = $db->fetch();
+
+				$templating->block('add', 'admin_modules/admin_module_featured');
+				$templating->set('max_width', core::config('carousel_image_width'));
+				$templating->set('max_height', core::config('carousel_image_height'));
+
+				$templating->set('article_title', $title['title']);
+				$templating->set('article_id', $_GET['article_id']);
 			}
-			$options .= "<option value=\"{$list['article_id']}\" $selected>{$list['title']}</option>";
+			else {
+				$core->message('Article does not exist!');
+			}
 		}
-		$templating->set('options', $options);
-
-		// current editor picks
-		$templating->block('add_existing', 'admin_modules/admin_module_featured');
-		$templating->set('max_width', core::config('carousel_image_width'));
-		$templating->set('max_height', core::config('carousel_image_height'));
-
-		$options = '';
-		$db->sqlquery("SELECT p.`article_id`, a.`title` FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id");
-		while ($list = $db->fetch())
+		else
 		{
-			$selected = '';
-			if (isset($_GET['article_id']) && $_GET['article_id'] == $list['article_id'])
-			{
-				$selected = 'selected';
-			}
-			$options .= "<option value=\"{$list['article_id']}\" $selected>{$list['title']}</option>";
+			$core->message("You can only add a featured image when setting an article to be an editor's pick!");
 		}
-		$templating->set('options', $options);
 	}
 
 	if ($_GET['view'] == 'manage')
@@ -126,9 +110,9 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
-		if ($core->carousel_image($_POST['article_id']) == true)
+		if ($core->carousel_image($_POST['article_id'], 1) == true)
 		{
-			header("Location: /admin.php?module=featured&view=add&message=added");
+			header("Location: /admin.php?module=featured&view=manage&message=added");
 		}
 		else
 		{
@@ -138,7 +122,7 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'edit')
 	{
-		$upload = $core->carousel_image($_POST['article_id']);
+		$upload = $core->carousel_image($_POST['article_id'], 0);
 		if ($upload === true)
 		{
 			header("Location: /admin.php?module=featured&view=manage&message=edited");

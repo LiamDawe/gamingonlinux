@@ -557,7 +557,9 @@ class core
 		}
 	}
 
-	function carousel_image($article_id)
+	// $new has to be either 1 or 0
+	// 1 = new article, 0 = editing the current image
+	function carousel_image($article_id, $new = NULL)
 	{
 		global $db;
 
@@ -664,10 +666,6 @@ class core
 				}
 			}
 
-			// see if there is a current top image
-			$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id));
-			$image = $db->fetch();
-
 			$image_info = getimagesize($_FILES['new_image']['tmp_name']);
 			$image_type = $image_info[2];
 			$file_ext = '';
@@ -697,26 +695,34 @@ class core
 
 			if (move_uploaded_file($source, $target))
 			{
-				// remove old image
-				if (!empty($image['featured_image']))
+				// we are editing an existing featured image
+				if ($new == 0)
 				{
-					unlink($this->config('path') . 'uploads/carousel/' . $image['featured_image']);
+					// see if there is a current top image
+					$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id));
+					$image = $db->fetch();
+
+					// remove old image
+					if (!empty($image['featured_image']))
+					{
+						unlink($this->config('path') . 'uploads/carousel/' . $image['featured_image']);
+						$db->sqlquery("UPDATE `editor_picks` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
+					}
 				}
-				if (!empty($image['featured_image']))
+
+				// it's a brand new featured image
+				if ($new == 1)
 				{
-					$db->sqlquery("UPDATE `editor_picks` SET featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
-				}
-				else
-				{
+					$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 1 WHERE `article_id` = ?", array($article_id));
+
+					$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
+
 					$db->sqlquery("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?", array($article_id, $imagename));
 				}
 
-				$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 1 WHERE `article_id` = ?", array($article_id));
-
-				$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
-
 				return true;
 			}
+
 
 			else
 			{

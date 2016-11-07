@@ -1,0 +1,47 @@
+[block: add_top]
+<div class="box"><div class="head">Add a livestream to the calendar</div></div>
+[/block: add_top]
+
+[block: edit_top]
+<div class="box">
+	<div class="head">
+		Edit an existing livestream calendar entry
+	</div>
+</div>
+[/block: edit_top]
+
+[block: item]
+	<div class="box">
+			<div class="body group">
+				<form method="post" action="admin.php?module=games">
+					Title: <input type="text" name="title" value="{:title}" /><br />
+					Date (UTC only!): <br />
+					<input name="date" id="datetimepicker{:id}" type="text" value="{:date} "/>
+					<script>
+					var timepicker = new Pikaday(
+						{
+							field: document.getElementById('datetimepicker{:id}'),
+							firstDay: 1,
+							minDate: new Date(2000, 0, 1),
+							maxDate: new Date(2020, 12, 31),
+							yearRange: [2000,2020],
+							showTime: true,
+							autoClose: false,
+							use24hour: false
+						});</script>
+[/block: item]
+
+[block: add_bottom]
+<button formaction="admin.php?module=livestreams" name="act" value="Add" type="submit">Add</button>
+</form>
+</div>
+</div>
+[/block: add_bottom]
+
+[block: edit_bottom]
+<button formaction="admin.php?module=livestreams" name="act" value="Edit" type="submit">Edit</button> <button formaction="admin.php?module=livestreams" name="act" value="Delete" type="submit">Delete</button>
+<input type="hidden" name="id" value="{:id}" />
+</form>
+</div>
+</div>
+[/block: edit_bottom]

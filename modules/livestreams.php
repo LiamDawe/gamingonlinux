@@ -12,7 +12,7 @@ if ($user->check_group(1,2) == true)
 }
 $templating->set('edit_link', $edit_link);
 
-$db->sqlquery("SELECT l.`row_id`, l.`title`, l.`date`, l.`end_date`, u.`username`, u.`user_id` FROM `livestreams` l INNER JOIN `users` u ON l.`owner_id` = u.`user_id` ORDER BY `date` ASC");
+$db->sqlquery("SELECT l.`row_id`, l.`title`, l.`date`, l.`end_date`, u.`username`, u.`user_id` FROM `livestreams` l INNER JOIN `users` u ON l.`owner_id` = u.`user_id` WHERE NOW() < `end_date`ORDER BY `date` ASC");
 if ($db->num_rows() > 0)
 {
   while ($streams = $db->fetch())

@@ -24,17 +24,32 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->set_previous('meta_description', 'Managing livestreams', 1);
 		$templating->set_previous('title', 'Managing livestreams', 1);
 
+		$db->sqlquery("SELECT `username`, `user_id` FROM `users` WHERE `user_group` IN (1,2,5) ORDER BY `username` ASC");
+		$users_list = $db->fetch_all_rows();
+
 		$templating->block('add_top', 'admin_modules/livestreams');
 
 		$templating->block('item', 'admin_modules/livestreams');
 		$templating->set('title', '');
 		$templating->set('date', '');
 
+		$options = '';
+		foreach ($users_list as $user_loop)
+		{
+			$selected = '';
+			if ($_SESSION['user_id'] == $user_loop['user_id'])
+			{
+				$selected = 'selected';
+			}
+			$options .= '<option value="'.$user_loop['user_id'].'" ' . $selected . '>'.$user_loop['username'].'</option>';
+		}
+		$templating->set('options', $options);
+
 		$templating->block('add_bottom', 'admin_modules/livestreams');
 
 		$templating->block('edit_top', 'admin_modules/livestreams');
 
-		$db->sqlquery("SELECT l.`row_id`, l.`title`, l.`date` FROM `livestreams` l INNER JOIN `users` u ON l.`owner_id` = u.`user_id` ORDER BY `date` ASC");
+		$db->sqlquery("SELECT l.`row_id`, l.`title`, l.`date`, l.`owner_id` FROM `livestreams` l INNER JOIN `users` u ON l.`owner_id` = u.`user_id` ORDER BY `date` ASC");
 		while ($streams = $db->fetch())
 		{
 			$templating->block('item', 'admin_modules/livestreams');
@@ -43,6 +58,18 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 			$date = new DateTime($streams['date']);
 			$templating->set('date', $date->format('Y-m-d H:i:s'));
+
+			$options = '';
+			foreach ($users_list as $user_loop)
+			{
+				$selected = '';
+				if ($streams['owner_id'] == $user_loop['user_id'])
+				{
+					$selected = 'selected';
+				}
+				$options .= '<option value="'.$user_loop['user_id'].'" ' . $selected . '>'.$user_loop['username'].'</option>';
+			}
+			$templating->set('options', $options);
 
 			$templating->block('edit_bottom', 'admin_modules/livestreams');
 			$templating->set('id', $streams['row_id']);
@@ -63,7 +90,7 @@ if (isset($_POST['act']))
 		$date = new DateTime($_POST['date']);
 		$title = trim($_POST['title']);
 
-		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date` = ?, `owner_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $_SESSION['user_id']));
+		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date` = ?, `owner_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $_POST['user_id']));
 		$new_id = $db->grab_id();
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' added a new livestream event.', core::$date, core::$date));
@@ -87,7 +114,7 @@ if (isset($_POST['act']))
 		$date = new DateTime($_POST['date']);
 		$title = trim($_POST['title']);
 
-		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $_POST['id']));
+		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `owner_id` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $_POST['user_id'], $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited the ' . $_POST['title'] . ' livestream.', core::$date, core::$date));
 

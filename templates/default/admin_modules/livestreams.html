@@ -15,6 +15,7 @@
 			<div class="body group">
 				<form method="post" action="admin.php?module=games">
 					Title: <input type="text" name="title" value="{:title}" /><br />
+					Streamer: <select name="user_id">{:options}</select>
 					Date (UTC only!): <br />
 					<input name="date" id="datetimepicker{:id}" type="text" value="{:date} "/>
 					<script>

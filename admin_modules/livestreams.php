@@ -32,6 +32,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/livestreams');
 		$templating->set('title', '');
 		$templating->set('date', '');
+		$templating->set('end_date', '');
 
 		$options = '';
 		foreach ($users_list as $user_loop)
@@ -49,7 +50,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('edit_top', 'admin_modules/livestreams');
 
-		$db->sqlquery("SELECT l.`row_id`, l.`title`, l.`date`, l.`owner_id` FROM `livestreams` l INNER JOIN `users` u ON l.`owner_id` = u.`user_id` ORDER BY `date` ASC");
+		$db->sqlquery("SELECT l.`row_id`, l.`title`, l.`date`, l.`end_date`, l.`owner_id` FROM `livestreams` l INNER JOIN `users` u ON l.`owner_id` = u.`user_id` ORDER BY `date` ASC");
 		while ($streams = $db->fetch())
 		{
 			$templating->block('item', 'admin_modules/livestreams');
@@ -58,6 +59,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 			$date = new DateTime($streams['date']);
 			$templating->set('date', $date->format('Y-m-d H:i:s'));
+
+			$end_date = new DateTime($streams['end_date']);
+			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
 
 			$options = '';
 			foreach ($users_list as $user_loop)
@@ -88,9 +92,10 @@ if (isset($_POST['act']))
 		}
 
 		$date = new DateTime($_POST['date']);
+		$end_date = new DateTime($_POST['end_date']);
 		$title = trim($_POST['title']);
 
-		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date` = ?, `owner_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $_POST['user_id']));
+		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `owner_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $_POST['user_id']));
 		$new_id = $db->grab_id();
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' added a new livestream event.', core::$date, core::$date));
@@ -112,9 +117,10 @@ if (isset($_POST['act']))
 		}
 
 		$date = new DateTime($_POST['date']);
+		$end_date = new DateTime($_POST['end_date']);
 		$title = trim($_POST['title']);
 
-		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `owner_id` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $_POST['user_id'], $_POST['id']));
+		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `owner_id` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $_POST['user_id'], $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited the ' . $_POST['title'] . ' livestream.', core::$date, core::$date));
 

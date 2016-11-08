@@ -16,7 +16,7 @@
 				<form method="post" action="admin.php?module=games">
 					Title: <input type="text" name="title" value="{:title}" /><br />
 					Streamer: <select name="user_id">{:options}</select>
-					Date (UTC only!): <br />
+					Start Date (UTC only!): <br />
 					<input name="date" id="datetimepicker{:id}" type="text" value="{:date} "/>
 					<script>
 					var timepicker = new Pikaday(
@@ -30,6 +30,20 @@
 							autoClose: false,
 							use24hour: false
 						});</script>
+						End Date (UTC only!): <br />
+						<input name="end_date" id="datetimepickere{:id}" type="text" value="{:end_date} "/>
+						<script>
+						var timepicker = new Pikaday(
+							{
+								field: document.getElementById('datetimepickere{:id}'),
+								firstDay: 1,
+								minDate: new Date(2000, 0, 1),
+								maxDate: new Date(2020, 12, 31),
+								yearRange: [2000,2020],
+								showTime: true,
+								autoClose: false,
+								use24hour: false
+							});</script>
 [/block: item]
 
 [block: add_bottom]

@@ -1,6 +1,6 @@
 [block: top]
 <div class="box">
-	<div class="head">GamingOnLinux Livestream Calendar</div>
+	<div class="head">GamingOnLinux Livestream Calendar{:edit_link}</div>
 	<div class="body group">Our Twitch page: <a href="https://www.twitch.tv/gamingonlinux">https://www.twitch.tv/gamingonlinux</a><br />
 		<br />
 		<img src="/templates/default/images/cal.gif" alt="" /> We have an ical too, <a href="https://www.gamingonlinux.com/livestreams_ical.php">copy this url</a>. Link to it in your calendar apps to stay up to date!</div>
@@ -10,7 +10,8 @@
 [block: item]
 <div class="box">
 	<div class="head"><a href="https://www.twitch.tv/gamingonlinux">{:title}</a></div>
-	<div class="body group">When: {:time} UTC<br />
+	<div class="body group">Start time: {:time} UTC<br />
+		End time: {:end_time} UTC<br />
 		<br />Starts in: {:countdown}<br />
 		<br />
 	Stream presented by: <a href="{:profile_link}">{:username}</a></div>

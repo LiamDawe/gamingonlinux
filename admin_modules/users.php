@@ -5,7 +5,7 @@ if ($user->check_group(1,2) == false)
 }
 else
 {
-	$templating->merge('admin_modules/admin_module_users');
+	$templating->merge('admin_modules/users');
 
 	if (isset($_GET['view']) && !isset($_POST['act']))
 	{
@@ -27,7 +27,7 @@ else
 				}
 			}
 
-			$templating->block('search','admin_modules/admin_module_users');
+			$templating->block('search','admin_modules/users');
 
 			$username = '';
 			$email = '';
@@ -53,10 +53,10 @@ else
 					{
 						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `email` LIKE ?", array('%'.$email.'%'));
 					}
-					$templating->block('search_row_top', 'admin_modules/admin_module_users');
+					$templating->block('search_row_top', 'admin_modules/users');
 					while ($search = $db->fetch())
 					{
-						$templating->block('search_row','admin_modules/admin_module_users');
+						$templating->block('search_row','admin_modules/users');
 						$templating->set('username', $search['username']);
 						$templating->set('user_id', $search['user_id']);
 						$templating->set('email', $search['email']);
@@ -67,12 +67,12 @@ else
 
 		if ($_GET['view'] == 'premium')
 		{
-			$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2) ORDER BY `premium-ends-date` ASC", 'admin_module_users.php');
+			$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2) ORDER BY `premium-ends-date` ASC");
 			$templating->block('premium_row_top');
 			while ($search = $db->fetch())
 			{
 				$end_date = $core->normal_date($search['premium-ends-date']);
-				$templating->block('premium_row','admin_modules/admin_module_users');
+				$templating->block('premium_row','admin_modules/users');
 				$templating->set('username', $search['username']);
 				$templating->set('user_id', $search['user_id']);
 			}
@@ -86,7 +86,7 @@ else
 			}
 			else
 			{
-				$templating->block('search','admin_modules/admin_module_users');
+				$templating->block('search','admin_modules/users');
 
 				if (isset($_GET['message']))
 				{
@@ -114,7 +114,7 @@ else
 				$db->sqlquery("SELECT * FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$user_info = $db->fetch();
 
-				$templating->block('edituser', 'admin_modules/admin_module_users');
+				$templating->block('edituser', 'admin_modules/users');
 				$templating->set('user_id', $user_info['user_id']);
 				$templating->set('username', $user_info['username']);
 				$templating->set('email', $user_info['email']);
@@ -154,6 +154,14 @@ else
 					}
 
 					$admin_only = "User Group: <select name=\"user_group\">{$groups}</select><br />Secondary User Group: <select name=\"secondary_user_group\">{$sgroups}</select><br />";
+
+					$developer_check = '';
+					if ($user_info['game_developer'] == 1)
+					{
+						$developer_check = 'checked';
+					}
+
+					$admin_only = '<label><input type="checkbox" name="game_developer" '.$developer_check.'/>Game developer?</label>';
 
 				}
 				$templating->set('admin_only', $admin_only);
@@ -224,18 +232,17 @@ else
 					$expires = strtotime(gmdate($_POST['expires']));
 				}
 
-				$dev_check = '';
-				if (isset($_POST['dev_check']))
+				$dev_check = 0;
+				if (isset($_POST['game_developer']))
 				{
 					$dev_check = 1;
 				}
-				$templating->set('dev_check', $dev_check);
 
 				$db->sqlquery("UPDATE `users` SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $_GET['user_id']));
 
 				if ($user->check_group(1) == true)
 				{
-					$db->sqlquery("UPDATE `users` SET `user_group` = ?, `secondary_user_group` = ? WHERE `user_id` = ?", array($_POST['user_group'], $_POST['secondary_user_group'], $_GET['user_id']));
+					$db->sqlquery("UPDATE `users` SET `user_group` = ?, `secondary_user_group` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['user_group'], $_POST['secondary_user_group'], $dev_check, $_GET['user_id']));
 				}
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the user {$_POST['username']}.", core::$date, core::$date));

@@ -278,7 +278,6 @@ else if (isset($_POST['act']))
 		$subscribe_emails = 0;
 		$email_on_pm = 0;
 		$email_on_login = 0;
-		$hide_developer_status = 0;
 
 		if (isset($_POST['subscribe']))
 		{

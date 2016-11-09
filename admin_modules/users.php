@@ -124,9 +124,15 @@ else
 				if ($user->check_group(1) == true)
 				{
 					$groups = '';
+					$snone_selected = '';
 					$db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_id` ASC");
 					while ($group_sql = $db->fetch())
 					{
+						if ($user_info['secondary_user_group'] == 0)
+						{
+							$none_selected = 'selected';
+						}
+
 						if ($group_sql['group_id'] == $user_info['user_group'])
 						{
 							$groups .= "<option value=\"{$group_sql['group_id']}\" selected>{$group_sql['group_name']}</option>";
@@ -137,11 +143,18 @@ else
 							$groups .= "<option value=\"{$group_sql['group_id']}\">{$group_sql['group_name']}</option>";
 						}
 					}
+					$groups .= '<option value="0" '.$none_selected.'>None</option>';
 
 					$sgroups = '';
+					$snone_selected = '';
 					$db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_id` ASC");
 					while ($sgroup_sql = $db->fetch())
 					{
+						if ($user_info['secondary_user_group'] == 0)
+						{
+							$snone_selected = 'selected';
+						}
+
 						if ($sgroup_sql['group_id'] == $user_info['secondary_user_group'])
 						{
 							$sgroups .= "<option value=\"{$sgroup_sql['group_id']}\" selected>{$sgroup_sql['group_name']}</option>";
@@ -152,6 +165,7 @@ else
 							$sgroups .= "<option value=\"{$sgroup_sql['group_id']}\">{$sgroup_sql['group_name']}</option>";
 						}
 					}
+					$sgroups .= '<option value="0" '.$snone_selected.'>None</option>';
 
 					$admin_only = "User Group: <select name=\"user_group\">{$groups}</select><br />Secondary User Group: <select name=\"secondary_user_group\">{$sgroups}</select><br />";
 
@@ -161,7 +175,7 @@ else
 						$developer_check = 'checked';
 					}
 
-					$admin_only = '<label><input type="checkbox" name="game_developer" '.$developer_check.'/>Game developer?</label>';
+					$admin_only .= '<label><input type="checkbox" name="game_developer" '.$developer_check.'/>Game developer?</label>';
 
 				}
 				$templating->set('admin_only', $admin_only);

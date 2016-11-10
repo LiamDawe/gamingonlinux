@@ -858,7 +858,7 @@ else if (isset($_POST['act']))
 					$to = $author_email['email'];
 
 					// subject
-					$subject = 'Your article was review and edited on GamingOnLinux.com!';
+					$subject = 'Your article was reviewed and edited on GamingOnLinux.com!';
 
 					$nice_title = $core->nice_title($_POST['title']);
 

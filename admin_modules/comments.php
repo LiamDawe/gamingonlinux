@@ -163,6 +163,8 @@ if (!isset($_GET['view']))
 
 			$templating->set('paging', $article_pagination);
 
+			$templating->block('article_bottom', 'articles_full');
+
 			if (!empty($article['article_bio']) && ($article['user_group'] == 1 || $article['user_group'] == 2 || $article['user_group'] == 5))
 			{
 				$templating->block('bio', 'articles_full');

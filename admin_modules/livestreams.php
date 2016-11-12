@@ -99,13 +99,15 @@ if (isset($_POST['act']))
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);
 
+		$date_created = date('Y-m-d H:i:s');
+
 		$community = 0;
 		if (isset($_POST['community']))
 		{
 			$community = 1;
 		}
 
-		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url));
+		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ?", array($title, $date_created, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url));
 		$new_id = $db->grab_id();
 
 		$core->process_livestream_users($new_id);

@@ -31,9 +31,9 @@ function escapeString($string) {
   return preg_replace('/([\,;])/','\\\$1', $string);
 }
 
-$output = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nVERSION:2.0\r\nPRODID:-//Gaming On Linux//Release Calendar//EN\r\n";
+$output = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nVERSION:2.0\r\nPRODID:-//Gaming On Linux//Livestream Calendar//EN\r\n";
 
-$db->sqlquery("SELECT `row_id`, `title`, `date` FROM `livestreams` ORDER BY `date` ASC");
+$db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `date_created` FROM `livestreams` ORDER BY `date` ASC");
 
 // loop over events
 while ($item = $db->fetch())
@@ -44,7 +44,7 @@ while ($item = $db->fetch())
 		$url = 'URL:' . escapeString($item['link']) . "\r\nDESCRIPTION:" . escapeString($item['link']) . "\r\n";
 	}
 
-	$output .="BEGIN:VEVENT\r\nUID:{$item['row_id']}@gamingonlinux.com\r\n" . "DTSTART:" . date("Ymd\THis", strtotime($item['date'])) . "Z\r\n" . 'DTEND:' . date("Ymd\THis", strtotime($item['date'] . '+ 1 hour')) . "Z\r\nSUMMARY:GOL Livestream > " . $item['title'] . "\r\nEND:VEVENT";
+	$output .="BEGIN:VEVENT\r\nUID:{$item['row_id']}@gamingonlinux.com\r\nDTSTAMP:" . date("Ymd\THis", strtotime($item['date_created'])) . "Z\r\n" . "DTSTART:" . date("Ymd\THis", strtotime($item['date'])) . "Z\r\n" . 'DTEND:' . date("Ymd\THis", strtotime($item['end_date'])) . "Z\r\nSUMMARY:GOL Livestream > " . $item['title'] . "\r\nEND:VEVENT\r\n";
 }
 
 // close calendar

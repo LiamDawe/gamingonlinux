@@ -1032,5 +1032,43 @@ class core
 			return $get_graph;
 		}
 	}
+
+	function process_livestream_users($livestream_id)
+	{
+		global $db;
+
+		if (isset($livestream_id) && is_numeric($livestream_id))
+		{
+			// delete any existing categories that aren't in the final list for publishing
+			$db->sqlquery("SELECT `id`, `livestream_id`, `user_id` FROM `livestream_presenters` WHERE `livestream_id` = ?", array($livestream_id));
+			$current_users = $db->fetch_all_rows();
+
+			if (!empty($current_users))
+			{
+				foreach ($current_users as $current_user)
+				{
+					if (!in_array($current_user['user_id'], $_POST['user_ids']))
+					{
+						$db->sqlquery("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($current_user['id']));
+					}
+				}
+			}
+
+			// get fresh list of categories, and insert any that don't exist
+			$db->sqlquery("SELECT `user_id` FROM `livestream_presenters` WHERE `livestream_id` = ?", array($livestream_id));
+			$current_streamers = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
+
+			if (isset($_POST['user_ids']) && !empty($_POST['user_ids']))
+			{
+				foreach($_POST['user_ids'] as $streamer_id)
+				{
+					if (!in_array($streamer_id, $current_streamers))
+					{
+						$db->sqlquery("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
+					}
+				}
+			}
+		}
+	}
 }
 ?>

@@ -24,34 +24,24 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->set_previous('meta_description', 'Managing livestreams', 1);
 		$templating->set_previous('title', 'Managing livestreams', 1);
 
-		$db->sqlquery("SELECT `username`, `user_id` FROM `users` WHERE `user_group` IN (1,2,5) ORDER BY `username` ASC");
-		$users_list = $db->fetch_all_rows();
-
 		$templating->block('add_top', 'admin_modules/livestreams');
 
 		$templating->block('item', 'admin_modules/livestreams');
 		$templating->set('title', '');
 		$templating->set('date', '');
 		$templating->set('end_date', '');
-
-		$options = '';
-		foreach ($users_list as $user_loop)
-		{
-			$selected = '';
-			if ($_SESSION['user_id'] == $user_loop['user_id'])
-			{
-				$selected = 'selected';
-			}
-			$options .= '<option value="'.$user_loop['user_id'].'" ' . $selected . '>'.$user_loop['username'].'</option>';
-		}
-		$templating->set('options', $options);
+		$templating->set('community_check', '');
+		$templating->set('community_name', '');
+		$templating->set('stream_url', '');
 
 		$templating->block('add_bottom', 'admin_modules/livestreams');
 
 		$templating->block('edit_top', 'admin_modules/livestreams');
 
-		$db->sqlquery("SELECT l.`row_id`, l.`title`, l.`date`, l.`end_date`, l.`owner_id` FROM `livestreams` l INNER JOIN `users` u ON l.`owner_id` = u.`user_id` ORDER BY `date` ASC");
-		while ($streams = $db->fetch())
+		$streams_grab = $db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` ORDER BY `date` ASC");
+		$streams_store = $db->fetch_all_rows();
+
+		foreach ($streams_store as $streams)
 		{
 			$templating->block('item', 'admin_modules/livestreams');
 			$templating->set('title', $streams['title']);
@@ -63,17 +53,29 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$end_date = new DateTime($streams['end_date']);
 			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
 
-			$options = '';
-			foreach ($users_list as $user_loop)
+			$streamer_list = '';
+			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN users u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
+			while ($grab_streamers = $db->fetch())
 			{
-				$selected = '';
-				if ($streams['owner_id'] == $user_loop['user_id'])
-				{
-					$selected = 'selected';
-				}
-				$options .= '<option value="'.$user_loop['user_id'].'" ' . $selected . '>'.$user_loop['username'].'</option>';
+				$streamer_list .= '<option value="'.$grab_streamers['user_id'].'" selected>'.$grab_streamers['username'].'</option>';
 			}
-			$templating->set('options', $options);
+			$templating->set('users_list', $streamer_list);
+
+			$community_check = '';
+			if ($streams['community_stream'] == 1)
+			{
+				$community_check = 'checked';
+			}
+			$templating->set('community_check', $community_check);
+
+			$templating->set('stream_url', $streams['stream_url']);
+
+			$streamer_community_name = '';
+			if (!empty($streams['streamer_community_name']))
+			{
+				$streamer_community_name = $streams['streamer_community_name'];
+			}
+			$templating->set('community_name', $streamer_community_name);
 
 			$templating->block('edit_bottom', 'admin_modules/livestreams');
 			$templating->set('id', $streams['row_id']);
@@ -94,9 +96,19 @@ if (isset($_POST['act']))
 		$date = new DateTime($_POST['date']);
 		$end_date = new DateTime($_POST['end_date']);
 		$title = trim($_POST['title']);
+		$community_name = trim($_POST['community_name']);
+		$stream_url = trim($_POST['stream_url']);
 
-		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `owner_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $_POST['user_id']));
+		$community = 0;
+		if (isset($_POST['community']))
+		{
+			$community = 1;
+		}
+
+		$db->sqlquery("INSERT INTO `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url));
 		$new_id = $db->grab_id();
+
+		$core->process_livestream_users($new_id);
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' added a new livestream event.', core::$date, core::$date));
 
@@ -119,8 +131,18 @@ if (isset($_POST['act']))
 		$date = new DateTime($_POST['date']);
 		$end_date = new DateTime($_POST['end_date']);
 		$title = trim($_POST['title']);
+		$community_name = trim($_POST['community_name']);
+		$stream_url = trim($_POST['stream_url']);
 
-		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `owner_id` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $_POST['user_id'], $_POST['id']));
+		$community = 0;
+		if (isset($_POST['community']))
+		{
+			$community = 1;
+		}
+
+		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url, $_POST['id']));
+
+		$core->process_livestream_users($_POST['id']);
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited the ' . $_POST['title'] . ' livestream.', core::$date, core::$date));
 
@@ -158,9 +180,11 @@ if (isset($_POST['act']))
 
 			$db->sqlquery("DELETE FROM `livestreams` WHERE `row_id` = ?", array($_GET['id']));
 
+			$db->sqlquery("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_GET['id']));
+
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' removed ' . $title['title'] . ' from the livestream events.', core::$date, core::$date));
 
-				header("Location: /admin.php?module=livestreams&view=manage&message=deleted");
+			header("Location: /admin.php?module=livestreams&view=manage&message=deleted");
 		}
 	}
 }

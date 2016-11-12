@@ -158,6 +158,29 @@ jQuery(document).ready(function()
     },
     minimumInputLength: 2
   });
+  $(".livestream_user_ids").select2({
+    selectOnClose: true,
+    width: '100%',
+    ajax: {
+      url: "/includes/ajax/livestream_users_ajax.php",
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term // search term
+        };
+      },
+      processResults: function (data) {
+        return {
+          results: $.map(data, function(obj) {
+            return { id: obj.id, text: obj.text };
+          })
+        };
+      },
+      cache: true,
+    },
+    minimumInputLength: 2
+  });
   $("#articleGames").select2({
   selectOnClose: true,
   width: '100%',
@@ -209,15 +232,14 @@ jQuery(document).ready(function()
   });
 
   $(".gallery_tagline").fancybox({
-    maxWidth	: 800,
-    maxHeight	: 600,
     fitToView	: false,
-    width		: '70%',
-    height		: '70%',
+    width		: '80%',
+    height		: '80%',
     autoSize	: false,
     closeClick	: false,
     openEffect	: 'none',
-    closeEffect	: 'none'
+    closeEffect	: 'none',
+    autoCenter : false
   });
 
   // Enable on all forms
@@ -617,6 +639,7 @@ $(document).on('click', ".gallery_item", function() {
     var id = $(this).data('id');
     $('#preview2').html('<img src="/uploads/tagline_gallery/' + filename + '" alt="image" />');
     $.fancybox.close();
+    $.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id });
   });
 
   $('#preview_text_button').click(function() {

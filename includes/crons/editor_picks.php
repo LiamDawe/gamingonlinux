@@ -8,16 +8,6 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include($path . 'includes/class_core.php');
 $core = new core();
 
-// get config
-$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-$fetch_config = $db->fetch_all_rows();
-
-$config = array();
-foreach ($fetch_config as $config_set)
-{
-	$config[$config_set['data_key']] = $config_set['data_value'];
-}
-
 $timeout = 1209600; // 14 days
 
 $stamp = time() - $timeout;
@@ -57,7 +47,7 @@ $db->sqlquery("SELECT `article_id` FROM `editor_picks`");
 
 $editor_pick_count = $db->num_rows();
 
-if ($editor_pick_count < $config['editor_picks_limit'])
+if ($editor_pick_count < core::config('editor_picks_limit'))
 {
 	$to = "liamdawe@gmail.com";
 
@@ -72,10 +62,10 @@ if ($editor_pick_count < $config['editor_picks_limit'])
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 	</head>
 	<body>
-		<img src=\"{$config['website_url']}{$config['path']}/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+		<img src=\"" . core::config('website_url') . "/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 		<br />
 		<p>Hello <strong>liamdawe</strong>,</p>
-		<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to {$config['editor_picks_limit']}!</p>
+		<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to " . core::config('editor_picks_limit') . "!</p>
 		<p>Games removed:</p>
 		<p>$games</p>
 		<div>

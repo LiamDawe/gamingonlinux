@@ -48,7 +48,7 @@
 [/block: premium_row]
 
 [block: edituser]
-<div class="box"><div class="head">Here you can edit {:username}'s details.</div>
+<div class="box"><div class="head">Here you can edit {:username}'s details. <span class="fright"><a href="{:profile_link}">View live profile</a></span></div>
 	<div class="body group">
 		<form method="post" action="admin.php?module=users&user_id={:user_id}">
 			Username: <input type="text" name="username" class="form-control" value="{:username}" /><br />
@@ -63,6 +63,17 @@
 			<button type="submit" name="act" value="delete_user" class="btn btn-danger">Delete User</button>
 			{:delete_content_button}
 			{:ban_button}
+		</form>
+	</div>
+</div>
+<div class="box"><div class="head">Admin notes about this user</div></div>
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+			<em>These notes are never shown to a user, if you feel the need to note something down other editors to know enter it here</em><br />
+			<textarea name="notes" rows="20">{:admin_notes}</textarea>
+			<input type="hidden" name="username" value="{:username}" />
+			<button type="submit" name="act" value="editnotes" class="btn btn-primary">Save</button>
 		</form>
 	</div>
 </div>

@@ -105,6 +105,11 @@ else
 						$core->message("You have edited that user!");
 					}
 
+					if ($_GET['message'] == 'notesdone')
+					{
+						$core->message("You have edited the admin notes for that user!");
+					}
+
 					if ($_GET['message'] == 'banned')
 					{
 						$core->message("You have now banned this user!", NULL, 1);
@@ -115,6 +120,17 @@ else
 				$user_info = $db->fetch();
 
 				$templating->block('edituser', 'admin_modules/users');
+
+				if (core::config('pretty_urls') == 1)
+				{
+					$profile_link = '/profiles/' . $user_info['user_id'];
+				}
+				else
+				{
+					$profile_link = '/index.php?module=profile&user_id='. $user_info['user_id'];
+				}
+				$templating->set('profile_link', $profile_link);
+
 				$templating->set('user_id', $user_info['user_id']);
 				$templating->set('username', $user_info['username']);
 				$templating->set('email', $user_info['email']);
@@ -124,7 +140,7 @@ else
 				if ($user->check_group(1) == true)
 				{
 					$groups = '';
-					$snone_selected = '';
+					$none_selected = '';
 					$db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_id` ASC");
 					while ($group_sql = $db->fetch())
 					{
@@ -209,6 +225,11 @@ else
 				}
 
 				$templating->set('ban_button', $ban_button);
+
+				$db->sqlquery("SELECT `notes` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']));
+				$grab_notes = $db->fetch();
+
+				$templating->set('admin_notes', $grab_notes['notes']);
 			}
 		}
 
@@ -262,6 +283,36 @@ else
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the user {$_POST['username']}.", core::$date, core::$date));
 
 				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=done");
+			}
+		}
+
+		if ($_POST['act'] == 'editnotes')
+		{
+			if (!isset($_GET['user_id']) || empty($_GET['user_id']))
+			{
+				header("Location: admin.php?module=users&view=search&message=noid");
+			}
+
+			else
+			{
+				// make sure they have a row for notes, if not add a new row otherwise edit
+				$db->sqlquery("SELECT `user_id` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']));
+				$user_count = $db->num_rows();
+
+				$notes = trim($_POST['notes']);
+
+				if ($user_count == 1)
+				{
+					$db->sqlquery("UPDATE `admin_user_notes` SET `notes` = ?, `last_edited` = ?, `last_edit_by` = ? WHERE `user_id` = ?", array($notes, core::$date, $_SESSION['user_id'], $_GET['user_id']));
+				}
+				else if ($user_count == 0)
+				{
+					$db->sqlquery("INSERT INTO `admin_user_notes` SET `notes` = ?, `last_edited` = ?, `last_edit_by` = ?, `user_id` = ?", array($notes, core::$date, $_SESSION['user_id'], $_GET['user_id']));
+				}
+
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the admin notes about user {$_POST['username']}.", core::$date, core::$date));
+
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=notesdone");
 			}
 		}
 

@@ -206,7 +206,7 @@ if (!isset($_GET['go']))
 				$templating->set('article_views', $article['views']);
 
 				$games_list = '';
-				// sort out the categories (tags)
+				// sort out the games tags
 				$db->sqlquery("SELECT c.`name`, c.`id` FROM `calendar` c INNER JOIN `article_game_assoc` r ON c.id = r.game_id WHERE r.article_id = ? ORDER BY c.`name` ASC", array($article['article_id']));
 				while ($get_games = $db->fetch())
 				{

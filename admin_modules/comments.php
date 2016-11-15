@@ -99,6 +99,16 @@ if (!isset($_GET['view']))
 
 			$templating->set('article_views', $article['views']);
 
+			$games_list = '';
+			// sort out the games tags
+			$db->sqlquery("SELECT c.`name`, c.`id` FROM `calendar` c INNER JOIN `article_game_assoc` r ON c.id = r.game_id WHERE r.article_id = ? ORDER BY c.`name` ASC", array($article['article_id']));
+			while ($get_games = $db->fetch())
+			{
+				$games_list .= " <li><a href=\"/index.php?module=game&game-id={$get_games['id']}\">{$get_games['name']}</a></li> ";
+			}
+
+			$templating->set('games_list', $games_list);
+
 			$categories_list = '';
 			// sort out the categories (tags)
 			$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ?", array($article['article_id']), 'articles_full.php');

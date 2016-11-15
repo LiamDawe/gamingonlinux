@@ -21,7 +21,7 @@ class user
 
 				if ($db->num_rows() == 1)
 				{
-					$user = $db->fetch();
+					$user_info = $db->fetch();
 
 					// sort old passwords to new
 					$old_password = hash('sha256', $info['password_salt'] . $password);
@@ -29,17 +29,17 @@ class user
 					{
 							$new_password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-							$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_hash, $user['user_id']));
+							$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_hash, $user_info['user_id']));
 					}
 
-					$this->check_banned($user);
+					$this->check_banned($user_info);
 
-					$generated_session = md5(mt_rand() . $user['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+					$generated_session = md5(mt_rand() . $user_info['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
 					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']));
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
 
-					$this->register_session($user, $generated_session);
+					$this->register_session($user_info, $generated_session);
 
 					if ($remember_username == 1)
 					{
@@ -48,7 +48,7 @@ class user
 
 					if ($stay == 1)
 					{
-						setcookie('gol_stay', $user['user_id'], time()+31556926, '/', core::config('cookie_domain'));
+						setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', core::config('cookie_domain'));
 						setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
 					}
 

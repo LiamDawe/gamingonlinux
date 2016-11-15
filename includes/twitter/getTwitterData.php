@@ -43,11 +43,11 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 	{
 		$uid = $user_info->id;
     $username = $user_info->screen_name;
-    $user = new twitter_user();
-    $userdata = $user->checkUser($uid, 'twitter', $username);
+    $twitter_user = new twitter_user();
+    $userdata = $twitter_user->checkUser($uid, 'twitter', $username);
 
 		// linking account via usercp
-    if ($user->new == 0)
+    if ($twitter_user->new == 0)
     {
 			header("Location: /usercp.php");
     }
@@ -74,7 +74,7 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
     }
 
 		// registering a new account with a twitter handle, send them to register with the twitter data
-		else if($user->new == 2)
+		else if($twitter_user->new == 2)
 		{
 			$_SESSION['twitter_data'] = $userdata;
 

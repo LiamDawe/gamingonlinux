@@ -95,6 +95,11 @@ if (isset($_GET['view']))
 					$core->message('You have to fill in a title, tagline and text!', NULL, 1);
 				}
 
+				if ($_GET['error'] == 'noimageselected')
+				{
+					$core->message('There is no tagline image, please make sure you add one!', NULL, 1);
+				}
+
 				else if ($_GET['error'] == 'shorttagline')
 				{
 					$core->message('The tagline was too short, it needs to be at least 100 characters to be informative!', NULL, 1);

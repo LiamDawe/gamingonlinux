@@ -39,7 +39,6 @@ if ($db->num_rows() > 0)
     $templating->set('stream_url', $stream_url);
 
     $templating->set('title', $streams['title']);
-    $templating->set('username', $streams['username']);
     $templating->set('time', $streams['date']);
     $templating->set('end_time', $streams['end_date']);
 

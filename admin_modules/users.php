@@ -280,21 +280,6 @@ else
 					$db->sqlquery("UPDATE `users` SET `user_group` = ?, `secondary_user_group` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['user_group'], $_POST['secondary_user_group'], $dev_check, $_GET['user_id']));
 				}
 
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the user {$_POST['username']}.", core::$date, core::$date));
-
-				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=done");
-			}
-		}
-
-		if ($_POST['act'] == 'editnotes')
-		{
-			if (!isset($_GET['user_id']) || empty($_GET['user_id']))
-			{
-				header("Location: admin.php?module=users&view=search&message=noid");
-			}
-
-			else
-			{
 				// make sure they have a row for notes, if not add a new row otherwise edit
 				$db->sqlquery("SELECT `user_id` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']));
 				$user_count = $db->num_rows();
@@ -310,9 +295,9 @@ else
 					$db->sqlquery("INSERT INTO `admin_user_notes` SET `notes` = ?, `last_edited` = ?, `last_edit_by` = ?, `user_id` = ?", array($notes, core::$date, $_SESSION['user_id'], $_GET['user_id']));
 				}
 
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the admin notes about user {$_POST['username']}.", core::$date, core::$date));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the user {$_POST['username']}.", core::$date, core::$date));
 
-				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=notesdone");
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=done");
 			}
 		}
 

@@ -30,13 +30,13 @@ unset($_SESSION['image_rand']);
 // email all editors apart from yourself
 $db->sqlquery("SELECT `user_id`, `email`, `username` FROM `users` WHERE `user_group` IN (1,2) AND `user_id` != ?", array($_SESSION['user_id']));
 $users_array = array();
-while ($users = $db->fetch())
+while ($email_users = $db->fetch())
 {
-	if ($users['user_id'] != $_SESSION['user_id'] && $users['email'] == 1)
+	if ($email_users['user_id'] != $_SESSION['user_id'] && $email_users['email'] == 1)
 	{
-		$users_array[$users['user_id']]['user_id'] = $users['user_id'];
-		$users_array[$users['user_id']]['email'] = $users['email'];
-		$users_array[$users['user_id']]['username'] = $users['username'];
+		$users_array[$email_users['user_id']]['user_id'] = $email_users['user_id'];
+		$users_array[$email_users['user_id']]['email'] = $email_users['email'];
+		$users_array[$email_users['user_id']]['username'] = $email_users['username'];
 	}
 }
 

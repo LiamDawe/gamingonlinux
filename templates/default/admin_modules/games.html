@@ -31,6 +31,7 @@
 [/block: add_top]
 
 [block: edit_top]
+<script src="includes/jscripts/jquery.form.min.js"></script>
 <div class="box">
 	<div class="head">
 		Edit the game <span class="fright"><a href="/index.php?module=game&game-id={:id}">View in live database</a></span>
@@ -58,7 +59,12 @@
 						showTime: false
 					});</script>
 					Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
+					<br />
 					DLC <em>Tick if this is a DLC</em> <input type="checkbox" name="dlc" {:dlc_check}/><br />
+					Base game name <em>If it's a DLC, what game is it for?</em><br />
+					<select tabindex="-1" name="game" id="articleGames" style="width:300px" class="populate select2-offscreen"><option value="0">None</option>{:base_game}</select><br />
+					<button class="clear-games">Clear game</button><br />
+					<br />
 					<br />
 					Description:<br />
 [/block: item]

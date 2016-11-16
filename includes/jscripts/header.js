@@ -181,7 +181,7 @@ jQuery(document).ready(function()
     },
     minimumInputLength: 2
   });
-  $("#articleGames").select2({
+  var $gamesMulti = $("#articleGames").select2({
   selectOnClose: true,
   width: '100%',
   ajax: {
@@ -204,6 +204,7 @@ jQuery(document).ready(function()
   },
   minimumInputLength: 2
   });
+  $(".clear-games").on("click", function (e) { e.preventDefault(); $gamesMulti.val(null).trigger("change"); });
 }
   var clipboard = new Clipboard('.btn');
 

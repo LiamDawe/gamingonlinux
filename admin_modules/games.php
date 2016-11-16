@@ -27,14 +27,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('add_top', 'admin_modules/games');
 
 		$templating->block('item', 'admin_modules/games');
-		$templating->set('id', '');
-		$templating->set('name', '');
-		$templating->set('link', '');
-		$templating->set('steam_link', '');
-		$templating->set('gog_link', '');
-		$templating->set('date', '');
-		$templating->set('guess_check', '');
-		$templating->set('dlc_check', '');
+
+		// all these need to be empty, as it's a new game
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'date', 'guess_guess', 'dlc_check', 'base_game');
+		foreach ($set_empty as $make_empty)
+		{
+			$templating->set($make_empty, '');
+		}
+
 		$core->editor('text', '');
 
 		$templating->block('add_bottom', 'admin_modules/games');
@@ -47,7 +47,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		else
 		{
-			$db->sqlquery("SELECT * FROM `calendar` WHERE `id` = ?", array($_GET['id']));
+			$db->sqlquery("SELECT c.*, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ?", array($_GET['id']));
 			$count = $db->num_rows();
 
 			if ($count == 0)
@@ -107,6 +107,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('dlc_check', $dlc_check);
 
+				$base_game = '';
+				if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
+				{
+					$base_game = '<option value="'.$game['base_game_id'].'" selected>'.$game['base_game_name'].'</option>';
+				}
+				$templating->set('base_game', $base_game);
+
 				$text = $game['description'];
 
 				$core->editor('text', $text);
@@ -151,10 +158,16 @@ if (isset($_POST['act']))
 			$dlc = 1;
 		}
 
+		$base_game = NULL;
+		if (isset($_POST['game']) && is_numeric($_POST['game']))
+		{
+			$base_game = $_POST['game'];
+		}
+
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $dlc));
+		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $dlc, $base_game));
 		$new_id = $db->grab_id();
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' added ' . $_POST['name'] . ' to the games database.', core::$date, core::$date));
@@ -190,10 +203,16 @@ if (isset($_POST['act']))
 			$dlc = 1;
 		}
 
+		$base_game = NULL;
+		if (isset($_POST['game']) && is_numeric($_POST['game']))
+		{
+			$base_game = $_POST['game'];
+		}
+
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $edit_date, $dlc, $_POST['id']));
+		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $edit_date, $dlc, $base_game, $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited ' . $_POST['name'] . ' in the games database.', core::$date, core::$date));
 

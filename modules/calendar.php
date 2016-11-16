@@ -162,7 +162,7 @@ $templating->block('head', 'calendar');
 
 	$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-	$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
+	$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
 	while ($listing = $db->fetch())
 	{
 		$get_date = date_parse($listing['date']);
@@ -175,6 +175,12 @@ $templating->block('head', 'calendar');
 			$best_guess = '<span class="tooltip-top badge blue" title="We haven\'t been given an exact date!">Best Guess</span>';
 		}
 		$templating->set('best_guess', $best_guess);
+		$dlc = '';
+		if ($listing['is_dlc'] == 1)
+		{
+			$dlc = '<span class="badge yellow">DLC</span>';
+		}
+		$templating->set('dlc', $dlc);
 		$templating->set('day', $current_day);
 
 		$today = '';

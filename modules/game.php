@@ -52,7 +52,7 @@ if (!isset($_GET['game-id']))
 if (isset($_GET['game-id']))
 {
 	// make sure it exists
-	$db->sqlquery("SELECT `id`, `name`, `date`, `gog_link`, `steam_link`, `link`, `description`, `best_guess`, `is_dlc` FROM `calendar` WHERE `id` = ? AND `approved` = 1", array($_GET['game-id']));
+	$db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`description`, c.`best_guess`, c.`is_dlc`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
 		$game = $db->fetch();
@@ -75,12 +75,26 @@ if (isset($_GET['game-id']))
 		$templating->block('top', 'game_database');
 		$templating->set('name', $game['name']);
 
+		$dlc = '';
+		if ($game['is_dlc'] == 1)
+		{
+			$dlc = '<span class="badge yellow">DLC</span>';
+		}
+		$templating->set('dlc', $dlc);
+
 		$edit_link = '';
 		if ($user->check_group(1,2) == TRUE || $user->check_group(5) == TRUE)
 		{
 			$edit_link = '<a class="fright" href="/admin.php?module=games&amp;view=edit&amp;id=' . $game['id'] . '&return=game">Edit</a>';
 		}
 		$templating->set('edit-link', $edit_link);
+
+		if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
+		{
+			$templating->block('base_game', 'game_database');
+			$templating->set('base_game_id', $game['base_game_id']);
+			$templating->set('base_game_name', $game['base_game_name']);
+		}
 
 		$templating->block('main-info', 'game_database');
 
@@ -104,13 +118,6 @@ if (isset($_GET['game-id']))
 			$best_guess = '<span class="badge blue">Best Guess Date!</span>';
 		}
 		$templating->set('best_guess', $best_guess);
-
-		$dlc = '';
-		if ($game['is_dlc'] == 1)
-		{
-			$dlc = '<span class="badge yellow">DLC</span>';
-		}
-		$templating->set('dlc', $dlc);
 
 		$description = '';
 		if (!empty($game['description']) && $game['description'] != NULL)

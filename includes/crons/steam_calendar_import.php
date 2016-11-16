@@ -64,6 +64,10 @@ do
             {
               $dont_use = 1;
             }
+            if (strpos($title, 'soundtrack') !== false)
+            {
+              $dont_use = 1;
+            }
             if (strpos($title, 'Soundtracks') !== false)
             {
               $dont_use = 1;

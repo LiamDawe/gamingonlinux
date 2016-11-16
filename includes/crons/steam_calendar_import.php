@@ -1,4 +1,6 @@
 <?php
+error_reporting(-1);
+
 echo "Steam Store importer started on " .date('d-m-Y H:m:s'). "<br />\n";
 
 // http://simplehtmldom.sourceforge.net/
@@ -27,7 +29,7 @@ do
   echo 'Moving onto page ' . $page . '<br />';
   $html = file_get_html($url . $page);
 
-  $get_games = $html->find('a.search_result_row');
+  $get_games = $html->find('div.responsive_search_name_combined');
 
   if (empty($get_games))
   {
@@ -37,6 +39,7 @@ do
   {
     foreach($get_games as $element)
     {
+
         foreach ($element->find('div.search_released') as $release_date)
         {
           $trimmed_date = trim($release_date->plaintext);
@@ -96,7 +99,7 @@ do
 
               echo 'Release date: ' . $parsed_release_date . ' original ('.$release_date->plaintext.')' . '<br />';
 
-              $link = $element->href;
+              $link = $element->parent()->href;
               echo  'Link: ' . $link . '<br /><br />';
 
               $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
@@ -114,7 +117,7 @@ do
 
                 echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
 
-                $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br />';
+                $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br /><br />';
               }
 
               // if we already have it, just update it

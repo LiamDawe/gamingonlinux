@@ -156,15 +156,6 @@ if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'art
 	$templating->set('meta_data', '');;
 }
 
-if (($core->current_page() == 'admin.php') || (isset($_GET['module']) && $_GET['module'] == 'articles'))
-{
-	if (isset($_GET['view']) && $_GET['view'] != 'cat' || !isset($_GET['view']))
-	{
-		$templating->block('category_selection');
-		$templating->set('url', url);
-	}
-}
-
 $templating->merge('mainpage');
 
 $templating->block('top');
@@ -175,6 +166,11 @@ if (date('dm') == '0104')
 {
 	$icon = 'windows_logo.png';
 	$site_title = 'Gaming On Windows 10';
+}
+else if (date('m') == '12')
+{
+	$icon = 'icon_xmas.png';
+	$site_title = 'Gaming On Linux';
 }
 else
 {

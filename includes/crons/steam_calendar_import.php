@@ -81,6 +81,11 @@ do
             {
               $dont_use = 1;
             }
+            // we don't want artbooks
+            if (strpos($title, ' Artbook') !== false)
+            {
+              $dont_use = 1;
+            }
             if ($dont_use == 0)
             {
               echo 'Title: ' . $element->find('span.title', 0)->plaintext . '<br />';

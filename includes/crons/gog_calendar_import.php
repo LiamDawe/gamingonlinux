@@ -81,6 +81,11 @@ do {
 			{
 				$dont_use = 1;
 			}
+			// we dont want artbooks either
+			if (strpos($games['title'], ' Artbook') !== false)
+			{
+				$dont_use = 1;
+			}
 
 			// what the fuck GOG, seriously, stop re-ordering the fucking "The"
 			if (strpos($games['title'], ', The - The') !== false)

@@ -20,7 +20,7 @@ $stop = 0;
 $games_added_list = '';
 
 $page = 1;
-$url = "http://store.steampowered.com/search/?category1=998&os=linux&filter=comingsoon&page=";
+$url = "http://store.steampowered.com/search/?sort_by=Released_DESC&os=linux&category1=998%2C21&page=";
 
 do
 {

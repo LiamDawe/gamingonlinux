@@ -27,7 +27,7 @@ do
   echo 'Moving onto page ' . $page . '<br />';
   $html = file_get_html($url . $page);
 
-  $get_games = $html->find('a.search_result_row');
+  $get_games = $html->find('div.responsive_search_name_combined');
 
   if (empty($get_games))
   {
@@ -59,27 +59,14 @@ do
             $title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title);
 
             $dont_use = 0;
-            // don't give us soundtracks, they are DLC but we don't want them!
-            if (strpos($title, 'Soundtrack') !== false)
+            $dont_use_array = array("Soundtrack", "soundtrack", "Soundtracks", "Sound Track", "Wallpapers", " OST", "Artbook", " Walkthrough", "Season Pass");
+            foreach ($dont_use_array as $checker)
             {
-              $dont_use = 1;
-            }
-            if (strpos($title, 'Soundtracks') !== false)
-            {
-              $dont_use = 1;
-            }
-            if (strpos($title, 'Sound Track') !== false)
-            {
-              $dont_use = 1;
-            }
-            if (strpos($title, ' Wallpapers') !== false)
-            {
-              $dont_use = 1;
-            }
-            //include space to not end up finding games with "OST" in the name
-            if (strpos($title, ' OST') !== false)
-            {
-              $dont_use = 1;
+              // don't give us this junk
+              if (strpos($title, $checker) !== false)
+              {
+                $dont_use = 1;
+              }
             }
 
             if ($dont_use == 0)
@@ -88,7 +75,7 @@ do
 
               echo 'Release date: ' . $parsed_release_date . ' original ('.$release_date->plaintext.')' . '<br />';
 
-              $link = $element->href;
+              $link = $element->parent()->href;
               echo  'Link: ' . $link . '<br /><br />';
 
               $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
@@ -106,7 +93,7 @@ do
 
                 echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
 
-                $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br />';
+                $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br /><br />';
               }
 
               // if we already have it, just update it

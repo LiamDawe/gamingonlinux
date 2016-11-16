@@ -62,37 +62,16 @@ do
             $title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title);
 
             $dont_use = 0;
-            // don't give us this junk
-            if (strpos($title, 'Soundtrack') !== false)
+            $dont_use_array = array("Soundtrack", "soundtrack", "Soundtracks", "Sound Track", "Wallpapers", " OST", "Artbook", " Walkthrough", "Season Pass");
+            foreach ($dont_use_array as $checker)
             {
-              $dont_use = 1;
+              // don't give us this junk
+              if (strpos($title, $checker) !== false)
+              {
+                $dont_use = 1;
+              }
             }
-            if (strpos($title, 'soundtrack') !== false)
-            {
-              $dont_use = 1;
-            }
-            if (strpos($title, 'Soundtracks') !== false)
-            {
-              $dont_use = 1;
-            }
-            if (strpos($title, 'Sound Track') !== false)
-            {
-              $dont_use = 1;
-            }
-            if (strpos($title, ' Wallpapers') !== false)
-            {
-              $dont_use = 1;
-            }
-            //include space to not end up finding games with "OST" in the name
-            if (strpos($title, ' OST') !== false)
-            {
-              $dont_use = 1;
-            }
-            // we don't want artbooks
-            if (strpos($title, ' Artbook') !== false)
-            {
-              $dont_use = 1;
-            }
+
             if ($dont_use == 0)
             {
               echo 'Title: ' . $element->find('span.title', 0)->plaintext . '<br />';

@@ -4,12 +4,19 @@ $templating->merge('blocks/block_livestreams');
 $templating->block('list');
 
 // count how many there is due this month and today
-$count_query = "SELECT `row_id`, `title`, `date` FROM `livestreams` WHERE NOW() < `end_date` ORDER BY `date` ASC LIMIT 1";
+$count_query = "SELECT `row_id`, `title`, `date`, `community_stream`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` ORDER BY `date` ASC LIMIT 1";
 $db->sqlquery($count_query);
 if ($db->num_rows() == 1)
 {
 	$get_info = $db->fetch();
-	$templating->set('title', '<li><a href="https://www.twitch.tv/gamingonlinux">' . $get_info['title'] . '</a></li>');
+
+	$stream_url = 'https://www.twitch.tv/gamingonlinux';
+	if ($get_info['community_stream'] == 1)
+	{
+		$stream_url = $get_info['stream_url'];
+	}
+
+	$templating->set('title', '<li><a href="'.$stream_url.'">' . $get_info['title'] . '</a></li>');
 
 	if ($get_info['date'] <= date('Y-m-d H:i:s'))
 	{

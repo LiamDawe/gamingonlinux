@@ -26,7 +26,7 @@ if (isset($_GET['q']))
 {
 	$templating->block('search_result_top');
 
-	$db->sqlquery("SELECT `id`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE `name` LIKE ?", array('%'.$search.'%'));
+	$db->sqlquery("SELECT `id`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE `name` LIKE ? AND `approved` = 1", array('%'.$search.'%'));
 	$total_found = $db->num_rows();
 	if ($total_found > 0)
 	{

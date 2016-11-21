@@ -100,14 +100,8 @@ if (core::config('forum_posting_open') == 1)
 					// update topic reply count and last post info
 					$db->sqlquery("UPDATE `forum_topics` SET `replys` = (replys + 1), `last_post_date` = ?, $mod_sql `last_post_id` = ? WHERE `topic_id` = ?", array(core::$date, $author, $topic_id));
 
-					// find the last comment number
-					$db->sqlquery("SELECT `post_number` FROM `forum_replies` WHERE `topic_id` = ? ORDER BY `post_number` DESC LIMIT 1", array($topic_id));
-					$comment_number = $db->fetch();
-
-					$this_post_number = $comment_number['post_number']+1;
-
 					// add the reply
-					$db->sqlquery("INSERT INTO `forum_replies` SET `topic_id` = ?, `post_number` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?", array($topic_id, $this_post_number, $author, $message, core::$date));
+					$db->sqlquery("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?", array($topic_id, $author, $message, core::$date));
 					$post_id = $db->grab_id();
 
 					// find what page and where in the page the link needs to go!

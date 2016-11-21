@@ -34,10 +34,11 @@ if (!isset($_GET['go']))
 
 				if ($count['comment_count'] > $_SESSION['per-page'])
 				{
-					$db->sqlquery("SELECT `comment_number` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
-					$number = $db->fetch();
+					// count how many are below and equal to this comment, to find how many comments that is
+					$db->sqlquery("SELECT count(`comment_id`) as counter FROM `articles_comments` WHERE `article_id` = ? AND `comment_id` <= ?", array($_GET['aid'], $_GET['comment_id']));
+					$current_number = $db->fetch();
 
-					$last_page = ceil($number['comment_number']/$_SESSION['per-page']);
+					$last_page = ceil($current_number['counter']/$_SESSION['per-page']);
 
 					if (core::config('pretty_urls') == 1)
 					{
@@ -997,14 +998,8 @@ else if (isset($_GET['go']))
 
 							$article_id = $_POST['aid'];
 
-							// find the last comment number
-							$db->sqlquery("SELECT `comment_number` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_number` DESC LIMIT 1", array($_POST['aid']));
-							$comment_number = $db->fetch();
-
-							$this_comment_number = $comment_number['comment_number']+1;
-
 							// add the comment
-							$db->sqlquery("INSERT INTO `articles_comments` SET `comment_number` = ?, `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($this_comment_number, $_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
+							$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
 
 							$new_comment_id = $db->grab_id();
 

@@ -481,10 +481,10 @@ else
 
 					if ($count['replys'] > $_SESSION['per-page'])
 					{
-						$db->sqlquery("SELECT `post_number` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
+						$db->sqlquery("SELECT count(`post_id`) as counter FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ?", array($_GET['topic_id'], $_GET['post_id']));
 						$number = $db->fetch();
 
-						$last_page = ceil($number['post_number']/$_SESSION['per-page']);
+						$last_page = ceil($number['counter']/$_SESSION['per-page']);
 
 						if (core::config('pretty_urls') == 1)
 						{

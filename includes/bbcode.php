@@ -518,8 +518,18 @@ function emoticons($text)
 }
 
 // remove bits to make sure RSS validates, and to make sure hidden bits don't become available to all
-function rss_stripping($text)
+function rss_stripping($text, $tagline_image = NULL)
 {
+
+	if ($tagline_image != NULL)
+	{
+		$find = "[img]tagline-image[/img]";
+
+		$replace = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/$tagline_image\" alt=\"tagline-image\" />";
+
+		$text = str_replace($find, $replace, $text);
+	}
+
 	$text = str_replace('<*PAGE*>', '', $text);
 
 	$text = preg_replace("/\[youtube\](.+?)\[\/youtube\]/is", '', $text);

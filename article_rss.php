@@ -68,7 +68,7 @@ foreach ($articles as $line)
 		$tagline_bbcode = ""; //Piratelv @ 05/06/14 -- Some older articles didn't have this
 	}
 
-	$line['text'] = rss_stripping($line['text']);
+	$line['text'] = rss_stripping($line['text'], $tagline_bbcode);
 
 	$line['text'] = bbcode($line['text'], 1, 1, $tagline_bbcode, 1);
 
@@ -86,28 +86,10 @@ foreach ($articles as $line)
 
 	$cats = implode(',', $categories_list);
 
-	if ($line['author_id'] == 0)
-	{
-		if (empty($line['guest_username']))
-		{
-			$username = 'Guest';
-		}
-
-		else
-		{
-			$username = $line['guest_username'];
-		}
-	}
-
-	else
-	{
-		$username = $line['username'];
-	}
-
 	$output .= "
 		<item>
 			<title>{$title}</title>
-			<author>$username</author>
+			<author>contact@gamingonlinux.com (GamingOnLinux)</author>
 			<link>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</link>
 			<description><![CDATA[Tags:$cats<br />{$line['text']}<br /><br />Content from <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>]]></description>
 			<pubDate>{$date}</pubDate>

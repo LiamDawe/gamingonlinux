@@ -68,9 +68,18 @@ foreach ($articles as $line)
 		$tagline_bbcode = ""; //Piratelv @ 05/06/14 -- Some older articles didn't have this
 	}
 
-	$line['text'] = rss_stripping($line['text'], $tagline_bbcode);
+	if (isset($_GET['tagline']) && $_GET['tagline'] == 1)
+	{
+		$text = $line['tagline'];
+	}
+	else
+	{
+		$text = rss_stripping($line['text'], $tagline_bbcode);
 
-	$line['text'] = bbcode($line['text'], 1, 1, $tagline_bbcode, 1);
+		$text = bbcode($text, 1, 1, $tagline_bbcode, 1);
+	}
+
+
 
 	$title = str_replace("&#039;", '\'', $line['title']);
 	$title = str_replace("&", "&amp;", $title);
@@ -91,7 +100,7 @@ foreach ($articles as $line)
 			<title>{$title}</title>
 			<author>contact@gamingonlinux.com (GamingOnLinux)</author>
 			<link>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</link>
-			<description><![CDATA[Tags:$cats<br />{$line['text']}<br /><br />Content from <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>]]></description>
+			<description><![CDATA[Tags:$cats<br />{$text}<br /><br />Content from <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>]]></description>
 			<pubDate>{$date}</pubDate>
 			<guid>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</guid>
 		</item>";

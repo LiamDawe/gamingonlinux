@@ -80,7 +80,7 @@ else
 		}
 
 		// get topic info/make sure it exists
-		$db->sqlquery("SELECT t.*, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.forum_posts, u.game_developer, $db_grab_fields f.name as forum_name FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id INNER JOIN `forums` f ON t.forum_id = f.forum_id WHERE t.topic_id = ? AND t.approved = 1", array($_GET['topic_id']), 'viewtopic.php');
+		$db->sqlquery("SELECT t.*, u.user_id, u.distro, u.pc_info_public, u.pc_info_filled, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.forum_posts, u.game_developer, $db_grab_fields f.name as forum_name FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id INNER JOIN `forums` f ON t.forum_id = f.forum_id WHERE t.topic_id = ? AND t.approved = 1", array($_GET['topic_id']), 'viewtopic.php');
 		if ($db->num_rows() != 1)
 		{
 			$core->message('That is not a valid forum topic!');
@@ -350,10 +350,20 @@ else
 					$templating->set('poll_question', $grab_poll['poll_question']);
 				}
 
+				$pc_info = '';
+				if ($topic['pc_info_public'] == 1)
+				{
+					if ($topic['pc_info_filled'] == 1)
+					{
+						$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/call_profile.php?user_id='.$topic['author_id'].'">View PC info</a>';
+					}
+				}
+
 				// if we are on the first page then show the initial topic post
 				if ($page == 1)
 				{
 					$templating->block('topic', 'viewtopic');
+					$templating->set('pc_info_link', $pc_info);
 					$templating->set('topic_title', $topic['topic_title']);
 
 					$topic_date = $core->format_date($topic['creation_date']);
@@ -519,7 +529,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
+					$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
 					while ($post = $db->fetch())
 					{
 						if ($page > 1 && $reply_count == 0)
@@ -566,6 +576,16 @@ else
 						{
 							$into_username .= "<img title=\"{$post['distro']}\" class=\"distro tooltip-top\" alt=\"\" src=\"/templates/default/images/distros/{$post['distro']}.svg\" />";
 						}
+
+						$pc_info = '';
+						if ($post['pc_info_public'] == 1)
+						{
+							if ($post['pc_info_filled'] == 1)
+							{
+								$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/call_profile.php?user_id='.$post['author_id'].'">View PC info</a>';
+							}
+						}
+						$templating->set('pc_info_link', $pc_info);
 
 						$templating->set('username', $into_username . $username);
 

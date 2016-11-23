@@ -1153,7 +1153,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'deletecomment')
 	{
-		$db->sqlquery("SELECT c.`author_id`, c.`comment_number`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
+		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
 		$comment = $db->fetch();
 
 		$nice_title = $core->nice_title($comment['title']);
@@ -1212,9 +1212,6 @@ else if (isset($_GET['go']))
 					}
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `comment_id` = ?, `content` = ?", array(core::$date, "{$_SESSION['username']} deleted a comment.", core::$date, $_GET['comment_id'], $comment['comment_text']));
-
-					// delete comment and update comments counter
-					$db->sqlquery("UPDATE `articles_comments` SET `comment_number` = (comment_number - 1) WHERE `comment_number` > ?", array($comment['comment_number']));
 
 					$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
 					$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));

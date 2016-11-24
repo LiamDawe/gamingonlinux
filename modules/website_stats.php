@@ -9,6 +9,11 @@ $templating->block('top');
 $templating->block('users');
 $templating->set('total_users', core::config('total_users'));
 
+$db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM `users` WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH)) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
+$count_monthly_users = $db->fetch();
+
+$templating->set('users_month', $count_monthly_users['counter']);
+
 $db->sqlquery("SELECT COUNT(article_id) as `total` FROM `articles` WHERE `active` = 1");
 $total_articles = $db->fetch();
 

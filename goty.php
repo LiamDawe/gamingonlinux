@@ -216,7 +216,7 @@ if (!isset($_POST['act']))
 
 			else if (core::config('goty_finished') == 1)
 			{
-				$voting_text = '<br /><br />Voting is now over!';
+				$voting_text = '<br /><br />Voting is currently closed!';
 			}
 			$templating->set('voting_text', $voting_text);
 

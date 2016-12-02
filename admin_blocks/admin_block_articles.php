@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_blocks/admin_block_articles');
+$templating->merge('admin_blocks/articles');
 $templating->block('main');
 
 // count any submitted admin articles for review
@@ -13,7 +13,7 @@ if ($review_count > 0)
 
 else if ($review_count == 0)
 {
-	$templating->set('review_count', "($review_count)");
+	$templating->set('review_count', "(0)");
 }
 
 // count any submitted articles for review
@@ -27,7 +27,7 @@ if ($submitted_count > 0)
 
 else if ($submitted_count == 0)
 {
-	$templating->set('submitted_count', "($submitted_count)");
+	$templating->set('submitted_count', "(0)");
 }
 
 // count any spam reports on comments
@@ -41,7 +41,7 @@ if ($spam_count > 0)
 
 else if ($spam_count == 0)
 {
-	$templating->set('spam_count', "($spam_count)");
+	$templating->set('spam_count', "(0)");
 }
 
 // count any drafts you have
@@ -55,5 +55,19 @@ if ($draft_count > 0)
 
 else if ($draft_count == 0)
 {
-	$templating->set('draft_count', "($draft_count)");
+	$templating->set('draft_count', "(0)");
+}
+
+// correction counter
+$db->sqlquery("SELECT `row_id` FROM `article_corrections`");
+$correction_counter = $db->num_rows();
+
+if ($correction_counter > 0)
+{
+	$templating->set('correction_count', "<span class=\"badge badge-important\">$correction_counter</span>");
+}
+
+else if ($correction_counter == 0)
+{
+	$templating->set('correction_count', "(0)");
 }

@@ -1,0 +1,21 @@
+[block: top]
+<div class="box"><div class="head">Here you can view correction submissions for articles. Delete them once done!</div></div>
+[/block: top]
+
+[block: bottom]
+{:pagination}
+[/block: bottom]
+
+[block: row]
+<div class="box">
+	<div class="head">Correction for article: <a href="{:article_link}">{:title}</a></div>
+	<div class="body group">
+		Suggestion from {:username}<br />
+		"{:correction}"
+		<form method="post" action="admin.php?module=articles">
+			<input type="hidden" name="correction_id" value="{:correction_id}" />
+			<button type="submit" name="act" value="delete" formaction="/admin.php?module=corrections&correction_id={:correction_id}" />Delete suggestion</button>
+		</form>
+	</div>
+</div>
+[/block: row]

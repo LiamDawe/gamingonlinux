@@ -50,7 +50,7 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']))
         $profile_link = '/index.php?module=profile&user_id=' . $grab_users['user_id'];
       }
 
-      $avatar = $user->sort_avatar($grab_users);
+      $avatar = user::sort_avatar($grab_users);
 
       $templating->block('user_row');
       $templating->set('username', $grab_users['username']);

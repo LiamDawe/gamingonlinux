@@ -41,30 +41,14 @@ if (!isset($_GET['ip_id']))
       if ($comments['author_id'] == 0)
       {
         $username = $comments['guest_username'];
-        $quote_username = $comments['guest_username'];
       }
       else
       {
         $username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
-        $quote_username = $comments['username'];
       }
 
       // sort out the avatar
-      // either no avatar (gets no avatar from gravatars redirect) or gravatar set
-      if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
-      {
-        $comment_avatar = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=https://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-      }
-
-      // either uploaded or linked an avatar
-      else
-      {
-        $comment_avatar = $comments['avatar'];
-        if ($comments['avatar_uploaded'] == 1)
-        {
-          $comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-        }
-      }
+      $comment_avatar = $user->sort_avatar($comments);
 
       $editor_bit = '';
       // check if editor or admin
@@ -73,15 +57,28 @@ if (!isset($_GET['ip_id']))
         $editor_bit = "<span class=\"comments-editor\">Editor</span>";
       }
 
+      $donator_badge = '';
+      if (($comments['secondary_user_group'] == 6 || $comments['secondary_user_group'] == 7) && $comments['user_group'] != 1 && $comments['user_group'] != 2)
+      {
+        $donator_badge = ' <li><span class="badge supporter">GOL Supporter</span></li>';
+      }
+
+      $developer_badge = '';
+      if ($comments['game_developer'] == 1)
+      {
+        $developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
+      }
+
       $templating->block('article_comments', 'admin_modules/comment_reports');
       $templating->set('user_id', $comments['author_id']);
       $templating->set('username', $username);
       $templating->set('editor', $editor_bit);
+      $templating->set('donator_badge', $donator_badge);
+      $templating->set('game_developer', $developer_badge);
       $templating->set('comment_avatar', $comment_avatar);
       $templating->set('date', $date);
       $templating->set('text', bbcode($comments['comment_text']));
-      $templating->set('quote_username', $quote_username);
-      $templating->set('reported_by', "<a href=\"/profiles/{$comments['spam_report_by']}\">{$comments['reported_by_username']}");
+      $templating->set('reported_by', "<a href=\"/profiles/{$comments['spam_report_by']}\">{$comments['reported_by_username']}</a>");
       $templating->set('comment_id', $comments['comment_id']);
       $templating->set('article_title', $comments['title']);
       $templating->set('article_link', $core->nice_title($comments['title']) . '.' . $comments['article_id']);
@@ -96,7 +93,7 @@ if (!isset($_GET['ip_id']))
   }
 }
 
-if ($_POST['act'] == 'delete_spam_report')
+if (isset($_POST['act']) && $_POST['act'] == 'delete_spam_report')
 {
   if (!is_numeric($_GET['comment_id']))
   {
@@ -108,7 +105,8 @@ if ($_POST['act'] == 'delete_spam_report')
     $db->sqlquery("SELECT `comment_text` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
     $get_comment = $db->fetch();
 
-    $db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ?, `content` = ? WHERE `comment_id` = ?", array("{$_SESSION['username']} deleted a comment report.", core::$date, $get_comment['comment_text'], $_GET['comment_id']));
+    $db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'reported_comment' AND `data` = ?", array(core::$date, $_GET['comment_id']));
+    $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_comment_report', $_GET['comment_id']));
 
     $db->sqlquery("UPDATE `articles_comments` SET `spam` = 0 WHERE `comment_id` = ?", array($_GET['comment_id']));
 

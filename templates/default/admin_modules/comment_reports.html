@@ -7,29 +7,33 @@
 [/block: comment_reports_bottom]
 
 [block: article_comments]
-	<div class="row">
-		<div class="span9">
-			<table class="table table-bordered">
-				<thead>
-				<th class="alert alert-info no-bottom-margin no-rounded-corners" colspan="2">Comment by {:username} commented on <a href="/articles/{:article_link}">{:article_title}</a> {:date} <br />
-				Spam Report By {:reported_by}</th>
-				</thead>
-				<tbody>
-				<tr>
-				<td valign="top" width="120px">
-					<img src="{:comment_avatar}" alt="avatar" />
-				</td>
-				<td valign="top">
-					<div id="{:comment_id}" class="forumpost">{:text}</div><br />
-					<form method="post" action="admin.php?module=articles">
-						<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=comment_reports&comment_id={:comment_id}" class="btn btn-warning" /><i class="icon-remove-sign"></i> Delete Report</button>
-						<button type="submit" formaction="/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={:comment_id}" class="btn btn-danger"><i class="icon-trash"></i> Delete Comment</button>
-						<button type="submit" formaction="/index.php?module=articles_full&amp;view=Edit&amp;comment_id={:comment_id}&page=1" class="btn btn-info"><i class="icon-pencil"></i> Edit</button
-					</form>
-				</td>
-				</tr>
-				</tbody>
-			</table>
+<div class="box"><div class="body group">Article: <a href="/articles/{:article_link}">{:article_title}</a></div></div>
+<div id="r{:comment_id}" class="comment group">
+	<div class="comment-meta group">
+		<div class="comment-post">
+			{:username} commented {:date}
+		</div>
+		<div class="comment-actions">
+			Reported by By {:reported_by}
 		</div>
 	</div>
+	<div class="comment-author">
+		<img class="avatar" alt="" src="{:comment_avatar}" />
+		<ul class="comment-badges">
+			{:editor}
+			{:donator_badge}
+			{:game_developer}
+		</ul>
+	</div>
+	<div id="{:comment_id}" class="comment-body">
+		<div id="{:comment_id}">
+			<p>{:text}</p>
+		</div>
+	</div>
+</div>
+<form method="post" action="admin.php?module=articles">
+	<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=comment_reports&comment_id={:comment_id}" class="btn btn-warning" /><i class="icon-remove-sign"></i> Delete Report</button>
+	<button type="submit" formaction="/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={:comment_id}" class="btn btn-danger"><i class="icon-trash"></i> Delete Comment</button>
+	<button type="submit" formaction="/index.php?module=articles_full&amp;view=Edit&amp;comment_id={:comment_id}&page=1" class="btn btn-info"><i class="icon-pencil"></i> Edit</button
+</form>
 [/block: article_comments]

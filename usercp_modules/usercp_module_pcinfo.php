@@ -264,6 +264,19 @@ else if (isset($_POST['act']))
 			}
 		}
 
+		// they have to be a number, no matter what
+		$ram_count = NULL;
+		if (isset($_POST['ram_count']) && is_numeric($_POST['ram_count']))
+		{
+			$ram_count = $_POST['ram_count'];
+		}
+
+		$monitor_count = NULL;
+		if (isset($_POST['monitor_count']) && is_numeric($_POST['monitor_count']))
+		{
+			$monitor_count = $_POST['monitor_count'];
+		}
+
 		// additional profile fields
 		$sql_additional = "UPDATE `user_profile_info` SET
 		`desktop_environment` = ?,
@@ -291,8 +304,8 @@ else if (isset($_POST['act']))
 		trim($_POST['gpu_vendor']),
 		trim($_POST['gpu_model']),
 		$_POST['gpu_driver'],
-		$_POST['ram_count'],
-		$_POST['monitor_count'],
+		$ram_count,
+		$monitor_count,
 		$_POST['resolution'],
 		$_POST['gaming_machine_type'],
 		$_POST['gamepad'],

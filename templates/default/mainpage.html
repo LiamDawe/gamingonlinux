@@ -2,10 +2,9 @@
 	<nav class="navigation-main">
 		<div class="container group">
 			<ul class="header-navbar">
-				<div id="navigation-mobile">
-					<input type="checkbox" id="menu-toggle">
-						<label for="menu-toggle" class="label-toggle"></label>
-					<div id="nav-hidden">
+				<div id="navigation-mobile" class="toggle-nav">
+					<a href="#" onclick="return false;"></a>
+					<div class="toggle-content" id="nav-hidden">
 						<ul>
 							{:user_link}
 							<li><a href="{:statistics_link}">Statistics</a></li>

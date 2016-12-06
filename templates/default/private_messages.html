@@ -54,7 +54,7 @@
 						<div id="r{:post_id}" class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									PM from <a href="/profiles/{:user_id}">{:username}</a> <abbr title="{:tzdate}" class="timeago">on {:message_date}</abbr> {:edit_link}
+									PM from <a href="/profiles/{:user_id}">{:username}</a> {:cake_icon} <abbr title="{:tzdate}" class="timeago">on {:message_date}</abbr> {:edit_link}
 								</div>
 								<div class="comment-actions">
 									<ul>
@@ -65,8 +65,9 @@
 							<div class="comment-author">
 								<img class="avatar" alt="" src="{:avatar}" />
 								<ul class="comment-badges">
-                                    {:editor}
+                  {:editor}
 									{:donator_badge}
+									{:new_user_badge}
 								</ul>
 								<ul class="comment-social">
 									{:profile_fields}
@@ -84,7 +85,7 @@
 						<div id="r{:post_id}" class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									PM from <a href="/profiles/{:user_id}">{:username}</a> <abbr title="{:tzdate}" class="timeago">on {:message_date}</abbr> {:edit_link}
+									PM from <a href="/profiles/{:user_id}">{:username}</a> {:cake_icon} <abbr title="{:tzdate}" class="timeago">on {:message_date}</abbr> {:edit_link}
 								</div>
 								<div class="comment-actions">
 									<ul>
@@ -97,6 +98,7 @@
 								<ul class="comment-badges">
                   {:editor}
 									{:donator_badge}
+									{:new_user_badge}
 								</ul>
 								<ul class="comment-social">
 									{:profile_fields}

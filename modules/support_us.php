@@ -23,7 +23,7 @@ foreach ($chucks as $row)
 		$templating->set('user_id', $rowuser['user_id']);
 		$templating->set('username', $rowuser['username']);
 
-		$avatar = $user->sort_avatar($rowuser);
+		$avatar = user::sort_avatar($rowuser);
 		$templating->set('avatarurl', $avatar);
 
 		$supporter_link = '';

@@ -62,15 +62,73 @@ if (!isset($_GET['view']))
 	// editor tracking
 	$templating->block('editor_tracking', 'admin_modules/admin_home');
 
-	$db->sqlquery("SELECT * FROM `admin_notifications` ORDER BY `id` DESC LIMIT 50");
+	$db->sqlquery("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.user_id = u.user_id ORDER BY n.`id` DESC LIMIT 50");
 	while ($tracking = $db->fetch())
 	{
-		$date = $tracking['created'];
-		if (!empty($tracking['completed_date']) || $tracking['completed_date'] != 0)
+		$templating->block('tracking_row', 'admin_modules/admin_home');
+
+		$username = '';
+		if (empty($tracking['username']))
 		{
-			$date = $tracking['completed_date'];
+			$username = 'Guest';
+		}
+		else
+		{
+			if (core::config('pretty_urls') == 1)
+			{
+				$username = '<a href="/profiles/'.$tracking['user_id'].'">'.$tracking['username'].'</a>';
+			}
+			else
+			{
+				$username = '<a href="/index.php?module=profile&user_id='.$tracking['user_id'].'">'.$tracking['username'].'</a>';
+			}
+
 		}
 
+		$types_array = array(
+			"comment_deleted" =>  ' deleted a comment',
+			"closed_comments" => ' closed the comments on an article.',
+			"reported_comment" => ' reported a comment.',
+			"deleted_comment_report" => ' deleted a comment report.',
+
+			"forum_topic_report" => ' reported a forum topic.',
+			"forum_reply_report" => ' reported a forum reply',
+			"deleted_topic_report" => ' deleted a forum topic report.',
+			"deleted_reply_report" => ' deleted a forum reply report.',
+			"mod_queue" => ' requires approval of their forum post.',
+			"mod_queue_approved" => ' approved a forum post.',
+			"mod_queue_removed" => ' removed a forum topic requesting approval.',
+
+			"approved_calendar" => ' approved a calendar and games database submission.',
+
+			"deleted_article" => ' deleted an article.',
+			"denied_submitted_article" => ' denied a user submitted article.',
+			"approve_submitted_article" => ' approved a user submitted article.',
+			"article_admin_queue_approved" => ' approved an article from the admin review queue.',
+			"article_admin_queue" => ' sent a new article to the admin review queue.',
+			"new_article_published" => ' published a new article.',
+			"submitted_article" => ' submitted an article.',
+			"article_correction" =>  ' sent in an article correction.',
+			"deleted_correction" => ' deleted an article correction report.',
+			"disabled_article" => ' disabled an article.',
+			"enabled_article" => ' re-enabled an article.',
+
+			"new_livestream_event" => ' added a new livestream event.',
+			"edit_livestream_event" => ' edited a livestream event.',
+			'deleted_livestream_event' => ' deleted a livestream event.',
+
+			"goty_game_submission" => ' submitted a GOTY game for review.',
+			"goty_game_added" => ' added a GOTY game'
+		);
+
+		$completed_indicator = '&#10004;';
+		if ($tracking['completed'] == 0)
+		{
+			$completed_indicator = '<span class="badge badge-important">!</span>';
+		}
+
+		$templating->set('editor_action', '<li>' . $completed_indicator . ' ' . $username . $types_array[$tracking['type']] . ' When: ' . $core->format_date($tracking['created_date']) . '</li>');
+		/*
 		// if the comment_id is set, then we should link to the comment within the admin to see what it was (reported or deleted comments)
 		$link = '';
 		if ($tracking['comment_id'] != 0 && $tracking['reported_comment'] == 0)
@@ -84,9 +142,9 @@ if (!isset($_GET['view']))
 		if ($tracking['reported_comment'] == 1 && $tracking['completed'] == 1)
 		{
 			$link = '<br /> <a href="/admin.php?module=home&view=comment&comment_id='.$tracking['comment_id'].'">See what it was</a>';
-		}
-		$templating->block('tracking_row', 'admin_modules/admin_home');
-		$templating->set('editor_action', '<li>' . $tracking['action'] . ' When: ' . $core->format_date($date) . $link . '</li>');
+		}*/
+
+
 	}
 	$templating->block('tracking_bottom', 'admin_modules/admin_home');
 }

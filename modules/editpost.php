@@ -86,22 +86,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 
 			if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group(1,2) == true)
 			{
-				// make sure that if its a reported post that we have been sent here via the report and that we are an admin/editor (so a user making a tiny edit won't remove the report)
-				if ($_GET['reported'] == 1 && $user->check_group(1,2) == true)
-				{
-					// check if its been reported first so we can remove the report
-					$db->sqlquery("SELECT `reported` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					$check = $db->fetch();
-
-					if ($check['reported'] == 1)
-					{
-						// update admin notifications
-						$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'admin_notifications'");
-
-						$db->sqlquery("UPDATE `forum_topics` SET `reported` = 0 WHERE `topic_id` = ?", array($_GET['topic_id']));
-					}
-				}
-
 				// update the topic
 				$message = htmlspecialchars($_POST['text'], ENT_QUOTES);
 				$db->sqlquery("UPDATE `forum_topics` SET `topic_title` = ?, `topic_text` = ? WHERE `topic_id` = ?", array($_POST['title'], $message, $_GET['topic_id']));
@@ -133,22 +117,6 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 
 			if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group(1,2) == true)
 			{
-				// make sure that if its a reported post that we have been sent here via the report and that we are an admin/editor (so a user making a tiny edit won't remove the report)
-				if (isset($_GET['reported']) && $_GET['reported'] == 1 && $user->check_group(1,2) == true)
-				{
-					// check if its been reported first so we can remove the report
-					$db->sqlquery("SELECT `reported` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-					$check = $db->fetch();
-
-					if ($check['reported'] == 1)
-					{
-						// update admin notifications
-						$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'admin_notifications'");
-
-						$db->sqlquery("UPDATE `forum_replies` SET `reported` = 0 WHERE `post_id` = ?", array($_GET['post_id']));
-					}
-				}
-
 				// update the topic
 				$message = htmlspecialchars($_POST['text'], ENT_QUOTES);
 				$db->sqlquery("UPDATE `forum_replies` SET `reply_text` = ? WHERE `post_id` = ?", array($message, $_GET['post_id']));

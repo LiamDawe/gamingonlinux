@@ -31,7 +31,7 @@ $templating->merge('register');
 
 if (core::config('allow_registrations') == 1)
 {
-	if (core::config('register_captcha') == 1)
+	if (core::config('captcha_disabled') == 0 && core::config('register_captcha') == 1)
 	{
 		$captcha = '<strong>You must do a captcha to register</strong><br />If you don\'t see a captcha below, then <strong>please allow google reCAPTCHA in your privacy plugins</strong>. <div class="g-recaptcha" data-sitekey="6Les6RYTAAAAAGZVgAdkXbPQ7U8AuyqrWrHVbVq4"></div>';
 	}
@@ -91,7 +91,7 @@ if (core::config('allow_registrations') == 1)
 
 		else
 		{
-			if (core::config('register_captcha') == 1)
+			if (core::config('captcha_disabled') == 0 && core::config('register_captcha') == 1)
 			{
 				$recaptcha=$_POST['g-recaptcha-response'];
 				$google_url="https://www.google.com/recaptcha/api/siteverify";
@@ -101,7 +101,7 @@ if (core::config('allow_registrations') == 1)
 				$res= json_decode($res, true);
 			}
 
-			if ((core::config('register_captcha') == 1 && $res['success']) || core::config('register_captcha') == 0)
+			if (core::config('captcha_disabled') == 1 || (core::config('captcha_disabled') == 0 && (core::config('register_captcha') == 1 && $res['success']) || core::config('register_captcha') == 0))
 			{
 				// check fields are set
 				if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['verify_password']) || empty($_POST['uemail']))
@@ -227,7 +227,7 @@ if (core::config('allow_registrations') == 1)
 				}
 			}
 			// Check the score to determine what to do.
-			else if (core::config('register_captcha') == 1 && !$res['success'])
+			else if (core::config('captcha_disabled') == 0 && core::config('register_captcha') == 1 && !$res['success'])
 			{
 				// Add code to process the form.
 				$core->message("You need to complete the captcha to prove you are human and not a bot! <a href=\"index.php?module=register\">Click here to try again</a>.", NULL, 1);

@@ -12,7 +12,7 @@
 				{:theme_options}
 			</select></label>
 			{:supporter_link}<br />
-			<button type="submit" name="act" value="premium" class="btn btn-primary {:state}">Update</button>
+			<button type="submit" name="act" value="premium" class="{:state}">Update</button>
 		</form>
 	</div>
 </div>
@@ -28,30 +28,11 @@
 			<strong>Forum type</strong><br />
 			<em>What type of forum do you want displayed?</em><br />
 			<select name="forum_type">{:forum_types}</select><br />
-			<strong>Security</strong><br />
-			<label class="checkbox">
-				Get email's when we detect a new device logging in? <input type="checkbox" name="emaillogin" {:email_on_login} />
-			</label><br />
+			<br />
 			<strong>Articles &amp; Forum topics</strong><br />
 			Article paging<br />
 			<em>Display articles meant for multiple pages as one single page?</em><br />
 			<select name="single_article_page"><option value="1" {:single_article_yes}>Yes</option><option value="0" {:single_article_no}>No</option></select><br />
-			<label class="checkbox">
-				Auto subscribe when replying? <input type="checkbox" name="subscribe" {:subscribe_check} />
-			</label>
-			<label class="checkbox">
-				Auto subscribe when creating an article? <input type="checkbox" name="subscribe_article" {:subscribe_article_check} />
-			</label>
-			<label class="checkbox">
-				Get email replies when subscribed? <input type="checkbox" name="emails" {:subscribe_email_check} />
-			</label>
-			<label>Email options for replies<br />
-			<select class="form-control" name="email_options">
-				{:email_options}
-			</select></label>
-			<label class="checkbox">
-				Get email's when receiving a Personal Message? <input type="checkbox" name="emailpm" {:email_on_pm} />
-			</label>
 			Comments &amp; forum posts per-page:<br />
 			<select name="per-page">{:per-page}</select><br />
 			Articles per-page, for homepage and category (tag) view:<br />

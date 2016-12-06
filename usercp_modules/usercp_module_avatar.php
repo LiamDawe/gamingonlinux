@@ -34,7 +34,7 @@ $db->sqlquery("SELECT `avatar`, `avatar_uploaded`,`avatar_gravatar`, `gravatar_e
 $user_avatar = $db->fetch();
 
 // sort out the avatar
-$avatar = $user->sort_avatar($user_avatar);
+$avatar = user::sort_avatar($user_avatar);
 $templating->set('current_avatar', $avatar);
 
 $templating->set('width', core::config('avatar_width'));

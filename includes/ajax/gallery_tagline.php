@@ -15,10 +15,11 @@ $templating = new template('default');
 
 $templating->load('/admin_modules/gallery_tagline');
 
-$db->sqlquery("SELECT id, filename FROM `articles_tagline_gallery` ORDER BY `filename` ASC");
+$db->sqlquery("SELECT `id`, `filename`, `name` FROM `articles_tagline_gallery` ORDER BY `name` ASC");
 while ($images = $db->fetch())
 {
   $templating->block('image_row');
+  $templating->set('name', $images['name']);
   $templating->set('filename', $images['filename']);
   $templating->set('id', $images['id']);
 }

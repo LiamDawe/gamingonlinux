@@ -81,7 +81,7 @@ do
               $link = $element->parent()->href;
               echo  'Link: ' . $link . '<br /><br />';
 
-              $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
+              $db->sqlquery("SELECT `id`, `name`, `steam_link` FROM `calendar` WHERE `name` = ?", array($title));
 
               $grab_info = $db->fetch();
 

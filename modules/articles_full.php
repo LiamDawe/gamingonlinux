@@ -28,6 +28,19 @@ if (!isset($_GET['go']))
 			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
 			if (isset($_GET['comment_id']) && is_numeric($_GET['comment_id']))
 			{
+				// have they come from a notification/alert box link?
+				if (isset($_GET['clear_note']) && is_numeric($_GET['clear_note']))
+				{
+					// make sure they own it to clear it
+					$db->sqlquery("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array($_GET['clear_note']));
+					$check_note = $db->fetch();
+					if ($check_note['owner_id'] == $_SESSION['user_id'])
+					{
+						// they have seen it and when they saw it
+						$db->sqlquery("UPDATE `user_notifications` SET `seen` = 1, `seen_date` = ? WHERE `id` = ?", array(core::$date, $_GET['clear_note']));
+					}
+				}
+
 				// see if we are above their set limit per-page
 				$db->sqlquery("SELECT `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
 				$count = $db->fetch();
@@ -42,24 +55,24 @@ if (!isset($_GET['go']))
 
 					if (core::config('pretty_urls') == 1)
 					{
-						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#{$_GET['comment_id']}");
+						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#r{$_GET['comment_id']}");
 					}
 					else
 					{
 
-						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#{$_GET['comment_id']}");
+						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#r{$_GET['comment_id']}");
 					}
 				}
 				else
 				{
 					if (core::config('pretty_urls') == 1)
 					{
-						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/#{$_GET['comment_id']}");
+						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/#r{$_GET['comment_id']}");
 					}
 					else
 					{
 
-						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#{$_GET['comment_id']}");
+						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#r{$_GET['comment_id']}");
 					}
 				}
 			}
@@ -335,7 +348,7 @@ if (!isset($_GET['go']))
 					}
 					else
 					{
-						$like_button = '<a class="likearticle tooltip-top" data-id="'.$article['article_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a>';
+						$like_button = '<a class="likearticle tooltip-top" data-type="article" data-id="'.$article['article_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a>';
 					}
 				}
 				$templating->set('like_button', $like_button);
@@ -346,7 +359,7 @@ if (!isset($_GET['go']))
 				{
 					$templating->block('bio', 'articles_full');
 
-					$avatar = $user->sort_avatar($article);
+					$avatar = user::sort_avatar($article);
 					$templating->set('avatar', $avatar);
 
 					$templating->set('username', $username);
@@ -492,7 +505,7 @@ if (!isset($_GET['go']))
 						$db_grab_fields .= "u.`{$field['db_field']}`,";
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, {$_SESSION['per-page']}", array($_GET['aid'], $core->start));
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, {$_SESSION['per-page']}", array($_GET['aid'], $core->start));
 
 					$comments_get = $db->fetch_all_rows();
 
@@ -543,7 +556,7 @@ if (!isset($_GET['go']))
 						}
 
 						// sort out the avatar
-						$comment_avatar = $user->sort_avatar($comments);
+						$comment_avatar = user::sort_avatar($comments);
 
 						$editor_bit = '';
 						// check if editor or admin
@@ -572,6 +585,10 @@ if (!isset($_GET['go']))
 						$templating->set('date', $comment_date);
 						$templating->set('tzdate', date('c',$comments['time_posted']) ); //piratelv timeago
 						$templating->set('pc_info_link', $pc_info);
+						$cake_bit = $user->cake_day($comments['register_date'], $comments['username']);
+						$templating->set('cake_icon', $cake_bit);
+						$new_badge = $user->new_user_badge($comments['register_date']);
+						$templating->set('new_user_badge', $new_badge);
 
 						$last_edited = '';
 						if ($comments['last_edited'] != 0)
@@ -637,7 +654,7 @@ if (!isset($_GET['go']))
 							}
 							else
 							{
-								$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-id="'.$comments['comment_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+								$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="comment" data-id="'.$comments['comment_id'].'" data-article-id="'.$article['article_id'].'" data-author-id="'.$comments['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 							}
 
 							$logged_in_options = $templating->store_replace($logged_in_options, array('plain_username'=> $quote_username,'text_plain'=>htmlspecialchars($comments['comment_text'], ENT_QUOTES), 'like_button'=>$like_button));
@@ -645,14 +662,12 @@ if (!isset($_GET['go']))
 						$templating->set('logged_in_options', $logged_in_options);
 
 						$donator_badge = '';
-
 						if (($comments['secondary_user_group'] == 6 || $comments['secondary_user_group'] == 7) && $comments['user_group'] != 1 && $comments['user_group'] != 2)
 						{
 							$donator_badge = ' <li><span class="badge supporter">GOL Supporter</span></li>';
 						}
 
 						$developer_badge = '';
-
 						if ($comments['game_developer'] == 1)
 						{
 							$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
@@ -759,6 +774,14 @@ if (!isset($_GET['go']))
 						}
 					}
 
+					if (isset($_GET['message']))
+					{
+						if ($_GET['message'] == 'tipsent')
+						{
+							$core->message('Thank you for the correction!');
+						}
+					}
+
 					// only show comments box if the comments are turned on for this article
 					if (core::config('comments_open') == 1)
 					{
@@ -813,6 +836,7 @@ if (!isset($_GET['go']))
 									}
 									$templating->block('comments_box_top', 'articles_full');
 									$templating->set('url', core::config('website_url'));
+									$templating->set('article_id', $_GET['aid']);
 
 									$core->editor('text', $comment, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
 
@@ -887,6 +911,86 @@ if (!isset($_GET['go']))
 
 else if (isset($_GET['go']))
 {
+	if ($_GET['go'] == 'correction')
+	{
+		// make sure news id is a number
+		if (!isset($_POST['article_id']) || !is_numeric($_POST['article_id']))
+		{
+			if (core::config('pretty_urls') == 1)
+			{
+				header("Location: " . core::config('website_url'));
+			}
+			else
+			{
+				header("Location: " . core::config('website_url'));
+			}
+
+			die();
+		}
+
+		// had to put this in, as somehow a guest was able to comment even without showing a textarea to them (HIGHLY CONFUSED HOW)
+		else if ($_SESSION['user_id'] == 0)
+		{
+			$core->message('You do not have permisions to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
+		}
+
+		else if ($parray['comment_on_articles'] == 0)
+		{
+			$core->message('You do not have permisions to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
+		}
+		else
+		{
+			// check to make sure their IP isn't banned
+			$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
+			if ($db->num_rows() >= 1)
+			{
+				header("Location: /home/banned");
+				die();
+			}
+
+			// check empty
+			$correction = trim($_POST['correction']);
+
+			$correction = htmlspecialchars($correction, ENT_QUOTES);
+
+			// get article name for the email and redirect
+			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+			$title = $db->fetch();
+			$title_nice = $core->nice_title($title['title']);
+
+			if (empty($correction))
+			{
+				if (core::config('pretty_urls') == 1)
+				{
+					header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['article_id']}/error=emptycomment#commentbox");
+				}
+				else
+				{
+					header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&error=emptycomment#commentbox");
+				}
+
+				die();
+			}
+
+			$db->sqlquery("INSERT INTO `article_corrections` SET `article_id` = ?, `date` = ?, `user_id` = ?, `correction_comment` = ?", array($_POST['article_id'], core::$date, $_SESSION['user_id'], $correction));
+
+			$correction_id = $db->grab_id();
+
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `type` = ?, `data` = ?, `completed` = 0", array($_SESSION['user_id'], core::$date, 'article_correction', $correction_id));
+
+			if (core::config('pretty_urls') == 1)
+			{
+				header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['article_id']}/message=tipsent#corrections");
+			}
+			else
+			{
+				header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&message=tipsent#corrections");
+			}
+
+		}
+
+	}
+
 	if ($_GET['go'] == 'comment')
 	{
 		// make sure news id is a number
@@ -894,10 +998,11 @@ else if (isset($_GET['go']))
 		{
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: " . core::config('website_url') . "/articles/$title_nice.{$_POST['aid']}/error=noid#commentbox");
+				header("Location: " . core::config('website_url'));
 			}
-			else {
-				header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=noid#commentbox");
+			else
+			{
+				header("Location: " . core::config('website_url'));
 			}
 
 			die();
@@ -1037,13 +1142,19 @@ else if (isset($_GET['go']))
 							// email anyone subscribed which isn't you
 							$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.send_email = 1 AND s.emails = 1", array($article_id));
 							$users_array = array();
-							while ($users = $db->fetch())
+							$users_to_email = $db->fetch_all_rows();
+							foreach ($users_to_email as $email_user)
 							{
-								if ($users['user_id'] != $_SESSION['user_id'] && $users['emails'] == 1)
+								if ($email_user['user_id'] != $_SESSION['user_id'])
 								{
-									$users_array[$users['user_id']]['user_id'] = $users['user_id'];
-									$users_array[$users['user_id']]['email'] = $users['email'];
-									$users_array[$users['user_id']]['username'] = $users['username'];
+									if ($email_user['emails'] == 1)
+									{
+										$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
+										$users_array[$email_user['user_id']]['email'] = $email_user['email'];
+										$users_array[$email_user['user_id']]['username'] = $email_user['username'];
+									}
+
+									$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
 								}
 							}
 
@@ -1208,10 +1319,10 @@ else if (isset($_GET['go']))
 					// this comment was reported as spam but as its now deleted remove the notification
 					if ($comment['spam'] == 1)
 					{
-						$db->sqlquery("DELETE FROM `admin_notifications` WHERE `comment_id` = ?", array($_GET['comment_id']));
+						$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'reported_comment'", array(core::$date, $_GET['comment_id']));
 					}
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `comment_id` = ?, `content` = ?", array(core::$date, "{$_SESSION['username']} deleted a comment.", core::$date, $_GET['comment_id'], $comment['comment_text']));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, 'comment_deleted', core::$date, $_GET['comment_id'], $comment['comment_text']));
 
 					$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
 					$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
@@ -1301,7 +1412,7 @@ else if (isset($_GET['go']))
 			if ($_SESSION['user_group'] != 4)
 			{
 				// update admin notifications
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `comment_id` = ?, `reported_comment` = 1", array("{$_SESSION['username']} reported an article comment.", core::$date, $_GET['comment_id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'reported_comment', core::$date, $_GET['comment_id']));
 
 				$db->sqlquery("UPDATE `articles_comments` SET `spam` = 1, `spam_report_by` = ? WHERE `comment_id` = ?", array($_SESSION['user_id'], $_GET['comment_id']));
 			}
@@ -1311,7 +1422,14 @@ else if (isset($_GET['go']))
 			$title = $db->fetch();
 			$title = $core->nice_title($title['title']);
 
-			header("Location: /articles/{$title}.{$_GET['article_id']}/message=reported#comments");
+			if (core::config('pretty_urls') == 1)
+			{
+				header("Location: /articles/{$title}.{$_GET['article_id']}/message=reported#comments");
+			}
+			else {
+				header("Location: /index.php?module=articles_full&aid={$_GET['article_id']}&title={$title}&message=reported#comments");
+			}
+
 		}
 	}
 
@@ -1336,7 +1454,7 @@ else if (isset($_GET['go']))
 				$db->sqlquery("UPDATE `articles` SET `comments_open` = 1 WHERE `article_id` = ?", array($_GET['article_id']));
 			}
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Opened the comments on {$title['title']}", core::$date, $_GET['article_id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, 'opened_comments', core::$date, $_GET['article_id']));
 
 			header("Location: /articles/{$title_nice}.{$_GET['article_id']}#comments");
 		}
@@ -1368,7 +1486,7 @@ else if (isset($_GET['go']))
 				$db->sqlquery("UPDATE `articles` SET `comments_open` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
 			}
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `article_id` = ?", array("{$_SESSION['username']} Closed the comments on {$title['title']}", core::$date, $_GET['article_id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, 'closed_comments', core::$date, $_GET['article_id']));
 
 			header("Location: /articles/{$title_nice}.{$_GET['article_id']}#comments");
 		}

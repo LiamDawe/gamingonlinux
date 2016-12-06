@@ -139,7 +139,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 
   	$article_id = $db->grab_id();
 
-  	$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `created` = ?, `action` = ?, `completed_date` = ?, `article_id` = ?", array(core::$date, "{$_SESSION['username']} published a new article.", core::$date, $article_id));
+  	$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, 'new_article_published', core::$date, $article_id));
 
   	// upload attached images
   	if (isset($_SESSION['uploads']))

@@ -30,20 +30,19 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 	$user->logout();
 }
 
-// all three of these can be removed eventually, stop-gap to stop errors for people already logged in that don't get the new options
-if (!isset($_SESSION['per-page']))
+// can be removed eventually, stop-gap to stop errors for people already logged in that don't get the new options
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
-	$_SESSION['per-page'] = 10;
-}
-
-if (!isset($_SESSION['articles-per-page']))
-{
-	$_SESSION['articles-per-page'] = 15;
-}
-
-if (!isset($_SESSION['single_article_page']))
-{
-	$_SESSION['single_article_page'] = 0;
+	if (!isset($_SESSION['display_comment_alerts']))
+	{
+		$_SESSION['display_comment_alerts'] = 1;
+	}
+	if (!isset($_SESSION['avatar']))
+	{
+		$db->sqlquery("SELECT `avatar_gravatar`, `gravatar_email`, `avatar_gallery`, `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$temp_user = $db->fetch();
+		$_SESSION['avatar'] = user::sort_avatar($temp_user);
+	}
 }
 
 // If they are not logged in make them a guest (group 4)
@@ -186,6 +185,7 @@ if (core::config('pretty_urls') == 1)
 	$donate_link = '/support-us/';
 	$statistics_link = '/users/statistics';
 	$forum_link = '/forum/';
+	$irc_link = '/irc/';
 	$contact_link = '/contact-us/';
 	$submit_a = '/submit-article/';
 	if (isset($_SESSION['user_group']))
@@ -201,6 +201,7 @@ else {
 	$donate_link = url . 'index.php?module=support_us';
 	$statistics_link = url . 'index.php?module=statistics';
 	$forum_link = url . 'index.php?module=forum';
+	$irc_link = url . 'irc.php';
 	$contact_link = url . 'index.php?module=contact';
 	$submit_a = url . 'index.php?module=submit_article&view=Submit';
 	if (isset($_SESSION['user_group']))
@@ -215,6 +216,7 @@ else {
 $templating->set('donate_link', $donate_link);
 $templating->set('statistics_link', $statistics_link);
 $templating->set('forum_link', $forum_link);
+$templating->set('irc_link', $irc_link);
 $templating->set('contact_link', $contact_link);
 $templating->set('submit_a', $submit_a);
 $templating->set('submit_e', $submit_e);
@@ -231,89 +233,43 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 		$username_remembered = 'checked';
 	}
 
-	$user_menu = "<a href=\"/index.php?module=login\">Account</a>
-							<div>
-								<form method=\"post\" action=\"".url."index.php?module=login\">
-									<input name=\"username\" class=\"ays-ignore\" type=\"text\" value=\"$username\" placeholder=\"Username or Email\" />
-									<input name=\"password\" class=\"ays-ignore\" type=\"password\" placeholder=\"Password\" />
-									<label>
-										<input name=\"remember_name\" class=\"ays-ignore\" type=\"checkbox\" $username_remembered/> Remember username
-									</label>
-									<label>
-										<input name=\"stay\" class=\"ays-ignore\" checked=\"checked\" type=\"checkbox\" /> Stay logged in
-									</label>
-									<hr />
-									<input type=\"submit\" name=\"action\" value=\"Login\" />
-									<span class=\"group fright\" style=\"margin-top: 7px;\">Or login with...</span>
-									<hr />
-									<div class=\"group\">
-										<a href=\"".url."index.php?module=login&amp;steam\" class=\"button fleft\">
-											<img alt src=\"".url."templates/default/images/social/steam.svg\" width=\"18\" height=\"18\" />
-											Steam
-										</a>
-										<a href=\"".url."index.php?module=login&amp;twitter\" class=\"button fright\">
-											<img alt src=\"".url."templates/default/images/social/twitter.svg\" width=\"18\" height=\"18\" />
-											Twitter
-										</a>
-									</div>
-									<hr />
-									<div class=\"group\">
-										<a href=\"/register/\" class=\"button fleft\">Register</a>
-										<a href=\"".url."index.php?module=login&amp;forgot\" class=\"button fright\">Forgot Login?</a>
-									</div>
-								</form>
-							</div>";
+	$templating->set('user_link', '<li><a href="/index.php?module=login">Login</a></li><li><a href="/index.php?module=register">Register</a></li>');
 
-	$templating->set('user_menu', $user_menu);
-	$templating->set('username', "Account");
-}
+	$login_menu = $templating->block_store('login_menu');
+
+	$templating->set('user_menu', $login_menu);
+	$templating->set('notifications_menu', '');
+
+	}
 
 else if ($_SESSION['user_id'] > 0)
 {
-	// sort out private message unread counter
-	$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", array($_SESSION['user_id']), 'header.php');
-	$unread_counter = $db->num_rows();
-
-	if ($unread_counter == 0)
-	{
-		$messages_link = 'Private Messages';
-	}
-
-	else if ($unread_counter > 0)
-	{
-		$messages_link = "Private Messages <span class=\"badge badge-important\">$unread_counter</span>";
-	}
-
-	// sort out admin red numbered notification for article submissions
+	// give admin link to who is allowed it, and sort out admin notifications
+	$admin_line = '';
 	$admin_link = '';
-	$notifications_link = '';
-	if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5 || $_SESSION['secondary_user_group'] == 5)
+	$admin_indicator = '';
+	$admin_notes['counter'] = 0;
+	if ($user->check_group(1,2) || $user->check_group(5))
 	{
-		// now we set if we need to show notifications or not
-		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
+		$db->sqlquery("SELECT count(id) as counter FROM `admin_notifications` WHERE `completed` = 0");
+		$admin_notes = $db->fetch();
+		if ($admin_notes['counter'] > 0)
 		{
-			$db->sqlquery("SELECT `id` FROM `admin_notifications` WHERE `completed` = 0");
-			$admin_notes = $db->num_rows();
-			if ($admin_notes > 0)
-			{
-				$notifications_link = "<span class=\"badge badge-important\">$admin_notes</span>";
-			}
+			$admin_indicator = '<span class="badge badge-important">' . $admin_notes['counter'] . '</span>';
 		}
-
-		$admin_link = '<li><a href="'.url.'admin.php">Admin CP '.$notifications_link.'</a></li>';
+		else
+		{
+			$admin_indicator = 0;
+		}
+		$admin_link = '<li><a href="'.url.'admin.php">Admin CP</a></li>';
+		$admin_line = '<li><a href="'.url.'admin.php">'.$admin_indicator.' new admin notifications</a></li>';
 	}
 
-	$notifications_total = $unread_counter;
-	if ($user->check_group(1,2))
-	{
-		$notifications_total = $unread_counter + $admin_notes;
-	}
-	$notifications_show = 0;
-	$notifications_username = '';
-	if ($notifications_total > 0)
-	{
-		$notifications_username = "<span class=\"badge badge-important\">$notifications_total</span>";
-	}
+	// for the mobile navigation
+	$templating->set('user_link', '<li><a href="/index.php?module=account_links">'.$_SESSION['username'].'</a></li>');
+
+	// for the user menu toggle
+	$user_menu = $templating->block_store('user_menu', 'mainpage');
 
 	if (core::config('pretty_urls') == 1)
 	{
@@ -326,13 +282,77 @@ else if ($_SESSION['user_id'] > 0)
 		$messages_html_link = url . "index.php?module=messages";
 	}
 
-	$user_menu = "<a href=\"".url."index.php?module=account_links\">{$_SESSION['username']} $notifications_username</a>
-	<ul><li><a href=\"$profile_link\">View Profile</a></li>
-								<li><a href=\"".url."usercp.php\">User CP</a></li>
-								<li><a href=\"$messages_html_link\">$messages_link</a></li>
-								$admin_link
-								<li><a href=\"".url."index.php?act=Logout\">Logout</a></li></ul>";
-
+	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link));
 	$templating->set('user_menu', $user_menu);
 
+	/* This section is for general user notifications, it covers:
+	- article comments
+	- comment likes TODO
+	- forum replies TODO
+	*/
+
+	$notifications_menu = $templating->block_store('notifications', 'mainpage');
+
+	$alerts_counter = 0;
+
+	// sort out private message unread counter
+	$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", array($_SESSION['user_id']), 'header.php');
+	$unread_messages_counter = $db->num_rows();
+
+	if ($unread_messages_counter == 0)
+	{
+		$messages_indicator = 0;
+	}
+
+	else if ($unread_messages_counter > 0)
+	{
+		$messages_indicator = "<span class=\"badge badge-important\">$unread_messages_counter</span>";
+	}
+
+	// set these by default as comment notifications can be turned off
+	$new_comments_line = '';
+	$unread_comments_counter['counter'] = 0;
+	if (isset($_SESSION['display_comment_alerts']) && $_SESSION['display_comment_alerts'] == 1)
+	{
+		// sort out the number of unread comments
+		$db->sqlquery("SELECT count(`id`) as `counter` FROM `user_notifications` WHERE `seen` = 0 AND owner_id = ?", array($_SESSION['user_id']));
+		$unread_comments_counter = $db->fetch();
+
+		if ($unread_comments_counter['counter'] == 0)
+		{
+			$comments_indicator = 0;
+		}
+
+		else if ($unread_comments_counter['counter'] > 0)
+		{
+			$comments_indicator = '<span class="badge badge-important">'.$unread_comments_counter['counter'].'</span>';
+		}
+		$new_comments_line = '<li><a href="/usercp.php?module=notifications">'.$comments_indicator.' new notifications</a></li>';
+	}
+
+	// sort out the main navbar indicator
+	$alerts_counter = $unread_messages_counter + $unread_comments_counter['counter'] + $admin_notes['counter'];
+
+	// sort out the styling for the alerts indicator
+	$alerts_indicator = '';
+	$alerts_icon = 'envelope-open';
+	$alert_box_type = 'normal';
+	if ($alerts_counter > 0)
+	{
+		$alerts_icon = 'envelope';
+		$alert_box_type = 'new';
+		$alerts_indicator = " <span class=\"badge badge-important\">$alerts_counter</span>";
+	}
+
+	// replace everything in the notifications menu block
+	$notifications_menu = $templating->store_replace($notifications_menu,
+	array('alerts_icon' => $alerts_icon,
+	'notifications_total' => $alerts_indicator,
+	'alert_box_type' => $alert_box_type,
+	'message_count' => $messages_indicator,
+	'comments_line' => $new_comments_line,
+	'messages_link' => $messages_html_link,
+	'admin_line' => $admin_line));
+
+	$templating->set('notifications_menu', $notifications_menu);
 }

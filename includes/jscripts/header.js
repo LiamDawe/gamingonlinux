@@ -134,6 +134,27 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
+  // navbar toggle menu
+  $(".toggle-nav > a").on('click', function(event){
+    event.preventDefault();
+    event.stopPropagation();
+  	var $toggle = $(this).closest('.toggle-nav').children('.toggle-content');
+    if ($toggle.hasClass('toggle-active'))
+    {
+      $($toggle).removeClass('toggle-active');
+    }
+    else
+    {
+      $(".toggle-content").removeClass('toggle-active');
+      $($toggle).addClass('toggle-active');
+    }
+  });
+  
+  // hide the toggle-nav if you click outside of it
+  $(document).on("click", function () {
+    $(".toggle-content").removeClass('toggle-active');
+  });
+
   if ( $.isFunction($.fn.select2) ) {
   $("#articleCategories").select2({
     selectOnClose: true,
@@ -280,11 +301,6 @@ jQuery(document).ready(function()
     //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
     $content.slideToggle(500)});
 
-	$('.contentwrap') .css({'margin-top': (($('#nav-small').height() + $('#nav-normal').height()) + 1 )+'px'});
-	$(window).resize(function()
-	{
-        	$('.contentwrap') .css({'margin-top': (($('#nav-small').height() + $('#nav-normal').height()) + 1 )+'px'});
-	});
 	$('.quote_function').click(function()
 	{
 	    $('html, body').animate({
@@ -373,10 +389,19 @@ jQuery(document).ready(function()
     var comment = $(this).parents('.comment')[0];
     //Get the post ID
     var sid = $(this).attr("data-id");
+    // get the author id of the comment itself
+    var author_id = $(this).attr("data-author-id");
+    // get the id of the article it's on
+    var article_id = $(this).attr("data-article-id");
+    // the type of like this is
+    var type = $(this).attr("data-type");
     //Send of a like (needs a like/dislike check)
       var $that = $(this);
       $.post('/includes/ajax/like.php', {
        comment_id: sid,
+       author_id: author_id,
+       article_id: article_id,
+       type: type,
        sta: $that.find("span").text().toLowerCase()
       }, function (returndata){
         if(returndata === "liked")
@@ -434,11 +459,13 @@ jQuery(document).ready(function()
   //Get the comment ID
   var article_id = $(this).attr("data-id");
   var likeobj = $("#article-likes");
+  var type = $(this).attr("data-type");
 
   //Send of a like (needs a like/dislike check)
     var $that = $(this);
     $.post('/includes/ajax/like.php', {
      article_id: article_id,
+     type: type,
      sta: $that.find("span").text().toLowerCase()
     }, function (returndata){
       if(returndata === "liked")
@@ -635,7 +662,7 @@ function(data){
     });
   });
 
-$(document).on('click', ".gallery_item", function() {
+  $(document).on('click', ".gallery_item", function() {
     var filename = $(this).data('filename');
     var id = $(this).data('id');
     $('#preview2').html('<img src="/uploads/tagline_gallery/' + filename + '" alt="image" />');
@@ -643,12 +670,13 @@ $(document).on('click', ".gallery_item", function() {
     $.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id });
   });
 
-  $('#preview_text_button').click(function() {
-  var text = $('#editor_content').val();
-  $('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
-  $('.preview_pm').show();
-  $('#preview').scrollMinimal();
-  $(".preview_pm").highlight();
+  $('#preview_text_button').click(function()
+  {
+    var text = $('#editor_content').val();
+    $('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
+    $('.preview_pm').show();
+    $('#preview').scrollMinimal();
+    $(".preview_pm").highlight();
   });
 
 });

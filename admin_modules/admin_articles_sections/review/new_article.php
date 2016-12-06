@@ -7,7 +7,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	$article_id = $db->grab_id();
 
 	// update admin notifications
-	$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("{$_SESSION['username']} sent a new article to the admin review queue.", core::$date, $article_id));
+	$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'article_admin_queue', core::$date, $article_id));
 
 	// update any uploaded images to have this article id, stop any images not being attached to an article
 	if (isset($_SESSION['uploads']))

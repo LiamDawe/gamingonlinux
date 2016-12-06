@@ -49,6 +49,11 @@ if (isset($_GET['user_id']))
 
 				$templating->set('username', $profile['username']);
 
+				$cake_bit = $user->cake_day($profile['register_date'], $profile['username']);
+				$templating->set('cake_icon', $cake_bit);
+
+				$new_user = $user->new_user_badge($profile['register_date']);
+				$templating->set('new_user_badge', $new_user);
 
 				$donator_badge = '';
 				if (($profile['secondary_user_group'] == 6 || $profile['secondary_user_group'] == 7) && $profile['user_group'] != 1 && $profile['user_group'] != 2)
@@ -75,7 +80,7 @@ if (isset($_GET['user_id']))
 				$registered_date = $core->format_date($profile['register_date']);
 				$templating->set('registered_date', $registered_date);
 
-				$avatar = $user->sort_avatar($profile);
+				$avatar = user::sort_avatar($profile);
 
 				$templating->set('avatar', $avatar);
 				$templating->set('article_comments', $profile['comment_count']);

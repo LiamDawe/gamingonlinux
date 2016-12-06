@@ -665,6 +665,10 @@ else if (isset($_POST['act']))
 				$show = 1;
 			}
 
+			// first check if it was disabled
+			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+			$enabled_check = $db->fetch();
+
 			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
@@ -682,6 +686,16 @@ else if (isset($_POST['act']))
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
 				$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
+			}
+
+			// update admin notes if it was disabled
+			if (!isset($_POST['show_article']) && $enabled_check['active'] == 1)
+			{
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'disabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
+			}
+			if (isset($_POST['show_article']) && $enabled_check['active'] == 0)
+			{
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'enabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
 			}
 
 			// update history

@@ -234,7 +234,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('topic_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t INNER JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
+		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('topic', 'admin_modules/admin_module_forum');
@@ -262,7 +262,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			$avatar = $user->sort_avatar($topic);
+			$avatar = user::sort_avatar($topic);
 
 			$templating->set('avatar', $avatar);
 
@@ -323,7 +323,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			$avatar = $user->sort_avatar($topic);
+			$avatar = user::sort_avatar($topic);
 
 			$templating->set('avatar', $avatar);
 
@@ -357,7 +357,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$db->sqlquery("UPDATE `forum_topics` SET `reported` = 0 WHERE `topic_id` = ?", array($_GET['topic_id']));
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `topic_id` = ?", array("{$_SESSION['username']} deleted a topic report.", core::$date, $_GET['topic_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_topic_report', $_GET['topic_id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_topic_report', $_GET['topic_id']));
 
 			header("Location: /admin.php?module=forum&view=reportedtopics&message=done");
 		}
@@ -378,7 +379,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$db->sqlquery("UPDATE `forum_replies` SET `reported` = 0 WHERE `post_id` = ?", array($_GET['post_id']));
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `action` = ?, `completed_date` = ? WHERE `reply_id` = ?", array("{$_SESSION['username']} deleted a forum topic reply report.", core::$date, $_GET['post_id']));
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_reply_report', $_GET['post_id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_reply_report', $_GET['post_id']));
 
 			header("Location: /admin.php?module=forum&view=reportedreplies&message=done");
 		}

@@ -13,6 +13,10 @@ if (isset($_GET['view']))
 		{
 			$core->message("That announcement has now been deleted!");
 		}
+		if ($_GET['message'] == 'updated')
+		{
+			$core->message("That announcement has now been updated!");
+		}
 		if ($_GET['message'] == 'empty')
 		{
 			$core->message("You cannot leave it empty!", NULL, 1);
@@ -78,6 +82,7 @@ if (isset($_POST['act']))
 		}
 
 		$db->sqlquery("UPDATE `announcements` SET `text` = ? WHERE `id` = ?", array($text, $_POST['id']));
+		header("Location: /admin.php?module=announcements&view=manage&message=updated");
 	}
 
 	if ($_POST['act'] == 'delete')

@@ -3,7 +3,11 @@ class user
 {
 	public $message;
 
-	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`, `articles-per-page`, `username`, `user_group`, `secondary_user_group`, `banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`, `forum_type`";
+	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
+	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
+	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
+	`forum_type`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`, `avatar`, `avatar_uploaded`,
+	`display_comment_alerts`";
 
 	// normal login form
 	function login($username, $password, $remember_username, $stay)
@@ -198,6 +202,8 @@ class user
 		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
 		$_SESSION['forum_type'] = $user_data['forum_type'];
 		$_SESSION['single_article_page'] = $user_data['single_article_page'];
+		$_SESSION['avatar'] = user::sort_avatar($user_data);
+		$_SESSION['display_comment_alerts'] = $user_data['display_comment_alerts'];
 	}
 
 	// if they have a stay logged in cookie log them in!
@@ -243,6 +249,8 @@ class user
 					$_SESSION['articles-per-page'] = $user['articles-per-page'];
 					$_SESSION['forum_type'] = $user['forum_type'];
 					$_SESSION['single_article_page'] = $user['single_article_page'];
+					$_SESSION['avatar'] = user::sort_avatar($user);
+					$_SESSION['display_comment_alerts'] = $user['display_comment_alerts'];
 
 					return true;
 				}
@@ -439,8 +447,9 @@ class user
 		}
 	}
 
-	function sort_avatar($user_data)
+	public static function sort_avatar($user_data)
 	{
+		$avatar = '';
 		if ($user_data['avatar_gravatar'] == 1)
 		{
 			$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. core::config('website_url') . '/uploads/avatars/no_avatar.png';
@@ -468,5 +477,45 @@ class user
 		}
 
 		return $avatar;
+	}
+
+	// give them a cake icon if they have been here for x years
+	public function cake_day($reg_date, $username)
+	{
+		global $core;
+
+		$this_year = date('Y');
+
+		// sort date to correct format
+		$reg_year = date('Y', $reg_date);
+		$reg_month = date('m', $reg_date);
+		$reg_day = date('d', $reg_date);
+
+		$cake_icon = '';
+		if ($reg_month == date('m') && $reg_day == date('d') && $reg_year != date('Y'))
+		{
+			// calculate how many years
+			$total_years = date('Y') - $reg_year;
+
+			$cake_icon = '<img src="/templates/default/images/cake.png" alt="'.$total_years.' years" class="tooltip-top" title="'.$username.' has been here for '.$total_years.' years" />';
+		}
+		return $cake_icon;
+	}
+
+	public function new_user_badge($reg_date)
+	{
+		$this_year = date('Y');
+
+		// sort date to correct format
+		$reg_year = date('Y', $reg_date);
+		$reg_month = date('m', $reg_date);
+		$reg_day = date('d', $reg_date);
+
+		$new_user_badge = '';
+		if ($reg_month == date('m') && $reg_day <= '07' && $reg_year == date('Y'))
+		{
+			$new_user_badge = '<span class="badge blue">New User</span>';
+		}
+		return $new_user_badge;
 	}
 }

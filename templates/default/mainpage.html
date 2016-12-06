@@ -1,68 +1,110 @@
 [block: top]
-<div id="wrapper" class="group">
-	<div id="header" class="group">
+	<nav class="navigation-main">
 		<div class="container group">
-			<div id="header-inner" class="col-12">
-				<h1 id="logo-res">
-          <a href="/index.php"><img alt="" src="{:url}templates/default/images/{:icon}"><span>{:site_title}</span></a>
-        </h1>
-				<div id="navigation">
-					<div id="navigation-mobile">
-						<a href="#navigation" title="Show navigation">Show navigation</a>
-						<a href="#" title="Hide navigation">Hide navigation</a>
+			<ul class="header-navbar">
+				<div id="navigation-mobile">
+					<input type="checkbox" id="menu-toggle">
+						<label for="menu-toggle" class="label-toggle"></label>
+					<div id="nav-hidden">
+						<ul>
+							{:user_link}
+							<li><a href="{:statistics_link}">Statistics</a></li>
+							<li><a href="{:donate_link}">Support Us</a></li>
+							<li><a href="/wiki/">Wiki</a></li>
+							<li><a href="{:contact_link}">Contact Us</a></li>
+							<li><a href="{:forum_link}">Forum</a></li>
+							<li><a href="{:irc_link}">IRC</a></li>
+							<li><a href="/index.php?module=search">Search</a></li>
+						</ul>
 					</div>
-					<div id="extra">
-				    <ul>
-								<li><a href="{:statistics_link}">Statistics</a></li>
-				        <li><a href="{:donate_link}">Support Us</a></li>
-				        <li><a href="/wiki/">Wiki</a></li>
-				        <li class="login">
-				            {:user_menu}
-				        </li>
-				    </ul>
-				  </div>
-					<ul>
-						<li class="extra"><a href="{:statistics_link}">Statistics</a></li>
-						<li class="extra"><a href="{:donate_link}">Support Us</a></li>
-						<li>
-						<a href="{:contact_link}">Submit</a>
-							<ul>
-								<li><a href="{:submit_a}">Article</a></li>
-								<li><a href="{:submit_e}">Tip</a></li>
-							</ul>
-						</li>
-						<li class="extra"><a href="/wiki/">Wiki</a></li>
-						<li>
-						<a href="{:forum_link}">Forum</a>
-							<ul>
-								<li><a href="{:forum_link}">Forum</a></li>
-								<li><a href="/irc/">IRC</a></li>
-							</ul>
-						</li>
-						<li class="login extra">
-							{:user_menu}
-						</li>
-						<li class="search">
-							<a href="{:url}index.php?module=search">Search</a>
-							<div>
-								<form method="get" action="{:url}index.php?module=search">
-									<input type="hidden" name="module" value="search" />
-									<input type="text" class="form-control ays-ignore" name="q" placeholder="Search Articles" />
-									<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
-								</form>
-							</div>
-						</li>
-					</ul>
 				</div>
-			</div>
+				<li class="gol-icon"><a href="/" title="GamingOnLinux Home"><img src="{:url}templates/default/images/{:icon}" width="35" height="35" alt="GamingOnLinux"></a></li>
+				<li class="nav-title"><a href="/">{:site_title}</a></li>
+				<li class="dropdown hide-small">
+					<a href="#" onclick="return false;">Sections <b class="caret-down"></b></a>
+					<ul class="dropdown-menu">
+						<li><a href="{:statistics_link}">Statistics</a></li>
+						<li><a href="{:donate_link}">Support Us</a></li>
+						<li><a href="/wiki/">Wiki</a></li>
+					</ul>
+				</li>
+				<li class="dropdown hide-small">
+					<a href="{:contact_link}">Contact Us <b class="caret-down"></b></a>
+					<ul class="dropdown-menu">
+						<li><a href="{:submit_e}">Email Us</a></li>
+						<li><a href="{:submit_a}">Submit Article</a></li>
+					</ul>
+				</li>
+				<li class="dropdown hide-small">
+					<a href="#" onclick="return false;">Forum <b class="caret-down"></b></a>
+					<ul class="dropdown-menu">
+						<li><a href="{:forum_link}">Forum</a></li>
+						<li><a href="/irc/">IRC</a></li>
+					</ul>
+				</li>
+				<li class="dropdown hide-small">
+					<a href="/index.php?module=search">Search <b class="caret-down"></b></a>
+					<ul class="dropdown-menu">
+						<li>
+							<form class="header-search" method="get" action="{:url}index.php?module=search">
+								<input type="hidden" name="module" value="search" />
+								<input type="text" class="search-field ays-ignore" name="q" placeholder="Search Articles…" />
+								<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+							</form>
+						</li>
+						<li class="divider"></li>
+						<li><a href="/index.php?module=search">Advanced search</a></li>
+					</ul>
+				</li>
+			</ul>
+			{:notifications_menu}
+			{:user_menu}
 		</div>
-	</div>
+	</nav>
 	<div id="body" class="smooth group">
 [/block: top]
 
+[block: user_menu]
+	<div class="toggle-nav user-box hide-small">
+		<a href="#"><div class="avatar-container"><img id="nav-avatar" src="{:avatar}" alt="" width="35" height="35"></div></a>
+			<div class="toggle-content">
+				<ul>
+					<li style="padding:5px;"><strong>{:username}</strong></li>
+					<li class="divider"></li>
+					<li><a href="{:profile_link}">View Profile</a></li>
+					<li><a href="/usercp.php">User CP</a></li>
+					{:admin_link}
+					<li><a href="/index.php?act=Logout">Logout</a></li>
+				</ul>
+		</div>
+	</div>
+[/block: user_menu]
+
+[block: notifications]
+	<div class="toggle-nav alerts-box right hide-small alerts-box-{:alert_box_type}">
+		<a href="#">{:notifications_total} <img src="/templates/default/images/comments/{:alerts_icon}.png" alt=""/></a>
+		<div class="toggle-content">
+				<ul>
+					{:admin_line}
+					{:comments_line}
+					<li><a href="{:messages_link}">{:message_count} new messages</a></li>
+				</ul>
+		</div>
+	</div>
+[/block: notifications]
+
+[block: login_menu]
+<div class="login-box hide-small">
+	<ul>
+		<li class="pull-right"><a href="/index.php?module=login">Login</a></li>
+		<li class="pull-right">Or</li>
+		<li class="pull-right"><a href="/index.php?module=register">Register</a></li>
+	</ul>
+</div>
+[/block: login_menu]
+
 [block: featured]
 		<div class="group" id="main-article" style="background: url('{:url}uploads/carousel/{:image}'); background-size: 100%;">
-
 			<div class="container">
 				<div class="col-12">
 					<div class="article group">
@@ -73,7 +115,6 @@
 					</div>
 				</div>
 			</div>
-
 		</div>
 [/block: featured]
 

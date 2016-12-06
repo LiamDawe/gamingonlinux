@@ -14,6 +14,8 @@ include('/home/gamingonlinux/public_html/includes/class_template.php');
 
 $templating = new template();
 
-// remove completed admin notifications older than 7 days, clean up the cruft
-$db->sqlquery("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created <= (created - 604800)");
+$year = 365*24*60*60;
+
+// remove completed admin notifications older than 1 year, clean up the cruft
+$db->sqlquery("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_date <= (created_date - $year)");
 ?>

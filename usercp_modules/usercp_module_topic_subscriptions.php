@@ -40,7 +40,7 @@ if (!isset($_GET['go']))
 		$templating->block('post_row', 'usercp_modules/usercp_module_topic_subscriptions');
 
 		// sort out topic icon
-		$topic_pip = $user->sort_avatar($post);
+		$topic_pip = user::sort_avatar($post);
 
 		$templating->set('topic_pip', $topic_pip);
 		$templating->set('topic_id', $post['topic_id']);

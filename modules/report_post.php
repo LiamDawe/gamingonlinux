@@ -83,7 +83,7 @@ if (isset($_POST['act']))
     else if (isset($_POST['yes']))
     {
       // update admin notifications
-      $db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `topic_id` = ?", array("{$_SESSION['username']} reported a forum topic.", core::$date, $_GET['topic_id']));
+      $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_topic_report', core::$date, $_GET['topic_id']));
 
       // give it a report
       $db->sqlquery("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
@@ -115,7 +115,7 @@ if (isset($_POST['act']))
     else if (isset($_POST['yes']))
     {
       // update admin notifications
-      $db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `reply_id` = ?", array("{$_SESSION['username']} reported a forum topic reply.", core::$date, $_GET['post_id']));
+      $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_reply_report', core::$date, $_GET['post_id']));
 
       // give it a report
       $db->sqlquery("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));

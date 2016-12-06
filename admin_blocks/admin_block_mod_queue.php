@@ -1,7 +1,7 @@
 <?php
 $templating->merge('admin_blocks/admin_block_mod_queue');
 
-$db->sqlquery("SELECT COUNT(`topic_id`) as count FROM `admin_notifications` WHERE `mod_queue` = 1 AND `completed` = 0");
+$db->sqlquery("SELECT COUNT(`id`) as count FROM `admin_notifications` WHERE `type` = 'mod_queue' AND `completed` = 0");
 $topic_counter = $db->fetch();
 
 $templating->block('main');

@@ -66,9 +66,9 @@ if (!isset($_GET['view']))
 			$edit_link = '';
 			if ($_SESSION['user_id'] == $article['author_id'])
 			{
-				$edit_link = ' <button type="submit" formaction="' . core::config('website_url') . $page . '&aid=' . $_GET['aid'] . '" class="btn btn-info">Edit</button></form>';
+				$edit_link = ' <button type="submit" formaction="' . core::config('website_url') . $page . '&aid=' . $_GET['aid'] . '">Edit</button></form>';
 			}
-			$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . core::config('website_url') . "{$page}\">Back</button>$edit_link");
+			$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" formaction=\"" . core::config('website_url') . "{$page}\">Back</button>$edit_link");
 
 			$templating->set('title', $article['title']);
 			$templating->set('user_id', $article['author_id']);
@@ -89,8 +89,8 @@ if (!isset($_GET['view']))
 
 			else
 			{
-				$username = "<a rel=\"author\" href=\"/profiles/{$article['author_id']}\"><span class=\"glyphicon glyphicon-user\"></span> {$article['username']}</a>";
-				$view_more = "<a href=\"/index.php?module=search&amp;author_id={$article['author_id']}\"><span class=\"glyphicon glyphicon-search\"></span> View more articles from {$article['username']}</a>";
+				$username = "<a rel=\"author\" href=\"/profiles/{$article['author_id']}\">{$article['username']}</a>";
+				$view_more = "<a href=\"/index.php?module=search&amp;author_id={$article['author_id']}\">View more articles from {$article['username']}</a>";
 			}
 
 			$templating->set('username', $username);
@@ -179,7 +179,7 @@ if (!isset($_GET['view']))
 			{
 				$templating->block('bio', 'articles_full');
 
-				$avatar = $user->sort_avatar($article);
+				$avatar = user::sort_avatar($article);
 				$templating->set('avatar', $avatar);
 
 				$templating->set('username', $username);
@@ -216,7 +216,7 @@ if (!isset($_GET['view']))
 				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
 				$quote_username = $comments['username'];
 
-				$comment_avatar = $user->sort_avatar($comments);
+				$comment_avatar = user::sort_avatar($comments);
 
 				$templating->block('review_comments', 'admin_modules/admin_module_comments');
 				$templating->set('user_id', $comments['author_id']);

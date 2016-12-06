@@ -112,7 +112,7 @@ if (isset($_POST['act']))
 
 		$core->process_livestream_users($new_id);
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' added a new livestream event.', core::$date, core::$date));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'new_livestream_event', core::$date, core::$date));
 
 		header("Location: /admin.php?module=livestreams&view=manage&&message=added");
 	}
@@ -146,7 +146,7 @@ if (isset($_POST['act']))
 
 		$core->process_livestream_users($_POST['id']);
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited the ' . $_POST['title'] . ' livestream.', core::$date, core::$date));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'edit_livestream_event', $_POST['id'], core::$date, core::$date));
 
 		header("Location: /admin.php?module=livestreams&view=manage&message=edited");
 	}
@@ -184,7 +184,7 @@ if (isset($_POST['act']))
 
 			$db->sqlquery("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_GET['id']));
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' removed ' . $title['title'] . ' from the livestream events.', core::$date, core::$date));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'deleted_livestream_event', core::$date, core::$date));
 
 			header("Location: /admin.php?module=livestreams&view=manage&message=deleted");
 		}

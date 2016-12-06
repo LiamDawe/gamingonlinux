@@ -1,5 +1,5 @@
 [block: main]
-                		<div class="box">
+        <div class="box">
 					<div class="body group">
 						<form method="post" action="/index.php?module=login">
 							<input class="ays-ignore" name="username" type="text" value="{:username}" placeholder="Username or Email" />
@@ -39,7 +39,7 @@
 [/block: main]
 
 [block: small]
-                		<div class="box">
+        <div class="box">
 					<div class="body group">
 						<p>Due to spam you need to <a href="//www.gamingonlinux.com/register/">Register</a> and <a href="//www.gamingonlinux.com/index.php?module=login">Login</a> to comment.</p>
 						<form method="post" action="/index.php?module=login">
@@ -80,25 +80,30 @@
 [/block: small]
 
 [block: forgot]
-<div class="well well-sm">
-	<form method="post" action="index.php?module=login">
-	Here you can request your password.<br />
-	Email address
-	<input class="ays-ignore" type="text" class="form-control" name="email" />
-	<input type="submit" name="action" value="Send" class="btn btn-primary" />
-	</form>
+<div class="box">
+  <div class="head">Here you can request your password</div>
+  <div class="body group">
+  	<form method="post" action="index.php?module=login">
+  	Email address
+  	<input class="ays-ignore" type="text" class="form-control" name="email" />
+  	<input type="submit" name="action" value="Send" class="btn btn-primary" />
+  	</form>
+  </div>
 </div>
 [/block: forgot]
 
 [block: reset]
-<div class="well well-sm">
-	<form method="post" action="index.php?module=login&code={:code}&email={:email}">
-	New password<br />
-	<input class="ays-ignore" type="password" name="password" /><br />
-	Password again<br />
-	<input class="ays-ignore" type="password" name="password_again" /><br />
-	<br />
-	<input type="submit" name="action" value="Reset" class="btn btn-primary" />
-	</form>
+<div class="box">
+  <div class="head">Reset your password</div>
+  <div class="body group">
+  	<form method="post" action="index.php?module=login&code={:code}&email={:email}">
+  	New password<br />
+  	<input class="ays-ignore" type="password" name="password" /><br />
+  	Password again<br />
+  	<input class="ays-ignore" type="password" name="password_again" /><br />
+  	<br />
+  	<input type="submit" name="action" value="Reset" class="btn btn-primary" />
+  	</form>
+  </div>
 </div>
 [/block: reset]

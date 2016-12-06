@@ -284,10 +284,6 @@
 		border-bottom: 1px dotted;
 	}
 
-/* Floats */
-	.fleft {float: left;}
-	.fright {float: right;}
-
 /* Clearer */
 	.group:after {
 		content: ".";

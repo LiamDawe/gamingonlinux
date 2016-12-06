@@ -69,5 +69,6 @@ $article_id = $db->grab_id();
 
 $db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 63", array($article_id));
 
-$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("TheBoss sent a new article to the admin review queue.", core::$date, $article_id));
+// this needs updating to the new style
+//$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("TheBoss sent a new article to the admin review queue.", core::$date, $article_id));
 ?>

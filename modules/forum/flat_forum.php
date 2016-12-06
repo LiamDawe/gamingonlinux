@@ -130,7 +130,7 @@ while ($topics = $db->fetch())
 		$postNumber = (($post_count - 1) % $rows_per_page) + 1;
 	}
 
-	$avatar = $user->sort_avatar($topics);
+	$avatar = user::sort_avatar($topics);
 
 	if (core::config('pretty_urls') == 1)
 	{

@@ -65,8 +65,8 @@ if (isset($_POST['action']))
 			$db->sqlquery("UPDATE `users` SET `in_mod_queue` = 0 WHERE `user_id` = ?", array($_POST['author_id']));
 		}
 
-		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `topic_id` = ? AND `mod_queue` = 1", array($_POST['topic_id']));
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `topic_id` = ?, `mod_queue` = 1", array("{$_SESSION['username']} approved a forum topic", core::$date, core::$date, $_POST['topic_id']));
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
 		// finally check if this is the latest topic we are approving to update the latest topic info for the forum
 		$db->sqlquery("SELECT `last_post_time` FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']));
@@ -103,9 +103,8 @@ if (isset($_POST['action']))
 			$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['forum_id']));
 		}
 
-		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `topic_id` = ? AND `mod_queue` = 1", array($_POST['topic_id']));
-
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `topic_id` = ?, `mod_queue` = 1", array("{$_SESSION['username']} removed a forum topic from the moderation queue.", core::$date, core::$date, $_POST['topic_id']));
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
 		header("Location: /admin.php?module=mod_queue&view=forum_topics&message=removed");
 	}

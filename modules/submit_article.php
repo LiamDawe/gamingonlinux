@@ -119,7 +119,7 @@ if (isset($_GET['view']))
         }
 
         $captcha = '';
-        if ($parray['article_comments_captcha'] == 1)
+        if (core::config('captcha_disabled') == 0 && $parray['article_comments_captcha'] == 1)
         {
             $captcha = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
         }
@@ -179,7 +179,7 @@ if (isset($_POST['act']))
 
         else
         {
-            if ($parray['submit_article_captcha'] == 1)
+            if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1)
             {
               if (isset($_POST['g-recaptcha-response']))
               {
@@ -197,7 +197,7 @@ if (isset($_POST['act']))
               }
             }
 
-            if ($parray['submit_article_captcha'] == 1 && !$res['success'])
+            if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && !$res['success'])
             {
                 $_SESSION['atitle'] = $_POST['title'];
                 $_SESSION['atext'] = $_POST['text'];
@@ -208,7 +208,7 @@ if (isset($_POST['act']))
             }
 
             // carry on and submit the article
-            if (($parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0)
+            if ((core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0 || core::config('captcha_disabled') == 1)
             {
                 // setup category if empty
                 if (empty($_POST['category']) || !is_numeric($_POST['category']))
@@ -247,7 +247,7 @@ if (isset($_POST['act']))
 
                 $article_id = $db->grab_id();
 
-                $db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 0, `action` = ?, `created` = ?, `article_id` = ?", array("A submitted article was sent for review.", core::$date, $article_id), 'articles.php');
+                $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_article', core::$date, $article_id));
 
                 // check if they are subscribing
                 if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)

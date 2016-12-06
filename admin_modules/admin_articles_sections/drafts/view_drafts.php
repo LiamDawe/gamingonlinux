@@ -33,7 +33,7 @@ if (!isset($_GET['aid']))
 
 		$templating->set('date_created', $core->format_date($article['date']));
 		$templating->set('delete_button', '<button type="submit" name="act" value="delete_draft" formaction="'.core::config('website_url').'admin.php?module=articles">Delete</button>');
-		$templating->set('edit_button', '<button type="submit" class="btn btn-primary" formaction="'.core::config('website_url').'admin.php?module=articles&view=drafts&aid='.$article['article_id'].'">Edit</button>');
+		$templating->set('edit_button', '<button type="submit" formaction="'.core::config('website_url').'admin.php?module=articles&view=drafts&aid='.$article['article_id'].'">Edit</button>');
 	}
 
 	$templating->block('others_drafts', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');

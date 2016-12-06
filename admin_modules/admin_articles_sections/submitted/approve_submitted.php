@@ -40,9 +40,9 @@ else
 
 			$checked['text'] = $checked['text'] . "\r\n\r\n[i]Thanks to " . $submitted_by_user . ' for letting us know![/i]';
 		}
-		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `article_id` = ?", array($_POST['article_id']));
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], 'submitted_article'));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `article_id` = ?", array("{$_SESSION['username']} approved a user submitted article.", core::$date, core::$date, $_POST['article_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'approve_submitted_article', core::$date, core::$date, $_POST['article_id']));
 
 		// remove all the comments made by admins
 		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));

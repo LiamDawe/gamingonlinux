@@ -1,0 +1,54 @@
+[block: main]
+<form method="post" action="/usercp.php?module=notification_preferences&amp;go=update">
+<div class="box">
+  <div class="head">Update notification preferences</div>
+</div>
+<div class="box">
+  <div class="body group">
+      Turn on notification area for:<br />
+      <label>Comments: <input type="checkbox" name="comments" {:comments_check}/><br />
+        <em>If you turn this off, you can still be emailed, but you won't see them pop up in the navbar</em><br /></label><br />
+      <em>Personal message notifications in the navbar cannot be turned off, as they can be important, but you can turn off emails for them below.</em>
+  </div>
+</div>
+<div class="box">
+  <div class="body group">
+    <strong>Articles &amp; Forum posts</strong><br />
+    <label class="checkbox">
+      Auto subscribe when replying? <input type="checkbox" name="auto_subscribe" {:subscribe_check} />
+    </label>
+    <label class="checkbox">
+      Auto subscribe when creating an article? <input type="checkbox" name="subscribe_article" {:subscribe_article_check} />
+    </label><br />
+    <label class="checkbox">
+      Get email replies when subscribed? <input type="checkbox" name="emails" {:subscribe_email_check} />
+    </label>
+    <label><em>Email options for replies</em><br />
+    <select class="form-control" name="email_options">
+      {:email_options}
+    </select></label>
+  </div>
+</div>
+<div class="box">
+  <div class="body group">
+      <strong>Personal Messages</strong><br />
+      <label class="checkbox">
+        Get email's when receiving a Personal Message? <input type="checkbox" name="emailpm" {:email_on_pm} />
+      </label>
+    </div>
+</div>
+<div class="box">
+  <div class="body group">
+      <strong>Security</strong><br />
+      <label class="checkbox">
+        Get an email when we detect a new device logging in? <input type="checkbox" name="emaillogin" {:email_on_login} />
+      </label>
+    </div>
+  </div>
+<div class="box">
+    <div class="body group">
+      <button type="submit">Update Preferences</button>
+  </div>
+</div>
+</form>
+[/block: main]

@@ -99,6 +99,15 @@ if (!isset($_GET['view']))
 			"mod_queue_approved" => ' approved a forum post.',
 			"mod_queue_removed" => ' removed a forum topic requesting approval.',
 
+			"user_edited" => ' edited a user.',
+			"banned_user" => ' banned a user!',
+			"unbanned_user" => ' unbanned a user!',
+			"ip_banned" => ' banned an IP address!',
+			"total_ban" => ' banned a user along with their IP address!',
+			"unban_ip" => ' unbanned an IP address!',
+			"delete_user" => ' deleted a user account!',
+			"deleted_user_content" => ' deleted all the content from a user!',
+
 			"approved_calendar" => ' approved a calendar and games database submission.',
 
 			"deleted_article" => ' deleted an article.',
@@ -128,23 +137,6 @@ if (!isset($_GET['view']))
 		}
 
 		$templating->set('editor_action', '<li>' . $completed_indicator . ' ' . $username . $types_array[$tracking['type']] . ' When: ' . $core->format_date($tracking['created_date']) . '</li>');
-		/*
-		// if the comment_id is set, then we should link to the comment within the admin to see what it was (reported or deleted comments)
-		$link = '';
-		if ($tracking['comment_id'] != 0 && $tracking['reported_comment'] == 0)
-		{
-			$link = '<br /> <a href="/admin.php?module=home&view=comment&comment_id='.$tracking['comment_id'].'">See Comment</a>';
-		}
-		if ($tracking['reported_comment'] == 1 && $tracking['completed'] == 0)
-		{
-			$link = '<br /> <a href="/admin.php?module=articles&view=comments">Deal with report</a>';
-		}
-		if ($tracking['reported_comment'] == 1 && $tracking['completed'] == 1)
-		{
-			$link = '<br /> <a href="/admin.php?module=home&view=comment&comment_id='.$tracking['comment_id'].'">See what it was</a>';
-		}*/
-
-
 	}
 	$templating->block('tracking_bottom', 'admin_modules/admin_home');
 }

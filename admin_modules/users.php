@@ -295,7 +295,7 @@ else
 					$db->sqlquery("INSERT INTO `admin_user_notes` SET `notes` = ?, `last_edited` = ?, `last_edit_by` = ?, `user_id` = ?", array($notes, core::$date, $_SESSION['user_id'], $_GET['user_id']));
 				}
 
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} edited the user {$_POST['username']}.", core::$date, core::$date));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'edited_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
 				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=done");
 			}
@@ -322,7 +322,7 @@ else
 				{
 					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} plain banned {$ban_info['username']}.", core::$date, core::$date));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'banned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
 					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=banned");
 				}
@@ -332,6 +332,8 @@ else
 		if ($_POST['act'] == 'unban')
 		{
 			$db->sqlquery("UPDATE `users` SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
+
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unbanned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
 			$core->message("The user {$_POST['username']} is now unbanned!");
 		}
@@ -346,6 +348,9 @@ else
 			else
 			{
 				$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($_POST['ip']));
+
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'ip_banned', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_POST['ip'], core::$date, core::$date));
+
 				$core->message("That IP {$_POST['ip']} has now been banned!");
 			}
 		}
@@ -378,7 +383,7 @@ else
 					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($_SESSION['ban_ip']));
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} banned {$ban_info['username']} along with their IP.", core::$date, core::$date));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'total_ban', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
 					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=banned");
 					unset($_SESSION['ban_ip']);
@@ -388,7 +393,13 @@ else
 
 		if ($_POST['act'] == 'unipban')
 		{
+			$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `id` = ?", array($_POST['id']));
+			$get_ip_ban = $db->fetch();
+
 			$db->sqlquery("DELETE FROM `ipbans` WHERE `id` = ?", array($_POST['id']));
+
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unban_ip', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $get_ip_ban['ip'], core::$date, core::$date));
+
 			$core->message("That IP has now been unbanned!");
 		}
 
@@ -452,11 +463,11 @@ else
 			{
 				// remove any old avatar if one was uploaded
 				$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
-				$avatar = $db->fetch();
+				$deleted_info = $db->fetch();
 
-				if ($avatar['avatar_uploaded'] == 1)
+				if ($deleted_info['avatar_uploaded'] == 1)
 				{
-					unlink('uploads/avatars/' . $avatar['avatar']);
+					unlink('uploads/avatars/' . $deleted_info['avatar']);
 				}
 
 				$db->sqlquery("DELETE FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
@@ -467,8 +478,8 @@ else
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($_GET['user_id']));
 
 				$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} deleted the user '{$avatar['username']}'", core::$date, core::$date));
 
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
 
 				header("Location: /admin.php?module=users&view=search&message=userdeleted");
 			}
@@ -476,52 +487,68 @@ else
 
 		if ($_POST['act'] == 'delete_user_content')
 		{
-			if (!isset($_GET['user_id'])){
-				$core->message("You there suckka, why is there no userID given? Go back and give me a user!");
-				return; //Stop here
-			} else {
-				$db->sqlquery("SELECT `username`, `banned` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
-				$localUsrThing = $db->fetch();
-			}
-
-			if ($localUsrThing['banned'] !== "1")
+			if (!isset($_GET['user_id']))
 			{
-				$core->message("This user is not banned. Delete a users content is only possible if it is banned.");
-				return; //Stop here
-			}
-
-			if (!isset($_POST['yes']) && !isset($_POST['no']))
-			{
-				$core->yes_no("Are you sure you wish to delete all content from {$localUsrThing['username']}? This CANNOT be undone, and this action is logged!", "admin.php?module=users&user_id={$_GET['user_id']}", 'delete_user_content');
-			}
-
-			else if (isset($_POST['no']))
-			{
-				header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
+				$core->message("There was no ID of a user given!", NULL, 1);
 			}
 			else
 			{
-				$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
-				$topics_subs_to_remove = $db->fetch_all_rows();
-				foreach ($topics_subs_to_remove as $key => $row) {
-					$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `topic_id` = ?", array( $row['topic_id'] ));
-					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `topic_id` = ? AND completed = 0", array( time(), $row['topic_id'] ));
+				$db->sqlquery("SELECT `username`, `banned` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$check_ban = $db->fetch();
+
+				if ($check_ban['banned'] !== "1")
+				{
+					$core->message("This user is not banned. Deleting a users content is only possible if they are banned.");
 				}
+				else
+				{
+					if (!isset($_POST['yes']) && !isset($_POST['no']))
+					{
+						$core->yes_no("Are you sure you wish to delete all content from {$check_ban['username']}? This CANNOT be undone, and this action is logged!", "admin.php?module=users&user_id={$_GET['user_id']}", 'delete_user_content');
+					}
 
-				$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
-				$topics_admin_notif_rep_to_remove = $db->fetch_all_rows();
-				foreach ($topics_admin_notif_rep_to_remove as $key => $row) {
-					$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `reply_id` = ? AND completed = 0", array( time(), $row['post_id'] ));
+					else if (isset($_POST['no']))
+					{
+						header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
+					}
+					else
+					{
+						$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
+						$topics_subs_to_remove = $db->fetch_all_rows();
+						foreach ($topics_subs_to_remove as $key => $row)
+						{
+							$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `topic_id` = ?", array( $row['topic_id'] ));
+							$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `topic_id` = ? AND completed = 0", array( time(), $row['topic_id'] ));
+						}
+
+						$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
+						$topics_admin_notif_rep_to_remove = $db->fetch_all_rows();
+						foreach ($topics_admin_notif_rep_to_remove as $key => $row)
+						{
+							$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `reply_id` = ? AND completed = 0", array( time(), $row['post_id'] ));
+						}
+
+						$db->sqlquery("DELETE FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
+						$db->sqlquery("DELETE FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
+
+						// delete any comment reports for their comments
+						$db->sqlquery("SELECT `comment_id`, `spam` FROM `article_comments` WHERE `author_id` = ?" , array($_GET['user_id']))
+						$reported_comments = $db->fetch_all_rows();
+						foreach ($reported_comments as $comment_loop)
+						{
+							if ($comment_loop['spam'] == 1)
+							{
+								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'reported_comment' AND `data` = ?", array(core::$date, $_GET['user_id'], $comment_loop['comment_id']));
+							}
+						}
+						$db->sqlquery("DELETE FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
+
+						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'deleted_user_content', `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
+
+
+						header("Location: /admin.php?module=users&view=search&message=usercontentdeleted");
+					}
 				}
-
-				$db->sqlquery("DELETE FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
-				$db->sqlquery("DELETE FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
-				$db->sqlquery("DELETE FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
-
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array("{$_SESSION['username']} deleted all forum content for user '{$localUsrThing['username']}'", core::$date, core::$date));
-
-
-				header("Location: /admin.php?module=users&view=search&message=usercontentdeleted");
 			}
 		}
 	}

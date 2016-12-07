@@ -184,6 +184,7 @@ margin-bottom: -3px;
      color: #fff;
  }
 /* toggle menus */
+.right-menu{float: right; right: 0px;}
 .toggle-content {
 	display: none;
 	white-space: nowrap;
@@ -213,15 +214,15 @@ margin-bottom: -3px;
 .toggle-content a {display: block; color: #999; padding: 5px !important;}
 .toggle-content a:hover {color: #fff;}
 /* alerts menu */
-.alerts-box {position: relative; float: right; right: 80px; color: #999; line-height: 29px;}
-.alerts-box-new{background-color: #609FA9; right: 98px;}
+.alerts-box {position: relative; float: left; color: #999; line-height: 29px; right: 1px;}
+.alerts-box-new{background-color: #609FA9;}
 .alerts-box-new:hover{background-color: #6FA8B1;}
 .alerts-box-normal{background-color: #383838;}
 .alerts-box-normal:hover{background-color: #4B4B4B;}
 .alerts-box a {padding: 10px; height: 29px; display: block; color: #999;}
 .alerts-box:hover{cursor: pointer;}
 /* user menu */
-.user-box {position: relative; float: right; right: 0px; color: #999; background-color: #383838; height: 49px; padding-left: 5px; padding-right: 5px;}
+.user-box {position: relative; float: right; color: #999; background-color: #383838; height: 49px; padding-left: 5px; padding-right: 5px;}
 .user-box:hover {background-color: #4B4B4B;}
 /* getting the avatar to align in the middle */
 .avatar-container {height: 49px;}

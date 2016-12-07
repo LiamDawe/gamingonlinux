@@ -1145,7 +1145,10 @@ else if (isset($_GET['go']))
 								$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $article_id, $emails, $emails));
 							}
 
-							// email anyone subscribed which isn't you
+							/* gather a list of subscriptions for this article
+							- Make an array of anyone who needs an email now
+							- Send a notification to them
+							*/
 							$db->sqlquery("SELECT s.`user_id`, s.emails, s.send_email, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ?", array($article_id));
 							$users_array = array();
 							$users_to_email = $db->fetch_all_rows();

@@ -80,16 +80,16 @@ class mysql
 
 		catch (Exception $error)
 		{
-			//if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
-			//{
+			if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
+			{
 				$trace = $error->getTrace();
 				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br />" . '<strong>Query:</strong> ' . $sql, NULL, 1);
-			//}
-			////else
-			//{
-			//	$core->message("Something went wrong. The admin will be notified", NULL, 1);
-			//	$this->pdo_error($error->getMessage(), $trace[2]['file'], $sql, $referrer);
-			//}
+			}
+			else
+			{
+				$core->message("Something went wrong. The admin will be notified", NULL, 1);
+				$this->pdo_error($error->getMessage(), $trace[2]['file'], $sql, $referrer);
+			}
 		}
 	}
 

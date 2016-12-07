@@ -1383,21 +1383,7 @@ else if (isset($_GET['go']))
 			$templating->set('text', bbcode($comment['comment_text']));
 
 			// sort out the avatar
-			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-			if (empty($comments['avatar']) || $comments['avatar_gravatar'] == 1)
-			{
-				$comment_avatar = "//www.gravatar.com/avatar/" . md5( strtolower( trim( $comments['gravatar_email'] ) ) ) . "?d=" . urlencode(core::config('website_url') . 'uploads/avatars/no_avatar.png') . "&size=125";
-			}
-
-			// either uploaded or linked an avatar
-			else
-			{
-				$comment_avatar = $comments['avatar'];
-				if ($comments['avatar_uploaded'] == 1)
-				{
-					$comment_avatar = "/uploads/avatars/{$comments['avatar']}";
-				}
-			}
+			$comment_avatar = $user->sort_avatar($comment);
 
 			$templating->set('comment_avatar', $comment_avatar);
 

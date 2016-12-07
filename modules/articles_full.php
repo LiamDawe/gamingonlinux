@@ -830,7 +830,7 @@ if (!isset($_GET['go']))
 									}
 
 									$subscribe_email_check = '';
-									if ($subscribe_info['auto_subscribe_email'] == 1 || (isset($check_current_sub) && $check_current_sub['emails'] == 1))
+									if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $subscribe_info['auto_subscribe_email'] == 1)
 									{
 										$subscribe_email_check = 'selected';
 									}

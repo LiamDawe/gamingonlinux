@@ -1,4 +1,5 @@
 <?php
+$templating->set_previous('title', 'Manage article subscriptions' . $templating->get('title', 1)  , 1);
 $templating->merge('usercp_modules/usercp_module_article_subscriptions');
 
 if (!isset($_GET['go']))

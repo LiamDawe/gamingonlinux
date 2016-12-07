@@ -56,6 +56,27 @@
 				</div>
 [/block: bio]
 
+[block: corrections]
+<a id="corrections"></a>
+<div class="box">
+	<div class="collapse_container">
+		<div class="collapse_header">
+			<span>For spelling and grammar corrections click here</span>
+		</div>
+		<div class="collapse_content">
+			<div class="body group">
+				<form method="post" action="/index.php?module=articles_full">
+					Correction comment: <br />
+					<textarea name="correction" rows="10"></textarea>
+					<input type="hidden" name="article_id" value="{:article_id}" />
+					<button formaction="/index.php?module=articles_full&go=correction" type="submit">Submit correction</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+[/block: corrections]
+
 [block: subscribe]
 <br />
 <strong>{:subscribe_link} {:close_comments}</strong>
@@ -119,7 +140,6 @@
 					</div>
 				</div>
 {:pagination}
-<a id="corrections"></a>
 [/block: bottom]
 
 [block: comments_closed]
@@ -131,23 +151,6 @@
 [/block: comments_closed]
 
 [block: comments_box_top]
-<div class="box">
-	<div class="collapse_container">
-		<div class="collapse_header">
-			<span>For spelling and grammar corrections click here</span>
-		</div>
-		<div class="collapse_content">
-			<div class="body group">
-				<form method="post" action="index.php?module=articles_full">
-					Correction comment: <br />
-					<textarea name="correction" rows="10"></textarea>
-					<input type="hidden" name="article_id" value="{:article_id}" />
-					<button formaction="index.php?module=articles_full&go=correction" name="act" type="submit">Submit correction</button>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
 <form method="post" action="{:url}index.php?module=articles_full&amp;go=comment" enctype="multipart/form-data">
 [/block: comments_box_top]
 

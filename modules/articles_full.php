@@ -370,6 +370,20 @@ if (!isset($_GET['go']))
 					$templating->set('article_bio', $bio);
 				}
 
+				if (isset($_GET['message']))
+				{
+					if ($_GET['message'] == 'tipsent')
+					{
+						$core->message('Thank you for the correction!');
+					}
+				}
+
+				if ($_SESSION['user_id'] > 0)
+				{
+					$templating->block('corrections', 'articles_full');
+					$templating->set('article_id', $article['article_id']);
+				}
+
 				// get the comments if we aren't in preview mode
 				if ($article['active'] == 1)
 				{
@@ -771,14 +785,6 @@ if (!isset($_GET['go']))
 						if ($_GET['error'] == 'noid')
 						{
 							$core->message('Article id was not a number! Stop trying to do something naughty!');
-						}
-					}
-
-					if (isset($_GET['message']))
-					{
-						if ($_GET['message'] == 'tipsent')
-						{
-							$core->message('Thank you for the correction!');
 						}
 					}
 

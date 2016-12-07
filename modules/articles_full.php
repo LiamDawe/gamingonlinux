@@ -1145,26 +1145,24 @@ else if (isset($_GET['go']))
 								$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $article_id, $emails, $emails));
 							}
 
-							/* gather a list of subscriptions for this article
+							/* gather a list of subscriptions for this article (not including yourself!)
 							- Make an array of anyone who needs an email now
 							- Send a notification to them
 							*/
-							$db->sqlquery("SELECT s.`user_id`, s.emails, s.send_email, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ?", array($article_id));
+							$db->sqlquery("SELECT s.`user_id`, s.emails, s.send_email, u.email, u.username, u.email_options FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, $_SESSION['user_id']));
 							$users_array = array();
 							$users_to_email = $db->fetch_all_rows();
 							foreach ($users_to_email as $email_user)
 							{
-								if ($email_user['user_id'] != $_SESSION['user_id'])
+								if ($email_user['emails'] == 1 && $email_user['send_email'] == 1)
 								{
-									if ($email_user['emails'] == 1 && $email_user['send_emails'] == 1)
-									{
-										$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
-										$users_array[$email_user['user_id']]['email'] = $email_user['email'];
-										$users_array[$email_user['user_id']]['username'] = $email_user['username'];
-									}
-
-									$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+									$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
+									$users_array[$email_user['user_id']]['email'] = $email_user['email'];
+									$users_array[$email_user['user_id']]['username'] = $email_user['username'];
+									$users_array[$email_user['user_id']]['email_options'] = $email_user['email_options'];
 								}
+
+								$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
 							}
 
 							// send the emails
@@ -1197,11 +1195,9 @@ else if (isset($_GET['go']))
 									$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
 									$mail->send();
 								}
-								// remove anyones send_emails subscription setting if they have it set to email once
-								$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']));
-								$update_sub = $db->fetch();
 
-								if ($update_sub['email_options'] == 2)
+								// remove anyones send_emails subscription setting if they have it set to email once
+								if ($email_user['email_options'] == 2)
 								{
 									$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($article_id, $email_user['user_id']));
 								}

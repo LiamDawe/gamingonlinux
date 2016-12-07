@@ -1146,14 +1146,14 @@ else if (isset($_GET['go']))
 							}
 
 							// email anyone subscribed which isn't you
-							$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.send_email = 1 AND s.emails = 1", array($article_id));
+							$db->sqlquery("SELECT s.`user_id`, s.emails, s.send_email, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ?", array($article_id));
 							$users_array = array();
 							$users_to_email = $db->fetch_all_rows();
 							foreach ($users_to_email as $email_user)
 							{
 								if ($email_user['user_id'] != $_SESSION['user_id'])
 								{
-									if ($email_user['emails'] == 1)
+									if ($email_user['emails'] == 1 && $email_user['send_emails'] == 1)
 									{
 										$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
 										$users_array[$email_user['user_id']]['email'] = $email_user['email'];

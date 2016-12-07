@@ -513,25 +513,30 @@ else
 					}
 					else
 					{
-						$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
+						// delete subscriptions and complete any reports on their forum topics
+						$db->sqlquery("SELECT `topic_id`, `reported` FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
 						$topics_subs_to_remove = $db->fetch_all_rows();
 						foreach ($topics_subs_to_remove as $key => $row)
 						{
 							$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `topic_id` = ?", array( $row['topic_id'] ));
-							$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `topic_id` = ? AND completed = 0", array( time(), $row['topic_id'] ));
+							if ($row['reported'] == 1)
+							{
+								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `data` = ? AND `type` = 'forum_topic_report'", array(core::$date, $row['topic_id']));
+							}
 						}
 
-						$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
+						// complete any reports on their forum replies
+						$db->sqlquery("SELECT `post_id`, `reported` FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
 						$topics_admin_notif_rep_to_remove = $db->fetch_all_rows();
 						foreach ($topics_admin_notif_rep_to_remove as $key => $row)
 						{
-							$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `reply_id` = ? AND completed = 0", array( time(), $row['post_id'] ));
+							if ($row['reported'] == 1)
+							{
+								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `data` = ? AND `type` = 'forum_reply_report'", array(core::$date, $row['post_id']));
+							}
 						}
 
-						$db->sqlquery("DELETE FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
-						$db->sqlquery("DELETE FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
-
-						// delete any comment reports for their comments
+						// complete any comment reports for their comments
 						$db->sqlquery("SELECT `comment_id`, `spam` FROM `article_comments` WHERE `author_id` = ?" , array($_GET['user_id']))
 						$reported_comments = $db->fetch_all_rows();
 						foreach ($reported_comments as $comment_loop)
@@ -541,10 +546,14 @@ else
 								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'reported_comment' AND `data` = ?", array(core::$date, $_GET['user_id'], $comment_loop['comment_id']));
 							}
 						}
+
+						// now do the actual deleting of the rest of their content
+						$db->sqlquery("DELETE FROM `forum_replies` WHERE `author_id` = ?", array($_GET['user_id']));
+						$db->sqlquery("DELETE FROM `forum_topics` WHERE `author_id` = ?", array($_GET['user_id']));
 						$db->sqlquery("DELETE FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
 
+						// alert admins this was done
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'deleted_user_content', `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
-
 
 						header("Location: /admin.php?module=users&view=search&message=usercontentdeleted");
 					}

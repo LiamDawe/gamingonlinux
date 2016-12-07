@@ -384,7 +384,11 @@ class article_class
       $count_subs = $db->num_rows();
       if ($count_subs == 0)
       {
-        $db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $article_id));
+        // find how they like to normally subscribe
+        $db->sqlquery("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+        $get_email_type = $db->fetch();
+
+        $db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?", array($_SESSION['user_id'], $article_id, $get_email_type['auto_subscribe_email']));
       }
     }
   }

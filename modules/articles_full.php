@@ -1163,6 +1163,7 @@ else if (isset($_GET['go']))
 								}
 
 								$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+								$new_notification_id = $db->grab_id();
 							}
 
 							// send the emails
@@ -1175,7 +1176,7 @@ else if (isset($_GET['go']))
 
 								// message
 								$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "articles/$title_nice.$article_id/comment_id={$new_comment_id}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 								<div>
 							 	<hr>
 							 	{$comment_email}
@@ -1187,7 +1188,7 @@ else if (isset($_GET['go']))
 							  	<p>-----------------------------------------------------------------------------------------------------------</p>
 								</div>";
 
-								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . core::config('website_url') . "articles/$title_nice.$article_id/comment_id={$new_comment_id}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 								// Mail it
 								if (core::config('send_emails') == 1)

@@ -8,8 +8,18 @@
 [block: post_row]
 	<div class="box">
 		<div class="body group">
-			<a href="/articles/{:article_link}">{:title}</a> - <strong><a href="/usercp.php?module=article_subscriptions&go=unsubscribe&article_id={:article_id}"> <i class="icon-trash"></i> Unsubscribe</a></strong><br />
-			by <a href="/profiles/{:author_id}">{:author}</a> on {:date}
+			<a href="/articles/{:article_link}">{:title}</a><br />
+			by <a href="/profiles/{:author_id}">{:author}</a> on {:date}<br />
+			<br />
+			<form method="post">
+				Adjust your subscription to this article:<br />
+				<select name="subscribe-type">
+					<option value="sub-only" {:no_emails}>Subscribe without emails</option>
+					<option value="sub-emails" {:get_emails}>Subscribe and get emailed</option>
+				</select><br />
+				<input type="hidden" name="article_id" value="{:article_id}" />
+				<button type="submit" formaction="/usercp.php?module=article_subscriptions&go=update">Update Subscription</button> <button type="submit" formaction="/usercp.php?module=article_subscriptions&go=unsubscribe&article_id={:article_id}">Unsubscribe</button>
+			</form>
 		</div>
 	</div>
 [/block: post_row]

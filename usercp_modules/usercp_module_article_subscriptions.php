@@ -20,6 +20,10 @@ if (!isset($_GET['go']))
 		{
 			$core->message('Subscription removed!');
 		}
+		if ($_GET['message'] == 'updated')
+		{
+			$core->message('Subscription updated!');
+		}
 	}
 
 	$templating->block('main_top', 'usercp_modules/usercp_module_article_subscriptions');
@@ -32,7 +36,7 @@ if (!isset($_GET['go']))
 	$pagination = $core->pagination_link(9, $total_pages, "usercp.php?module=article_subscriptions&", $page);
 
 	// get the articles
-	$db->sqlquery("SELECT a.article_id, a.title, a.date, s.user_id, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id INNER JOIN `users` u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 9", array($_SESSION['user_id'], $core->start));
+	$db->sqlquery("SELECT a.article_id, a.title, a.date, s.user_id, s.emails, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id INNER JOIN `users` u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 9", array($_SESSION['user_id'], $core->start));
 
 	while ($post = $db->fetch())
 	{
@@ -44,6 +48,22 @@ if (!isset($_GET['go']))
 		$templating->set('author_id', $post['user_id']);
 		$templating->set('date', $core->format_date($post['date']));
 		$templating->set('author', $post['username']);
+
+		$no_emails = '';
+		$get_emails = '';
+		if ($post['emails'] == 1)
+		{
+			$no_emails = '';
+			$get_emails = 'selected';
+		}
+		else if ($post['emails'] == 0)
+		{
+			$no_emails = 'selected';
+			$get_emails = '';
+		}
+		$templating->set('no_emails', $no_emails);
+		$templating->set('get_emails', $get_emails);
+
 	}
 
 	$templating->block('main_bottom', 'usercp_modules/usercp_module_article_subscriptions');
@@ -77,6 +97,29 @@ else if (isset($_GET['go']))
 		{
 			$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['article_id']));
 			header("Location: /usercp.php?module=article_subscriptions&message=done");
+		}
+	}
+
+	if ($_GET['go'] == 'update')
+	{
+		if (!isset($_POST['article_id']) || !is_numeric($_POST['article_id']))
+		{
+			$core->message("There was an error, as no ID was set!");
+		}
+		else
+		{
+			$emails = '';
+			if ($_POST['subscribe-type'] == 'sub-only')
+			{
+				$emails = 0;
+			}
+			else if ($_POST['subscribe-type'] == 'sub-emails')
+			{
+				$emails = 1;
+			}
+			$db->sqlquery("UPDATE `articles_subscriptions` SET `emails` = $emails WHERE `article_id` = ? AND `user_id` = ?", array($_POST['article_id'], $_SESSION['user_id']));
+
+			header("Location: /usercp.php?module=article_subscriptions&message=updated");
 		}
 	}
 }

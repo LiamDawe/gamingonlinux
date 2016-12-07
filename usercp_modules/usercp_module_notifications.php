@@ -71,7 +71,7 @@ if (!isset($_GET['go']))
 
 				if (core::config('pretty_urls') == 1)
 				{
-					$profile_link = '/profiles/' . $grab_notes['user_id'];
+					$profile_link = '/profiles/' . $note_list['user_id'];
 				}
 				else
 				{

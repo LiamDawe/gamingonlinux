@@ -526,6 +526,7 @@ jQuery(document).ready(function()
     $.post('/includes/ajax/delete-notification.php', {'note_id':note_id},
     function(data)
     {
+      // we need to do this, or else it's seen as text and not a JSON
       data = JSON.parse(data);
       if (data.result == 1)
       {
@@ -536,6 +537,14 @@ jQuery(document).ready(function()
         }
         $('#note-' + note_id).find('span').remove();
         $('#note-' + note_id).fadeOut(500);
+
+        // change the alertbox to normal if there's none left and remove the counter
+        var total_left = parseInt($('#notes-counter').text());
+        if (total_left === 0)
+        {
+          $("#alert_box").toggleClass('alerts-box-new alerts-box-normal');
+          $("#notes-counter").remove();
+        }
       }
     });
   });

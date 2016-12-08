@@ -69,6 +69,8 @@ if (!isset($_GET['view']))
 		$templating->block('announcement_bottom', 'announcements');
 	}
 
+	$core->check_old_pc_info($_SESSION['user_id']);
+
 	$templating->block('articles_top', 'home');
 
 	// paging for pagination

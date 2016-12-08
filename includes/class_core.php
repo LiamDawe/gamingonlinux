@@ -1070,5 +1070,30 @@ class core
 			}
 		}
 	}
+
+	function check_old_pc_info($user_id)
+	{
+		global $db, $templating;
+
+		if (isset($user_id) && $user_id != 0)
+		{
+			$db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($user_id));
+			$checker = $db->fetch();
+
+			if ($checker['date_updated'] != NULL)
+			{
+				$minus_4months = strtotime('-4 months');
+
+				if (strtotime($checker['date_updated']) < $minus_4months)
+				{
+					$templating->merge('announcements');
+					$templating->block('announcement_top', 'announcements');
+					$templating->block('announcement', 'announcements');
+					$templating->set('text', 'You haven\'t updated your PC information in over 4 months! <a href="/usercp.php?module=pcinfo">Click here to go and check</a>. You can simply update if nothing has changed to be included in our statistics!');
+					$templating->block('announcement_bottom', 'announcements');
+				}
+			}
+		}
+	}
 }
 ?>

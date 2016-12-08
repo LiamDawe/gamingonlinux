@@ -2,9 +2,21 @@
 $templating->set_previous('title', 'Livestreaming schedule', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux livestreaming schedule', 1);
 
+if (isset($_GET['message']))
+{
+  if ($_GET['message'] == 'sent')
+  {
+    $core->message('Thank you! That livestream has been sent for admin review!');
+  }
+  if ($_GET['message'] == 'missing')
+  {
+    $core->message('Required fields were missing. It needs a title, both date fields filled and a stream url!', NULL, 1);
+  }
+}
+
 $templating->load('livestreams');
 
-$templating->block('top');
+$templating->block('top', 'livestreams');
 $edit_link = '';
 if ($user->check_group(1,2) == true)
 {
@@ -12,13 +24,18 @@ if ($user->check_group(1,2) == true)
 }
 $templating->set('edit_link', $edit_link);
 
-$db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` ORDER BY `date` ASC");
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'])
+{
+  $templating->block('submit', 'livestreams');
+}
+
+$db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC");
 if ($db->num_rows() > 0)
 {
   $grab_streams = $db->fetch_all_rows();
   foreach ($grab_streams as $streams)
   {
-    $templating->block('item');
+    $templating->block('item', 'livestreams');
 
     $badge = '';
     if ($streams['community_stream'] == 1)
@@ -69,7 +86,7 @@ if ($db->num_rows() > 0)
     {
       if (!empty($streamer_list))
       {
-        $streamer_list = $streamer_list + ', ' . $streams['streamer_community_name'];
+        $streamer_list = $streamer_list . ', ' . $streams['streamer_community_name'];
       }
       else
       {
@@ -80,6 +97,37 @@ if ($db->num_rows() > 0)
     $templating->set('users_list', $streamer_list);
   }
 }
-else {
+else
+{
   $core->message('There are no livestreams currently planned, or we forgot to update this page. Please <a href="https://www.gamingonlinux.com/forum/2">bug us to update it</a>!');
+}
+
+if (isset($_POST['act']))
+{
+  if ($_POST['act'] == 'submit')
+  {
+    $title = trim($_POST['title']);
+    $community_name = trim($_POST['community_name']);
+    $stream_url = trim($_POST['stream_url']);
+
+    if (empty($title) || empty($_POST['date']) || empty($_POST['end_date']) || empty($stream_url))
+    {
+      header("Location: /index.php?module=livestreams&message=missing");
+      die();
+    }
+
+    $date = new DateTime($_POST['date']);
+    $end_date = new DateTime($_POST['end_date']);
+
+    $date_created = date('Y-m-d H:i:s');
+
+    $db->sqlquery("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 0, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = 1, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $title, $date_created, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community_name, $stream_url));
+    $new_id = $db->grab_id();
+
+    $core->process_livestream_users($new_id);
+
+    $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'new_livestream_submission', core::$date, $new_id));
+
+    header("Location: /index.php?module=livestreams&message=sent");
+  }
 }

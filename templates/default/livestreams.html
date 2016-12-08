@@ -7,6 +7,62 @@
 </div>
 [/block: top]
 
+[block: submit]
+<div class="box">
+	<div class="collapse_container">
+		<div class="collapse_header">
+			<span>Click here to submit your own livestream!</span>
+		</div>
+		<div class="collapse_content">
+			<div class="body group">
+				<script src="includes/jscripts/jquery.form.min.js"></script>
+				<form method="post" action="admin.php?module=games">
+					<div class="box">
+							<div class="body group">
+								<form method="post">
+									Title: <em>Keep it as short as possible and to the point</em><input type="text" name="title" /><br />
+									Start Date (UTC only!): <br />
+									<input name="date" id="datetimepicker1" type="text" />
+									<script>
+									var timepicker = new Pikaday(
+										{
+											field: document.getElementById('datetimepicker1'),
+											firstDay: 1,
+											minDate: new Date(2000, 0, 1),
+											maxDate: new Date(2020, 12, 31),
+											yearRange: [2000,2020],
+											showTime: true,
+											autoClose: false,
+											use24hour: false
+										});</script>
+										End Date (UTC only!): <br />
+										<input name="end_date" id="datetimepickere2" type="text"/>
+										<script>
+										var timepicker = new Pikaday(
+											{
+												field: document.getElementById('datetimepickere2'),
+												firstDay: 1,
+												minDate: new Date(2000, 0, 1),
+												maxDate: new Date(2020, 12, 31),
+												yearRange: [2000,2020],
+												showTime: true,
+												autoClose: false,
+												use24hour: false
+											});</script>
+									Streamer: <em>Enter the usernames of who is presenting it (accepts multiple people)</em><br />
+									<select tabindex="-1" multiple="" name="user_ids[]" class="livestream_user_ids" style="width:300px" class="populate select2-offscreen"></select><br />
+									Enter if not listed (if not registered on GOL): <input type="text" name="community_name" /><br />
+									Your livestream url <input type="text" name="stream_url" />
+								</div>
+							</div>
+							<button formaction="index.php?module=livestreams" name="act" value="submit" type="submit">Submit for review</button>
+						</form>
+			</div>
+		</div>
+	</div>
+</div>
+[/block: submit]
+
 [block: item]
 <div class="box">
 	<div class="head">{:badge} <a href="{:stream_url}">{:title}</a></div>

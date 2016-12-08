@@ -100,13 +100,13 @@ if (!isset($_GET['view']))
 			"mod_queue_removed" => ' removed a forum topic requesting approval.',
 
 			"edited_user" => ' edited a user.',
-			"banned_user" => ' banned a user!',
-			"unbanned_user" => ' unbanned a user!',
-			"ip_banned" => ' banned an IP address!',
-			"total_ban" => ' banned a user along with their IP address!',
-			"unban_ip" => ' unbanned an IP address!',
-			"delete_user" => ' deleted a user account!',
-			"deleted_user_content" => ' deleted all the content from a user!',
+			"banned_user" => ' banned a user.',
+			"unbanned_user" => ' unbanned a user.',
+			"ip_banned" => ' banned an IP address.',
+			"total_ban" => ' banned a user along with their IP address.',
+			"unban_ip" => ' unbanned an IP address.',
+			"delete_user" => ' deleted a user account.',
+			"deleted_user_content" => ' deleted all the content from a user.',
 
 			"approved_calendar" => ' approved a calendar and games database submission.',
 
@@ -125,6 +125,9 @@ if (!isset($_GET['view']))
 			"new_livestream_event" => ' added a new livestream event.',
 			"edit_livestream_event" => ' edited a livestream event.',
 			'deleted_livestream_event' => ' deleted a livestream event.',
+			"new_livestream_submission" => ' sent a livestream event for review.',
+			"accepted_livestream_submission" => ' accepted a livestream submission.',
+			"denied_livestream_submission" => ' denied a livestream submission.',
 
 			"goty_game_submission" => ' submitted a GOTY game for review.',
 			"goty_game_added" => ' added a GOTY game'

@@ -10,6 +10,14 @@
 </div>
 [/block: edit_top]
 
+[block: submit_top]
+<div class="box">
+	<div class="head">
+		Manage livestream event submissions
+	</div>
+</div>
+[/block: submit_top]
+
 [block: item]
 <script src="includes/jscripts/jquery.form.min.js"></script>
 <form method="post" action="admin.php?module=games">
@@ -51,7 +59,7 @@
 					Streamer: <em>Enter the usernames of who is presenting it</em><br />
 					<select tabindex="-1" multiple="" name="user_ids[]" class="livestream_user_ids" style="width:300px" class="populate select2-offscreen">{:users_list}</select><br />
 					Enter if not listed: <input type="text" name="community_name" value="{:community_name}" /><br />
-					<label><input type="checkbox" name="community" {:community_check}/> Community stream <em>If it's not a GOL livestream, tick this</em></label><br />
+					<label><input type="checkbox" name="community" {:community_check} {:disabled_check}/> Community stream <em>If it's not a GOL livestream, tick this</em></label><br />
 					Stream url <em>Enter if it's not a GOL stream</em> <input type="text" name="stream_url" value="{:stream_url}" />
 				</div>
 			</div>
@@ -75,3 +83,28 @@
 </div>
 </form>
 [/block: edit_bottom]
+
+[block: submitted_bottom]
+<div class="box">
+	<div class="body group">
+		<button formaction="admin.php?module=livestreams" name="act" value="approve_submission" type="submit">Approve</button> <button formaction="admin.php?module=livestreams" name="act" value="deny_submission" type="submit">Deny</button>
+		<input type="hidden" name="id" value="{:id}" />
+	</div>
+</div>
+</form>
+[/block: submitted_bottom]
+
+[block: deny_reason]
+<div class="box">
+	<div class="head">Denying the "{:title}" livestream submission from {:username}</div>
+	<div class="body group">
+		<form method="post">
+			Please enter a reason why to let them know:<br />
+			<textarea name="message" rows="10"></textarea><br />
+			<button type="submit" name="go" value="deny">Deny</button> <button type="submit" name="go" value="nope">Go back</button>
+			<input type="hidden" name="id" value="{:id}" />
+			<input type="hidden" name="act" value="deny_submission" />
+		</form>
+	</div>
+</div>
+[/block: deny_reason]

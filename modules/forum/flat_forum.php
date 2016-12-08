@@ -13,6 +13,14 @@ if (isset($_GET['message']))
 $templating->merge('flat_forum');
 $templating->block('top');
 
+$db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 0 ORDER BY `name` ASC");
+$options = '';
+while ($forum_list = $db->fetch())
+{
+	$options .= '<option value="'.$forum_list['forum_id'].'">'.$forum_list['name'].'</option>';
+}
+$templating->set('forum_list_search', $options);
+
 // paging for pagination
 if (!isset($_GET['page']) || $_GET['page'] <= 0)
 {

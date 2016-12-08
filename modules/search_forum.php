@@ -6,6 +6,14 @@ $templating->merge('forum_search');
 $templating->block('top');
 $templating->set('url', core::config('website_url'));
 
+$db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 0 ORDER BY `name` ASC");
+$options = '';
+while ($forum_list = $db->fetch())
+{
+	$options .= '<option value="'.$forum_list['forum_id'].'">'.$forum_list['name'].'</option>';
+}
+$templating->set('forum_list_search', $options);
+
 $strict_check = '';
 if (isset($_GET['strict']))
 {
@@ -24,6 +32,11 @@ $templating->set('search_text', $search_text);
 
 if (isset($search_text) && !empty($search_text))
 {
+	$search_sql = '';
+	if ($_GET['forums'] != 'all')
+	{
+		$search_sql = ' AND t.`forum_id` IN ('.$_GET['forums'].')';
+	}
 	if (!isset($_GET['strict']))
 	{
 		// do the search query
@@ -35,7 +48,7 @@ if (isset($search_text) && !empty($search_text))
 		)
 		AGAINST (
 		? IN BOOLEAN MODE
-		)
+		) $search_sql
 		ORDER BY t.creation_date DESC
 		LIMIT 0 , 30", array($search_text));
 	}
@@ -53,7 +66,7 @@ if (isset($search_text) && !empty($search_text))
 		)
 		AGAINST (
 		? IN BOOLEAN MODE
-		)
+		) $search_sql
 		ORDER BY t.creation_date DESC
 		LIMIT 0 , 30", array($search_text));
 	}

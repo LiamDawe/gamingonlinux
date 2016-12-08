@@ -529,6 +529,11 @@ jQuery(document).ready(function()
       data = JSON.parse(data);
       if (data.result == 1)
       {
+        // adjust the navbar counter if this was an unread item
+        if($('#note-' + note_id + ' img').hasClass('envelope'))
+        {
+          $('#notes-counter').html(parseInt($('#notes-counter').html(), 10)-1);
+        }
         $('#note-' + note_id).find('span').remove();
         $('#note-' + note_id).fadeOut(500);
       }

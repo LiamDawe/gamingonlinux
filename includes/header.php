@@ -340,7 +340,7 @@ else if ($_SESSION['user_id'] > 0)
 	{
 		$alerts_icon = 'envelope';
 		$alert_box_type = 'new';
-		$alerts_indicator = " <span class=\"badge badge-important\">$alerts_counter</span>";
+		$alerts_indicator = " <span id=\"notes-counter\" class=\"badge badge-important\">$alerts_counter</span>";
 	}
 
 	// replace everything in the notifications menu block

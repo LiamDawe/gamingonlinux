@@ -25,6 +25,10 @@ if (!isset($_GET['go']))
 		{
 			$core->message('All read notifications removed!');
 		}
+		if ($_GET['message'] == 'removed_all')
+		{
+			$core->message('All read notifications removed!');
+		}
 	}
 
 	$templating->block('top', 'usercp_modules/notifications');
@@ -140,7 +144,7 @@ else if (isset($_GET['go']))
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
 			$templating->set_previous('title', 'Clear all notifications', 1);
-			$core->yes_no('Are you sure you want to clear all notifications?', url."usercp.php?module=notifications&go=clear_all");
+			$core->yes_no('Are you sure you want to clear all notifications? This cannot be undone!', url."usercp.php?module=notifications&go=clear_all");
 		}
 
 		else if (isset($_POST['no']))
@@ -160,7 +164,7 @@ else if (isset($_GET['go']))
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
 			$templating->set_previous('title', 'Remove all read notifications', 1);
-			$core->yes_no('Are you sure you want to remove all read notifications?', url."usercp.php?module=notifications&go=remove_read");
+			$core->yes_no('Are you sure you want to remove all read notifications? This cannot be undone!', url."usercp.php?module=notifications&go=remove_read");
 		}
 
 		else if (isset($_POST['no']))
@@ -172,6 +176,26 @@ else if (isset($_GET['go']))
 		{
 			$db->sqlquery("DELETE FROM `user_notifications` WHERE `seen` = 1 AND `owner_id` = ?", array($_SESSION['user_id']));
 			header("Location: /usercp.php?module=notifications&message=removed_read");
+		}
+	}
+
+	if ($_GET['go'] == 'remove_all')
+	{
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Remove all read notifications', 1);
+			$core->yes_no('Are you sure you want to remove all notifications (unread and read)? This cannot be undone!', url."usercp.php?module=notifications&go=remove_all");
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: /usercp.php?module=notifications");
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$db->sqlquery("DELETE FROM `user_notifications` WHERE `owner_id` = ?", array($_SESSION['user_id']));
+			header("Location: /usercp.php?module=notifications&message=removed_all");
 		}
 	}
 }

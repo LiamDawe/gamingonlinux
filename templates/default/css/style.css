@@ -1071,6 +1071,13 @@ body.dark {
 .dark ul.pagination li span,.dark ul.pagination li a {
 	color: #ffffff;
 }
+.dark .pagination-disabled {
+	background: #202020 !important;
+}
+.dark ul.pagination li.active a {
+	background: #202020 !important;
+}
+.dark .subhead {background-color: #202020;}
 .dark .livestream {
 	background: #111111;
 }
@@ -1334,7 +1341,8 @@ div.cal:nth-child(odd) {background: #FFF}
 }
 
 .dark .bbcodeblock, .dark .bbcodeblock:before {
-    color: black;
+    color: #ccc;
+		background-color: #383838;
 }
 
 div.announce:nth-of-type(odd) {background: #609FA9; margin-bottom: 7px; color: #000}

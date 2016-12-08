@@ -44,3 +44,6 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/moment/ (MIT)
 - http://momentjs.com/timezone/
+
+- Gallery avatars
+- https://openclipart.org/ (Public Domain)

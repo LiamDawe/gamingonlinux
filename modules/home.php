@@ -56,16 +56,17 @@ if (!isset($_GET['view']))
 	$count_announcements = $db->fetch();
 	if ($count_announcements['count'] > 0)
 	{
-		$templating->block('announcement_top', 'home');
+		$templating->merge('announcements');
+		$templating->block('announcement_top', 'announcements');
 
 		$db->sqlquery("SELECT `text` FROM `announcements` ORDER BY `id` DESC");
 		while ($announcement = $db->fetch())
 		{
-			$templating->block('announcement', 'home');
+			$templating->block('announcement', 'announcements');
 			$templating->set('text', bbcode($announcement['text']));
 		}
 
-		$templating->block('announcement_bottom', 'home');
+		$templating->block('announcement_bottom', 'announcements');
 	}
 
 	$templating->block('articles_top', 'home');

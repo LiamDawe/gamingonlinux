@@ -518,4 +518,20 @@ class user
 		}
 		return $new_user_badge;
 	}
+
+	public function delete_user_notification($note_id)
+	{
+		global $db;
+		
+		$db->sqlquery("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array($note_id));
+		$checker = $db->fetch();
+		if ($checker['owner_id'] != $_SESSION['user_id'])
+		{
+			return false;
+		}
+
+		$db->sqlquery("DELETE FROM `user_notifications` WHERE `id` = ?", array($note_id));
+
+		return true;
+	}
 }

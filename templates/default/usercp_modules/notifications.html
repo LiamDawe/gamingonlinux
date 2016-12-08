@@ -16,11 +16,11 @@
 [/block: read]
 
 [block: row]
-<div class="box"><div class="body group"><img src="/templates/default/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> replied to "<a href="{:link}">{:title}</a>"</div></div>
+<div id="note-{:id}" class="box"><div class="body group"><img src="/templates/default/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> replied to "<a href="{:link}">{:title}</a>"<span class="fright" style="clear: both;"><a href="#" class="delete_notification" data-note-id="{:id}">&#10799;</a></span></div></div>
 [/block: row]
 
 [block: liked_row]
-<div class="box"><div class="body group"><img src="/templates/default/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> {:additional_likes} liked your comment on "<a href="{:link}">{:title}</a>"</div></div>
+<div id="note-{:id}" class="box"><div class="body group"><img src="/templates/default/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> {:additional_likes} liked your comment on "<a href="{:link}">{:title}</a>"<span class="fright"><a href="#" class="delete_notification" data-note-id="{:id}">&#10799;</a></span></div></div>
 
 [/block: liked_row]
 

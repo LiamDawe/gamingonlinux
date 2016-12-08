@@ -149,7 +149,7 @@ jQuery(document).ready(function()
       $($toggle).addClass('toggle-active');
     }
   });
-  
+
   // hide the toggle-nav if you click outside of it
   $(document).on("click", function () {
     $(".toggle-content").removeClass('toggle-active');
@@ -516,6 +516,24 @@ jQuery(document).ready(function()
       }
     }); //end of .post callback
 }); //end of .click callback
+
+  // delete a single notification from the users list
+  var $this_link = $('.delete_notification').click(function()
+  {
+    event.preventDefault();
+    var note_id = $(this).data('note-id');
+
+    $.post('/includes/ajax/delete-notification.php', {'note_id':note_id},
+    function(data)
+    {
+      data = JSON.parse(data);
+      if (data.result == 1)
+      {
+        $('#note-' + note_id).find('span').remove();
+        $('#note-' + note_id).fadeOut(500);
+      }
+    });
+  });
 
   $(".poll_content").on("click", ".close_poll", function()
   {

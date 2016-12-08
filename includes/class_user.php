@@ -155,7 +155,7 @@ class user
 			{
 				// send email about new device
 				$message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
-				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the GamingOnLinux website you may want to let <a href=\"https://www.gamingonlinux.com/profiles/1\">TheBoss</a> and <a href=\"https://www.gamingonlinux.com/profiles/432\">Levi</a> know and change your password immediately.</p>
+				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the GamingOnLinux website you may want to let <a href=\"https://www.gamingonlinux.com/profiles/1\">liamdawe</a> know and change your password immediately.</p>
 				<div>
 				<hr>
 				Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "
@@ -522,7 +522,7 @@ class user
 	public function delete_user_notification($note_id)
 	{
 		global $db;
-		
+
 		$db->sqlquery("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array($note_id));
 		$checker = $db->fetch();
 		if ($checker['owner_id'] != $_SESSION['user_id'])

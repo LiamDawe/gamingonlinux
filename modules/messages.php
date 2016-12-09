@@ -44,7 +44,7 @@ else
 		$templating->set('compose_link', $compose_link);
 
 		// count them for pagination
-		$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_info` WHERE `owner_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT i.`conversation_id` FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.participant_id = i.owner_id AND p.conversation_id = i.conversation_id WHERE i.`owner_id` = ?", array($_SESSION['user_id']));
 		$total = $db->num_rows();
 
 		// sort out the pagination link
@@ -112,16 +112,21 @@ else
 			$templating->set('last_reply_username', "<a href=\"/profiles/{$message['last_user_id']}/\">{$message['last_username']}</a>");
 		}
 
-		$templating->block('bottom');
-		if (core::config('pretty_urls') == 1)
+		if ($total > 0)
 		{
-			$compose_link = '/private-messages/compose/';
+			$templating->block('bottom');
+			if (core::config('pretty_urls') == 1)
+			{
+				$compose_link = '/private-messages/compose/';
+			}
+			else {
+				$compose_link = core::config('website_url') . 'index.php?module=messages&view=compose';
+			}
+			$templating->set('compose_link', $compose_link);
+
+			$templating->block('pagination');
+			$templating->set('pagination', $pagination);
 		}
-		else {
-			$compose_link = core::config('website_url') . 'index.php?module=messages&view=compose';
-		}
-		$templating->set('compose_link', $compose_link);
-		$templating->set('pagination', $pagination);
 	}
 
 	// if editing a message
@@ -454,6 +459,8 @@ else
 				$templating->set('edit_link', $edit_link);
 			}
 
+			$templating->block('view_bottom', 'private_messages');
+
 			// Stop them from replying if it's only them left in the convo
 			if ($count_participants != 1)
 			{
@@ -462,7 +469,7 @@ else
 
 				$core->editor('text', '');
 
-				$templating->block('view_bottom', 'private_messages');
+				$templating->block('reply_bottom', 'private_messages');
 				$templating->set('conversation_id', $start['conversation_id']);
 
 				$templating->block('preview', 'private_messages');

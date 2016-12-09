@@ -18,8 +18,11 @@
 <div class="box">
 	<div class="body group"><a href="{:compose_link}">Compose New PM</a></div>
 </div>
-{:pagination}
 [/block: bottom]
+
+[block: pagination]
+{:pagination}
+[/block: pagination]
 
 [block: compose_top]
 <form method="post" action="/index.php?module=messages">
@@ -113,6 +116,10 @@
 [/block: view_row_reply]
 
 [block: view_bottom]
+</div></div>
+[/block: view_bottom]
+
+[block: reply_bottom]
 	<div class="box">
 		<div class="body group">
 			<button type="submit" name="act" value="Reply">Reply</button><button id="preview_text_button" type="button">Preview Reply</button><button formaction="/index.php?module=messages" type="submit" name="act" value="Delete">Delete Message</button>
@@ -120,7 +127,7 @@
 		</div>
 	</div>
 </form>
-[/block: view_bottom]
+[/block: reply_bottom]
 
 [block: preview]
 <div class="preview_pm">
@@ -132,7 +139,6 @@
 [/block: preview]
 
 [block: reply]
-</div></div>
 {:pagination}
 <form method="post" action="/index.php?module=messages">
 [/block: reply]

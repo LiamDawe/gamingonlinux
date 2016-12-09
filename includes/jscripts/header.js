@@ -518,7 +518,7 @@ jQuery(document).ready(function()
 }); //end of .click callback
 
   // delete a single notification from the users list
-  var $this_link = $('.delete_notification').click(function()
+  var $this_link = $('.delete_notification').click(function(event)
   {
     event.preventDefault();
     var note_id = $(this).data('note-id');

@@ -60,7 +60,7 @@ $categorys_list = '';
 $db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
 while ($categorys = $db->fetch())
 {
-  if (isset($_GET['error']))
+  if (isset($_GET['error']) || isset($_GET['dump']))
   {
     if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
     {
@@ -80,7 +80,7 @@ $tagline = '';
 $tagline_image = '';
 $previously_uploaded = '';
 
-if (isset($_GET['error']))
+if (isset($_GET['error']) || isset($_GET['dump']))
 {
   $title = $_SESSION['atitle'];
   $tagline = $_SESSION['atagline'];

@@ -76,6 +76,36 @@ function remove_bbcode($string)
 	return preg_replace($pattern, $replace, $string);
 }
 
+function article_dump($dump)
+{
+	$sections = array();
+
+	// title
+	$pattern = '/\=title\=(.+?)\=title\=/is';
+
+	preg_match($pattern, $dump, $title);
+	$sections['title'] = $title[1];
+
+	// tags
+	$pattern = '/\=tags\=(.+?)\=tags\=/is';
+
+	preg_match($pattern, $dump, $tags);
+	$sections['tags'] = $tags[1];
+
+	// tagline
+	$pattern = '/\=tagline\=(.+?)\=tagline\=/is';
+
+	preg_match($pattern, $dump, $tagline);
+	$sections['tagline'] = $tagline[1];
+
+	// text
+	$pattern = '/\=text\=(.+?)\=text\=/is';
+
+	preg_match($pattern, $dump, $text);
+	$sections['text'] = $text[1];
+
+	return $sections;
+}
 function quotes($body, $rss = 0)
 {
 	// Quoting an actual person, book or whatever

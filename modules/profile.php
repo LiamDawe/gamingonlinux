@@ -16,7 +16,7 @@ if (isset($_GET['user_id']))
 			$db_grab_fields .= "{$field['db_field']},";
 		}
 
-		$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+		$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip`, `game_developer` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 		if ($db->num_rows() != 1)
 		{
 			$core->message('That person does not exist here!');
@@ -74,6 +74,14 @@ if (isset($_GET['user_id']))
 				{
 					$editor_badge = " <span class=\"badge editor\">Contributing Editor</span> ";
 				}
+
+				$developer_badge = '';
+				if ($comments['game_developer'] == 1)
+				{
+					$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
+				}
+
+				$templating->set('developer_badge', $developer_badge);
 
 				$templating->set('editor_badge', $editor_badge);
 

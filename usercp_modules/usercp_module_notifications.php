@@ -33,21 +33,22 @@ if (!isset($_GET['go']))
 
 	$templating->block('top', 'usercp_modules/notifications');
 
-	$clear_all_link = '';
 	$pagination = '';
 
 	if ($_SESSION['display_comment_alerts'] == 1)
 	{
 		// count how many there is in total
-		$db->sqlquery("SELECT `id` FROM `user_notifications` WHERE `owner_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `id` FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `date`", array($_SESSION['user_id']));
 		$total_notifications = $db->num_rows();
 
 		if ($total_notifications > 0)
 		{
+			$pagination = $core->pagination_link(15, $total_notifications, "usercp.php?module=notifications&", $page);
+
 			$unread_array = array();
 			$read_array = array();
 			// show the notifications here
-			$db->sqlquery("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.is_like, n.total, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC", array($_SESSION['user_id']));
+			$db->sqlquery("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.is_like, n.total, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start));
 			while ($note_list = $db->fetch())
 			{
 				if ($note_list['is_like'] == 0)
@@ -132,7 +133,6 @@ if (!isset($_GET['go']))
 		$templating->block('bottom', 'usercp_modules/notifications');
 
 		// sort out the pagination link
-		$pagination = $core->pagination_link(9, $total_notifications, "usercp.php?module=notifications&", $page);
 		$templating->set('pagination', $pagination);
 	}
 }

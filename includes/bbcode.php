@@ -76,6 +76,7 @@ function remove_bbcode($string)
 	return preg_replace($pattern, $replace, $string);
 }
 
+// this is the replacement function the the article dump module in admin, it sorts the different sections and splits them
 function article_dump($dump)
 {
 	$sections = array();
@@ -106,6 +107,7 @@ function article_dump($dump)
 
 	return $sections;
 }
+
 function quotes($body, $rss = 0)
 {
 	// Quoting an actual person, book or whatever

@@ -42,7 +42,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	unset($_SESSION['image_rand']);
 
 	// email all editors apart from yourself
-	$db->sqlquery("SELECT `user_id`, `email`, `username` FROM `users` WHERE `user_group` IN (1,2) AND `user_id` != ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `user_id`, `email`, `username` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
 	$users_array = array();
 	while ($users = $db->fetch())
 	{

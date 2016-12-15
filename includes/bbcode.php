@@ -49,6 +49,51 @@ function do_charts($body)
 	return $body;
 }
 
+function replace_giveaways($text, $giveaway_id)
+{
+	global $db;
+
+	$key_claim = '';
+
+	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+	{
+		$db->sqlquery("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id));
+		$get_name = $db->fetch();
+
+		$db->sqlquery("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", array($giveaway_id));
+		$keys_left = $db->fetch();
+
+		$db->sqlquery("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", array($_SESSION['user_id'], $giveaway_id));
+		$your_key = $db->fetch();
+
+		// they have a key already
+		if ($your_key['counter'] == 1)
+		{
+			$key_claim = '[b]Grab a key[/b]<br />You already claimed one: ' . $your_key['game_key'];
+		}
+		// they do not have a key
+		else if ($your_key['counter'] == 0)
+		{
+			if ($keys_left['counter'] == 0)
+			{
+				$key_claim = '[b]Grab a key[/b]<br />All keys are now gone, sorry!';
+			}
+			else if ($keys_left['counter'] > 0)
+			{
+				$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$get_name['id'].'" href="#">click here to claim</a></div><br />';
+			}
+		}
+
+		$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", $key_claim, $text);
+	}
+	else
+	{
+		$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", '[b]Grab a key[/b]<br />You must be logged in to grab a key!', $text);
+	}
+
+	return $text;
+}
+
 function replace_timer($matches)
 {
 	if (preg_match("/\*time-only/is", $matches[0]))
@@ -172,6 +217,14 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $r
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
 
 	$body = logged_in_code($body);
+
+	if (preg_match_all("/\[giveaway\](.+?)\[\/giveaway\]/is", $body, $giveaway_matches))
+	{
+		foreach ($giveaway_matches[1] as $match)
+		{
+			$body = replace_giveaways($body, $match);
+		}
+	}
 
 	$body = do_timers($body);
 

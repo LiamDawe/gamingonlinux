@@ -624,17 +624,34 @@ function(data){
   	$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
   });
 
+  // this controls the subscribe to comments link inside articles_full.php
+  $(document).on('click', '#claim_key', function(e)
+  {
+    e.preventDefault();
+
+    var giveaway_id = $(this).attr('data-game-id');
+    $.post('/includes/ajax/claim_key.php', { 'giveaway_id':giveaway_id },
+    function(data)
+    {
+      if (data.result == 1)
+      {
+        $('#key-area').text("Here's your key: " + data.key);
+      }
+    });
+  });
+
   $('.votebutton').click(function() {
   	var button = $(this);
   	var category_id = $(this).data('category-id');
   	var game_id = $(this).data('game-id');
   	$.post('/includes/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
-  	function(data){
+  	function(data)
+    {
   	    if (data.result == 1){ //data needs to be valid json:  {result: true}
   			$(button).html('Vote Saved!');
   			$(button).addClass("vote_done");
   			$.fancybox.open({type:"inline", href:"#wrap"})
-  	    }
+  	}
   		else if (data.result == 2)
   		{
   			document.getElementById("wrap_text").innerHTML = "Sorry, but voting is closed!";

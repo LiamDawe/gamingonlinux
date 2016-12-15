@@ -54,6 +54,16 @@ if (!isset($_GET['go']))
 				if ($note_list['is_like'] == 0)
 				{
 					$note_row = $templating->block_store('row', 'usercp_modules/notifications');
+					if ($note_list['total'] > 1)
+					{
+						$total = $note_list['total'] - 1;
+						$additional_comments = ' plus ' . $total . ' more comments';
+					}
+					else if ($note_list['total'] == 1)
+					{
+						$additional_comments = '';
+					}
+					$note_row = $templating->store_replace($note_row, array('additional_comments' => $additional_comments));
 				}
 				else
 				{

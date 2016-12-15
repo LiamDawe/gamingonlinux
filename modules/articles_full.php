@@ -1162,8 +1162,29 @@ else if (isset($_GET['go']))
 									$users_array[$email_user['user_id']]['email_options'] = $email_user['email_options'];
 								}
 
-								$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
-								$new_notification_id = $db->grab_id();
+								$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0", array($article_id, $email_user['user_id']));
+								$check_exists = $db->num_rows();
+								$get_note_info = $db->fetch();
+								if ($check_exists == 0)
+								{
+									$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+									$new_notification_id = $db->grab_id();
+								}
+								else if ($check_exists == 1)
+								{
+									// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
+									if ($get_note_info['seen'] == 1)
+									{
+										$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
+									}
+									// they haven't seen this note before, so add one to the counter and update the date
+									else if ($get_note_info['seen'] == 0)
+									{
+										$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
+									}
+									$new_notification_id = $get_note_info['id'];
+								}
+
 							}
 
 							// send the emails
@@ -1334,11 +1355,53 @@ else if (isset($_GET['go']))
 					$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
 					$db->sqlquery("DELETE FROM `likes` WHERE `comment_id` = ?", array($_GET['comment_id']));
 
+					// update notifications
+
+					// find any notifications caused by the deleted comment
+	        $db->sqlquery("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `is_like` = 0 AND `article_id` = ?", array($comment['article_id']));
+					$current_notes = $db->fetch_all_rows();
+					foreach ($current_notes as $this_note)
+	        {
+						// if this wasn't the only comment made for that notification
+		        if ($this_note['total'] >= 2)
+		        {
+							// if the one deleted is the original comment we were notified about
+							if ($this_note['comment_id'] == $_GET['comment_id'])
+							{
+								// find the last available comment
+								$db->sqlquery("SELECT `author_id`, `comment_id`, `time_posted` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `time_posted` DESC LIMIT 1", array($this_note['article_id']));
+								$last_comment = $db->fetch();
+
+								$seen = '';
+
+								// if the last time they saw this notification was before the date of the new last like, they haven't seen it
+								if ($last_comment['time_posted'] > $this_note['seen_date'])
+								{
+									$seen = 0;
+								}
+								else
+								{
+									$seen = 1;
+								}
+
+								$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($last_comment['time_posted'], $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
+							}
+							// no matter what we need to adjust the counter
+		          $db->sqlquery("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
+		        }
+		        // it's the only comment they were notified about, so just delete the notification to completely remove it
+		        else if ($this_note['total'] == 1)
+		        {
+		          $db->sqlquery("DELETE FROM `user_notifications` WHERE `id` = ?", array($this_note['id']));
+		        }
+					}
+
 					if (core::config('pretty_urls') == 1)
 					{
 						header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 					}
-					else {
+					else
+					{
 						header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
 					}
 				}

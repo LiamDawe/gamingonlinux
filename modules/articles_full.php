@@ -552,12 +552,12 @@ if (!isset($_GET['go']))
 									$username = $comments['guest_username'];
 								}
 							}
-							$quote_username = preg_replace('/[^A-Za-z0-9 -]+/', "", $comments['guest_username']);
+							$quote_username = $comments['guest_username'];
 						}
 						else
 						{
 							$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
-							$quote_username = preg_replace('/[^A-Za-z0-9 -]+/', "", $comments['username']);
+							$quote_username = $comments['username'];
 						}
 
 						$pc_info = '';

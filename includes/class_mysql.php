@@ -83,7 +83,10 @@ class mysql
 			if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
 			{
 				$trace = $error->getTrace();
-				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br />" . '<strong>Query:</strong> ' . $sql, NULL, 1);
+				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br /><strong>Line:</strong> " . $trace[2]['line'] . '<br /><strong>Query:</strong> ' . $sql, NULL, 1);
+				// stop the script for the admin and editors so they can't miss it and so they can see the error if case of any header redirects
+				include('includes/footer.php');
+				die();
 			}
 			else
 			{
@@ -95,7 +98,26 @@ class mysql
 
 	public function fetch()
 	{
-		return $this->last->fetch();
+		global $core;
+
+		try
+		{
+			$result = $this->last->fetch();
+			return $result;
+		}
+		catch (Exception $error)
+		{
+			if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
+			{
+				$trace = $error->getTrace();
+				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br /><strong>Line:</strong> " . $trace[2]['line'], NULL, 1);
+			}
+			else
+			{
+				$core->message("Something went wrong. The admin will be notified", NULL, 1);
+				$this->pdo_error($error->getMessage(), $trace[2]['file'], $sql, $referrer);
+			}
+		}
 	}
 
 	public function fetch_all_rows($mode = NULL)

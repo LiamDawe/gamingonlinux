@@ -1,0 +1,21 @@
+[block: giveaway_add]
+<div class="box">
+	<div class="head">Add a new giveaway</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=giveaways">
+			Game name: <input type="text" name="name" /><br />
+			Game keys, put each one on a new line.<br />
+			<textarea name="list" cols="100" rows="10"></textarea><br />
+			<button type="submit" name="act" value="add">Add</button>
+		</form>
+	</div>
+</div>
+[/block: giveaway_add]
+
+[block: manage_top]
+<div class="box"><div class="head">Manage current giveaways NOT FINISHED</div></div>
+[/block: manage_top]
+
+[block: row]
+<div class="box"><div class="body group">{:name}</div></div>
+[/block: row]

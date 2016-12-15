@@ -80,7 +80,7 @@ function replace_giveaways($text, $giveaway_id)
 			}
 			else if ($keys_left['counter'] > 0)
 			{
-				$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$get_name['id'].'" href="#">click here to claim</a></div><br />';
+				$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$get_name['id'].'" href="#">click here to claim</a></div>';
 			}
 		}
 

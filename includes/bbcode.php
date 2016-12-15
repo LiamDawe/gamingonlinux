@@ -155,20 +155,40 @@ function article_dump($dump)
 
 function quotes($body, $rss = 0)
 {
+	global $db;
+
 	// Quoting an actual person, book or whatever
 	$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
 
-	if ($rss == 0)
+	while(preg_match($pattern, $body, $matches))
 	{
-		$replace = "<blockquote><cite>$1</cite>$2</blockquote>";
-	}
-	else if ($rss == 1)
-	{
-		$replace = "<blockquote><cite>$1</cite><br />$2</blockquote>";
-	}
+		if ($rss == 0)
+		{
+			$db->sqlquery("SELECT `username`, `user_id` FROM `users` WHERE `username` = ?", array($matches[1]));
+			if ($db->num_rows() == 1)
+			{
+				$get_quoted = $db->fetch();
+				if (core::config('pretty_urls') == 1)
+				{
+					$profile_link = '/profiles/' . $get_quoted['user_id'];
+				}
+				else
+				{
+					$profile_link = '/index.php?module=profile&user_id=' . $get_quoted['user_id'];
+				}
+				$replace = '<blockquote><cite><a href="'.$profile_link.'">$1</a></cite>$2</blockquote>';
+			}
+			else
+			{
+				$replace = "<blockquote><cite>$1</cite>$2</blockquote>";
+			}
 
-	while(preg_match($pattern, $body))
-	{
+		}
+		else if ($rss == 1)
+		{
+			$replace = "<blockquote><cite>$1</cite><br />$2</blockquote>";
+		}
+
 		$body = preg_replace($pattern, $replace, $body);
 	}
 

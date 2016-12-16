@@ -88,9 +88,9 @@ class mysql
 
 		catch (Exception $error)
 		{
-			if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
+			$trace = $error->getTrace();
+			if (isset($_SESSION['user_grup']) && ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2))
 			{
-				$trace = $error->getTrace();
 				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br /><strong>Line:</strong> " . $trace[2]['line'] . '<br /><strong>Query:</strong> ' . $sql, NULL, 1);
 				echo $templating->output();
 				die();

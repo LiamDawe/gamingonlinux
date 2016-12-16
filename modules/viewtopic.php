@@ -538,9 +538,8 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
-					$all_posts = $db->fetch_all_rows();
-					foreach ($all_posts as $post)
+					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
+					while ($post = $get_replies->fetch())
 					{
 						if ($page > 1 && $reply_count == 0)
 						{

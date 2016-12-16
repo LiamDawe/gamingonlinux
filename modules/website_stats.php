@@ -9,8 +9,8 @@ $templating->block('top');
 $templating->block('users');
 $templating->set('total_users', number_format(core::config('total_users')));
 
-$db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM `users` WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
-$count_monthly_users = $db->fetch();
+$count_new_users = $db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM `users` WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
+$count_monthly_users = $count_new_users->fetch();
 
 $templating->set('users_month', number_format($count_monthly_users['counter']));
 
@@ -28,10 +28,10 @@ $comments_24 = $db->fetch();
 $templating->set('total_comments', number_format($comments_24['total']));
 
 // list who wrote articles for GOL since the start of last month
-$db->sqlquery("SELECT COUNT( DISTINCT a.article_id ) AS `counter`, u.username, u.user_id, (SELECT `date` FROM `articles` WHERE author_id = a.author_id ORDER BY `article_id` DESC LIMIT 1) as last_date FROM `articles` a LEFT JOIN `users` u ON u.user_id = a.author_id LEFT JOIN `article_category_reference` c ON a.`article_id` = c.`article_id`
+$article_list = $db->sqlquery("SELECT COUNT( DISTINCT a.article_id ) AS `counter`, u.username, u.user_id, (SELECT `date` FROM `articles` WHERE author_id = a.author_id ORDER BY `article_id` DESC LIMIT 1) as last_date FROM `articles` a LEFT JOIN `users` u ON u.user_id = a.author_id LEFT JOIN `article_category_reference` c ON a.`article_id` = c.`article_id`
 WHERE MONTH(FROM_UNIXTIME(a.`date`)) >= MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH)) AND YEAR(FROM_UNIXTIME(a.`date`)) = YEAR(CURRENT_DATE) AND a.`active` = 1 AND c.`category_id` NOT IN (63) GROUP BY u.`username` ORDER BY `counter` DESC, a.date DESC");
 
-$templating->block('articles');
+$templating->block('articles', 'website_stats');
 $author_list = '';
 
 $last_month = date("j M Y", strtotime("first day of previous month"));
@@ -51,7 +51,7 @@ else
 
 $counter = 0;
 
-while ($fetch_authors = $db->fetch())
+while ($fetch_authors = $article_list->fetch())
 {
 	if ($counter == 0)
 	{

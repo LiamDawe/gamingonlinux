@@ -166,10 +166,10 @@ function quotes($body, $rss = 0)
 	{
 		if ($rss == 0)
 		{
-			$db->sqlquery("SELECT `username`, `user_id` FROM `users` WHERE `username` = ?", array($matches[1]));
+			$find_quoted = $db->sqlquery("SELECT `username`, `user_id` FROM `users` WHERE `username` = ?", array($matches[1]));
 			if ($db->num_rows() == 1)
 			{
-				$get_quoted = $db->fetch();
+				$get_quoted = $find_quoted->fetch();
 				if (core::config('pretty_urls') == 1)
 				{
 					$profile_link = '/profiles/' . $get_quoted['user_id'];

@@ -12,6 +12,9 @@ class mysql
 	//Last query that ran
 	protected $last;
 
+	// the current statement
+	private $stmt;
+
 	// the database connection
 	protected $database;
 
@@ -31,51 +34,56 @@ class mysql
 		return ( strpos( $value, "." ) !== false );
 	}
 
+	// bind a placeholder to it's value
+	public function bind($param, $value, $type = null)
+	{
+		if (is_null($type))
+		{
+				switch (true)
+				{
+						case is_int($value):
+								$type = PDO::PARAM_INT;
+								break;
+						case is_bool($value):
+								$type = PDO::PARAM_BOOL;
+								break;
+						case is_null($value):
+								$type = PDO::PARAM_NULL;
+								break;
+						default:
+								$type = PDO::PARAM_STR;
+				}
+		}
+		$this->stmt->bindValue($param, $value, $type);
+	}
+
 	// the main sql query function
 	public function sqlquery($sql, $objects = NULL, $page = NULL, $referrer = NULL)
 	{
-		global $core;
+		global $core, $templating;
 
 		try
 		{
-			$STH = $this->database->prepare($sql);
+			$this->stmt = $this->database->prepare($sql);
 			if (is_array($objects))
 			{
 				foreach($objects as $k=>$p)
 				{
-					// +1 is needed as arrays start at 0 where as ? placeholders start at 1 in PDO
-					if(is_numeric($p))
-					{
-						// we need to do this or else decimals always seem to end up 'x.00', php has no decimal check, odd
-						// A number with decimal places is called a float or double in programming @ Piratelv
-						if ($this->contains_decimal($p) == true)
-						{
-							$STH->bindValue($k+1, $p, PDO::PARAM_STR);
-						}
-
-						else
-						{
-							$STH->bindValue($k+1, (int)$p, PDO::PARAM_INT);
-						}
-					}
-					else
-					{
-						$STH->bindValue($k+1, $p, PDO::PARAM_STR);
-					}
+					$this->bind($k+1, $p);
 				}
 			}
 
-			$this->queries .= '<pre>' . $STH->interpolateQuery() . '</pre>';
+			// add this to the list of queries being done for debugging
+			$this->queries .= '<pre>' . $this->stmt->interpolateQuery() . '</pre>';
 
-			$this->last = new db_result($STH);
-
+			// update the counter for how many queries are being done
 			$this->counter++;
 
-			//Return the result object
-			$this->last->execute();
-			$this->last->setID($this->grab_id());
 
-			return $this->last;
+			$this->execute();
+
+			// return the result to fetch somehow
+			return $this->stmt;
 		}
 
 		catch (Exception $error)
@@ -84,33 +92,37 @@ class mysql
 			{
 				$trace = $error->getTrace();
 				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br /><strong>Line:</strong> " . $trace[2]['line'] . '<br /><strong>Query:</strong> ' . $sql, NULL, 1);
-				// stop the script for the admin and editors so they can't miss it and so they can see the error if case of any header redirects
-				include('includes/footer.php');
+				echo $templating->output();
 				die();
 			}
 			else
 			{
 				$core->message("Something went wrong. The admin will be notified", NULL, 1);
 				$this->pdo_error($error->getMessage(), $trace[2]['file'], $sql, $referrer);
+				echo $templating->output();
+				die();
 			}
 		}
 	}
 
+	public function execute()
+	{
+		$this->stmt->execute();
+	}
+
 	public function fetch()
 	{
-		global $core;
-
-		return $this->last->fetch();
+		return $this->stmt->fetch();
 	}
 
 	public function fetch_all_rows($mode = NULL)
 	{
-		return $this->last->fetch_all_rows($mode);
+		return $this->stmt->fetchAll($mode);
 	}
 
 	public function num_rows()
 	{
-		return $this->last->num_rows();
+		return $this->stmt->rowCount();
 	}
 
 	// get the last auto made ID
@@ -119,6 +131,7 @@ class mysql
 		return $this->database->lastInsertId();
 	}
 
+	// email any mysql errors to liam so he cant miss them
 	function pdo_error($exception, $page, $sql, $referrer = NULL)
 	{
 		$to = "liamdawe@gmail.com";
@@ -155,10 +168,8 @@ class mysql
 	}
 }
 
+/*
 
-/**
-* Mysql Result
-*/
 class db_result implements ArrayAccess,Iterator
 {
 	public $success 	= false;
@@ -172,15 +183,8 @@ class db_result implements ArrayAccess,Iterator
 	}
 
 
-	public function execute($values=array())
+	public function execute()
 	{
-		if (!empty($values)){
-			foreach ($values as $k => $v) {
-				if (is_numeric($v) && !is_float($v)){
-					$values[$k] = (int) $v;
-				}
-			}
-		}
 		$this->success = $this->statement->execute();
 	}
 
@@ -207,9 +211,8 @@ class db_result implements ArrayAccess,Iterator
 		$this->id = (int) $id;
 	}
 
-	/**
-	 * @return int Last inserted ID at time of this query;
-	 **/
+	//@return int Last inserted ID at time of this query;
+
 	public function grab_id()
 	{
 		return $this->id;
@@ -217,7 +220,7 @@ class db_result implements ArrayAccess,Iterator
 
 
 
-	/**  Allow access like an array **/
+	//  Allow access like an array
 	public function offsetExists( $offset ){
 		if (!isset($this->data)){  $this->fetch_all_rows();	 }
 		return (isset($this->data[$offset]));
@@ -251,4 +254,4 @@ class db_result implements ArrayAccess,Iterator
 	public function valid() {
 	    return $this->offsetExists($this->position);
 	}
-}
+}*/

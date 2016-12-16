@@ -87,12 +87,12 @@ include('includes/bbcode.php');
 // if you are logged in check for banning
 if ($_SESSION['user_id'] != 0)
 {
-	$db->sqlquery("SELECT `banned` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']), 'header.php');
+	$db->sqlquery("SELECT `banned` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$banning_check = $db->fetch();
 
 	if ($banning_check['banned'] == 1)
 	{
-		$db->sqlquery("DELETE FROM `saved_sessions` WHERE `user_id` = ?", array($_SESSION['user_id']), 'header.php');
+		$db->sqlquery("DELETE FROM `saved_sessions` WHERE `user_id` = ?", array($_SESSION['user_id']));
 		setcookie('gol_stay', "",  time()-60, '/');
 		$_SESSION['user_id'] = 0;
 		$_SESSION['user_group'] = 4;

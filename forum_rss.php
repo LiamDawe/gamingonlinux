@@ -12,17 +12,6 @@ $templating = new template(core::config('template'));
 
 if (core::config('articles_rss') == 1)
 {
-	$limit = core::config('rss_article_limit');
-	if (isset($_GET['limit']) && is_numeric($_GET['limit']))
-	{
-		$limit = $_GET['limit'];
-
-		if ($limit > 50)
-		{
-			$limit = 50;
-		}
-	}
-
 	$now = date("D, d M Y H:i:s O");
 
 	$output = "<?xml version=\"1.0\"?>
@@ -36,7 +25,7 @@ if (core::config('articles_rss') == 1)
 			<pubDate>$now</pubDate>
 			<lastBuildDate>$now</lastBuildDate>";
 
-	$db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC LIMIT ?", array($limit));
+	$db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC LIMIT 15");
 
 	while ($line = $db->fetch())
 	{

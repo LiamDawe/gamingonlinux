@@ -21,8 +21,11 @@
 
 [block: liked_row]
 <div id="note-{:id}" class="box"><div class="body group"><img class="{:icon}" src="/templates/default/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> {:additional_likes} liked your comment on "<a href="{:link}">{:title}</a>"<span class="fright"><a href="#" class="delete_notification" data-note-id="{:id}">&#10799;</a></span></div></div>
-
 [/block: liked_row]
+
+[block: quoted_row]
+<div id="note-{:id}" class="box"><div class="body group"><img class="{:icon}" src="/templates/default/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> quoted your comment on "<a href="{:link}">{:title}</a>"<span class="fright"><a href="#" class="delete_notification" data-note-id="{:id}">&#10799;</a></span></div></div>
+[/block: quoted_row]
 
 [block: none]
 <div class="box"><div class="body group">You have zero :(</div></div>

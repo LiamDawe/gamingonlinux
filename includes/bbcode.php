@@ -160,6 +160,8 @@ function quotes($body, $rss = 0)
 	// Quoting an actual person, book or whatever
 	$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
 
+	preg_match_all($pattern, $body, $matches);
+
 	while(preg_match($pattern, $body, $matches))
 	{
 		if ($rss == 0)

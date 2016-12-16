@@ -324,9 +324,13 @@ if (isset($_GET['user_id']))
 						$date = $core->format_date($comments['time_posted']);
 						$title = $comments['title'];
 
+						// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
+						$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
+						$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
+
 						$comment_posts .= "<li class=\"list-group-item\">
 					<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">{$title}</a>
-					<div>".substr(strip_tags(bbcode($comments['comment_text'])), 0, 63)."&hellip;</div>
+					<div>".substr(strip_tags(bbcode($text)), 0, 63)."&hellip;</div>
 					<small>{$date}</small>
 				</li>";
 					}
@@ -414,9 +418,9 @@ if (isset($_GET['user_id']))
 
 					$comment_posts = '';
 					$db->sqlquery("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start));
-					while ($comments = $db->fetch())
+					$all_comments = $db->fetch_all_rows();
+					foreach ($all_comments as $comments)
 					{
-
 						// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
 						$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
 						$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);

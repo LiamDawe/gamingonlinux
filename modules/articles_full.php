@@ -1187,6 +1187,20 @@ else if (isset($_GET['go']))
 
 							}
 
+							// gather a list of people quoted and let them know
+							$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
+							preg_match_all($pattern, $comment, $matches);
+
+							foreach($matches[1] as $match)
+							{
+								$db->sqlquery("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match));
+								if ($db->num_rows() == 1)
+								{
+									$quoted_user = $db->fetch();
+									$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+								}
+							}
+
 							// send the emails
 							foreach ($users_array as $email_user)
 							{

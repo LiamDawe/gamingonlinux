@@ -48,10 +48,11 @@ if (!isset($_GET['go']))
 			$unread_array = array();
 			$read_array = array();
 			// show the notifications here
-			$db->sqlquery("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.is_like, n.total, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start));
+			$db->sqlquery("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.is_like, n.is_quote, n.total, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start));
 			while ($note_list = $db->fetch())
 			{
-				if ($note_list['is_like'] == 0)
+				$additional_comments = '';
+				if ($note_list['is_like'] == 0 && $note_list['is_quote'] == 0)
 				{
 					$note_row = $templating->block_store('row', 'usercp_modules/notifications');
 					if ($note_list['total'] > 1)
@@ -65,7 +66,11 @@ if (!isset($_GET['go']))
 					}
 					$note_row = $templating->store_replace($note_row, array('additional_comments' => $additional_comments));
 				}
-				else
+				else if ($note_list['is_quote'] == 1)
+				{
+					$note_row = $templating->block_store('quoted_row', 'usercp_modules/notifications');
+				}
+				else if ($note_list['is_like'] == 1)
 				{
 					$note_row = $templating->block_store('liked_row', 'usercp_modules/notifications');
 					if ($note_list['total'] > 1)

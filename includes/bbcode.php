@@ -174,7 +174,7 @@ function replace_quotes($matches)
 	}
 	else
 	{
-		return "<blockquote><cite>'.$matches[1].'</cite>'.$matches[2].'</blockquote>";
+		return '<blockquote><cite>'.$matches[1].'</cite>'.$matches[2].'</blockquote>';
 	}
 }
 

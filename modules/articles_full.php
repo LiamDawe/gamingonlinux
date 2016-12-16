@@ -1070,7 +1070,7 @@ else if (isset($_GET['go']))
 							$comment_page = ceil($new_total/$_SESSION['per-page']);
 						}
 
-						// check empty
+						// remove extra pointless whitespace
 						$comment = trim($_POST['text']);
 
 						// check for double comment
@@ -1084,12 +1084,13 @@ else if (isset($_GET['go']))
 								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=doublecomment#commentbox");
 							}
 							else {
-								header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
+								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
 							}
 
 							die();
 						}
 
+						// check if it's an empty comment
 						if (empty($comment))
 						{
 							if (core::config('pretty_urls') == 1)
@@ -1097,7 +1098,7 @@ else if (isset($_GET['go']))
 								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=emptycomment#commentbox");
 							}
 							else {
-								header("Location: " . core::config('website_url') . "/index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
+								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
 							}
 
 							die();
@@ -1191,13 +1192,18 @@ else if (isset($_GET['go']))
 							$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
 							preg_match_all($pattern, $comment, $matches);
 
+							$unique_usernames = array_values(array_unique($matches[1]));
+
 							foreach($matches[1] as $match)
 							{
-								$db->sqlquery("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match));
-								if ($db->num_rows() == 1)
+								if ($match != $_SESSION['username'])
 								{
-									$quoted_user = $db->fetch();
-									$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+									$db->sqlquery("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match));
+									if ($db->num_rows() == 1)
+									{
+										$quoted_user = $db->fetch();
+										$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+									}
 								}
 							}
 

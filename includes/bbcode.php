@@ -153,57 +153,43 @@ function article_dump($dump)
 	return $sections;
 }
 
-function quotes($body, $rss = 0)
+// replace specific-user quotes, called by quotes()
+function replace_quotes($matches)
 {
 	global $db;
 
+	$find_quoted = $db->sqlquery("SELECT `username`, `user_id` FROM `users` WHERE `username` = ?", array($matches[1]));
+	if ($db->num_rows() == 1)
+	{
+		$get_quoted = $find_quoted->fetch();
+		if (core::config('pretty_urls') == 1)
+		{
+			$profile_link = '/profiles/' . $get_quoted['user_id'];
+		}
+		else
+		{
+			$profile_link = '/index.php?module=profile&user_id=' . $get_quoted['user_id'];
+		}
+		return '<blockquote><cite><a href="'.$profile_link.'">'.$matches[1].'</a></cite>'.$matches[2].'</blockquote>';
+	}
+	else
+	{
+		return "<blockquote><cite>'.$matches[1].'</cite>'.$matches[2].'</blockquote>";
+	}
+}
+
+// find all quotes
+function quotes($body)
+{
 	// Quoting an actual person, book or whatever
 	$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
 
-	preg_match_all($pattern, $body, $matches);
-
-	while(preg_match($pattern, $body, $matches))
-	{
-		if ($rss == 0)
-		{
-			$find_quoted = $db->sqlquery("SELECT `username`, `user_id` FROM `users` WHERE `username` = ?", array($matches[1]));
-			if ($db->num_rows() == 1)
-			{
-				$get_quoted = $find_quoted->fetch();
-				if (core::config('pretty_urls') == 1)
-				{
-					$profile_link = '/profiles/' . $get_quoted['user_id'];
-				}
-				else
-				{
-					$profile_link = '/index.php?module=profile&user_id=' . $get_quoted['user_id'];
-				}
-				$replace = '<blockquote><cite><a href="'.$profile_link.'">$1</a></cite>$2</blockquote>';
-			}
-			else
-			{
-				$replace = "<blockquote><cite>$1</cite>$2</blockquote>";
-			}
-
-		}
-		else if ($rss == 1)
-		{
-			$replace = "<blockquote><cite>$1</cite><br />$2</blockquote>";
-		}
-
-		$body = preg_replace($pattern, $replace, $body);
-	}
+	$body = preg_replace_callback($pattern, 'replace_quotes', $body);
 
 	// Quote on its own
 	$pattern = '/\[quote\](.+?)\[\/quote\]/is';
-	if ($rss == 0)
-	{
-		$replace = "<blockquote><cite>Quote</cite>$1</blockquote>";
-	}
-	else if ($rss == 1)
-	{
-		$replace = "<blockquote><cite>Quote</cite><br />$1</blockquote>";
-	}
+	$replace = "<blockquote><cite>Quote</cite>$1</blockquote>";
+
 	while(preg_match($pattern, $body))
 	{
 		$body = preg_replace($pattern, $replace, $body);
@@ -212,6 +198,7 @@ function quotes($body, $rss = 0)
 	return $body;
 }
 
+// this is to only show to people who are logged in
 function logged_in_code($body)
 {
 	// Quoting an actual person, book or whatever
@@ -233,7 +220,7 @@ function logged_in_code($body)
 	return $body;
 }
 
-function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $rss = 0)
+function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 {
 	//  get rid of empty BBCode, is there a point in having excess markup?
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
@@ -352,7 +339,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $r
 
 	$body = preg_replace($find_lines, $replace_lines, $body);
 
-	$body = quotes($body, $rss);
+	$body = quotes($body);
 
 	// replace images and youtube to the correct size if its a comment or forum post (less space!)
 	if ($article == 0)
@@ -639,11 +626,13 @@ function rss_stripping($text, $tagline_image = NULL)
 
 	$text = str_replace('<*PAGE*>', '', $text);
 
+	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$1</blockquote>", $text);
+
 	$text = preg_replace("/\[youtube\](.+?)\[\/youtube\]/is", '', $text);
 
-	$text = preg_replace("/\[timer=(.+?)](.+?)\[\/timer]/is", ' Visit <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a> to see the timer ', $text);
+	$text = preg_replace("/\[timer=(.+?)](.+?)\[\/timer]/is", ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see the timer ', $text);
 
-	$text = preg_replace('/\[users-only\](.+?)\[\/users-only\]/is', ' Visit <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a> to see this bit, this is for logged in users only ', $text);
+	$text = preg_replace('/\[users-only\](.+?)\[\/users-only\]/is', ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see this bit, this is for logged in users only ', $text);
 
 	return $text;
 }

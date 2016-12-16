@@ -76,10 +76,8 @@ foreach ($articles as $line)
 	{
 		$text = rss_stripping($line['text'], $tagline_bbcode);
 
-		$text = bbcode($text, 1, 1, $tagline_bbcode, 1);
+		$text = bbcode($text, 1, 1, $tagline_bbcode);
 	}
-
-
 
 	$title = str_replace("&#039;", '\'', $line['title']);
 	$title = str_replace("&", "&amp;", $title);

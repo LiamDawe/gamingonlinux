@@ -76,7 +76,7 @@ if (isset($_GET['user_id']))
 				}
 
 				$developer_badge = '';
-				if ($comments['game_developer'] == 1)
+				if ($profile['game_developer'] == 1)
 				{
 					$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
 				}

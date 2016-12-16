@@ -170,7 +170,7 @@ if (isset($_POST['act']))
 		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $dlc, $base_game));
 		$new_id = $db->grab_id();
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' added ' . $_POST['name'] . ' to the games database.', core::$date, core::$date));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
 
 		header("Location: /admin.php?module=games&view=add&&message=added&id={$new_id}");
 	}
@@ -214,7 +214,7 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $edit_date, $dlc, $base_game, $_POST['id']));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?", array($_SESSION['username'] . ' edited ' . $_POST['name'] . ' in the games database.', core::$date, core::$date));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 
 		if (isset($_GET['return']) && !empty($_GET['return']))
 		{
@@ -281,9 +281,7 @@ if (isset($_POST['act']))
 
 			$db->sqlquery("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
 
-			$db->sqlquery("DELETE FROM `admin_notifications` WHERE `calendar_id` = ?", array($_GET['id']));
-
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `calendar_id` = ?", array($_SESSION['username'] . ' removed ' . $name['name'] . ' from the games database and calendar.', core::$date, core::$date, $_GET['id']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $name['name']));
 
 			if (isset($_GET['return']) && !empty($_GET['return']))
 			{

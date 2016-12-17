@@ -3,14 +3,11 @@ require_once "EPDOStatement.php";
 
 class mysql
 {
-	// the query counter
+	// the query counter for debugging
 	public $counter = 0;
 
 	// store all the queries for debugging
 	public $queries = '';
-
-	//Last query that ran
-	protected $last;
 
 	// the current statement
 	private $stmt;
@@ -65,6 +62,7 @@ class mysql
 		try
 		{
 			$this->stmt = $this->database->prepare($sql);
+			
 			if (is_array($objects))
 			{
 				foreach($objects as $k=>$p)
@@ -79,8 +77,7 @@ class mysql
 			// update the counter for how many queries are being done
 			$this->counter++;
 
-
-			$this->execute();
+			$this->stmt->execute();
 
 			// return the result to fetch somehow
 			return $this->stmt;

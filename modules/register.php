@@ -15,9 +15,17 @@ if (isset($_GET['message']))
 	{
 		$core->message('Sorry but that username is taken, please try another! If you have forgotten your password, <a href="https://www.gamingonlinux.com/index.php?module=login&forgot">click here to start a lost password request.</a>', NULL, 1);
 	}
+	if ($_GET['message'] == 'username_characters')
+	{
+		$core->message('Your username is not properly formatted. We only allow numbers, letters, "-" and "_".', NULL, 1);
+	}
 	if ($_GET['message'] == 'email-taken')
 	{
 		$core->message('Sorry but that email is taken, please try another! If you have forgotten your password, <a href="https://www.gamingonlinux.com/index.php?module=login&forgot">click here to start a lost password request.</a>', NULL, 1);
+	}
+	if ($_GET['message'] == 'empty')
+	{
+		$core->message('You left some fields empty, you must fill in all fields when registering, <a href="index.php?module=register">click here togo back and try again!</a>', NULL, 1);
 	}
 	if ($_GET['message'] == 'password-match')
 	{
@@ -78,8 +86,14 @@ if (core::config('allow_registrations') == 1)
 
 	else if (isset($_POST['register']))
 	{
-		// make them safe and sort the password
-		$username =  htmlspecialchars($_POST['username']);
+		// disallow certain username characters
+		$aValid = array('-', '_');
+
+		if(!ctype_alnum(str_replace($aValid, '', $_POST['username'])))
+		{
+				header("Location: /index.php?module=register&message=username_characters");
+				die();
+		}
 		$safe_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
 		// check ip bans
@@ -106,14 +120,15 @@ if (core::config('allow_registrations') == 1)
 				// check fields are set
 				if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['verify_password']) || empty($_POST['uemail']))
 				{
-					$core->message('You left some fields empty, you must fill in all fields when registering, <a href="index.php?module=register">click here togo back and try again!</a>', NULL, 1);
+					header("Location: /index.php?module=register&message=empty");
+					die();
 				}
 
 				else
 				{
 
 					// check username isnt taken
-					$db->sqlquery("SELECT `username` FROM `users` WHERE `username` = ?", array($username));
+					$db->sqlquery("SELECT `username` FROM `users` WHERE `username` = ?", array($_POST['username']));
 					if ($db->fetch())
 					{
 						if (core::config('pretty_urls') == 1)
@@ -170,17 +185,17 @@ if (core::config('allow_registrations') == 1)
 							// register away
 							if ($_POST['register'] == 'Register')
 							{
-								$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?", array($username, $safe_password, $_POST['uemail'], $_POST['uemail'], core::$ip, core::$date, core::$date, $code));
+								$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?", array($_POST['username'], $safe_password, $_POST['uemail'], $_POST['uemail'], core::$ip, core::$date, core::$date, $code));
 							}
 
 							if ($_POST['register'] == 'twitter')
 							{
-								$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'light', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?", array($username, $safe_password, $_POST['uemail'], $_POST['uemail'], core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code));
+								$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'light', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?", array($_POST['username'], $safe_password, $_POST['uemail'], $_POST['uemail'], core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code));
 							}
 
 							if ($_POST['register'] == 'steam')
 							{
-								$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'light', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?", array($username, $safe_password, $_POST['uemail'], $_POST['uemail'], core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code));
+								$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'light', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?", array($_POST['username'], $safe_password, $_POST['uemail'], $_POST['uemail'], core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code));
 							}
 
 							$last_id = $db->grab_id();

@@ -155,6 +155,19 @@ jQuery(document).ready(function()
     $(".toggle-content").removeClass('toggle-active');
   });
 
+  // for checking usernames
+  var charReg = /^\s*[a-zA-Z0-9-_]+\s*$/;
+  $('.keyup-char').keyup(function () {
+      $('span.error-keyup-1').hide();
+      var inputVal = $(this).val();
+
+      if (!charReg.test(inputVal)) {
+          $(this).parent().find(".register-warning").show();
+      } else {
+          $(this).parent().find(".register-warning").hide();
+      }
+  });
+
   if ( $.isFunction($.fn.select2) ) {
   $("#articleCategories").select2({
     selectOnClose: true,

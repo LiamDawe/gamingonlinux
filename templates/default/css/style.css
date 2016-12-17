@@ -1367,3 +1367,10 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 	line-height: 30px;
 }
 .preview_pm{display: none;}
+.register-warning {
+  color:#d2232a;
+  background-color:#ffdd97;
+  padding:5px;
+  width:100%;
+  display:none;
+}

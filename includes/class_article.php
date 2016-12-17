@@ -1,6 +1,25 @@
 <?php
 class article_class
 {
+  function tagline_image($data)
+  {
+    $tagline_image = '';
+    if ($data['article_top_image'] == 1)
+    {
+      $tagline_image = "<img alt src=\"".url."uploads/articles/topimages/{$data['article_top_image_filename']}\">";
+    }
+    if (!empty($data['tagline_image']))
+    {
+      $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+    }
+    if ($data['article_top_image'] == 0 && empty($data['tagline_image']))
+    {
+      $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
+    }
+
+    return $tagline_image;
+  }
+
   function display_previous_uploads($article_id = NULL)
   {
     global $db;

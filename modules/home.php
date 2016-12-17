@@ -19,7 +19,7 @@ if (isset($_GET['message']))
 	{
 		$core->message("Sorry your details didn't match up to unsubscribe you!", NULL, 1);
 	}
-	if ($_GET['message'] == 'cannotunlike')
+	if ($_GET['message'] == 'cannotunlike') // this is from the unlike all function
 	{
 		$core->message("Sorry your details didn't match up to unlike!", NULL, 1);
 	}
@@ -232,21 +232,9 @@ if (!isset($_GET['view']))
 
 		$templating->set('categories_list', $categories_list);
 
-		$top_image = '';
-		if ($article['article_top_image'] == 1)
-		{
-			$top_image = "<img alt src=\"".url."uploads/articles/topimages/{$article['article_top_image_filename']}\">";
-		}
-		if (!empty($article['tagline_image']))
-		{
-			$top_image = "<img alt src=\"".url."uploads/articles/tagline_images/{$article['tagline_image']}\">";
-		}
-		if ($article['article_top_image'] == 0 && empty($article['tagline_image']))
-		{
-			$top_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
-		}
+		$tagline_image = $article_class->tagline_image($article);
 
-		$templating->set('top_image', $top_image);
+		$templating->set('top_image', $tagline_image);
 
 		// set last bit to 0 so we don't parse links in the tagline
 		$templating->set('text', $article['tagline']);

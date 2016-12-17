@@ -213,48 +213,33 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 					foreach ($get_categories as $k => $category_list)
 					{
-							if (in_array($article['article_id'], $category_list))
+						if (in_array($article['article_id'], $category_list))
+						{
+							$category_name = str_replace(' ', '-', $category_list['category_name']);
+							if (core::config('pretty_urls') == 1)
 							{
-								$category_name = str_replace(' ', '-', $category_list['category_name']);
-								if (core::config('pretty_urls') == 1)
-								{
-									$category_url = "/articles/category/{$category_name}/";
-								}
-								else
-								{
-									$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
-								}
-								if ($category_list['category_id'] == 60)
-								{
-									$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
-								}
-
-								else
-								{
-									$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
-								}
+								$category_url = "/articles/category/{$category_name}/";
 							}
+							else
+							{
+								$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
+							}
+							if ($category_list['category_id'] == 60)
+							{
+								$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+							}
+							else
+							{
+								$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+							}
+						}
 					}
 
 					$templating->set('categories_list', $categories_list);
 
-					$top_image = '';
-					if ($article['article_top_image'] == 1)
-					{
-						$top_image = "<img src=\"/uploads/articles/topimages/{$article['article_top_image_filename']}\" class=\"tagline-img\" alt=\"[articleimage]\">";
-					}
+					$tagline_image = $article_class->tagline_image($article);
 
-					if (!empty($article['tagline_image']))
-					{
-						$top_image = "<img class=\"img-responsive\" src=\"/uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"article-image\">";
-					}
-
-					if ($article['article_top_image'] == 0 && empty($article['tagline_image']))
-					{
-						$top_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
-					}
-
-					$templating->set('top_image', $top_image);
+					$templating->set('top_image', $tagline_image);
 
 					// set last bit to 0 so we don't parse links in the tagline
 					$templating->set('text', bbcode($article['tagline'], 1, 0));
@@ -439,23 +424,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 						$templating->set('categories_list', $categories_list);
 
-						$top_image = '';
-						if ($article['article_top_image'] == 1)
-						{
-							$top_image = "<img src=\"/uploads/articles/topimages/{$article['article_top_image_filename']}\" class=\"tagline-img\" alt=\"[articleimage]\">";
-						}
+						$tagline_image = $article_class->tagline_image($article);
 
-						if (!empty($article['tagline_image']))
-						{
-							$top_image = "<img class=\"img-responsive\" src=\"/uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"article-image\">";
-						}
-
-						if ($article['article_top_image'] == 0 && empty($article['tagline_image']))
-						{
-							$top_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
-						}
-
-						$templating->set('top_image', $top_image);
+						$templating->set('top_image', $tagline_image);
 
 						// set last bit to 0 so we don't parse links in the tagline
 						$templating->set('text', bbcode($article['tagline'], 1, 0));

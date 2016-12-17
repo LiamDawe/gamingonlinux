@@ -12,6 +12,9 @@ class mysql
 	// the current statement
 	private $stmt;
 
+	//Last query that ran
+	protected $last;
+
 	// the database connection
 	protected $database;
 
@@ -62,7 +65,7 @@ class mysql
 		try
 		{
 			$this->stmt = $this->database->prepare($sql);
-			
+
 			if (is_array($objects))
 			{
 				foreach($objects as $k=>$p)
@@ -77,10 +80,13 @@ class mysql
 			// update the counter for how many queries are being done
 			$this->counter++;
 
-			$this->stmt->execute();
+			$this->last = new db_result($this->stmt);
+			$this->counter++;
 
-			// return the result to fetch somehow
-			return $this->stmt;
+			//Return the result object
+			$this->last->execute();
+			$this->last->setID($this->grab_id());
+			return $this->last;
 		}
 
 		catch (Exception $error)
@@ -102,26 +108,19 @@ class mysql
 		}
 	}
 
-	public function execute()
-	{
-		$this->stmt->execute();
-	}
-
 	public function fetch()
 	{
-		return $this->stmt->fetch();
+		return $this->last->fetch();
 	}
 
 	public function fetch_all_rows($mode = NULL)
 	{
-		return $this->stmt->fetchAll($mode);
+		return $this->last->fetch_all_rows($mode);
 	}
-
 	public function num_rows()
 	{
-		return $this->stmt->rowCount();
+		return $this->last->num_rows();
 	}
-
 	// get the last auto made ID
 	public function grab_id()
 	{
@@ -165,31 +164,34 @@ class mysql
 	}
 }
 
-/*
-
+/**
+* Mysql Result
+*/
 class db_result implements ArrayAccess,Iterator
 {
 	public $success 	= false;
 	public $id 			= false;
 	private $position	= 0;
-
 	function __construct($sth)
 	{
 		$this->statement = $sth;
 		$this->statement->setFetchMode(PDO::FETCH_ASSOC);
 	}
-
-
-	public function execute()
+	public function execute($values=array())
 	{
+		if (!empty($values)){
+			foreach ($values as $k => $v) {
+				if (is_numeric($v) && !is_float($v)){
+					$values[$k] = (int) $v;
+				}
+			}
+		}
 		$this->success = $this->statement->execute();
 	}
-
 	public function fetch()
 	{
 		return $this->statement->fetch();
 	}
-
 	public function fetch_all_rows($mode = NULL)
 	{
 		if (!isset($this->data)){
@@ -197,27 +199,22 @@ class db_result implements ArrayAccess,Iterator
 		}
 		return $this->data;
 	}
-
 	public function num_rows()
 	{
 		return $this->statement->rowCount();
 	}
-
 	public function setID($id)
 	{
 		$this->id = (int) $id;
 	}
-
-	//@return int Last inserted ID at time of this query;
-
+	/**
+	 * @return int Last inserted ID at time of this query;
+	 **/
 	public function grab_id()
 	{
 		return $this->id;
 	}
-
-
-
-	//  Allow access like an array
+	/**  Allow access like an array **/
 	public function offsetExists( $offset ){
 		if (!isset($this->data)){  $this->fetch_all_rows();	 }
 		return (isset($this->data[$offset]));
@@ -251,4 +248,4 @@ class db_result implements ArrayAccess,Iterator
 	public function valid() {
 	    return $this->offsetExists($this->position);
 	}
-}*/
+}

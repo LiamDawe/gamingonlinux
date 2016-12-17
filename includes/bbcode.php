@@ -181,12 +181,7 @@ function replace_quotes($matches)
 // find all quotes
 function quotes($body)
 {
-	// Quoting an actual person, book or whatever
-	$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
-
-	$body = preg_replace_callback($pattern, 'replace_quotes', $body);
-
-	// Quote on its own
+	// Quote on its own, do these first so they don't get in the way
 	$pattern = '/\[quote\](.+?)\[\/quote\]/is';
 	$replace = "<blockquote><cite>Quote</cite>$1</blockquote>";
 
@@ -194,6 +189,13 @@ function quotes($body)
 	{
 		$body = preg_replace($pattern, $replace, $body);
 	}
+
+	// Quoting an actual person, book or whatever
+	$pattern = '~\[quote=([^]]+)]([^[]*(?:\[(?!/?quote\b)[^[]*)*)\[/quote]~i';
+	do
+	{
+		$body = preg_replace_callback($pattern, 'replace_quotes', $body, -1, $count);
+	} while ($count);
 
 	return $body;
 }

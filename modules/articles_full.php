@@ -1151,8 +1151,8 @@ else if (isset($_GET['go']))
 							$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
 							preg_match_all($pattern, $comment, $matches);
 
-							$unique_usernames = array_values(array_unique($matches[1]));
-							if (!empty($unique_usernames))
+							$quoted_usernames = array_values(array_unique($matches[1]));
+							if (!empty($quoted_usernames))
 							{
 								foreach($matches[1] as $match)
 								{
@@ -1188,7 +1188,7 @@ else if (isset($_GET['go']))
 								}
 
 								// notify them, if they haven't been quoted and already given one
-								if (!in_array($email_user['username'], $unique_usernames))
+								if (!in_array($email_user['username'], $quoted_usernames))
 								{
 									$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($article_id, $email_user['user_id']));
 									$check_exists = $db->num_rows();

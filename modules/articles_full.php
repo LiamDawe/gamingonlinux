@@ -1146,15 +1146,39 @@ else if (isset($_GET['go']))
 								$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $article_id, $emails, $emails));
 							}
 
+							/* gather a list of people quoted and let them know
+							 do this first, so we can check if they have been notified already and not send another */
+							$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
+							preg_match_all($pattern, $comment, $matches);
+
+							$unique_usernames = array_values(array_unique($matches[1]));
+							if (!empty($unique_usernames))
+							{
+								foreach($matches[1] as $match)
+								{
+									if ($match != $_SESSION['username'])
+									{
+										$db->sqlquery("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match));
+										if ($db->num_rows() == 1)
+										{
+											$quoted_user = $db->fetch();
+											$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+											$new_notification_id = $db->grab_id();
+										}
+									}
+								}
+							}
+
 							/* gather a list of subscriptions for this article (not including yourself!)
 							- Make an array of anyone who needs an email now
-							- Send a notification to them
+							- Additionally, send a notification to anyone subscribed
 							*/
 							$db->sqlquery("SELECT s.`user_id`, s.emails, s.send_email, u.email, u.username, u.email_options FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, $_SESSION['user_id']));
 							$users_array = array();
 							$users_to_email = $db->fetch_all_rows();
 							foreach ($users_to_email as $email_user)
 							{
+								// gather list
 								if ($email_user['emails'] == 1 && $email_user['send_email'] == 1)
 								{
 									$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
@@ -1163,46 +1187,30 @@ else if (isset($_GET['go']))
 									$users_array[$email_user['user_id']]['email_options'] = $email_user['email_options'];
 								}
 
-								$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0", array($article_id, $email_user['user_id']));
-								$check_exists = $db->num_rows();
-								$get_note_info = $db->fetch();
-								if ($check_exists == 0)
+								// notify them, if they haven't been quoted and already given one
+								if (!in_array($email_user['username'], $unique_usernames))
 								{
-									$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
-									$new_notification_id = $db->grab_id();
-								}
-								else if ($check_exists == 1)
-								{
-									// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
-									if ($get_note_info['seen'] == 1)
+									$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($article_id, $email_user['user_id']));
+									$check_exists = $db->num_rows();
+									$get_note_info = $db->fetch();
+									if ($check_exists == 0)
 									{
-										$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
+										$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+										$new_notification_id = $db->grab_id();
 									}
-									// they haven't seen this note before, so add one to the counter and update the date
-									else if ($get_note_info['seen'] == 0)
+									else if ($check_exists == 1)
 									{
-										$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
-									}
-									$new_notification_id = $get_note_info['id'];
-								}
-
-							}
-
-							// gather a list of people quoted and let them know
-							$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
-							preg_match_all($pattern, $comment, $matches);
-
-							$unique_usernames = array_values(array_unique($matches[1]));
-
-							foreach($matches[1] as $match)
-							{
-								if ($match != $_SESSION['username'])
-								{
-									$db->sqlquery("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match));
-									if ($db->num_rows() == 1)
-									{
-										$quoted_user = $db->fetch();
-										$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user['user_id'], $_SESSION['user_id'], $article_id, $new_comment_id));
+										// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
+										if ($get_note_info['seen'] == 1)
+										{
+											$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
+										}
+										// they haven't seen this note before, so add one to the counter and update the date
+										else if ($get_note_info['seen'] == 0)
+										{
+											$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
+										}
+										$new_notification_id = $get_note_info['id'];
 									}
 								}
 							}

@@ -139,9 +139,8 @@ if (isset($_POST['action']))
 
 		$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($get_ip['ip']));
 
-		$db->sqlquery("DELETE FROM `admin_notifications` WHERE `topic_id` = ? AND `mod_queue` = 1", array($_POST['topic_id']));
-
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `completed` = 1, `created` = ?, `completed_date` = ?, `topic_id` = ?, `mod_queue` = 1", array("{$_SESSION['username']} removed a forum topic from the moderation queue, and banned that user.", core::$date, core::$date, $_POST['topic_id']));
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed_ban', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
 		header("Location: /admin.php?module=mod_queue&view=forum_topics&message=removed");
 	}

@@ -42,13 +42,13 @@
 [block: form_bottom]
 	<div class="box">
 		<div class="body group">
+			<strong>Subscribe to article comments?</strong><br />
+			<em>You can <a href="/usercp.php?module=article_subscriptions">see all watched articles here</a>.</em><br />
 			<label class="checkbox">
-				<input type="checkbox" name="subscribe" {:subscribe_check}/> <strong>Subscribe to article to receive comment replies</strong>
+				<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to comments
 			</label>
-			<label class="checkbox">
-				<input type="checkbox" name="emails" {:subscribe_email_check}/> <strong>Receive comment replies via email?</strong>
-			</label>
-			<button type="submit" name="act" value="comment" class="btn btn-primary">Post Comment</button>
+			<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select><br />
+			<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" name="act" value="comment" class="btn btn-primary">Post Comment</button>
 		</div>
 	</div>
 </form>

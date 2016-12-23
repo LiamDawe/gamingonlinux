@@ -254,20 +254,29 @@ if (!isset($_GET['view']))
 				}
 			}
 
+			// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+			$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
+			$sub_exists = $db->num_rows();
+
+			if ($sub_exists == 1)
+			{
+				$check_current_sub = $db->fetch();
+			}
+
 			// find if they have auto subscribe on
 			$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 			$subscribe_info = $db->fetch();
 
 			$subscribe_check = '';
-			if ($subscribe_info['auto_subscribe'] == 1)
+			if ($subscribe_info['auto_subscribe'] == 1 || $sub_exists == 1)
 			{
 				$subscribe_check = 'checked';
 			}
 
 			$subscribe_email_check = '';
-			if ($subscribe_info['auto_subscribe_email'] == 1)
+			if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $subscribe_info['auto_subscribe_email'] == 1)
 			{
-				$subscribe_email_check = 'checked';
+				$subscribe_email_check = 'selected';
 			}
 
 			$comment = '';
@@ -343,19 +352,29 @@ if (isset($_POST['act']))
 
 				$new_comment_id = $db->grab_id();
 
+				// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+				$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+				if ($db->num_rows() == 1)
+				{
+					if (!isset($_POST['subscribe']))
+					{
+						$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+					}
+				}
+
 				// check if they are subscribing
-				if (isset($_POST['subscribe']))
+				if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 				{
 					// make sure we don't make lots of doubles
 					$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
 
 					$emails = 0;
-					if (isset($_POST['emails']))
+					if ($_POST['subscribe-type'] == 'sub-emails')
 					{
 						$emails = 1;
 					}
 
-					$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?", array($_SESSION['user_id'], $article_id, $emails));
+					$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $article_id, $emails, $emails));
 				}
 
 				// email anyone subscribed which isn't you
@@ -374,70 +393,33 @@ if (isset($_POST['act']))
 				// send the emails
 				foreach ($users_array as $email_user)
 				{
-					$to = $email_user['email'];
-
-					// set the title to upper case
-					$title_upper = $title['title'];
-
 					// subject
-					$subject = "New reply to article {$title_upper} on GamingOnLinux.com";
+					$subject = 'New reply to editor review article "' . $title['title'] . '" on GamingOnLinux.com';
 
-					$username = $_SESSION['username'];
-				}
+					$comment_email = email_bbcode($comment);
 
-				$comment_email = email_bbcode($comment);
+					// message
+					$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to an editor review article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "admin.php?module=comments&aid=$article_id#comments\">{$title['title']}</a></strong>\".</p>
+					<div>
+					<hr>
+					{$comment_email}
+					<hr>
+					You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
+					<hr>
+						<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+						<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
+						<p>-----------------------------------------------------------------------------------------------------------</p>
+					</div>";
 
-				$message = '';
+					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an editor review article on " . core::config('website_url') . "admin.php?module=comments&aid=$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
-				// message
-				$html_message = "
-				<html>
-				<head>
-				<title>New reply to an article in admin review you follow on GamingOnLinux.com</title>
-				<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-				</head>
-				<body>
-				<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-				<br />
-				<p>Hello <strong>{$email_user['username']}</strong>,</p>
-				<p><strong>{$username}</strong> has replied to an admin review article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "admin.php?module=comments&aid=$article_id#comments\">{$title_upper}</a></strong>\".</p>
-				<div>
-				<hr>
-				{$comment_email}
-				<hr>
-				You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
-				<hr>
-				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-				</div>
-				</body>
-				</html>";
-
-				$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on " . core::config('website_url') . "articles/$title_nice.$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
-
-				$boundary = uniqid('np');
-
-				// To send HTML mail, the Content-type header must be set
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
-				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-				$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
-				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-				$message .= $plain_message;
-
-				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-				$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
-				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-				$message .= "$html_message";
-
-				$message .= "\r\n\r\n--" . $boundary . "--";
-
-				// Mail it
-				if (core::config('send_emails') == 1)
-				{
-					mail($to, $subject, $message, $headers);
+					// Mail it
+					if (core::config('send_emails') == 1)
+					{
+						$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
+						$mail->send();
+					}
 				}
 			}
 
@@ -448,7 +430,6 @@ if (isset($_POST['act']))
 		unset($_SESSION['acomment']);
 
 		header("Location: " . core::config('website_url') . "admin.php?module=comments&aid=$article_id");
-
 	}
 }
 

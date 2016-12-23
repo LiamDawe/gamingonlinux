@@ -78,7 +78,7 @@ if (isset($_GET['user_id']))
 				$developer_badge = '';
 				if ($profile['game_developer'] == 1)
 				{
-					$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
+					$developer_badge = ' <span class="badge yellow">Game Dev</span>';
 				}
 
 				$templating->set('developer_badge', $developer_badge);

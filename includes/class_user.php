@@ -504,15 +504,8 @@ class user
 
 	public function new_user_badge($reg_date)
 	{
-		$this_year = date('Y');
-
-		// sort date to correct format
-		$reg_year = date('Y', $reg_date);
-		$reg_month = date('m', $reg_date);
-		$reg_day = date('d', $reg_date);
-
 		$new_user_badge = '';
-		if ($reg_month == date('m') && $reg_day <= '07' && $reg_year == date('Y'))
+		if ($reg_date > strtotime("-7 days"))
 		{
 			$new_user_badge = '<span class="badge blue">New User</span>';
 		}

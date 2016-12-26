@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_articles_sections/admin_module_articles_drafts');
+$templating->merge('admin_modules/admin_articles_sections/drafts');
 if (!isset($_GET['aid']))
 {
 	if (isset($_GET['message']))
@@ -20,36 +20,52 @@ if (!isset($_GET['aid']))
 		}
 	}
 
-	$templating->block('drafts_top', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
+	$templating->block('drafts_top', 'admin_modules/admin_articles_sections/drafts');
 
 	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `draft` = 1 AND `user_id` = ?", array($_SESSION['user_id']));
-	while ($article = $db->fetch())
+	$count_yours = $db->num_rows();
+	if ($count_yours > 0)
 	{
-		$templating->block('drafts_row', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
-		$templating->set('url', core::config('website_url'));
-		$templating->set('article_id', $article['article_id']);
-		$templating->set('article_title', $article['title']);
-		$templating->set('username', $article['username']);
+		while ($article = $db->fetch())
+		{
+			$templating->block('drafts_row', 'admin_modules/admin_articles_sections/drafts');
+			$templating->set('url', core::config('website_url'));
+			$templating->set('article_id', $article['article_id']);
+			$templating->set('article_title', $article['title']);
+			$templating->set('username', $article['username']);
 
-		$templating->set('date_created', $core->format_date($article['date']));
-		$templating->set('delete_button', '<button type="submit" name="act" value="delete_draft" formaction="'.core::config('website_url').'admin.php?module=articles">Delete</button>');
-		$templating->set('edit_button', '<button type="submit" formaction="'.core::config('website_url').'admin.php?module=articles&view=drafts&aid='.$article['article_id'].'">Edit</button>');
+			$templating->set('date_created', $core->format_date($article['date']));
+			$templating->set('delete_button', '<button type="submit" name="act" value="delete_draft" formaction="'.core::config('website_url').'admin.php?module=articles">Delete</button>');
+			$templating->set('edit_button', '<button type="submit" formaction="'.core::config('website_url').'admin.php?module=articles&view=drafts&aid='.$article['article_id'].'">Edit</button>');
+		}
+	}
+	else
+	{
+		$templating->block('none', 'admin_modules/admin_articles_sections/drafts');
 	}
 
-	$templating->block('others_drafts', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
+	$templating->block('others_drafts', 'admin_modules/admin_articles_sections/drafts');
 
 	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `draft` = 1 AND `user_id` != ?", array($_SESSION['user_id']));
-	while ($article = $db->fetch())
+	$count_theirs = $db->num_rows();
+	if ($count_theirs > 0)
 	{
-		$templating->block('drafts_row', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
-		$templating->set('url', core::config('website_url'));
-		$templating->set('article_id', $article['article_id']);
-		$templating->set('article_title', $article['title']);
-		$templating->set('username', $article['username']);
+		while ($article = $db->fetch())
+		{
+			$templating->block('drafts_row', 'admin_modules/admin_articles_sections/drafts');
+			$templating->set('url', core::config('website_url'));
+			$templating->set('article_id', $article['article_id']);
+			$templating->set('article_title', $article['title']);
+			$templating->set('username', $article['username']);
 
-		$templating->set('date_created', $core->format_date($article['date']));
-		$templating->set('delete_button', '');
-		$templating->set('edit_button', '');
+			$templating->set('date_created', $core->format_date($article['date']));
+			$templating->set('delete_button', '');
+			$templating->set('edit_button', '');
+		}
+	}
+	else
+	{
+		$templating->block('none', 'admin_modules/admin_articles_sections/drafts');
 	}
 }
 
@@ -105,7 +121,7 @@ else
 		}
 	}
 
-	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
+	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/drafts');
 
 	$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `article_id` = ?", array($_GET['aid']));
 
@@ -204,7 +220,7 @@ else
 
 	$core->editor('text', $text, 1);
 
-	$templating->block('drafts_bottom', 'admin_modules/admin_articles_sections/admin_module_articles_drafts');
+	$templating->block('drafts_bottom', 'admin_modules/admin_articles_sections/drafts');
 	$templating->set('article_id', $article['article_id']);
 	$templating->set('author_id', $article['author_id']);
 

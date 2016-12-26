@@ -257,6 +257,8 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 	// replace charts bbcode with the pretty stuff
 	$body = do_charts($body);
 
+	$body = pc_info($body);
+
 	if ($tagline_image != NULL)
 	{
 		$find = "[img]tagline-image[/img]";
@@ -628,6 +630,8 @@ function rss_stripping($text, $tagline_image = NULL)
 
 	$text = str_replace('<*PAGE*>', '', $text);
 
+	$text = str_replace('[pcinfo]', '', $text);
+
 	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$1</blockquote>", $text);
 
 	$text = preg_replace("/\[youtube\](.+?)\[\/youtube\]/is", '', $text);
@@ -637,5 +641,33 @@ function rss_stripping($text, $tagline_image = NULL)
 	$text = preg_replace('/\[users-only\](.+?)\[\/users-only\]/is', ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see this bit, this is for logged in users only ', $text);
 
 	return $text;
+}
+
+// for showing them when they last updated their PC info
+function pc_info($body)
+{
+	global $db;
+
+	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+	{
+		$db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$grab_date = $db->fetch();
+
+		if (!isset($grab_date['date_updated']))
+		{
+			$date_updated = '<strong>Never</strong>!';
+		}
+		else
+		{
+			$date_updated = '<strong>' . date('d M, Y', strtotime($grab_date['date_updated'])) . '</strong>.';
+		}
+		$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . ' <a href="/usercp.php?module=pcinfo">Click here to check and update yours now!</a>', $body);
+	}
+	else
+	{
+		$body = str_replace("[pcinfo]", '<em>You need to be logged in to see when you last updated your PC info!</em>', $body);
+	}
+
+	return $body;
 }
 ?>

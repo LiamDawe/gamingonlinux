@@ -9,12 +9,24 @@ if (isset($_GET['updated']))
 
 if (!isset($_POST['act']))
 {
-	$db->sqlquery("SELECT  `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-
+	$db->sqlquery("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$usercpcp = $db->fetch();
+
+	$db->sqlquery("SELECT `date_updated`, `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$additional = $db->fetch();
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_pcinfo');
 	$templating->set('user_id', $_SESSION['user_id']);
+
+	if (!isset($additional['date_updated']))
+	{
+		$date_updated = 'Never!';
+	}
+	else
+	{
+		$date_updated = date('d M, Y', strtotime($additional['date_updated']));
+	}
+	$templating->set('date_updated', $date_updated);
 
 	$public_info = '';
 	if ($usercpcp['pc_info_public'] == 1)
@@ -36,9 +48,6 @@ if (!isset($_POST['act']))
 			$distro_list .= "<option value=\"{$distros['name']}\" $selected>{$distros['name']}</option>";
 	}
 	$templating->set('distro_list', $distro_list);
-
-	$db->sqlquery("SELECT `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
-	$additional = $db->fetch();
 
 	// Desktop environment
 	$desktop_list = '';

@@ -285,7 +285,7 @@ else
 $previously_uploaded = '';
 $previously_uploaded = $article_class->display_previous_uploads();
 
-if (isset($_POST['check']))
+if (isset($_POST['check']) && isset($article))
 {
 	// add in uploaded images from database
 	$previously_uploaded	= $article_class->display_previous_uploads($article['article_id']);

@@ -16,12 +16,17 @@ if (core::config('goty_page_open') == 0)
 
 $templating->set_previous('title', 'Linux Game Of The Year Awards', 1);
 $templating->set_previous('meta_description', 'Vote for your favourite Linux game of the past year', 1);
-
 $templating->merge('goty');
 
 $templating->block('vote_popover', 'goty');
 
 $templating->block('main', 'goty');
+
+if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0))
+{
+	$templating->block('login');
+}
+
 
 if (isset($_GET['category_id']) && !isset($_GET['view']) && !isset($_GET['direct']))
 {
@@ -109,6 +114,11 @@ if (!isset($_POST['act']))
 		if ($_GET['message'] == 'empty')
 		{
 			$core->message('Your can\'t add a game with no name!');
+		}
+
+		if ($_GET['message'] == 'vote_deleted')
+		{
+			$core->message('Your vote has been removed! You can now vote in that category again.');
 		}
 	}
 
@@ -256,10 +266,13 @@ if (!isset($_POST['act']))
 				$templating->set('category_name', $cat['category_name']);
 
 				$tick = '';
-				$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $cat['category_id']));
-				if ($db->num_rows() == 1)
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 				{
-					$tick = '&#10004;';
+					$db->sqlquery("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $cat['category_id']));
+					if ($db->num_rows() == 1)
+					{
+						$tick = '&#10004;';
+					}
 				}
 				$templating->set('tick', $tick);
 			}
@@ -490,6 +503,11 @@ if (isset($_POST['act']))
 					header("Location: /goty.php?category_id=".$_POST['category_id']."&message=vote_deleted");
 				}
 			}
+		}
+		else
+		{
+			header("Location: /goty.php");
+			die();
 		}
 	}
 }

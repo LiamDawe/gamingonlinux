@@ -29,8 +29,8 @@ if (!isset($_GET['view']))
 	{
 		$templating->block('comments_top', 'admin_modules/admin_home');
 
-		$db->sqlquery("SELECT a.*, u.user_id, u.username FROM `admin_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT 10");
-		while ($comments = $db->fetch())
+		$grab_comments = $db->sqlquery("SELECT a.text, a.date_posted, u.user_id, u.username FROM `admin_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT 10");
+		while ($comments = $grab_comments->fetch())
 		{
 			$templating->block('comment', 'admin_modules/admin_home');
 
@@ -46,8 +46,8 @@ if (!isset($_GET['view']))
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_home');
 
-	$db->sqlquery("SELECT a.*, u.user_id, u.username FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT 10");
-	while ($commentsall = $db->fetch())
+	$editor_chat = $db->sqlquery("SELECT a.*, u.user_id, u.username FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT 10");
+	while ($commentsall = $editor_chat->fetch())
 	{
 		$templating->block('commentall', 'admin_modules/admin_home');
 

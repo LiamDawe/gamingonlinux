@@ -57,14 +57,14 @@ function replace_giveaways($text, $giveaway_id)
 
 	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	{
-		$db->sqlquery("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id));
-		$get_name = $db->fetch();
+		$get_name = $db->sqlquery("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id));
+		$game_info = $get_name->fetch();
 
-		$db->sqlquery("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", array($giveaway_id));
-		$keys_left = $db->fetch();
+		$get_keys = $db->sqlquery("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", array($giveaway_id));
+		$keys_left = $get_keys->fetch();
 
-		$db->sqlquery("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", array($_SESSION['user_id'], $giveaway_id));
-		$your_key = $db->fetch();
+		$grab_your_key = $db->sqlquery("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", array($_SESSION['user_id'], $giveaway_id));
+		$your_key = $grab_your_key->fetch();
 
 		// they have a key already
 		if ($your_key['counter'] == 1)
@@ -80,7 +80,7 @@ function replace_giveaways($text, $giveaway_id)
 			}
 			else if ($keys_left['counter'] > 0)
 			{
-				$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$get_name['id'].'" href="#">click here to claim</a></div>';
+				$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
 			}
 		}
 
@@ -650,16 +650,16 @@ function pc_info($body)
 
 	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	{
-		$db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		$grab_date = $db->fetch();
+		$grab_date = $db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$update_info = $grab_date->fetch();
 
-		if (!isset($grab_date['date_updated']))
+		if (!isset($update_info['date_updated']))
 		{
 			$date_updated = '<strong>Never</strong>!';
 		}
 		else
 		{
-			$date_updated = '<strong>' . date('d M, Y', strtotime($grab_date['date_updated'])) . '</strong>.';
+			$date_updated = '<strong>' . date('d M, Y', strtotime($update_info['date_updated'])) . '</strong>.';
 		}
 		$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . ' <a href="/usercp.php?module=pcinfo">Click here to check and update yours now!</a>', $body);
 	}

@@ -31,7 +31,7 @@ class mysql
 	// the main sql query function
 	public function sqlquery($sql, $objects = NULL, $page = NULL, $referrer = NULL)
 	{
-		global $core;
+		global $core, $templating;
 
 		try
 		{

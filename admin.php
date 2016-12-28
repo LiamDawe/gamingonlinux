@@ -24,7 +24,7 @@ if ($user->check_group(1) == false)
 $modules_allowed = '';
 $module_links = '';
 $get_modules_info = $db->sqlquery("SELECT `module_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `admin_modules` WHERE `activated` = 1 $sql_editor");
-while ($modules = $db->fetch($get_modules_info))
+while ($modules = $db->fetch())
 {
 	// modules allowed for loading
 	$modules_allowed .= " {$modules['module_name']} ";

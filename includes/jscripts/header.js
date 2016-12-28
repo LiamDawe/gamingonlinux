@@ -134,6 +134,26 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
+  // this function may eventually handle pasting rich html from a pre-written doc into gol's editor
+  /*$('textarea').on('paste',function(e) {
+     e.preventDefault();
+     var text = (e.originalEvent || e).clipboardData.getData('text/html') || prompt('Paste something..');
+     var jqTxt = jQuery(text);
+
+     console.log(text);
+
+     jqTxt.find("a").each(function(item, el)
+     {
+       $(el).replaceWith("[url=" + el.href + "]" + el.textContent + "[/url]");
+     });
+
+     jqTxt.find("br").each(function(item, el)
+     {
+       $(el).replaceWith("\n");
+     });
+
+     window.document.execCommand('insertText', false, jqTxt.text());
+});*/
   // navbar toggle menu
   $(".toggle-nav > a").on('click', function(event){
     event.preventDefault();
@@ -384,15 +404,6 @@ jQuery(document).ready(function()
 			resetFormElement($('#photoimg2'));
 		}
     }).submit();
-
-    $('#vote').on('click', function(){
-        var nzData = '/url.com?Zip=8000 #module';
-
-        $('#foo').load(nzData, function(){
-         var foo = $('#foo').html();
-         $.fancybox(foo);
-        });
-    });
 	});
 
     $(".like-button").show();
@@ -653,18 +664,21 @@ function(data){
     });
   });
 
-  $('.votebutton').click(function() {
+  // this is for voting in the GOTY awards
+  $('.votebutton').click(function()
+  {
   	var button = $(this);
   	var category_id = $(this).data('category-id');
   	var game_id = $(this).data('game-id');
   	$.post('/includes/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
   	function(data)
     {
-  	    if (data.result == 1){ //data needs to be valid json:  {result: true}
+  	  if (data.result == 1)
+      { 
   			$(button).html('Vote Saved!');
   			$(button).addClass("vote_done");
   			$.fancybox.open({type:"inline", href:"#wrap"})
-  	}
+  	  }
   		else if (data.result == 2)
   		{
   			document.getElementById("wrap_text").innerHTML = "Sorry, but voting is closed!";
@@ -675,12 +689,12 @@ function(data){
   			document.getElementById("wrap_text").innerHTML = "Sorry, but you have already voted in this category!";
   			$.fancybox.open({type:"inline", href:"#wrap"})
   		}
-  		else {
-  	      button.text("Try again later, something broke").attr('disabled', 'disabled');
-  	      setTimeout(function(){ button.removeAttr('disabled') }, 2000);
-  	    }
-          });
-
+  		else
+      {
+  	    button.text("Try again later, something broke").attr('disabled', 'disabled');
+  	    setTimeout(function(){ button.removeAttr('disabled') }, 2000);
+  	  }
+    });
   });
 
   $(".uploads").on("click", ".add_button", function(){

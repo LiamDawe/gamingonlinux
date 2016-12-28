@@ -155,10 +155,22 @@ if (!isset($_POST['act']))
 		$templating->set('game_id', $game['id']);
 		$templating->set('url', core::config('website_url'));
 
-		$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $_GET['category_id']));
-		if ($db->num_rows() == 0 && core::config('goty_voting_open') == 1)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
+			$db->sqlquery("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['category_id']));
+			$count_votes = $db->num_rows();
+			if ($count_votes == 0 && core::config('goty_voting_open') == 1)
+			{
+				$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
+			}
+			else if (core::config('goty_voting_open') == 1 && $count_votes == 1)
+			{
+				$templating->set('vote_button', '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Remove Vote</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>');
+			}
+			else
+			{
+				$templating->set('vote_button', '');
+			}
 		}
 		else
 		{
@@ -298,6 +310,20 @@ if (!isset($_POST['act']))
 
 			// games list
 			$templating->block('games_list', 'goty');
+
+			$reset_button = '';
+			if (core::config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			{
+				$db->sqlquery("SELECT `user_id`, `id` FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_GET['category_id'], $_SESSION['user_id']));
+				$check_vote = $db->num_rows();
+				if ($check_vote == 1)
+				{
+					$reset_button = '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Reset vote in current category</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>';
+				}
+			}
+
+			$templating->set('reset_button', $reset_button);
+
 			$templating->set('category_id', $_GET['category_id']);
 			$templating->set('url', core::config('website_url'));
 
@@ -346,10 +372,22 @@ if (!isset($_POST['act']))
 					$templating->set('game_id', $game['id']);
 					$templating->set('url', core::config('website_url'));
 
-					$db->sqlquery("SELECT `ip` FROM `goty_votes` WHERE `ip` = ? AND `category_id` = ?", array(core::$ip, $_GET['category_id']));
-					if ($db->num_rows() == 0 && core::config('goty_voting_open') == 1)
+					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 					{
-						$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
+						$db->sqlquery("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['category_id']));
+						$count_votes = $db->num_rows();
+						if ($count_votes == 0 && core::config('goty_voting_open') == 1)
+						{
+							$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
+						}
+						else if (core::config('goty_voting_open') == 1 && $count_votes == 1)
+						{
+							$templating->set('vote_button', '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Remove Vote</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>');
+						}
+						else
+						{
+							$templating->set('vote_button', '');
+						}
 					}
 					else
 					{
@@ -434,6 +472,24 @@ if (isset($_POST['act']))
 		else
 		{
 			header("Location: " . core::config('website_url') . "goty.php");
+		}
+	}
+
+	if ($_POST['act'] == 'reset_category_vote')
+	{
+		if (core::config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			if (!empty($_POST['category_id']))
+			{
+				$db->sqlquery("SELECT `user_id`, `id` FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_POST['category_id'], $_SESSION['user_id']));
+				$check_vote = $db->num_rows();
+				if ($check_vote == 1)
+				{
+					$grab_vote = $db->fetch();
+					$db->sqlquery("DELETE FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_POST['category_id'], $_SESSION['user_id']));
+					header("Location: /goty.php?category_id=".$_POST['category_id']."&message=vote_deleted");
+				}
+			}
 		}
 	}
 }

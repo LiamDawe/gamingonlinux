@@ -823,6 +823,10 @@ ul.social-networks li > a {
 	float: right;
 }
 
+.remove_vote {
+	float: right;
+}
+
 /* Support us page */
 .box.profile {
 	float: left;

@@ -1,4 +1,6 @@
 <?php
+require_once "EPDOStatement.php";
+
 class mysql
 {
 	// the query counter
@@ -20,6 +22,7 @@ class mysql
 		);
 		$this->database = new PDO("mysql:host=$database_host;dbname=$database_db", $database_username, $database_password, $options);
 		$this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		$this->database->setAttribute(PDO::ATTR_STATEMENT_CLASS, array("EPDOStatement\EPDOStatement", array($this->database)));
 	}
 
 	// for storing decimals
@@ -62,11 +65,12 @@ class mysql
 				}
 			}
 
+			// add this to the list of queries being done for debugging
+			$this->queries .= '<pre>' . $STH->interpolateQuery() . '</pre>';
+
 			$this->last = new db_result($STH);
 
 			$this->counter++;
-
-			$this->queries .= "<br />$sql";
 
 			//Return the result object
 			$this->last->execute();

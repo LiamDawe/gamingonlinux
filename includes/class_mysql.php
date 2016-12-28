@@ -1,16 +1,11 @@
 <?php
-require_once "EPDOStatement.php";
-
 class mysql
 {
-	// the query counter for debugging
+	// the query counter
 	public $counter = 0;
 
 	// store all the queries for debugging
 	public $queries = '';
-
-	// the current statement
-	private $stmt;
 
 	//Last query that ran
 	protected $last;
@@ -25,7 +20,6 @@ class mysql
 		);
 		$this->database = new PDO("mysql:host=$database_host;dbname=$database_db", $database_username, $database_password, $options);
 		$this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		$this->database->setAttribute(PDO::ATTR_STATEMENT_CLASS, array("EPDOStatement\EPDOStatement", array($this->database)));
 	}
 
 	// for storing decimals
@@ -34,58 +28,50 @@ class mysql
 		return ( strpos( $value, "." ) !== false );
 	}
 
-	// bind a placeholder to it's value
-	public function bind($param, $value, $type = null)
-	{
-		if (is_null($type))
-		{
-				switch (true)
-				{
-						case is_int($value):
-								$type = PDO::PARAM_INT;
-								break;
-						case is_bool($value):
-								$type = PDO::PARAM_BOOL;
-								break;
-						case is_null($value):
-								$type = PDO::PARAM_NULL;
-								break;
-						default:
-								$type = PDO::PARAM_STR;
-				}
-		}
-		$this->stmt->bindValue($param, $value, $type);
-	}
-
 	// the main sql query function
 	public function sqlquery($sql, $objects = NULL, $page = NULL, $referrer = NULL)
 	{
-		global $core, $templating;
+		global $core;
 
 		try
 		{
-			$this->stmt = $this->database->prepare($sql);
-
+			$STH = $this->database->prepare($sql);
 			if (is_array($objects))
 			{
 				foreach($objects as $k=>$p)
 				{
-					$this->bind($k+1, $p);
+					// +1 is needed as arrays start at 0 where as ? placeholders start at 1 in PDO
+					if(is_numeric($p))
+					{
+						// we need to do this or else decimals always seem to end up 'x.00', php has no decimal check, odd
+						// A number with decimal places is called a float or double in programming @ Piratelv
+						if ($this->contains_decimal($p) == true)
+						{
+							$STH->bindValue($k+1, $p, PDO::PARAM_STR);
+						}
+
+						else
+						{
+							$STH->bindValue($k+1, (int)$p, PDO::PARAM_INT);
+						}
+					}
+					else
+					{
+						$STH->bindValue($k+1, $p, PDO::PARAM_STR);
+					}
 				}
 			}
 
-			// add this to the list of queries being done for debugging
-			$this->queries .= '<pre>' . $this->stmt->interpolateQuery() . '</pre>';
+			$this->last = new db_result($STH);
 
-			// update the counter for how many queries are being done
 			$this->counter++;
 
-			$this->last = new db_result($this->stmt);
-			$this->counter++;
+			$this->queries .= "<br />$sql";
 
 			//Return the result object
 			$this->last->execute();
 			$this->last->setID($this->grab_id());
+
 			return $this->last;
 		}
 
@@ -113,24 +99,27 @@ class mysql
 		return $this->last->fetch();
 	}
 
-	public function fetch_all_rows($mode = NULL)
+	public function fetch_all_rows()
 	{
-		return $this->last->fetch_all_rows($mode);
+		return $this->last->fetch_all_rows();
 	}
+
 	public function num_rows()
 	{
 		return $this->last->num_rows();
 	}
+
 	// get the last auto made ID
 	public function grab_id()
 	{
 		return $this->database->lastInsertId();
 	}
 
-	// email any mysql errors to liam so he cant miss them
 	function pdo_error($exception, $page, $sql, $referrer = NULL)
 	{
-		$to = "liamdawe@gmail.com";
+		global $config;
+
+		$to = "liamdawe@gmail.com, levi.voorintholt@gmail.com";
 
 		// subject
 		$subject = "GOL PDO Error";
@@ -164,6 +153,7 @@ class mysql
 	}
 }
 
+
 /**
 * Mysql Result
 */
@@ -172,11 +162,14 @@ class db_result implements ArrayAccess,Iterator
 	public $success 	= false;
 	public $id 			= false;
 	private $position	= 0;
+
 	function __construct($sth)
 	{
 		$this->statement = $sth;
 		$this->statement->setFetchMode(PDO::FETCH_ASSOC);
 	}
+
+
 	public function execute($values=array())
 	{
 		if (!empty($values)){
@@ -188,25 +181,30 @@ class db_result implements ArrayAccess,Iterator
 		}
 		$this->success = $this->statement->execute();
 	}
+
 	public function fetch()
 	{
 		return $this->statement->fetch();
 	}
-	public function fetch_all_rows($mode = NULL)
+
+	public function fetch_all_rows()
 	{
 		if (!isset($this->data)){
-			$this->data = $this->statement->fetchAll($mode);
+			$this->data = $this->statement->fetchAll();;
 		}
 		return $this->data;
 	}
+
 	public function num_rows()
 	{
 		return $this->statement->rowCount();
 	}
+
 	public function setID($id)
 	{
 		$this->id = (int) $id;
 	}
+
 	/**
 	 * @return int Last inserted ID at time of this query;
 	 **/
@@ -214,6 +212,9 @@ class db_result implements ArrayAccess,Iterator
 	{
 		return $this->id;
 	}
+
+
+
 	/**  Allow access like an array **/
 	public function offsetExists( $offset ){
 		if (!isset($this->data)){  $this->fetch_all_rows();	 }

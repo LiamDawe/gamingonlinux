@@ -30,17 +30,17 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	// count how many there is in total
 	$sql_count = "SELECT `id` FROM `editor_discussion`";
 	$db->sqlquery($sql_count);
-	$total_pages = $db->num_rows();
+	$total_comments = $db->num_rows();
 
 	// sort out the pagination link
-	$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "admin.php?module=more_comments&view=editors&", $page);
+	$pagination = $core->pagination_link($_SESSION['per-page'], $total_comments, "admin.php?module=more_comments&view=editors&", $page);
 
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
 	$templating->set('pagination', $pagination);
 
-	$db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
-	while ($commentsall = $db->fetch())
+	$result = $db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
+	while ($commentsall = $result->fetch())
 	{
 		$templating->block('commentall', 'admin_modules/admin_module_more_comments');
 

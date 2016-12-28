@@ -487,6 +487,7 @@ else
 				}
 
 				$reply_count = 0;
+
 				/*
 				REPLIES SECTION
 				*/
@@ -713,6 +714,8 @@ else
 
 				// Sort out moderator options
 				$options_count = 0;
+				$options = '';
+				$options_form = '';
 				if ($parray['sticky'] == 1)
 				{
 					if ($topic['is_sticky'] == 1)

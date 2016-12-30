@@ -5,13 +5,8 @@ $templating->set_previous('meta_description', 'GamingOnLinux forum', 1);
 $templating->merge('normal_forum');
 $templating->block('top');
 
-$db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 0 ORDER BY `name` ASC");
-$options = '';
-while ($forum_list = $db->fetch())
-{
-	$options .= '<option value="'.$forum_list['forum_id'].'">'.$forum_list['name'].'</option>';
-}
-$templating->set('forum_list_search', $options);
+$templating->merge('forum_search');
+$templating->block('small');
 
 $sql = "
 SELECT
@@ -79,7 +74,7 @@ while ( $row = $db->fetch($query_forums) )
 
 foreach ($category_array as $category)
 {
-	$templating->block('category_top');
+	$templating->block('category_top', 'normal_forum');
 	$templating->set('category_name', $category['name']);
 
 	foreach ($forum_array as $forum)
@@ -87,7 +82,7 @@ foreach ($category_array as $category)
 		// show this categorys forums
 		if ($forum['parent'] == $category['id'])
 		{
-			$templating->block('forum_row');
+			$templating->block('forum_row', 'normal_forum');
 
 			if (core::config('pretty_urls') == 1)
 			{
@@ -145,10 +140,10 @@ foreach ($category_array as $category)
 			$templating->set('last_post_time', $last_post_time);
 		}
 	}
-	$templating->block('category_bottom');
+	$templating->block('category_bottom', 'normal_forum');
 }
 
-$templating->block('latest');
+$templating->block('latest', 'normal_forum');
 
 // lastest posts block below forums
 $forum_posts = '';

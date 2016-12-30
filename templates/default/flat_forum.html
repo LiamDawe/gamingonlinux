@@ -3,28 +3,6 @@
 				<div class="box">
 					<div class="head">Linux Gamers Forum <a href="/forum_rss.php"><img src="/templates/default/images/social/white/rss.svg" alt="" class="fright" width="23px"></a></div>
 				</div>
-
-				<div class="box">
-						<div class="collapse_container">
-							<div class="collapse_header">
-								<span>Click to open search</span>
-							</div>
-							<div class="collapse_content">
-								<form method="get" action="/index.php">
-									<input type="hidden" name="module" value="search_forum" />
-									<input class="ays-ignore" type="text" name="q" /> <br />
-									<button class="btn btn-primary">Search</button><br />
-									<br />
-									<strong>Search Options</strong><br />
-									<label class="checkbox">
-									Title has to include all the searched words? <input type="checkbox" name="strict" {:strict_check} />
-									</label>
-									<select name="forums"><option value="all">Search all forums</option>{:forum_list_search}</select>
-								</form>
-							</div>
-						</div>
-				</div>
-
 [/block: top]
 
 [block: options]

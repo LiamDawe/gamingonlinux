@@ -13,13 +13,8 @@ if (isset($_GET['message']))
 $templating->merge('flat_forum');
 $templating->block('top');
 
-$db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 0 ORDER BY `name` ASC");
-$options = '';
-while ($forum_list = $db->fetch())
-{
-	$options .= '<option value="'.$forum_list['forum_id'].'">'.$forum_list['name'].'</option>';
-}
-$templating->set('forum_list_search', $options);
+$templating->merge('forum_search');
+$templating->block('small');
 
 // paging for pagination
 if (!isset($_GET['page']) || $_GET['page'] <= 0)
@@ -36,7 +31,7 @@ else if (is_numeric($_GET['page']))
 $db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ( ?, ? ) GROUP BY forum_id ORDER BY f.name ASC", array($_SESSION['user_group'], $_SESSION['secondary_user_group']));
 $forum_ids = $db->fetch_all_rows();
 
-$templating->block('options');
+$templating->block('options', 'flat_forum');
 $new_topic = '';
 if (isset($_SESSION['activated']))
 {
@@ -112,7 +107,7 @@ $db->sqlquery($sql, array($core->start));
 
 while ($topics = $db->fetch())
 {
-	$templating->block('topics');
+	$templating->block('topics', 'flat_forum');
 
 	$last_date = $core->format_date($topics['last_post_date']);
 	$templating->set('tzdate', date('c',$topics['last_post_date']) );
@@ -169,9 +164,9 @@ while ($topics = $db->fetch())
 	$templating->set('profile_link', $profile_link);
 }
 
-$templating->block('options');
+$templating->block('options', 'flat_forum');
 $templating->set('new_topic', $new_topic);
 
-$templating->block('bottom');
+$templating->block('bottom', 'flat_forum');
 $templating->set('pagination', $pagination);
 ?>

@@ -254,7 +254,7 @@ else if (isset($_GET['aid']))
 
 	else
 	{
-		$username = $article['username'];
+		$username = '<a href="/profiles/'.$article['author_id'].'">' . $article['username'] . '</a>';
 	}
 
 	$templating->set('username', $username);

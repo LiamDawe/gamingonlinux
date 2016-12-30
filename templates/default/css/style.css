@@ -1373,7 +1373,13 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 .register-warning {
   color:#d2232a;
   background-color:#ffdd97;
-  padding:5px;
   width:100%;
   display:none;
 }
+.all-ok {
+  color:#33FF33;
+  background-color:#333333;
+  width:100%;
+  display:none;
+}
+.input-alert-text {padding: 5px 5px 5px 5px;}

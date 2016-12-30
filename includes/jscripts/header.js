@@ -41,6 +41,11 @@ function disableFunction() {
     document.getElementById("send").disabled = 'true';
 }
 
+function validateEmail(email) {
+  var charReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+  return charReg.test(email);
+}
+
 function resetFormElement(e)
 {
   e.wrap('<form>').closest('form').get(0).reset();
@@ -186,6 +191,21 @@ jQuery(document).ready(function()
       } else {
           $(this).parent().find(".register-warning").hide();
       }
+  });
+
+  // for checking emails
+  $('.keyup-char-email').keyup(function () {
+      $('div.error-keyup-1').hide();
+      $('div.error-keyup-2').hide();
+      var inputVal = $(this).val();
+
+  if (!validateEmail(inputVal)) {
+      $(this).parent().find(".register-warning").show();
+      $(this).parent().find(".all-ok").hide();
+  } else {
+      $(this).parent().find(".register-warning").hide();
+      $(this).parent().find(".all-ok").show();
+  }
   });
 
   if ( $.isFunction($.fn.select2) ) {

@@ -34,9 +34,10 @@
 								</div>
 								<div class="form-group">
 									<label for="input-email" class="control-label">Your Email</label>
-									<input class="form-control ays-ignore" id="input-email" type="text" name="email" value="{:email}" />
-
-								</div>
+									<input class="keyup-char-email form-control ays-ignore" id="input-email" type="text" name="email" value="{:email}" />
+                  <div class="register-warning"><div class="input-alert-text">Warning: That email doesn't look valid, but don't worry! You can email us anonymously if you wish, but if you want a reply make sure it's correct!</div></div>
+                  <div class="all-ok"><div class="input-alert-text">Email looks valid!</div></div>
+                </div>
                 <strong>Our contact email is NOT for user support, please <a href="https://www.gamingonlinux.com/forum/">use the Forum</a>.</strong>
 									<label for="input-message" class="control-label">Message</label>
 									<textarea id="input-message" class="ays-ignore" name="message" cols="100" rows="25">{:message}</textarea><br />

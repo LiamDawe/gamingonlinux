@@ -674,7 +674,7 @@ function(data){
   	function(data)
     {
   	  if (data.result == 1)
-      { 
+      {
   			$(button).html('Vote Saved!');
   			$(button).addClass("vote_done");
   			$.fancybox.open({type:"inline", href:"#wrap"})

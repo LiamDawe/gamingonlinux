@@ -51,7 +51,7 @@ else
 		$pagination = $core->pagination_link(9, $total, "/private-messages/", $page);
 
 		// need to paginate the list
-		$db->sqlquery("SELECT
+		$get_pms = $db->sqlquery("SELECT
 			i.`conversation_id`,
 			i.`title`,
 			i.`creation_date`,
@@ -75,8 +75,7 @@ else
 			i.`owner_id` = ?
 		ORDER BY
 			i.`last_reply_date` DESC LIMIT ?, 9", array($_SESSION['user_id'], $core->start));
-
-		while ($message = $db->fetch())
+		while ($message = $get_pms->fetch())
 		{
 			$templating->block('message_row');
 
@@ -354,8 +353,8 @@ else
 			$templating->set('edit_link', $edit_link);
 
 			// replies
-			$db->sqlquery("SELECT m.creation_date, m.message, m.message_id, m.author_id, u.user_id, u.username, u.register_date, u.user_group, u.secondary_user_group, u.avatar, u.avatar_gravatar,u.gravatar_email, $db_grab_fields u.avatar_uploaded FROM `user_conversations_messages` m INNER JOIN `users` u ON u.user_id = m.author_id WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
-			while ($replies = $db->fetch())
+			$get_replies = $db->sqlquery("SELECT m.creation_date, m.message, m.message_id, m.author_id, u.user_id, u.username, u.register_date, u.user_group, u.secondary_user_group, u.avatar, u.avatar_gravatar,u.gravatar_email, $db_grab_fields u.avatar_uploaded FROM `user_conversations_messages` m INNER JOIN `users` u ON u.user_id = m.author_id WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
+			while ($replies = $get_replies->fetch())
 			{
 				$templating->block('view_row_reply', 'private_messages');
 				$templating->set('message_date', $core->format_date($replies['creation_date']));

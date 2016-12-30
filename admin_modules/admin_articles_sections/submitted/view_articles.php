@@ -24,7 +24,7 @@ if (!isset($_GET['aid']))
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');
 
-	$db->sqlquery("SELECT a.article_id, a.date_submitted, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `submitted_article` = 1 AND `submitted_unapproved` = 1");
+	$db->sqlquery("SELECT a.article_id, a.date_submitted, a.title, a.tagline, a.guest_username, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `submitted_article` = 1 AND `submitted_unapproved` = 1");
 	while ($article = $db->fetch())
 	{
 		$templating->block('submitted_row', 'admin_modules/admin_articles_sections/submitted_articles');
@@ -46,7 +46,7 @@ if (!isset($_GET['aid']))
 
 		else
 		{
-			$username = $article['username'];
+			$username = '<a href="/profiles/'.$article['user_id'].'">' . $article['username'] . '</a>';
 		}
 
 		$templating->set('username', $username);

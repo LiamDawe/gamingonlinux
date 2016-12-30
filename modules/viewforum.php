@@ -22,6 +22,9 @@ else
 		$page = $_GET['page'];
 	}
 
+	$templating->merge('forum_search');
+	$templating->block('small');
+
 	$templating->merge('viewforum');
 
 	$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($forum_id));

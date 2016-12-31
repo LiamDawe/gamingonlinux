@@ -7,7 +7,7 @@ if (!isset($_GET['game-id']))
 	$templating->set_previous('title', 'GamingOnLinux Linux games database', 1);
 
 	$templating->block('main_top', 'game_database');
-	$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1");
+	$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL");
 	$total_games = $db->fetch();
 	$templating->set('total_games', $total_games['total']);
 
@@ -15,16 +15,17 @@ if (!isset($_GET['game-id']))
 	$templating->block('search', 'game-search');
 	$templating->set('search_text', '');
 
-	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY RAND() LIMIT 1");
+	// random game spotlight
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL ORDER BY RAND() LIMIT 1");
 	$random_item = $db->fetch();
 	$templating->block('random', 'game_database');
 	$templating->set('id', $random_item['id']);
 	$templating->set('name', $random_item['name']);
 	$templating->set('release_date', $random_item['date']);
 
+	// latest games in the database
 	$templating->block('latest_top', 'game_database');
-
-	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 ORDER BY `id` DESC LIMIT 10");
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL ORDER BY `id` DESC LIMIT 10");
 	while ($latest = $db->fetch())
 	{
 		$templating->block('latest_item', 'game_database');
@@ -35,9 +36,9 @@ if (!isset($_GET['game-id']))
 
 	$templating->block('latest_bottom', 'game_database');
 
+	// games recently updated in the database
 	$templating->block('edits_top', 'game_database');
-
-	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 AND `edit_date` IS NOT NULL AND `edit_date` != '0000-00-00 00:00:00' ORDER BY UNIX_TIMESTAMP(`edit_date`) DESC LIMIT 10");
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL AND `edit_date` IS NOT NULL AND `edit_date` != '0000-00-00 00:00:00' ORDER BY UNIX_TIMESTAMP(`edit_date`) DESC LIMIT 10");
 	while ($latest = $db->fetch())
 	{
 		$templating->block('latest_item', 'game_database');
@@ -52,10 +53,10 @@ if (!isset($_GET['game-id']))
 if (isset($_GET['game-id']))
 {
 	// make sure it exists
-	$db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`description`, c.`best_guess`, c.`is_dlc`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
+	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`description`, c.`best_guess`, c.`is_dlc`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
-		$game = $db->fetch();
+		$game = $get_game->fetch();
 
 		$templating->set_previous('meta_description', 'GamingOnLinux games database: '.$game['name'], 1);
 		$templating->set_previous('title', $game['name'], 1);
@@ -146,6 +147,20 @@ if (isset($_GET['game-id']))
 			$steam_link = '<li><a href="' . $game['steam_link'] . '">Steam Store</a></li>';
 		}
 		$templating->set('steam_link', $steam_link);
+
+		// find any associations
+		$get_associations = $db->sqlquery("SELECT `name` FROM `calendar` WHERE `also_known_as` = ?", array($game['id']));
+		$count_same = $db->num_rows();
+		$same_games = array();
+		if ($count_same > 0)
+		{
+			$templating->block('associations');
+			while ($associations = $get_associations->fetch())
+			{
+				$same_games[] = $associations['name'];
+			}
+			$templating->set('games', implode(', ', $same_games));
+		}
 
 		$game['name'] = trim($game['name']);
 		$db->sqlquery("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `article_game_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC", array($game['name']));

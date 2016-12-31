@@ -81,7 +81,7 @@ function ordinal($number)
 $templating->merge('calendar');
 
 // count how many there is due this month
-$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1");
+$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1 AND `also_known_as` IS NULL");
 $counter = $db->fetch();
 
 $templating->block('top');
@@ -157,12 +157,12 @@ $templating->block('head', 'calendar');
 	$templating->set('next_year', $next_year);
 
 	// count how many there is
-	$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1");
+	$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL");
 	$counter = $db->fetch();
 
 	$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-	$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 ORDER BY `date` ASC, `name` ASC");
+	$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL ORDER BY `date` ASC, `name` ASC");
 	while ($listing = $db->fetch())
 	{
 		$get_date = date_parse($listing['date']);

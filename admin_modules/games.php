@@ -29,7 +29,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'date', 'guess_guess', 'dlc_check', 'base_game');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', `itch_link`, 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');
@@ -84,11 +84,15 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$return = $_GET['return'];
 				}
 
+				$stores = array('steam', 'gog', 'itch');
+				foreach ($stores as $store)
+				{
+					$templating->set($store . '_link', $game[$store . '_link']);
+				}
+
 				$templating->set('id', $game['id']);
 				$templating->set('name', $game['name']);
 				$templating->set('link', $game['link']);
-				$templating->set('steam_link', $game['steam_link']);
-				$templating->set('gog_link', $game['gog_link']);
 
 				$date = new DateTime($game['date']);
 				$templating->set('date', $date->format('d-m-Y'));
@@ -106,6 +110,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$dlc_check = 'checked';
 				}
 				$templating->set('dlc_check', $dlc_check);
+
+				$free_check = '';
+				if ($game['free_game'] == 1)
+				{
+					$free_check = 'checked';
+				}
+				$templating->set('free_check', $free_check);
 
 				$base_game = '';
 				if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
@@ -130,7 +141,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'Add')
 	{
-		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link'])))
+		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link'] && empty($_POST['itch_link']))))
 		{
 			header("Location: /admin.php?module=games&view=add&error=missing");
 			exit;
@@ -158,6 +169,12 @@ if (isset($_POST['act']))
 			$dlc = 1;
 		}
 
+		$free_game = 0;
+		if (isset($_POST['free_game']))
+		{
+			$free_game = 1;
+		}
+
 		$base_game = NULL;
 		if (isset($_POST['game']) && is_numeric($_POST['game']))
 		{
@@ -167,7 +184,7 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $dlc, $base_game));
+		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game));
 		$new_id = $db->grab_id();
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
@@ -182,7 +199,7 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link'])))
+		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link']) && empty($_POST['itch_link'])))
 		{
 			header("Location: /admin.php?module=games&view=edit&message=missing&id=" . $_POST['id']);
 			die();
@@ -203,6 +220,12 @@ if (isset($_POST['act']))
 			$dlc = 1;
 		}
 
+		$free_game = 0;
+		if (isset($_POST['free_game']))
+		{
+			$free_game = 1;
+		}
+
 		$base_game = NULL;
 		if (isset($_POST['game']) && is_numeric($_POST['game']))
 		{
@@ -212,7 +235,7 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $guess, $edit_date, $dlc, $base_game, $_POST['id']));
+		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $edit_date, $dlc, $base_game, $free_game, $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 

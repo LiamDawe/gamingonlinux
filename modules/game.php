@@ -16,7 +16,7 @@ if (!isset($_GET['game-id']))
 	$templating->set('search_text', '');
 
 	// random game spotlight
-	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL ORDER BY RAND() LIMIT 1");
+	$db->sqlquery("SELECT `id`, `name`, `date` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL AND `description` IS NOT NULL AND `description` != '' ORDER BY RAND() LIMIT 1");
 	$random_item = $db->fetch();
 	$templating->block('random', 'game_database');
 	$templating->set('id', $random_item['id']);

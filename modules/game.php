@@ -1,7 +1,45 @@
 <?php
 $templating->merge('game_database');
 
-if (!isset($_GET['game-id']))
+if (isset($_GET['view']))
+{
+	if ($_GET['view'] == 'all')
+	{
+		$templating->set_previous('meta_description', 'GamingOnLinux Linux games database', 1);
+		$templating->set_previous('title', 'GamingOnLinux Linux games database - viewing full database', 1);
+
+		$page = 1;
+		// paging for pagination
+		if (!isset($_GET['page']) || $_GET['page'] == 0)
+		{
+			$page = 1;
+		}
+
+		else if (is_numeric($_GET['page']))
+		{
+			$page = $_GET['page'];
+		}
+
+		$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL");
+		$total_games = $db->fetch();
+
+		// sort out the pagination link
+		$pagination = $core->pagination_link(18, $total_games['total'], '/index.php?module=game&amp;view=all&', $page, '#comments');
+
+		$grab_games = $db->sqlquery("SELECT `name`, `id` FROM `calendar` ORDER BY `name` ASC LIMIT ?, 18", array($core->start));
+		$templating->block('game_list');
+		while ($game = $grab_games->fetch())
+		{
+			$templating->block('game_list_row');
+			$templating->set('name', $game['name']);
+			$templating->set('id', $game['id']);
+		}
+		$templating->block('game_list_bottom');
+		$templating->set('pagination', $pagination);
+	}
+}
+
+if (!isset($_GET['game-id']) && !isset($_GET['view']))
 {
 	$templating->set_previous('meta_description', 'GamingOnLinux Linux games database', 1);
 	$templating->set_previous('title', 'GamingOnLinux Linux games database', 1);
@@ -50,7 +88,7 @@ if (!isset($_GET['game-id']))
 	$templating->block('edits_bottom', 'game_database');
 }
 
-if (isset($_GET['game-id']))
+if (isset($_GET['game-id']) && !isset($_GET['view']))
 {
 	// make sure it exists
 	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));

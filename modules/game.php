@@ -123,7 +123,7 @@ if (isset($_GET['game-id']))
 		$description = '';
 		if (!empty($game['description']) && $game['description'] != NULL)
 		{
-			$description = '<strong>About this game</strong><br />' . $game['description'] . '<br /><br />';
+			$description = $game['description'] . '<br /><br />';
 		}
 		$templating->set('description', bbcode($description));
 

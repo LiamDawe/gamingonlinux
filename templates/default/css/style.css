@@ -1383,3 +1383,8 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
   display:none;
 }
 .input-alert-text {padding: 5px 5px 5px 5px;}
+.database_stores{display: inline;list-style-type: none; padding: 0; margin: 0;}
+.database_stores li + li:before {
+    content: ", ";
+}
+.database_stores li {display: inline;}

@@ -534,15 +534,7 @@ if (!isset($_GET['go']))
 						{
 							if (empty($comments['username']))
 							{
-								if ($user->check_group(1,2) == true)
-								{
-									$username = "<a href=\"/admin.php?module=articles&view=comments&ip_id={$comments['comment_id']}\">Guest</a>";
-								}
-								else
-								{
-									$username = 'Guest';
-								}
-
+								$username = 'Guest';
 							}
 							if (!empty($comments['guest_username']))
 							{
@@ -602,7 +594,10 @@ if (!isset($_GET['go']))
 						$templating->set('date', $comment_date);
 						$templating->set('tzdate', date('c',$comments['time_posted']) ); //piratelv timeago
 						$templating->set('pc_info_link', $pc_info);
-						$cake_bit = $user->cake_day($comments['register_date'], $comments['username']);
+						if ($username != 'Guest')
+						{
+							$cake_bit = $user->cake_day($comments['register_date'], $comments['username']);
+						}
 						$templating->set('cake_icon', $cake_bit);
 						$new_badge = $user->new_user_badge($comments['register_date']);
 						$templating->set('new_user_badge', $new_badge);

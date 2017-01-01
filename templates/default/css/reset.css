@@ -556,13 +556,13 @@ ul.pagination li:hover a,  ul.pagination li.active a {
 	/* Generic */
 	.masonry {
 	padding: 0;
-	-moz-column-gap: 1.5em;
-	-webkit-column-gap: 1.5em;
-	column-gap: 1.5em;
+	-moz-column-gap: 1em;
+	-webkit-column-gap: 1em;
+	column-gap: 1em;
 	}
 	.masonry .block {
 		display: inline-block;
-    margin: 0 0 1.5em;
+    margin: 0 0 5px;
     width: 100%;
 	}
 

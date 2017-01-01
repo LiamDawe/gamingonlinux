@@ -53,7 +53,7 @@ if (!isset($_GET['game-id']))
 if (isset($_GET['game-id']))
 {
 	// make sure it exists
-	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`description`, c.`best_guess`, c.`is_dlc`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
+	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
 		$game = $get_game->fetch();
@@ -147,6 +147,13 @@ if (isset($_GET['game-id']))
 			$steam_link = '<li><a href="' . $game['steam_link'] . '">Steam Store</a></li>';
 		}
 		$templating->set('steam_link', $steam_link);
+
+		$itch_link = '';
+		if (!empty($game['itch_link']))
+		{
+			$itch_link = '<li><a href="' . $game['itch_link'] . '">itch.io Store</a></li>';
+		}
+		$templating->set('itch_link', $itch_link);
 
 		// find any associations
 		$get_associations = $db->sqlquery("SELECT `name` FROM `calendar` WHERE `also_known_as` = ?", array($game['id']));

@@ -827,36 +827,19 @@ ul.social-networks li > a {
 }
 
 /* Support us page */
-.box.profile {
-	float: left;
-	margin: 6px;
+.masonry-support-us .block {
+	display: inline-block;
+	margin: 0 0 1.5em;
+	width: 100%;
 }
-.box.profile:first-child {
-	margin-left: 0px;
-}
-.box.profile:last-child {
-	margin-right: 0px;
-}
-.box.profile .body {
-	height: 195px;
-	width: 280px;
+.support-us-box {
 	text-align: center;
 	overflow: hidden;
+	background: #efefef;
 }
-.box.profile img {
-	display: block;
-	margin: 0 auto;
-}
-.box.profile a {
-    word-wrap: break-word;
-}
-.box.profile a:hover {
+.support-us-box a {display: block;}
+.support-us-box a:hover {
 	color: #518FD0;
-}
-.supportusrow:after {
-	display: block;
-	clear: both;
-	content: "";
 }
 
 /* Games Database */
@@ -1149,6 +1132,40 @@ body.dark {
 .dark strong {color: #ffffff}
 
 /* Responsive CSS */
+@media only screen and (min-width: 700px) {
+    .masonry {
+        -moz-column-count: 2;
+        -webkit-column-count: 2;
+        column-count: 2;
+    }
+		.masonry-support-us {
+				-moz-column-count: 2;
+				-webkit-column-count: 2;
+				column-count: 2;
+		}
+}
+
+@media only screen and (min-width: 900px) {
+    .masonry {
+        -moz-column-count: 3;
+        -webkit-column-count: 3;
+        column-count: 3;
+    }
+		.masonry-support-us {
+				-moz-column-count: 3;
+				-webkit-column-count: 3;
+				column-count: 3;
+		}
+}
+
+@media only screen and (min-width: 1100px) {
+    .masonry {
+        -moz-column-count: 4;
+        -webkit-column-count: 4;
+        column-count: 4;
+    }
+}
+
 /* DESKTOP */
 @media only screen and (min-width: 1200px) {
 	.container {

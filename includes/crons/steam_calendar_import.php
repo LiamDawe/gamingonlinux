@@ -62,7 +62,7 @@ do
             $title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title);
 
             $dont_use = 0;
-            $dont_use_array = array("Soundtrack", "soundtrack", "Soundtracks", "Sound Track", "Wallpapers", " OST", "Artbook", " Walkthrough", "Season Pass");
+            $dont_use_array = array("Soundtrack", "soundtrack", "Soundtracks", "Sound Track", "Wallpapers", " OST", "Artbook", "Art Book", " Walkthrough", "Season Pass");
             foreach ($dont_use_array as $checker)
             {
               // don't give us this junk

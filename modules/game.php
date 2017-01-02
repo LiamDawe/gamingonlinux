@@ -5,6 +5,8 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'all')
 	{
+		$licenses = array('', 'Closed Source', 'GPL', 'BSD', 'MIT');
+
 		$templating->set_previous('meta_description', 'GamingOnLinux Linux games database', 1);
 		$templating->set_previous('title', 'GamingOnLinux Linux games database - viewing full database', 1);
 
@@ -20,22 +22,58 @@ if (isset($_GET['view']))
 			$page = $_GET['page'];
 		}
 
-		$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL");
+		$templating->block('game_list');
+		$license_options = '';
+		foreach ($licenses as $license)
+		{
+			$selected = '';
+			if (isset($_GET['license']) && !empty($_GET['license']) && $_GET['license'] == $license)
+			{
+				$selected = 'selected';
+			}
+			$license_options .= '<option value="' . $license . '" '.$selected.'>'.$license.'</option>';
+		}
+		$templating->set('license_options', $license_options);
+
+		// sort out any filters
+		$additional_sql = '';
+		$license_sql = '';
+		if (isset($_GET['license']) && !empty($_GET['license']))
+		{
+			$license_sql = str_replace('+', ' ', $_GET['license']);
+			if (in_array($license_sql, $licenses))
+			{
+				$additional_sql = ' AND `license` = \'' . $license_sql . '\' ';
+			}
+		}
+
+		$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL $additional_sql");
 		$total_games = $db->fetch();
 
 		// sort out the pagination link
 		$pagination = $core->pagination_link(18, $total_games['total'], '/index.php?module=game&amp;view=all&', $page, '#comments');
 
-		$grab_games = $db->sqlquery("SELECT `name`, `id` FROM `calendar` WHERE `also_known_as` IS NULL ORDER BY `name` ASC LIMIT ?, 18", array($core->start));
-		$templating->block('game_list');
-		while ($game = $grab_games->fetch())
+		$grab_games = $db->sqlquery("SELECT `name`, `id` FROM `calendar` WHERE `also_known_as` IS NULL $additional_sql ORDER BY `name` ASC LIMIT ?, 18", array($core->start));
+		$count_found = $db->num_rows();
+		if ($count_found > 0)
 		{
-			$templating->block('game_list_row');
-			$templating->set('name', $game['name']);
-			$templating->set('id', $game['id']);
+			while ($game = $grab_games->fetch())
+			{
+				$templating->block('game_list_row');
+				$templating->set('name', $game['name']);
+				$templating->set('id', $game['id']);
+			}
+			$templating->block('game_list_bottom');
+			$templating->set('pagination', $pagination);
 		}
-		$templating->block('game_list_bottom');
-		$templating->set('pagination', $pagination);
+		else
+		{
+			$templating->block('game_list_bottom');
+			$templating->set('pagination', '');
+			$core->message("None found with those filters!");
+		}
+
+
 	}
 }
 

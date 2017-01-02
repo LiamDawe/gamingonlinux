@@ -66,7 +66,7 @@ if (isset($_GET['q']))
 	}
 	else
 	{
-		$core->message('None found.');
+		$core->message('None found. You could try the filters on our <a href="/index.php?module=game&view=all">main games page here.</a>');
 	}
 
 	$templating->block('search_result_bottom', 'game-search');

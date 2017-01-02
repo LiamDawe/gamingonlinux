@@ -358,7 +358,7 @@ if (!isset($_GET['go']))
 
 				$templating->block('article_bottom', 'articles_full');
 
-				if (!empty($article['article_bio']) && ($article['user_group'] == 1 || $article['user_group'] == 2 || $article['user_group'] == 5))
+				if (!empty($article['article_bio']) && ($article['user_group'] == 1 || $article['user_group'] == 2 || $article['user_group'] == 5) && $article['author_id'] != 1844)
 				{
 					$templating->block('bio', 'articles_full');
 

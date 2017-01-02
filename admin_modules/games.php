@@ -29,7 +29,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', `itch_link`, 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');

@@ -91,7 +91,7 @@ if (!isset($_GET['game-id']) && !isset($_GET['view']))
 if (isset($_GET['game-id']) && !isset($_GET['view']))
 {
 	// make sure it exists
-	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
+	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
 		$game = $get_game->fetch();
@@ -136,6 +136,41 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 		}
 
 		$templating->block('main-info', 'game_database');
+
+		// extra info box
+		$extra = 0; // don't show it if nothing is filled
+		$extra_info = '';
+
+		// sort out price
+		$price = '';
+		if ($game['free_game'] == 1)
+		{
+			$price = 'Free';
+		}
+		if (!empty($price))
+		{
+			$price = '<li>Price: ' . $price . '</li>';
+			$extra++;
+		}
+
+		// sort out license
+		$license = '';
+		if (!empty($game['license']) || $game['license'] != NULL)
+		{
+			$license = $game['license'];
+		}
+		if (!empty($license))
+		{
+			$license = '<li>License: ' . $license . '</li>';
+			$extra++;
+		}
+
+		if ($extra > 0)
+		{
+			$extra_info = $templating->block_store('extra', 'game_database');
+			$extra_info = $templating->store_replace($extra_info, array('price' => $price, 'license' => $license));
+		}
+		$templating->set('extra_info', $extra_info);
 
 		$date = '';
 		if (!empty($game['date']))

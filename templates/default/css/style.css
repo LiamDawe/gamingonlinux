@@ -1405,3 +1405,5 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
     content: ", ";
 }
 .database_stores li {display: inline;}
+.database_extra{display: inline;list-style-type: none; padding: 0; margin: 0;}
+.database_extra li {padding: 0px;}

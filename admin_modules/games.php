@@ -1,6 +1,8 @@
 <?php
 $templating->merge('admin_modules/games');
 
+$licenses = array('', 'Closed Source', 'GPL', 'BSD', 'MIT');
+
 if (isset($_GET['view']) && !isset($_POST['act']))
 {
 	if ($_GET['view'] == 'add')
@@ -34,6 +36,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$templating->set($make_empty, '');
 		}
+
+		$license_options = '';
+		foreach ($licenses as $license)
+		{
+			$license_options .= '<option value="' . $license . '">'.$license.'</option>';
+		}
+		$templating->set('license_options', $license_options);
 
 		$core->editor('text', '');
 
@@ -118,6 +127,18 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('free_check', $free_check);
 
+				$license_options = '';
+				foreach ($licenses as $license)
+				{
+					$selected = '';
+					if ($game['license'] == $license)
+					{
+						$selected = 'selected';
+					}
+					$license_options .= '<option value="' . $license . '" '.$selected.'>'.$license.'</option>';
+				}
+				$templating->set('license_options', $license_options);
+
 				$base_game = '';
 				if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
 				{
@@ -181,10 +202,16 @@ if (isset($_POST['act']))
 			$base_game = $_POST['game'];
 		}
 
+		$license = NULL;
+		if (!empty($_POST['license']))
+		{
+			$license = $_POST['license'];
+		}
+
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game));
+		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license));
 		$new_id = $db->grab_id();
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
@@ -232,10 +259,16 @@ if (isset($_POST['act']))
 			$base_game = $_POST['game'];
 		}
 
+		$license = NULL;
+		if (!empty($_POST['license']))
+		{
+			$license = $_POST['license'];
+		}
+
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $edit_date, $dlc, $base_game, $free_game, $_POST['id']));
+		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $edit_date, $dlc, $base_game, $free_game, $license, $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 

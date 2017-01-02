@@ -59,8 +59,8 @@ if (!isset($_GET['view']))
 		$templating->merge('announcements');
 		$templating->block('announcement_top', 'announcements');
 
-		$db->sqlquery("SELECT `text` FROM `announcements` ORDER BY `id` DESC");
-		while ($announcement = $db->fetch())
+		$get_announcements = $db->sqlquery("SELECT `text` FROM `announcements` ORDER BY `id` DESC");
+		while ($announcement = $get_announcements->fetch())
 		{
 			$templating->block('announcement', 'announcements');
 			$templating->set('text', bbcode($announcement['text']));

@@ -26,7 +26,7 @@ if (isset($_GET['view']))
 		// sort out the pagination link
 		$pagination = $core->pagination_link(18, $total_games['total'], '/index.php?module=game&amp;view=all&', $page, '#comments');
 
-		$grab_games = $db->sqlquery("SELECT `name`, `id` FROM `calendar` ORDER BY `name` ASC LIMIT ?, 18", array($core->start));
+		$grab_games = $db->sqlquery("SELECT `name`, `id` FROM `calendar` WHERE `also_known_as` IS NULL ORDER BY `name` ASC LIMIT ?, 18", array($core->start));
 		$templating->block('game_list');
 		while ($game = $grab_games->fetch())
 		{

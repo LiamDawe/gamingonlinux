@@ -134,7 +134,10 @@ if (!isset($_GET['view']))
 			"denied_livestream_submission" => ' denied a livestream submission.',
 
 			"goty_game_submission" => ' submitted a GOTY game for review.',
-			"goty_game_added" => ' added a GOTY game'
+			"goty_game_added" => ' added a GOTY game.',
+			"goty_accepted_game" => ' accepted a GOTY submission.',
+			"goty_denied_game" => ' denied a GOTY submission.',
+			"goty_finished" => ' closed the GOTY awards.'
 		);
 
 		$completed_indicator = '&#10004;';

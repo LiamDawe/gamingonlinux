@@ -197,15 +197,19 @@ class article_class
     $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article_id, 'deleted_article', core::$date, core::$date));
 
     // remove old article's image
-    if ($check['article_top_image'] == 1)
+    if ($article['article_top_image'] == 1)
     {
       unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/topimages/' . $article['article_top_image_filename']);
     }
 
-    if (!empty($check['tagline_image']))
+    // if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
+    if ($article['author_id'] != 1844)
     {
-      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
-      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
+      if (!empty($article['tagline_image']))
+      {
+        unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
+        unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
+      }
     }
 
     // find any uploaded images, and remove them

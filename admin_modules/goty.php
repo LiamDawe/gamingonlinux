@@ -214,7 +214,7 @@ if (isset($_POST['act']))
 		if (!empty($_POST['name']))
 		{
 			// check if it exists
-			$db->sqlquery("SELECT `game` FROM `goty_games` WHERE `game` = ? AND `category_id = ?`", array($_POST['name'], $_POST['category']));
+			$db->sqlquery("SELECT `game` FROM `goty_games` WHERE `game` = ? AND `category_id` = ?", array($_POST['name'], $_POST['category']));
 
 			// add it
 			if ($db->num_rows() != 1)

@@ -893,7 +893,7 @@ class core
 					{
 						$labels[$last_id]['colour'] = "#33a02c";
 					}
-					$labels[$last_id]['percent'] = round(($label_loop['data'] / $chart_info['total_answers']) * 100, 2) . '%';
+					$labels[$last_id]['percent'] = round(($label_loop['data'] / $chart_info['total_answers']) * 100, 2);
 		  }
 
 			// this is for the full info expand box, as charts only show 10 items, this expands to show them all
@@ -956,36 +956,14 @@ class core
 			}
 			$full_info .= '</div></div>';
 
-			$settings = array('show_tooltips' => true, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 20, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
+			$settings = array('units_label' => '%', 'grid_division_h' => 10, 'show_tooltips' => true, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 35, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 0, 'units_y' => "%", 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
 			$settings['structured_data'] = true;
 			$settings['structure'] = array(
 			'key' => 'name',
-			'value' => 'total',
+			'value' => 'percent',
 			'colour' => 'colour',
-			'tooltip' => 'percent'
+			'tooltip' => 'total'
 			);
-
-			// to give labels a + or - over last months figures
-
-			/*$settings['data_label_callback'] = function($d, $k, $v)
-			{
-				if ($this_month > $last_month)
-				{
-					$delimiter = '+';
-				}
-				else if ($this_month < $last_month)
-				{
-					$delimiter = '-';
-				}
-				else
-				{
-					$delimiter = '';
-				}
-				$total = $this_month + $last_month;
-
-				return $v . '(' . $delimiter . ')';
-				return 'test';
-			}*/
 
 			$graph = new SVGGraph(400, 300, $settings);
 

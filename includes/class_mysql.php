@@ -123,7 +123,7 @@ class mysql
 	{
 		global $config;
 
-		$to = "liamdawe@gmail.com, levi.voorintholt@gmail.com";
+		$to = "liamdawe@gmail.com";
 
 		// subject
 		$subject = "GOL PDO Error";

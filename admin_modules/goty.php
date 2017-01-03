@@ -294,7 +294,7 @@ if (isset($_POST['act']))
 			// add it
 			if ($db->num_rows() != 1)
 			{
-				$db->sqlquery("UPDATE `goty_games` SET `game` = ?, `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_POST['name'], $_POST['id'], $_SESSION['user_id']));
+				$db->sqlquery("UPDATE `goty_games` SET `game` = ?, `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_POST['name'], $_SESSION['user_id'], $_POST['id']));
 				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=submitted&message=added");

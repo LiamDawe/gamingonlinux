@@ -12,6 +12,8 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include(path . 'class_core.php');
 $core = new core();
 
+include(path . 'class_mail.php');
+
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 $url = 'https://itch.io/feed/new.xml';
 if ($core->file_get_contents_curl($url) == true)

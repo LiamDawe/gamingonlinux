@@ -159,13 +159,54 @@ jQuery(document).ready(function()
 
      window.document.execCommand('insertText', false, jqTxt.text());
 });*/
+  // this will grab any url parameter like ?module=test and give you "test" if you search for "module"
+  var getUrlParameter = function getUrlParameter(sParam) {
+      var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+          sURLVariables = sPageURL.split('&'),
+          sParameterName,
+          i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : sParameterName[1];
+          }
+      }
+  };
+
+  // detect if there's a # in the url
+  if(window.location.hash)
+  {
+    var current_module = getUrlParameter('module');
+    var hash = window.location.hash.substring(1);
+    // if it's the stats page, show them the stats they want
+    if (current_module == 'statistics')
+    {
+      if (hash == 'trends')
+      {
+        $("#trends").show();
+        $("#monthly").hide();
+      }
+      else if (hash == 'monthly')
+      {
+        $("#trends").hide();
+        $("#monthly").show();
+      }
+    }
+  }
+
   $("#trends_link").on('click', function(event)
   {
+    event.preventDefault();
+    document.location.hash = "#trends";
     $("#trends").show();
     $("#monthly").hide();
   });
   $("#monthly_link").on('click', function(event)
   {
+    event.preventDefault();
+    document.location.hash = "#monthly";
     $("#trends").hide();
     $("#monthly").show();
   });

@@ -1059,7 +1059,10 @@ class core
 		'#6a3d9a'
 		);
 
-		$get_graph['graph'] = '<canvas id="myLineChart" width="400" height="200"></canvas>';
+		$graph_name = str_replace(' ', '', $name); // Replaces all spaces with hyphens.
+ 		$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
+
+		$get_graph['graph'] = '<canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
 
 		$total_array = count($labels);
 
@@ -1084,8 +1087,8 @@ class core
 		}
 
 		$javascript = "<script>
-		var ctx = document.getElementById('myLineChart');
-		var myChart = new Chart.Line(ctx, {
+		var ".$graph_name." = document.getElementById('".$graph_name."');
+		var myChart = new Chart.Line(".$graph_name.", {
 			type: 'bar',
 			data: {
       labels: [".implode(',', $dates)."],
@@ -1107,7 +1110,7 @@ class core
 				{
 					callbacks: {
 						label: function(tooltipItem, data) {
-              var value = data.datasets[tooltipItem.datasetIndex].data[0];
+              var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 							var label = data.datasets[tooltipItem.datasetIndex].label;
               return label + ' ' + value + '%';
         		}
@@ -1117,7 +1120,7 @@ class core
 		});
 		</script>";
 
-	core::$user_graphs_js = $javascript;
+	core::$user_graphs_js .= $javascript;
 
 	return $get_graph;
 

@@ -1011,6 +1011,118 @@ class core
 		}
 	}
 
+	function trends_charts($name, $order = '')
+	{
+		global $db;
+
+		$dates = array();
+		$chart_ids = array();
+		$labels = array();
+
+		// get each chart along with the date they were generated to make the axis
+		$get_charts = $db->sqlquery("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ?", array($name));
+		while ($chart_info = $get_charts->fetch())
+		{
+			$chart_ids[] = $chart_info['id'];
+
+			$make_time = strtotime($chart_info['generated_date']);
+			$dates[] = "'".date("M-Y", $make_time) . "'";
+		}
+
+		$chart_ids_sql = implode(',', $chart_ids);
+
+		// get the names of all the labels
+		$find_labels = $db->sqlquery("SELECT DISTINCT(`name`) FROM `user_stats_charts_labels` WHERE `chart_id` IN ($chart_ids_sql)");
+		$get_labels = $find_labels->fetch_all_rows();
+
+		$top_10_labels = array_slice($get_labels, 0, 10);
+		foreach ($top_10_labels as $sort_labels)
+		{
+			$get_data = $db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY l.`name` ASC, d.`data`, c.generated_date, c.`total_answers`, l.`label_id` LIMIT 10");
+			while ($data = $get_data->fetch())
+			{
+				$percent = round(($data['data'] / $data['total_answers']) * 100, 2);
+				$labels[$data['name']][] = $percent;
+			}
+		}
+
+		$colours = array(
+		'#a6cee3',
+		'#1f78b4',
+		'#b2df8a',
+		'#33a02c',
+		'#fb9a99',
+		'#e31a1c',
+		'#fdbf6f',
+		'#ff7f00',
+		'#cab2d6',
+		'#6a3d9a'
+		);
+
+		$get_graph['graph'] = '<canvas id="myLineChart" width="400" height="200"></canvas>';
+
+		$total_array = count($labels);
+
+		$data_sets = '';
+		$counter = 0;
+		foreach ($labels as $key => $data)
+		{
+			$data_sets .= "{
+      label: '".$key."',
+			fill: false,
+      data: [";
+			$data_sets .= implode(',', $data);
+			$data_sets .= "],
+      borderColor: '$colours[$counter]',
+      borderWidth: 1
+      }";
+			$counter++;
+			if ($counter != $total_array)
+			{
+				$data_sets .= ',';
+			}
+		}
+
+		$javascript = "<script>
+		var ctx = document.getElementById('myLineChart');
+		var myChart = new Chart.Line(ctx, {
+			type: 'bar',
+			data: {
+      labels: [".implode(',', $dates)."],
+      datasets: [$data_sets]
+			},
+			options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero:true
+            },
+						scaleLabel: {
+        			display: true,
+        			labelString: 'Percentage of users'
+      			}
+          }]
+        },
+				tooltips:
+				{
+					callbacks: {
+						label: function(tooltipItem, data) {
+              var value = data.datasets[0].data[tooltipItem.index];
+							var label = data.datasets[tooltipItem.datasetIndex].label
+              return label + ' ' + value + '%';
+        		}
+    			},
+				},
+    	}
+		});
+		</script>";
+
+	core::$user_graphs_js = $javascript;
+
+	return $get_graph;
+
+	}
+
 	function process_livestream_users($livestream_id)
 	{
 		global $db;

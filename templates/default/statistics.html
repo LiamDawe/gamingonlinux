@@ -1,4 +1,4 @@
-[block: users]
+[block: top]
 <div class="box">
   <div class="body group">
     This is currently in BETA. There are {:total_users} registered users on GamingOnLinux. These statistics are gathered using their manually entered data on their profiles. <strong>Please <a href="https://www.gamingonlinux.com/usercp.php?module=pcinfo">update your profile here</a> to make this as accurate as possible</strong>.<br />
@@ -6,7 +6,14 @@
     As with any survey, this won't be 100% accurate and should be taken with a pinch of salt.
   </div>
 </div>
-[/block: users]
+<div class="box">
+  <div class="body group"><strong>Sections:</strong> <a id="monthly_link" href="#">Monthly</a> | <a id="trends_link" href="#">Trends</a></div>
+</div>
+[/block: top]
+
+[block: monthly_top]
+<div id="monthly">
+[/block: monthly_top]
 
 [block: picker]
 <div class="box">
@@ -36,3 +43,29 @@
   </div>
 </div>
 [/block: chart_section]
+
+[block: monthly_bottom]
+</div>
+[/block: monthly_bottom]
+
+[block: trends_top]
+<div id="trends">
+  <div class="box">
+    <div class="body group">You can interact with these graphs. Click a label to disable/enable it to fine-tune your experience when looking at it</div>
+  </div>
+[/block: trends_top]
+
+[block: trend_chart]
+  <div class="box">
+    <div class="head">
+      {:title}
+    </div>
+    <div class="body group">
+      {:graph}
+    </div>
+  </div>
+[/block: trend_chart]
+
+[block: trends_bottom]
+</div>
+[/block: trends_bottom]

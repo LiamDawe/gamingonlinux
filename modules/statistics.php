@@ -7,22 +7,8 @@ include(core::config('path') . '/includes/profile_fields.php');
 $templating->load('statistics');
 
 // TOTAL USERS
-$templating->block('users');
+$templating->block('top', 'statistics');
 $templating->set('total_users', core::config('total_users'));
-
-$options = '';
-$db->sqlquery("SELECT `grouping_id`, `generated_date` FROM `user_stats_grouping` ORDER BY `grouping_id` DESC LIMIT 12");
-while ($get_list = $db->fetch())
-{
-  $selected = '';
-  if (isset($_POST['picker']) && is_numeric($_POST['picker']) && $_POST['picker'] == $get_list['grouping_id'])
-  {
-    $selected = 'selected';
-  }
-  $options .= '<option value="' . $get_list['grouping_id'] . '" ' . $selected . '>'.$get_list['generated_date'].'</option>';
-}
-$templating->block('picker');
-$templating->set('options', $options);
 
 $charts = array(
   array("name" => "Linux Distributions (Combined)"),
@@ -41,6 +27,21 @@ $charts = array(
   array("name" => "Main Gaming Machine"),
   array("name" => "Main Gamepad")
 );
+
+$templating->block('monthly_top');
+$options = '';
+$db->sqlquery("SELECT `grouping_id`, `generated_date` FROM `user_stats_grouping` ORDER BY `grouping_id` DESC LIMIT 12");
+while ($get_list = $db->fetch())
+{
+  $selected = '';
+  if (isset($_POST['picker']) && is_numeric($_POST['picker']) && $_POST['picker'] == $get_list['grouping_id'])
+  {
+    $selected = 'selected';
+  }
+  $options .= '<option value="' . $get_list['grouping_id'] . '" ' . $selected . '>'.$get_list['generated_date'].'</option>';
+}
+$templating->block('picker');
+$templating->set('options', $options);
 
 $counter = 0;
 
@@ -94,3 +95,28 @@ foreach($charts as $chart)
   $templating->set('full_info', $grab_chart['full_info']);
   $counter++;
 }
+$templating->block('monthly_bottom');
+
+// trends charts
+$templating->block('trends_top');
+$counter = 0;
+foreach ($charts as $chart)
+{
+  $order = '';
+  if (isset($chart['order']))
+  {
+    $order = $chart['order'];
+  }
+
+  $grab_chart = $core->trends_charts($chart['name'], $order);
+
+  $templating->block('trend_chart');
+  $templating->set('title', $chart['name']);
+  $templating->set('graph', $grab_chart['graph']);
+
+  if ($counter == 0)
+  {
+    break;
+  }
+}
+$templating->block('trends_bottom', 'statistics');

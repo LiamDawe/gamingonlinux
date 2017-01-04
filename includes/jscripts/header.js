@@ -159,6 +159,16 @@ jQuery(document).ready(function()
 
      window.document.execCommand('insertText', false, jqTxt.text());
 });*/
+  $("#trends_link").on('click', function(event)
+  {
+    $("#trends").show();
+    $("#monthly").hide();
+  });
+  $("#monthly_link").on('click', function(event)
+  {
+    $("#trends").hide();
+    $("#monthly").show();
+  });
   // navbar toggle menu
   $(".toggle-nav > a").on('click', function(event){
     event.preventDefault();

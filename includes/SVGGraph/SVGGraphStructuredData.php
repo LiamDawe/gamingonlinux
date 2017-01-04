@@ -26,26 +26,23 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
 
   private $datasets = 0;
   private $key_field = 0;
-  private $axis_text_field = null;
   private $dataset_fields = array();
   private $data;
   private $force_assoc = false;
   private $assoc = null;
+  private $datetime;
   private $repeated_keys;
   private $assoc_test;
   private $structure = array();
-  private $iterators = array();
   private $max_keys = array();
   private $min_keys = array();
   private $max_values = array();
   private $min_values = array();
-  private $before_label = '';
-  private $after_label = '';
-  private $encoding = 'UTF-8';
   public $error = null;
 
-  public function __construct(&$data, $force_assoc, $structure, $repeated_keys,
-    $integer_keys, $requirements)
+  public function __construct(&$data, $force_assoc, $datetime_keys,
+    $structure, $repeated_keys, $integer_keys, $requirements,
+    $rekey_done = FALSE)
   {
     if(!is_null($structure) && !empty($structure)) {
       // structure provided, is it valid?
@@ -61,12 +58,6 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
       $this->key_field = $structure['key'];
       $this->dataset_fields = is_array($structure['value']) ?
         $structure['value'] : array($structure['value']);
-      if(isset($structure['_before']))
-        $this->before_label = $structure['_before'];
-      if(isset($structure['_after']))
-        $this->after_label = $structure['_after'];
-      if(isset($structure['_encoding']))
-        $this->encoding = $structure['_encoding'];
     } else {
       // find key and datasets
       $keys = array_keys($data[0]);
@@ -75,10 +66,12 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
 
       // check for more datasets
       foreach($data as $item) {
-        foreach(array_keys($item) as $key)
-          if($key != $this->key_field && 
-            array_search($key, $this->dataset_fields) === FALSE)
+        foreach(array_keys($item) as $key) {
+          if($key !== $this->key_field &&
+            array_search($key, $this->dataset_fields) === FALSE) {
             $this->dataset_fields[] = $key;
+          }
+        }
       }
 
       // default structure
@@ -114,12 +107,21 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
     $this->datasets = count($this->dataset_fields);
     $this->force_assoc = $force_assoc;
     $this->assoc_test = $integer_keys ? 'is_int' : 'is_numeric';
-    if(isset($structure['axis_text']))
-      $this->axis_text_field = $structure['axis_text'];
 
-    if($this->AssociativeKeys()) {
+    if($datetime_keys || $this->AssociativeKeys()) {
       // reindex the array to 0, 1, 2, ...
       $this->data = array_values($this->data);
+      if($datetime_keys) {
+        if($rekey_done || $this->Rekey('SVGGraphDateConvert')) {
+          $this->datetime = true;
+          $this->assoc = false;
+        } else {
+          $this->error = 'Too many date/time conversion errors';
+          return;
+        }
+        $GLOBALS['SVGGraphFieldSortField'] = $this->key_field;
+        usort($this->data, 'SVGGraphFieldSort');
+      }
     } elseif(!is_null($this->key_field)) {
       // if not associative, sort by key field
       $GLOBALS['SVGGraphFieldSortField'] = $this->key_field;
@@ -131,12 +133,6 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
         $this->force_assoc = true;
       elseif($repeated_keys != 'accept')
         $this->error = 'Repeated keys in data';
-    }
-    if(!$this->error) {
-      for($i = 0; $i < $this->datasets; ++$i) {
-        $this->iterators[$i] = new SVGGraphStructuredDataIterator($this->data,
-          $i, $this->structure);
-      }
     }
   }
 
@@ -193,7 +189,8 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
   
   public function offsetGet($offset)
   {
-    return $this->iterators[$offset];
+    return new SVGGraphStructuredDataIterator($this->data, $offset,
+      $this->structure);
   }
 
   /**
@@ -307,23 +304,21 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
   }
 
   /**
-   * Returns the key (or axis text) at a given index/key
+   * Returns the key at a given index
    */
   public function GetKey($index, $dataset = 0)
   {
-    if(is_null($this->axis_text_field) && !$this->AssociativeKeys())
+    if(!$this->AssociativeKeys())
       return $index;
     $index = (int)round($index);
-    if($this->AssociativeKeys()) {
-      $item = $this->iterators[$dataset]->GetItemByIndex($index);
-    } else {
-      $item = $this->iterators[$dataset]->GetItemByKey($index);
+    if(isset($this->data[$index])) {
+      if(is_null($this->key_field))
+        return $index;
+      $item = $this->data[$index];
+      if(isset($item[$this->key_field]))
+        return $item[$this->key_field];
     }
-    if(is_null($item))
-      return null;
-    if($this->axis_text_field)
-      return $item->RawData($this->axis_text_field);
-    return $item->key;
+    return null;
   }
 
   /**
@@ -430,21 +425,54 @@ class SVGGraphStructuredData implements Countable, ArrayAccess, Iterator {
   }
 
   /**
-   * Strips units from before and after label
+   * Returns TRUE if the data field exists, setting $value
    */
-  protected function StripLabel($label)
+  public function GetData($index, $name, &$value)
   {
-    $before = $this->before_label;
-    $after = $this->after_label;
-    $enc = $this->encoding;
-    $llen = SVGGraphStrlen($label, $enc);
-    $blen = SVGGraphStrlen($before, $enc);
-    $alen = SVGGraphStrlen($after, $enc);
-    if($alen > 0 && SVGGraphSubstr($label, $llen - $alen, $alen, $enc) == $after)
-      $label = SVGGraphSubstr($label, 0, $llen - $alen, $enc);
-    if($blen > 0 && SVGGraphSubstr($label, 0, $blen, $enc) == $before)
-      $label = SVGGraphSubstr($label, $blen, NULL, $enc);
-    return $label;
+    if(!isset($this->structure[$name]))
+      return false;
+
+    $index = (int)round($index);
+    $dataset = 0;
+    $item = isset($this->data[$index]) ? $this->data[$index] : NULL;
+    $field = $this->structure[$name];
+    if(is_null($item) || !isset($item[$field]))
+      return false;
+    $value = $item[$field];
+    return true;
+  }
+
+  /**
+   * Transforms the keys using a callback function
+   */
+  public function Rekey($callback)
+  {
+    // use a tab character as the new key name
+    $rekey_name = "\t";
+    $invalid = 0;
+    foreach($this->data as $index => $item) {
+      $key = $item[$this->key_field];
+      $new_key = call_user_func($callback, $key);
+
+      // if the callback returns NULL, NULL the data item
+      if(is_null($new_key)) {
+        $this->data[$index] = array($rekey_name => NULL);
+        ++$invalid;
+      } else {
+        $this->data[$index][$rekey_name] = $new_key;
+      }
+    }
+
+    // if too many invalid, probably a format error
+    if(count($this->data) && $invalid / count($this->data) > 0.05)
+      return false;
+
+    // forget previous min/max and assoc settings
+    $this->min_keys = array();
+    $this->max_keys = array();
+    $this->assoc = NULL;
+    $this->key_field = $this->structure['key'] = $rekey_name;
+    return true;
   }
 }
 
@@ -581,6 +609,14 @@ class SVGGraphStructuredDataItem {
     }
 
     return isset($this->item[$item_field]) ? $this->item[$item_field] : null;
+  }
+
+  /**
+   * Check if extra data field exists
+   */
+  public function RawDataExists($field)
+  {
+    return isset($this->item[$field]);
   }
 
   /**

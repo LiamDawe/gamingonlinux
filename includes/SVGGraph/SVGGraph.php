@@ -19,7 +19,7 @@
  * For more information, please contact <graham@goat1000.com>
  */
 
-define('SVGGRAPH_VERSION', 'SVGGraph 2.22');
+define('SVGGRAPH_VERSION', 'SVGGraph 2.23');
 
 require_once 'SVGGraphColours.php';
 
@@ -220,6 +220,7 @@ abstract class Graph {
   private static $precision = 5;
   private static $decimal = '.';
   private static $thousands = ',';
+  public static $key_format = NULL;
   protected $legend_reverse = false;
   protected $force_assoc = false;
   protected $repeated_keys = 'error';
@@ -317,20 +318,20 @@ abstract class Graph {
         $this->structure = array('key' => 0, 'value' => 1, 'datasets' => true);
     }
 
+    if($this->datetime_keys && $this->datetime_key_format) {
+      Graph::$key_format = $this->datetime_key_format;
+    }
+
     if($this->structured_data || is_array($this->structure)) {
       $this->structured_data = true;
       require_once 'SVGGraphStructuredData.php';
-      if(is_array($this->structure)) {
-        $this->structure['_before'] = $this->units_before_x;
-        $this->structure['_after'] = $this->units_x;
-        $this->structure['_encoding'] = $this->encoding;
-      }
-      $this->values = new SVGGraphStructuredData($new_values,
-        $this->force_assoc, $this->structure, $this->repeated_keys,
+      $this->values = new SVGGraphStructuredData($new_values, $this->force_assoc,
+        $this->datetime_keys, $this->structure, $this->repeated_keys,
         $this->require_integer_keys, $this->require_structured);
     } else {
       require_once 'SVGGraphData.php';
-      $this->values = new SVGGraphData($new_values, $this->force_assoc);
+      $this->values = new SVGGraphData($new_values, $this->force_assoc,
+        $this->datetime_keys);
       if(!$this->values->error && !empty($this->require_structured))
         $this->values->error = get_class($this) . ' requires structured data';
     }
@@ -1081,6 +1082,9 @@ abstract class Graph {
         $attr['stroke-dasharray'] = $dash;
       else
         unset($attr['stroke-dasharray']);
+    } else {
+      unset($attr['stroke'], $attr['stroke-width'], $attr['stroke-linejoin'],
+        $attr['stroke-dasharray']);
     }
   }
 
@@ -1518,6 +1522,20 @@ abstract class Graph {
   }
 
   /**
+   * Builds and returns the body of the graph
+   */
+  private function BuildGraph()
+  {
+    $this->CheckValues($this->values);
+
+    if($this->show_tooltips)
+      $this->LoadJavascript();
+
+    // body content comes from the subclass
+    return $this->DrawGraph();
+  }
+
+  /**
    * Returns the SVG document
    */
   public function Fetch($header = TRUE, $defer_javascript = TRUE)
@@ -1549,19 +1567,17 @@ abstract class Graph {
     if($this->description)
       $heading .= $this->Element('desc', NULL, NULL, $this->description);
 
-    try {
-      $this->CheckValues($this->values);
-
-      if($this->show_tooltips)
-        $this->LoadJavascript();
-
-      // get the body content from the subclass
-      $body = $this->DrawGraph();
-    } catch(Exception $e) {
-      $err = $e->getMessage();
-      if($this->exception_details)
-        $err .= " [" . basename($e->getFile()) . ' #' . $e->getLine() . ']';
-      $body = $this->ErrorText($err);
+    if($this->exception_throw) {
+      $body = $this->BuildGraph();
+    } else {
+      try {
+        $body = $this->BuildGraph();
+      } catch(Exception $e) {
+        $err = $e->getMessage();
+        if($this->exception_details)
+          $err .= " [" . basename($e->getFile()) . ' #' . $e->getLine() . ']';
+        $body = $this->ErrorText($err);
+      }
     }
 
     $svg = array(
@@ -1632,15 +1648,16 @@ abstract class Graph {
     $defer_javascript = FALSE)
   {
     $mime_header = 'Content-type: image/svg+xml; charset=UTF-8';
-    try {
-      $content = $this->Fetch($header, $defer_javascript);
-      if($content_type)
-        header($mime_header);
-      echo $content;
-    } catch(Exception $e) {
-      if($content_type)
-        header($mime_header);
-      $this->ErrorText($e);
+    if($content_type)
+      header($mime_header);
+    if($this->exception_throw) {
+      echo $this->Fetch($header, $defer_javascript);
+    } else {
+      try {
+        echo $this->Fetch($header, $defer_javascript);
+      } catch(Exception $e) {
+        $this->ErrorText($e);
+      }
     }
   }
 
@@ -1745,5 +1762,27 @@ abstract class Graph {
     }
     return $min;
   }
+}
+
+
+/**
+ * Converts a string key to a unix timestamp, or NULL if invalid
+ */
+function SVGGraphDateConvert($k)
+{
+  // if the format is set, try it
+  if(!is_null(Graph::$key_format)) {
+    $dt = date_create_from_format(Graph::$key_format, $k);
+
+    // if the specified format fails, try default format
+    if($dt === FALSE)
+      $dt = date_create($k);
+  } else {
+    $dt = date_create($k);
+  }
+  if($dt === FALSE)
+    return NULL;
+  // this works in 64-bit on 32-bit systems, getTimestamp() doesn't
+  return $dt->format('U');
 }
 

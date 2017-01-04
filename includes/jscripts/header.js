@@ -179,6 +179,11 @@ jQuery(document).ready(function()
   if(window.location.hash)
   {
     var current_module = getUrlParameter('module');
+    // if it isn't set, it's likely we're using apache rewrite urls, check there too
+    if (typeof current_module === 'undefined')
+    {
+      var current_module = document.location.pathname.match(/[^\/]+$/)[0];
+    }
     var hash = window.location.hash.substring(1);
     // if it's the stats page, show them the stats they want
     if (current_module == 'statistics')

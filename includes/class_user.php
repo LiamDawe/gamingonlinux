@@ -316,6 +316,13 @@ class user
 
 		if (is_uploaded_file($_FILES['new_image']['tmp_name']))
 		{
+			// this will make sure it is an image file, if it cant get an image size then its not an image
+			if (!getimagesize($_FILES['new_image']['tmp_name']))
+			{
+				$this->message = 'Not an image!';
+				return false;
+			}
+			
 			// check the dimensions
 			list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
 
@@ -344,13 +351,6 @@ class user
 					$this->message = 'Too big!';
 					return false;
 				}
-			}
-
-			// this will make sure it is an image file, if it cant get an image size then its not an image
-			if (!getimagesize($_FILES['new_image']['tmp_name']))
-			{
-				$this->message = 'Not an image!';
-				return false;
 			}
 
 			// see if they currently have an avatar set

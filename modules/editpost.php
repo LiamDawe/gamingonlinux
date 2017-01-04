@@ -33,6 +33,15 @@ if (!isset($_POST['act']))
 			$templating->set('page', $_GET['page']);
 			$templating->set('topic_id', $topic['topic_id']);
 			$templating->set('action', 'index.php?module=editpost&amp;topic_id='.$topic['topic_id'].'&reported=' . $reported);
+			if (core::config('pretty_urls') == 1)
+			{
+				$cancel_action = '/forum/topic/' . $topic['topic_id'];
+			}
+			else
+			{
+				$cancel_action = '/index.php?module=viewtopic&topic_id=' . $topic['topic_id'];
+			}
+			$templating->set('cancel_action', $cancel_action);
 		}
 		else
 		{
@@ -60,6 +69,15 @@ if (!isset($_POST['act']))
 			$templating->set('page', $_GET['page']);
 			$templating->set('topic_id', $post['topic_id']);
 			$templating->set('action', 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&reported=' . $reported);
+			if (core::config('pretty_urls') == 1)
+			{
+				$cancel_action = '/forum/topic/' . $post['topic_id'];
+			}
+			else
+			{
+				$cancel_action = '/index.php?module=viewtopic&topic_id=' . $post['topic_id'];
+			}
+			$templating->set('cancel_action', $cancel_action);
 		}
 		else
 		{

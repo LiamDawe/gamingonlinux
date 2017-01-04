@@ -57,7 +57,8 @@ class core
 	}
 
 	// secure way of grabbing a remote image, for avatars
-	function remoteImage($url){
+	function remoteImage($url)
+	{
     $ch = curl_init ($url);
     curl_setopt($ch, CURLOPT_HEADER, 0);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -99,7 +100,7 @@ class core
 
     curl_close ($ch);
     return $result;
-}
+	}
 
 	// grab a config key
 	public static function config($key)

@@ -322,7 +322,7 @@ class user
 				$this->message = 'Not an image!';
 				return false;
 			}
-			
+
 			// check the dimensions
 			list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
 

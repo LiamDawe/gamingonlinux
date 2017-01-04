@@ -1,4 +1,7 @@
 <?php
+$templating->set_previous('title', 'Change your avatar', 1);
+$templating->set_previous('meta_description', 'Here you can change your avatar!', 1);
+
 if (isset($_GET['error']))
 {
 	$core->message($_SESSION['message'], NULL, 1);
@@ -24,6 +27,10 @@ if (isset($_GET['message']))
 	if ($_GET['message'] == 'gallery')
 	{
 		$core->message("You are now using an avatar picked from the gallery!");
+	}
+	if ($_GET['message'] == 'toobig')
+	{
+		$core->message('The dimensions are too big!', NULL, 1);
 	}
 }
 $templating->merge('usercp_modules/usercp_module_avatar');
@@ -61,7 +68,7 @@ if (isset($_POST['action']))
 		}
 
 		// check url is valid
-		else if (getimagesize($_POST['avatar_url']) == false)
+		else if ($core->file_get_contents_curl($_POST['avatar_url']) == false)
 		{
 			$core->message('Could not access the image!', NULL, 1);
 		}
@@ -69,11 +76,16 @@ if (isset($_POST['action']))
 		else
 		{
 			// check dimensions
-			list($width, $height, $type, $attr) = getimagesize($_POST['avatar_url']);
-
-			if ($width > core::config('avatar_width') || $height > core::config('avatar_height'))
+			$avatar_file_check = $core->remoteImage($_POST['avatar_url']);
+			if ($avatar_file_check == false)
 			{
-				$core->message('The dimensions are too big!');
+				$core->message('Error!');
+			}
+
+			if ($avatar_file_check['w'] > core::config('avatar_width') || $avatar_file_check['h'] > core::config('avatar_height'))
+			{
+				header("Location: /usercp.php?module=avatar&message=toobig");
+				die();
 			}
 
 			else

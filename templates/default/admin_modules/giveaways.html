@@ -17,5 +17,17 @@
 [/block: manage_top]
 
 [block: row]
-<div class="box"><div class="body group">{:name}</div></div>
+<div class="box"><div class="body group"><a href="/admin.php?module=giveaways&manage={:id}">{:name}</a></div></div>
 [/block: row]
+
+[block: key_list_top]
+<div class="box">
+	<div class="head">Managing keys for "{:name}"</div>
+	<div class="body group">Claimed: {:claimed}/{:total}</div>
+</div>
+<div class="box"><div class="head">Key list</div></div>
+[/block: key_list_top]
+
+[block: key_row]
+<div class="box"><div class="body group">{:key} {:profile_link}</div></div>
+[/block: key_row]

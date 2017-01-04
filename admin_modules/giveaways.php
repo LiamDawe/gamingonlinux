@@ -11,13 +11,44 @@ if (isset($_GET['message']))
 
 $templating->block('giveaway_add', 'admin_modules/giveaways');
 
-$templating->block('manage_top', 'admin_modules/giveaways');
-
-$db->sqlquery("SELECT `id`, `game_name` FROM `game_giveaways` ORDER BY `date_created` DESC");
-while ($current = $db->fetch())
+if (!isset($_GET['manage']))
 {
-	$templating->block('row', 'admin_modules/giveaways');
-	$templating->set('name', $current['game_name']);
+	$templating->block('manage_top', 'admin_modules/giveaways');
+
+	$db->sqlquery("SELECT `id`, `game_name` FROM `game_giveaways` ORDER BY `date_created` DESC");
+	while ($current = $db->fetch())
+	{
+		$templating->block('row', 'admin_modules/giveaways');
+		$templating->set('name', $current['game_name']);
+		$templating->set('id', $current['id']);
+	}
+}
+else if (isset($_GET['manage']))
+{
+	$db->sqlquery("SELECT `game_name` FROM `game_giveaways` WHERE `id` = ?", array($_GET['manage']));
+	$giveaway = $db->fetch();
+	$templating->block('key_list_top');
+	$templating->set('name', $giveaway['game_name']);
+
+	$db->sqlquery("SELECT (SELECT COUNT(`id`) FROM `game_giveaways_keys` WHERE `claimed` = 1 AND `game_id` = ?) as `claimed`,
+(SELECT COUNT(`id`) FROM `game_giveaways_keys` WHERE `game_id` = ?) as `total`", array($_GET['manage'], $_GET['manage']));
+	$key_totals = $db->fetch();
+	$templating->set('claimed', $key_totals['claimed']);
+	$templating->set('total', $key_totals['total']);
+
+	$db->sqlquery("SELECT k.`game_key`, k.`claimed`, u.`user_id`, u.`username` FROM `game_giveaways_keys` k LEFT JOIN `users` u ON u.`user_id` = k.`claimed_by_id` WHERE k.`game_id` = ? ORDER BY k.`claimed` DESC", array($_GET['manage']));
+	while ($keys = $db->fetch())
+	{
+		$templating->block('key_row');
+		$templating->set('key', $keys['game_key']);
+
+		$profile_link = '';
+		if ($keys['user_id'] != NULL && $keys['user_id'] != 0)
+		{
+			$profile_link = ' - Claimed by: <a href="/profiles/'.$keys['user_id'].'">' . $keys['username'] . '</a>';
+		}
+		$templating->set('profile_link', $profile_link);
+	}
 }
 
 if (isset($_POST['act']))

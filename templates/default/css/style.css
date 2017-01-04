@@ -84,7 +84,7 @@ margin-bottom: -3px;
 		 top: 0;
 		 width: 100%;
 		 height: 49px;
-		 z-index: 10001;
+		 z-index: 999;
 		 background-color: #222;
  }
  .header-navbar {
@@ -1407,3 +1407,10 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 .database_stores li {display: inline;}
 .database_extra{display: inline;list-style-type: none; padding: 0; margin: 0;}
 .database_extra li {padding: 0px;}
+.fancybox-wrap {
+	 position: absolute;
+	 top: 0;
+	 left: 0;
+	 padding: 20px;
+	 z-index: 9999;
+	 outline: none;}

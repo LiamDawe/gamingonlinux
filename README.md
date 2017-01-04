@@ -1,13 +1,13 @@
 # Gamingonlinux.com code
 
-The awesome [Gamingonlinux](https://gamingonlinux.com) news site source code.
+The [Gamingonlinux](https://gamingonlinux.com) news site source code.
 
-Please read first: The entire codebase is probably a mess, it was started years ago and tons needs updating for standards, newer PHP versions etc. It was started as a learning experience for Liam and still is to this day. Remember this before making any smart-arsed comments ;) (helpful pointers appreciated!)
+Please read first: The entire codebase is probably a mess, as it was started years ago and tons needs updating for standards, newer PHP versions etc. It was started as a learning experience for Liam and still is to this day. Remember this before making any smart-arsed comments ;) (helpful pointers appreciated!)
 
 ## Requirements
 
 This site requires atleast PHP 5.6, Mysql 5.6 or MariaDB 10.0 and apache 2.4.  
-It is also recommanded to have the following php extentions available: 
+It is also recommended to have the following php extentions available: 
 
 - Curl
 - Mysql
@@ -41,5 +41,13 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/moment/ (http://momentjs.com/timezone/ MIT)
 
-- Gallery avatars
-- https://openclipart.org/ (Public Domain)
+- Gallery avatars (https://openclipart.org/ Public Domain)
+
+- /includes/jscripts/Chart.min.js (http://www.chartjs.org/ MIT)
+
+## Misc
+
+If you want to know what you can put in a chart.js tooltip:
+str = JSON.stringify(tooltipItem, null, 4); // (Optional) beautiful indented output.
+console.log(str); // Logs output to dev tools console.
+alert(str); // Displays output using window.alert()

@@ -1107,8 +1107,8 @@ class core
 				{
 					callbacks: {
 						label: function(tooltipItem, data) {
-              var value = data.datasets[0].data[tooltipItem.index];
-							var label = data.datasets[tooltipItem.datasetIndex].label
+              var value = data.datasets[tooltipItem.datasetIndex].data[0];
+							var label = data.datasets[tooltipItem.datasetIndex].label;
               return label + ' ' + value + '%';
         		}
     			},

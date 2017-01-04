@@ -601,7 +601,7 @@ if (!isset($_GET['go']))
 							$cake_bit = $user->cake_day($comments['register_date'], $comments['username']);
 						}
 						$templating->set('cake_icon', $cake_bit);
-						
+
 						$new_badge = $user->new_user_badge($comments['register_date']);
 						$templating->set('new_user_badge', $new_badge);
 
@@ -879,10 +879,11 @@ if (!isset($_GET['go']))
 		$db->sqlquery("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']), 'articles_full.php');
 		$comment = $db->fetch();
 
+		$nice_title = $core->nice_title($comment['title']);
+
 		// check if author
 		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group(1,2) == false || $_SESSION['user_id'] == 0)
 		{
-			$nice_title = $core->nice_title($comment['title']);
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 			die();
 		}
@@ -912,6 +913,15 @@ if (!isset($_GET['go']))
 		$templating->set('url', core::config('website_url'));
 		$templating->set('page', $page);
 
+		if (core::config('pretty_urls') == 1)
+		{
+			$cancel_action = '/articles/' . $nice_title . '.' . $comment['article_id'];
+		}
+		else
+		{
+			$cancel_action = '/index.php?module=articles_full&aid=' . $comment['article_id'] . '&title=' . $nice_title;
+		}
+		$templating->set('cancel_action', $cancel_action);
 		$templating->block('preview', 'articles_full');
 	}
 }

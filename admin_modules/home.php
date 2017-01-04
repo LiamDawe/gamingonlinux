@@ -109,6 +109,7 @@ if (!isset($_GET['view']))
 			"delete_user" => ' deleted a user account.',
 			"deleted_user_content" => ' deleted all the content from a user.',
 
+			"calendar_submission" => ' submitted a game for the calendar and games database.',
 			"approved_calendar" => ' approved a calendar and games database submission.',
 			"game_database_addition" => ' added a new game to the calendar and games database',
 			"game_database_edit" => ' edited a game in the calendar and games database',

@@ -20,7 +20,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	}
 
 	// update history
-	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date));
+	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 	unset($_SESSION['atitle']);
@@ -32,6 +32,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	unset($_SESSION['uploads']);
 	unset($_SESSION['uploads_tagline']);
 	unset($_SESSION['image_rand']);
+	unset($_SESSION['original_text']);
 
 	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&message=editdone");
 }

@@ -138,6 +138,8 @@ else if (isset($_GET['aid']))
 		$article = $db->fetch();
 	}
 
+	$_SESSION['original_text'] = $article['text'];
+
 	$edit_state = '';
 	$edit_state_textarea = '';
 	$editor_disabled = 0;
@@ -349,9 +351,9 @@ Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_
 		$history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> - ' . $date . '</li>';
 	}
 
-	$templating->block('edit_history', 'admin_modules/admin_articles_sections/submitted_articles');
+	$templating->merge('admin_modules/admin_module_articles');
+	$templating->block('history', 'admin_modules/admin_module_articles');
 	$templating->set('history', $history);
-	$templating->block('edit_bottom_history', 'admin_modules/admin_articles_sections/submitted_articles');
 }
 
 if (isset($_POST['act']))

@@ -19,6 +19,8 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
 	}
 
+	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+
 	unset($_SESSION['atitle']);
 	unset($_SESSION['atagline']);
 	unset($_SESSION['atext']);
@@ -30,6 +32,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	unset($_SESSION['uploads']);
 	unset($_SESSION['uploads_tagline']);
 	unset($_SESSION['image_rand']);
+	unset($_SESSION['original_text']);
 
 	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&message=editdone");
 }

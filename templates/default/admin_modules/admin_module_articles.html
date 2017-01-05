@@ -89,21 +89,7 @@
 			<div class="uploads">
 			{:previously_uploaded}
 			</div>
-			<div class="box">
-				<div class="head">Article Edit History</div>
-				<div class="body list" style="overflow:auto; height:200px;">
-					<ul>
 [/block: edit_bottom]
-
-[block: edit_history]
-						{:history}
-[/block: edit_history]
-
-[block: edit_bottom_history]
-					</ul>
-				</div>
-			</div>
-[/block: edit_bottom_history]
 
 [block: manage_cat_top]
 <div class="box"><div class="head">Here you can select a category to manage or view all.</div></div>
@@ -252,3 +238,12 @@
 </div>
 {:previously_uploaded}
 [/block: preview_bottom]
+
+[block: history]
+<div class="box">
+	<div class="head">Article Edit History</div>
+	<div class="body list" style="overflow:auto; height:200px;">
+		<ul>{:history}</ul>
+	</div>
+</div>
+[/block: history]

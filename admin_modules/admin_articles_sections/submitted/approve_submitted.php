@@ -59,6 +59,12 @@ else
 			}
 		}
 
+		// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
+		if ($_SESSION['original_text'] != $checked['text'])
+		{
+			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+		}
+
 		$article_class->process_categories($_POST['article_id']);
 
 		$article_class->process_game_assoc($_POST['article_id']);
@@ -77,6 +83,7 @@ else
 		unset($_SESSION['uploads']);
 		unset($_SESSION['uploads_tagline']);
 		unset($_SESSION['image_rand']);
+		unset($_SESSION['original_text']);
 
 		// pick the email to use
 		$email = '';
@@ -127,10 +134,9 @@ else
 		{
 			header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&accepted");
 		}
-		else {
+		else
+		{
 			header("Location: ". core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 		}
-
-
 	}
 }

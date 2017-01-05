@@ -62,6 +62,8 @@ if (isset($_GET['view']))
 				$article = $db->fetch();
 			}
 
+			$_SESSION['original_text'] = $article['text'];
+
 			$edit_state = '';
 			$edit_state_textarea = '';
 			$editor_disabled = 0;
@@ -699,7 +701,7 @@ else if (isset($_POST['act']))
 			}
 
 			// update history
-			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date));
+			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 			unset($_SESSION['atitle']);
@@ -712,6 +714,7 @@ else if (isset($_POST['act']))
 			unset($_SESSION['uploads']);
 			unset($_SESSION['uploads_tagline']);
 			unset($_SESSION['image_rand']);
+			unset($_SESSION['original_text']);
 
 			if (core::config('pretty_urls') == 1)
 			{
@@ -853,7 +856,7 @@ else if (isset($_POST['act']))
 			}
 
 			// update history
-			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date));
+			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 			unset($_SESSION['atitle']);
@@ -866,6 +869,7 @@ else if (isset($_POST['act']))
 			unset($_SESSION['uploads_tagline']);
 			unset($_SESSION['image_rand']);
 			unset($_SESSION['aslug']);
+			unset($_SESSION['original_text']);
 
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{

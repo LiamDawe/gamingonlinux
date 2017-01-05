@@ -57,6 +57,12 @@ else
 			$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
 		}
 
+		// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
+		if ($_SESSION['original_text'] != $checked['text'])
+		{
+			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+		}
+
 		// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 		unset($_SESSION['atitle']);
 		unset($_SESSION['aslug']);
@@ -67,6 +73,7 @@ else
 		unset($_SESSION['uploads']);
 		unset($_SESSION['image_rand']);
 		unset($_SESSION['uploads_tagline']);
+		unset($_SESSION['original_text']);
 
 		// if the person publishing it is not the author then email them
 		if ($_POST['author_id'] != $_SESSION['user_id'])

@@ -632,7 +632,7 @@ function rss_stripping($text, $tagline_image = NULL)
 
 	$text = str_replace('[pcinfo]', '', $text);
 
-	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$1</blockquote>", $text);
+	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$2</blockquote>", $text);
 
 	$text = preg_replace("/\[youtube\](.+?)\[\/youtube\]/is", '', $text);
 

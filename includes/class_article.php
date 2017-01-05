@@ -431,5 +431,26 @@ class article_class
       }
     }
   }
+
+  function article_history($article_id)
+  {
+    global $db, $templating, $core;
+    $db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
+    $history = '';
+    while ($grab_history = $db->fetch())
+    {
+      $view_link = '';
+      if ($grab_history['text'] != NULL && !empty($grab_history['text']))
+      {
+        $view_link = '- <a href="/admin.php?module=article_history&id='.$grab_history['id'].'">View text</a>';
+      }
+      $date = $core->format_date($grab_history['date']);
+      $history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> '.$view_link.' - ' . $date . '</li>';
+    }
+
+    $templating->merge('admin_modules/admin_module_articles');
+    $templating->block('history', 'admin_modules/admin_module_articles');
+    $templating->set('history', $history);
+  }
 }
 ?>

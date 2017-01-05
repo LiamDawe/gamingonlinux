@@ -304,17 +304,7 @@ else
 
 	$templating->set('previously_uploaded', $previously_uploaded);
 
-	$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date` FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($_GET['aid']));
-	$history = '';
-	while ($grab_history = $db->fetch())
-	{
-		$date = $core->format_date($grab_history['date']);
-		$history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> - ' . $date . '</li>';
-	}
-
-	$templating->merge('admin_modules/admin_module_articles');
-	$templating->block('history', 'admin_modules/admin_module_articles');
-	$templating->set('history', $history);
+	$article_class->article_history($article['article_id']);
 }
 
 if (isset($_POST['act']))

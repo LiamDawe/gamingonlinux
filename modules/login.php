@@ -292,12 +292,11 @@ else if (isset($_POST['action']))
 			// drop any previous requested
 			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
 
-			$core->message("That is not a correct password reset request! <a href=\"index.php?module=login\">Go back.</a>");
+			$core->message("That reset request has expired, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
 		}
 
 		else
 		{
-
 			// check code and email is valid
 			$db->sqlquery("SELECT `user_email` FROM `password_reset` WHERE `user_email` = ? AND `secret_code` = ?", array($email, $code));
 			if ($db->num_rows() != 1)

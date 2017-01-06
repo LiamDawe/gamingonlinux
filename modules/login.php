@@ -55,14 +55,14 @@ if (!isset($_POST['action']))
 		$code = $_GET['code'];
 
 		// check its a valid time
-		$db->sqlquery("SELECT `expires` FROM `password_reset` WHERE `user_email` = ?", array($email), 'login.php');
+		$db->sqlquery("SELECT `expires` FROM `password_reset` WHERE `user_email` = ?", array($email));
 		$get_time = $db->fetch();
 		if (time() > $get_time['expires'])
 		{
 			// drop any previous requested
-			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email), 'login.php');
+			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
 
-			$core->message("That is not a correct password reset request! <a href=\"/index.php?module=login\">Go back.</a>");
+			$core->message("That reset request has expired, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
 		}
 
 		// check code and email is valid

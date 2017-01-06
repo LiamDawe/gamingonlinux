@@ -68,7 +68,7 @@ if (!isset($_POST['action']))
 		// check code and email is valid
 		else if ($db->num_rows($db->sqlquery("SELECT `user_email` FROM `password_reset` WHERE `user_email` = ? AND `secret_code` = ?", array($email, $code))) != 1)
 		{
-			$core->message("That is not a correct password reset request! <a href=\"/index.php?module=login\">Go back.</a>");
+			$core->message("That is not a correct password reset request, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
 		}
 
 		else
@@ -268,18 +268,27 @@ else if (isset($_POST['action']))
 			$db->sqlquery("INSERT INTO `password_reset` SET `user_email` = ?, `secret_code` = ?, `expires` = ?", array($_POST['email'], $random_string, $next_week));
 
 			// send mail with link including the key
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: noreply@gamingonlinux.com\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+			$html_message = "Please click <a href=\"" . core::config('website_url') . "index.php?module=login&reset&code={$random_string}&email={$_POST['email']}\">this link</a> to reset your password
+			<hr>
+				<p>If you didn't request this, don't worry! Unless someone has access to your email address it isn't an issue!</p>
+				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> to let us know!</p>
+				<p>Please don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
+			<hr>";
 
-			if (mail($_POST['email'], 'GamingOnLinux.com password reset request', "Please click <a href=\"" . core::config('website_url') . "index.php?module=login&reset&code={$random_string}&email={$_POST['email']}\">this link</a> to reset your password", $headers) == true)
+			$plain_message = "Please go here: " . core::config('website_url') . "index.php?module=login&reset&code={$random_string}&email={$_POST['email']} to change your password. If you didn't request this, you can ignore it as it's not a problem unless anyone has access to your email!";
+
+			// Mail it
+			if (core::config('send_emails') == 1)
 			{
-				// tell them it's done
+				$mail = new mail($_POST['email'], 'GamingOnLinux.com password reset request', $html_message, $plain_message);
+				$mail->send();
+
 				$core->message("An email has been sent to {$_POST['email']} with instructions on how to change your password.");
 			}
 		}
 	}
 
+	// actually change the password as their code was correct and password + confirmation matched
 	else if ($_POST['action'] == 'Reset')
 	{
 		$email = $_GET['email'];

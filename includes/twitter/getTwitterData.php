@@ -28,10 +28,9 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 	$user_info = $twitteroauth->get('account/verify_credentials');
 
 	// Print user's info DEBUG ONLY TO SEE WHATS AVAILABLE
-	/*
-	echo '<pre>';
-	print_r($user_info);
-	echo '</pre><br/>';*/
+	//echo '<pre>';
+	//print_r($user_info);
+	//echo '</pre><br/>';
 
 	if (isset($user_info->error))
 	{
@@ -46,6 +45,11 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
     $twitter_user = new twitter_user();
     $userdata = $twitter_user->checkUser($uid, 'twitter', $username);
 
+		if (!isset($userdata) || empty($userdata))
+		{
+			die('There was an error getting your user data!');
+		}
+
 		// linking account via usercp
     if ($twitter_user->new == 0)
     {
@@ -53,7 +57,7 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
     }
 
     	// logging in via twitter
-    else if ($user->new == 1)
+    else if ($twitter_user->new == 1)
     {
 			// update IP address and last login
 			$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));

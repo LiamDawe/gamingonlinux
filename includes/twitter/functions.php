@@ -13,8 +13,8 @@ class twitter_user
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
-			$db->sqlquery("SELECT ".user::$user_sql_fields." FROM `users` WHERE oauth_uid = ? and oauth_provider = ? AND `twitter_username` = ?", array($uid, $oauth_provider, $username));
-			$result = $db->fetch();
+			$get_user = $db->sqlquery("SELECT ".user::$user_sql_fields." FROM `users` WHERE oauth_uid = ? and oauth_provider = ? AND `twitter_username` = ?", array($uid, $oauth_provider, $username));
+			$result = $get_user->fetch();
 			if (!empty($result))
 			{
 				$this->new = 1;

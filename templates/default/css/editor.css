@@ -85,7 +85,7 @@
 }
 .octus-editor > .styles > ul > li.dropdown {
 	position: relative;
-	z-index: 1001;
+	z-index: 800;
 }
 .octus-editor > .styles > ul > li.dropdown:before {
 	content: "";
@@ -102,9 +102,9 @@
 .octus-editor > .styles > ul > li.dropdown:after {
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;
-	border-top: 5px solid #a5a5a5; 
+	border-top: 5px solid #a5a5a5;
 	content: "";
-	height: 0; 
+	height: 0;
 	position: absolute;
 	bottom: 8px;
 	right: 6px;
@@ -223,7 +223,7 @@
 	content: "";
 	border-left: 15px solid transparent;
 	border-right: 15px solid transparent;
-	border-bottom: 25px solid #FF9500; 
+	border-bottom: 25px solid #FF9500;
 	height: 0;
 	position: absolute;
 	top: 11px;

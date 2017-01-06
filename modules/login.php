@@ -54,8 +54,6 @@ if (!isset($_POST['action']))
 		$email = $_GET['email'];
 		$code = $_GET['code'];
 
-		echo $email;
-
 		// check its a valid time
 		$db->sqlquery("SELECT `expires` FROM `password_reset` WHERE `user_email` = ?", array($email));
 		$get_time = $db->fetch();

@@ -99,7 +99,6 @@ $templating->block('monthly_bottom');
 
 // trends charts
 $templating->block('trends_top');
-$counter = 0;
 foreach ($charts as $chart)
 {
   $order = '';
@@ -113,11 +112,5 @@ foreach ($charts as $chart)
   $templating->block('trend_chart');
   $templating->set('title', $chart['name']);
   $templating->set('graph', $grab_chart['graph']);
-
-  if ($counter == 3)
-  {
-    break;
-  }
-  $counter++;
 }
 $templating->block('trends_bottom', 'statistics');

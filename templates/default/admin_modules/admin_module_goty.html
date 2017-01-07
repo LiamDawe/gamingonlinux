@@ -14,8 +14,8 @@
 <div class="box"><div class="body group">
 <form method="post" action="{:url}goty.php&game_id={:id}">
 <input type="text" name="name" value="{:game_name}" />
-<span class="gotycategory">{:category_name}</span>
-<div class="gotyadminbuttons" style="float:right;" data-comment="Yes, I didnt want to clear css cache">
+<span class="gotycategory"><a href="/goty.php?category_id={:category_id}">{:category_name}</a></span>
+<div class="gotyadminbuttons fright">
 	<button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="accept" class="fnone">Accept Game For Voting</button>
 	<button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="deny" class="fnone">Deny Game For Voting</button>
 </div>

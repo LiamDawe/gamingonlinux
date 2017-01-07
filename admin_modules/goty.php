@@ -195,12 +195,13 @@ if (isset($_GET['view']))
 
 		$templating->block('submitted_top', 'admin_modules/admin_module_goty');
 
-		$db->sqlquery("SELECT g.`game`, g.`id`, c.`category_name` FROM `goty_games` g LEFT JOIN `goty_category` c ON c.category_id = g.category_id WHERE `accepted` = 0");
+		$db->sqlquery("SELECT g.`game`, g.`id`, c.`category_name`, g.`category_id` FROM `goty_games` g LEFT JOIN `goty_category` c ON c.category_id = g.category_id WHERE `accepted` = 0");
 		while ($games = $db->fetch())
 		{
 			$templating->block('submitted_row', 'admin_modules/admin_module_goty');
 			$templating->set('game_name', $games['game']);
 			$templating->set('category_name', $games['category_name']);
+			$templating->set('category_id', $games['category_id']);
 			$templating->set('url', core::config('website_url'));
 			$templating->set('id', $games['id']);
 		}

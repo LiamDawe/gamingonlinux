@@ -67,7 +67,7 @@ if (!isset($_GET['go']))
 				{
 					if (core::config('pretty_urls') == 1)
 					{
-						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/#r{$_GET['comment_id']}");
+						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}#r{$_GET['comment_id']}");
 					}
 					else
 					{

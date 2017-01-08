@@ -33,9 +33,14 @@ else
 				$submitted_by_user = $check_article['username'];
 			}
 
-			else
+			else if (!empty($check_article['guest_username']))
 			{
 				$submitted_by_user = $check_article['guest_username'];
+			}
+
+			else
+			{
+				$submitted_by_user = "a guest submitter";
 			}
 
 			$checked['text'] = $checked['text'] . "\r\n\r\n[i]Thanks to " . $submitted_by_user . ' for letting us know![/i]';

@@ -1092,7 +1092,7 @@ class core
 		}
 		foreach ($top_10_labels as $sort_labels)
 		{
-			$find_data = $db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY l.`name` ASC, d.`data`, c.generated_date, c.`total_answers`, l.`label_id` LIMIT 10");
+			$find_data = $db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id` LIMIT 10");
 			$get_data = $find_data->fetch_all_rows();
 			$total_data = $db->num_rows();
 

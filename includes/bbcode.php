@@ -648,24 +648,27 @@ function pc_info($body)
 {
 	global $db;
 
-	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+	if(preg_match('/\[pcinfo\]/', $body))
 	{
-		$grab_date = $db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		$update_info = $grab_date->fetch();
-
-		if (!isset($update_info['date_updated']))
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$date_updated = '<strong>Never</strong>!';
+			$grab_date = $db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
+			$update_info = $grab_date->fetch();
+
+			if (!isset($update_info['date_updated']))
+			{
+				$date_updated = '<strong>Never</strong>!';
+			}
+			else
+			{
+				$date_updated = '<strong>' . date('d M, Y', strtotime($update_info['date_updated'])) . '</strong>.';
+			}
+			$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . ' <a href="/usercp.php?module=pcinfo">Click here to check and update yours now!</a>', $body);
 		}
 		else
 		{
-			$date_updated = '<strong>' . date('d M, Y', strtotime($update_info['date_updated'])) . '</strong>.';
+			$body = str_replace("[pcinfo]", '<em>You need to be logged in to see when you last updated your PC info!</em>', $body);
 		}
-		$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . ' <a href="/usercp.php?module=pcinfo">Click here to check and update yours now!</a>', $body);
-	}
-	else
-	{
-		$body = str_replace("[pcinfo]", '<em>You need to be logged in to see when you last updated your PC info!</em>', $body);
 	}
 
 	return $body;

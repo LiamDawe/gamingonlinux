@@ -536,7 +536,7 @@ else
 						}
 
 						// complete any comment reports for their comments
-						$db->sqlquery("SELECT `comment_id`, `spam` FROM `article_comments` WHERE `author_id` = ?" , array($_GET['user_id']));
+						$db->sqlquery("SELECT `comment_id`, `spam` FROM `articles_comments` WHERE `author_id` = ?" , array($_GET['user_id']));
 						$reported_comments = $db->fetch_all_rows();
 						foreach ($reported_comments as $comment_loop)
 						{

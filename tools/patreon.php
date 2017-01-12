@@ -23,8 +23,10 @@ foreach ($csv as $line)
   // if they pledge at least 5 dollars a month
   if ($pledge >= 5)
   {
-    $db->sqlquery("SELECT `username` FROM `users` WHERE `email` = ?", array($line[2]));
-    if ($db->num_rows() != 1)
+    $db->sqlquery("SELECT `username`, `secondary_user_group` FROM `users` WHERE `email` = ?", array($line[2]));
+    $count = $db->num_rows();
+    // it didn't find an account, email them
+    if ($count != 1)
     {
       if (core::config('send_emails') == 1)
       {
@@ -45,6 +47,16 @@ foreach ($csv as $line)
         $mail->send();
 
         echo "Email sent to " . $line[2] . '<br />';
+      }
+    }
+    // it found an account, give them their badge
+    else if ($count == 1)
+    {
+      $result = $db->fetch();
+      if ($result['secondary_user_group'] != 6)
+      {
+        $db->sqlquery("UPDATE `users` SET `secondary_user_group` = 6 WHERE `email` = ?", array($line[2]));
+        echo 'User ' . $result['username'] . ' ' . $line[2] . ' given GOL Supporter status.<br />';
       }
     }
   }

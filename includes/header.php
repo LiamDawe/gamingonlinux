@@ -43,6 +43,16 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		$temp_user = $db->fetch();
 		$_SESSION['avatar'] = user::sort_avatar($temp_user);
 	}
+	if (!isset($_SESSION['auto_subscribe_email']) || !isset($_SESSION['auto_subscribe']) || !isset($_SESSION['email_options']))
+	{
+		// find if they have auto subscribe on
+		$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email`, `email_options` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$subscribe_info = $db->fetch();
+
+		$_SESSION['auto_subscribe_email'] = $subscribe_info['auto_subscribe_email'];
+		$_SESSION['auto_subscribe'] = $subscribe_info['auto_subscribe'];
+		$_SESSION['email_options'] = $subscribe_info['email_options'];
+	}
 }
 
 // If they are not logged in make them a guest (group 4)

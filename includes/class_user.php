@@ -7,7 +7,7 @@ class user
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`, `avatar`, `avatar_uploaded`,
-	`display_comment_alerts`";
+	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`";
 
 	// normal login form
 	function login($username, $password, $remember_username, $stay)
@@ -204,6 +204,9 @@ class user
 		$_SESSION['single_article_page'] = $user_data['single_article_page'];
 		$_SESSION['avatar'] = user::sort_avatar($user_data);
 		$_SESSION['display_comment_alerts'] = $user_data['display_comment_alerts'];
+		$_SESSION['email_options'] = $user_data['email_options'];
+		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
+		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
 	}
 
 	// if they have a stay logged in cookie log them in!
@@ -251,6 +254,9 @@ class user
 					$_SESSION['single_article_page'] = $user['single_article_page'];
 					$_SESSION['avatar'] = user::sort_avatar($user);
 					$_SESSION['display_comment_alerts'] = $user['display_comment_alerts'];
+					$_SESSION['email_options'] = $user['email_options'];
+					$_SESSION['auto_subscribe'] = $user['auto_subscribe'];
+					$_SESSION['auto_subscribe_email'] = $user['auto_subscribe_email'];
 
 					return true;
 				}
@@ -299,6 +305,10 @@ class user
 		unset($_SESSION['activated']);
 		unset($_SESSION['in_mod_queue']);
 		unset($_SESSION['logged_in']);
+		unset($_SESSION['email_options']);
+		unset($_SESSION['auto_subscribe']);
+		unset($_SESSION['auto_subscribe_email']);
+
 		$_SESSION['per-page'] = 15;
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';

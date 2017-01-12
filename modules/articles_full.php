@@ -425,18 +425,19 @@ if (!isset($_GET['go']))
 					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 					{
 						$db->sqlquery("SELECT `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
-						$check_sub = $db->fetch();
-
-						$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-						$check_user = $db->fetch();
-
-						if ($check_user['email_options'] == 2 && $check_sub['send_email'] == 0)
+						$count_rows = $db->num_rows();
+						if ($count_rows == 1)
 						{
-							// they have read all new comments (or we think they have since they are on the last page)
-							if ($page == $lastpage)
+							$check_sub = $db->fetch();
+
+							if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
 							{
-								// send them an email on a new comment again
-								$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
+								// they have read all new comments (or we think they have since they are on the last page)
+								if ($page == $lastpage)
+								{
+									// send them an email on a new comment again
+									$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
+								}
 							}
 						}
 					}
@@ -820,18 +821,14 @@ if (!isset($_GET['go']))
 										$check_current_sub = $db->fetch();
 									}
 
-									// find if they have auto subscribe on
-									$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-									$subscribe_info = $db->fetch();
-
 									$subscribe_check = '';
-									if ($subscribe_info['auto_subscribe'] == 1 || $sub_exists == 1)
+									if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
 									{
 										$subscribe_check = 'checked';
 									}
 
 									$subscribe_email_check = '';
-									if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $subscribe_info['auto_subscribe_email'] == 1)
+									if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
 									{
 										$subscribe_email_check = 'selected';
 									}

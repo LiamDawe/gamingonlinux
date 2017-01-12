@@ -159,12 +159,13 @@ else
 				// update their subscriptions if they are reading the last page
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
-					$db->sqlquery("SELECT s.`send_email`, u.`email_options` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE u.`user_id` = ? AND s.`topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
-					if ($db->num_rows() == 1)
+					$db->sqlquery("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `topic_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']));
+					$sub_counter = $db->num_rows();
+					if ($sub_counter == 1)
 					{
 						$check_sub = $db->fetch();
 
-						if ($check_sub['email_options'] == 2 && $check_sub['send_email'] == 0)
+						if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
 						{
 							// they have read all new comments (or we think they have since they are on the last page)
 							if ($page == $lastpage)
@@ -182,8 +183,7 @@ else
 				// find out if this user has subscribed to the comments
 				if ($_SESSION['user_id'] != 0)
 				{
-					$db->sqlquery("SELECT `user_id` FROM `forum_topics_subscriptions` WHERE `topic_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']));
-					if ($db->num_rows() == 1)
+					if ($sub_counter == 1)
 					{
 						$subscribe_link = "<a href=\"/index.php?module=viewtopic&amp;go=unsubscribe&amp;topic_id={$_GET['topic_id']}\"> <i class=\"icon-trash\"></i>Unsubscribe</a><br />";
 					}
@@ -823,27 +823,14 @@ else
 					{
 						if ($reply_access == 1)
 						{
-							// find if they have auto subscribe on
-							$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-							$subscribe_info = $db->fetch();
-
-							// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
-							$db->sqlquery("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic['topic_id']));
-							$sub_exists = $db->num_rows();
-
-							if ($sub_exists == 1)
-							{
-								$check_current_sub = $db->fetch();
-							}
-
 							$subscribe_check = '';
-							if ($subscribe_info['auto_subscribe'] == 1 || $sub_exists == 1)
+							if ($_SESSION['auto_subscribe'] == 1 || $sub_counter == 1)
 							{
 								$subscribe_check = 'checked';
 							}
 
 							$subscribe_email_check = '';
-							if ($subscribe_info['auto_subscribe_email'] == 1 || (isset($check_current_sub) && $check_current_sub['emails'] == 1))
+							if ($_SESSION['auto_subscribe_email'] == 1 || (isset($sub_counter) && $sub_counter['emails'] == 1))
 							{
 								$subscribe_email_check = 'selected';
 							}

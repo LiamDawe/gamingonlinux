@@ -263,18 +263,14 @@ if (!isset($_GET['view']))
 				$check_current_sub = $db->fetch();
 			}
 
-			// find if they have auto subscribe on
-			$db->sqlquery("SELECT `auto_subscribe`,`auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-			$subscribe_info = $db->fetch();
-
 			$subscribe_check = '';
-			if ($subscribe_info['auto_subscribe'] == 1 || $sub_exists == 1)
+			if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
 			{
 				$subscribe_check = 'checked';
 			}
 
 			$subscribe_email_check = '';
-			if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $subscribe_info['auto_subscribe_email'] == 1)
+			if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
 			{
 				$subscribe_email_check = 'selected';
 			}

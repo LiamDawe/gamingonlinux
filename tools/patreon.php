@@ -13,7 +13,6 @@ include($path . 'includes/class_mail.php');
 
 $csv = array_map('str_getcsv', file('patreon.csv'));
 
-$data = [];
 array_splice($csv, 0, 2);
 foreach ($csv as $line)
 {

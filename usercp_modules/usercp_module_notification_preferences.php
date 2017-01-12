@@ -146,6 +146,9 @@ else if (isset($_GET['go']))
 			$_SESSION['user_id']));
 
 		$_SESSION['display_comment_alerts'] = $comment_alerts;
+		$_SESSION['email_options'] = $_POST['email_options'];
+		$_SESSION['auto_subscribe'] = $auto_subscribe;
+		$_SESSION['auto_subscribe_email'] = $subscribe_emails;
 
 		header("Location: /usercp.php?module=notification_preferences&message=updated");
 	}

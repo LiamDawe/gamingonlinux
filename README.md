@@ -19,6 +19,11 @@ It is also recommended to have the following php extentions available:
 Setup apache, PHP and MySQL to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
 Import the development SQL database from the stripped SQL file `includes/dev/db.sql`  
 
+## Crons ##
+
+Various cron jobs are needed to keep it all running smoothly, below are the files and suggested times:
+- includes/crons/remove_temp_uploads.php (removes left-over temp tagline uploads, once a day)
+
 ## Licensing
 
 The GOL site source is MIT licensed, but we also use other scripts which use different licenses:

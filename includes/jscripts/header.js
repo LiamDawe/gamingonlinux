@@ -819,7 +819,7 @@ function(data){
     var id = $(this).data('id');
     $('#preview2').html('<img src="/uploads/tagline_gallery/' + filename + '" alt="image" />');
     $.fancybox.close();
-    $.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id });
+    $.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id, 'filename':filename });
   });
 
   $('#preview_text_button').click(function()

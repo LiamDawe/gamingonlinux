@@ -15,6 +15,8 @@ $templating = new template('default');
 
 $templating->load('/admin_modules/gallery_tagline');
 
+$templating->block('top');
+
 $db->sqlquery("SELECT `id`, `filename`, `name` FROM `articles_tagline_gallery` ORDER BY `name` ASC");
 while ($images = $db->fetch())
 {
@@ -23,4 +25,5 @@ while ($images = $db->fetch())
   $templating->set('filename', $images['filename']);
   $templating->set('id', $images['id']);
 }
+$templating->block('bottom');
 echo $templating->output();

@@ -230,6 +230,11 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			$_SESSION['uploads_tagline']['image_name'] = $imagename;
 			$_SESSION['uploads_tagline']['image_rand'] = $_SESSION['image_rand'];
 
+			// this will replace any previously selected gallery image
+			unset($_SESSION['gallery_tagline_id']);
+			unset($_SESSION['gallery_tagline_rand']);
+			unset($_SESSION['gallery_tagline_filename']);
+
 			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\" class='imgList'><br />";
 			echo "BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />";
 			echo "<input type=\"hidden\" name=\"image_name\" value=\"{$imagename}\" />";

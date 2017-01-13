@@ -23,7 +23,9 @@ if (isset($_POST['id']))
   }
 
   // set the id of the image in the session to detect and use when finishing the article
-  $_SESSION['gallery_tagline'] = $_POST['id'];
+  $_SESSION['gallery_tagline_id'] = $_POST['id'];
+  $_SESSION['gallery_tagline_rand'] = $_SESSION['image_rand'];
+  $_SESSION['gallery_tagline_filename'] = $_POST['filename'];
 
   echo json_encode(array("result" => 'done'));
   return;

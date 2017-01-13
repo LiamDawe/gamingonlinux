@@ -28,7 +28,7 @@ while ($user_list = $db->fetch())
     {
       $twitch_username = str_replace('/', '', $url['path']);
     }
-    $twitch = '<a class="ltwitch" href="#" data-tnick="'.$twitch_username.'" href="' . $user_list['twitch'] . '">Twitch</a> <span></span><br />';
+    $twitch = '<a class="ltwitch" data-tnick="'.$twitch_username.'" href="' . $user_list['twitch'] . '">Twitch</a> <span></span><br />';
   }
   $templating->set('twitch', $twitch);
 

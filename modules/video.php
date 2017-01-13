@@ -6,7 +6,25 @@ $templating->load('videos');
 $templating->block('top');
 $templating->set('twitch_key', core::config('twitch_dev_key'));
 
-$db->sqlquery("SELECT `username`, `youtube`, `twitch` FROM `users` WHERE `twitch` != '' OR `youtube` != ''");
+// paging for pagination
+$page = 1;
+if (!isset($_GET['page']) || $_GET['page'] == 0)
+{
+  $page = 1;
+}
+
+else if (is_numeric($_GET['page']))
+{
+  $page = $_GET['page'];
+}
+
+$db->sqlquery("SELECT COUNT(user_id) as count FROM `users` WHERE `twitch` != '' OR `youtube` != ''");
+$counter = $db->fetch();
+
+// sort out the pagination link
+$pagination = $core->pagination_link(30, $counter['count'], "/index.php?module=video&amp;", $page);
+
+$db->sqlquery("SELECT `username`, `youtube`, `twitch` FROM `users` WHERE `twitch` != '' OR `youtube` != '' LIMIT ?, 30", array($core->start));
 while ($user_list = $db->fetch())
 {
   $templating->block('user');
@@ -40,5 +58,5 @@ while ($user_list = $db->fetch())
   $templating->set('youtube', $youtube);
 
 }
-
 $templating->block('bottom');
+$templating->set('pagination', $pagination);

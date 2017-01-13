@@ -643,7 +643,7 @@ class core
 
 				list($width, $height, $type, $attr) = $image_info;
 
-				if ($width < $this->config('carousel_image_width') || $height < $this->config('carousel_image_height'))
+				if ($this->config('carousel_image_width') > $width || $this->config('carousel_image_height') > $height)
 				{
 					// include the image class to resize it as its too big
 					include('includes/class_image.php');

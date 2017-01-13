@@ -104,18 +104,18 @@
 [/block: login_menu]
 
 [block: featured]
-		<div class="group" id="main-article" style="background: url('{:url}uploads/carousel/{:image}'); background-size: 100%;">
-			<div class="container">
-				<div class="col-12">
-					<div class="article group">
-						<div class="info group">
-							<div class="title"><span class="badge-featured">Featured</span> <a href="{:article_link}">{:title}</a></div>
-							<div class="meta">Posted by {:username} (<a href="{:article_link}">{:comment_count} Comments</a>) {:edit_link} {:editors_pick_link}</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+<div class="group" id="main-article">
+    <div class="container">
+        <div class="col-12">
+            <div class="article group">
+                <div class="featured-image group">
+                    <img alt="" src="{:url}uploads/carousel/{:image}" />
+										<a href="{:article_link}"><div class="featured-title"><div class="featured-title-text">{:title}</div></div></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 [/block: featured]
 
 [block: patreon]

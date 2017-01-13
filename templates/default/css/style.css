@@ -396,16 +396,15 @@ display: inline-block;
 	background: #efefef;
 	margin: 0 0 9px 0;
 }
-.article .image {
-	float: left;
-	width: 100%;
+.article .featured-image
+{
+	position: relative;
+	max-height: 300px;
 }
-.article .image a {
-	float: left;
+.article .featured-image img {
 	width: 100%;
-}
-.article .image a img {
-	width: 100%;
+	display: block;
+	max-height: 300px;
 }
 .article .info {
 	padding: 7px 14px;
@@ -471,27 +470,25 @@ display: inline-block;
 /* Home Page */
 #main-article {
 	background: #333;
-	background-repeat: no-repeat !important;
-	padding-top: 150px;
 	z-index: 1;
 }
 #main-article .article {
 	position: relative;
 	margin: 0;
 }
-#main-article .article .info {
-	float: left;
-	padding: 10px 10px 0;
-}
-
-#main-article .article .image {
-    display: none;
-}
-
 .articles .article .info {
 	float: left;
 }
-
+.featured-title
+{
+	position: absolute;
+	bottom: 0;
+	background-color:rgba(0, 0, 0, 0.5);
+	width: 100%;
+	color: #fff;
+}
+.featured-title-text {padding: 5px; font-weight: bold;}
+.featured-title a {color: #fff; display: block;}
 
 /* Individual Article Page */
 .article.individual .info {
@@ -700,17 +697,6 @@ display: inline-block;
 }
 .badge.yellow {
     background: #ccb845;
-}
-.badge-featured
-{
-    background: #333333;
-    color: #ffffff;
-    padding: 3px;
-    -webkit-border-radius: 3px;
-     -khtml-border-radius: 3px;
-       -moz-border-radius: 3px;
-         -o-border-radius: 3px;
-            border-radius: 3px;
 }
 
 /* Login Page */
@@ -1171,17 +1157,11 @@ body.dark {
 	.container {
 		width: 1136px;
 	}
-	#main-article {
-		padding-top: 200px;
-	}
 }
 /* WIDESCREEN */
 @media only screen and (min-width: 1400px) {
 	.container {
 		width: 1300px;
-	}
-	#main-article {
-		padding-top: 250px;
 	}
 }
 /* DESKTOP */
@@ -1218,12 +1198,6 @@ body.dark {
 	}
   .navigation-main #extra {
         display: none;
-  }
-  #main-article
-  {
-    padding-top: 10px;
-  	background: #000 !important;
-  	background-image:none !important;
   }
 	.hide-small{display:none;}
 	#navigation-mobile {display: block;}

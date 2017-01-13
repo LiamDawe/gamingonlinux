@@ -1,0 +1,38 @@
+[block: top]
+<script>
+jQuery(document).ready(function($) {
+$('.ltwitch').each(function () {
+    var tnick = $(this).data('tnick');
+    var span = $(this).next();
+  $.getJSON("https://api.twitch.tv/kraken/streams?client_id={:twitch_key}&channel="+tnick+"", function(c) {
+    if (c["streams"].length == 0) {
+      span.html("");
+    } else {
+      span.html("(Online)");
+    }
+  });
+});
+});
+</script>
+<div class="box">
+  <div class="head">Linux gamer video directory</div>
+  <div class="body group">This page takes information from GOL users profiles to make a directory of livestreams and video content for you to watch!</div>
+</div>
+<div class="masonry">
+[/block: top]
+
+[block: user]
+  <div class="block">
+    <div class="box">
+      <div class="body group">
+        {:username}
+        {:twitch}
+        {:youtube}
+      </div>
+    </div>
+  </div>
+[/block: user]
+
+[block: bottom]
+</div>
+[/block: bottom]

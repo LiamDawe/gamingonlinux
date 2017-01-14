@@ -47,6 +47,14 @@ while ($user_list = $db->fetch())
        this way we don't have to work out what has what vs what doesn't have what
        it seems silly, but it's the only real sane way to make sure
       */
+      if ($check == 'youtube')
+      {
+        if (strpos($check_output, 'youtube.com/') === false)
+        {
+          $check_output = 'youtube.com/' . $check_output;
+        }
+      }
+
       $remove_array = array('www.', 'http://', 'https://');
       $check_output = str_replace($remove_array, '', $check_output);
       $check_output = 'https://www.' . $check_output;

@@ -18,11 +18,30 @@ else if (is_numeric($_GET['page']))
   $page = $_GET['page'];
 }
 
+// first get a list of anyone who is actually live TODO
+$templating->block('online_now');
+$online_list = '';
+$db->sqlquery("SELECT `username`, `twitch` FROM `users` WHERE `twitch` != ''");
+while ($get_online = $db->fetch())
+{
+  // their username will be the last thing in the path after the slash (we remove the slash to get it)
+  $url = parse_url($get_online['twitch']);
+  if (isset($url['path']))
+  {
+    $twitch_username = str_replace('/', '', $url['path']);
+  }
+  $online_list .= '<div class="online_list" data-tnick="'.$twitch_username.'" style="display: none;">'.$get_online['username'].': <a href="https://www.twitch.tv/'.$twitch_username.'">Twitch</a> <span>(Online)</span></div>';
+}
+$templating->set('online_list', $online_list);
+
+// now get the full directory
 $db->sqlquery("SELECT COUNT(user_id) as count FROM `users` WHERE `twitch` != '' OR `youtube` != ''");
 $counter = $db->fetch();
 
 // sort out the pagination link
 $pagination = $core->pagination_link(30, $counter['count'], "/index.php?module=video&amp;", $page);
+
+$templating->block('directory_top');
 
 $db->sqlquery("SELECT `username`, `youtube`, `twitch` FROM `users` WHERE `twitch` != '' OR `youtube` != '' LIMIT ?, 30", array($core->start));
 while ($user_list = $db->fetch())
@@ -62,21 +81,8 @@ while ($user_list = $db->fetch())
       // make the first letter a capital, as we don't use capitals in the DB
       $service_name = ucfirst($check);
 
-      // grab the twitch username for the online checker
-      $additional_classes = '';
-      if ($check == 'twitch')
-      {
-        // their username will be the last thing in the path after the slash (we remove the slash to get it)
-        $url = parse_url($check_output);
-        if (isset($url['path']))
-        {
-          $twitch_username = str_replace('/', '', $url['path']);
-        }
-        $additional_classes = 'class="ltwitch" data-tnick="'.$twitch_username.'"';
-      }
-
       // add a break if it's not the last link in the loop
-      $check_output = '<a '.$additional_classes.' href="'.$check_output.'">'.$service_name.'</a> <span></span>';
+      $check_output = '<a href="'.$check_output.'">'.$service_name.'</a> <span></span>';
       if ($counter != $total_array)
       {
         $check_output = $check_output . '<br />';

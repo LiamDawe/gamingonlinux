@@ -36,6 +36,7 @@ $profile_fields['website']['link'] = 1;
 $profile_fields['website']['image'] = NULL;
 
 $profile_fields['youtube']['name'] = 'Youtube:';
+$profile_fields['youtube']['description'] = 'Enter your <strong>full</strong> Youtube channel, like this: https://www.youtube.com/gamingonlinux';
 $profile_fields['youtube']['db_field'] = 'youtube';
 $profile_fields['youtube']['span'] = '<span class="inline icon youtube">YouTube</span>';
 $profile_fields['youtube']['base_link'] = NULL;
@@ -52,7 +53,7 @@ $profile_fields['facebook']['link'] = 1;
 $profile_fields['facebook']['image'] = NULL;
 
 $profile_fields['twitch']['name'] = 'Twitch:';
-$profile_fields['twitch']['description'] = 'Enter your <strong>full</strong> twitch url!';
+$profile_fields['twitch']['description'] = 'Enter your <strong>full</strong> twitch channel, like this: http://www.twitch.tv/gamingonlinux (not your profile or anything else)';
 $profile_fields['twitch']['db_field'] = 'twitch';
 $profile_fields['twitch']['span'] = '<span class="inline icon twitch">twitch</span>';
 $profile_fields['twitch']['base_link'] = NULL;

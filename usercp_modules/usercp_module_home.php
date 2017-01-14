@@ -4,6 +4,14 @@ $templating->merge('usercp_modules/usercp_module_home');
 
 include('includes/profile_fields.php');
 
+if (isset($_GET['message']))
+{
+	if ($_GET['message'] == 'youtube-missing')
+	{
+		$core->message('That is not a correct Youtube URL format, please use a correct URL like: https://www.youtube.com/gamingonlinux', NULL, 1);
+	}
+}
+
 if (isset($_GET['updated']))
 {
 	$core->message('You have updated your profile!');
@@ -268,6 +276,11 @@ else if (isset($_POST['act']))
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)
 		{
+			if ($field['db_field'] == 'youtube' && strpos($_POST['youtube'], "youtube.com") === false)
+			{
+				header("Location: " . core::config('website_url') . "usercp.php?module=home&message=youtube-missing");
+				die();
+			}
 			// make sure the Steam field can't be a plain steam profile url for broken links
 			if ($field['db_field'] == 'steam' && $_POST['steam'] == 'http://steamcommunity.com/id/')
 			{

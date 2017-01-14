@@ -52,7 +52,7 @@ else
 		// remove all the comments made by admins
 		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
 
-		$title = strip_tags($_POST['title']);
+		$article_class->gallery_tagline($checked);
 
 		$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date, $submission_date, $_POST['article_id']));
 
@@ -89,6 +89,9 @@ else
 		unset($_SESSION['uploads_tagline']);
 		unset($_SESSION['image_rand']);
 		unset($_SESSION['original_text']);
+		unset($_SESSION['gallery_tagline_id']);
+		unset($_SESSION['gallery_tagline_rand']);
+		unset($_SESSION['gallery_tagline_filename']);
 
 		// pick the email to use
 		$email = '';
@@ -102,13 +105,8 @@ else
 			$email = $check_article['email'];
 		}
 
-		// sort out registration email
-		$to = $email;
-
 		// subject
 		$subject = 'Your article was approved on GamingOnLinux.com!';
-
-		$nice_title = $core->nice_title($_POST['title']);
 
 		// message
 		$message = "
@@ -119,7 +117,7 @@ else
 		<body>
 		<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 		<br />
-		<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/$slug.{$_POST['article_id']}/\">{$title}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>
+		<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>
 		</body>
 		</html>";
 
@@ -131,7 +129,7 @@ else
 		include(core::config('path') . 'includes/telegram_poster.php');
 
 		// Mail it
-		mail($to, $subject, $message, $headers);
+		mail($email, $subject, $message, $headers);
 
 		telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $_POST['article_id']);
 

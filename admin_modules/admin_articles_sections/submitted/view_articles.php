@@ -60,6 +60,7 @@ else if (isset($_GET['aid']))
 	if (!isset($_GET['error']))
 	{
 		$_SESSION['image_rand'] = rand();
+		$article_class->reset_sessions();
 	}
 	if (isset ($_GET['message']))
 	{
@@ -102,28 +103,54 @@ else if (isset($_GET['aid']))
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');
 
-	$db->sqlquery("SELECT a.article_id, a.preview_code,a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.guest_ip, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `submitted_article` = 1 AND `active` = 0 AND `article_id` = ?", array($_GET['aid']));
+	$article_sql = "SELECT
+	a.`article_id`,
+	a.preview_code,
+	a.title,
+	a.text,
+	a.tagline,
+	a.show_in_menu,
+	a.active,
+	a.article_top_image,
+	a.article_top_image_filename,
+	a.tagline_image,
+	a.guest_username,
+	a.author_id,
+	a.guest_ip,
+	a.locked,
+	a.locked_by,
+	a.locked_date,
+	a.gallery_tagline,
+	t.`filename` as gallery_tagline_filename,
+	u.`username`, u2.`username` as `username_lock`
+	FROM
+	`articles` a
+	LEFT JOIN `users` u on a.`author_id` = u.`user_id`
+	LEFT JOIN `users` u2 ON a.`locked_by` = u2.`user_id`
+	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
+	WHERE `submitted_article` = 1 AND `active` = 0 AND `article_id` = ?";
+	$db->sqlquery($article_sql, array($_GET['aid']));
 
 	$article = $db->fetch();
 
-	if ($article['locked'] == 1 && $_GET['unlock'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
+	if (isset($_GET['unlock']) && $article['locked'] == 1 && $_GET['unlock'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
 		$db->sqlquery("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
 
 		$core->message("You have unlocked the article for others to edit!");
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery("SELECT a.article_id, a.preview_code,a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
+		$db->sqlquery($article_sql, array($_GET['aid']));
 
 		$article = $db->fetch();
 	}
 
-	if (isset($_GET['lock']) && $_GET['lock'] == 1 && $article['locked'] == 0)
+	if (isset($_GET['lock']) && isset($_GET['lock']) && $_GET['lock'] == 1 && $article['locked'] == 0)
 	{
 		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery("SELECT a.article_id, a.preview_code,a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
+		$db->sqlquery($article_sql, array($_GET['aid']));
 
 		$article = $db->fetch();
 	}
@@ -133,7 +160,7 @@ else if (isset($_GET['aid']))
 		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", NULL, 1);
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['aid']), 'view_articles.php admin review');
+		$db->sqlquery($article_sql, array($_GET['aid']));
 
 		$article = $db->fetch();
 	}
@@ -285,30 +312,8 @@ else if (isset($_GET['aid']))
 		$templating->set('slug', $core->nice_title($article['title']));
 	}
 
-	$top_image = '';
-	$top_image_delete = '';
-	if ($article['article_top_image'] == 1)
-	{
-		$top_image = "<img src=\"".url."uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
-	}
-	if (!empty($article['tagline_image']))
-	{
-		$top_image = "<img src=\"".url."uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />
-Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a><br />";
-	}
-	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-	{
-		$top_image = "<img src=\"".url."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
-	}
-
-	$templating->set('tagline_image', $top_image);
-	$tagline_image = '';
-	$temp_tagline_image = '';
-
-	$templating->set('top_image_delete', $top_image_delete);
+	$tagline_image = $article_class->display_tagline_image($article);
+	$templating->set('tagline_image', $tagline_image);
 
 	$templating->set('max_height', core::config('article_image_max_height'));
 	$templating->set('max_width', core::config('article_image_max_width'));

@@ -74,6 +74,7 @@ else
 	if (!isset($_GET['error']))
 	{
 		$_SESSION['image_rand'] = rand();
+		$article_class->reset_sessions();
 	}
 
 	if (isset ($_GET['message']))
@@ -123,7 +124,7 @@ else
 
 	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/drafts');
 
-	$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `article_id` = ?", array($_GET['aid']));
+	$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.gallery_tagline, t.filename as gallery_tagline_filename, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE `article_id` = ?", array($_GET['aid']));
 
 	$article = $db->fetch();
 
@@ -203,19 +204,8 @@ else
 		$templating->set('slug', $article['slug']);
 	}
 
-	$top_image = '';
-	if (!empty($article['tagline_image']))
-	{
-		$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />Full Image Url: <a href=\"http://www.gamingonlinux.com/uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a><br />";
-	}
-	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-	{
-		$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
-	}
-
-	$templating->set('tagline_image', $top_image);
+	$tagline_image = $article_class->display_tagline_image($article);
+	$templating->set('tagline_image', $tagline_image);
 
 	$templating->set('max_height', core::config('article_image_max_height'));
 	$templating->set('max_width', core::config('article_image_max_width'));

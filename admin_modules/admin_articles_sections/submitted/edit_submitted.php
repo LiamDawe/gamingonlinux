@@ -8,6 +8,8 @@ if ($checked = $article_class->check_article_inputs($return_page))
 		$block = 1;
 	}
 
+	$article_class->gallery_tagline($checked);
+
 	$db->sqlquery("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ? WHERE `article_id` = ?", array($checked['title'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
 
 	$article_class->process_categories($_POST['article_id']);
@@ -33,6 +35,9 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	unset($_SESSION['uploads_tagline']);
 	unset($_SESSION['image_rand']);
 	unset($_SESSION['original_text']);
+	unset($_SESSION['gallery_tagline_id']);
+	unset($_SESSION['gallery_tagline_rand']);
+	unset($_SESSION['gallery_tagline_filename']);
 
 	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&message=editdone");
 }

@@ -9,7 +9,30 @@ if (isset($_POST['check']))
 {
 	if ($_POST['check'] == 'Edit' || $_POST['check'] == 'Submitted' || $_POST['check'] == 'Draft' || $_POST['check'] == 'Review')
 	{
-		$db->sqlquery("SELECT a.article_id, a.`author_id`, a.`guest_username`, a.`article_top_image`, a.`article_top_image_filename`, a.tagline_image, a.locked, a.locked_by, a.locked_date, u1.username, u1.user_id, u2.username as username_lock FROM `articles` a LEFT JOIN users u1 ON u1.user_id = a.author_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_POST['article_id']));
+		$check_article_sql = "SELECT
+		a.`article_id`,
+		a.`author_id`,
+		a.`guest_username`,
+		a.`article_top_image`,
+		a.`article_top_image_filename`,
+		a.`tagline_image`,
+		a.`locked`,
+		a.`locked_by`,
+		a.`locked_date`,
+		a.`gallery_tagline`,
+		t.`filename` as `gallery_tagline_filename`,
+		u1.`username`,
+		u1.`user_id`,
+		u2.`username` as username_lock
+		FROM `articles` a
+		LEFT JOIN
+		users u1 ON u1.`user_id` = a.`author_id`
+		LEFT JOIN
+		`users` u2 ON a.`locked_by` = u2.`user_id`
+		LEFT JOIN
+		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
+		WHERE `article_id` = ?";
+		$db->sqlquery($check_article_sql, array($_POST['article_id']));
 		$article = $db->fetch();
 
 		$author_id = $article['author_id'];
@@ -95,6 +118,21 @@ if (!empty($article['tagline_image']))
 	$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 	BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
 }
+if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
+{
+	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
+	$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+	BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
+	Full Image Url: <a href=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
+}
+if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+{
+	$db->sqlquery("SELECT `filename` FROM `articles_tagline_gallery` WHERE `id` = ?", array($_SESSION['gallery_tagline_id']));
+	$gallery_image = $db->fetch();
+	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$gallery_image['filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
+	$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$gallery_image['filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+	BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /></div>";
+}
 if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 {
 	$top_image_nobbcode = '<img src="' . core::config('website_url') . 'uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name'] . '" alt="[articleimage]">';
@@ -112,12 +150,19 @@ else
 }
 
 $tagline_bbcode = '';
+$bbcode_tagline_gallery = NULL;
 if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 {
 	$tagline_bbcode = '/temp/' . $_SESSION['uploads_tagline']['image_name'];
 }
 
-else if ((!isset($_SESSION['uploads_tagline']) || $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']) && isset($article))
+else if (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+{
+	$tagline_bbcode = $_SESSION['gallery_tagline_filename'];
+	$bbcode_tagline_gallery = 1;
+}
+
+else if ((!isset($_SESSION['uploads_tagline']) || $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']) || (!isset($_SESSION['gallery_tagline_rand']) || $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) && isset($article))
 {
 	if ($article['article_top_image'] == 1)
 	{
@@ -127,10 +172,15 @@ else if ((!isset($_SESSION['uploads_tagline']) || $_SESSION['uploads_tagline']['
 	{
 		$tagline_bbcode  = $article['tagline_image'];
 	}
+	if (!empty($article['gallery_tagline']))
+	{
+		$tagline_bbcode = $article['gallery_tagline_filename'];
+		$bbcode_tagline_gallery = 1;
+	}
 }
 $templating->set('top_image_nobbcode', $top_image_nobbcode);
 $templating->set('tagline', $_POST['tagline']);
-$templating->set('text_full', bbcode($_POST['text'], 1, 1, $tagline_bbcode));
+$templating->set('text_full', bbcode($_POST['text'], 1, 1, $tagline_bbcode, $bbcode_tagline_gallery));
 $templating->set('article_link', '#');
 $templating->set('comment_count', '0');
 

@@ -1,6 +1,6 @@
 <?php
 // check it hasn't been accepted already
-$db->sqlquery("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, a.gallery_tagline, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
 $check_article = $db->fetch();
 if ($check_article['active'] == 1)
 {
@@ -38,6 +38,8 @@ else
 		// since it's now up we need to add 1 to total article count, it now exists, yaay have a beer on me, just kidding get your wallet!
 		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
 
+		$article_class->gallery_tagline($checked);
+
 		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 
 		if (isset($_SESSION['uploads']))
@@ -74,6 +76,9 @@ else
 		unset($_SESSION['image_rand']);
 		unset($_SESSION['uploads_tagline']);
 		unset($_SESSION['original_text']);
+		unset($_SESSION['gallery_tagline_id']);
+		unset($_SESSION['gallery_tagline_rand']);
+		unset($_SESSION['gallery_tagline_filename']);
 
 		// if the person publishing it is not the author then email them
 		if ($_POST['author_id'] != $_SESSION['user_id'])
@@ -82,13 +87,8 @@ else
 			$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
 			$author_email = $db->fetch();
 
-			// sort out registration email
-			$to = $author_email['email'];
-
 			// subject
 			$subject = 'Your article was reviewed and published on GamingOnLinux.com!';
-
-			$nice_title = $core->nice_title($_POST['title']);
 
 			// message
 			$message = "
@@ -99,7 +99,7 @@ else
 			<body>
 			<img src=\"http://www.gamingonlinux.com/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
 			<br />
-			<p><strong>{$_SESSION['username']}</strong> has reviewed and published your article \"<a href=\"http://www.gamingonlinux.com/articles/$nice_title.{$_POST['article_id']}/\">{$title}</a>\" on <a href=\"https://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>.</p>
+			<p><strong>{$_SESSION['username']}</strong> has reviewed and published your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"https://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>.</p>
 			</body>
 			</html>";
 
@@ -111,7 +111,7 @@ else
 			// Mail it
 			if (core::config('send_emails') == 1)
 			{
-				mail($to, $subject, $message, $headers);
+				mail($author_email['email'], $subject, $message, $headers);
 			}
 		}
 

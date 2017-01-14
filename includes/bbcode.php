@@ -222,7 +222,7 @@ function logged_in_code($body)
 	return $body;
 }
 
-function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
+function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $gallery_tagline = NULL)
 {
 	//  get rid of empty BBCode, is there a point in having excess markup?
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
@@ -263,7 +263,15 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL)
 	{
 		$find = "[img]tagline-image[/img]";
 
-		$replace = "<img itemprop=\"image\" src=\"" . core::config('website_url') . "uploads/articles/tagline_images/$tagline_image\" class=\"img-responsive\" alt=\"tagline-image\" />";
+		if ($gallery_tagline == NULL)
+		{
+			$file_path = "uploads/articles/tagline_images/";
+		}
+		else
+		{
+			$file_path = "uploads/tagline_gallery/";
+		}
+		$replace = "<img itemprop=\"image\" src=\"" . core::config('website_url') . $file_path . $tagline_image . "\" class=\"img-responsive\" alt=\"tagline-image\" />";
 
 		$body = str_replace($find, $replace, $body);
 	}

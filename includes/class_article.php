@@ -1,6 +1,16 @@
 <?php
 class article_class
 {
+  // clear out any left overs, since there's no error we don't need them, stop errors with them
+  function reset_sessions()
+  {
+    unset($_SESSION['uploads']);
+    unset($_SESSION['uploads_tagline']);
+    unset($_SESSION['gallery_tagline_id']);
+    unset($_SESSION['gallery_tagline_rand']);
+    unset($_SESSION['gallery_tagline_filename']);
+  }
+
   function tagline_image($data)
   {
     $tagline_image = '';
@@ -12,12 +22,47 @@ class article_class
     {
       $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/{$data['tagline_image']}\">";
     }
-    if ($data['article_top_image'] == 0 && empty($data['tagline_image']))
+    if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
+    {
+      $tagline_image = "<img alt src=\"".url."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
+    }
+    if ($data['article_top_image'] == 0 && empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
     {
       $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
     }
 
     return $tagline_image;
+  }
+
+  // if they have set a tagline image from the gallery, remove any existing images
+  function gallery_tagline($data = NULL)
+  {
+    global $db;
+
+    $gallery_tagline_sql = '';
+
+    if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+    {
+      if ($data != NULL)
+      {
+        if ($data['article_top_image'] == 1)
+        {
+          unlink(core::config('path') . 'uploads/articles/topimages/' . $data['article_top_image_filename']);
+        }
+        if (!empty($data['tagline_image']))
+        {
+          unlink(core::config('path') . 'uploads/articles/tagline_images/' . $data['tagline_image']);
+          unlink(core::config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
+        }
+
+        $db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `article_top_image_filename` = '', `article_top_image` = 0, `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
+      }
+      else
+      {
+        $gallery_tagline_sql = ", `gallery_tagline` = {$_SESSION['gallery_tagline_id']}";
+        return $gallery_tagline_sql;
+      }
+    }
   }
 
   function display_previous_uploads($article_id = NULL)
@@ -236,21 +281,36 @@ class article_class
         BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
         Full Image Url: <a href=\"" . core::config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a></div>";
       }
+      if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
+      {
+        $tagline_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+        BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
+        Full Image Url: <a href=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
+      }
     }
 
     if (isset($_GET['error']))
     {
       if ($_GET['temp_tagline'] == 1)
       {
-        $file = core::config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
-        $image_load = false;
-
-        if (file_exists($file))
+        if (isset($_SESSION['uploads_tagline']))
         {
-          $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
+          $file = core::config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
+
+          if (file_exists($file))
+          {
+            $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
+            BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
+            <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
+            <a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
+          }
+        }
+
+        if (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] = $_SESSION['image_rand'])
+        {
+          $tagline_image = "<div class=\"test\" id=\"{$_SESSION['gallery_tagline_filename']}\"><img src=\"".core::config('website_url')."uploads/tagline_gallery/{$_SESSION['gallery_tagline_filename']}\" class='imgList'><br />
           BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-          <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
-          <a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
+          <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['gallery_tagline_filename']}\" /></div>";
         }
       }
     }
@@ -278,14 +338,14 @@ class article_class
     $editor_pick_count = $db->num_rows();
 
     $temp_tagline = 0;
-    if (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+    if ( (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand']) || (!empty($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand']))
     {
       $temp_tagline = 1;
     }
 
     if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
     {
-      $db->sqlquery("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+      $db->sqlquery("SELECT `tagline_image`, `gallery_tagline`, `article_top_image_filename`, `article_top_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
       $check_article = $db->fetch();
     }
 
@@ -341,20 +401,26 @@ class article_class
 
     // if it's an existing article, check tagline image
     // if database tagline_image is empty and there's no upload OR upload doesn't match (previous left over)
-    else if ((isset($_POST['article_id'])) && (empty($check_article['tagline_image']) && !isset($_SESSION['uploads_tagline']) || isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
+    else if (isset($_POST['article_id']))
     {
-      $redirect = 1;
+      if ((empty($check_article['tagline_image']) && $check_article['gallery_tagline'] == 0 && !isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) && (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) && (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
+      {
+        $redirect = 1;
 
-      $return_error = 'noimageselected';
+        $return_error = 'noimageselected';
+      }
     }
 
     // if it's a new article, check for tagline image in a simpler way
     // if there's no upload, or upload doesn't match
-    else if ((!isset($_POST['article_id'])) && (!isset($_SESSION['uploads_tagline'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
+    else if (!isset($_POST['article_id']))
     {
-      $redirect = 1;
+      if ( (!isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']) || (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) )
+      {
+        $redirect = 1;
 
-      $return_error = 'noimageselected';
+        $return_error = 'noimageselected';
+      }
     }
 
     if ($redirect == 1)
@@ -393,7 +459,32 @@ class article_class
       die();
     }
 
-    $content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug);
+    // only set them, if they actually exists
+    $article_id = '';
+    if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
+    {
+      $article_id = $_POST['article_id'];
+    }
+
+    $tagline_image = '';
+    if (isset($check_article['tagline_image']))
+    {
+      $tagline_image = $check_article['tagline_image'];
+    }
+
+    $article_top_image_filename = '';
+    if (isset($check_article['article_top_image_filename']))
+    {
+      $article_top_image_filename = $check_article['article_top_image_filename'];
+    }
+
+    $article_top_image = '';
+    if (isset($check_article['article_top_image']))
+    {
+      $article_top_image = $check_article['article_top_image'];
+    }
+
+    $content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug, 'article_id' => $article_id, 'tagline_image' => $tagline_image, 'article_top_image_filename' => $article_top_image_filename, 'article_top_image' => $article_top_image);
 
     return $content_array;
   }

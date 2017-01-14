@@ -1,8 +1,10 @@
-<?php
+<?php // this page is for brand new articles instantly being sent into the review queue
 $return_page = "admin.php?module=add_article";
 if ($checked = $article_class->check_article_inputs($return_page))
 {
-	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], core::$date, $core->random_id()));
+	$gallery_tagline_sql = $article_class->gallery_tagline();
+
+	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `admin_review` = 1, `date` = ?, `preview_code` = ? $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], core::$date, $core->random_id()));
 
 	$article_id = $db->grab_id();
 
@@ -40,6 +42,10 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	unset($_SESSION['agames']);
 	unset($_SESSION['uploads_tagline']);
 	unset($_SESSION['image_rand']);
+	unset($_SESSION['original_text']);
+	unset($_SESSION['gallery_tagline_id']);
+	unset($_SESSION['gallery_tagline_rand']);
+	unset($_SESSION['gallery_tagline_filename']);
 
 	// email all editors apart from yourself
 	$db->sqlquery("SELECT `user_id`, `email`, `username` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));

@@ -13,7 +13,9 @@ else
 	$slug = $core->nice_title($_POST['title']);
 }
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `draft` = 1, `date` = ?, `preview_code` = ?", array($_SESSION['user_id'], $title, $slug, $_POST['tagline'], $text, core::$date, $core->random_id()));
+$gallery_tagline_sql = $article_class->gallery_tagline();
+
+$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0, `active` = 0, `draft` = 1, `date` = ?, `preview_code` = ? $gallery_tagline_sql", array($_SESSION['user_id'], $title, $slug, $_POST['tagline'], $text, core::$date, $core->random_id()));
 
 $article_id = $db->grab_id();
 
@@ -47,5 +49,9 @@ unset($_SESSION['agames']);
 unset($_SESSION['uploads_tagline']);
 unset($_SESSION['image_rand']);
 unset($_SESSION['uploads']);
+unset($_SESSION['original_text']);
+unset($_SESSION['gallery_tagline_id']);
+unset($_SESSION['gallery_tagline_rand']);
+unset($_SESSION['gallery_tagline_filename']);
 
 header("Location: admin.php?module=articles&view=drafts&message=saved");

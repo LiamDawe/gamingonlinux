@@ -1,5 +1,5 @@
 <?php
-$db->sqlquery("SELECT `author_id` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT `article_id`, `author_id`, `article_top_image`, `tagline_image`, `article_top_image_filename` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 $grab_author = $db->fetch();
 if ($grab_author['author_id'] == $_SESSION['user_id'])
 {
@@ -7,6 +7,8 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	$tagline = trim($_POST['tagline']);
 	$text = trim($_POST['text']);
 	$slug = $core->nice_title($_POST['slug']);
+
+	$article_class->gallery_tagline($grab_author);
 
 	$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $_POST['article_id']));
 
@@ -33,6 +35,9 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	unset($_SESSION['uploads_tagline']);
 	unset($_SESSION['image_rand']);
 	unset($_SESSION['original_text']);
+	unset($_SESSION['gallery_tagline_id']);
+	unset($_SESSION['gallery_tagline_rand']);
+	unset($_SESSION['gallery_tagline_filename']);
 
 	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&message=editdone");
 }

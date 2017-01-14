@@ -1,6 +1,6 @@
 <?php
 // check it hasn't been published already
-$db->sqlquery("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT a.`article_id`, a.`article_top_image`, a.`tagline_image`, a.`article_top_image_filename`, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
 $check_article = $db->fetch();
 if ($check_article['active'] == 1)
 {
@@ -39,6 +39,11 @@ else
 
 		$title = strip_tags($_POST['title']);
 
+		if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+		{
+			$article_class->gallery_tagline($check_article);
+		}
+
 		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `locked` = 0, `draft` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, 'new_article_published', core::$date, $_POST['article_id']));
@@ -70,6 +75,8 @@ else
 		unset($_SESSION['uploads']);
 		unset($_SESSION['image_rand']);
 		unset($_SESSION['uploads_tagline']);
+		unset($_SESSION['original_text']);
+		unset($_SESSION['gallery_tagline']);
 
 		include(core::config('path') . 'includes/telegram_poster.php');
 

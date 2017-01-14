@@ -50,6 +50,7 @@ else
 	if (!isset($_GET['error']))
 	{
 		$_SESSION['image_rand'] = rand();
+		$article_class->reset_sessions();
 	}
 
 	if (isset ($_GET['message']))
@@ -96,7 +97,32 @@ else
 		}
 	}
 
-	$query = "SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?";
+	$query = "SELECT
+	a.article_id,
+	a.preview_code,
+	a.title,
+	a.slug,
+	a.text,
+	a.tagline,
+	a.show_in_menu,
+	a.active,
+	a.article_top_image,
+	a.article_top_image_filename,
+	a.tagline_image,
+	a.guest_username,
+	a.author_id,
+	a.locked,
+	a.locked_by,
+	a.locked_date,
+	a.gallery_tagline,
+	t.filename as gallery_tagline_filename,
+	u.username,
+	u2.username as username_lock
+	FROM `articles` a
+	LEFT JOIN `users` u on a.author_id = u.user_id
+	LEFT JOIN `users` u2 ON a.locked_by = u2.user_id
+	LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline
+	WHERE `article_id` = ?";
 
 	$db->sqlquery($query, array($_GET['aid']));
 
@@ -394,11 +420,8 @@ if (isset($_POST['act']))
 				{
 					$to = $email_user['email'];
 
-					// set the title to upper case
-					$title_upper = $title['title'];
-
 					// subject
-					$subject = "New reply to article {$title_upper} on GamingOnLinux.com";
+					$subject = "New reply to article {$title['title']} on GamingOnLinux.com";
 
 					$username = $_SESSION['username'];
 				}

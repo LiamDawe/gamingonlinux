@@ -22,7 +22,41 @@ if (!isset($_GET['go']))
 		else
 		{
 			// get the article
-			$db->sqlquery("SELECT a.`article_id`, a.`slug`, a.`preview_code`, a.`title`, a.`text`, a.`tagline`, a.`date`, a.`date_submitted`, a.`author_id`, a.`active`, a.`guest_username`, a.`views`, a.`article_top_image`, a.`article_top_image_filename`, a.`tagline_image`, a.`comments_open`, u.`username`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`article_bio`, u.`user_group`, u.`twitter_on_profile` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE a.`article_id` = ?", array($_GET['aid']));
+			$db->sqlquery("SELECT
+				a.`article_id`,
+				a.`slug`,
+				a.`preview_code`,
+				a.`title`,
+				a.`text`,
+				a.`tagline`,
+				a.`date`,
+				a.`date_submitted`,
+				a.`author_id`,
+				a.`active`,
+				a.`guest_username`,
+				a.`views`,
+				a.`article_top_image`,
+				a.`article_top_image_filename`,
+				a.`tagline_image`,
+				a.`gallery_tagline`,
+				t.`filename` as `gallery_tagline_filename`,
+				a.`comments_open`,
+				u.`username`,
+				u.`avatar`,
+				u.`avatar_gravatar`,
+				u.`gravatar_email`,
+				u.`avatar_uploaded`,
+				u.`avatar_gallery`,
+				u.`article_bio`,
+				u.`user_group`,
+				u.`twitter_on_profile`
+				FROM `articles` a
+				LEFT JOIN
+				`users` u on a.`author_id` = u.`user_id`
+				LEFT JOIN
+				`articles_tagline_gallery` t ON t.id = a.gallery_tagline
+				WHERE
+				a.`article_id` = ?", array($_GET['aid']));
 			$article = $db->fetch();
 
 			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
@@ -134,6 +168,10 @@ if (!isset($_GET['go']))
 				{
 					$article_meta_image = core::config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}";
 				}
+				if (!empty($article['gallery_tagline_filename']))
+				{
+					$article_meta_image = core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}";
+				}
 
 				$nice_title = $core->nice_title($article['title']);
 
@@ -228,18 +266,20 @@ if (!isset($_GET['go']))
 				//piratelv timeago: 12/11/14
 				$templating->set('article_meta', "<meta itemprop=\"image\" content=\"$article_meta_image\" /> <script>var postdate=new Date('".date('c', $article['date'])."')</script>");
 
+				$tagline_bbcode = '';
+				$bbcode_tagline_gallery = NULL;
 				if ($article['article_top_image'] == 1)
 				{
 					$tagline_bbcode = $article['article_top_image_filename'];
 				}
-
 				if (!empty($article['tagline_image']))
 				{
 					$tagline_bbcode  = $article['tagline_image'];
 				}
-				else
+				if (!empty($article['gallery_tagline']))
 				{
-					$tagline_bbcode = "";
+					$tagline_bbcode = $article['gallery_tagline_filename'];
+					$bbcode_tagline_gallery = 1;
 				}
 
 				$article_page = 1;
@@ -262,7 +302,7 @@ if (!isset($_GET['go']))
 					$article_page_count = 1;
 				}
 
-				$templating->set('text', bbcode($article_body, 1, 1, $tagline_bbcode) . $article_bottom);
+				$templating->set('text', bbcode($article_body, 1, 1, $tagline_bbcode, $bbcode_tagline_gallery) . $article_bottom);
 
 				$article_link = "/articles/$nice_title.{$_GET['aid']}/";
 				if (isset($_GET['preview']))

@@ -15,6 +15,8 @@ if (isset($_GET['view']))
 		if (!isset($_GET['error']))
 		{
 			$_SESSION['image_rand'] = rand();
+
+			$article_class->reset_sessions();
 		}
 		$article_id = $_GET['article_id'];
 
@@ -26,7 +28,35 @@ if (isset($_GET['view']))
 
 		else
 		{
-			$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.tagline, a.text, a.show_in_menu, a.active, a.guest_username, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($_GET['article_id']));
+			$article_info_sql = "SELECT
+			a.`article_id`,
+			a.`title`,
+			a.`slug`,
+			a.`tagline`,
+			a.`text`,
+			a.`show_in_menu`,
+			a.`active`,
+			a.`guest_username`,
+			a.`article_top_image`,
+			a.`article_top_image_filename`,
+			a.`tagline_image`,
+			a.`locked`,
+			a.`locked_by`,
+			a.`locked_date`,
+			a.`gallery_tagline`,
+			t.`filename` as `gallery_tagline_filename`,
+			u.`username`,
+			u2.`username` as `username_lock`
+			FROM
+			`articles` a
+			LEFT JOIN
+			`users` u on a.author_id = u.user_id
+			LEFT JOIN
+			`users` u2 ON a.locked_by = u2.user_id
+			LEFT JOIN
+			`articles_tagline_gallery` t ON t.id = a.gallery_tagline
+			WHERE `article_id` = ?";
+			$db->sqlquery($article_info_sql, array($_GET['article_id']));
 
 			$article = $db->fetch();
 
@@ -37,7 +67,7 @@ if (isset($_GET['view']))
 				$core->message("You have unlocked the article for others to edit!");
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id));
+				$db->sqlquery($article_info_sql, array($article_id));
 
 				$article = $db->fetch();
 			}
@@ -47,7 +77,7 @@ if (isset($_GET['view']))
 				$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id));
+				$db->sqlquery($article_info_sql, array($article_id));
 
 				$article = $db->fetch();
 			}
@@ -57,7 +87,7 @@ if (isset($_GET['view']))
 				$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", NULL, 1);
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery("SELECT a.article_id, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.locked, a.locked_by, a.locked_date, u.username, u2.username as username_lock FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `users` u2 ON a.locked_by = u2.user_id WHERE `article_id` = ?", array($article_id), 'view_articles.php admin review');
+				$db->sqlquery($article_info_sql, array($article_id));
 
 				$article = $db->fetch();
 			}
@@ -657,6 +687,8 @@ else if (isset($_POST['act']))
 				$show = 1;
 			}
 
+			$article_class->gallery_tagline($checked);
+
 			// first check if it was disabled
 			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 			$enabled_check = $db->fetch();
@@ -705,6 +737,8 @@ else if (isset($_POST['act']))
 			unset($_SESSION['uploads_tagline']);
 			unset($_SESSION['image_rand']);
 			unset($_SESSION['original_text']);
+			unset($_SESSION['gallery_tagline_id']);
+			unset($_SESSION['gallery_tagline_rand']);
 
 			if (core::config('pretty_urls') == 1)
 			{
@@ -826,6 +860,8 @@ else if (isset($_POST['act']))
 				$block = 1;
 			}
 
+			$article_class->gallery_tagline($checked);
+
 			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
@@ -860,6 +896,9 @@ else if (isset($_POST['act']))
 			unset($_SESSION['image_rand']);
 			unset($_SESSION['aslug']);
 			unset($_SESSION['original_text']);
+			unset($_SESSION['gallery_tagline_id']);
+			unset($_SESSION['gallery_tagline_rand']);
+			unset($_SESSION['gallery_tagline_filename']);
 
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{

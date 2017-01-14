@@ -8,6 +8,7 @@ $templating->set_previous('title', 'New article ' . $templating->get('title', 1)
 if (!isset($_GET['error']) && !isset($_POST['act']))
 {
   $_SESSION['image_rand'] = rand();
+  $article_class->reset_sessions();
 }
 
 if (isset ($_GET['error']))
@@ -135,7 +136,9 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	// since it's now up we need to add 1 to total article count, it now exists, yaay have a beer on me, just kidding get your wallet!
   	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
 
-  	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date));
+    $gallery_tagline_sql = $article_class->gallery_tagline();
+
+  	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date));
 
   	$article_id = $db->grab_id();
 
@@ -170,6 +173,9 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
   	unset($_SESSION['uploads']);
   	unset($_SESSION['image_rand']);
   	unset($_SESSION['uploads_tagline']);
+    unset($_SESSION['gallery_tagline_id']);
+    unset($_SESSION['gallery_tagline_rand']);
+    unset($_SESSION['gallery_tagline_filename']);
 
   	include(core::config('path') . 'includes/telegram_poster.php');
 

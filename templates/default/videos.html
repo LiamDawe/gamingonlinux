@@ -9,6 +9,13 @@ jQuery(document).ready(function($)
     $.getJSON("https://api.twitch.tv/kraken/streams?client_id={:twitch_key}&channel="+tnick+"", function(a) {
       if (a["streams"].length > 0)
       {
+        //console.log(a["streams"][0].game);
+        var game_name = 'Not set';
+        if (a["streams"][0].game.length > 0)
+        {
+          game_name = a["streams"][0].game;
+        }
+        $(current).find("span").html("<br />Game: " + game_name);
         $(current).show();
       }
     });
@@ -23,13 +30,24 @@ jQuery(document).ready(function($)
 </div>
 [/block: top]
 
-[block: online_now]
+[block: online_top]
 <div class="box">
   <div class="head">Streaming now</div>
-  <div class="body group"><em>Please wait for this list to get populated as we query the Twitch API</em><br />
-    {:online_list}</div>
+  <div class="body group"><em>Please wait for this list to get populated as we query the Twitch API, refresh the page to reload it</em></div>
 </div>
-[/block: online_now]
+[/block: online_top]
+
+[block: user_online]
+  <div class="block online_list" data-tnick="{:twitch_username}" style="display: none;">
+    <div class="box">
+      <div class="body group">
+        {:username} (Online)
+        {:twitch_link}
+        <span></span>
+      </div>
+    </div>
+  </div>
+[/block: user_online]
 
 [block: directory_top]
 <div class="box">

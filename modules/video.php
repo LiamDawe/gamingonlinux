@@ -19,20 +19,22 @@ else if (is_numeric($_GET['page']))
 }
 
 // first get a list of anyone who is actually live TODO
-$templating->block('online_now');
+$templating->block('online_top');
 $online_list = '';
 $db->sqlquery("SELECT `username`, `twitch` FROM `users` WHERE `twitch` != ''");
 while ($get_online = $db->fetch())
 {
+  $templating->block('user_online');
   // their username will be the last thing in the path after the slash (we remove the slash to get it)
   $url = parse_url($get_online['twitch']);
   if (isset($url['path']))
   {
     $twitch_username = str_replace('/', '', $url['path']);
   }
-  $online_list .= '<div class="online_list" data-tnick="'.$twitch_username.'" style="display: none;">'.$get_online['username'].': <a href="https://www.twitch.tv/'.$twitch_username.'">Twitch</a> <span>(Online)</span></div>';
+  $templating->set('twitch_username', $twitch_username);
+  $templating->set('username', $get_online['username']);
+  $templating->set('twitch_link', '<a href="https://www.twitch.tv/'.$twitch_username.'">Twitch</a>');
 }
-$templating->set('online_list', $online_list);
 
 // now get the full directory
 $db->sqlquery("SELECT COUNT(user_id) as count FROM `users` WHERE `twitch` != '' OR `youtube` != ''");

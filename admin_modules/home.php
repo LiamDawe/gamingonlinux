@@ -99,7 +99,7 @@ if (!isset($_GET['view']))
 			"mod_queue_approved" => ' approved a forum post.',
 			"mod_queue_removed" => ' removed a forum topic requesting approval.',
 			"mod_queue_removed_ban" => ' removed a forum topic requesting approval and banned the user.',
-			"delete_forum_topic" => ' deleted a forum topic',
+			"delete_forum_topic" => ' deleted a forum topic.',
 
 			"edited_user" => ' edited a user.',
 			"banned_user" => ' banned a user.',

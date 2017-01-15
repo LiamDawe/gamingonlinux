@@ -29,7 +29,7 @@ if (!isset($_GET['view']))
 	{
 		$templating->block('comments_top', 'admin_modules/admin_home');
 
-		$grab_comments = $db->sqlquery("SELECT a.text, a.date_posted, u.user_id, u.username FROM `admin_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT 10");
+		$grab_comments = $db->sqlquery("SELECT a.`text`, a.`date_posted`, u.`user_id`, u.`username` FROM `admin_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY a.`id` DESC LIMIT 10");
 		while ($comments = $grab_comments->fetch())
 		{
 			$templating->block('comment', 'admin_modules/admin_home');
@@ -46,7 +46,7 @@ if (!isset($_GET['view']))
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_home');
 
-	$editor_chat = $db->sqlquery("SELECT a.*, u.user_id, u.username FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY `id` DESC LIMIT 10");
+	$editor_chat = $db->sqlquery("SELECT a.*, u.`user_id`, u.`username` FROM `editor_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY `id` DESC LIMIT 10");
 	while ($commentsall = $editor_chat->fetch())
 	{
 		$templating->block('commentall', 'admin_modules/admin_home');
@@ -71,7 +71,7 @@ if (!isset($_GET['view']))
 		$types[$types_set['name']] = $types_set;
 	}
 
-	$get_notifications = $db->sqlquery("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.user_id = u.user_id ORDER BY n.`id` DESC LIMIT 50");
+	$get_notifications = $db->sqlquery("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 50");
 	while ($tracking = $get_notifications->fetch())
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
@@ -116,7 +116,7 @@ if (!isset($_GET['view']))
 			}
 
 			// replace id numbers
-			$id_array = array('{:topic_id}','{:article_id}');
+			$id_array = array('{:topic_id}','{:article_id}', '{:post_id}');
 			$link = str_replace($id_array, $tracking['data'], $link);
 
 			$link = ' <a href="'.$link.'">View</a> - ';

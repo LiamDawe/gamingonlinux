@@ -1,17 +1,17 @@
 <?php
 $templating->merge('admin_blocks/admin_block_mod_queue');
 
-$db->sqlquery("SELECT COUNT(`id`) as count FROM `admin_notifications` WHERE `type` = 'mod_queue' AND `completed` = 0");
-$topic_counter = $db->fetch();
+$db->sqlquery("SELECT COUNT(`id`) as count FROM `admin_notifications` WHERE `type` IN('mod_queue','mod_queue_reply') AND `completed` = 0");
+$post_counter = $db->fetch();
 
 $templating->block('main');
 
-if ($topic_counter['count'] > 0)
+if ($post_counter['count'] > 0)
 {
-	$templating->set('topic_counter', "<span class=\"badge badge-important\">{$topic_counter['count']}</span>");
+	$templating->set('post_counter', "<span class=\"badge badge-important\">{$post_counter['count']}</span>");
 }
 
-else if ($topic_counter['count'] == 0)
+else if ($post_counter['count'] == 0)
 {
-	$templating->set('topic_counter', "({$topic_counter['count']})");
+	$templating->set('post_counter', "({$post_counter['count']})");
 }

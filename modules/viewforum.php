@@ -42,7 +42,7 @@ else
 
 		if ($_GET['message'] == 'queue')
 		{
-			$core->message('As you are a new user, your message is now in the mod queue to be manually approved due to spam attacks, please be patient while our editors work.', NULL, 1);
+			$core->message('Your message is now in the mod queue to be manually approved due to spam attacks, please be patient while our editors work. This only happens a few times to start with!', NULL, 1);
 		}
 	}
 

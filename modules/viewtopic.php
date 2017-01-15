@@ -154,13 +154,21 @@ else
 
 			else
 			{
-				if (isset($_GET['message']) && $_GET['message'] == 'reported')
+				if (isset($_GET['message']))
 				{
-					$core->message('Thank you for reporting the post!');
+					if ($_GET['message'] == 'reported')
+					{
+						$core->message('Thank you for reporting the post!');
+					}
+
+					if ($_GET['message'] == 'queue')
+					{
+						$core->message('Your message is now in the mod queue to be manually approved due to spam attacks, please be patient while our editors work. This only happens a few times to start with!', NULL, 1);
+					}
 				}
 
 				// update topic views
-				$db->sqlquery("UPDATE `forum_topics` SET `views` = (views +1) WHERE `topic_id` = ?", array($_GET['topic_id']));
+				$db->sqlquery("UPDATE `forum_topics` SET `views` = (views + 1) WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// count how many replies this topic has
 				$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
@@ -552,12 +560,12 @@ else
 				if (isset($_GET['post_id']) && is_numeric($_GET['post_id']))
 				{
 					// see if we are above their set limit per-page
-					$db->sqlquery("SELECT `replys` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
+					$db->sqlquery("SELECT `replys` FROM `forum_topics` WHERE `topic_id` = ? AND `approved` = 1", array($_GET['topic_id']));
 					$count = $db->fetch();
 
 					if ($count['replys'] > $_SESSION['per-page'])
 					{
-						$db->sqlquery("SELECT count(`post_id`) as counter FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ?", array($_GET['topic_id'], $_GET['post_id']));
+						$db->sqlquery("SELECT count(`post_id`) as counter FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ? AND `approved` = 1", array($_GET['topic_id'], $_GET['post_id']));
 						$number = $db->fetch();
 
 						$last_page = ceil($number['counter']/$_SESSION['per-page']);
@@ -595,7 +603,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
+					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
 					while ($post = $get_replies->fetch())
 					{
 						if ($page > 1 && $reply_count == 0)

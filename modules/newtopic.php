@@ -298,7 +298,8 @@ else
 							{
 								header("Location: /forum/topic/{$topic_id}");
 							}
-							else {
+							else
+							{
 								header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
 							}
 						}

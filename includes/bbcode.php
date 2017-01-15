@@ -423,7 +423,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	"<span style=\"text-decoration: line-through\">$1</span>",
 	"<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
 	"<iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe>",
-	'<ul>$1</ul>',$bbcode_tagline_gallery
+	'<ul>$1</ul>',
 	'</ul>',
 	'<li>',
 	'</li>',

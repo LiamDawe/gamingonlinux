@@ -62,8 +62,17 @@ if (!isset($_GET['view']))
 	// editor tracking
 	$templating->block('editor_tracking', 'admin_modules/admin_home');
 
-	$db->sqlquery("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.user_id = u.user_id ORDER BY n.`id` DESC LIMIT 50");
-	while ($tracking = $db->fetch())
+	// get the different types of notifications
+	$db->sqlquery("SELECT `name`, `text`, `link` FROM `admin_notification_types`");
+	$fetch_types = $db->fetch_all_rows();
+	// make their key their name, so we can easily call them
+	foreach ($fetch_types as $types_set)
+	{
+		$types[$types_set['name']] = $types_set;
+	}
+
+	$get_notifications = $db->sqlquery("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.user_id = u.user_id ORDER BY n.`id` DESC LIMIT 50");
+	while ($tracking = $get_notifications->fetch())
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
 
@@ -85,78 +94,35 @@ if (!isset($_GET['view']))
 
 		}
 
-		$types_array = array(
-			"comment_deleted" =>  ' deleted a comment',
-			"closed_comments" => ' closed the comments on an article.',
-			"reported_comment" => ' reported a comment.',
-			"deleted_comment_report" => ' deleted a comment report.',
-
-			"forum_topic_report" => ' reported a forum topic.',
-			"forum_reply_report" => ' reported a forum reply',
-			"deleted_topic_report" => ' deleted a forum topic report.',
-			"deleted_reply_report" => ' deleted a forum reply report.',
-			"mod_queue" => ' requires approval of their forum post.',
-			"mod_queue_approved" => ' approved a forum post.',
-			"mod_queue_removed" => ' removed a forum topic requesting approval.',
-			"mod_queue_removed_ban" => ' removed a forum topic requesting approval and banned the user.',
-			"delete_forum_topic" => ' deleted a forum topic.',
-			"stuck_forum_topic" => ' stickied a forum topic.',
-			"unstuck_forum_topic" => ' unstuck a forum topic.',
-			"locked_forum_topic" => ' locked a forum topic.',
-			"unlocked_forum_topic" =>  ' unlocked a forum topic.',
-			"unlocked_stuck_forum_topic" => ' unlocked and stickied a forum topic.',
-			"locked_unstuck_forum_topic" => ' locked and unstuck a forum topic.',
-			"unlocked_unstuck_forum_topic" => ' unlocked and unstuck a forum topic.',
-			"locked_stuck_forum_topic" => ' locked and stickied a forum topic.',
-
-			"edited_user" => ' edited a user.',
-			"banned_user" => ' banned a user.',
-			"unbanned_user" => ' unbanned a user.',
-			"ip_banned" => ' banned an IP address.',
-			"total_ban" => ' banned a user along with their IP address.',
-			"unban_ip" => ' unbanned an IP address.',
-			"delete_user" => ' deleted a user account.',
-			"deleted_user_content" => ' deleted all the content from a user.',
-
-			"calendar_submission" => ' submitted a game for the calendar and games database.',
-			"approved_calendar" => ' approved a calendar and games database submission.',
-			"game_database_addition" => ' added a new game to the calendar and games database',
-			"game_database_edit" => ' edited a game in the calendar and games database',
-			"game_database_deletion" => ' deleted a game from the calendar and games database',
-
-			"deleted_article" => ' deleted an article.',
-			"denied_submitted_article" => ' denied a user submitted article.',
-			"approve_submitted_article" => ' approved a user submitted article.',
-			"article_admin_queue_approved" => ' approved an article from the admin review queue.',
-			"article_admin_queue" => ' sent a new article to the admin review queue.',
-			"new_article_published" => ' published a new article.',
-			"submitted_article" => ' submitted an article.',
-			"article_correction" =>  ' sent in an article correction.',
-			"deleted_correction" => ' deleted an article correction report.',
-			"disabled_article" => ' disabled an article.',
-			"enabled_article" => ' re-enabled an article.',
-
-			"new_livestream_event" => ' added a new livestream event.',
-			"edit_livestream_event" => ' edited a livestream event.',
-			'deleted_livestream_event' => ' deleted a livestream event.',
-			"new_livestream_submission" => ' sent a livestream event for review.',
-			"accepted_livestream_submission" => ' accepted a livestream submission.',
-			"denied_livestream_submission" => ' denied a livestream submission.',
-
-			"goty_game_submission" => ' submitted a GOTY game for review.',
-			"goty_game_added" => ' added a GOTY game.',
-			"goty_accepted_game" => ' accepted a GOTY submission.',
-			"goty_denied_game" => ' denied a GOTY submission.',
-			"goty_finished" => ' closed the GOTY awards.'
-		);
-
 		$completed_indicator = '&#10004;';
 		if ($tracking['completed'] == 0)
 		{
 			$completed_indicator = '<span class="badge badge-important">!</span>';
 		}
 
-		$templating->set('editor_action', '<li>' . $completed_indicator . ' ' . $username . $types_array[$tracking['type']] . ' When: ' . $core->format_date($tracking['created_date']) . '</li>');
+		// if their is a "View" link to see what item the action was done on
+		$link = '';
+		if (!empty($types[$tracking['type']]['link']))
+		{
+			$link = $types[$tracking['type']]['link'];
+
+			// if it has a title in the URL for article, only do this if we have to so we save on queries
+			// still need a better way so we don't need a query for each one, but it works for now
+			if (preg_match('/{:title}/', $link))
+			{
+				$get_title = $db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($tracking['data']));
+				$title = $get_title->fetch();
+				$link = str_replace('{:title}', $core->nice_title($title['title']), $link);
+			}
+
+			// replace id numbers
+			$id_array = array('{:topic_id}','{:article_id}');
+			$link = str_replace($id_array, $tracking['data'], $link);
+
+			$link = ' <a href="'.$link.'">View</a> - ';
+		}
+
+		$templating->set('editor_action', '<li>' . $completed_indicator . ' ' . $username . ': ' . $types[$tracking['type']]['text'] . $link . ' When: ' . $core->format_date($tracking['created_date']) . '</li>');
 	}
 	$templating->block('tracking_bottom', 'admin_modules/admin_home');
 }

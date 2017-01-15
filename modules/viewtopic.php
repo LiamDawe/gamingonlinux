@@ -1056,22 +1056,25 @@ else
 
 					if ($check['reported'] == 1)
 					{
-						$db->sqlquery("DELETE FROM `admin_notifications` WHERE `topic_id` = ?", array($_GET['topic_id']));
+						$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_topic_report' AND `data` = ?", array(core::$date, $_GET['topic_id']));
 					}
 
 					// delete any replies that may have been reported from the admin notifications
 					if ($check['replys'] > 0)
 					{
-						$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
+						$db->sqlquery("SELECT `post_id`, `reported` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
 						$get_replies = $db->fetch_all_rows();
 
 						foreach ($get_replies as $delete_replies)
 						{
-							$db->sqlquery("DELETE FROM `admin_notifications` WHERE `reply_id` = ?", array($delete_replies['post_id']));
+							if ($delete_replies['reported'] == 1)
+							{
+								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report', `data` = ?", array(core::$date, $delete_replies['post_id']));
+							}
 						}
 					}
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} deleted a forum topic.", core::$date, core::$date, $_GET['topic_id']));
+					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_topic', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['topic_id']));
 
 					// count all posts including the topic
 					$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));

@@ -14,10 +14,6 @@ class article_class
   function tagline_image($data)
   {
     $tagline_image = '';
-    if ($data['article_top_image'] == 1)
-    {
-      $tagline_image = "<img alt src=\"".url."uploads/articles/topimages/{$data['article_top_image_filename']}\">";
-    }
     if (!empty($data['tagline_image']))
     {
       $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/{$data['tagline_image']}\">";
@@ -26,7 +22,7 @@ class article_class
     {
       $tagline_image = "<img alt src=\"".url."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
     }
-    if ($data['article_top_image'] == 0 && empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
+    if (empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
     {
       $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
     }
@@ -45,17 +41,13 @@ class article_class
     {
       if ($data != NULL)
       {
-        if ($data['article_top_image'] == 1)
-        {
-          unlink(core::config('path') . 'uploads/articles/topimages/' . $data['article_top_image_filename']);
-        }
         if (!empty($data['tagline_image']))
         {
           unlink(core::config('path') . 'uploads/articles/tagline_images/' . $data['tagline_image']);
           unlink(core::config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
         }
 
-        $db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `article_top_image_filename` = '', `article_top_image` = 0, `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
+        $db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
       }
       else
       {
@@ -242,12 +234,6 @@ class article_class
     $db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
     $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article_id, 'deleted_article', core::$date, core::$date));
 
-    // remove old article's image
-    if ($article['article_top_image'] == 1)
-    {
-      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/topimages/' . $article['article_top_image_filename']);
-    }
-
     // if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
     if ($article['author_id'] != 1844)
     {
@@ -345,7 +331,7 @@ class article_class
 
     if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
     {
-      $db->sqlquery("SELECT `tagline_image`, `gallery_tagline`, `article_top_image_filename`, `article_top_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+      $db->sqlquery("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
       $check_article = $db->fetch();
     }
 
@@ -472,19 +458,7 @@ class article_class
       $tagline_image = $check_article['tagline_image'];
     }
 
-    $article_top_image_filename = '';
-    if (isset($check_article['article_top_image_filename']))
-    {
-      $article_top_image_filename = $check_article['article_top_image_filename'];
-    }
-
-    $article_top_image = '';
-    if (isset($check_article['article_top_image']))
-    {
-      $article_top_image = $check_article['article_top_image'];
-    }
-
-    $content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug, 'article_id' => $article_id, 'tagline_image' => $tagline_image, 'article_top_image_filename' => $article_top_image_filename, 'article_top_image' => $article_top_image);
+    $content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug, 'article_id' => $article_id, 'tagline_image' => $tagline_image);
 
     return $content_array;
   }

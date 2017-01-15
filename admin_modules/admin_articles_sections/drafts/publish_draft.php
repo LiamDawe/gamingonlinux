@@ -1,6 +1,6 @@
 <?php
 // check it hasn't been published already
-$db->sqlquery("SELECT a.`article_id`, a.`article_top_image`, a.`tagline_image`, a.`article_top_image_filename`, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT a.`article_id`, a.`tagline_image`, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
 $check_article = $db->fetch();
 if ($check_article['active'] == 1)
 {

@@ -54,29 +54,28 @@ foreach ($articles as $line)
 	$date = date("D, d M Y H:i:s O", $line['date']);
 	$nice_title = preg_replace('/<[^>]+>/', '', $core->nice_title($line['title']) ); // ~~ Piratelv @ 28/08/13
 
-	if ($line['article_top_image'] == 1)
-	{
-		$tagline_bbcode = $line['article_top_image_filename'];
-	}
-
+	$tagline_bbcode = '';
+	$bbcode_tagline_gallery = 0;
 	if (!empty($line['tagline_image']))
 	{
 		$tagline_bbcode  = $line['tagline_image'];
 	}
-	else
+	if (!empty($article['gallery_tagline']))
 	{
-		$tagline_bbcode = ""; //Piratelv @ 05/06/14 -- Some older articles didn't have this
+		$tagline_bbcode = $article['gallery_tagline_filename'];
+		$bbcode_tagline_gallery = 1;
 	}
 
+	// for viewing the tagline, not the whole article
 	if (isset($_GET['tagline']) && $_GET['tagline'] == 1)
 	{
 		$text = $line['tagline'];
 	}
 	else
 	{
-		$text = rss_stripping($line['text'], $tagline_bbcode);
+		$text = rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
 
-		$text = bbcode($text, 1, 1, $tagline_bbcode);
+		$text = bbcode($text, 1, 1);
 	}
 
 	$title = str_replace("&#039;", '\'', $line['title']);

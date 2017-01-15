@@ -1,5 +1,5 @@
 <?php
-$db->sqlquery("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image', `article_top_image`,`article_top_image_filename`,`active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image', `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 $check = $db->fetch();
 
 // anti-cheese deleting the wrong article feature, not sure this is even needed any more?

@@ -574,16 +574,12 @@ class core
 
 			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail))
 			{
-				$db->sqlquery("SELECT `article_top_image`, `article_top_image_filename`,`tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id));
+				$db->sqlquery("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id));
 				$image = $db->fetch();
 
 				// remove old image
 				if (isset($image))
 				{
-					if ($image['article_top_image'] == 1)
-					{
-						unlink($this->config('path') . 'uploads/articles/topimages/' . $image['article_top_image_filename']);
-					}
 					if (!empty($image['tagline_image']))
 					{
 						unlink($this->config('path') . 'uploads/articles/tagline_images/' . $image['tagline_image']);
@@ -591,7 +587,7 @@ class core
 					}
 				}
 
-				$db->sqlquery("UPDATE `articles` SET `tagline_image` = ?, `article_top_image_filename` = '', `article_top_image` = 0, `gallery_tagline` = 0 WHERE `article_id` = ?", array($imagename, $article_id));
+				$db->sqlquery("UPDATE `articles` SET `tagline_image` = ?, `gallery_tagline` = 0 WHERE `article_id` = ?", array($imagename, $article_id));
 				return true;
 			}
 

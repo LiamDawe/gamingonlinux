@@ -35,8 +35,6 @@ if (!isset($_GET['go']))
 				a.`active`,
 				a.`guest_username`,
 				a.`views`,
-				a.`article_top_image`,
-				a.`article_top_image_filename`,
 				a.`tagline_image`,
 				a.`gallery_tagline`,
 				t.`filename` as `gallery_tagline_filename`,
@@ -160,10 +158,6 @@ if (!isset($_GET['go']))
 
 				// set the article image meta
 				$article_meta_image = '';
-				if ($article['article_top_image'] == 1)
-				{
-					$article_meta_image = core::config('website_url') . "uploads/articles/topimages/{$article['article_top_image_filename']}";
-				}
 				if (!empty($article['tagline_image']))
 				{
 					$article_meta_image = core::config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}";
@@ -268,10 +262,6 @@ if (!isset($_GET['go']))
 
 				$tagline_bbcode = '';
 				$bbcode_tagline_gallery = NULL;
-				if ($article['article_top_image'] == 1)
-				{
-					$tagline_bbcode = $article['article_top_image_filename'];
-				}
 				if (!empty($article['tagline_image']))
 				{
 					$tagline_bbcode  = $article['tagline_image'];

@@ -46,10 +46,6 @@ while ($articles = $db->fetch())
 	{
 		$tagline_image = "http://www.gamingonlinux.com/uploads/articles/tagline_images/thumbnails/{$articles['tagline_image']}";
 	}
-	else if (!empty($articles['article_top_image_filename']))
-	{
-		$tagline_image = "http://www.gamingonlinux.com/uploads/articles/topimages/{$articles['article_top_image_filename']}";
-	}
 	$text .= "\r\n[url=http://www.gamingonlinux.com/articles/$nice_link][img]{$tagline_image}[/img][/url]";
 	$text .= "\r\n[url=http://www.gamingonlinux.com/articles/$nice_link]{$articles['title']}[/url] - Views: {$views}";
 	$text .= "\r\n[i]{$articles['tagline']}[/i]\r\n\r\n";

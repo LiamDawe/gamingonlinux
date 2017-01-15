@@ -1200,55 +1200,63 @@ else
 				{
 					$mod_sql = '`is_sticky` = 1';
 					$action = 'Stuck';
+					$sql_type = 'stuck_forum_topic';
 				}
 
 				if ($_POST['moderator_options'] == 'unsticky')
 				{
 					$mod_sql = '`is_sticky` = 0';
 					$action = 'Unstuck';
+					$sql_type = 'unstuck_forum_topic';
 				}
 
 				if ($_POST['moderator_options'] == 'lock')
 				{
 					$mod_sql = '`is_locked` = 1';
 					$action = 'Locked';
+					$sql_type = 'locked_forum_topic';
 				}
 
 				if ($_POST['moderator_options'] == 'unlock')
 				{
 					$mod_sql = '`is_locked` = 0';
 					$action = 'Unlocked';
+					$sql_type = 'unlocked_forum_topic';
 				}
 
 				if ($_POST['moderator_options'] == 'bothunlock')
 				{
 					$mod_sql = '`is_locked` = 0,`is_sticky` = 1';
 					$action = 'Unlocked and Stuck';
+					$sql_type = 'unlocked_stuck_forum_topic';
 				}
 
 				if ($_POST['moderator_options'] == 'bothunsticky')
 				{
 					$mod_sql = '`is_locked` = 1,`is_sticky` = 0';
 					$action = 'Locked and Unstuck';
+					$sql_type = 'locked_unstuck_forum_topic';
 				}
 
 				if ($_POST['moderator_options'] == 'bothundo')
 				{
 					$mod_sql = '`is_locked` = 0,`is_sticky` = 0';
 					$action = 'Unlocked and Unstuck';
+					$sql_type = 'unlocked_unstuck_forum_topic';
 				}
 
 				if ($_POST['moderator_options'] == 'both')
 				{
 					$mod_sql = '`is_locked` = 1,`is_sticky` = 1';
 					$action = 'Locked and Stuck';
+					$sql_type = 'locked_stuck_forum_topic';
 				}
 
 				// do the lock/stick action
 				$db->sqlquery("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// add to editor tracking
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `action` = ?, `created` = ?, `completed` = 1, `completed_date` = ?, `topic_id` = ?", array("{$_SESSION['username']} \"{$action}\" a forum topic.", core::$date, core::$date, $_GET['topic_id']));
+				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `created_date` = ?, `completed` = 1, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $sql_type, core::$date, core::$date, $_GET['topic_id']));
 
 				$core->message("You have {$action} the topic! <a href=\"/forum/topic/{$_GET['topic_id']}\">Click here to return.</a>");
 			}

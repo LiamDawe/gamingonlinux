@@ -13,8 +13,6 @@ if (isset($_POST['check']))
 		a.`article_id`,
 		a.`author_id`,
 		a.`guest_username`,
-		a.`article_top_image`,
-		a.`article_top_image_filename`,
 		a.`tagline_image`,
 		a.`locked`,
 		a.`locked_by`,
@@ -106,12 +104,6 @@ $templating->set('submitted_date', 'Submitted ' . $date);
 
 $top_image = '';
 $top_image_nobbcode='';
-if (isset($article) && $article['article_top_image'] == 1)
-{
-	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\">";
-	$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/topimages/{$article['article_top_image_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-	BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
-}
 if (!empty($article['tagline_image']))
 {
 	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
@@ -164,10 +156,6 @@ else if (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_
 
 else if ((!isset($_SESSION['uploads_tagline']) || $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']) || (!isset($_SESSION['gallery_tagline_rand']) || $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) && isset($article))
 {
-	if ($article['article_top_image'] == 1)
-	{
-		$tagline_bbcode = $article['article_top_image_filename'];
-	}
 	if (!empty($article['tagline_image']))
 	{
 		$tagline_bbcode  = $article['tagline_image'];

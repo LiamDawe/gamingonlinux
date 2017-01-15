@@ -111,8 +111,6 @@ else if (isset($_GET['aid']))
 	a.tagline,
 	a.show_in_menu,
 	a.active,
-	a.article_top_image,
-	a.article_top_image_filename,
 	a.tagline_image,
 	a.guest_username,
 	a.author_id,

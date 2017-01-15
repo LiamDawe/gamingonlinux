@@ -11,7 +11,7 @@ $core = new core();
 
 if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 {
-	// get the image article_top_image_filename
+	// get the image 
 	$qry1 = "SELECT `id`, `filename` FROM `article_images` WHERE `id` = ?";
 	$db->sqlquery($qry1, array($_POST['image_id']));
 	$grabber = $db->fetch();

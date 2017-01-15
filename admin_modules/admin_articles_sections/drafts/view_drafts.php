@@ -124,7 +124,7 @@ else
 
 	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/drafts');
 
-	$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.guest_username, a.author_id, a.gallery_tagline, t.filename as gallery_tagline_filename, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE `article_id` = ?", array($_GET['aid']));
+	$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.tagline_image, a.guest_username, a.author_id, a.gallery_tagline, t.filename as gallery_tagline_filename, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE `article_id` = ?", array($_GET['aid']));
 
 	$article = $db->fetch();
 

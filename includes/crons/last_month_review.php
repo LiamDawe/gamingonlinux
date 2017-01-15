@@ -1,18 +1,23 @@
 <?php
-include('/home/gamingonlinux/public_html/includes/config.php');
+$path = '/home/gamingonlinux/public_html/includes/';
+include($path . 'config.php');
 
-include('/home/gamingonlinux/public_html/includes/class_mysql.php');
+include($path . 'class_mysql.php');
 $db = new mysql($database_host, $database_username, $database_password, $database_db);
 
-include('/home/gamingonlinux/public_html/includes/class_core.php');
+include($path . 'class_core.php');
 $core = new core();
 
-include('/home/gamingonlinux/public_html/includes/bbcode.php');
+define('url', core::config('website_url'));
+
+include($path . 'bbcode.php');
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
-include('/home/gamingonlinux/public_html/includes/class_template.php');
-
+include($path . 'class_template.php');
 $templating = new template();
+
+include($path . 'class_article.php');
+$article_class = new article_class();
 
 $prev_month = date('n', strtotime('-1 months'));
 $year_selector = date('Y');
@@ -37,18 +42,20 @@ $text = "Here is a look back at the 15 most popular articles on GamingOnLinux fo
 
 // sub query = grab the highest ones, then the outer query sorts them in ascending order, so we get the highest viewed articles, and then sorted from lowest to highest
 $db->sqlquery("SELECT a.*
-FROM (SELECT a.article_id, a.date, a.tagline_image, a.article_top_image_filename, a.title, a.tagline, a.views, c.category_id
+FROM (SELECT a.`article_id`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as `gallery_tagline_filename`, a.`title`, a.`tagline`, a.`views`, c.`category_id`
 	FROM
 		articles a
 	LEFT JOIN
-		`article_category_reference` c ON a.article_id = c.article_id
+		`article_category_reference` c ON a.`article_id` = c.`article_id`
+	LEFT JOIN
+		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 	WHERE
-		a.`date` >= $first_minute AND a.`date` <= $last_minute AND c.category_id NOT IN (63, 92) AND a.active = 1 group by `a`.`article_id`
+		a.`date` >= $first_minute AND a.`date` <= $last_minute AND c.`category_id` NOT IN (63, 92) AND a.`active` = 1 group by `a`.`article_id`
 	ORDER BY
-		a.views DESC
+		a.`views` DESC
 	LIMIT 15
      ) a
-ORDER BY views DESC");
+ORDER BY `views` DESC");
 
 while ($articles = $db->fetch())
 {
@@ -57,16 +64,8 @@ while ($articles = $db->fetch())
 
 	$date = $core->format_date($articles['date']);
 
-	$tagline_image = '';
-	if (!empty($articles['tagline_image']))
-	{
-		$tagline_image = "http://www.gamingonlinux.com/uploads/articles/tagline_images/thumbnails/{$articles['tagline_image']}";
-	}
-	else if (!empty($articles['article_top_image_filename']))
-	{
-		$tagline_image = "http://www.gamingonlinux.com/uploads/articles/topimages/{$articles['article_top_image_filename']}";
-	}
-	$text .= "<br /><a href=\"http://www.gamingonlinux.com/articles/$nice_link\"><img src=\"{$tagline_image}\" /></a>";
+	$tagline_image = $article_class->tagline_image($articles);
+	$text .= "<br /><a href=\"http://www.gamingonlinux.com/articles/$nice_link\">{$tagline_image}</a>";
 	$text .= "<br /><a href=\"http://www.gamingonlinux.com/articles/$nice_link\">{$articles['title']}</a> - $date - Views: {$views}";
 	$text .= "<br /><em>{$articles['tagline']}</em><br /><br />";
 }
@@ -88,5 +87,4 @@ $db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `c
 
 // update admin notifications
 $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = 1844, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array('article_admin_queue', core::$date, $article_id));
-
 ?>

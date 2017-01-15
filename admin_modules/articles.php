@@ -37,8 +37,6 @@ if (isset($_GET['view']))
 			a.`show_in_menu`,
 			a.`active`,
 			a.`guest_username`,
-			a.`article_top_image`,
-			a.`article_top_image_filename`,
 			a.`tagline_image`,
 			a.`locked`,
 			a.`locked_by`,
@@ -252,7 +250,6 @@ if (isset($_GET['view']))
 
 			$templating->set('username', $username);
 
-			$top_image_delete = '';
 			$tagline_image = $article_class->display_tagline_image($article);
 			$templating->set('tagline_image', $tagline_image);
 
@@ -313,7 +310,6 @@ if (isset($_GET['view']))
 				}
 			}
 
-			$templating->set('top_image_delete', $top_image_delete);
 			$templating->set('article_id', $article['article_id']);
 
 			$article_class->article_history($article['article_id']);
@@ -357,7 +353,7 @@ if (isset($_GET['view']))
 			{
 				$active = 0;
 				$paginate_link = "admin.php?module=articles&view=manage&category=inactive&";
-				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, a.article_top_image, a.article_top_image_filename, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT `article_id` FROM `articles` WHERE `active` = 0 AND `admin_review` = 0 AND `draft` = 0 AND `submitted_unapproved` = 0";
 			}
 
@@ -365,7 +361,7 @@ if (isset($_GET['view']))
 			{
 				$active = 1;
 				$paginate_link = "admin.php?module=articles&view=manage&category=all&";
-				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, a.article_top_image, a.article_top_image_filename, u.username FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT `article_id` FROM `articles`";
 			}
 
@@ -416,13 +412,6 @@ if (isset($_GET['view']))
 					$templating->set('comment_count', $article['comment_count']);
 					$templating->set('views', $article['views']);
 					$templating->set('article_link', $core->nice_title($article['title']) . '.' . $article['article_id']);
-
-					$top_image = '';
-					if ($article['article_top_image'] == 1)
-					{
-						$top_image = "<img data-src=\"holder.js/350x220\" alt=\"article-image\" src=\"/uploads/articles/topimages/{$article['article_top_image_filename']}\">";
-					}
-					$templating->set('top_image', $top_image);
 				}
 
 				$templating->block('manage_bottom');
@@ -451,7 +440,7 @@ if (isset($_GET['view']))
 			// sort out the pagination link
 			$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=articles&view=manage&category_id={$_GET['category_id']}&", $page);
 
-			$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.article_top_image, a.article_top_image_filename, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start));
+			$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start));
 			$article_get = $db->fetch_all_rows();
 
 			foreach ($article_get as $article)
@@ -484,13 +473,6 @@ if (isset($_GET['view']))
 				$templating->set('comment_count', $article['comment_count']);
 				$templating->set('views', $article['views']);
 				$templating->set('article_link', $core->nice_title($article['title']) . '.' . $article['article_id']);
-
-				$top_image = '';
-				if ($article['article_top_image'] == 1)
-				{
-					$top_image = "<img data-src=\"holder.js/350x220\" alt=\"article-image\" src=\"/uploads/articles/topimages/{$article['article_top_image_filename']}\">";
-				}
-				$templating->set('top_image', $top_image);
 			}
 
 			$templating->block('manage_bottom');
@@ -799,7 +781,7 @@ else if (isset($_POST['act']))
 			else
 			{
 				// check post exists
-				$db->sqlquery("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image', `article_top_image`,`article_top_image_filename` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
+				$db->sqlquery("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image' FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 				$check = $db->fetch();
 
 				if ($db->num_rows() != 1)
@@ -980,21 +962,17 @@ else if (isset($_POST['act']))
 
 		else
 		{
-			$db->sqlquery("SELECT `article_top_image`,`article_top_image_filename`,`title`,`tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("SELECT `title`,`tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 			$article = $db->fetch();
 
 			// remove old image
-			if ($article['article_top_image'] == 1)
-			{
-				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/topimages/' . $article['article_top_image_filename']);
-			}
 			if (!empty($article['tagline_image']))
 			{
 				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
 				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
 			}
 
-			$db->sqlquery("UPDATE `articles` SET `article_top_image` = 0, `article_top_image_filename` = '', `tagline_image` = '' WHERE `article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("UPDATE `articles` SET `tagline_image` = '' WHERE `article_id` = ?", array($_POST['article_id']));
 
 			$nice_title = $core->nice_title($article['title']);
 

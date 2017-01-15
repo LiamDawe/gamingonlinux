@@ -423,9 +423,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	"<span style=\"text-decoration: line-through\">$1</span>",
 	"<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
 	"<iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe>",
-	'<ul>$1</ul>',
-	'<li>$1</li>',
-	'<ul>',
+	'<ul>$1</ul>',$bbcode_tagline_gallery
 	'</ul>',
 	'<li>',
 	'</li>',
@@ -624,14 +622,21 @@ function emoticons($text)
 }
 
 // remove bits to make sure RSS validates, and to make sure hidden bits don't become available to all
-function rss_stripping($text, $tagline_image = NULL)
+function rss_stripping($text, $tagline_image = NULL, $gallery_tagline = NULL)
 {
-
 	if ($tagline_image != NULL)
 	{
 		$find = "[img]tagline-image[/img]";
 
-		$replace = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/$tagline_image\" alt=\"tagline-image\" />";
+		if ($gallery_tagline == NULL)
+		{
+			$file_path = "uploads/articles/tagline_images/";
+		}
+		else
+		{
+			$file_path = "uploads/tagline_gallery/";
+		}
+		$replace = "<img src=\"" . core::config('website_url') . $file_path . $tagline_image . "\" alt=\"tagline-image\" />";
 
 		$text = str_replace($find, $replace, $text);
 	}

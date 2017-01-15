@@ -118,7 +118,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			// sort out the pagination link
 			$pagination = $core->pagination_link($_SESSION['articles-per-page'], $total_items, $paging_url, $page);
 
-			$db->sqlquery("SELECT r.article_id, a.author_id, a.title, a.slug, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.show_in_menu, a.`gallery_tagline`, t.filename as gallery_tagline_filename, u.username FROM `article_category_reference` r JOIN `articles` a ON a.article_id = r.article_id LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE $cat_sql AND a.active = 1 GROUP BY r.article_id $all_sql ORDER BY a.`date` DESC LIMIT {$core->start}, {$_SESSION['articles-per-page']}", $_GET['catid']);
+			$db->sqlquery("SELECT r.article_id, a.author_id, a.title, a.slug, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.tagline_image, a.show_in_menu, a.`gallery_tagline`, t.filename as gallery_tagline_filename, u.username FROM `article_category_reference` r JOIN `articles` a ON a.article_id = r.article_id LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE $cat_sql AND a.active = 1 GROUP BY r.article_id $all_sql ORDER BY a.`date` DESC LIMIT {$core->start}, {$_SESSION['articles-per-page']}", $_GET['catid']);
 			$articles_get = $db->fetch_all_rows();
 
 			if ($db->num_rows() == 0)
@@ -289,7 +289,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				// sort out the pagination link
 				$pagination = $core->pagination_link($_SESSION['articles-per-page'], $total_pages, $paging_url, $page);
 
-				$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.slug, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.article_top_image, a.article_top_image_filename, a.tagline_image, a.show_in_menu, a.gallery_tagline, t.filename as gallery_tagline_filename, u.`username` FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN articles_tagline_gallery t ON t.`id` = a.`gallery_tagline` WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, {$_SESSION['articles-per-page']}", array($category_id, $core->start));
+				$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.slug, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.tagline_image, a.show_in_menu, a.gallery_tagline, t.filename as gallery_tagline_filename, u.`username` FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN articles_tagline_gallery t ON t.`id` = a.`gallery_tagline` WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, {$_SESSION['articles-per-page']}", array($category_id, $core->start));
 				$articles_get = $db->fetch_all_rows();
 
 				if ($db->num_rows() == 0)

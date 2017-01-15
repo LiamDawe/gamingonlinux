@@ -8,6 +8,32 @@ else
 {
 	$templating->merge('viewtopic');
 
+	if (isset($_GET['view']) && $_GET['view'] == 'deletetopic')
+	{
+		$core->forum_permissions($_GET['forum_id']);
+		if ($parray['delete'] == 1)
+		{
+			if (!isset($_POST['yes']) && !isset($_POST['no']))
+			{
+				$templating->set_previous('title', 'Deleting a forum topic', 1);
+				$core->yes_no('Are you sure you want to delete that topic?', "index.php?module=viewtopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}", 'Go', 'Delete', 'moderator_options');
+			}
+		}
+		else
+		{
+			if (core::config('pretty_urls') == 1)
+			{
+				$return = '/forum/topic/' . $_GET['topic_id'];
+			}
+			else
+			{
+				$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
+			}
+			header("Location: " . $return);
+			die();
+		}
+	}
+
 	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
 	{
 		if ($user->check_group(1,2) == true)
@@ -80,7 +106,29 @@ else
 		}
 
 		// get topic info/make sure it exists
-		$db->sqlquery("SELECT t.*, u.user_id, u.distro, u.pc_info_public, u.pc_info_filled, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.register_date, u.gravatar_email, u.avatar_gallery, u.forum_posts, u.game_developer, $db_grab_fields f.name as forum_name FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id INNER JOIN `forums` f ON t.forum_id = f.forum_id WHERE t.topic_id = ? AND t.approved = 1", array($_GET['topic_id']));
+		$db->sqlquery("SELECT
+			t.*,
+			u.`user_id`,
+			u.`distro`,
+			u.`pc_info_public`,
+			u.`pc_info_filled`,
+			u.`user_group`,
+			u.`secondary_user_group`,
+			u.`username`,
+			u.`avatar`,
+			u.`avatar_uploaded`,
+			u.`avatar_gravatar`,
+			u.`register_date`,
+			u.`gravatar_email`,
+			u.`avatar_gallery`,
+			u.`forum_posts`,
+			u.`game_developer`,
+			$db_grab_fields
+			f.`name` as `forum_name`
+			FROM `forum_topics` t
+			LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
+			INNER JOIN `forums` f ON t.`forum_id` = f.`forum_id`
+			WHERE t.`topic_id` = ? AND t.`approved` = 1", array($_GET['topic_id']));
 		if ($db->num_rows() != 1)
 		{
 			$core->message('That is not a valid forum topic!');
@@ -371,6 +419,14 @@ else
 					$templating->set('tzdate', date('c',$topic['creation_date']) ); // timeago
 					$templating->set('edit_link', $edit_link);
 					$templating->set('subscribe_link', $subscribe_link);
+
+					// sort out delete link if it's allowed
+					$delete_link = '';
+					if ($user->check_group(1,2) == true)
+					{
+						$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletetopic&topic_id=' . $topic['topic_id'] . '&forum_id='. $topic['forum_id'] . '&author_id=' . $topic['author_id'] . '"><span class="icon delete"></span></a>';
+					}
+					$templating->set('delete_link', $delete_link);
 
 					if ($topic['author_id'] != 0)
 					{
@@ -1045,7 +1101,16 @@ else
 
 				else if (isset($_POST['no']))
 				{
-					header("Location: /forum/topic/{$_GET['topic_id']}");
+					if (core::config('pretty_urls') == 1)
+					{
+						$return = '/forum/topic/' . $_GET['topic_id'];
+					}
+					else
+					{
+						$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
+					}
+					header("Location: " . $return);
+					die();
 				}
 
 				else if (isset($_POST['yes']))

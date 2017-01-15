@@ -1039,7 +1039,7 @@ else
 			{
 				if (!isset($_POST['yes']) && !isset($_POST['no']))
 				{
-					$templating->set_previous('title', ' - Deleting topic', 1);
+					$templating->set_previous('title', 'Deleting a forum topic', 1);
 					$core->yes_no('Are you sure you want to delete that topic?', "index.php?module=viewtopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}", 'Go', 'Delete', 'moderator_options');
 				}
 
@@ -1096,9 +1096,6 @@ else
 
 					// now we can remove all replys
 					$db->sqlquery("DELETE FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-
-					print_r($users_posts);
-					die();
 
 					// now update each users post count
 					foreach($users_posts as $post)

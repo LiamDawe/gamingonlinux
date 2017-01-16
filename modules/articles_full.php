@@ -1145,7 +1145,7 @@ else if (isset($_GET['go']))
 						else
 						{
 							$comment = htmlspecialchars($comment, ENT_QUOTES);
-
+							
 							$article_id = $_POST['aid'];
 
 							// add the comment
@@ -1189,10 +1189,12 @@ else if (isset($_GET['go']))
 							$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
 							preg_match_all($pattern, $comment, $matches);
 
+							// we only want to notify them once on being quoted, so make sure each quote has a unique name
 							$quoted_usernames = array_values(array_unique($matches[1]));
+
 							if (!empty($quoted_usernames))
 							{
-								foreach($matches[1] as $match)
+								foreach($quoted_usernames as $match)
 								{
 									if ($match != $_SESSION['username'])
 									{

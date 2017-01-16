@@ -271,15 +271,18 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 
 if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 {
-	$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
-	$featured = $db->fetch();
+	if ($user->check_group(1,2) == true || $user->check_group(5) == true)
+	{
+		$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
+		$featured = $db->fetch();
 
-	$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
-	unlink(core::config('path') . 'uploads/carousel/' . $featured['featured_image']);
+		$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
+		unlink(core::config('path') . 'uploads/carousel/' . $featured['featured_image']);
 
-	$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
+		$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
 
-	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
+		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 
-	header("Location: ".url."index.php?module=home&message=unpicked");
+		header("Location: ".url."index.php?module=home&message=unpicked");
+	}
 }

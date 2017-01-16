@@ -94,7 +94,8 @@ if (!isset($_GET['view']))
 		{
 			$pagination_linky = "/home/";
 		}
-		else {
+		else
+		{
 			$pagination_linky = url . "index.php?module=home&amp;";
 		}
 
@@ -102,7 +103,7 @@ if (!isset($_GET['view']))
 		$pagination = $core->pagination_link($_SESSION['articles-per-page'], $total, $pagination_linky, $page);
 
 		// latest news
-		$db->sqlquery("SELECT a.article_id, a.author_id, a.guest_username, a.title, a.tagline, a.text, a.date, a.comment_count, a.tagline_image, a.show_in_menu, a.slug, a.gallery_tagline, t.filename as gallery_tagline_filename, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.active = 1 ORDER BY a.`date` DESC LIMIT ?, {$_SESSION['articles-per-page']}", array($core->start));
+		$db->sqlquery("SELECT a.`article_id`, a.`author_id`, a.`guest_username`, a.`title`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`tagline_image`, a.`show_in_menu`, a.`slug`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`active` = 1 ORDER BY a.`date` DESC LIMIT ?, ?", array($core->start, $_SESSION['articles-per-page']));
 		$articles_get = $db->fetch_all_rows();
 
 		$count_rows = $db->num_rows();

@@ -91,7 +91,7 @@ class mysql
 			else
 			{
 				$core->message("Something went wrong. The admin will be notified", NULL, 1);
-				$this->pdo_error($error->getMessage(), $trace[2]['file'], $sql . '<br />' . $STH->interpolateQuery(), $referrer);
+				$this->pdo_error($error->getMessage(), $trace[2]['file'], $STH->interpolateQuery(), $referrer);
 				echo $templating->output();
 				die();
 			}

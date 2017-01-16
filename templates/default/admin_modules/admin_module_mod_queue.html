@@ -1,10 +1,11 @@
 [block: top]
 <div class="box">
 	<div class="head">Moderation Queue</div>
-
+</div>
 [/block: top]
 
 [block: approve_topic]
+<div class="box">
 	<div class="body group">
 					Title: {:topic_title}, by <a href="/profiles/{:author_id}">{:username}</a>
 					<div id="r{:comment_id}" class="comment group">
@@ -15,7 +16,7 @@
 						</div>
 					</div>
 					<form action="" method="post">
-						<button type="submit" name="action" value="approve">Approve</button> <button type="submit" name="action" value="remove">Remove</button> <button type="submit" name="action" value="remove_ban">Remove & Ban User</button>
+						<button type="submit" onclick="setTimeout(disableFunction, 1);" name="action" value="approve">Approve</button> <button type="submit" onclick="setTimeout(disableFunction, 1);" name="action" value="remove">Remove</button> <button type="submit" onclick="setTimeout(disableFunction, 1);" name="action" value="remove_ban">Remove & Ban User</button>
 						<input type="hidden" name="is_topic" value="{:is_topic}" />
 						<input type="hidden" name="topic_id" value="{:topic_id}" />
 						<input type="hidden" name="post_id" value="{:post_id}" />
@@ -24,9 +25,10 @@
 						<input type="hidden" name="creation_date" value="{:creation_date}" />
 					</form>
 	</div>
+</div>
 [/block: approve_topic]
 
 
 [block: bottom]
-</div>
+
 [/block: bottom]

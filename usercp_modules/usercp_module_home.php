@@ -276,7 +276,7 @@ else if (isset($_POST['act']))
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)
 		{
-			if ($field['db_field'] == 'youtube' && strpos($_POST['youtube'], "youtube.com") === false)
+			if ($field['db_field'] == 'youtube' && (!empty($_POST['youtube']) && strpos($_POST['youtube'], "youtube.com") === false))
 			{
 				header("Location: " . core::config('website_url') . "usercp.php?module=home&message=youtube-missing");
 				die();

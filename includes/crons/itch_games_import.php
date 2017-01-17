@@ -64,19 +64,7 @@ foreach ($xml->channel->item as $game)
 		$count_rows = $db->num_rows();
 
 		// if it does exist, make sure it's not from itch already
-		if ($count_rows == 0)
-		{
-			$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `itch_link` = ?, `date` = ?, `approved` = 1", array($name, $game->link, $released_date));
-
-			$calendar_id = $db->grab_id();
-
-			echo "\tAdded this game to the calendar DB with id: " . $calendar_id . ".\n";
-
-			$games_added .= $name . '<br />';
-		}
-
-		// if we already have it, just update it
-		else if ($count_rows == 1 && $grab_info['itch_link'] == NULL)
+		if ($count_rows == 1 && $grab_info['itch_link'] == NULL)
 		{
 			$db->sqlquery("UPDATE `calendar` SET `itch_link` = ? WHERE `name` = ?", array($game->link, $name));
 

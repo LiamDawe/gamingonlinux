@@ -482,6 +482,8 @@ if (!isset($_GET['go']))
 						}
 					}
 
+					$subscribe_link = '';
+					$close_comments_link = '';
 					if ($_SESSION['user_group'] != 4)
 					{
 						// find out if this user has subscribed to the comments
@@ -499,16 +501,6 @@ if (!isset($_GET['go']))
 							}
 						}
 
-						// if they are a guest don't show them a link
-						else
-						{
-							$subscribe_link = '';
-						}
-
-						$templating->block('subscribe', 'articles_full');
-						$templating->set('subscribe_link', $subscribe_link);
-
-						$close_comments_link = '';
 						if ($user->check_group(1,2) == true)
 						{
 							if ($article['comments_open'] == 1)
@@ -520,7 +512,6 @@ if (!isset($_GET['go']))
 								$close_comments_link = "<a href=\"/index.php?module=articles_full&go=open_comments&article_id={$article['article_id']}\" class=\"white-link\"><span class=\"link_button\">Open Comments</a></span>";
 							}
 						}
-						$templating->set('close_comments', $close_comments_link);
 					}
 
 					if ($article['comments_open'] == 0)
@@ -553,6 +544,8 @@ if (!isset($_GET['go']))
 					//
 
 					$templating->block('comments_top', 'articles_full');
+					$templating->set('subscribe_link', $subscribe_link);
+					$templating->set('close_comments', $close_comments_link);
 					$templating->set('pagination', $pagination);
 
 					include('includes/profile_fields.php');

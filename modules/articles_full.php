@@ -191,7 +191,17 @@ if (!isset($_GET['go']))
 
 				$templating->block('article', 'articles_full');
 				$templating->set('url', core::config('website_url'));
-				$templating->set('share_url', "http://www.gamingonlinux.com/articles/$nice_title.{$_GET['aid']}/");
+				$templating->set('share_url', "https://www.gamingonlinux.com/articles/$nice_title.{$_GET['aid']}");
+
+				if (core::config('pretty_urls') == 1)
+				{
+					$article_link = "https://www.gamingonlinux.com/articles/$nice_title.{$_GET['aid']}";
+				}
+				else
+				{
+					$article_link = "/index.php?module=articles_full&$nice_title&aid={$_GET['aid']}";
+				}
+				$templating->set('article_link', $article_link);
 
 				$templating->set('rules', core::config('rules'));
 
@@ -1145,7 +1155,7 @@ else if (isset($_GET['go']))
 						else
 						{
 							$comment = htmlspecialchars($comment, ENT_QUOTES);
-							
+
 							$article_id = $_POST['aid'];
 
 							// add the comment

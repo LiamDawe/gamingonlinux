@@ -1021,6 +1021,19 @@ body.dark {
 .dark .comment .comment-meta .distro {
 	background: #ffffff;
 }
+.dark .distro {
+	background: #ffffff;
+	width: 20px;
+	padding: 3px;
+	margin-right: 8px;
+	vertical-align: sub;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
+}
+.dark .fancybox-skin {background: #000000}
 .dark .comment .comment-social li a {
     background: #333333;
 }

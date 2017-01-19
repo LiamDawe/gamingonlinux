@@ -581,7 +581,7 @@ if (!isset($_GET['go']))
 					}
 
 					$per_page = 15;
-					if (isset($_SESSION['articles-per-page']) && is_numeric($_SESSION['articles-per-page']))
+					if (isset($_SESSION['articles-per-page']) && is_numeric($_SESSION['articles-per-page']) && $_SESSION['articles-per-page'] > 0)
 					{
 						$per_page = $_SESSION['articles-per-page'];
 					}

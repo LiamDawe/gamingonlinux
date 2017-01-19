@@ -636,30 +636,16 @@ jQuery(document).ready(function()
       if (data.result == 'added')
       {
         link.data("method", 'remove');
-        if (type == 'article')
-        {
-          link.text('Remove Bookmark');
-        }
-        if (type != 'article')
-        {
-          link.addClass("bookmark-saved");
-          link.attr('title','Remove Bookmark');
-        }
+        link.addClass("bookmark-saved");
+        link.attr('title','Remove Bookmark');
       }
       else if (data.result = 'removed')
       {
         if (page != 'usercp')
         {
           link.data("method", 'add');
-          if (type == 'article')
-          {
-            link.text('Bookmark');
-          }
-          if (type != 'article')
-          {
-            link.removeClass("bookmark-saved");
-            link.attr('title','Bookmark');
-          }
+          link.removeClass("bookmark-saved");
+          link.attr('title','Bookmark');
         }
         else if (page == 'usercp')
         {

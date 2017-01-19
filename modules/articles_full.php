@@ -205,21 +205,6 @@ if (!isset($_GET['go']))
 
 				$templating->set('rules', core::config('rules'));
 
-				$bookmark_link = '';
-				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
-				{
-					$db->sqlquery("SELECT `data_id` FROM `user_bookmarks` WHERE `data_id` = ? AND `user_id` = ? AND `type` = 'article'", array($article['article_id'], $_SESSION['user_id']));
-					if ($db->num_rows() == 1)
-					{
-						$bookmark_link = '<a href="#" class="bookmark-content" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="remove">Remove Bookmark</a>';
-					}
-					else
-					{
-						$bookmark_link = '<a href="#" class="bookmark-content" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="add">Bookmark</a>';
-					}
-				}
-				$templating->set('bookmark_link', $bookmark_link);
-
 				if (($user->check_group(1,2) == true || $user->check_group(5) == true) && !isset($_GET['preview']))
 				{
 					$templating->set('edit_link', " <a href=\"" . core::config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\">Edit</a>");
@@ -361,7 +346,24 @@ if (!isset($_GET['go']))
 					$templating->set('categories_list', $categories_list);
 				}
 
-				$templating->block('article_likes', 'articles_full');
+				// article meta for bookmarking, likes etc
+				$templating->block('article_meta', 'articles_full');
+
+				$bookmark_link = '';
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				{
+					$db->sqlquery("SELECT `data_id` FROM `user_bookmarks` WHERE `data_id` = ? AND `user_id` = ? AND `type` = 'article'", array($article['article_id'], $_SESSION['user_id']));
+					if ($db->num_rows() == 1)
+					{
+						$bookmark_link = '<a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a>';
+					}
+					else
+					{
+						$bookmark_link = '<a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a>';
+					}
+				}
+				$templating->set('bookmark_link', $bookmark_link);
+
 				// Total number of likes for the status message
 				$db->sqlquery("SELECT COUNT(article_id) as `total` FROM `article_likes` WHERE `article_id` = ?", array($article['article_id']));
 				$get_article_likes = $db->fetch();

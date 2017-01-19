@@ -448,6 +448,33 @@ display: inline-block;
 	color: #ffffff;
 	padding: 4px 7px;
 }
+.article .bottom-meta
+{
+	padding: 14px 14px 0px 14px;
+  border-top: 1px solid #cccccc;
+}
+.article .bottom-meta ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.article .bottom-meta ul li {
+  float: left;
+  margin: 0 7px 7px 0;
+}
+.article .bottom-meta ul li a {
+	background: #ffffff;
+	float: left;
+	padding: 5px;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
+}
+.article .bottom-meta ul li a:hover {
+	background-color: #428BCA;
+}
 .article .share {
     padding: 0px 14px 7px;
     line-height: 47px;

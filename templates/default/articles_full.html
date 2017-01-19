@@ -5,7 +5,7 @@
 					<div class="info group">
 						<div class="bubble">
 							<div class="title"><a href="{:article_link}">{:title}</a></div>
-							<div class="meta">Posted by {:username}, {:date} / {:article_views} views {:edit_link} {:bookmark_link}</div>
+							<div class="meta">Posted by {:username}, {:date} / {:article_views} views {:edit_link}</div>
 						</div>
 					</div>
 					<div class="share group">
@@ -29,11 +29,11 @@
 </div>
 [/block: tags]
 
-[block: article_likes]
-	<div class="likes tags group">
-	<span id="article-likes">{:total_likes} Likes</span><span id="who-likes-article">{:who_likes_alink}</span> <span class="fright like-button" style="display:none !important">{:like_button}</span>
+[block: article_meta]
+	<div class="likes bottom-meta group">
+	<span id="article-likes">{:total_likes} Likes</span><span id="who-likes-article">{:who_likes_alink}</span> <ul class="fright"><li><span class="like-button" style="display:none !important">{:like_button}</span></li> <li><span class="fright">{:bookmark_link}</span></li></ul>
 	</div>
-[/block: article_likes]
+[/block: article_meta]
 
 [block: article_bottom]
 </div>

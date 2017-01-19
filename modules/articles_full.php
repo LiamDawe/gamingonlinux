@@ -581,9 +581,9 @@ if (!isset($_GET['go']))
 					}
 
 					$per_page = 15;
-					if (isset($_SESSION['articles-per-page']) && is_numeric($_SESSION['articles-per-page']) && $_SESSION['articles-per-page'] > 0)
+					if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
 					{
-						$per_page = $_SESSION['articles-per-page'];
+						$per_page = $_SESSION['per-page'];
 					}
 
 					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array($_GET['aid'], $core->start, $per_page));

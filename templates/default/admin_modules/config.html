@@ -17,8 +17,12 @@
 	<label class="checkbox">
 		<input type="checkbox" name="register_captcha" {:register_captcha_check}/> Show a captcha on registration
 	</label>
-	Website Url (with no trailing slash!)<br />
-	<input type="text" name="url" value="{:url}" />
+	Website Url<br />
+	<input type="text" name="url" value="{:url}" /><br />
+	Debug mode?<br />
+	<label class="checkbox">
+		<input type="checkbox" name="debug" {:debug_check}/> Show debug info?
+	</label>
 	<br />
 	<input class="btn btn-primary" type="submit" name="Submit" value="Edit" />
 	</form>

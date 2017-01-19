@@ -5,7 +5,7 @@
 					<div class="info group">
 						<div class="bubble">
 							<div class="title"><a href="{:article_link}">{:title}</a></div>
-							<div class="meta">Posted by {:username}, {:date} / {:article_views} views {:edit_link}</div>
+							<div class="meta">Posted by {:username}, {:date} / {:article_views} views {:edit_link} {:bookmark_link}</div>
 						</div>
 					</div>
 					<div class="share group">
@@ -98,7 +98,7 @@
 								<div class="comment-actions">
 									<ul>
 										{:report_link}
-										{:edit} {:delete}
+										{:edit} {:delete} {:bookmark}
 										<li><a class="tooltip-top" href="{:comment_link}" title="Link to this comment"><span class="icon link">Link</span></a></li>
 										{:logged_in_options}
 									</ul>

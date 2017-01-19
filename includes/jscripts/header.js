@@ -617,6 +617,58 @@ jQuery(document).ready(function()
     }); //end of .post callback
 }); //end of .click callback
 
+  // bookmark content
+  $('.bookmark-content').click(function(event)
+  {
+    event.preventDefault();
+    var id = $(this).data('id');
+    var type = $(this).data('type');
+    var method = $(this).data('method');
+    var page = $(this).data('page');
+    var parent_id = $(this).data('parent-id');
+    var link = $(this);
+
+    $.post('/includes/ajax/bookmark-content.php', {'id':id, 'type':type, 'method':method, 'parent_id':parent_id},
+    function(data)
+    {
+      // we need to do this, or else it's seen as text and not a JSON
+      //data = JSON.parse(data);
+      if (data.result == 'added')
+      {
+        link.data("method", 'remove');
+        if (type == 'article')
+        {
+          link.text('Remove Bookmark');
+        }
+        if (type != 'article')
+        {
+          link.addClass("bookmark-saved");
+          link.attr('title','Remove Bookmark');
+        }
+      }
+      else if (data.result = 'removed')
+      {
+        if (page != 'usercp')
+        {
+          link.data("method", 'add');
+          if (type == 'article')
+          {
+            link.text('Bookmark');
+          }
+          if (type != 'article')
+          {
+            link.removeClass("bookmark-saved");
+            link.attr('title','Bookmark');
+          }
+        }
+        else if (page == 'usercp')
+        {
+          link.parent().parent().parent().fadeOut(500);
+        }
+      }
+    });
+  });
+
   // delete a single notification from the users list
   var $this_link = $('.delete_notification').click(function(event)
   {

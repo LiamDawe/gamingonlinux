@@ -907,6 +907,11 @@ ul.social-networks li > a {
 .icon.envelope-open {
     background-image: url('../images/comments/envelope-open.svg');
 }
+.icon.bookmark {
+    background-image: url('../images/comments/bookmark.png');
+		background-size: 10px 14px;
+}
+.bookmark-saved {background-color: yellow !important;}
 
 /* Dark CSS */
 body.dark {
@@ -1107,6 +1112,9 @@ body.dark {
 }
 .dark .icon.envelope-open {
     background-image: url('../images/comments/white/envelope-open.svg');
+}
+.dark .icon.bookmark {
+    background-image: url('../images/comments/white/bookmark.png');
 }
 .dark ::selection {
   background: #ffb7b7; /* WebKit/Blink Browsers */

@@ -205,9 +205,24 @@ if (!isset($_GET['go']))
 
 				$templating->set('rules', core::config('rules'));
 
+				$bookmark_link = '';
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				{
+					$db->sqlquery("SELECT `data_id` FROM `user_bookmarks` WHERE `data_id` = ? AND `user_id` = ? AND `type` = 'article'", array($article['article_id'], $_SESSION['user_id']));
+					if ($db->num_rows() == 1)
+					{
+						$bookmark_link = '<a href="#" class="bookmark-content" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="remove">Remove Bookmark</a>';
+					}
+					else
+					{
+						$bookmark_link = '<a href="#" class="bookmark-content" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="add">Bookmark</a>';
+					}
+				}
+				$templating->set('bookmark_link', $bookmark_link);
+
 				if (($user->check_group(1,2) == true || $user->check_group(5) == true) && !isset($_GET['preview']))
 				{
-					$templating->set('edit_link', " <a href=\"" . core::config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"><i class=\"icon-pencil\"></i><strong>Edit</strong></a>");
+					$templating->set('edit_link', " <a href=\"" . core::config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\">Edit</a>");
 					$templating->set('admin_button', '');
 				}
 
@@ -543,6 +558,13 @@ if (!isset($_GET['go']))
 					/* COMMENTS SECTION */
 					//
 
+					if ($total_comments > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+					{
+						// first grab a list of their bookmarks
+						$db->sqlquery("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'comment' AND `parent_id` = ? AND `user_id` = ?", array($_GET['aid'], $_SESSION['user_id']));
+						$bookmarks_array = $db->fetch_all_rows(PDO::FETCH_COLUMN);
+					}
+
 					$templating->block('comments_top', 'articles_full');
 					$templating->set('subscribe_link', $subscribe_link);
 					$templating->set('close_comments', $close_comments_link);
@@ -673,8 +695,19 @@ if (!isset($_GET['go']))
 						$templating->set('who_likes_link', $who_likes_link);
 
 						$logged_in_options = '';
+						$bookmark_comment = '';
 						if ($_SESSION['user_group'] != 4)
 						{
+							// sort bookmark icon out
+							if (in_array($comments['comment_id'], $bookmarks_array))
+							{
+								$bookmark_comment = '<li><a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="comment" data-id="'.$comments['comment_id'].'" data-parent-id="'.$article['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a></li>';
+							}
+							else
+							{
+								$bookmark_comment = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="comment" data-id="'.$comments['comment_id'].'" data-parent-id="'.$article['article_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
+							}
+
 							$like_text = "Like";
 							$like_class = "like";
 							if ($_SESSION['user_id'] != 0)
@@ -695,6 +728,7 @@ if (!isset($_GET['go']))
 								}
 							}
 							$logged_in_options = $templating->block_store('logged_in_options', 'articles_full');
+							$templating->set('bookmark', $bookmark_comment);
 
 							// don't let them like their own post
 							if ($comments['author_id'] == $_SESSION['user_id'])

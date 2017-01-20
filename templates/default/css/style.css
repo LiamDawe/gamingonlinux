@@ -1094,22 +1094,41 @@ body.dark {
         border-color: #444444;
         color: #ffffff;
 }
-.dark ul.pagination li {
-	background: #333333;
-	border: 1px solid #444444;
+
+.dark ul.pagination li a {
+	border: solid 1px #32373b;
+	background: #3e4347;
+	box-shadow: inset 0px 1px 1px rgba(255,255,255, .1), 0px 1px 3px rgba(0,0,0, .1);
+	color: #feffff;
+	text-shadow: 0px 1px 0px rgba(0,0,0, .5);
 }
-.dark ul.pagination li:hover a, .dark ul.pagination li:hover span {
-	background: #333333;
-}
-.dark ul.pagination li span,.dark ul.pagination li a {
-	color: #ffffff;
-}
-.dark .pagination-disabled {
-	background: #202020 !important;
+.dark ul.pagination li:hover a {
+	background: #3d4f5d;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#547085), to(#3d4f5d));
+	background: -moz-linear-gradient(0% 0% 270deg,#547085, #3d4f5d);
 }
 .dark ul.pagination li.active a {
-	background: #202020 !important;
+	border: none;
+	background: #2f3237;
+	box-shadow: inset 0px 0px 8px rgba(0,0,0, .5), 0px 1px 0px rgba(255,255,255, .1);
 }
+.dark ul.pagination li.pagination-disabled a {
+	pointer-events: none;
+	background: #2f3237;
+}
+
+.dark select.pagination {    border: solid 1px #32373b;
+    background: #3e4347;
+    box-shadow: inset 0px 1px 1px rgba(255,255,255, .1), 0px 1px 3px rgba(0,0,0, .1);
+    color: #feffff;
+    text-shadow: 0px 1px 0px rgba(0,0,0, .5);}
+
+.dark select.pagination:hover {	background: #3d4f5d;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#547085), to(#3d4f5d));
+	background: -moz-linear-gradient(0% 0% 270deg,#547085, #3d4f5d);}
+
+.dark select.pagination option {background: #3e4347; color: #feffff;}
+
 .dark .subhead {background-color: #202020;}
 .dark .livestream {
 	background: #111111;

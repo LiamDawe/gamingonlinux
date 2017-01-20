@@ -232,13 +232,8 @@ class core
 				$pagination.= "<li class=\"previouspage\"><a href=\"{$targetpage}page=$prev$extra\">&laquo;</a></li>";
 			}
 
-			else
-			{
-				$pagination.= "<li class=\"pagination-disabled previouspage\"><a href=\"#\">&laquo;</a></li>";
-			}
-
 			// current page
-			$pagination .= "<li class=\"pagination-disabled active\"><a href=\"#\">$page</a></li>";
+			$pagination .= "<li class=\"active\"><a href=\"#\">$page</a></li>";
 
 			// seperator
 			$pagination .= "<li class=\"pagination-disabled\"><a href=\"#\">/</a></li>";
@@ -260,16 +255,11 @@ class core
 				$pagination .= "<li class=\"nextpage\"><a href=\"{$targetpage}page=$next$extra\">&raquo;</a></li>";
 			}
 
-			else
-			{
-				$pagination .= "<li class=\"pagination-disabled nextpage\"><a href=\"#\">&raquo;</a></li>";
-			}
-
 			$pagination .= "</ul>";
 
 			$pagination .= "</div> <div class=\"fnone\">
 			<form name=\"form2\" class=\"form-inline\">
-			 &nbsp; Go to: <select class=\"wrap ays-ignore\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
+			 &nbsp; Go to: <select class=\"wrap ays-ignore pagination\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
 
 			for ($i = 1; $i <= $lastpage; $i++)
 			{

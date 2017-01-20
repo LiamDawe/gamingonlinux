@@ -1156,6 +1156,7 @@ body.dark {
 .dark .icon.bookmark {
     background-image: url('../images/comments/white/bookmark.png');
 }
+.dark .bookmark-saved {background-color: #A4A400 !important;}
 .dark ::selection {
   background: #ffb7b7; /* WebKit/Blink Browsers */
 }

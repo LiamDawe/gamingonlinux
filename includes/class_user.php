@@ -485,7 +485,14 @@ class user
 		// else no avatar, then as a fallback use gravatar if they have an email left-over
 		else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
 		{
-			$avatar = "/uploads/avatars/no_avatar.png";
+			if ($_SESSION['theme'] == 'dark')
+			{
+				$avatar = "/uploads/avatars/no_avatar_dark.png";
+			}
+			else if ($_SESSION['theme'] == 'light')
+			{
+				$avatar = "/uploads/avatars/no_avatar.png";
+			}
 		}
 
 		return $avatar;

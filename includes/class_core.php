@@ -41,6 +41,13 @@ class core
 		return static::genEmailCode($id)."-".$type."@mail.gamingonlinux.com";
 	}
 
+	public static function make_safe($text)
+	{
+		$text = htmlspecialchars($text, ENT_QUOTES);
+		$text = str_replace('{', '&#123;', $text);
+		return $text;
+	}
+
 	function file_get_contents_curl($url) {
 	    $ch = curl_init();
 

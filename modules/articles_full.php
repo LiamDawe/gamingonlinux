@@ -1191,7 +1191,7 @@ else if (isset($_GET['go']))
 
 						else
 						{
-							$comment = htmlspecialchars($comment, ENT_QUOTES);
+							$comment = core::make_safe($comment);
 
 							$article_id = $_POST['aid'];
 
@@ -1386,7 +1386,7 @@ else if (isset($_GET['go']))
 			// update comment
 			else
 			{
-				$comment_text = htmlspecialchars($comment_text, ENT_QUOTES);
+				$comment_text = core::make_safe($comment_text);
 
 				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], core::$date, $_POST['comment_id']));
 

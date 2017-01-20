@@ -319,6 +319,25 @@ margin-bottom: -3px;
 	color: #ffffff;
 }
 
+/* mainly for pagination inside head block */
+.head-list span {
+	border: 1px solid #666;
+	padding: 3px;
+	margin-left: -1px;
+}
+.head-list a {color:inherit;}
+.head-list span:hover, .head-list span.active {
+	background: #444;
+}
+.head-list .pagination-disabled
+{
+ background: #444 !important;
+ pointer-events: none;
+}
+.head-list form {display: inline;}
+.head-list select {padding: 3px; margin: 0; border: 0; background: #474747; color: #eee; border: 1px solid #666;}
+.head-list-position {float: right;}
+
 /* Universal Box */
 .box {
 	margin-bottom: 7px;
@@ -1279,6 +1298,8 @@ body.dark {
 		margin-bottom: 14px;
 	}
 
+	.head-list-position {float: left; margin-top: 5px;}
+
 	.database-latest{float: left; width: 100%; clear: both;}
 	.database-updated{float: left; width: 100%; clear: both;}
 
@@ -1451,20 +1472,3 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 	 padding: 20px;
 	 z-index: 9999;
 	 outline: none;}
-/* mainly for pagination inside head block */
-	 .head-list span {
-	 	border: 1px solid #666;
-	 	padding: 3px;
-	 	margin-left: -1px;
-	 }
-	 .head-list a {color:inherit;}
-	 .head-list span:hover, .head-list span.active {
-	 	background: #444;
-	 }
-	 .head-list .pagination-disabled
-	 {
-		 background: #444 !important;
-		 pointer-events: none;
-	 }
-	 .head-list form {display: inline;}
-	 .head-list select {padding: 3px; margin: 0; border: 0; background: #474747; color: #eee; border: 1px solid #666;}

@@ -330,9 +330,9 @@ class core
 			}
 
 			// current page
-			$pagination .= "<a href=\"#\"><span class=\"pagination-disabled\">$page</span></a>";
+			$pagination .= "<span class=\"pagination-disabled\">$page</span>";
 			// seperator
-			$pagination .= "<a href=\"#\"><span class=\"pagination-disabled\">/</span></a>";
+			$pagination .= "<span class=\"pagination-disabled\">/</span>";
 
 			// sort out last page link, no link if on last page
 			if ($page == $lastpage)

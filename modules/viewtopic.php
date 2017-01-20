@@ -547,7 +547,6 @@ else
 
 					$templating->set('post_id', $topic['topic_id']);
 					$templating->set('topic_id', $topic['topic_id']);
-					$templating->set('post_text', bbcode($topic['topic_text'], 0));
 
 					$user_options = '';
 					$bookmark = '';
@@ -566,6 +565,9 @@ else
 					}
 					$templating->set('bookmark', $bookmark);
 					$templating->set('user_options', $user_options);
+
+					// do last to help prevent templating tags in user text getting replaced
+					$templating->set('post_text', bbcode($topic['topic_text'], 0));
 				}
 
 				$reply_count = 0;
@@ -771,7 +773,6 @@ else
 						$templating->set('donator_badge', $donator_badge);
 						$templating->set('game_developer', $developer_badge);
 
-						$templating->set('post_text', bbcode($post['reply_text'], 0));
 						$templating->set('post_id', $post['post_id']);
 						$templating->set('topic_id', $_GET['topic_id']);
 
@@ -805,6 +806,7 @@ else
 						$templating->set('post_link', $post_link);
 
 						$reply_count++;
+						$templating->set('post_text', bbcode($post['reply_text'], 0));
 					}
 				}
 

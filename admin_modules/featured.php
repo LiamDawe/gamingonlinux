@@ -110,7 +110,8 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
-		if ($core->carousel_image($_POST['article_id'], 1) == true)
+		$upload = $core->carousel_image($_POST['article_id'], 1);
+		if ($upload === true)
 		{
 			header("Location: /admin.php?module=featured&view=manage&message=added");
 		}

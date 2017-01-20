@@ -547,6 +547,7 @@ if (!isset($_GET['go']))
 
 					// sort out the pagination link
 					$pagination = $core->pagination_link($_SESSION['per-page'], $total_comments, $pagination_linking, $page, '#comments');
+					$pagination_head = $core->head_pagination($_SESSION['per-page'], $total_comments, $pagination_linking, $page, '#comments');
 
 					if (isset($_GET['message']))
 					{
@@ -570,6 +571,7 @@ if (!isset($_GET['go']))
 					$templating->block('comments_top', 'articles_full');
 					$templating->set('subscribe_link', $subscribe_link);
 					$templating->set('close_comments', $close_comments_link);
+					$templating->set('pagination_head', $pagination_head);
 					$templating->set('pagination', $pagination);
 
 					include('includes/profile_fields.php');

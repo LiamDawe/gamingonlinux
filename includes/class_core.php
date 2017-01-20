@@ -291,6 +291,87 @@ class core
 	// total = total number of rows
 	// targetpage = the page to append the pagination target page onto
 	// extra = anything extra to add like "#comments" to go to the comments
+	function head_pagination($per_page, $total, $targetpage, $page, $extra = NULL)
+	{
+		// what row number for the query to start from
+		if ($page != 1 && $page > 0)
+		{
+			$this->start = ($page - 1) * $per_page;
+		}
+		else
+		{
+			$this->start = 0;
+		}
+
+		// make sure it's an int not a string - have to use this as it kept turning into a string somehow when i only pass numbers to it?
+		$this->start = intval($this->start);
+
+		//previous page is page - 1
+		$prev = $page - 1;
+
+		//next page is page + 1
+		$next = $page + 1;
+
+		//lastpage is = total pages / items per page, rounded up.
+		$lastpage = ceil($total/$per_page);
+
+		// sort out the pagination links
+		$pagination = "";
+		if ($lastpage > 1)
+		{
+			$pagination .= "Page: ";
+		}
+		if($lastpage > 1)
+		{
+			//previous button
+			if ($page > 1)
+			{
+				$pagination.= "<a href=\"{$targetpage}page=$prev$extra\"><span class=\"previouspage\">&laquo;</span></a>";
+			}
+
+			// current page
+			$pagination .= "<a href=\"#\"><span class=\"pagination-disabled\">$page</span></a>";
+			// seperator
+			$pagination .= "<a href=\"#\"><span class=\"pagination-disabled\">/</span></a>";
+
+			// sort out last page link, no link if on last page
+			if ($page == $lastpage)
+			{
+				$pagination .= "<a href=\"#\"><span class=\"pagination-disabled\">{$lastpage}</span></a>";
+			}
+			else
+			{
+				$pagination .= "<a href=\"{$targetpage}page={$lastpage}$extra\"><span>{$lastpage}</span></a>";
+			}
+
+			// next button
+			if ($page < $lastpage)
+			{
+				$pagination .= "<a href=\"{$targetpage}page=$next$extra\"><span class=\"nextpage\">&raquo;</span></a>";
+			}
+
+			$pagination .= "<form name=\"form2\" class=\"form-inline\">&nbsp; Go to: <select class=\"wrap ays-ignore\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
+
+			for ($i = 1; $i <= $lastpage; $i++)
+			{
+				$selected = '';
+				if ($page == $i)
+				{
+					$selected = 'selected';
+				}
+				$pagination .= "<option value=\"{$targetpage}page={$i}{$extra}\" $selected>$i</option>";
+			}
+
+			$pagination .= '</select></form>';
+		}
+
+		return $pagination;
+	}
+
+	// per page = how many rows to show per page
+	// total = total number of rows
+	// targetpage = the page to append the pagination target page onto
+	// extra = anything extra to add like "#comments" to go to the comments
 	function article_pagination($page, $lastpage, $targetpage)
 	{
 		//previous page is page - 1

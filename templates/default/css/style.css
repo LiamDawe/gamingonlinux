@@ -307,24 +307,21 @@ margin-bottom: -3px;
 	color: #ffffff;
 }
 
-
  /* Page CSS */
 .head {
-    background: #333333;
-}
-
-/* Universal Box */
-.box {
-	margin-bottom: 7px;
-}
-.box .head {
 	background: #222222;
 	color: #ffffff;
 	font-weight: bold;
 	padding: 7px 10px;
 }
-.box .head a {
+
+.head a {
 	color: #ffffff;
+}
+
+/* Universal Box */
+.box {
+	margin-bottom: 7px;
 }
 
 .box .subhead {
@@ -1424,6 +1421,7 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 	margin-top: 14px;
 	line-height: 30px;
 }
+.dark pre {background:#222;}
 .preview_pm{display: none;}
 .register-warning {
   color:#d2232a;
@@ -1445,6 +1443,7 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 .database_stores li {display: inline;}
 .database_extra{display: inline;list-style-type: none; padding: 0; margin: 0;}
 .database_extra li {padding: 0px;}
+/* fix fancybox going under the navbar */
 .fancybox-wrap {
 	 position: absolute;
 	 top: 0;
@@ -1452,3 +1451,20 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 	 padding: 20px;
 	 z-index: 9999;
 	 outline: none;}
+/* mainly for pagination inside head block */
+	 .head-list span {
+	 	border: 1px solid #666;
+	 	padding: 3px;
+	 	margin-left: -1px;
+	 }
+	 .head-list a {color:inherit;}
+	 .head-list span:hover, .head-list span.active {
+	 	background: #444;
+	 }
+	 .head-list .pagination-disabled
+	 {
+		 background: #444 !important;
+		 pointer-events: none;
+	 }
+	 .head-list form {display: inline;}
+	 .head-list select {padding: 3px; margin: 0; border: 0; background: #474747; color: #eee; border: 1px solid #666;}

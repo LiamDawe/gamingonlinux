@@ -35,7 +35,7 @@ if (core::config('forum_posting_open') == 1)
 			else
 			{
 				// make safe
-				$message = htmlspecialchars($_POST['text'], ENT_QUOTES);
+				$message = core::make_safe($_POST['text']);
 				$message = trim($message);
 				$author = $_SESSION['user_id'];
 

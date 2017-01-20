@@ -105,7 +105,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group(1,2) == true)
 			{
 				// update the topic
-				$message = htmlspecialchars($_POST['text'], ENT_QUOTES);
+				$message = core::make_safe($_POST['text']);
 				$db->sqlquery("UPDATE `forum_topics` SET `topic_title` = ?, `topic_text` = ? WHERE `topic_id` = ?", array($_POST['title'], $message, $_GET['topic_id']));
 
 				// get them to go back

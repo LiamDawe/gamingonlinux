@@ -182,7 +182,7 @@ else
 				{
 					// make safe
 					$title = strip_tags($_POST['title']);
-					$message = htmlspecialchars($_POST['text'], ENT_QUOTES);
+					$message = core::make_safe($_POST['text']);
 					$message = trim($message);
 					$author = $_SESSION['user_id'];
 

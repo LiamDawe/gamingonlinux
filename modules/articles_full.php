@@ -675,7 +675,6 @@ if (!isset($_GET['go']))
 							$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' at ' . $core->format_date($comments['last_edited_time']) . '[/i]';
 						}
 
-						$templating->set('text', bbcode($comments['comment_text'] . $last_edited, 0));
 						$templating->set('article_id', $_GET['aid']);
 						$templating->set('comment_id', $comments['comment_id']);
 						if (core::config('pretty_urls') == 1)
@@ -736,7 +735,6 @@ if (!isset($_GET['go']))
 								}
 							}
 							$logged_in_options = $templating->block_store('logged_in_options', 'articles_full');
-							$templating->set('bookmark', $bookmark_comment);
 
 							// don't let them like their own post
 							if ($comments['author_id'] == $_SESSION['user_id'])
@@ -751,6 +749,7 @@ if (!isset($_GET['go']))
 							$logged_in_options = $templating->store_replace($logged_in_options, array('plain_username'=> $quote_username,'text_plain'=>htmlspecialchars($comments['comment_text'], ENT_QUOTES), 'like_button'=>$like_button));
 						}
 						$templating->set('logged_in_options', $logged_in_options);
+						$templating->set('bookmark', $bookmark_comment);
 
 						$donator_badge = '';
 						if (($comments['secondary_user_group'] == 6 || $comments['secondary_user_group'] == 7) && $comments['user_group'] != 1 && $comments['user_group'] != 2)
@@ -837,6 +836,9 @@ if (!isset($_GET['go']))
 							$report_link = "<li><a class=\"tooltip-top\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$_GET['aid']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
 						}
 						$templating->set('report_link', $report_link);
+
+						// do this last, to help stop templating tags getting parsed in user text
+						$templating->set('text', bbcode($comments['comment_text'] . $last_edited, 0));
 					}
 
 					$templating->block('bottom', 'articles_full');

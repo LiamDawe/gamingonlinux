@@ -1420,6 +1420,7 @@ div.cal:nth-child(odd) {background: #FFF}
 	border-radius: 3px;
 	max-width: 100%;
 	width: 100%;
+	max-height: 400px;
 	display: inline-block;
 	white-space: pre;
 	overflow: auto;

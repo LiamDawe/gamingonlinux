@@ -509,12 +509,12 @@ if (!isset($_GET['go']))
 							$db->sqlquery("SELECT `user_id` FROM `articles_subscriptions` WHERE `article_id` = ? AND `user_id` = ?", array($_GET['aid'], $_SESSION['user_id']));
 							if ($db->num_rows() == 1)
 							{
-								$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$_GET['aid']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe from comments</span></a>";
+								$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$_GET['aid']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe</span></a>";
 							}
 
 							else
 							{
-								$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"subscribe\" data-article-id=\"{$_GET['aid']}\" href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Subscribe to comments</span></a>";
+								$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"subscribe\" data-article-id=\"{$_GET['aid']}\" href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$_GET['aid']}\" class=\"white-link\"><span class=\"link_button\">Subscribe</span></a>";
 							}
 						}
 

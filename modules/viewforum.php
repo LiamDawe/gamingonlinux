@@ -76,7 +76,20 @@ else
 	$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/{$forum_id}/", $page);
 
 	// get the posts for this forum
-	$db->sqlquery("SELECT t.*, u.`username`, u.`avatar`, u.`gravatar_email`, u.`avatar_gravatar`, u.`avatar_uploaded`, u2.`username` as `username_last`, u2.`user_id` as `user_id_last` FROM `forum_topics` t LEFT JOIN `users` u ON t.`author_id` = u.`user_id` LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id` WHERE t.`forum_id`= ? AND t.approved = 1 ORDER BY t.is_sticky DESC, t.`last_post_date` DESC LIMIT ?, {$_SESSION['per-page']}", array($forum_id, $core->start));
+	$db->sqlquery("SELECT
+		t.*,
+		u.`username`,
+		u.`avatar`,
+		u.`gravatar_email`,
+		u.`avatar_gravatar`,
+		u.`avatar_uploaded`,
+		u2.`username` as `username_last`,
+		u2.`user_id` as `user_id_last`
+		FROM `forum_topics` t
+		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
+		LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id`
+		WHERE t.`forum_id`= ? AND t.`approved` = 1
+		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, {$_SESSION['per-page']}", array($forum_id, $core->start));
 	while ($post = $db->fetch())
 	{
 		$pagination_post = '';
@@ -120,7 +133,7 @@ else
 
 				$lastlink = "<li><a href=\"/forum/topic/{$post['topic_id']}/page={$lastpage}\">$lastpage</a></li>";
 
-				$pagination_post = "<div class=\"fleft\"><ul class=\"pagination\">" . implode(' ', $pages) . "<li class=\"disabled\"><a href=\"#\">....</a></li>{$lastlink}</ul></div><div class=\"clearer\"></div>";
+				$pagination_post = "<div class=\"fleft\"><ul class=\"pagination\">" . implode(' ', $pages) . "<li class=\"pagination-disabled\"><a href=\"#\">....</a></li>{$lastlink}</ul></div><div class=\"clearer\"></div>";
 			}
 		}
 		$templating->block('post_row', 'viewforum');

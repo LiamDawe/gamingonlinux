@@ -104,7 +104,6 @@ else
 				}
 				$templating->set('crumbs', $crumbs);
 
-
 				if (isset($parray) && !empty($parray))
 				{
 					$options = 'Moderator Options<br />
@@ -151,6 +150,11 @@ else
 				if ($check_queue['in_mod_queue'] == 0)
 				{
 					$templating->block('poll', 'newtopic');
+				}
+
+				if (isset($_GET['forum_id']) && $_GET['forum_id'] == 17)
+				{
+					$templating->block('support');
 				}
 
 				$templating->block('top', 'newtopic');

@@ -789,49 +789,38 @@ ul.social-networks li > a {
  * Control panels
  * ------------------------------
  */
-.form-group .preinput {
-    border: 1px solid #ddd;
-    color: #444444;
-    margin-bottom: 7px;
-    padding: 7px;
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-
-    background: #E2E2E2;
-    border-right: 0px;
-    padding-right: 0px;
+.input-field {
+  display: flex;
+  white-space: nowrap;
+  vertical-align: bottom;
+	background: #fff;
+	position: relative;
+	vertical-align: middle;
+	width: 100%;
+	min-width: 16px;
+	border: 1px solid #ddd;
+	border-radius: .2em;
+	box-sizing: border-box;
 }
-
-.form-group .form-control {
-    display: inline;
-    width: 71%;
-    padding-left: 2px;
+.input-field .addon {
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-align: center;
+	text-shadow: 0 1px 0 #fff;
+	background: #f0f0f0;
 }
-
-.form-group .extrainput {
-    border: 1px solid #ddd;
-    color: #444444;
-    margin-bottom: 7px;
-    padding: 7px;
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-
-    background: #E2E2E2;
-    border-right: 0px;
-    padding-right: 0px;
+.input-field input {
+  padding-left: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+  margin: 0;
+  border: 0;
+  resize: none;
+	flex: 1;
 }
-
-.form-group .form-control-extra {
-    display: inline;
-    width: 71%;
-    border-right: 0px;
-    padding-right: 2px;
-}
-
+.input-field:hover {border: 1px solid #05c9f0;}
 
 /* GOTY */
 .goty .col-4 {

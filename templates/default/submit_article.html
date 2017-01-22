@@ -14,7 +14,7 @@
 							Article homepage image. Max of 120kb!
 							<div id='imageloadstatus2' style='display:none'><img src="{:url}templates/default/images/loader2.gif" alt="Uploading...."/></div>
 							<div id='imageloadbutton2'>
-								<input class="form-control" type="file" name="photos2" id="photoimg2" multiple="true" />
+								<input type="file" name="photos2" id="photoimg2" multiple="true" />
 								<small>Shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height. </small>
 							</div>
 						</form>
@@ -23,7 +23,7 @@
 						</div>
 						<form action="/index.php?module=submit_article" method="post">
 							<label class="control-label">Title</label>
-              <input type="text" name="title" class="form-control ays-ignore" placeholder="Enter a title..." value="{:title}" /><br />
+              <input type="text" name="title" class="ays-ignore" placeholder="Enter a title..." value="{:title}" /><br />
 							{:guest_fields}
 [/block: submit]
 
@@ -39,9 +39,9 @@
 
 [block: guest_fields]
 <label>Your Name: <em>Not Required, you will be called "Guest" if you leave it blank.</em></label>
-<input type="text" class="form-control ays-ignore" name="name" placeholder="Enter your name..." value="{:guest_username}" /><br />
+<input type="text" class="ays-ignore" name="name" placeholder="Enter your name..." value="{:guest_username}" /><br />
 <label>Your Email: <em><strong>Required</strong>, will not be published, so we can email you when it's denied/accepted!</em></label>
-<input type="text" class="form-control ays-ignore" name="email" placeholder="Enter your email address..." value="{:guest_email}" /><br />
+<input type="text" class="ays-ignore" name="email" placeholder="Enter your email address..." value="{:guest_email}" /><br />
 [/block: guest_fields]
 
 [block: preview_row]

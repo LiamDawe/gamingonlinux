@@ -103,13 +103,13 @@ if (!isset($_POST['act']))
 		if (isset($field['preinput']) && $field['preinput'] != NULL)
 		{
 			$preinput = 1;
-			$form_input  .= '<div class="form-group"><span class="preinput">'.$field['preinput'].'</span>';
+			$form_input  .= '<div class="input-field"><span class="addon">'.$field['preinput'].'</span>';
 		}
 		else
 		{
 			$form_input .= "<div style=\"display:inline;\">";
 		}
-		$form_input .= "<input id=\"{$field['db_field']}_field\" type=\"text\" name=\"{$field['db_field']}\" class=\"form-control\" value=\"{$usercpcp[$field['db_field']]}\" />";
+		$form_input .= "<input id=\"{$field['db_field']}_field\" type=\"text\" name=\"{$field['db_field']}\" value=\"{$usercpcp[$field['db_field']]}\" />";
 		$form_input .= "</div>";
 
 		$profile_fields_output .= "<label for=\"{$field['name']}\">$image $span {$field['name']} $form_input <small>$description</small></label><br />";

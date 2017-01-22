@@ -960,12 +960,11 @@ body.dark {
     border: 1px solid #444;
     color: #ffffff;
 }
+.dark .input-field {
+	background: #333;
+	border: 1px solid #444;
+}
 .dark .input-field .addon {
-	padding-left: 8px;
-	padding-right: 8px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	text-align: center;
 	text-shadow: none;
 	background: #333;
 }

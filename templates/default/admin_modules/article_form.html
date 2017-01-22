@@ -13,7 +13,7 @@
 							Article tagline image (shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height). Max of {:max_filesize}!
 							<div id='imageloadstatus2' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
 							<div id='imageloadbutton2'>
-							<input class="form-control" type="file" name="photos2" id="photoimg2" multiple="true" {:edit_state}/>
+							<input type="file" name="photos2" id="photoimg2" multiple="true" {:edit_state}/>
 							</div>
 						</form>
 						<div id='preview2'>
@@ -35,16 +35,16 @@
 						<div class="body group">
 							Title: <em>Please make it as descriptive a title as possible, just a games name for example is not good! <strong>Minimum of 10 characters</strong>.</em><br />
 							Please try not to have question marks in the title unless you have to! To adhere to <a href="https://en.wikipedia.org/wiki/Betteridge%27s_Law_of_Headlines">Betteridges law of headlines</a>.<br />
-							<input type="text" name="title" id="title" class="form-control" placeholder="Enter a title..." value="{:title}" maxlength="120" {:edit_state}/><br />
+							<input type="text" name="title" id="title" placeholder="Enter a title..." value="{:title}" maxlength="120" {:edit_state}/><br />
 							Friendly url (what shows in the url bar).
-							<input type="text" name="slug" id="slug" class="form-control" value="{:slug}" readonly="readonly"/> <a id="slug_edit" href="#">Edit Slug</a> | <a id="slug_update" href="#">Update Slug</a>
+							<input type="text" name="slug" id="slug" value="{:slug}" readonly="readonly"/> <a id="slug_edit" href="#">Edit Slug</a> | <a id="slug_update" href="#">Update Slug</a>
 						</div>
 					</div>
 			<div class="box">
 					<div class="body group">
 							<label for="tagline">Tagline of article, This is what will show on the home page only.<br />
 							<strong>Must be over 100 characters but no more than 400! Plain text only.</strong></label>
-							<textarea id="tagline" class="form-control" name="tagline" cols="100" placeholder="Enter a tagline, take text from your main post!" rows="4" {:edit_state_textarea}>{:tagline}</textarea><br />
+							<textarea id="tagline" name="tagline" cols="100" placeholder="Enter a tagline, take text from your main post!" rows="4" {:edit_state_textarea}>{:tagline}</textarea><br />
 							<div id="count"></div>
 					</div>
 				</div>

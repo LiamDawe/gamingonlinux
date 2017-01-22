@@ -51,9 +51,9 @@
 <div class="box"><div class="head">Here you can edit {:username}'s details. <span class="fright"><a href="{:profile_link}">View live profile</a></span></div>
 	<div class="body group">
 		<form method="post" action="admin.php?module=users&user_id={:user_id}">
-			Username: <input type="text" name="username" class="form-control" value="{:username}" /><br />
-			Email: <input type="text" name="email" class="form-control" value="{:email}" /><br />
-			Website: <input type="text" name="website" class="form-control" value="{:website}" /><br />
+			Username: <input type="text" name="username" value="{:username}" /><br />
+			Email: <input type="text" name="email" value="{:email}" /><br />
+			Website: <input type="text" name="website" value="{:website}" /><br />
 			<label for="bio">Biography, for Editors this will show on articles you create, for normal users it will just show it on your profile, keep it short.</label>
 			<textarea name="article_bio" class="bbcode-editor" cols="100" rows="10">{:bio}</textarea><br />
 			{:admin_only}

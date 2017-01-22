@@ -10,6 +10,7 @@ $profile_fields['steam']['base_link'] = 'http://steamcommunity.com/id/';
 $profile_fields['steam']['base_link_required'] = 1;
 $profile_fields['steam']['link'] = 1;
 $profile_fields['steam']['image'] = NULL;
+$profile_fields['steam']['preinput'] = 'http://steamcommunity.com/id/';
 
 $profile_fields['twitter']['name'] = 'Twitter:';
 $profile_fields['twitter']['db_field'] = 'twitter_on_profile';
@@ -18,6 +19,7 @@ $profile_fields['twitter']['base_link_required'] = 1;
 $profile_fields['twitter']['span'] = '<span class="inline icon twitter">Twitter</span>';
 $profile_fields['twitter']['link'] = 1;
 $profile_fields['twitter']['image'] = NULL;
+$profile_fields['twitter']['preinput'] = 'https://twitter.com/';
 
 $profile_fields['google']['name'] = 'G+';
 $profile_fields['google']['db_field'] = 'google_plus';

@@ -296,20 +296,6 @@
 
 	.clearer {clear:both}
 
-/* Smooth Divs */
-	.smooth {
-		-webkit-transition: all .3s linear;
-		   -moz-transition: all .3s linear;
-		     -o-transition: all .3s linear;
-		        transition: all .3s linear;
-	}
-	.super-smooth {
-		-webkit-transition: all .8s linear;
-		   -moz-transition: all .8s linear;
-		     -o-transition: all .8s linear;
-		        transition: all .8s linear;
-	}
-
 /* Button */
 	.button, button, input[type=submit], input[type=reset], input[type=button] {
 		background: #f9f9f9;

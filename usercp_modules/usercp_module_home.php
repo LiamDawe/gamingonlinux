@@ -99,13 +99,11 @@ if (!isset($_POST['act']))
 		}
 
 		$form_input = "";
-		if ($field['db_field'] == 'steam')
+		$preinput = 0;
+		if (isset($field['preinput']) && $field['preinput'] != NULL)
 		{
-			$form_input  .= "<div class=\"form-group\"><span class=\"preinput\">http://steamcommunity.com/id/</span>";
-		}
-		else if ($field['db_field'] == 'twitter_on_profile')
-		{
-			$form_input  .= "<div class=\"form-group\"><span class=\"preinput\">https://twitter.com/</span>";
+			$preinput = 1;
+			$form_input  .= '<div class="form-group"><span class="preinput">'.$field['preinput'].'</span>';
 		}
 		else
 		{

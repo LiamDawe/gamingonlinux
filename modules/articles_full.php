@@ -355,7 +355,7 @@ if (!isset($_GET['go']))
 					$db->sqlquery("SELECT `data_id` FROM `user_bookmarks` WHERE `data_id` = ? AND `user_id` = ? AND `type` = 'article'", array($article['article_id'], $_SESSION['user_id']));
 					if ($db->num_rows() == 1)
 					{
-						$bookmark_link = '<a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a>';
+						$bookmark_link = '<a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a>';
 					}
 					else
 					{

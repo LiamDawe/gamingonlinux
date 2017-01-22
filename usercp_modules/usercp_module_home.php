@@ -10,6 +10,10 @@ if (isset($_GET['message']))
 	{
 		$core->message('That is not a correct Youtube URL format, please use a correct URL like: https://www.youtube.com/gamingonlinux', NULL, 1);
 	}
+	if ($_GET['message'] == 'twitch-missing')
+	{
+		$core->message('That is not a correct Twitch URL format, please use a correct URL like: http://www.twitch.tv/gamingonlinux', NULL, 1);
+	}
 }
 
 if (isset($_GET['updated']))
@@ -274,13 +278,26 @@ else if (isset($_POST['act']))
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)
 		{
+			// tell them to do it properly
 			if ($field['db_field'] == 'youtube' && (!empty($_POST['youtube']) && strpos($_POST['youtube'], "youtube.com") === false))
 			{
 				header("Location: " . core::config('website_url') . "usercp.php?module=home&message=youtube-missing");
 				die();
 			}
-			// make sure the Steam field can't be a plain steam profile url for broken links
-			if ($field['db_field'] == 'steam' && $_POST['steam'] == 'http://steamcommunity.com/id/')
+
+			// tell them to do it properly
+			if ($field['db_field'] == 'twitch' && (!empty($_POST['twitch']) && strpos($_POST['twitch'], "twitch.tv") === false))
+			{
+				header("Location: " . core::config('website_url') . "usercp.php?module=home&message=twitch-missing");
+				die();
+			}
+
+			// make sure the fields can't be just the basic url for broken junk links
+			if ($field['db_field'] == 'steam' && ($_POST['steam'] == 'http://steamcommunity.com/id/' || $_POST['steam'] == 'https://steamcommunity.com/id/'))
+			{
+				$db->sqlquery("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
+			}
+			else if ($field['db_field'] == 'twitch' && ($_POST['twitch'] == 'https://www.twitch.tv/' || $_POST['twitch'] == 'http://www.twitch.tv/'))
 			{
 				$db->sqlquery("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
 			}

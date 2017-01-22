@@ -13,6 +13,7 @@ $profile_fields['steam']['image'] = NULL;
 $profile_fields['steam']['preinput'] = 'http://steamcommunity.com/id/';
 
 $profile_fields['twitter']['name'] = 'Twitter:';
+$profile_fields['twitter']['description'] = 'Just your Twitter username!';
 $profile_fields['twitter']['db_field'] = 'twitter_on_profile';
 $profile_fields['twitter']['base_link'] = 'http://www.twitter.com/';
 $profile_fields['twitter']['base_link_required'] = 1;

@@ -90,18 +90,20 @@ foreach ($articles as $line)
 		$categories_list[] = $get_categories['category_name'];
 	}
 
+	$cats = implode(',', $categories_list);
+
 	$output .= "
 		<item>
 			<title>{$title}</title>
 			<author>contact@gamingonlinux.com (GamingOnLinux)</author>
 			<link>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</link>
-			<description><![CDATA[{$text}<br /><br />Content from <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>]]></description>
+			<description><![CDATA[Tags:$cats<br />{$text}<br /><br />Content from <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>]]></description>
 			<pubDate>{$date}</pubDate>
-			<guid>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</guid>";
+			<guid>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</guid>\n";
 
 	foreach ($categories_list as $cat)
 	{
-		$output .= "<category domain=\"\">$cat</category>";
+		$output .= "<category domain=\"\">$cat</category>\n";
 	}
 
 	$output .= "</item>";

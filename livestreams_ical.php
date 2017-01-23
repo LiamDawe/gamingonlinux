@@ -13,19 +13,6 @@ $core = new core();
 // the iCal date format. Note the Z on the end indicates a UTC timestamp.
 define('DATE_ICAL', 'Ymd\THis\Z');
 
-if (!isset($_GET['year']))
-{
-	$year = date("Y");
-}
-else if (isset($_GET['year']) && empty($_GET['year'])) // stupid google bot!
-{
-	$year = $_GET['year'];
-}
-else if (isset($_GET['year']) && is_numeric($_GET['year']))
-{
-	$year = $_GET['year'];
-}
-
 // Escapes a string of characters
 function escapeString($string) {
   return preg_replace('/([\,;])/','\\\$1', $string);

@@ -13,15 +13,8 @@ $core = new core();
 // the iCal date format. Note the Z on the end indicates a UTC timestamp.
 define('DATE_ICAL', 'Ymd\THis\Z');
 
-if (!isset($_GET['year']))
-{
-	$year = date("Y");
-}
-else if (isset($_GET['year']) && empty($_GET['year'])) // stupid google bot!
-{
-	$year = $_GET['year'];
-}
-else if (isset($_GET['year']) && is_numeric($_GET['year']))
+$year = date("Y");
+if (isset($_GET['year']) && is_numeric($_GET['year']))
 {
 	$year = $_GET['year'];
 }
@@ -33,7 +26,7 @@ function escapeString($string) {
 
 $output = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nVERSION:2.0\r\nPRODID:-//Gaming On Linux//Release Calendar//EN\r\n";
 
-$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND `approved` = 1 ORDER BY `date` ASC");
+$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess`, `edit_date` FROM `calendar` WHERE YEAR(date) = $year AND `approved` = 1 ORDER BY `date` ASC");
 
 // loop over events
 while ($item = $db->fetch())

@@ -1,5 +1,4 @@
 <?php
-// Article categorys block
 $templating->merge('blocks/block_article_categorys');
 $templating->block('menu');
 
@@ -44,7 +43,7 @@ $templating->set('category_links', $articles_categorys);
 $timestamp = strtotime("-7 days");
 
 $hot_articles = '';
-$db->sqlquery("SELECT `article_id`, `title`, `views`,`date` FROM `articles` WHERE `date` > ? AND `views` > 1000 AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4", array($timestamp));
+$db->sqlquery("SELECT `article_id`, `title`, `views`, `date` FROM `articles` WHERE `date` > ? AND `views` > ".core::config('hot-article-viewcount')." AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4", array($timestamp));
 while ($top_articles = $db->fetch())
 {
 	if (core::config('pretty_urls') == 1)

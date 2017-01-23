@@ -966,7 +966,7 @@ body.dark {
 }
 .dark .input-field .addon {
 	text-shadow: none;
-	background: #333;
+	background: #474747;
 }
 .dark .button, .dark button, .dark input[type=submit], .dark input[type=reset], .dark input[type=button] {
     background: #428BCA;

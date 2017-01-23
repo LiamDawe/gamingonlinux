@@ -153,6 +153,7 @@ if (isset($_POST['act']))
 	if ($_POST['act'] == 'comment')
 	{
 		$text = trim($_POST['text']);
+		$text = core::make_safe($text);
 
 		if (empty($text))
 		{
@@ -208,6 +209,7 @@ if (isset($_POST['act']))
 	if ($_POST['act'] == 'commentall')
 	{
 		$text = trim($_POST['text']);
+		$text = core::make_safe($text);
 
 		if (empty($text))
 		{

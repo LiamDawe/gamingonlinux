@@ -44,7 +44,7 @@ else
 		$templating->set('compose_link', $compose_link);
 
 		// count them for pagination
-		$db->sqlquery("SELECT i.`conversation_id` FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.participant_id = i.owner_id AND p.conversation_id = i.conversation_id WHERE i.`owner_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT i.`conversation_id` FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id` WHERE i.`owner_id` = ?", array($_SESSION['user_id']));
 		$total = $db->num_rows();
 
 		// sort out the pagination link
@@ -55,22 +55,22 @@ else
 			i.`conversation_id`,
 			i.`title`,
 			i.`creation_date`,
-			i.replies,
-			i.last_reply_date,
-			i.owner_id,
-			u.username,
-			u.user_id,
-			u2.username as last_username,
-			u2.user_id as last_user_id,
-			p.unread
+			i.`replies`,
+			i.`last_reply_date`,
+			i.`owner_id`,
+			u.`username`,
+			u.`user_id`,
+			u2.`username` as last_username,
+			u2.`user_id` as last_user_id,
+			p.`unread`
 		FROM
 			`user_conversations_info` i
 		INNER JOIN
-			`users` u ON u.user_id = i.author_id
+			`users` u ON u.`user_id` = i.`author_id`
 		INNER JOIN
-			user_conversations_participants p ON p.participant_id = i.owner_id AND p.conversation_id = i.conversation_id
+			user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id`
 		LEFT JOIN
-			`users` u2 ON u2.user_id = i.last_reply_id
+			`users` u2 ON u2.`user_id` = i.`last_reply_id`
 		WHERE
 			i.`owner_id` = ?
 		ORDER BY
@@ -206,7 +206,7 @@ else
 			include('includes/profile_fields.php');
 
 			// get usernames of everyone in this conversation
-			$db->sqlquery("SELECT u.`username`, u.`user_id` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.user_id = p.participant_id WHERE p.conversation_id = ?", array($_GET['id']));
+			$db->sqlquery("SELECT u.`username`, u.`user_id` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.`user_id` = p.`participant_id` WHERE p.`conversation_id` = ?", array($_GET['id']));
 			$p_list = '';
 
 			$count_participants = $db->num_rows();
@@ -246,7 +246,7 @@ else
 				$db_grab_fields .= "u.`{$field['db_field']}`,";
 			}
 
-			$db->sqlquery("SELECT i.conversation_id, i.`title`, m.creation_date, m.message, m.message_id, m.author_id, u.user_id, u.register_date, u.username, u.user_group, u.secondary_user_group, u.avatar, u.avatar_gravatar,u.gravatar_email, $db_grab_fields u.avatar_uploaded FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.conversation_id = i.conversation_id INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']));
+			$db->sqlquery("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']));
 			$start = $db->fetch();
 
 			$templating->block('view_row', 'private_messages');
@@ -353,7 +353,7 @@ else
 			$templating->set('edit_link', $edit_link);
 
 			// replies
-			$get_replies = $db->sqlquery("SELECT m.creation_date, m.message, m.message_id, m.author_id, u.user_id, u.username, u.register_date, u.user_group, u.secondary_user_group, u.avatar, u.avatar_gravatar,u.gravatar_email, $db_grab_fields u.avatar_uploaded FROM `user_conversations_messages` m INNER JOIN `users` u ON u.user_id = m.author_id WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
+			$get_replies = $db->sqlquery("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
 			while ($replies = $get_replies->fetch())
 			{
 				$templating->block('view_row_reply', 'private_messages');
@@ -525,7 +525,7 @@ else
 	{
 		$title = strip_tags($_POST['title']);
 		$text = trim($_POST['text']);
-		$text = htmlspecialchars($text);
+		$text = core::make_safe($text);
 
 		// check empty
 		if (empty($_POST['to']) || empty($title) || empty($text))
@@ -673,7 +673,7 @@ else
 	if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 	{
 		$text = trim($_POST['text']);
-		$text = htmlspecialchars($text);
+		$text = core::make_safe($text);
 
 		if (!isset($_GET['message_id']) || !is_numeric($_GET['message_id']))
 		{
@@ -761,7 +761,7 @@ else
 	if (isset($_POST['act']) && $_POST['act'] == 'Reply')
 	{
 		$text = trim($_POST['text']);
-		$text = htmlspecialchars($text);
+		$text = core::make_safe($text);
 
 		if (empty($_POST['conversation_id']) || !is_numeric($_POST['conversation_id']))
 		{

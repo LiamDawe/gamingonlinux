@@ -18,9 +18,9 @@ if (isset($_GET['message']))
 	}
 }
 
-$templating->merge('admin_modules/admin_module_mod_queue');
+$templating->merge('admin_modules/mod_queue');
 
-$templating->block('top', 'admin_modules/admin_module_mod_queue');
+$templating->block('top', 'admin_modules/mod_queue');
 
 if (isset($_GET['view']))
 {
@@ -32,7 +32,7 @@ if (isset($_GET['view']))
 		{
 			while ($results = $db->fetch())
 			{
-					$templating->block('approve_topic', 'admin_modules/admin_module_mod_queue');
+					$templating->block('approve_topic', 'admin_modules/mod_queue');
 					$templating->set('username', $results['username']);
 					$templating->set('topic_id', $results['topic_id']);
 					$templating->set('post_id', '');
@@ -52,13 +52,13 @@ if (isset($_GET['view']))
 		{
 			while ($results = $db->fetch())
 			{
-					$templating->block('approve_topic', 'admin_modules/admin_module_mod_queue');
+					$templating->block('approve_topic', 'admin_modules/mod_queue');
 					$templating->set('username', $results['username']);
 					$templating->set('topic_id', $results['topic_id']);
 					$templating->set('post_id', $results['post_id']);
 					$templating->set('is_topic', 0);
-					$templating->set('topic_title', bbcode($results['topic_title']));
-					$templating->set('text', $results['reply_text']);
+					$templating->set('topic_title', '<a href="/index.php?module=viewtopic&topic_id='.$results['topic_id'].'">'.$results['topic_title'].'</a>');
+					$templating->set('text', bbcode($results['reply_text']));
 					$templating->set('author_id', $results['author_id']);
 					$templating->set('forum_id', $results['forum_id']);
 					$templating->set('creation_date', $results['creation_date']);
@@ -72,7 +72,7 @@ if (isset($_GET['view']))
 	}
 }
 
-$templating->block('bottom', 'admin_modules/admin_module_mod_queue');
+$templating->block('bottom', 'admin_modules/mod_queue');
 
 if (isset($_POST['action']))
 {

@@ -21,6 +21,14 @@ if (!isset($_GET['go']))
 
 		else
 		{
+			if (isset($_GET['message']))
+			{
+				if ($_GET['message'] == 'nocomment')
+				{
+					$core->message('Sorry, couldn\'t find that linked comment! It may have been removed or you have followed a wrong link!', NULL, 1);
+				}
+			}
+
 			// get the article
 			$db->sqlquery("SELECT
 				a.`article_id`,
@@ -73,38 +81,56 @@ if (!isset($_GET['go']))
 					}
 				}
 
-				// see if we are above their set limit per-page
-				$db->sqlquery("SELECT `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
-				$count = $db->fetch();
-
-				if ($count['comment_count'] > $_SESSION['per-page'])
+				// check comment still exists
+				$db->sqlquery("SELECT COUNT(`comment_id`) as `count` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
+				$check = $db->fetch();
+				if ($check['count'] == 1)
 				{
-					// count how many are below and equal to this comment, to find how many comments that is
-					$db->sqlquery("SELECT count(`comment_id`) as counter FROM `articles_comments` WHERE `article_id` = ? AND `comment_id` <= ?", array($_GET['aid'], $_GET['comment_id']));
-					$current_number = $db->fetch();
+					// see if we are above their set limit per-page
+					$db->sqlquery("SELECT `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
+					$count = $db->fetch();
 
-					$last_page = ceil($current_number['counter']/$_SESSION['per-page']);
-
-					if (core::config('pretty_urls') == 1)
+					if ($count['comment_count'] > $_SESSION['per-page'])
 					{
-						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#r{$_GET['comment_id']}");
+						// count how many are below and equal to this comment, to find how many comments that is
+						$db->sqlquery("SELECT count(`comment_id`) as counter FROM `articles_comments` WHERE `article_id` = ? AND `comment_id` <= ?", array($_GET['aid'], $_GET['comment_id']));
+						$current_number = $db->fetch();
+
+						$last_page = ceil($current_number['counter']/$_SESSION['per-page']);
+
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#r{$_GET['comment_id']}");
+						}
+						else
+						{
+
+							header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#r{$_GET['comment_id']}");
+						}
 					}
 					else
 					{
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}#r{$_GET['comment_id']}");
+						}
+						else
+						{
 
-						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#r{$_GET['comment_id']}");
+							header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#r{$_GET['comment_id']}");
+						}
 					}
 				}
 				else
 				{
 					if (core::config('pretty_urls') == 1)
 					{
-						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}#r{$_GET['comment_id']}");
+						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/message=nocomment");
 					}
 					else
 					{
 
-						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#r{$_GET['comment_id']}");
+						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&message=nocomment");
 					}
 				}
 			}

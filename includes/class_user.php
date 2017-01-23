@@ -309,7 +309,7 @@ class user
 		unset($_SESSION['auto_subscribe']);
 		unset($_SESSION['auto_subscribe_email']);
 
-		$_SESSION['per-page'] = 15;
+		$_SESSION['per-page'] = core::config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
 		$_SESSION['single_article_page'] = 0;

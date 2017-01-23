@@ -70,7 +70,7 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['user_group'] = 4;
 		$_SESSION['secondary_user_group'] = 4;
 		$_SESSION['theme'] = 'light';
-		$_SESSION['per-page'] = 10;
+		$_SESSION['per-page'] = core::config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
 		$_SESSION['single_article_page'] = 0;

@@ -65,8 +65,14 @@ $sql_forum_ids = implode(', ', $forum_id_list);
 $db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1");
 $total_pages = $db->num_rows();
 
+$comments_per_page = core::config('default-comments-per-page');
+if (isset($_SESSION['per-page']))
+{
+	$comments_per_page = $_SESSION['per-page'];
+}
+
 // sort out the pagination link
-$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/", $page);
+$pagination = $core->pagination_link($comments_per_page, $total_pages, "/forum/", $page);
 
 $sql = "
 SELECT

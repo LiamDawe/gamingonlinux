@@ -3,7 +3,12 @@
 $templating->merge('blocks/block_forum_latest');
 $templating->block('list');
 
-$comments_per_page = (isset($_SESSION['per-page'])?$_SESSION['per-page']:20); //Prevent Devide by 0 without session
+$comments_per_page = core::config('default-comments-per-page');
+if (isset($_SESSION['per-page']))
+{
+	$comments_per_page = $_SESSION['per-page'];
+}
+
 $forum_posts = '';
 $db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit 5");
 while ($topics = $db->fetch())

@@ -32,8 +32,14 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	$db->sqlquery($sql_count);
 	$total_comments = $db->num_rows();
 
+	$comments_per_page = core::config('default-comments-per-page');
+	if (isset($_SESSION['per-page']))
+	{
+		$comments_per_page = $_SESSION['per-page'];
+	}
+
 	// sort out the pagination link
-	$pagination = $core->pagination_link($_SESSION['per-page'], $total_comments, "admin.php?module=more_comments&view=editors&", $page);
+	$pagination = $core->pagination_link($comments_per_page, $total_comments, "admin.php?module=more_comments&view=editors&", $page);
 
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');

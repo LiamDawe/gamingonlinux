@@ -49,15 +49,38 @@ foreach ($search_array[0] as $item)
 if (isset($search_text) && !empty($search_text))
 {
 	// do the search query
-	$db->sqlquery("SELECT a.article_id, a.`title` , a.author_id, a.`date` , a.guest_username, u.username
+	$db->sqlquery("SELECT a.`article_id`, a.`title` , a.`author_id`, a.`date` , a.`guest_username`, u.`username`
 	FROM  `articles` a
-	LEFT JOIN  `users` u ON a.author_id = u.user_id
-	WHERE a.active = 1
-	AND a.title LIKE ?
-	ORDER BY a.date DESC
+	LEFT JOIN  `users` u ON a.`author_id` = u.`user_id`
+	WHERE a.`active` = 1
+	AND a.`title` LIKE ?
+	ORDER BY a.`date` DESC
 	LIMIT 0 , 100", array($search_through));
 
 	$found_search = $db->fetch_all_rows();
+
+	$article_id_array = array();
+
+	foreach ($found_search as $article)
+	{
+		$article_id_array[] = $article['article_id'];
+	}
+	$article_id_sql = implode(', ', $article_id_array);
+
+	// this is required to properly count up the rank for the tags
+	$db->sqlquery("SET @rank=null, @val=null");
+
+	$category_tag_sql = "SELECT * FROM (
+		SELECT r.`article_id`, c.`category_name` , c.`category_id` , @rank := IF( @val = r.`article_id`, @rank +1, 1 ) AS rank, @val := r.`article_id`
+		FROM  `article_category_reference` r
+		INNER JOIN  `articles_categorys` c ON c.`category_id` = r.`category_id`
+		WHERE r.`article_id`
+		IN ( $article_id_sql )
+		ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
+	) AS a
+	WHERE rank < 5";
+	$db->sqlquery($category_tag_sql);
+	$get_categories = $db->fetch_all_rows();
 
 	// loop through results
 	foreach ($found_search as $found)
@@ -81,12 +104,35 @@ if (isset($search_text) && !empty($search_text))
 		}
 		$templating->set('username', $username);
 
-		// sort out the categories (tags)
-		$categories_list = '';
-		$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ?", array($found['article_id']));
-		while ($get_categories = $db->fetch())
+		$editors_pick = '';
+		if ($found_search['show_in_menu'] == 1)
 		{
-			$categories_list .= "<li><a href=\"/articles/category/{$get_categories['category_id']}\"><span class=\"label label-info\">{$get_categories['category_name']}</span></a></li>";
+			$editors_pick = '<li><a href="#">Editors Pick</a></li>';
+		}
+		$categories_list = $editors_pick;
+		foreach ($get_categories as $k => $category_list)
+		{
+			if (in_array($found['article_id'], $category_list))
+			{
+				$category_name = str_replace(' ', '-', $category_list['category_name']);
+				if (core::config('pretty_urls') == 1)
+				{
+					$category_url = "/articles/category/{$category_name}/";
+				}
+				else
+				{
+					$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
+				}
+				if ($category_list['category_id'] == 60)
+				{
+					$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+				}
+
+				else
+				{
+					$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+				}
+			}
 		}
 		$templating->set('categories_list', $categories_list);
 	}

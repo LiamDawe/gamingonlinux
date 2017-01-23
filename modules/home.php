@@ -216,27 +216,27 @@ if (!isset($_GET['view']))
 			$categories_list = $editors_pick;
 			foreach ($get_categories as $k => $category_list)
 			{
-					if (in_array($article['article_id'], $category_list))
+				if (in_array($article['article_id'], $category_list))
+				{
+					$category_name = str_replace(' ', '-', $category_list['category_name']);
+					if (core::config('pretty_urls') == 1)
 					{
-						$category_name = str_replace(' ', '-', $category_list['category_name']);
-						if (core::config('pretty_urls') == 1)
-						{
-							$category_url = "/articles/category/{$category_name}/";
-						}
-						else
-						{
-							$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
-						}
-						if ($category_list['category_id'] == 60)
-						{
-							$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
-						}
-
-						else
-						{
-							$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
-						}
+						$category_url = "/articles/category/{$category_name}/";
 					}
+					else
+					{
+						$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
+					}
+					if ($category_list['category_id'] == 60)
+					{
+						$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+					}
+
+					else
+					{
+						$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+					}
+				}
 			}
 
 			$templating->set('categories_list', $categories_list);

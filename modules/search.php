@@ -56,7 +56,7 @@ if (isset($search_text) && !empty($search_text))
 	AND a.`title` LIKE ?
 	ORDER BY a.`date` DESC
 	LIMIT 0 , 100", array($search_through));
-
+	$total = $db->num_rows();
 	$found_search = $db->fetch_all_rows();
 
 	$article_id_array = array();
@@ -67,20 +67,23 @@ if (isset($search_text) && !empty($search_text))
 	}
 	$article_id_sql = implode(', ', $article_id_array);
 
-	// this is required to properly count up the rank for the tags
-	$db->sqlquery("SET @rank=null, @val=null");
+	if ($total > 0)
+	{
+		// this is required to properly count up the rank for the tags
+		$db->sqlquery("SET @rank=null, @val=null");
 
-	$category_tag_sql = "SELECT * FROM (
-		SELECT r.`article_id`, c.`category_name` , c.`category_id` , @rank := IF( @val = r.`article_id`, @rank +1, 1 ) AS rank, @val := r.`article_id`
-		FROM  `article_category_reference` r
-		INNER JOIN  `articles_categorys` c ON c.`category_id` = r.`category_id`
-		WHERE r.`article_id`
-		IN ( $article_id_sql )
-		ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
-	) AS a
-	WHERE rank < 5";
-	$db->sqlquery($category_tag_sql);
-	$get_categories = $db->fetch_all_rows();
+		$category_tag_sql = "SELECT * FROM (
+			SELECT r.`article_id`, c.`category_name` , c.`category_id` , @rank := IF( @val = r.`article_id`, @rank +1, 1 ) AS rank, @val := r.`article_id`
+			FROM  `article_category_reference` r
+			INNER JOIN  `articles_categorys` c ON c.`category_id` = r.`category_id`
+			WHERE r.`article_id`
+			IN ( $article_id_sql )
+			ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
+		) AS a
+		WHERE rank < 5";
+		$db->sqlquery($category_tag_sql);
+		$get_categories = $db->fetch_all_rows();
+	}
 
 	// loop through results
 	foreach ($found_search as $found)

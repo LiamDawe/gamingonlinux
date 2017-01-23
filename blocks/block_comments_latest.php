@@ -1,5 +1,6 @@
 <?php
-// main menu block
+define("TITLE_MAX_LENGTH", 55);
+
 $templating->merge('blocks/block_comments_latest');
 $templating->block('list');
 
@@ -12,17 +13,22 @@ else {
 }
 $templating->set('latest_link', $latest_link);
 
-$comments_per_page = (isset($_SESSION['per-page'])?$_SESSION['per-page']:20); //Prevent Devide by 0 without session
+$comments_per_page = 10
+if (isset($_SESSION['per-page']))
+{
+	$comments_per_page = $_SESSION['per-page'];
+}
+
 $comment_posts = '';
-$db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, a.`title`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 ORDER BY `comment_id` DESC limit 5");
+$db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, a.`title`, a.`comment_count`, a.`active` FROM `articles_comments` c INNER JOIN `articles` a ON c.`article_id` = a.`article_id` WHERE a.`active` = 1 ORDER BY `comment_id` DESC limit 5");
 while ($comments = $db->fetch())
 {
 	$date = $core->format_date($comments['time_posted']);
 
 	$title_length = strlen($comments['title']);
-	if ($title_length >= 55)
+	if ($title_length >= TITLE_MAX_LENGTH)
 	{
-		$title = substr($comments['title'], 0, 65);
+		$title = substr($comments['title'], 0, TITLE_MAX_LENGTH);
 		$title = $title . '&hellip;';
 	}
 	else
@@ -40,8 +46,6 @@ while ($comments = $db->fetch())
 	<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#{$comments['comment_id']}\">{$title}</a><br />
 	<small>{$date}</small>
 </li>";
-
-
 }
 
 $templating->set('comment_posts', $comment_posts);

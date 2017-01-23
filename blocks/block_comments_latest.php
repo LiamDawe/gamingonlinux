@@ -13,7 +13,7 @@ else {
 }
 $templating->set('latest_link', $latest_link);
 
-$comments_per_page = 10
+$comments_per_page = 10;
 if (isset($_SESSION['per-page']))
 {
 	$comments_per_page = $_SESSION['per-page'];

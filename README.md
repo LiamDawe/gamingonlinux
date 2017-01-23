@@ -17,7 +17,7 @@ It is also recommended to have the following php extentions available:
 ## Setting up a dev enviroment
 
 Setup apache, PHP and MySQL to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
-Import the development SQL database from the stripped SQL file `includes/dev/db.sql`  
+Import the development SQL database from the stripped SQL file `tools/SQL.sql`  
 
 ## Crons ##
 
@@ -52,7 +52,7 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 ## Misc
 
-If you want to know what you can put in a chart.js tooltip:
-str = JSON.stringify(tooltipItem, null, 4); // (Optional) beautiful indented output.
+If you want to know what you can put in a chart.js tooltip:  
+`str = JSON.stringify(tooltipItem, null, 4); // (Optional) beautiful indented output.
 console.log(str); // Logs output to dev tools console.
-alert(str); // Displays output using window.alert()
+alert(str); // Displays output using window.alert()`

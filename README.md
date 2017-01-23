@@ -4,6 +4,8 @@ The [Gamingonlinux](https://gamingonlinux.com) news site source code.
 
 Please read first: The entire codebase is probably a mess, as it was started years ago and tons needs updating for standards, newer PHP versions etc. It was started as a learning experience for Liam and still is to this day. Remember this before making any smart-arsed comments ;) (helpful pointers appreciated!)
 
+If you like what I do please consider [supporting me on Patreon](https://www.patreon.com/liamdawe).
+
 ## Requirements
 
 This site requires atleast PHP 5.6, Mysql 5.6 or MariaDB 10.0 and apache 2.4.  

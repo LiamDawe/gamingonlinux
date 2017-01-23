@@ -1,5 +1,5 @@
 <?php
-$db->sqlquery("SELECT `article_id`, `author_id`, tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 $grab_author = $db->fetch();
 if ($grab_author['author_id'] == $_SESSION['user_id'])
 {

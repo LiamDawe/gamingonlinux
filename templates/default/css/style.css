@@ -1459,6 +1459,7 @@ svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-L
 	margin-top: 14px;
 	line-height: 30px;
 }
+.patreon-small{line-height: 30px;}
 .dark pre {background:#222;}
 .preview_pm{display: none;}
 .register-warning {

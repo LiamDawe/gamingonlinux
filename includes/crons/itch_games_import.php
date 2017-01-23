@@ -40,13 +40,6 @@ $games_added = '';
 $email = 0;
 foreach ($xml->channel->item as $game)
 {
-
-	// for seeing what we have available
-	/*
-	echo '<pre>';
-	print_r($game);
-	echo '</pre>';*/
-
 	if ($game->{'platforms'}->linux == 'yes')
 	{
 		$game->plainTitle = html_entity_decode($game->plainTitle, ENT_QUOTES);
@@ -55,8 +48,6 @@ foreach ($xml->channel->item as $game)
 
 		$parsed_release_date = strtotime($game->pubDate);
 		$released_date = date('Y-m-d', $parsed_release_date);
-
-		echo $name . ' ' . $game->link . ' ' . $released_date . '<br />';
 
 		$get_info = $db->sqlquery("SELECT `name`, `itch_link` FROM `calendar` WHERE `name` = ?", array($name));
 		$grab_info = $get_info->fetch();

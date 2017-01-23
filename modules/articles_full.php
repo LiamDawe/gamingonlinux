@@ -82,7 +82,7 @@ if (!isset($_GET['go']))
 				}
 
 				// check comment still exists
-				$db->sqlquery("SELECT COUNT(`comment_id`) as `count` FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
+				$db->sqlquery("SELECT COUNT(`comment_id`) as `count` FROM `articles_comments` WHERE `comment_id` = ? AND `article_id` = ?", array($_GET['comment_id'], $_GET['aid']));
 				$check = $db->fetch();
 				if ($check['count'] == 1)
 				{

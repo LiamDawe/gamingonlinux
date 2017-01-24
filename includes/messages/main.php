@@ -32,7 +32,8 @@ return [
 		"error" => 1
 	],
 	"no_id" => [
-		"text" => "There was no ID number given!",
+		"text" => "There was no %s ID number given!",
+		"additions" => 1,
 		"error" => 1
 	],
 	"already_approved" => [
@@ -56,6 +57,19 @@ return [
 	"saved" => [
 		"text" => "That %s has now been saved.",
 		"additions" => 1,
+		"error" => 0
+	],
+	"edited" => [
+		"text" => "That %s has now been edited.",
+		"additions" => 1,
+		"error" => 0
+	],
+	"banned" => [
+		"text" => "That user is now banned!",
+		"error" => 1
+	],
+	"unbanned" => [
+		"text" => "That user is now unbanned!",
 		"error" => 0
 	]
 ];

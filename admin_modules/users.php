@@ -13,19 +13,13 @@ else
 		{
 			if (isset($_GET['message']))
 			{
-				
-				if ($_GET['message'] == 'noid')
+				$extra = NULL;
+				if (isset($_GET['extra']))
 				{
-					$core->message("You didn't select a user to view, there was no ID.", NULL, 1);
+					$extra = $_GET['extra'];
 				}
-				if ($_GET['message'] == 'userdeleted')
-				{
-					$core->message("You have deleted that user! Please let liamdawe know if the user was not a spammer, as he will wish to know why!", NULL, 1);
-				}
-				if ($_GET['message'] == 'usercontentdeleted')
-				{
-					$core->message("You have deleted that users content!", NULL, 1);
-				}
+				$message = $message_map->get_message($_GET['message'], $extra);
+				$core->message($message['message'], NULL, $message['error']);
 			}
 
 			$templating->block('search','admin_modules/users');
@@ -81,9 +75,9 @@ else
 
 		if ($_GET['view'] == 'edituser')
 		{
-			if (!isset($_GET['user_id']))
+			if (!isset($_GET['user_id']) || isset($_GET['user_id']) && empty($_GET['user_id']))
 			{
-				header("Location: admin.php?module=users&view=search&message=noid");
+				header("Location: admin.php?module=users&view=search&message=no_id&extra=user");
 			}
 			else
 			{
@@ -91,30 +85,13 @@ else
 
 				if (isset($_GET['message']))
 				{
-					if ($_GET['message'] == 'avatardeleted')
+					$extra = NULL;
+					if (isset($_GET['extra']))
 					{
-						$core->message("You have deleted that users avatar!");
+						$extra = $_GET['extra'];
 					}
-
-					if ($_GET['message'] == 'empty')
-					{
-						$core->message("You cannot leave the name or email fields empty!", NULL, 1);
-					}
-
-					if ($_GET['message'] == 'done')
-					{
-						$core->message("You have edited that user!");
-					}
-
-					if ($_GET['message'] == 'notesdone')
-					{
-						$core->message("You have edited the admin notes for that user!");
-					}
-
-					if ($_GET['message'] == 'banned')
-					{
-						$core->message("You have now banned this user!", NULL, 1);
-					}
+					$message = $message_map->get_message($_GET['message'], $extra);
+					$core->message($message['message'], NULL, $message['error']);
 				}
 
 				$db->sqlquery("SELECT * FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
@@ -216,13 +193,13 @@ else
 
 				if ($user_info['banned'] == 1)
 				{
-					$ban_button = '<button type="submit" name="act" value="unban" class="btn btn-info"><i class="icon-thumbs-up"></i> UnBan User</button>';
-					$templating->set('delete_content_button', "<button type=\"submit\" name=\"act\" value=\"delete_user_content\"  class=\"btn btn-danger\">Delete user content</button>");
+					$ban_button = '<button type="submit" name="act" value="unban">UnBan User</button>';
+					$templating->set('delete_content_button', "<button type=\"submit\" name=\"act\" value=\"delete_user_content\">Delete user content</button>");
 				}
 
 				else
 				{
-					$ban_button = '<button type="submit" name="act" value="ban" class="btn btn-danger"><i class="icon-remove-sign"></i> Ban User</button>';
+					$ban_button = '<button type="submit" name="act" value="ban">Ban User</button>';
 				}
 
 				$templating->set('ban_button', $ban_button);
@@ -255,9 +232,13 @@ else
 	{
 		if ($_POST['act'] == 'edituser')
 		{
-			if (empty($_POST['username']) || empty($_POST['email']))
+			$username = trim($_POST['username']);
+			$email = trim($_POST['email']);
+
+			$empty_check = core::mempty(compact('username', 'email'));
+			if ($empty_check !== true)
 			{
-				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=empty");
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=empty&extra=$empty_check");
 			}
 
 			else
@@ -298,7 +279,7 @@ else
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'edited_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=done");
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=edited&extra=user");
 			}
 		}
 
@@ -316,7 +297,7 @@ else
 			{
 				if ($_GET['user_id'] == 1)
 				{
-					$core->message("You cannot ban the main editor!!", NULL, 1);
+					$core->message("You cannot ban the main editor!", NULL, 1);
 				}
 
 				else
@@ -336,7 +317,8 @@ else
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unbanned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-			$core->message("The user {$_POST['username']} is now unbanned!");
+
+			header('Location: /admin.php?module=users&view=edituser&user_id='.$_GET['user_id'].'&message=unbanned');
 		}
 
 		if ($_POST['act'] == 'ipban')
@@ -376,7 +358,7 @@ else
 			{
 				if ($_GET['user_id'] == 1)
 				{
-					$db->message("You cannot ban the main editor!!", NULL, 1);
+					$db->message("You cannot ban the main editor!", NULL, 1);
 				}
 
 				else
@@ -445,7 +427,7 @@ else
 
 			$db->sqlquery("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
 
-			header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=avatardeleted");
+			header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=deleted&extra=avatar");
 		}
 
 		if ($_POST['act'] == 'delete_user')
@@ -481,7 +463,7 @@ else
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
 
-				header("Location: /admin.php?module=users&view=search&message=userdeleted");
+				header("Location: /admin.php?module=users&view=search&message=deleted&extra=user");
 			}
 		}
 
@@ -489,7 +471,7 @@ else
 		{
 			if (!isset($_GET['user_id']))
 			{
-				$core->message("There was no ID of a user given!", NULL, 1);
+				header("Location: /admin.php?module=users&view=search&message=no_id&extra=user");
 			}
 			else
 			{
@@ -555,7 +537,7 @@ else
 						// alert admins this was done
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'deleted_user_content', `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-						header("Location: /admin.php?module=users&view=search&message=usercontentdeleted");
+						header("Location: /admin.php?module=users&view=search&message=deleted&extra=user-content");
 					}
 				}
 			}

@@ -83,43 +83,15 @@ else
 		{
 			$core->message('Post Edited!');
 		}
-
-		if ($_GET['message'] == 'shorttile')
-		{
-			$core->message('The title was too short!', NULL, 1);
-		}
 	}
 	if (isset ($_GET['error']))
 	{
-		if ($_GET['error'] == 'empty')
-		{
-			$core->message('You have to fill in a title, tagline and text!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'shorttagline')
-		{
-			$core->message('The tagline was too short, it needs to be at least 100 characters to be informative!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'taglinetoolong')
-		{
-			$core->message('The tagline was too long, it needs to be 400 characters or less!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'shorttitle')
-		{
-			$core->message('The title was too short, make it informative!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'toomanypicks')
-		{
-			$core->message('There are already 3 articles set as editor picks!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'noimageselected')
-		{
-			$core->message('You didn\'t select a tagline image to upload with the article, all articles must have one!', NULL, 1);
-		}
+		$extra = NULL;
+	  if (isset($_GET['extra']))
+	  {
+	    $extra = $_GET['extra'];
+	  }
+	  $core->message($message_map->get_message($_GET['error'], $extra), NULL, 1);
 	}
 
 	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/drafts');

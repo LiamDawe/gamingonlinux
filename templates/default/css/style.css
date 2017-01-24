@@ -950,6 +950,9 @@ body.dark {
 	background: #151515;
 	color: #ffffff;
 }
+.dark input[type="text"][readonly] {
+    background-color: #000000;
+}
 .dark a, .dark a:hover, .dark a:active {
     color: #428BCA;
 }

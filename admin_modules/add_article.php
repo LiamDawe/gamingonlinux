@@ -13,40 +13,12 @@ if (!isset($_GET['error']) && !isset($_POST['act']))
 
 if (isset ($_GET['error']))
 {
-  if ($_GET['error'] == 'empty')
+  $extra = NULL;
+  if (isset($_GET['extra']))
   {
-    $core->message('You have to fill in a title, tagline and text!', NULL, 1);
+    $extra = $_GET['extra'];
   }
-
-  if ($_GET['error'] == 'categories')
-  {
-    $core->message('You have to give the article at least one category tag!', NULL, 1);
-  }
-
-  else if ($_GET['error'] == 'shorttagline')
-  {
-    $core->message('The tagline was too short, it needs to be at least 100 characters to be informative!', NULL, 1);
-  }
-
-  else if ($_GET['error'] == 'taglinetoolong')
-  {
-    $core->message('The tagline was too long, it needs to be 400 characters or less!', NULL, 1);
-  }
-
-  else if ($_GET['error'] == 'shorttitle')
-  {
-    $core->message('The title was too short, make it informative!', NULL, 1);
-  }
-
-  else if ($_GET['error'] == 'toomanypicks')
-  {
-    $core->message('There are already 3 articles set as editor picks!', NULL, 1);
-  }
-
-  else if ($_GET['error'] == 'noimageselected')
-  {
-    $core->message('You didn\'t select a tagline image to upload with the article, all articles must have one!', NULL, 1);
-  }
+  $core->message($message_map->get_message($_GET['error'], $extra), NULL, 1);
 }
 
 $templating->block('add', 'admin_modules/admin_module_articles');

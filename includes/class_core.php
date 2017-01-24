@@ -447,7 +447,6 @@ class core
 		if ($urgent == 0)
 		{
 			$templating->block('message');
-
 		}
 
 		else if ($urgent == 1)
@@ -467,6 +466,23 @@ class core
 			$templating->block('redirect');
 			$templating->set('redirect', $redirect);
 		}
+	}
+
+	// check for multiple things being empty and return the name of what was empty
+	public static function mempty()
+	{
+	  foreach(func_get_args()[0] as $key => $arg)
+		{
+	    if(empty($arg))
+			{
+	      return $key;
+			}
+	    else
+			{
+	      continue;
+			}
+		}
+		return true;
 	}
 
 	// $message = what to ask them

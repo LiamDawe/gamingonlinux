@@ -350,12 +350,13 @@ class article_class
     }
 
     // make sure its not empty
-		if (empty($title) || empty($tagline) || empty($text))
-		{
+    $empty_check = core::mempty(compact('title', 'tagline', 'text'));
+    if ($empty_check !== true)
+    {
       $redirect = 1;
 
-      $return_error = 'empty';
-		}
+      $return_error = 'empty&extra=' . $empty_check;
+    }
 
 		else if (strlen($tagline) < 100)
 		{
@@ -364,11 +365,11 @@ class article_class
       $return_error = 'shorttagline';
 		}
 
-		else if (strlen($tagline) > 400)
+		else if (strlen($tagline) > core::config('tagline-max-length'))
 		{
       $redirect = 1;
 
-      $return_error = 'taglinetoolong';
+      $return_error = 'taglinetoolong&extra=' . core::config('tagline-max-length');
 		}
 
 		else if (strlen($title) < 10)
@@ -382,7 +383,7 @@ class article_class
 		{
       $redirect = 1;
 
-      $return_error = 'toomanypicks';
+      $return_error = 'editor_picks_full&extra=' . core::config('editor_picks_limit');
     }
 
     // if it's an existing article, check tagline image

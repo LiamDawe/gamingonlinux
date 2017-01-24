@@ -15,6 +15,9 @@ $db = new mysql($database_host, $database_username, $database_password, $databas
 include('includes/class_core.php');
 $core = new core();
 
+include('includes/class_messages.php');
+$message_map = new message_map();
+
 include('includes/class_article.php');
 $article_class = new article_class();
 

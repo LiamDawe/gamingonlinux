@@ -13,6 +13,7 @@ else
 		{
 			if (isset($_GET['message']))
 			{
+				
 				if ($_GET['message'] == 'noid')
 				{
 					$core->message("You didn't select a user to view, there was no ID.", NULL, 1);

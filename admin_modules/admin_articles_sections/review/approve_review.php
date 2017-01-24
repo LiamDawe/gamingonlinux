@@ -4,7 +4,7 @@ $db->sqlquery("SELECT a.`tagline_image`, a.`active`, a.`date_submitted`, a.`gues
 $check_article = $db->fetch();
 if ($check_article['active'] == 1)
 {
-	header("Location: /admin.php?module=reviewqueue&error=alreadyapproved");
+	header("Location: /admin.php?module=reviewqueue&message=already_approved");
 }
 
 else

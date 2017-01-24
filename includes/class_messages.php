@@ -25,7 +25,12 @@ class message_map
       {
         $extras_output = $extras;
       }
-      return sprintf($this->messages[$key]['text'], $extras_output);
+      $error = 0;
+      if (isset($this->messages[$key]['error']) && is_numeric($this->messages[$key]['error']))
+      {
+        $error = $this->messages[$key]['error'];
+      }
+      return ["message" => sprintf($this->messages[$key]['text'], $extras_output), "error" => $error];
     }
     else
     {

@@ -5,29 +5,15 @@ $templating->merge('admin_modules/admin_articles_sections/admin_review');
 
 if (!isset($_GET['aid']))
 {
-	if (isset($_GET['accepted']))
-	{
-		$core->message('That article has been approved!');
-	}
-
 	if (isset($_GET['message']))
 	{
-		if ($_GET['message'] == 'sentforreview')
+		$extra = NULL;
+		if (isset($_GET['extra']))
 		{
-			$core->message('Your article has been sent to be reviewed by the others! Now go bug them and buy Liam cake.');
+			$extra = $_GET['extra'];
 		}
-	}
-
-	if (isset($_GET['error']))
-	{
-		if ($_GET['error'] == 'doesntexist')
-		{
-			$core->message('Article doesn\'t exist, someone must have gotten to it first!', NULL, 1);
-		}
-		if ($_GET['error'] == 'alreadyapproved')
-		{
-			$core->message('Article already approved, someone must have gotten to it first!');
-		}
+		$message = $message_map->get_message($_GET['message'], $extra);
+		$core->message($message['message'], NULL, $message['error']);
 	}
 
 	$templating->block('review_top', 'admin_modules/admin_articles_sections/admin_review');
@@ -72,7 +58,8 @@ else
 	  {
 	    $extra = $_GET['extra'];
 	  }
-	  $core->message($message_map->get_message($_GET['error'], $extra), NULL, 1);
+	  $message = $message_map->get_message($_GET['error'], $extra);
+	  $core->message($message['message'], NULL, $message['error']);
 	}
 
 	$query = "SELECT

@@ -18,7 +18,8 @@ if (isset ($_GET['error']))
   {
     $extra = $_GET['extra'];
   }
-  $core->message($message_map->get_message($_GET['error'], $extra), NULL, 1);
+  $message = $message_map->get_message($_GET['error'], $extra);
+  $core->message($message['message'], NULL, $message['error']);
 }
 
 $templating->block('add', 'admin_modules/admin_module_articles');

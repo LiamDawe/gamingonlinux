@@ -94,5 +94,5 @@ if ($checked = $article_class->check_article_inputs($return_page))
 		}
 	}
 
-	header("Location: /admin.php?module=reviewqueue&message=sentforreview");
+	header("Location: /admin.php?module=reviewqueue&message=article_in_review");
 }

@@ -76,7 +76,8 @@ else if (isset($_GET['aid']))
 	  {
 	    $extra = $_GET['extra'];
 	  }
-	  $core->message($message_map->get_message($_GET['error'], $extra), NULL, 1);
+	  $message = $message_map->get_message($_GET['error'], $extra);
+	  $core->message($message['message'], NULL, $message['error']);
 	}
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');

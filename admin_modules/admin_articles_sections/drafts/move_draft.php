@@ -86,7 +86,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		}
 	}
 
-	header("Location: /admin.php?module=articles&view=drafts&message=moved");
+	header("Location: /admin.php?module=articles&view=drafts&message=article_in_review");
 }
 else
 {

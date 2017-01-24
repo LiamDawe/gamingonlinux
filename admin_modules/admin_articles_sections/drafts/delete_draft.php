@@ -21,5 +21,5 @@ else if (isset($_POST['yes']))
 {
 	$article_class->delete_article($check);
 
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&message=deleted");
+	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&message=deleted&extra=draft");
 }

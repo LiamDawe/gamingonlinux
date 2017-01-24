@@ -54,4 +54,4 @@ unset($_SESSION['gallery_tagline_id']);
 unset($_SESSION['gallery_tagline_rand']);
 unset($_SESSION['gallery_tagline_filename']);
 
-header("Location: admin.php?module=articles&view=drafts&message=saved");
+header("Location: admin.php?module=articles&view=drafts&message=saved&extra=draft");

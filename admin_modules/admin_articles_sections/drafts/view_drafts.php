@@ -4,25 +4,18 @@ if (!isset($_GET['aid']))
 {
 	if (isset($_GET['message']))
 	{
-		if ($_GET['message'] == 'saved')
+		$extra = NULL;
+		if (isset($_GET['extra']))
 		{
-			$core->message('Draft saved!');
+			$extra = $_GET['extra'];
 		}
-
-		if ($_GET['message'] == 'moved')
-		{
-			$core->message('That article has been moved to the admin review queue.');
-		}
-
-		if ($_GET['message'] == 'deleted')
-		{
-			$core->message('That article draft has been deleted!', NULL, 1);
-		}
+		$message = $message_map->get_message($_GET['message'], $extra);
+		$core->message($message['message'], NULL, $message['error']);
 	}
 
 	$templating->block('drafts_top', 'admin_modules/admin_articles_sections/drafts');
 
-	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `draft` = 1 AND `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT a.`article_id`, a.`date`, a.`title`, a.`tagline`, a.`guest_username`, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE `draft` = 1 AND `user_id` = ?", array($_SESSION['user_id']));
 	$count_yours = $db->num_rows();
 	if ($count_yours > 0)
 	{
@@ -46,7 +39,7 @@ if (!isset($_GET['aid']))
 
 	$templating->block('others_drafts', 'admin_modules/admin_articles_sections/drafts');
 
-	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `draft` = 1 AND `user_id` != ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT a.`article_id`, a.`date`, a.`title`, a.`tagline`, a.`guest_username`, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE `draft` = 1 AND `user_id` != ?", array($_SESSION['user_id']));
 	$count_theirs = $db->num_rows();
 	if ($count_theirs > 0)
 	{
@@ -91,12 +84,13 @@ else
 	  {
 	    $extra = $_GET['extra'];
 	  }
-	  $core->message($message_map->get_message($_GET['error'], $extra), NULL, 1);
+	  $message = $message_map->get_message($_GET['error'], $extra);
+	  $core->message($message['message'], NULL, $message['error']);
 	}
 
 	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/drafts');
 
-	$db->sqlquery("SELECT a.article_id, a.preview_code, a.title, a.slug, a.text, a.tagline, a.show_in_menu, a.active, a.tagline_image, a.guest_username, a.author_id, a.gallery_tagline, t.filename as gallery_tagline_filename, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE `article_id` = ?", array($_GET['aid']));
+	$db->sqlquery("SELECT a.`article_id`, a.`preview_code`, a.`title`, a.`slug`, a.`text`, a.`tagline`, a.`show_in_menu`, a.`active`, a.`tagline_image`, a.`guest_username`, a.`author_id`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.gallery_tagline WHERE `article_id` = ?", array($_GET['aid']));
 
 	$article = $db->fetch();
 

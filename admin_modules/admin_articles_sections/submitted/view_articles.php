@@ -71,54 +71,32 @@ else if (isset($_GET['aid']))
 	}
 	if (isset ($_GET['error']))
 	{
-		if ($_GET['error'] == 'empty')
-		{
-			$core->message('You have to fill in a title, slug, tagline and text!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'shorttagline')
-		{
-			$core->message('The tagline was too short, it needs to be at least 100 characters to be informative!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'taglinetoolong')
-		{
-			$core->message('The tagline was too long, it needs to be 400 characters or less!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'shorttitle')
-		{
-			$core->message('The title was too short, make it informative!', NULL, 1);
-		}
-
-		else if ($_GET['error'] == 'toomanypicks')
-		{
-			$core->message('There are already 3 articles set as editor picks!', NULL, 1);
-		}
-		else if ($_GET['error'] == 'noimageselected')
-		{
-			$core->message('You didn\'t select a tagline image to upload with the article, all articles must have one!', NULL, 1);
-		}
+		$extra = NULL;
+	  if (isset($_GET['extra']))
+	  {
+	    $extra = $_GET['extra'];
+	  }
+	  $core->message($message_map->get_message($_GET['error'], $extra), NULL, 1);
 	}
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');
 
 	$article_sql = "SELECT
 	a.`article_id`,
-	a.preview_code,
-	a.title,
-	a.text,
-	a.tagline,
-	a.show_in_menu,
-	a.active,
-	a.tagline_image,
-	a.guest_username,
-	a.author_id,
-	a.guest_ip,
-	a.locked,
-	a.locked_by,
-	a.locked_date,
-	a.gallery_tagline,
+	a.`preview_code`,
+	a.`title`,
+	a.`text`,
+	a.`tagline`,
+	a.`show_in_menu`,
+	a.`active`,
+	a.`tagline_image`,
+	a.`guest_username`,
+	a.`author_id`,
+	a.`guest_ip`,
+	a.`locked`,
+	a.`locked_by`,
+	a.`locked_date`,
+	a.`gallery_tagline`,
 	t.`filename` as gallery_tagline_filename,
 	u.`username`, u2.`username` as `username_lock`
 	FROM

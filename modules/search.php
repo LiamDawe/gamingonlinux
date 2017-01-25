@@ -49,7 +49,7 @@ foreach ($search_array[0] as $item)
 if (isset($search_text) && !empty($search_text))
 {
 	// do the search query
-	$db->sqlquery("SELECT a.`article_id`, a.`title` , a.`author_id`, a.`date` , a.`guest_username`, u.`username`
+	$db->sqlquery("SELECT a.`article_id`, a.`title` , a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
 	FROM  `articles` a
 	LEFT JOIN  `users` u ON a.`author_id` = u.`user_id`
 	WHERE a.`active` = 1

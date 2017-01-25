@@ -35,6 +35,17 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->set_previous('meta_description', 'GamingOnLinux viewing Linux gaming news from mutiple categories', 1);
 		$templating->set_previous('title', 'Searching for articles in multiple categories', 1);
 
+		// test to make sure they are all safe
+		foreach ($_GET['catid'] as $test_id)
+		{
+			if (!is_numeric($test_id))
+			{
+				$core->message('Category IDs must be a number.', NULL, 1);
+				include('includes/footer.php');
+				die();
+			}
+		}
+
 		$templating->block('multi', 'articles');
 
 		$templating->block('articles_top', 'articles');
@@ -79,17 +90,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			else
 			{
 				$type = $_GET['type'];
-			}
-
-			// test to make sure they are all safe
-			foreach ($_GET['catid'] as $test_id)
-			{
-				if (!is_numeric($test_id))
-				{
-					$core->message('Category IDs must be a number.', NULL, 1);
-					include('includes/footer.php');
-					die();
-				}
 			}
 
 			// sanitize

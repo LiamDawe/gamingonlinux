@@ -81,6 +81,20 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$type = $_GET['type'];
 			}
 
+			// test to make sure they are all safe
+			foreach ($_GET['catid'] as $test_id)
+			{
+				if (!is_numeric($test_id))
+				{
+					$core->message('Category IDs must be a number.', NULL, 1);
+					include('includes/footer.php');
+					die();
+				}
+			}
+
+			// sanitize
+			$safe_ids = core::make_safe($_GET['catid']);
+
 			// this is really ugly, but I can't think of a better way to do it
 			$cat_sql = ' r.`category_id` IN (';
 			$count_array = count($_GET['catid']);
@@ -103,7 +117,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$all_sql = ' having count(r.`category_id`) = ' . $count_array;
 			}
 			// count how many there is in total
-			$db->sqlquery("SELECT r.`article_id` FROM `article_category_reference` r JOIN `articles` a ON a.article_id = r.article_id WHERE $cat_sql GROUP BY r.article_id $all_sql", $_GET['catid']);
+			$db->sqlquery("SELECT r.`article_id` FROM `article_category_reference` r JOIN `articles` a ON a.article_id = r.article_id WHERE $cat_sql GROUP BY r.article_id $all_sql", $safe_ids);
 
 			$total_items = $db->num_rows();
 
@@ -118,7 +132,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			// sort out the pagination link
 			$pagination = $core->pagination_link($_SESSION['articles-per-page'], $total_items, $paging_url, $page);
 
-			$db->sqlquery("SELECT r.article_id, a.author_id, a.title, a.slug, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.tagline_image, a.show_in_menu, a.`gallery_tagline`, t.filename as gallery_tagline_filename, u.username FROM `article_category_reference` r JOIN `articles` a ON a.article_id = r.article_id LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE $cat_sql AND a.active = 1 GROUP BY r.article_id $all_sql ORDER BY a.`date` DESC LIMIT {$core->start}, {$_SESSION['articles-per-page']}", $_GET['catid']);
+			$db->sqlquery("SELECT r.`article_id`, a.`author_id`, a.`title`, a.`slug`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`guest_username`, a.`tagline_image`, a.`show_in_menu`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` LEFT JOIN `users` u on a.`author_id` = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.id = a.gallery_tagline WHERE $cat_sql AND a.active = 1 GROUP BY r.article_id $all_sql ORDER BY a.`date` DESC LIMIT {$core->start}, {$_SESSION['articles-per-page']}", $safe_ids);
 			$articles_get = $db->fetch_all_rows();
 
 			if ($db->num_rows() == 0)

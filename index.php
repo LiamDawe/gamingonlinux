@@ -24,13 +24,13 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 }
 
 // Here we sort out what modules we are allowed to load
-$modules_allowed = '';
+$modules_allowed = [];
 $module_links = '';
 $db->sqlquery('SELECT `module_file_name` FROM `modules` WHERE `activated` = 1');
 while ($modules = $db->fetch())
 {
 	// modules allowed for loading
-	$modules_allowed .= " {$modules['module_file_name']} ";
+	$modules_allowed[] = $modules['module_file_name'];
 }
 
 // modules loading, first are we asked to load a module, if not use the default
@@ -151,9 +151,7 @@ else {
 }
 $templating->set('articles_css', $articles_css);
 
-$modules_check = explode(" ", $modules_allowed);
-
-if (in_array($module, $modules_check))
+if (in_array($module, $modules_allowed))
 {
 	include("modules/$module.php");
 }

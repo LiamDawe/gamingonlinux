@@ -21,13 +21,13 @@ if ($user->check_group(1) == false)
 }
 
 // Here we sort out what modules we are allowed to load
-$modules_allowed = '';
+$modules_allowed = [];
 $module_links = '';
 $get_modules_info = $db->sqlquery("SELECT `module_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `admin_modules` WHERE `activated` = 1 $sql_editor");
 while ($modules = $db->fetch())
 {
 	// modules allowed for loading
-	$modules_allowed .= " {$modules['module_name']} ";
+	$modules_allowed[] = $modules['module_name'];
 
 	// links
 	if ($modules['show_in_sidebar'] == 1)
@@ -49,9 +49,7 @@ else
 	$module = 'home';
 }
 
-$modules_check = explode(" ", $modules_allowed);
-
-if (in_array($module, $modules_check))
+if (in_array($module, $modules_allowed))
 {
 	include("admin_modules/$module.php");
 }

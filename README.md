@@ -6,6 +6,10 @@ Please read first: The entire codebase is probably a mess, as it was started yea
 
 If you like what I do please consider [supporting me on Patreon](https://www.patreon.com/liamdawe).
 
+## Security issues
+
+If you discover a security issue, PLEASE notify us privately first!
+
 ## Requirements
 
 This site requires atleast PHP 5.6, Mysql 5.6 or MariaDB 10.0 and apache 2.4.  

@@ -154,7 +154,7 @@ if (isset($_POST['act']))
         $templating->set_previous('title', 'Submit An Article', 1);
         $title = strip_tags($_POST['title']);
         $title = $title;
-        $text = htmlentities($_POST['text']);
+        $text = core::make_safe($_POST['text']);
 
         if ($_SESSION['user_id'] == 0 && empty($_POST['email']))
         {
@@ -224,8 +224,8 @@ if (isset($_POST['act']))
                 $guest_username = '';
                 if (!empty($_POST['name']))
                 {
-                    $guest_username = $_POST['name'];
-                    $username = $_POST['name'];
+                    $guest_username = core::make_safe($_POST['name']);
+                    $username = core::make_safe($_POST['name']);
                 }
 
                 else

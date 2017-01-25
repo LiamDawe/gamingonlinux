@@ -11,7 +11,7 @@ if (!isset($_GET['go']))
 	if (!isset($_GET['view']))
 	{
 		// make sure the id is set
-		if (!isset($_GET['aid']))
+		if (!isset($_GET['aid']) || core::is_number($_GET['aid']) == false)
 		{
 			http_response_code(404);
 			$templating->set_previous('meta_data', '', 1);
@@ -66,10 +66,10 @@ if (!isset($_GET['go']))
 			$article = $db->fetch();
 
 			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
-			if (isset($_GET['comment_id']) && is_numeric($_GET['comment_id']))
+			if (isset($_GET['comment_id']) && core::is_number($_GET['comment_id']))
 			{
 				// have they come from a notification/alert box link?
-				if (isset($_GET['clear_note']) && is_numeric($_GET['clear_note']))
+				if (isset($_GET['clear_note']) && core::is_number($_GET['clear_note']))
 				{
 					// make sure they own it to clear it
 					$db->sqlquery("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array($_GET['clear_note']));

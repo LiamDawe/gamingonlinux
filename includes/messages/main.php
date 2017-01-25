@@ -71,6 +71,10 @@ return [
 	"unbanned" => [
 		"text" => "That user is now unbanned!",
 		"error" => 0
+	],
+	"password-match" => [
+		"text" => "Your password did not match what we have for you!",
+		"error" => 1
 	]
 ];
 ?>

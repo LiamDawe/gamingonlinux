@@ -42,7 +42,7 @@ $templating->set('current_password', $current_password);
 if (isset($_POST['Update']))
 {
 	// find current password
-	$db->sqlquery("SELECT `password`, `steam_id`, `oauth_uid` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `password`, `steam_id`, `oauth_uid`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$grab_current_password = $db->fetch();
 
 	if (!empty($grab_current_password['password']))
@@ -83,6 +83,27 @@ if (isset($_POST['Update']))
 	{
 		header("Location: /usercp.php?module=password&message=nochecknew");
 		die();
+	}
+
+	// send an email to their old address to let them know
+	$subject = "Password changed on GamingOnLinux.com";
+
+	// message
+	$html_message = "<p>Hello <strong>{$grab_current_password['username']}</strong>,</p>
+	<p>Someone, hopefully you, has changed your password on <a href=\"".core::config('website_url')."\">gamingonlinux.com</a>. If this was you, please ignore this email as it's just a security measure.</p>
+	<hr>
+		<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> !</p>
+		<p>Please don&#39;t reply to this automated message. We do not read any mails recieved on this email address.</p>
+		<p>-----------------------------------------------------------------------------------------------------------</p>
+	</div>";
+
+	$plain_message = PHP_EOL."Hello {$grab_email['username']}! Someone, hopefully you, has changed your password on ".core::config('website_url').". If this was you, please ignore this email as it's just a security measure.";
+
+	// Mail it
+	if (core::config('send_emails') == 1)
+	{
+		$mail = new mail($grab_current_password['email'], $subject, $html_message, $plain_message);
+		$mail->send();
 	}
 
 	$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_safe, $_SESSION['user_id']));

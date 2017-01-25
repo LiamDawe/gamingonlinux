@@ -60,6 +60,34 @@ class core
 		return $text;
 	}
 
+	// for validating numbers a bit more thoroughly, for things like ID numbers to use in the database
+	// this will work on arrays as well as single digits
+	public static function is_number($data)
+	{
+		if (isset($data))
+		{
+			if (is_array($data))
+			{
+				foreach ($data as $test_id)
+				{
+					if (!is_numeric($test_id))
+					{
+						return false;
+					}
+				}
+			}
+			else if (!is_numeric($data))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+		return true;
+	}
+
 	function file_get_contents_curl($url) {
 	    $ch = curl_init();
 

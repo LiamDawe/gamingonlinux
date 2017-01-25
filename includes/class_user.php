@@ -159,7 +159,7 @@ class user
 		}
 	}
 
-	function register_session($user_data)
+	private static function register_session($user_data)
 	{
 		$_SESSION['user_id'] = $user_data['user_id'];
 		$_SESSION['username'] = $user_data['username'];

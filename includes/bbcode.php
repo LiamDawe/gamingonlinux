@@ -664,7 +664,7 @@ function pc_info($body)
 
 	if(preg_match('/\[pcinfo\]/', $body))
 	{
-		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0 && is_numeric($_SESSION['user_id']))
 		{
 			$fields_output = '';
 			$pc_info = user::display_pc_info($_SESSION['user_id'], $_SESSION['distro']);

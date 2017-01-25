@@ -21,6 +21,7 @@ class user
 			$safe_id = core::make_safe($_SESSION['user_id']);
 
 			// check if they actually have any saved sessions, if they don't then logout to cancel everything
+			// this is also if we need to remove everyone being logged in due to any security issues
 			$db->sqlquery("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", array($safe_id));
 			if ($db->num_rows() == 0)
 			{

@@ -63,7 +63,7 @@ if ($db->num_rows() > 0)
     $templating->set('countdown', $countdown);
 
     $streamer_list = '';
-    $db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN users u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
+    $db->sqlquery("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN users u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']));
     $total_streamers = $db->num_rows();
     $streamer_counter = 0;
     while ($grab_streamers = $db->fetch())
@@ -107,8 +107,11 @@ if (isset($_POST['act']))
   if ($_POST['act'] == 'submit')
   {
     $title = trim($_POST['title']);
+    $title = strip_tags($title);
     $community_name = trim($_POST['community_name']);
+    $community_name = strip_tags($community_name);
     $stream_url = trim($_POST['stream_url']);
+    $stream_url = strip_tags($stream_url);
 
     if (empty($title) || empty($_POST['date']) || empty($_POST['end_date']) || empty($stream_url))
     {

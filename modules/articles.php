@@ -38,14 +38,23 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		// test to make sure they are all safe
 		if (isset($_GET['catid']))
 		{
-			foreach ($_GET['catid'] as $test_id)
+			if (is_array($_GET['catid']))
 			{
-				if (!is_numeric($test_id))
+				foreach ($_GET['catid'] as $test_id)
 				{
-					$core->message('Category IDs must be a number.', NULL, 1);
-					include('includes/footer.php');
-					die();
+					if (!is_numeric($test_id))
+					{
+						$core->message('Category IDs must be a number.', NULL, 1);
+						include('includes/footer.php');
+						die();
+					}
 				}
+			}
+			else if (!is_numeric($_GET['catid']))
+			{
+				$core->message('Category IDs must be a number.', NULL, 1);
+				include('includes/footer.php');
+				die();				
 			}
 		}
 

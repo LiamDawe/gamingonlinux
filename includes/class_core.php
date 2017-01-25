@@ -43,8 +43,20 @@ class core
 
 	public static function make_safe($text)
 	{
-		$text = htmlspecialchars($text, ENT_QUOTES);
-		$text = str_replace('{', '&#123;', $text);
+		if (is_array($text))
+		{
+			foreach ($text as $k => $unsafe_text)
+			{
+				$text[$k] = htmlspecialchars($unsafe_text, ENT_QUOTES);
+				$text[$k] = str_replace('{', '&#123;', $unsafe_text);
+			}
+		}
+		else
+		{
+			$text = htmlspecialchars($text, ENT_QUOTES);
+			$text = str_replace('{', '&#123;', $text);
+		}
+
 		return $text;
 	}
 

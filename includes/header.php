@@ -56,6 +56,13 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		$_SESSION['auto_subscribe'] = $subscribe_info['auto_subscribe'];
 		$_SESSION['email_options'] = $subscribe_info['email_options'];
 	}
+	if (!isset($_SESSION['distro']))
+	{
+		$db->sqlquery("SELECT `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$temp_distro = $db->fetch();
+
+		$_SESSION['distro'] = $temp_distro['distro'];
+	}
 }
 
 // If they are not logged in make them a guest (group 4)

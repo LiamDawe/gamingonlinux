@@ -66,7 +66,7 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 
 			$generated_session = md5(mt_rand()  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
-			user::register_session($userdata, $generated_session);
+			user::new_login($userdata, $generated_session);
 
 			if ($_COOKIE['request_stay'] == 1)
 			{

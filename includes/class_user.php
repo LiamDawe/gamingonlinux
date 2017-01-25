@@ -7,7 +7,7 @@ class user
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`, `avatar`, `avatar_uploaded`,
-	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`";
+	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`";
 
 	// normal login form
 	function login($username, $password, $remember_username, $stay)
@@ -43,7 +43,7 @@ class user
 					// update IP address and last login
 					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
 
-					$this->register_session($user_info, $generated_session);
+					$this->new_login($user_info, $generated_session);
 
 					if ($remember_username == 1)
 					{
@@ -119,8 +119,31 @@ class user
 		}
 	}
 
+	function register_session($user_data)
+	{
+		$_SESSION['user_id'] = $user_data['user_id'];
+		$_SESSION['username'] = $user_data['username'];
+		$_SESSION['user_group'] = $user_data['user_group'];
+		$_SESSION['secondary_user_group'] = $user_data['secondary_user_group'];
+		$_SESSION['theme'] = $user_data['theme'];
+		$_SESSION['new_login'] = 1;
+		$_SESSION['activated'] = $user_data['activated'];
+		$_SESSION['in_mod_queue'] = $user_data['in_mod_queue'];
+		$_SESSION['logged_in'] = 1;
+		$_SESSION['per-page'] = $user_data['per-page'];
+		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
+		$_SESSION['forum_type'] = $user_data['forum_type'];
+		$_SESSION['single_article_page'] = $user_data['single_article_page'];
+		$_SESSION['avatar'] = user::sort_avatar($user_data);
+		$_SESSION['display_comment_alerts'] = $user_data['display_comment_alerts'];
+		$_SESSION['email_options'] = $user_data['email_options'];
+		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
+		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
+		$_SESSION['distro'] = $user_data['distro'];
+	}
+
 	// check if it's a new device, then set the session up
-	public static function register_session($user_data, $generated_session)
+	public static function new_login($user_data, $generated_session)
 	{
 		global $db;
 
@@ -151,7 +174,7 @@ class user
 
 			setcookie('gol-device', $device_id, time()+31556926, '/', core::config('cookie_domain'));
 
-			if ($user_data['login_emails'] == 1)
+			if ($user_data['login_emails'] == 1 && core::config('send_emails'))
 			{
 				// send email about new device
 				$message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
@@ -189,24 +212,7 @@ class user
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
 		$db->sqlquery("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
 
-		$_SESSION['user_id'] = $user_data['user_id'];
-		$_SESSION['username'] = $user_data['username'];
-		$_SESSION['user_group'] = $user_data['user_group'];
-		$_SESSION['secondary_user_group'] = $user_data['secondary_user_group'];
-		$_SESSION['theme'] = $user_data['theme'];
-		$_SESSION['new_login'] = 1;
-		$_SESSION['activated'] = $user_data['activated'];
-		$_SESSION['in_mod_queue'] = $user_data['in_mod_queue'];
-		$_SESSION['logged_in'] = 1;
-		$_SESSION['per-page'] = $user_data['per-page'];
-		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
-		$_SESSION['forum_type'] = $user_data['forum_type'];
-		$_SESSION['single_article_page'] = $user_data['single_article_page'];
-		$_SESSION['avatar'] = user::sort_avatar($user_data);
-		$_SESSION['display_comment_alerts'] = $user_data['display_comment_alerts'];
-		$_SESSION['email_options'] = $user_data['email_options'];
-		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
-		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
+		self::register_session($user_data);
 	}
 
 	// if they have a stay logged in cookie log them in!
@@ -221,9 +227,9 @@ class user
 		{
 			// login then
 			$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
-			$user = $db->fetch();
+			$user_data = $db->fetch();
 
-			if ($user['banned'] == 0)
+			if ($user_data['banned'] == 0)
 			{
 				// now check IP ban
 				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
@@ -237,26 +243,9 @@ class user
 				else
 				{
 					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user['user_id']));
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
 
-					$_SESSION['user_id'] = $user['user_id'];
-					$_SESSION['username'] = $user['username'];
-					$_SESSION['user_group'] = $user['user_group'];
-					$_SESSION['secondary_user_group'] = $user['secondary_user_group'];
-					$_SESSION['theme'] = $user['theme'];
-					$_SESSION['new_login'] = 1;
-					$_SESSION['activated'] = $user['activated'];
-					$_SESSION['in_mod_queue'] = $user['in_mod_queue'];
-					$_SESSION['logged_in'] = 1;
-					$_SESSION['per-page'] = $user['per-page'];
-					$_SESSION['articles-per-page'] = $user['articles-per-page'];
-					$_SESSION['forum_type'] = $user['forum_type'];
-					$_SESSION['single_article_page'] = $user['single_article_page'];
-					$_SESSION['avatar'] = user::sort_avatar($user);
-					$_SESSION['display_comment_alerts'] = $user['display_comment_alerts'];
-					$_SESSION['email_options'] = $user['email_options'];
-					$_SESSION['auto_subscribe'] = $user['auto_subscribe'];
-					$_SESSION['auto_subscribe_email'] = $user['auto_subscribe_email'];
+					self::register_session($user_data);
 
 					return true;
 				}
@@ -267,7 +256,7 @@ class user
 				setcookie('gol_stay', "",  time()-60, '/');
 
 				// update their ip in the user table
-				$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array(core::$ip, $user['user_id']));
+				$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array(core::$ip, $user_data['user_id']));
 
 				// search the ip list, if it's not on it then add it in
 				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
@@ -547,11 +536,13 @@ class user
 		return true;
 	}
 
-	public function display_pc_info($user_id, $distribution)
+	public static function display_pc_info($user_id, $distribution)
 	{
 		global $db;
 
 		$pc_info = [];
+
+		$counter = 0;
 
 		$get_info = $db->sqlquery("SELECT
 			`desktop_environment`,
@@ -566,7 +557,8 @@ class user
 			`gaming_machine_type`,
 			`resolution`,
 			`dual_boot`,
-			`gamepad`
+			`gamepad`,
+			`date_updated`
 			FROM
 			`user_profile_info`
 			WHERE
@@ -574,6 +566,7 @@ class user
 
 		if (!empty($distribution) && $distribution != 'Not Listed')
 		{
+			$counter++;
 			$pc_info['distro'] = "<strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$distribution}.svg\" alt=\"{$distribution}\" /> {$distribution}";
 		}
 
@@ -581,69 +574,83 @@ class user
 		{
 			if (!empty($additionaldb['desktop_environment']))
 			{
+				$counter++;
 				$pc_info['desktop'] = '<strong>Desktop Environment:</strong> ' . $additionaldb['desktop_environment'];
 			}
 
 			if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))
 			{
+				$counter++;
 				$pc_info['what_bits'] = '<strong>Distribution Architecture:</strong> '.$additionaldb['what_bits'];
 			}
 
 			if ($additionaldb['dual_boot'] != NULL && !empty($additionaldb['dual_boot']))
 			{
+				$counter++;
 				$pc_info['dual_boot'] = '<strong>Do you dual-boot with a different operating system?</strong> '.$additionaldb['dual_boot'];
 			}
 
 			if ($additionaldb['cpu_vendor'] != NULL && !empty($additionaldb['cpu_vendor']))
 			{
+				$counter++;
 				$pc_info['cpu_vendor'] = '<strong>CPU Vendor:</strong> '.$additionaldb['cpu_vendor'];
 			}
 
 			if ($additionaldb['cpu_model'] != NULL && !empty($additionaldb['cpu_model']))
 			{
+				$counter++;
 				$pc_info['cpu_model'] = '<strong>CPU Model:</strong> ' . $additionaldb['cpu_model'];
 			}
 
 			if ($additionaldb['gpu_vendor'] != NULL && !empty($additionaldb['gpu_vendor']))
 			{
+				$counter++;
 				$pc_info['gpu_vendor'] = '<strong>GPU Vendor:</strong> ' . $additionaldb['gpu_vendor'];
 			}
 
 			if ($additionaldb['gpu_model'] != NULL && !empty($additionaldb['gpu_model']))
 			{
+				$counter++;
 				$pc_info['gpu_model'] = '<strong>GPU Model:</strong> ' . $additionaldb['gpu_model'];
 			}
 
 			if ($additionaldb['gpu_driver'] != NULL && !empty($additionaldb['gpu_driver']))
 			{
+				$counter++;
 				$pc_info['gpu_driver'] = '<strong>GPU Driver:</strong> ' . $additionaldb['gpu_driver'];
 			}
 
 			if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
 			{
+				$counter++;
 				$pc_info['ram_count'] = '<strong>RAM:</strong> '.$additionaldb['ram_count'].'GB';
 			}
 
 			if ($additionaldb['monitor_count'] != NULL && !empty($additionaldb['monitor_count']))
 			{
+				$counter++;
 				$pc_info['monitor_count'] = '<strong>Monitors:</strong> '.$additionaldb['monitor_count'];
 			}
 
 			if ($additionaldb['resolution'] != NULL && !empty($additionaldb['resolution']))
 			{
+				$counter++;
 				$pc_info['resolution'] = '<strong>Resolution:</strong> '.$additionaldb['resolution'];
 			}
 
 			if ($additionaldb['gaming_machine_type'] != NULL && !empty($additionaldb['gaming_machine_type']))
 			{
+				$counter++;
 				$pc_info['gaming_machine_type'] = '<strong>Main gaming machine:</strong> '.$additionaldb['gaming_machine_type'];
 			}
 
 			if ($additionaldb['gamepad'] != NULL && !empty($additionaldb['gamepad']))
 			{
+				$counter++;
 				$pc_info['gamepad'] = '<strong>Gamepad:</strong> '.$additionaldb['gamepad'];
 			}
 		}
+		$pc_info['counter'] = $counter;
 		return $pc_info;
 	}
 }

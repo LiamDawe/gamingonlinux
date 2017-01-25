@@ -36,13 +36,16 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->set_previous('title', 'Searching for articles in multiple categories', 1);
 
 		// test to make sure they are all safe
-		foreach ($_GET['catid'] as $test_id)
+		if (isset($_GET['catid']))
 		{
-			if (!is_numeric($test_id))
+			foreach ($_GET['catid'] as $test_id)
 			{
-				$core->message('Category IDs must be a number.', NULL, 1);
-				include('includes/footer.php');
-				die();
+				if (!is_numeric($test_id))
+				{
+					$core->message('Category IDs must be a number.', NULL, 1);
+					include('includes/footer.php');
+					die();
+				}
 			}
 		}
 

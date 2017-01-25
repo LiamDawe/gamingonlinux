@@ -58,6 +58,14 @@ if (isset($_POST['Update']))
 		}
 	}
 
+	// check to see if this email exists
+	$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['new_email']));
+	if ($db->num_rows() >= 1)
+	{
+		header("Location: /usercp.php?module=email&message=not-that-email");
+		die();
+	}
+
 	// update to the new email address
 	$db->sqlquery("UPDATE `users` SET `email` = ? WHERE `user_id` = ?", array($_POST['new_email'], $_SESSION['user_id']));
 

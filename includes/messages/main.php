@@ -75,6 +75,10 @@ return [
 	"password-match" => [
 		"text" => "Your password did not match what we have for you!",
 		"error" => 1
+	],
+	"not-that-email" => [
+		"text" => "You cannot use that email address, as it's in use!",
+		"error" => 1
 	]
 ];
 ?>

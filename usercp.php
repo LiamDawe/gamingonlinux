@@ -15,13 +15,13 @@ if ($_SESSION['user_id'] == 0)
 $templating->block('left');
 
 // Here we sort out what modules we are allowed to load
-$modules_allowed = '';
+$modules_allowed = [];
 $module_links = '';
 $db->sqlquery('SELECT `module_file_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `usercp_modules` WHERE `activated` = 1');
 while ($modules = $db->fetch())
 {
 	// modules allowed for loading
-	$modules_allowed .= " {$modules['module_file_name']} ";
+	$modules_allowed .= $modules['module_file_name'];
 
 	// links
 	if ($modules['show_in_sidebar'] == 1)
@@ -41,9 +41,7 @@ else
 	$module = 'home';
 }
 
-$modules_check = explode(" ", $modules_allowed);
-
-if (in_array($module, $modules_check))
+if (in_array($module, $modules_allowed))
 {
 	include("usercp_modules/usercp_module_$module.php");
 }

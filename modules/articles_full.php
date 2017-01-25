@@ -1060,7 +1060,7 @@ else if (isset($_GET['go']))
 			// check empty
 			$correction = trim($_POST['correction']);
 
-			$correction = htmlspecialchars($correction, ENT_QUOTES);
+			$correction = core::make_safe($correction, ENT_QUOTES);
 
 			// get article name for the email and redirect
 			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));

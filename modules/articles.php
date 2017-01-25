@@ -127,7 +127,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$for_url = '';
 			foreach ($_GET['catid'] as $cat_url_id)
 			{
-				$for_url .= 'catid[]=' . $cat_url_id . '&amp;';
+				$safe_url_id = core::make_safe($cat_url_id)
+				$for_url .= 'catid[]=' . $safe_url_id . '&amp;';
 			}
 
 			$paging_url = "/index.php?module=articles&view=multiple&{$for_url}";

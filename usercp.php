@@ -21,7 +21,7 @@ $db->sqlquery('SELECT `module_file_name`, `module_link`, `module_title`, `show_i
 while ($modules = $db->fetch())
 {
 	// modules allowed for loading
-	$modules_allowed .= $modules['module_file_name'];
+	$modules_allowed[] = $modules['module_file_name'];
 
 	// links
 	if ($modules['show_in_sidebar'] == 1)

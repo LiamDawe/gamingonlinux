@@ -27,6 +27,7 @@ define('url', core::config('website_url'));
 
 include('includes/class_user.php');
 $user = new user();
+$user->check_session();
 
 if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {

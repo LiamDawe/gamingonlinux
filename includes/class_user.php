@@ -9,6 +9,31 @@ class user
 	`forum_type`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`, `avatar`, `avatar_uploaded`,
 	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`";
 
+	function check_session()
+	{
+		global $db;
+
+		$logout = 0;
+
+		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			// we know it's numeric, but doubly be sure and don't allow any html
+			$safe_id = core::make_safe($_SESSION['user_id']);
+
+			// check if they actually have any saved sessions, if they don't then logout to cancel everything
+			$db->sqlquery("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", array($safe_id));
+			if ($db->num_rows() == 0)
+			{
+				$logout = 1;
+			}
+		}
+
+		if ($logout == 1)
+		{
+			self::logout();
+		}
+	}
+
 	// normal login form
 	function login($username, $password, $remember_username, $stay)
 	{

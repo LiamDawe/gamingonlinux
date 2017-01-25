@@ -13,9 +13,12 @@ include('../class_template.php');
 
 $templating = new template('default');
 
+include('../class_user.php');
+$user = new user();
+
 if(isset($_GET['user_id']))
 {
-  $db->sqlquery("SELECT u.`username`, u.`pc_info_public`, u.`distro`, p.`desktop_environment`, p.`what_bits`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, p.`gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`dual_boot`, p.`gamepad` FROM `users` u LEFT JOIN `user_profile_info` p ON p.`user_id` = u.`user_id` WHERE p.`user_id` = ?", array($_GET['user_id']));
+  $db->sqlquery("SELECT `username`, `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
   if ($db->num_rows() != 1)
 	{
 		$core->message('That person does not exist here!');
@@ -40,126 +43,22 @@ if(isset($_GET['user_id']))
       $templating->set('username', $grab_fields['username']);
       $templating->set('profile_link', $profile_link);
 
-      $counter = 0;
-
-      $distro = '';
-      if (!empty($grab_fields['distro']) && $grab_fields['distro'] != 'Not Listed')
+      $fields_output = '';
+      $pc_info = $user->display_pc_info($_GET['user_id'], $grab_fields['distro']);
+      $array_count = count($pc_info);
+      if ($array_count > 0)
       {
-        $distro = "<li><strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$grab_fields['distro']}.svg\" alt=\"{$grab_fields['distro']}\" /> {$grab_fields['distro']}</li>";
-        $counter++;
+        foreach ($pc_info as $info)
+        {
+          $fields_output .= '<li>' . $info . '</li>';
+        }
       }
-      $templating->set('distro', $distro);
-
-      $desktop = '';
-      if (!empty($grab_fields['desktop_environment']))
+      else
       {
-        $desktop = "<li><strong>Desktop Environment:</strong> {$grab_fields['desktop_environment']}</li>";
-        $counter++;
+        $fields_output = '<li><em>This user has not filled out their PC info!</em></li>';
       }
-      $templating->set('desktop', $desktop);
 
-      $dist_arc = '';
-      if ($grab_fields['what_bits'] != NULL && !empty($grab_fields['what_bits']))
-      {
-        $dist_arc = '<li><strong>CPU Architecture:</strong> '.$grab_fields['what_bits'].'</li>';
-        $counter++;
-      }
-      $templating->set('dist_arc', $dist_arc);
-
-      $dual_boot = '';
-      if ($grab_fields['dual_boot'] != NULL && !empty($grab_fields['dual_boot']))
-      {
-        $dual_boot = '<li><strong>Do you dual-boot with a different operating system?</strong> '.$grab_fields['dual_boot'].'</li>';
-        $counter++;
-      }
-      $templating->set('dual_boot', $dual_boot);
-
-      $cpu_vendor = '';
-      if ($grab_fields['cpu_vendor'] != NULL && !empty($grab_fields['cpu_vendor']))
-      {
-        $cpu_vendor = '<li><strong>CPU Vendor:</strong> '.$grab_fields['cpu_vendor'].'</li>';
-        $counter++;
-      }
-      $templating->set('cpu_vendor', $cpu_vendor);
-
-      $cpu_model = '';
-      if ($grab_fields['cpu_model'] != NULL && !empty($grab_fields['cpu_model']))
-      {
-        $cpu_model = '<li><strong>CPU Model:</strong> '.$grab_fields['cpu_model'].'</li>';
-        $counter++;
-      }
-      $templating->set('cpu_model', $cpu_model);
-
-      $gpu_vendor = '';
-      if ($grab_fields['gpu_vendor'] != NULL && !empty($grab_fields['gpu_vendor']))
-      {
-        $gpu_vendor = '<li><strong>GPU Vendor:</strong> '.$grab_fields['gpu_vendor'].'</li>';
-        $counter++;
-      }
-      $templating->set('gpu_vendor', $gpu_vendor);
-
-      $gpu_model = '';
-      if ($grab_fields['gpu_model'] != NULL && !empty($grab_fields['gpu_model']))
-      {
-        $gpu_model = '<li><strong>GPU Model:</strong> '.$grab_fields['gpu_model'].'</li>';
-        $counter++;
-      }
-      $templating->set('gpu_model', $gpu_model);
-
-      $gpu_driver = '';
-      if ($grab_fields['gpu_driver'] != NULL && !empty($grab_fields['gpu_driver']))
-      {
-        $gpu_driver = '<li><strong>GPU Driver:</strong> '.$grab_fields['gpu_driver'].'</li>';
-        $counter++;
-      }
-      $templating->set('gpu_driver', $gpu_driver);
-
-      $ram_count = '';
-      if ($grab_fields['ram_count'] != NULL && !empty($grab_fields['ram_count']))
-      {
-        $ram_count = '<li><strong>RAM:</strong> '.$grab_fields['ram_count'].'</li>';
-        $counter++;
-      }
-      $templating->set('ram_count', $ram_count);
-
-      $monitor_count = '';
-      if ($grab_fields['monitor_count'] != NULL && !empty($grab_fields['monitor_count']))
-      {
-        $monitor_count = '<li><strong>Monitors:</strong> '.$grab_fields['monitor_count'].'</li>';
-        $counter++;
-      }
-      $templating->set('monitor_count', $monitor_count);
-
-      $resolution = '';
-      if ($grab_fields['resolution'] != NULL && !empty($grab_fields['resolution']))
-      {
-        $resolution = '<li><strong>Resolution:</strong> '.$grab_fields['resolution'].'</li>';
-        $counter++;
-      }
-      $templating->set('resolution', $resolution);
-
-      $gaming_machine_type = '';
-      if ($grab_fields['gaming_machine_type'] != NULL && !empty($grab_fields['gaming_machine_type']))
-      {
-        $gaming_machine_type = '<li><strong>Main gaming machine:</strong> '.$grab_fields['gaming_machine_type'].'</li>';
-        $counter++;
-      }
-      $templating->set('gaming_machine_type', $gaming_machine_type);
-
-      $gamepad = '';
-      if ($grab_fields['gamepad'] != NULL && !empty($grab_fields['gamepad']))
-      {
-        $gamepad = '<li><strong>Gamepad:</strong> '.$grab_fields['gamepad'].'</li>';
-        $counter++;
-      }
-      $templating->set('gamepad', $gamepad);
-
-      $additional_empty = '';
-      if ($counter == 0)
-      {
-        $additional_empty = '<li><em>This user has not filled out their PC info!</em></li>';
-      }
-      $templating->set('additional_empty', $additional_empty);
+      $templating->set('fields', $fields_output);
 
       $templating->block('view_full');
 

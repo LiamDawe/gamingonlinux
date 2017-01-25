@@ -666,6 +666,25 @@ function pc_info($body)
 	{
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
+			$fields_output = '';
+			$pc_info = user::display_pc_info($_SESSION['user_id'], $_SESSION['distro']);
+			if ($pc_info['counter'] > 0)
+			{
+				$fields_output = '<ul style="list-style-type: none; margin: 0; padding: 0;">';
+				foreach ($pc_info as $k => $info)
+				{
+					if ($k != 'counter')
+					{
+						$fields_output .= '<li>' . $info . '</li>';
+					}
+				}
+				$fields_output .= '</ul>';
+			}
+			else
+			{
+				$fields_output = "<em>You haven't filled yours in!</em>";
+			}
+
 			$grab_date = $db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
 			$update_info = $grab_date->fetch();
 
@@ -675,9 +694,9 @@ function pc_info($body)
 			}
 			else
 			{
-				$date_updated = '<strong>' . date('d M, Y', strtotime($update_info['date_updated'])) . '</strong>.';
+				$date_updated = '<strong>' . date('d M, Y', strtotime($update_info['date_updated'])) . '</strong>';
 			}
-			$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . ' <a href="/usercp.php?module=pcinfo">Click here to check and update yours now!</a>', $body);
+			$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . '. <br /><br />Here\'s what we have for you at the moment:' . $fields_output . '<br />If this is correct, <a href="#" id="pc_info_update">click here to continue</a> to be included. If this isn\'t correct, <a href="/usercp.php?module=pcinfo">click here to go to your User Control Panel to update it!</a><span class="all-ok" id="pc_info_done"></span>', $body);
 		}
 		else
 		{

@@ -166,13 +166,15 @@ if (isset($_GET['user_id']))
 						$templating->set('username', $profile['username']);
 
 						$fields_output = '';
-						$pc_info = $user->display_pc_info($profile['user_id'], $profile['distro']);
-						$array_count = count($pc_info);
-						if ($array_count > 0)
+						$pc_info = user::display_pc_info($profile['user_id'], $profile['distro']);
+						if ($pc_info['counter'] > 0)
 						{
-							foreach ($pc_info as $info)
+							foreach ($pc_info as $k => $info)
 							{
-								$fields_output .= '<li>' . $info . '</li>';
+								if ($k != 'counter')
+								{
+									$fields_output .= '<li>' . $info . '</li>';
+								}
 							}
 						}
 						else

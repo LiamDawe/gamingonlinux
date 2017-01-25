@@ -762,7 +762,7 @@ function(data){
   	$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
   });
 
-  // this controls the subscribe to comments link inside articles_full.php
+  // claim a key from bbcode key giveaway
   $(document).on('click', '#claim_key', function(e)
   {
     e.preventDefault();
@@ -774,6 +774,20 @@ function(data){
       if (data.result == 1)
       {
         $('#key-area').text("Here's your key: " + data.key);
+      }
+    });
+  });
+
+  // to mark PC info as being up to date
+  $(document).on('click', '#pc_info_update', function(e)
+  {
+    e.preventDefault();
+    $.post('/includes/ajax/pc-info-update.php', function(data)
+    {
+      if (data.result == 1)
+      {
+        $('#pc_info_done').show();
+        $('#pc_info_done').html("<br />Thank you, your PC info has been updated!");
       }
     });
   });

@@ -44,20 +44,21 @@ if(isset($_GET['user_id']))
       $templating->set('profile_link', $profile_link);
 
       $fields_output = '';
-      $pc_info = $user->display_pc_info($_GET['user_id'], $grab_fields['distro']);
-      $array_count = count($pc_info);
-      if ($array_count > 0)
+      $pc_info = user::display_pc_info($_GET['user_id'], $grab_fields['distro']);
+      if ($pc_info['counter'] > 0)
       {
-        foreach ($pc_info as $info)
+        foreach ($pc_info as $k => $info)
         {
-          $fields_output .= '<li>' . $info . '</li>';
+          if ($k != 'counter')
+          {
+            $fields_output .= '<li>' . $info . '</li>';
+          }
         }
       }
       else
       {
         $fields_output = '<li><em>This user has not filled out their PC info!</em></li>';
       }
-
       $templating->set('fields', $fields_output);
 
       $templating->block('view_full');

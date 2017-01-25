@@ -180,6 +180,9 @@ class user
 		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
 		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
 		$_SESSION['distro'] = $user_data['distro'];
+
+		session_regenerate_id(true);
+		$_SESSION['canary'] = time();
 	}
 
 	// check if it's a new device, then set the session up

@@ -2,6 +2,17 @@
 $templating->set_previous('title', 'Forum Search', 1);
 $templating->set_previous('meta_description', 'Search for Linux gaming forum topics on GamingOnLinux.com', 1);
 
+if (isset ($_GET['message']))
+{
+  $extra = NULL;
+  if (isset($_GET['extra']))
+  {
+    $extra = $_GET['extra'];
+  }
+  $message = $message_map->get_message($_GET['message'], $extra);
+  $core->message($message['message'], NULL, $message['error']);
+}
+
 $templating->merge('forum_search');
 $templating->block('top');
 $templating->set('url', core::config('website_url'));
@@ -35,6 +46,11 @@ if (isset($search_text) && !empty($search_text))
 	$search_sql = '';
 	if ($_GET['forums'] != 'all')
 	{
+		if ( (!isset($_GET['forums']) || empty($_GET['forums'])) || (isset($_GET['forums']) && !core::is_number($_GET['forums'])) )
+		{
+			header("Location: /index.php?module=search_forum&message=no_id&extra=forum");
+			die();
+		}
 		$search_sql = ' AND t.`forum_id` IN ('.$_GET['forums'].')';
 	}
 	if (!isset($_GET['strict']))

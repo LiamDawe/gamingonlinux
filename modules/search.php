@@ -119,7 +119,7 @@ if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) ||
 			$templating->set('username', $username);
 
 			$editors_pick = '';
-			if ($found_search['show_in_menu'] == 1)
+			if ($found['show_in_menu'] == 1)
 			{
 				$editors_pick = '<li><a href="#">Editors Pick</a></li>';
 			}
@@ -161,16 +161,8 @@ if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) ||
 if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 {
 	// paging for pagination
-	if (!isset($_GET['page']) || $_GET['page'] <= 0)
-	{
-		$page = 1;
-	}
-
-	else if (is_numeric($_GET['page']))
-	{
-		$page = $_GET['page'];
-	}
-
+	$page = core::give_page();
+	
 	// count how many there is in total
 	$db->sqlquery("SELECT `article_id` FROM `articles` WHERE active = 1 AND `author_id` = ?", array($_GET['author_id']), 'search.php');
 	$total = $db->num_rows();

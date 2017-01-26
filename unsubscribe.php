@@ -1,9 +1,21 @@
 <?php
 include('includes/header.php');
 
-$user_id = $_GET['user_id'];
-$email = $_GET['email'];
-$article_id = $_GET['article_id'];
+$user_id = '';
+if (isset($_GET['user_id']))
+{
+	$user_id = $_GET['user_id'];
+}
+$email = '';
+if (isset($_GET['email']))
+{
+	$email = $_GET['email'];
+}
+$article_id = '';
+if (isset($_GET['article_id']))
+{
+	$article_id = $_GET['article_id'];
+}
 
 $empty_check = core::mempty(compact('user_id', 'email', 'article_id'));
 if($empty_check !== true)

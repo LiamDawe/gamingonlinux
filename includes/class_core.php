@@ -91,7 +91,7 @@ class core
 	public function give_page()
 	{
 		$page = 1;
-		if (!isset($_GET['page']) || $_GET['page'] == 0)
+		if (!isset($_GET['page']) || $_GET['page'] <= 0)
 		{
 		  $page = 1;
 		}

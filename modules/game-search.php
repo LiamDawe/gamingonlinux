@@ -11,6 +11,7 @@ if (isset($_GET['q']))
 {
 	$search = trim($_GET['q']);
 	$search = str_replace('+', '', $search);
+	$search = strip_tags($search);
 
 	if (empty($search))
 	{
@@ -25,9 +26,6 @@ $templating->set('search_text', $search);
 if (isset($_GET['q']))
 {
 	$templating->block('search_result_top');
-
-	$search = core::make_safe($search);
-	$search = strip_tags($search);
 
 	$db->sqlquery("SELECT `id`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE `name` LIKE ? AND `approved` = 1 AND `also_known_as` IS NULL", array('%'.$search.'%'));
 	$total_found = $db->num_rows();

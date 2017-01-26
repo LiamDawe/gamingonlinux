@@ -208,127 +208,131 @@ if (isset($_GET['view']))
 		$articles_get = $db->fetch_all_rows();
 
 		$count_rows = $db->num_rows();
-		$article_id_array = array();
 
-		foreach ($articles_get as $article)
+		if ($count_rows > 0)
 		{
-			$article_id_array[] = $article['article_id'];
-		}
-		$article_id_sql = implode(', ', $article_id_array);
+			$article_id_array = array();
 
-		// this is required to properly count up the rank for the tags
-		$db->sqlquery("SET @rank=null, @val=null");
-
-		$category_tag_sql = "SELECT * FROM (
-			SELECT r.article_id, c.`category_name` , c.`category_id`,
-			@rank := IF( @val = r.article_id, @rank +1, 1 ) AS rank, @val := r.article_id
-			FROM  `article_category_reference` r
-			INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
-			WHERE r.article_id
-			IN ( $article_id_sql )
-			ORDER BY CASE WHEN ($cat_sql) THEN 0 ELSE 1 END, r.`article_id` ASC
-			) AS a
-			WHERE rank < 5";
-		$db->sqlquery($category_tag_sql, $safe_ids);
-		$get_categories = $db->fetch_all_rows();
-
-		foreach ($articles_get as $article)
-		{
-			// make date human readable
-			$date = $core->format_date($article['date']);
-
-			// get the article row template
-			$templating->block('article_row');
-
-			if ($user->check_group(1) == true)
+			foreach ($articles_get as $article)
 			{
-				$templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
-				if ($article['show_in_menu'] == 0)
-				{
-					$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><strong>Make Editors Pick</strong></a></p>");
-				}
-				else if ($article['show_in_menu'] == 1)
-				{
-					$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><strong>Remove Editors Pick</strong></a></p>");
-				}
+				$article_id_array[] = $article['article_id'];
 			}
+			$article_id_sql = implode(', ', $article_id_array);
 
-			else
+			// this is required to properly count up the rank for the tags
+			$db->sqlquery("SET @rank=null, @val=null");
+
+			$category_tag_sql = "SELECT * FROM (
+				SELECT r.article_id, c.`category_name` , c.`category_id`,
+				@rank := IF( @val = r.article_id, @rank +1, 1 ) AS rank, @val := r.article_id
+				FROM  `article_category_reference` r
+				INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
+				WHERE r.article_id
+				IN ( $article_id_sql )
+				ORDER BY CASE WHEN ($cat_sql) THEN 0 ELSE 1 END, r.`article_id` ASC
+				) AS a
+				WHERE rank < 5";
+			$db->sqlquery($category_tag_sql, $safe_ids);
+			$get_categories = $db->fetch_all_rows();
+
+			foreach ($articles_get as $article)
 			{
-				$templating->set('edit_link', '');
-				$templating->set('editors_pick_link', '');
-			}
+				// make date human readable
+				$date = $core->format_date($article['date']);
 
-			$templating->set('title', $article['title']);
-			$templating->set('user_id', $article['author_id']);
+				// get the article row template
+				$templating->block('article_row');
 
-			if ($article['author_id'] == 0)
-			{
-				if (empty($article['guest_username']))
+				if ($user->check_group(1) == true)
 				{
-					$username = 'Guest';
+					$templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
+					if ($article['show_in_menu'] == 0)
+					{
+						$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><strong>Make Editors Pick</strong></a></p>");
+					}
+					else if ($article['show_in_menu'] == 1)
+					{
+						$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><strong>Remove Editors Pick</strong></a></p>");
+					}
 				}
 
 				else
 				{
-					$username = $article['guest_username'];
+					$templating->set('edit_link', '');
+					$templating->set('editors_pick_link', '');
 				}
-			}
 
-			else
-			{
-				$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
-			}
+				$templating->set('title', $article['title']);
+				$templating->set('user_id', $article['author_id']);
 
-			$templating->set('username', $username);
-
-			$templating->set('date', $date);
-
-			$editors_pick = '';
-			if ($article['show_in_menu'] == 1)
-			{
-				$editors_pick = '<li><a href="#">Editors Pick</a></li>';
-			}
-			$categories_list = $editors_pick;
-
-			foreach ($get_categories as $k => $category_list)
-			{
-				if (in_array($article['article_id'], $category_list))
+				if ($article['author_id'] == 0)
 				{
-					$category_name = str_replace(' ', '-', $category_list['category_name']);
-					if (core::config('pretty_urls') == 1)
+					if (empty($article['guest_username']))
 					{
-						$category_url = "/articles/category/{$category_name}/";
+						$username = 'Guest';
 					}
+
 					else
 					{
-						$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
-					}
-					if ($category_list['category_id'] == 60)
-					{
-						$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
-					}
-					else
-					{
-						$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+						$username = $article['guest_username'];
 					}
 				}
+
+				else
+				{
+					$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
+				}
+
+				$templating->set('username', $username);
+
+				$templating->set('date', $date);
+
+				$editors_pick = '';
+				if ($article['show_in_menu'] == 1)
+				{
+					$editors_pick = '<li><a href="#">Editors Pick</a></li>';
+				}
+				$categories_list = $editors_pick;
+
+				foreach ($get_categories as $k => $category_list)
+				{
+					if (in_array($article['article_id'], $category_list))
+					{
+						$category_name = str_replace(' ', '-', $category_list['category_name']);
+						if (core::config('pretty_urls') == 1)
+						{
+							$category_url = "/articles/category/{$category_name}/";
+						}
+						else
+						{
+							$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
+						}
+						if ($category_list['category_id'] == 60)
+						{
+							$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+						}
+						else
+						{
+							$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+						}
+					}
+				}
+
+				$templating->set('categories_list', $categories_list);
+
+				$tagline_image = $article_class->tagline_image($article);
+
+				$templating->set('top_image', $tagline_image);
+
+				// set last bit to 0 so we don't parse links in the tagline
+				$templating->set('text', bbcode($article['tagline'], 1, 0));
+
+				$templating->set('article_link', $article['slug'] . '.' . $article['article_id']);
+				$templating->set('comment_count', $article['comment_count']);
 			}
 
-			$templating->set('categories_list', $categories_list);
-
-			$tagline_image = $article_class->tagline_image($article);
-
-			$templating->set('top_image', $tagline_image);
-
-			// set last bit to 0 so we don't parse links in the tagline
-			$templating->set('text', bbcode($article['tagline'], 1, 0));
-
-			$templating->set('article_link', $article['slug'] . '.' . $article['article_id']);
-			$templating->set('comment_count', $article['comment_count']);
+			$templating->block('bottom');
+			$templating->set('pagination', $pagination);
 		}
-
-		$templating->block('bottom');
-		$templating->set('pagination', $pagination);
 	}
 }

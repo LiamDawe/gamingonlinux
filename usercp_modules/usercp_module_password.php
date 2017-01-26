@@ -41,24 +41,15 @@ $templating->set('current_password', $current_password);
 
 if (isset($_POST['Update']))
 {
+	if (empty($_POST['current_password']))
+	{
+		header("Location: /usercp.php?module=password&message=nocurrent");
+		die();
+	}
+
 	// find current password
 	$db->sqlquery("SELECT `username`, `password`, `steam_id`, `oauth_uid`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$grab_current_password = $db->fetch();
-
-	if (!empty($grab_current_password['password']))
-	{
-		$current_password_test = password_verify($_POST['current_password'], $grab_current_password['password']);
-
-		if (empty($_POST['current_password']))
-		{
-			header("Location: /usercp.php?module=password&message=nocurrent");
-		}
-		// check the originals match
-		else if ($grab_current_password['password'] != $current_password_test)
-		{
-			header("Location: /usercp.php?module=password&message=nomatchoriginal");
-		}
-	}
 
 	// if they have no password, they simply must have a steamid or a twitter oauth id
 	if (empty($grab_current_password['password']))
@@ -66,6 +57,16 @@ if (isset($_POST['Update']))
 		if (empty($grab_current_password['steam_id']) && empty($grab_current_password['oauth_uid']))
 		{
 			$user->logout();
+			die();
+		}
+	}
+
+	if (!empty($grab_current_password['password']))
+	{
+		// check the original matches
+		if (!password_verify($_POST['current_password'], $grab_current_password['password']))
+		{
+			header("Location: /usercp.php?module=password&message=nomatchoriginal");
 			die();
 		}
 	}

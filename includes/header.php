@@ -123,13 +123,16 @@ if ($_SESSION['user_id'] != 0)
 }
 
 // get user group permissions
-$get_permissions = $db->sqlquery("SELECT `name`,`value` FROM `group_permissions` WHERE `group` = ?", array($_SESSION['user_group']));
-$fetch_permissions = $db->fetch_all_rows();
-
-$parray = array();
-foreach ($fetch_permissions as $permissions_set)
+if (core::is_number($_SESSION['user_group']))
 {
-	$parray[$permissions_set['name']] = $permissions_set['value'];
+	$get_permissions = $db->sqlquery("SELECT `name`,`value` FROM `group_permissions` WHERE `group` = ?", array($_SESSION['user_group']));
+	$fetch_permissions = $db->fetch_all_rows();
+
+	$parray = array();
+	foreach ($fetch_permissions as $permissions_set)
+	{
+		$parray[$permissions_set['name']] = $permissions_set['value'];
+	}
 }
 
 // check for gol premium

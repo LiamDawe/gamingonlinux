@@ -88,6 +88,22 @@ class core
 		return true;
 	}
 
+	public function give_page()
+	{
+		$page = 1;
+		if (!isset($_GET['page']) || $_GET['page'] == 0)
+		{
+		  $page = 1;
+		}
+
+		else if (core::is_number($_GET['page']))
+		{
+		  $page = $_GET['page'];
+		}
+
+		return $page;
+	}
+
 	function file_get_contents_curl($url) {
 	    $ch = curl_init();
 

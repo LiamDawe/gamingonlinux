@@ -60,6 +60,8 @@ if (isset($_GET['view']))
 
 if (isset($_POST['act']))
 {
+	$name = core::make_safe($_POST['name']);
+
 	if ($_POST['act'] == 'Approve')
 	{
 		if (empty($_POST['id']) || !is_numeric($_POST['id']))
@@ -68,7 +70,7 @@ if (isset($_POST['act']))
 			exit;
 		}
 
-		if (empty($_POST['name']) || empty($_POST['date']))
+		if (empty($name) || empty($_POST['date']))
 		{
 			header("Location: /admin.php?module=calendar&view=submitted&error=missing");
 			exit;
@@ -82,9 +84,9 @@ if (isset($_POST['act']))
 			$guess = 1;
 		}
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ? WHERE `id` = ?", array($_POST['name'], $date->format('Y-m-d'), $_POST['link'], $guess, date("Y-m-d"), $_POST['id']));
+		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ? WHERE `id` = ?", array($name, $date->format('Y-m-d'), $_POST['link'], $guess, date("Y-m-d"), $_POST['id']));
 
-		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'calendar_submission' AND `data` = ?", array($_POST['id']));
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'calendar_submission' AND `data` = ?", array(core::$date, $_POST['id']));
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'approved_calendar', core::$date, core::$date, $_POST['id']));
 

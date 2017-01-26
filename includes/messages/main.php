@@ -79,6 +79,10 @@ return [
 	"not-that-email" => [
 		"text" => "You cannot use that email address, as it's in use!",
 		"error" => 1
+	],
+	"none_found" => [
+		"text" => "No %s where found!",
+		"additions" => 1
 	]
 ];
 ?>

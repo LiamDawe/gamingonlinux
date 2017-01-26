@@ -38,10 +38,8 @@ if (isset($_POST['Update']))
 
 	if (!empty($grab_current_password['password']))
 	{
-		$current_password_test = password_verify($_POST['password'], $grab_current_password['password']);
-
 		// check the originals match
-		if ($grab_current_password['password'] != $current_password_test)
+		if (!password_verify($_POST['password'], $grab_current_password['password']))
 		{
 			header("Location: /usercp.php?module=email&message=password-match");
 			die();

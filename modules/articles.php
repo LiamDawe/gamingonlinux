@@ -41,7 +41,7 @@ if (isset($_GET['view']))
 	// clicked a single category link from somewhere
 	if ($_GET['view'] == 'cat')
 	{
-		if (isset($_GET['catid']))
+		if (isset($_GET['catid']) && !is_array($_GET['catid']))
 		{
 			$safe_category = core::make_safe($_GET['catid']);
 			$safe_category = str_replace('-', ' ', $safe_category);

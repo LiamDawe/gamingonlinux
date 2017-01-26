@@ -44,7 +44,7 @@ if (isset($_GET['view']))
 		if (isset($_GET['catid']))
 		{
 			$safe_category = core::make_safe($_GET['catid']);
-
+			$safe_category = str_replace('-', ' ', $safe_category);
 			$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `category_name` = ?", array($safe_category));
 			if ($db->num_rows() == 0)
 			{

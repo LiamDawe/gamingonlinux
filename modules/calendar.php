@@ -28,40 +28,15 @@ else if (isset($_GET['month']) && !is_numeric($_GET['month']))
 $templating->set_previous('title', 'Linux Game Release Calendar', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com maintained list of Linux game releases', 1);
 
-if (isset($_GET['message']))
+if (isset ($_GET['message']))
 {
-	if ($_GET['message'] == 'sent')
-	{
-		$core->message("You have sent in a calendar item! Thanks for the help, much appreciated!");
-	}
-	if ($_GET['message'] == 'edited')
-	{
-		$core->message("You have edited the games database and calendar item!");
-	}
-	if ($_GET['message'] == 'deleted')
-	{
-		$core->message("You have deleted the games database and calendar item!");
-	}
-}
-
-if (isset($_GET['error']))
-{
-	if ($_GET['error'] == 'notloggedin')
-	{
-		$core->message("You are not logged in! You must be logged in to be able to submit calendar games!", NULL, 1);
-	}
-	if ($_GET['error'] == 'missing')
-	{
-		$core->message("You have to put at least a name and date in! If you added a link, be sure it contains a valid URL!", NULL, 1);
-	}
-	if ($_GET['error'] == 'exists')
-	{
-		$core->message("That game already exists! You can find it <a href=\"/index.php?module=game&game-id={$_GET['id']}\">by clicking here.</a>", NULL, 1);
-	}
-	if ($_GET['error'] == 'emptysearch')
-	{
-		$core->message("You cannot search for nothing dummy!", NULL, 1);
-	}
+  $extra = NULL;
+  if (isset($_GET['extra']))
+  {
+    $extra = $_GET['extra'];
+  }
+  $message = $message_map->get_message($_GET['message'], $extra);
+  $core->message($message['message'], NULL, $message['error']);
 }
 
 // cheers stack overflow http://stackoverflow.com/questions/3109978/php-display-number-with-ordinal-suffix
@@ -214,33 +189,30 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'submit')
 	{
-		if (!isset($_SESSION['user_id']))
+		if ( (!isset($_SESSION['user_id'])) || (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!core::is_number($_SESSION['user_id'])))
 		{
-			header("Location: /index.php?module=calendar&error=notloggedin");
-			exit;
+			header("Location: /index.php?module=calendar&message=notloggedin");
+			die();
 		}
 
-		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0)
-		{
-			header("Location: /index.php?module=calendar&error=notloggedin");
-			exit;
-		}
+		$name = core::make_safe($_POST['name']);
+		$date = core::make_safe($_POST['date']);
+		$link = core::make_safe($_POST['link']);
 
-		$name = trim($_POST['name']);
-		$name = htmlspecialchars($name);
+		$check_empty = core::mempty(compact('name', 'date', 'link'));
 
-		if (empty($name) || empty($_POST['date']))
+		if ($check_empty !== true)
 		{
-			header("Location: /index.php?module=calendar&error=missing");
-			exit;
+			header("Location: /index.php?module=calendar&message=empty&extra=".$check_empty);
+			die();
 		}
 
 		if (!empty($_POST['link']))
 		{
 			if (strpos($_POST['link'], "www.") === false && strpos($_POST['link'], "http") === false)
 			{
-				header("Location: /index.php?module=calendar&error=missing");
-				exit;
+				header("Location: /index.php?module=calendar&message=empty&extra=link");
+				die();
 			}
 		}
 
@@ -248,7 +220,7 @@ if (isset($_POST['act']))
 		if ($db->num_rows() == 1)
 		{
 			$game = $db->fetch();
-			header("Location: /index.php?module=calendar&error=exists&id=" . $game['id']);
+			header("Location: /index.php?module=calendar&message=exists&extra=" . $game['id']);
 			exit;
 		}
 
@@ -266,6 +238,6 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'calendar_submission', core::$date, $new_id));
 
-		header("Location: /index.php?module=calendar&message=sent");
+		header("Location: /index.php?module=calendar&message=game_submitted");
 	}
 }

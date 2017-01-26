@@ -49,12 +49,14 @@ class core
 			{
 				$text[$k] = htmlspecialchars($unsafe_text, ENT_QUOTES);
 				$text[$k] = str_replace('{', '&#123;', $unsafe_text);
+				$text[$k] = trim($unsafe_text);
 			}
 		}
 		else
 		{
 			$text = htmlspecialchars($text, ENT_QUOTES);
 			$text = str_replace('{', '&#123;', $text);
+			$text = trim($text);
 		}
 
 		return $text;

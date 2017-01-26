@@ -83,6 +83,18 @@ return [
 	"none_found" => [
 		"text" => "No %s where found!",
 		"additions" => 1
+	],
+	"notloggedin" => [
+		"text" => "You have to be logged in to do that!",
+		"error" => 1
+	],
+	"game_submit_exists" => [
+		"text" => "That game already exists! You can find it <a href=\"/index.php?module=game&game-id=%d\">by clicking here.</a>",
+		"additions" => 1,
+		"error" => 1
+	],
+	"game_submitted" => [
+		"text" => "You have sent in a game for our database! Thank you for helping to keep us up to date!"
 	]
 ];
 ?>

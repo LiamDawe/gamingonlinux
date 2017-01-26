@@ -1,7 +1,12 @@
 <?php
-$forum_id = $_GET['forum_id'];
+if (!core::is_number($_GET['forum_id']))
+{
+	$core->message('The forum ID has to be a number!', NULL, 1);
+	include('includes/footer.php');
+	die();
+}
 
-$core->forum_permissions($forum_id);
+$core->forum_permissions($_GET['forum_id']);
 
 // permissions for viewforum page
 if($parray['view'] == 0)
@@ -27,7 +32,7 @@ else
 
 	$templating->merge('viewforum');
 
-	$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($forum_id));
+	$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
 	$name = $db->fetch();
 
 	$templating->set_previous('title', "Viewing forum {$name['name']}", 1);
@@ -62,18 +67,18 @@ else
 	{
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{
-			$new_topic = "<a href=\"" . core::config('website_url') . "index.php?module=newtopic&amp;forum_id={$forum_id}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a>";
-			$new_topic_bottom = "<span class=\"block3\"><a href=\"" . core::config('website_url') . "index.php?module=newtopic&amp;forum_id={$forum_id}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a></span><br /><br />";
+			$new_topic = "<a href=\"" . core::config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a>";
+			$new_topic_bottom = "<span class=\"block3\"><a href=\"" . core::config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a></span><br /><br />";
 		}
 	}
 	$templating->set('new_topic_link', $new_topic);
 
 	// count how many there is in total
-	$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `forum_id` = ?", array($forum_id));
+	$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_GET['forum_id']));
 	$total_pages = $db->num_rows();
 
 	// sort out the pagination link
-	$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/{$forum_id}/", $page);
+	$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/{$_GET['forum_id']}/", $page);
 
 	// get the posts for this forum
 	$db->sqlquery("SELECT
@@ -89,7 +94,7 @@ else
 		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
 		LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id`
 		WHERE t.`forum_id`= ? AND t.`approved` = 1
-		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, {$_SESSION['per-page']}", array($forum_id, $core->start));
+		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, {$_SESSION['per-page']}", array($_GET['forum_id'], $core->start));
 	while ($post = $db->fetch())
 	{
 		$pagination_post = '';

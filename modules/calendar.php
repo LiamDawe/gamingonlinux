@@ -229,7 +229,7 @@ if (isset($_POST['act']))
 		$date = new DateTime($_POST['date']);
 
 		$guess = 0;
-		if (isset($_POST['guess']) && core::is_number($_POST['guess']))
+		if (isset($_POST['guess']))
 		{
 			$guess = 1;
 		}

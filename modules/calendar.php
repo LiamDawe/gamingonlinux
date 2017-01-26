@@ -80,7 +80,9 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 
 $templating->block('picker', 'calendar');
 
-$years_array = range(2010, 2020);
+$max_year = date('Y') + 5;
+
+$years_array = range(2010, $max_year);
 $options = '';
 foreach ($years_array as $what_year)
 {

@@ -1,4 +1,15 @@
 <?php
+if (isset ($_GET['message']))
+{
+  $extra = NULL;
+  if (isset($_GET['extra']))
+  {
+    $extra = $_GET['extra'];
+  }
+  $message = $message_map->get_message($_GET['message'], $extra);
+  $core->message($message['message'], NULL, $message['error']);
+}
+
 $templating->merge('search');
 if (!isset($_GET['author_id']))
 {
@@ -13,7 +24,7 @@ $search_text = '';
 if (isset($_GET['q']))
 {
 	$search_text = str_replace("+", ' ', $_GET['q']);
-	$search_text = htmlspecialchars($search_text);
+	$search_text = core::make_safe($search_text);
 }
 $templating->set('search_text', $search_text);
 
@@ -46,7 +57,8 @@ foreach ($search_array[0] as $item)
 	$search_through .= '%'.$item.'%';
 }
 
-if (isset($search_text) && !empty($search_text))
+// check there wasn't none found to prevent loops
+if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) || isset($_GET['message']) && $_GET['message'] != 'none_found' ) )
 {
 	// do the search query
 	$db->sqlquery("SELECT a.`article_id`, a.`title` , a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
@@ -83,61 +95,66 @@ if (isset($search_text) && !empty($search_text))
 		WHERE rank < 5";
 		$db->sqlquery($category_tag_sql);
 		$get_categories = $db->fetch_all_rows();
-	}
 
-	// loop through results
-	foreach ($found_search as $found)
-	{
-		$date = $core->format_date($found['date']);
-
-		$templating->block('row');
-
-		$templating->set('date', $date);
-		$templating->set('title', $found['title']);
-		$templating->set('article_link', $core->nice_title($found['title']) . '.' . $found['article_id']);
-
-		if ($found['author_id'] == 0)
+		// loop through results
+		foreach ($found_search as $found)
 		{
-			$username = $found['guest_username'];
-		}
+			$date = $core->format_date($found['date']);
 
-		else
-		{
-			$username = "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>';
-		}
-		$templating->set('username', $username);
+			$templating->block('row');
 
-		$editors_pick = '';
-		if ($found_search['show_in_menu'] == 1)
-		{
-			$editors_pick = '<li><a href="#">Editors Pick</a></li>';
-		}
-		$categories_list = $editors_pick;
-		foreach ($get_categories as $k => $category_list)
-		{
-			if (in_array($found['article_id'], $category_list))
+			$templating->set('date', $date);
+			$templating->set('title', $found['title']);
+			$templating->set('article_link', $core->nice_title($found['title']) . '.' . $found['article_id']);
+
+			if ($found['author_id'] == 0)
 			{
-				$category_name = str_replace(' ', '-', $category_list['category_name']);
-				if (core::config('pretty_urls') == 1)
-				{
-					$category_url = "/articles/category/{$category_name}/";
-				}
-				else
-				{
-					$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
-				}
-				if ($category_list['category_id'] == 60)
-				{
-					$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
-				}
+				$username = $found['guest_username'];
+			}
 
-				else
+			else
+			{
+				$username = "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>';
+			}
+			$templating->set('username', $username);
+
+			$editors_pick = '';
+			if ($found_search['show_in_menu'] == 1)
+			{
+				$editors_pick = '<li><a href="#">Editors Pick</a></li>';
+			}
+			$categories_list = $editors_pick;
+			foreach ($get_categories as $k => $category_list)
+			{
+				if (in_array($found['article_id'], $category_list))
 				{
-					$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+					$category_name = str_replace(' ', '-', $category_list['category_name']);
+					if (core::config('pretty_urls') == 1)
+					{
+						$category_url = "/articles/category/{$category_name}/";
+					}
+					else
+					{
+						$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
+					}
+					if ($category_list['category_id'] == 60)
+					{
+						$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+					}
+
+					else
+					{
+						$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+					}
 				}
 			}
+			$templating->set('categories_list', $categories_list);
 		}
-		$templating->set('categories_list', $categories_list);
+	}
+	else
+	{
+		header("Location: /index.php?module=search&q=".$search_text.'&message=none_found&extra=articles');
+		die();
 	}
 }
 

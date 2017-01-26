@@ -11,16 +11,7 @@ if (!isset($_GET['view']) && !isset($_POST['act']))
 if (isset($_GET['view']) && !isset($_POST['act']))
 {
 	// paging for pagination
-	$page = 1; // start at one, just so it's always set
-	if (!isset($_GET['page']) || $_GET['page'] <= 0)
-	{
-		$page = 1;
-	}
-
-	else if (core::is_number($_GET['page']) && $_GET['page'] > 0)
-	{
-		$page = $_GET['page'];
-	}
+	$page = core::give_page();
 
 	if (isset($_GET['message']))
 	{

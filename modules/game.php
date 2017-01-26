@@ -1,6 +1,17 @@
 <?php
 $templating->merge('game_database');
 
+if (isset($_GET['message']))
+{
+	$extra = NULL;
+	if (isset($_GET['extra']))
+	{
+		$extra = $_GET['extra'];
+	}
+	$message = $message_map->get_message($_GET['message'], $extra);
+	$core->message($message['message'], NULL, $message['error']);
+}
+
 if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'all')
@@ -10,17 +21,7 @@ if (isset($_GET['view']))
 		$templating->set_previous('meta_description', 'GamingOnLinux Linux games database', 1);
 		$templating->set_previous('title', 'GamingOnLinux Linux games database - viewing full database', 1);
 
-		$page = 1;
-		// paging for pagination
-		if (!isset($_GET['page']) || $_GET['page'] == 0)
-		{
-			$page = 1;
-		}
-
-		else if (is_numeric($_GET['page']))
-		{
-			$page = $_GET['page'];
-		}
+		$page = core::give_page();
 
 		$templating->block('game_list');
 		$license_options = '';
@@ -128,8 +129,14 @@ if (!isset($_GET['game-id']) && !isset($_GET['view']))
 
 if (isset($_GET['game-id']) && !isset($_GET['view']))
 {
+	if (!core::is_number($_GET['game-id']))
+	{
+		header("Location: /index.php?module=game&message=no_id&extra=game");
+		die();
+	}
+
 	// make sure it exists
-	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
+	$get_game = $db->sqlquery("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['game-id']));
 	if ($db->num_rows() == 1)
 	{
 		$game = $get_game->fetch();

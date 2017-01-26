@@ -42,7 +42,7 @@ $templating->set('current_password', $current_password);
 if (isset($_POST['Update']))
 {
 	// find current password
-	$db->sqlquery("SELECT `password`, `steam_id`, `oauth_uid`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `username`, `password`, `steam_id`, `oauth_uid`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$grab_current_password = $db->fetch();
 
 	if (!empty($grab_current_password['password']))
@@ -97,7 +97,7 @@ if (isset($_POST['Update']))
 		<p>-----------------------------------------------------------------------------------------------------------</p>
 	</div>";
 
-	$plain_message = PHP_EOL."Hello {$grab_email['username']}! Someone, hopefully you, has changed your password on ".core::config('website_url').". If this was you, please ignore this email as it's just a security measure.";
+	$plain_message = PHP_EOL."Hello {$grab_current_password['username']}! Someone, hopefully you, has changed your password on ".core::config('website_url').". If this was you, please ignore this email as it's just a security measure.";
 
 	// Mail it
 	if (core::config('send_emails') == 1)

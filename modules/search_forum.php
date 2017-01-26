@@ -87,18 +87,27 @@ if (isset($search_text) && !empty($search_text))
 		LIMIT 0 , 30", array($search_text));
 	}
 	$found_search = $db->fetch_all_rows();
+	$total = $db->num_rows();
 
-	// loop through results
-	foreach ($found_search as $found)
+	if ($total > 0)
 	{
-		$date = $core->format_date($found['creation_date']);
+		// loop through results
+		foreach ($found_search as $found)
+		{
+			$date = $core->format_date($found['creation_date']);
 
-		$templating->block('row');
+			$templating->block('row');
 
-		$templating->set('date', $date);
-		$templating->set('title', $found['topic_title']);
-		$templating->set('topic_id', $found['topic_id']);
-		$templating->set('username', "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>');
+			$templating->set('date', $date);
+			$templating->set('title', $found['topic_title']);
+			$templating->set('topic_id', $found['topic_id']);
+			$templating->set('username', "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>');
+		}
+	}
+	else
+	{
+		header("Location: /index.php?module=search_forum&message=none_found&extra=posts");
+		die();
 	}
 }
 ?>

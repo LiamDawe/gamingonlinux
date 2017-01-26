@@ -349,6 +349,10 @@ class user
 		setcookie('gol_session', "",  time()-60, '/');
 		setcookie('gol-device', "",  time()-60, '/');
 		setcookie('steamID', '', -1, '/');
+
+		session_regenerate_id(true);
+		$_SESSION['canary'] = time();
+
 		header("Location: index.php");
 	}
 

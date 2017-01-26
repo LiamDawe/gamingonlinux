@@ -120,6 +120,10 @@ if (isset($_GET['view']))
 
 		// sanitize
 		$safe_ids = core::make_safe($categorys_ids);
+		foreach ($safe_ids as $k => $safe)
+		{
+			$safe_ids[$k] = strip_tags($safe);
+		}
 
 		// this is really ugly, but I can't think of a better way to do it
 		$count_array = count($safe_ids);

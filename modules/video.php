@@ -7,16 +7,7 @@ $templating->block('top');
 $templating->set('twitch_key', core::config('twitch_dev_key'));
 
 // paging for pagination
-$page = 1;
-if (!isset($_GET['page']) || $_GET['page'] == 0)
-{
-  $page = 1;
-}
-
-else if (is_numeric($_GET['page']))
-{
-  $page = $_GET['page'];
-}
+$page = core::give_page();
 
 // first get a list of anyone who is actually live TODO
 $templating->block('online_top');

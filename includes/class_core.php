@@ -88,7 +88,7 @@ class core
 		return true;
 	}
 
-	public function give_page()
+	public static function give_page()
 	{
 		$page = 1;
 		if (!isset($_GET['page']) || $_GET['page'] <= 0)

@@ -74,15 +74,7 @@ if (!isset($_GET['view']))
 	$templating->block('articles_top', 'home');
 
 	// paging for pagination
-	if (!isset($_GET['page']) || $_GET['page'] <= 0)
-	{
-		$page = 1;
-	}
-
-	else if (is_numeric($_GET['page']))
-	{
-		$page = $_GET['page'];
-	}
+	$page = core::give_page();
 
 	// count how many there is in total
 	$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `active` = 1");

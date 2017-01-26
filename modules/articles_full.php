@@ -60,7 +60,7 @@ if (!isset($_GET['go']))
 				LEFT JOIN
 				`users` u on a.`author_id` = u.`user_id`
 				LEFT JOIN
-				`articles_tagline_gallery` t ON t.id = a.gallery_tagline
+				`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 				WHERE
 				a.`article_id` = ?", array($_GET['aid']));
 			$article = $db->fetch();

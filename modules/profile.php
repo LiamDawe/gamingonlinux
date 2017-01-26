@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'Linux Gamer User Profile', 1);
 
 // check user exists
-if (isset($_GET['user_id']))
+if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 {
 	if ($_GET['user_id'] == 1844)
 	{

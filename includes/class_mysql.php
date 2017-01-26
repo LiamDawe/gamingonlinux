@@ -41,7 +41,9 @@ class mysql
 			$STH = $this->database->prepare($sql);
 			if (is_array($objects))
 			{
-				foreach($objects as $k=>$p)
+				// reset the array keys, to be sure it starts at zero
+				$set_objects = array_values($objects);
+				foreach($set_objects as $k=>$p)
 				{
 					// +1 is needed as arrays start at 0 where as ? placeholders start at 1 in PDO
 					if(is_numeric($p))

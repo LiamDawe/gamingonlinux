@@ -155,7 +155,7 @@ if (!isset($_POST['act']))
 			die();
 		}
 
-		if (!core::is_number($_GET['category_id']))
+		if (!isset($_GET['category_id']) || isset($_GET['category_id']) && !core::is_number($_GET['category_id']))
 		{
 			header('Location: /goty.php?message=no_id&extra=category');
 			die();

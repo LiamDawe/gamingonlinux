@@ -22,6 +22,17 @@ $templating->block('vote_popover', 'goty');
 
 $templating->block('main', 'goty');
 
+if (isset($_GET['message']))
+{
+	$extra = NULL;
+	if (isset($_GET['extra']))
+	{
+		$extra = $_GET['extra'];
+	}
+	$message = $message_map->get_message($_GET['message'], $extra);
+	$core->message($message['message'], NULL, $message['error']);
+}
+
 if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0))
 {
 	$templating->block('login');
@@ -30,6 +41,11 @@ if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_id']) && $_SESSION['u
 
 if (isset($_GET['category_id']) && !isset($_GET['view']) && !isset($_GET['direct']))
 {
+	if (!core::is_number($_GET['category_id']))
+	{
+		header('Location: /goty.php?message=no_id&extra=category');
+		die();
+	}
 	$db->sqlquery("SELECT `category_name`, `description` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']));
 	$cat = $db->fetch();
 
@@ -45,6 +61,12 @@ if (isset($_GET['category_id']) && !isset($_GET['view']) && !isset($_GET['direct
 
 if (isset($_GET['category_id']) && isset($_GET['view']) && $_GET['view'] == 'top10')
 {
+	if (!core::is_number($_GET['category_id']))
+	{
+		header('Location: /goty.php?message=no_id&extra=category');
+		die();
+	}
+
 	if (core::config('goty_finished') == 1)
 	{
 		$db->sqlquery("SELECT `category_name` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']));
@@ -127,6 +149,18 @@ if (!isset($_POST['act']))
 	*/
 	if (isset($_GET['direct']) && isset($_GET['game_id']))
 	{
+		if (!core::is_number($_GET['game_id']))
+		{
+			header('Location: /goty.php?message=no_id&extra=game');
+			die();
+		}
+
+		if (!core::is_number($_GET['category_id']))
+		{
+			header('Location: /goty.php?message=no_id&extra=category');
+			die();
+		}
+
 		$db->sqlquery("SELECT g.`id`, g.`game`, g.`votes`, g.`category_id`, c.`category_name`, c.`description` FROM `goty_games` g LEFT JOIN `goty_category` c ON g.category_id = c.category_id WHERE g.`accepted` = 1 AND g.`id` = ?", array($_GET['game_id']));
 		$game = $db->fetch();
 

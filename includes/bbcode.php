@@ -371,76 +371,45 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 		$body = preg_replace($find, $replace, $body);
 	}
 
-	$find = array(
-  "/\[url\=(.+?)\](.+?)\[\/url\]/is",
-	"/\[url\](.+?)\[\/url\]/is",
-  "/\[b\](.+?)\[\/b\]/is",
-  "/\[i\](.+?)\[\/i\]/is",
-  "/\[u\](.+?)\[\/u\]/is",
-  "/\[s\](.+?)\[\/s\]/is",
-  "/\[color\=(.+?)\](.+?)\[\/color\]/is",
-  "/\[font\=(.+?)\](.+?)\[\/font\]/is",
-  "/\[center\](.+?)\[\/center\]/is",
-  "/\[right\](.+?)\[\/right\]/is",
-  "/\[left\](.+?)\[\/left\]/is",
-  "/\[img\](.+?)\[\/img\]/is",
-  "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
-  "/\[email\](.+?)\[\/email\]/is",
-	"/\[s\](.+?)\[\/s\]/is",
-	"/\[youtube\](.+?)\[\/youtube\]/is",
-	"/\[media=youtube\](.+?)\[\/media\]/is", // this one is for old articles, probably from xenforo, do not remove
-	'/\[list\](.*?)\[\/list\]/is',
-	'/\[\*\](.*?)(\n|\r\n?)/is',
-	'/\[ul\]/is',
-	'/\[\/ul\]/is',
-	'/\[li\]/is',
-	'/\[\/li\]/is',
-	"/\[size\=(.+?)\](.+?)\[\/size\]/is",
-	"/\[email\=(.+?)\](.+?)\[\/email\]/is",
-	"/\[justify\](.+?)\[\/justify\]/is",
-	"/\[code\](.+?)\[\/code\]/is",
-	"/\[sup\](.+?)\[\/sup\]/is",
-	"/\[spoiler](.+?)\[\/spoiler\]/is",
-	"/\[mp3](.+?)\[\/mp3\]/is",
-	"/\[ogg](.+?)\[\/ogg\]/is"
-	);
-
-	$replace = array(
-  "<a href=\"$1\" target=\"_blank\">$2</a>",
-	"<a href=\"$1\" target=\"_blank\">$1</a>",
-  "<strong>$1</strong>",
-  "<em>$1</em>",
-  "<span style=\"text-decoration:underline;\">$1</span>",
-  "<del>$1</del>",
-  "$2",
-  "$2",
-  "<div style=\"text-align:center;\">$1</div>",
-  "<div style=\"text-align:right;\">$1</div>",
-  "<div style=\"text-align:left;\">$1</div>",
-  "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
-  "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
-  "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
-	"<span style=\"text-decoration: line-through\">$1</span>",
-	"<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
-	"<iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe>",
-	'<ul>$1</ul>',
-	'<ul>',
-	'</ul>',
-	'<li>',
-	'</li>',
-	'$2',
-	'<a href="mailto:$1">$2</a>',
-	'$1',
-	'Code:<br /><code>$1</code>',
-	'<sup>$1</sup>',
-	'<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
-	'<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
-	'<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
+	$find_replace = array(
+  "/\[url\=(.+?)\](.+?)\[\/url\]/is" => "<a href=\"$1\" target=\"_blank\">$2</a>",
+	"/\[url\](.+?)\[\/url\]/is" => "<a href=\"$1\" target=\"_blank\">$1</a>",
+  "/\[b\](.+?)\[\/b\]/is" => "<strong>$1</strong>",
+  "/\[i\](.+?)\[\/i\]/is" => "<em>$1</em>",
+  "/\[u\](.+?)\[\/u\]/is" => "<span style=\"text-decoration:underline;\">$1</span>",
+  "/\[s\](.+?)\[\/s\]/is" => "<del>$1</del>",
+  "/\[color\=(.+?)\](.+?)\[\/color\]/is" => "$2",
+  "/\[font\=(.+?)\](.+?)\[\/font\]/is" => "$2",
+  "/\[center\](.+?)\[\/center\]/is" => "<div style=\"text-align:center;\">$1</div>",
+  "/\[right\](.+?)\[\/right\]/is" => "<div style=\"text-align:right;\">$1</div>",
+  "/\[left\](.+?)\[\/left\]/is" => "<div style=\"text-align:left;\">$1</div>",
+  "/\[img\](.+?)\[\/img\]/is" => "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
+  "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" => "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
+  "/\[email\](.+?)\[\/email\]/is" => "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
+	"/\[youtube\](.+?)\[\/youtube\]/is" => "<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
+	"/\[media=youtube\](.+?)\[\/media\]/is" => "<iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe>", // this one is for old articles, probably from xenforo, do not remove
+	'/\[list\](.*?)\[\/list\]/is' => '<ul>$1</ul>',
+	'/\[\*\](.*?)(\n|\r\n?)/is' => '<ul>$1</ul>',
+	'/\[ul\]/is' => '<ul>',
+	'/\[\/ul\]/is' => '</ul>',
+	'/\[li\]/is' => '<li>',
+	'/\[\/li\]/is' => '</li>',
+	"/\[size\=(.+?)\](.+?)\[\/size\]/is" => '$2', // disallow size
+	"/\[email\=(.+?)\](.+?)\[\/email\]/is" => '<a href="mailto:$1">$2</a>',
+	"/\[justify\](.+?)\[\/justify\]/is" => '$1',
+	"/\[code\](.+?)\[\/code\]/is" => '<code>$1</code>',
+	"/\[sup\](.+?)\[\/sup\]/is" => '<sup>$1</sup>',
+	"/\[spoiler](.+?)\[\/spoiler\]/is" => '<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
+	"/\[mp3](.+?)\[\/mp3\]/is" => '<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
+	"/\[ogg](.+?)\[\/ogg\]/is" => '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
 	);
 
 	$body = emoticons($body);
 
-	$body = preg_replace($find, $replace, $body);
+	foreach ($find_replace as $find => $replace)
+	{
+		$body = preg_replace($find, $replace, $body);
+	}
 
 	$body = nl2br($body);
 

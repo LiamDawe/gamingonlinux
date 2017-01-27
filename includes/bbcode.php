@@ -424,6 +424,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	"<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
 	"<iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe>",
 	'<ul>$1</ul>',
+	'<ul>',
 	'</ul>',
 	'<li>',
 	'</li>',

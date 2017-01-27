@@ -101,7 +101,7 @@ if (isset($_GET['view']))
 	$templating->set('any_check', $any_check);
 	$templating->set('all_check', $all_check);
 
-	if (isset($_GET['catid']))
+	if (isset($_GET['catid']) && !empty($_GET['catid']))
 	{
 		$types_allowed = ['any', 'all'];
 		// from clicking a single category tag, it wouldn't be set yet
@@ -120,6 +120,7 @@ if (isset($_GET['view']))
 
 		// sanitize
 		$safe_ids = core::make_safe($categorys_ids);
+
 		foreach ($safe_ids as $k => $safe)
 		{
 			$safe_ids[$k] = strip_tags($safe);

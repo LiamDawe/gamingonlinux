@@ -78,7 +78,7 @@ class core
 					}
 				}
 			}
-			else if (!is_numeric($data) || !is_int($test_id))
+			else if (!is_numeric($data) || !is_int($data))
 			{
 				return false;
 			}

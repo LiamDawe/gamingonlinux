@@ -123,12 +123,12 @@ class mysql
 
 	function pdo_error($exception, $page, $sql, $referrer = NULL)
 	{
-		global $config;
-
 		$to = "liamdawe@gmail.com";
 
 		// subject
 		$subject = "GOL PDO Error";
+
+		$make_sql_safe = core::make_safe($sql);
 
 		// message
 		$message = "
@@ -143,7 +143,7 @@ class mysql
 		$exception on page <br />
 		<strong>File:</strong> $page<br />
 		SQL QUERY<br />
-		$sql<br />
+		$make_sql_safe<br />
 		Referring Page<br />
 		$referrer
 		</body>

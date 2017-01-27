@@ -246,18 +246,7 @@ else if (isset($_POST['action']))
 
 		else
 		{
-			function generateRandomString($length = 10)
-			{
-				$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-				$randomString = '';
-				for ($i = 0; $i < $length; $i++)
-				{
-					$randomString .= $characters[rand(0, strlen($characters) - 1)];
-				}
-				return $randomString;
-			}
-
-			$random_string = generateRandomString();
+			$random_string = $core->generateRandomString();
 
 			// drop any previous requested
 			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($_POST['email']));

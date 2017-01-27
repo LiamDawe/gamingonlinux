@@ -72,13 +72,13 @@ class core
 			{
 				foreach ($data as $test_id)
 				{
-					if (!is_numeric($test_id) || !is_int($test_id))
+					if (!is_numeric($test_id))
 					{
 						return false;
 					}
 				}
 			}
-			else if (!is_numeric($data) || !is_int($data))
+			else if (!is_numeric($data))
 			{
 				return false;
 			}
@@ -233,17 +233,6 @@ class core
 	function current_page_path()
 	{
 		return $_SERVER["SCRIPT_FILENAME"];
-	}
-
-	public function current_page_url()
-	{
-		$page_url = 'http';
-		if (isset($_SERVER["HTTPS"]))
-		{
-			$page_url .= "s";
-		}
-		$page_url .= '://' . $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-		return $page_url;
 	}
 
 	// $date_to_format = a timestamp to make more human readable

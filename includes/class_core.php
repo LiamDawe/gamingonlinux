@@ -72,13 +72,13 @@ class core
 			{
 				foreach ($data as $test_id)
 				{
-					if (!is_numeric($test_id))
+					if (!is_numeric($test_id) || !is_int($test_id))
 					{
 						return false;
 					}
 				}
 			}
-			else if (!is_numeric($data))
+			else if (!is_numeric($data) || !is_int($test_id))
 			{
 				return false;
 			}

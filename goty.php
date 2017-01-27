@@ -316,44 +316,43 @@ if (!isset($_POST['act']))
 
 		else
 		{
-
 			if (core::config('goty_finished') == 1)
+			{
+				$templating->block('top_games', 'goty');
+				$templating->set('category_id', $_GET['category_id']);
+				$templating->set('category_name', $cat['category_name']);
+
+				$db->sqlquery("SELECT `id`, `game`, `votes` FROM `goty_games` WHERE `accepted` = 1  AND `category_id` = ? ORDER BY `votes` DESC LIMIT 3", array($_GET['category_id']));
+				$games_top = $db->fetch_all_rows();
+
+				foreach ($games_top as $game)
 				{
-					$templating->block('top_games', 'goty');
+					$templating->block('top_row', 'goty');
 					$templating->set('category_id', $_GET['category_id']);
-					$templating->set('category_name', $cat['category_name']);
+					$templating->set('game_name', $game['game']);
+					$templating->set('game_counter', $game['votes']);
+					$templating->set('game_id', $game['id']);
+					$templating->set('url', core::config('website_url'));
+					$templating->set('vote_button', '');
 
-					$db->sqlquery("SELECT `id`, `game`, `votes` FROM `goty_games` WHERE `accepted` = 1  AND `category_id` = ? ORDER BY `votes` DESC LIMIT 3", array($_GET['category_id']));
-					$games_top = $db->fetch_all_rows();
+					// work out the games total %
+					$db->sqlquery("SELECT `votes` FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']));
+					$total = $db->fetch_all_rows();
 
-					foreach ($games_top as $game)
+					$total_votes = 0;
+					foreach ($total as $votes)
 					{
-						$templating->block('top_row', 'goty');
-						$templating->set('category_id', $_GET['category_id']);
-						$templating->set('game_name', $game['game']);
-						$templating->set('game_counter', $game['votes']);
-						$templating->set('game_id', $game['id']);
-						$templating->set('url', core::config('website_url'));
-						$templating->set('vote_button', '');
-
-						// work out the games total %
-						$db->sqlquery("SELECT `votes` FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']));
-						$total = $db->fetch_all_rows();
-
-						$total_votes = 0;
-						foreach ($total as $votes)
-						{
-							$total_votes = $total_votes + $votes['votes'];
-						}
-						$total_perc = round($game['votes'] / $total_votes * 100);
-
-						$leaderboard = 'Leaderboard: <div style="background:#CCCCCC; border:1px solid #666666;"><div style="padding-left: 5px; background: #28B8C0; width:'.$total_perc.'%;">'.$total_perc.'%</div></div>';
-
-						$templating->set('leaderboard', $leaderboard);
+						$total_votes = $total_votes + $votes['votes'];
 					}
+					$total_perc = round($game['votes'] / $total_votes * 100);
 
-					$templating->block('top_end', 'goty');
+					$leaderboard = 'Leaderboard: <div style="background:#CCCCCC; border:1px solid #666666;"><div style="padding-left: 5px; background: #28B8C0; width:'.$total_perc.'%;">'.$total_perc.'%</div></div>';
+
+					$templating->set('leaderboard', $leaderboard);
 				}
+
+				$templating->block('top_end', 'goty');
+			}
 
 			// games list
 			$templating->block('games_list', 'goty');
@@ -384,8 +383,18 @@ if (!isset($_POST['act']))
 
 			if (isset($_GET['filter']))
 			{
+				if (!$core::is_number($_GET['category_id']))
+				{
+					header("Location: /goty.php?message=no_id&extra=category_id");
+					die();
+				}
 				if ($_GET['filter'] != 'misc')
 				{
+					if (strlen($_GET['filter']) != 1))
+					{
+						header("Location: /goty.php?message=empty&extra=filter");
+						die();
+					}
 					$db->sqlquery("SELECT `id`, `game`, `votes` FROM `goty_games` WHERE `accepted` = 1 AND `category_id` = ? AND `game` LIKE ? ORDER BY `game` ASC", array($_GET['category_id'], $_GET['filter'] . '%'));
 				}
 
@@ -397,6 +406,11 @@ if (!isset($_POST['act']))
 
 			else
 			{
+				if (!$core::is_number($_GET['category_id']))
+				{
+					header("Location: /goty.php&message=no_id&extra=category_id");
+					die();
+				}
 				$db->sqlquery("SELECT `id`, `game`, `votes` FROM `goty_games` WHERE `accepted` = 1 AND `category_id` = ? ORDER BY `game` ASC", array($_GET['category_id']));
 			}
 			if ($db->num_rows() > 0)

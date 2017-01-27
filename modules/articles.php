@@ -8,7 +8,7 @@ if (!isset($_GET['view']))
 	$core->message("There must have been an error as accessing this page directly doesn't do anything, be sure to report exactly what you did.", NULL, 1);
 }
 
-if (isset($_GET['view']))
+if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multiple'))
 {
 	// paging for pagination
 	$page = core::give_page();

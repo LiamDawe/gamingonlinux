@@ -34,6 +34,11 @@ if (isset($_GET['view']))
 
 		if (isset($_GET['catid']))
 		{
+			if (!is_array($_GET['catid']))
+			{
+				header("Location: /index.php?module=articles&view=cat&message=none_found&extra=categories");
+				die();
+			}
 			$categorys_ids = $_GET['catid'];
 		}
 	}

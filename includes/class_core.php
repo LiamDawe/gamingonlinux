@@ -242,8 +242,7 @@ class core
 		{
 			$page_url .= "s";
 		}
-			$page_url .= '://' . $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-		}
+		$page_url .= '://' . $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 		return $page_url;
 	}
 

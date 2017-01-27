@@ -86,14 +86,14 @@ class mysql
 			$trace = $error->getTrace();
 			if (isset($_SESSION['user_group']) && ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2))
 			{
-				$core->message( $error->getMessage() . '<br /><strong>File:</strong> ' . $trace[2]['file'] . "<br /><strong>Line:</strong> " . $trace[2]['line'] . '<br /><strong>Query:</strong> ' . htmlspecialchars($sql), NULL, 1);
+				$core->message( $error->getMessage() . '<br /><strong>Query:</strong> ' . htmlspecialchars($sql), NULL, 1);
 				echo $templating->output();
 				die();
 			}
 			else
 			{
 				$core->message("Something went wrong. The admin will be notified", NULL, 1);
-				$this->pdo_error($error->getMessage(), $trace[2]['file'], $STH->interpolateQuery(), $referrer);
+				$this->pdo_error($error->getMessage(), $trace[2]['file'], $STH->interpolateQuery(), core::current_page_url());
 				echo $templating->output();
 				die();
 			}
@@ -121,7 +121,7 @@ class mysql
 		return $this->database->lastInsertId();
 	}
 
-	function pdo_error($exception, $page, $sql, $referrer = NULL)
+	function pdo_error($exception, $page, $sql, $url)
 	{
 		$to = "liamdawe@gmail.com";
 
@@ -129,6 +129,7 @@ class mysql
 		$subject = "GOL PDO Error";
 
 		$make_sql_safe = core::make_safe($sql);
+		$make_url_safe = core::make_safe($url);
 
 		// message
 		$message = "
@@ -141,7 +142,7 @@ class mysql
 		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"Gaming On Linux\">
 		<br />
 		$exception on page <br />
-		<strong>File:</strong> $page<br />
+		<strong>URL:</strong> $make_url_safe<br />
 		SQL QUERY<br />
 		$make_sql_safe<br />
 		Referring Page<br />

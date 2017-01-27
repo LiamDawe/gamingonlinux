@@ -235,6 +235,18 @@ class core
 		return $_SERVER["SCRIPT_FILENAME"];
 	}
 
+	public function current_page_url()
+	{
+		$page_url = 'http';
+		if (isset($_SERVER["HTTPS"]))
+		{
+			$page_url .= "s";
+		}
+			$page_url .= '://' . $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+		}
+		return $page_url;
+	}
+
 	// $date_to_format = a timestamp to make more human readable
 	function format_date($timestamp, $format = "j F Y \a\\t g:i a")
 	{

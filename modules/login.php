@@ -246,7 +246,7 @@ else if (isset($_POST['action']))
 
 		else
 		{
-			$random_string = $core->generateRandomString();
+			$random_string = $core->random_id();
 
 			// drop any previous requested
 			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($_POST['email']));

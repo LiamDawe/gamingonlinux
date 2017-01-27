@@ -997,7 +997,7 @@ class core
 
 	function random_id($length = 10)
 	{
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#@';
     $characters_length = strlen($characters);
     $random_string = '';
 		for ($i = 0; $i < $length; $i++)

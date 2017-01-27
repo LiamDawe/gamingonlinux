@@ -505,7 +505,7 @@ class user
 
 		else if ($user_data['avatar_gallery'] != NULL)
 		{
-			$avatar = "/uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
+			$avatar = core::config('website_url') . "uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
 		}
 
 		// either uploaded or linked an avatar
@@ -514,7 +514,7 @@ class user
 			$avatar = $user_data['avatar'];
 			if ($user_data['avatar_uploaded'] == 1)
 			{
-				$avatar = "/uploads/avatars/{$user_data['avatar']}";
+				$avatar = core::config('website_url') . "uploads/avatars/{$user_data['avatar']}";
 			}
 		}
 
@@ -523,11 +523,11 @@ class user
 		{
 			if ($_SESSION['theme'] == 'dark')
 			{
-				$avatar = "/uploads/avatars/no_avatar_dark.png";
+				$avatar = core::config('website_url') . "uploads/avatars/no_avatar_dark.png";
 			}
 			else if ($_SESSION['theme'] == 'light')
 			{
-				$avatar = "/uploads/avatars/no_avatar.png";
+				$avatar = core::config('website_url') . "uploads/avatars/no_avatar.png";
 			}
 		}
 

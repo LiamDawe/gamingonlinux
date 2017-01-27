@@ -133,11 +133,6 @@ if (!isset($_POST['act']))
 			$core->message('That game already exists in our GOTY list!');
 		}
 
-		if ($_GET['message'] == 'empty')
-		{
-			$core->message('Your can\'t add a game with no name!');
-		}
-
 		if ($_GET['message'] == 'vote_deleted')
 		{
 			$core->message('Your vote has been removed! You can now vote in that category again.');
@@ -390,7 +385,7 @@ if (!isset($_POST['act']))
 				}
 				if ($_GET['filter'] != 'misc')
 				{
-					if (strlen($_GET['filter']) != 1))
+					if (strlen($_GET['filter']) != 1)
 					{
 						header("Location: /goty.php?message=empty&extra=filter");
 						die();
@@ -527,7 +522,7 @@ if (isset($_POST['act']))
 			}
 			else
 			{
-				header("Location: " . core::config('website_url') . "goty.php?message=empty");
+				header("Location: " . core::config('website_url') . "goty.php?message=empty&extra=game-name");
 			}
 		}
 

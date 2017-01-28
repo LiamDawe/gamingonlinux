@@ -106,7 +106,8 @@ class core
 		return $page;
 	}
 
-	function file_get_contents_curl($url) {
+	function file_get_contents_curl($url) 
+	{
 	    $ch = curl_init();
 
 	    curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
@@ -124,47 +125,49 @@ class core
 	// secure way of grabbing a remote image, for avatars
 	function remoteImage($url)
 	{
-    $ch = curl_init ($url);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
-    curl_setopt($ch, CURLOPT_RANGE, "0-10240");
+		$ch = curl_init ($url);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+		curl_setopt($ch, CURLOPT_RANGE, "0-10240");
 
-    $fn = "partial.jpg";
-    $raw = curl_exec($ch);
-    $result = array();
+		$fn = "partial.jpg";
+		$raw = curl_exec($ch);
+		$result = array();
 
-    if(file_exists($fn)){
-        unlink($fn);
-    }
+		if(file_exists($fn)){
+			unlink($fn);
+		}
 
-    if ($raw !== false) {
+		if ($raw !== false) 
+		{
 
-        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        if ($status == 200 || $status == 206) {
+			if ($status == 200 || $status == 206) 
+			{
 
-            $result["w"] = 0;
-            $result["h"] = 0;
+				$result["w"] = 0;
+				$result["h"] = 0;
 
-            $fp = fopen($fn, 'x');
-            fwrite($fp, $raw);
-            fclose($fp);
+				$fp = fopen($fn, 'x');
+				fwrite($fp, $raw);
+				fclose($fp);
 
-            $size = getImageSize($fn);
+				$size = getImageSize($fn);
 
-            if ($size===false) {
-            //  Cannot get file size information
-            } else {
-            //  Return width and height
-                list($result["w"], $result["h"]) = $size;
-            }
+				if ($size===false) {
+				//  Cannot get file size information
+				} else {
+				//  Return width and height
+					list($result["w"], $result["h"]) = $size;
+				}
 
-        }
-    }
+			}
+		}
 
-    curl_close ($ch);
-    return $result;
+		curl_close ($ch);
+		return $result;
 	}
 
 	// grab a config key
@@ -235,7 +238,7 @@ class core
 		return $_SERVER["SCRIPT_FILENAME"];
 	}
 
-	public function current_page_url()
+	public static function current_page_url()
 	{
 		$page_url = 'http';
 		if (isset($_SERVER["HTTPS"]))

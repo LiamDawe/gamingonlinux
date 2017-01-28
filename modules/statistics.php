@@ -58,13 +58,13 @@ foreach($charts as $chart)
     $grouping_id = $default_grouping['grouping_id'];
   }
 
-  $db->sqlquery("SELECT `id`, `grouping_id`,`name` FROM `user_stats_charts` WHERE `name` = '{$chart['name']}' AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($grouping_id));
+  $db->sqlquery("SELECT `id`, `grouping_id`,`name` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $grouping_id));
   $get_chart_id = $db->fetch();
 
   $db->sqlquery("SELECT `grouping_id` FROM `user_stats_charts` WHERE `grouping_id` < ? ORDER BY `id` DESC LIMIT 1", array($get_chart_id['grouping_id']));
   $previous_group = $db->fetch();
 
-  $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = '{$chart['name']}' AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($previous_group['grouping_id']));
+  $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $previous_group['grouping_id']));
   $get_last_chart_id = $db->fetch();
 
   $order = '';

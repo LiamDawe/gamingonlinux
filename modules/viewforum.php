@@ -17,15 +17,7 @@ if($parray['view'] == 0)
 else
 {
 	// paging for pagination
-	if (!isset($_GET['page']) || $_GET['page'] <= 0)
-	{
-		$page = 1;
-	}
-
-	else if (is_numeric($_GET['page']))
-	{
-		$page = $_GET['page'];
-	}
+	$page = core::give_page();
 
 	$templating->merge('forum_search');
 	$templating->block('small');
@@ -76,9 +68,15 @@ else
 	// count how many there is in total
 	$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_GET['forum_id']));
 	$total_pages = $db->num_rows();
+	
+	$per_page = core::config('default-comments-per-page');
+	if (isset($_SESSION['per-page']) && core::is_number($_SESSION['per-page']))
+	{
+		$per_page = $_SESSION['per-page'];
+	}
 
 	// sort out the pagination link
-	$pagination = $core->pagination_link($_SESSION['per-page'], $total_pages, "/forum/{$_GET['forum_id']}/", $page);
+	$pagination = $core->pagination_link($per_page, $total_pages, "/forum/{$_GET['forum_id']}/", $page);
 
 	// get the posts for this forum
 	$db->sqlquery("SELECT
@@ -94,7 +92,7 @@ else
 		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
 		LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id`
 		WHERE t.`forum_id`= ? AND t.`approved` = 1
-		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, {$_SESSION['per-page']}", array($_GET['forum_id'], $core->start));
+		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, {$per_page}", array($_GET['forum_id'], $core->start));
 	while ($post = $db->fetch())
 	{
 		$pagination_post = '';

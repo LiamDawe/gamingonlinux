@@ -23,7 +23,7 @@ class message_map
       $extras_output = '';
       if ((isset($this->messages[$key]['additions']) && $this->messages[$key]['additions'] == 1) && $extras != NULL)
       {
-        $extras_output = $extras;
+        $extras_output = htmlspecialchars($extras);
       }
       $error = 0;
       if (isset($this->messages[$key]['error']) && is_numeric($this->messages[$key]['error']))

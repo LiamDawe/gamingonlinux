@@ -1381,7 +1381,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'editcomment')
 	{
-		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_POST['comment_id']), 'articles_full.php');
+		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_POST['comment_id']));
 		$comment = $db->fetch();
 
 		// check if author or editor/admin
@@ -1424,6 +1424,13 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'deletecomment')
 	{
+		if (!isset($_GET['comment_id']) || !core::is_number($_GET['comment_id'))
+		{
+			$core->message('Looks like you took a wrong turn!');
+			include('includes/footer.php');
+			die();
+		}
+		
 		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
 		$comment = $db->fetch();
 
@@ -1491,13 +1498,13 @@ else if (isset($_GET['go']))
 					// update notifications
 
 					// find any notifications caused by the deleted comment
-	        $db->sqlquery("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `is_like` = 0 AND `article_id` = ?", array($comment['article_id']));
+					$db->sqlquery("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `is_like` = 0 AND `article_id` = ?", array($comment['article_id']));
 					$current_notes = $db->fetch_all_rows();
 					foreach ($current_notes as $this_note)
-	        {
+					{
 						// if this wasn't the only comment made for that notification
-		        if ($this_note['total'] >= 2)
-		        {
+						if ($this_note['total'] >= 2)
+						{
 							// if the one deleted is the original comment we were notified about
 							if ($this_note['comment_id'] == $_GET['comment_id'])
 							{
@@ -1520,13 +1527,13 @@ else if (isset($_GET['go']))
 								$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($last_comment['time_posted'], $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
 							}
 							// no matter what we need to adjust the counter
-		          $db->sqlquery("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
-		        }
-		        // it's the only comment they were notified about, so just delete the notification to completely remove it
-		        else if ($this_note['total'] == 1)
-		        {
-		          $db->sqlquery("DELETE FROM `user_notifications` WHERE `id` = ?", array($this_note['id']));
-		        }
+							$db->sqlquery("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
+						}
+						// it's the only comment they were notified about, so just delete the notification to completely remove it
+						else if ($this_note['total'] == 1)
+						{
+							$db->sqlquery("DELETE FROM `user_notifications` WHERE `id` = ?", array($this_note['id']));
+						}
 					}
 
 					if (core::config('pretty_urls') == 1)

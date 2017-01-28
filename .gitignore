@@ -2,4 +2,4 @@ uploads/carousel
 uploads/avatars
 uploads/articles
 latest.php
-includes/config_live.php
+includes/config.php

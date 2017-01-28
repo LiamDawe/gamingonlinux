@@ -1,11 +1,16 @@
 <?php
 class core
 {
+	// database config details
+	public static $database;
+	
 	// the current date and time for the mysql
 	public static $date;
 
 	// the users ip address
 	public static $ip;
+	
+	protected $_file_dir;
 
 	// how many pages their are in the pagination being done
 	public $pages;
@@ -20,8 +25,17 @@ class core
 
 	protected static $config = array();
 
-	function __construct()
-	{
+	function __construct($file_dir)
+	{	
+		header('X-Frame-Options: SAMEORIGIN');
+		ini_set('session.cookie_httponly', 1);
+		date_default_timezone_set('UTC');
+		
+		$this->_file_dir = $file_dir;
+		
+		session_start();
+		
+		core::$database = include  $this->_file_dir . '/includes/config.php';
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$ip = $this->get_client_ip();
 	}

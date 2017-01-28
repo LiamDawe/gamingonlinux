@@ -1,5 +1,5 @@
 <?php
-require_once "EPDOStatement.php";
+require_once $file_dir. "/includes/EPDOStatement.php";
 
 class mysql
 {
@@ -123,7 +123,7 @@ class mysql
 
 	function pdo_error($exception, $page, $sql, $url)
 	{
-		$to = "liamdawe@gmail.com";
+		$to = core::config('contact_email');
 
 		// subject
 		$subject = "GOL PDO Error";

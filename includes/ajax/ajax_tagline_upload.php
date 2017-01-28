@@ -1,15 +1,13 @@
 <?php
-session_start();
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include('config.php');
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include('class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include('class_core.php');
-$core = new core();
-
-include_once('class_image.php');
+include_once($file_dir . '/includes/class_image.php');
 $image_func = new SimpleImage();
 
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")

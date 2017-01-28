@@ -1,5 +1,7 @@
 <?php
-include('includes/header.php');
+$file_dir = dirname(__FILE__);
+
+include($file_dir . '/includes/header.php');
 
 $templating->set_previous('title', ' - User Control Panel', 1);
 
@@ -8,7 +10,7 @@ if ($_SESSION['user_id'] == 0)
 {
 	$templating->set_previous('title', 'No Access', 1);
 	$core->message('You do not have permissions to view this page! You need to be logged in. <a href="index.php">Please click here to return to the home page</a>.');
-	include('includes/footer.php');
+	include($file_dir . '/includes/footer.php');
 	die();
 }
 
@@ -43,7 +45,7 @@ else
 
 if (in_array($module, $modules_allowed))
 {
-	include("usercp_modules/usercp_module_$module.php");
+	include($file_dir . "/usercp_modules/usercp_module_$module.php");
 }
 
 else
@@ -88,5 +90,5 @@ foreach ($blocks as $block)
 
 $templating->block('right_end', 'mainpage');
 
-include('includes/footer.php');
+include($file_dir . '/includes/footer.php');
 ?>

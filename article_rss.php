@@ -1,13 +1,13 @@
 <?php
-include('includes/config.php');
+$file_dir = dirname(__FILE__);
 
-include('includes/class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include('includes/class_core.php');
-$core = new core();
+include($file_dir. '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include('includes/bbcode.php');
+include($file_dir . '/includes/bbcode.php');
 $sql_join = '';
 $sql_addition = '';
 if (isset($_GET['section']) && $_GET['section'] == 'overviews')
@@ -91,11 +91,21 @@ foreach ($articles as $line)
 	}
 
 	$cats = implode(', ', $categories_list);
+	
+	$username = '';
+	if (isset($line['username']))
+	{
+		$username = $line['username'];
+	}
+	else if (isset($line['guest_username']))
+	{
+		$username = $line['username'];
+	}
 
 	$output .= "
 		<item>
 			<title>{$title}</title>
-			<author>contact@gamingonlinux.com (GamingOnLinux)</author>
+			<author>contact@gamingonlinux.com ($username)</author>
 			<link>http://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}</link>
 			<description><![CDATA[<p>Tags:$cats</p><p>{$text}</p><br />Content from <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>]]></description>
 			<pubDate>{$date}</pubDate>

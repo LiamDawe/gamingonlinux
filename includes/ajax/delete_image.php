@@ -1,13 +1,11 @@
 <?php
-session_start();
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include('config.php');
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include('class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
-
-include('class_core.php');
-$core = new core();
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
 if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 {
@@ -20,7 +18,7 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 	$result=$db->sqlquery($qry2, array($_POST['image_id']));
 	if(isset($result))
 	{
-		if(unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $grabber['filename']))
+		if(unlink($file_dir . '/uploads/articles/article_images/' . $grabber['filename']))
 		{
 			unset($_SESSION['uploads'][$grabber['id']]);
 			echo "YES";

@@ -1,18 +1,16 @@
 <?php
-session_start();
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include('../config.php');
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include('../class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include('../class_core.php');
-$core = new core();
-
-include('../class_user.php');
+include($file_dir . '/includes/class_user.php');
 $user = new user();
 
-include('../class_article.php');
+include($file_dir . '/includes/class_article.php');
 $article_class = new article_class();
 
 if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)

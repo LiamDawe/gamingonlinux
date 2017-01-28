@@ -1,7 +1,9 @@
 <?php
 error_reporting(E_ALL);
 
-include('includes/header.php');
+$file_dir = dirname(__FILE__);
+
+include($file_dir . '/includes/header.php');
 
 // stop anyone not allowed in
 if ($parray['access_admin'] == 0)
@@ -51,7 +53,7 @@ else
 
 if (in_array($module, $modules_allowed))
 {
-	include("admin_modules/$module.php");
+	include($file_dir . "/admin_modules/$module.php");
 }
 
 else
@@ -80,7 +82,7 @@ foreach ($blocks as $block)
 {
 	if ($block['block_link'] != NULL)
 	{
-			include("admin_blocks/admin_block_{$block['block_link']}.php");
+			include($file_dir . "/admin_blocks/admin_block_{$block['block_link']}.php");
 	}
 
 	else if ($block['block_link'] == NULL)
@@ -93,5 +95,5 @@ foreach ($blocks as $block)
 
 $templating->block('right_end', 'mainpage');
 
-include('includes/footer.php');
+include($file_dir . '/includes/footer.php');
 ?>

@@ -1,31 +1,25 @@
 <?php
 error_reporting(-1);
-ini_set('session.cookie_httponly', 1);
-session_start();
-
-date_default_timezone_set('UTC');
 
 $timer_start = microtime(true);
 
-include('includes/config.php');
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include('includes/class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir. '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include('includes/class_core.php');
-$core = new core();
-
-include('includes/class_messages.php');
+include($file_dir . '/includes/class_messages.php');
 $message_map = new message_map();
 
-include('includes/class_article.php');
+include($file_dir . '/includes/class_article.php');
 $article_class = new article_class();
 
-include('includes/class_mail.php');
+include($file_dir . '/includes/class_mail.php');
 
 define('url', core::config('website_url'));
 
-include('includes/class_user.php');
+include($file_dir . '/includes/class_user.php');
 $user = new user();
 $user->check_session();
 
@@ -89,7 +83,7 @@ if (!isset($_SESSION['logged_in']))
 }
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
-include('includes/class_template.php');
+include($file_dir . '/includes/class_template.php');
 
 $templating = new template('default');
 
@@ -103,7 +97,7 @@ else if ($_SESSION['user_id'] == 0 || $_SESSION['theme'] == 'default')
 	$theme = 'light';
 }
 
-include('includes/bbcode.php');
+include($file_dir . '/includes/bbcode.php');
 
 // if you are logged in check for banning
 if ($_SESSION['user_id'] != 0)

@@ -152,16 +152,29 @@ if (isset($_POST['act']))
         }
 
         $templating->set_previous('title', 'Submit An Article', 1);
+        
         $title = strip_tags($_POST['title']);
-        $title = $title;
+        $title = core::make_safe($title);
         $text = core::make_safe($_POST['text']);
+        
+        $name = '';
+        if (isset($_POST['name']))
+        {
+			$name = core::make_safe($_POST['name']);
+        }
+        
+        $guest_email = '';
+        if (isset($_POST['email']))
+        {
+			$guest_email = core::make_safe($_POST['email']);
+        }
 
         if ($_SESSION['user_id'] == 0 && empty($_POST['email']))
         {
-            $_SESSION['atitle'] = $_POST['title'];
-            $_SESSION['atext'] = $_POST['text'];
-            $_SESSION['aname'] = $_POST['name'];
-            $_SESSION['aemail'] = $_POST['email'];
+            $_SESSION['atitle'] = $title;
+            $_SESSION['atext'] = $text;
+            $_SESSION['aname'] = $name;
+            $_SESSION['aemail'] = $guest_email;
 
             header("Location: /submit-article/error=email");
         }
@@ -169,10 +182,10 @@ if (isset($_POST['act']))
         // make sure its not empty
         else if (empty($_POST['title']) || empty($_POST['text']))
         {
-            $_SESSION['atitle'] = $_POST['title'];
-            $_SESSION['atext'] = $_POST['text'];
-            $_SESSION['aname'] = $_POST['name'];
-            $_SESSION['aemail'] = $_POST['email'];
+            $_SESSION['atitle'] = $title;
+            $_SESSION['atext'] = $text;
+            $_SESSION['aname'] = $name;
+            $_SESSION['aemail'] = $guest_email;
 
             header("Location: /submit-article/error=empty");
         }
@@ -199,10 +212,10 @@ if (isset($_POST['act']))
 
             if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && !$res['success'])
             {
-                $_SESSION['atitle'] = $_POST['title'];
-                $_SESSION['atext'] = $_POST['text'];
-                $_SESSION['aname'] = $_POST['name'];
-                $_SESSION['aemail'] = $_POST['email'];
+				$_SESSION['atitle'] = $title;
+				$_SESSION['atext'] = $text;
+				$_SESSION['aname'] = $name;
+				$_SESSION['aemail'] = $guest_email;
 
                 header("Location: /submit-article/error=captcha");
             }
@@ -231,12 +244,6 @@ if (isset($_POST['act']))
                 else
                 {
                     $username = $_SESSION['username'];
-                }
-
-                $guest_email = '';
-                if (!empty($_POST['email']))
-                {
-                    $guest_email = $_POST['email'];
                 }
 
                 // make the slug
@@ -314,7 +321,7 @@ if (isset($_POST['act']))
             $username = 'Guest';
             if (!empty($_POST['name']))
             {
-                $username = $_POST['name'];
+                $username = core::make_safe($_POST['name']);
             }
         }
 
@@ -337,13 +344,13 @@ if (isset($_POST['act']))
         $guest_username = '';
         if (isset($_POST['name']))
         {
-            $guest_username = $_POST['name'];
+            $guest_username = core::make_safe($_POST['name']);
         }
 
         $guest_email = '';
         if (isset($_POST['email']))
         {
-            $guest_email = $_POST['email'];
+            $guest_email = core::make_safe($_POST['email']);
         }
 
         $guest_fields = '';
@@ -358,7 +365,7 @@ if (isset($_POST['act']))
         $templating->block('submit', 'submit_article');
         $templating->set('url', core::config('website_url'));
         $templating->set('guest_fields', $guest_fields);
-        $templating->set('title', $_POST['title']);
+        $templating->set('title', core::make_safe($_POST['title']));
 
         $top_image = '';
         if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

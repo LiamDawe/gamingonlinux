@@ -104,7 +104,7 @@ $(function(){
         var image_id= $(this).attr('id');
         $.ajax({
             type:'POST',
-            url:'/includes/delete_image.php',
+            url:'/includes/ajax/delete_image.php',
             data:{'image_id':image_id},
             success: function(data){
                  if(data=="YES"){
@@ -123,7 +123,7 @@ $(function(){
         var image_id= $(this).attr('id');
         $.ajax({
             type:'POST',
-            url:'/includes/delete_tagline_image.php',
+            url:'/includes/ajax/delete_tagline_image.php',
             data:{'image_id':image_id},
             success: function(data){
               if(data=="YES"){
@@ -798,7 +798,7 @@ function(data){
   	var button = $(this);
   	var category_id = $(this).data('category-id');
   	var game_id = $(this).data('game-id');
-  	$.post('/includes/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
+  	$.post('/includes/ajax/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
   	function(data)
     {
   	  if (data.result == 1)

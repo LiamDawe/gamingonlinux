@@ -1,13 +1,13 @@
 <?php
-include('includes/config.php');
+$file_dir = dirname(__FILE__);
 
-include('includes/class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include('includes/class_core.php');
-$core = new core();
+include($file_dir. '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include('includes/bbcode.php');
+include($file_dir . '/includes/bbcode.php');
 
 header("Content-Type: application/rss+xml");
 header("Cache-Control: max-age=3600");

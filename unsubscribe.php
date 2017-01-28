@@ -1,5 +1,7 @@
 <?php
-include('includes/header.php');
+$file_dir = dirname(__FILE__);
+
+include($file_dir . '/includes/header.php');
 
 $user_id = '';
 if (isset($_GET['user_id']))

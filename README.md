@@ -10,6 +10,8 @@ If you like what I do please consider [supporting me on Patreon](https://www.pat
 
 If you discover a security issue, PLEASE notify us privately first!
 
+I will consider rewarding people who properly report security issues with games from their service of choice (while I have money, otherwise I will keep you in a list for when I have money to do so).
+
 ## Requirements
 
 This site requires atleast PHP 5.6, Mysql 5.6 or MariaDB 10.0 and apache 2.4.  

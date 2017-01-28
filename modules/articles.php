@@ -342,8 +342,8 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 		}
 	}
 }
-else {
-	$core->message("You must be lost.", NULL, 1);
-	include('includes/footer.php');
+else 
+{
+	header("Location: /index.php?module=search&message=empty&extra=view");
 	die();
 }

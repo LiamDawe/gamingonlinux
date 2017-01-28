@@ -22,6 +22,7 @@ if (isset($_GET['q']))
 {
 	$search = trim($_GET['q']);
 	$search = str_replace('+', '', $search);
+	$search = core::make_safe($search);
 	$search = strip_tags($search);
 
 	if (empty($search))

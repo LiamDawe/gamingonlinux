@@ -127,29 +127,37 @@ function article_dump($dump)
 	$sections = array();
 
 	// title
+	$sections['title'] = '';
 	$pattern = '/\=title\=(.+?)\=title\=/is';
-
-	preg_match($pattern, $dump, $title);
-	$sections['title'] = $title[1];
+	if (preg_match($pattern, $dump, $title))
+	{
+		$sections['title'] = $title[1];
+	}
 
 	// tags
+	$sections['tags'] = '';
 	$pattern = '/\=tags\=(.+?)\=tags\=/is';
-
-	preg_match($pattern, $dump, $tags);
-	$sections['tags'] = $tags[1];
-
+	if (preg_match($pattern, $dump, $tags))
+	{
+		$sections['tags'] = $tags[1];
+	}
+	
 	// tagline
+	$sections['tagline'] = '';
 	$pattern = '/\=tagline\=(.+?)\=tagline\=/is';
-
-	preg_match($pattern, $dump, $tagline);
-	$sections['tagline'] = $tagline[1];
-
+	if (preg_match($pattern, $dump, $tagline))
+	{
+		$sections['tagline'] = $tagline[1];
+	}
+	
 	// text
+	$sections['text'] = '';
 	$pattern = '/\=text\=(.+?)\=text\=/is';
-
-	preg_match($pattern, $dump, $text);
-	$sections['text'] = $text[1];
-
+	if (preg_match($pattern, $dump, $text))
+	{
+		$sections['text'] = $text[1];
+	}
+	
 	return $sections;
 }
 

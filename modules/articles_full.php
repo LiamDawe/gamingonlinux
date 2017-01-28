@@ -1424,7 +1424,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'deletecomment')
 	{
-		if (!isset($_GET['comment_id']) || !core::is_number($_GET['comment_id'))
+		if (!isset($_GET['comment_id']) || !core::is_number($_GET['comment_id']))
 		{
 			$core->message('Looks like you took a wrong turn!');
 			include('includes/footer.php');

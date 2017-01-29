@@ -29,17 +29,16 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 }
 
 // can be removed eventually, stop-gap to stop errors for people already logged in that don't get the new options
+if ($_SESSION['theme'] = 'light')
+{
+	$_SESSION['theme'] = 'default';
+}
+
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
 	if (!isset($_SESSION['display_comment_alerts']))
 	{
 		$_SESSION['display_comment_alerts'] = 1;
-	}
-	if (!isset($_SESSION['avatar']))
-	{
-		$db->sqlquery("SELECT `avatar_gravatar`, `gravatar_email`, `avatar_gallery`, `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		$temp_user = $db->fetch();
-		$_SESSION['avatar'] = user::sort_avatar($temp_user);
 	}
 	if (!isset($_SESSION['auto_subscribe_email']) || !isset($_SESSION['auto_subscribe']) || !isset($_SESSION['email_options']))
 	{
@@ -74,7 +73,7 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['username'] = 'Guest'; // not even sure why I set this
 		$_SESSION['user_group'] = 4;
 		$_SESSION['secondary_user_group'] = 4;
-		$_SESSION['theme'] = 'light';
+		$_SESSION['theme'] = 'default';
 		$_SESSION['per-page'] = core::config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
@@ -94,7 +93,7 @@ if ($_SESSION['user_id'] != 0 && $_SESSION['theme'] != 'default')
 
 else if ($_SESSION['user_id'] == 0 || $_SESSION['theme'] == 'default')
 {
-	$theme = 'light';
+	$theme = 'default';
 }
 
 include($file_dir . '/includes/bbcode.php');
@@ -148,11 +147,11 @@ $templating->set('url', url);
 
 // add a gol premium class tag to the body html tag, this is used to ignore gol premium and editors from the ad-blocking stats gathering
 $body_class = '';
-if ($theme == 'light')
+if ($theme == 'default')
 {
 	$body_class = '';
 }
-else if ($theme != 'light' && $user->check_group(6) == true)
+else if ($theme != 'default' && $user->check_group(6) == true)
 {
 	$body_class = 'class="dark"';
 }
@@ -298,7 +297,7 @@ else if ($_SESSION['user_id'] > 0)
 		$profile_link = url . "index.php?module=profile&user_id={$_SESSION['user_id']}";
 		$messages_html_link = url . "index.php?module=messages";
 	}
-
+	
 	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link));
 	$templating->set('user_menu', $user_menu);
 

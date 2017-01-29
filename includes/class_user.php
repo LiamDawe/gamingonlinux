@@ -340,6 +340,7 @@ class user
 		unset($_SESSION['email_options']);
 		unset($_SESSION['auto_subscribe']);
 		unset($_SESSION['auto_subscribe_email']);
+		unset($_SESSION['avatar']);
 
 		$_SESSION['per-page'] = core::config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
@@ -521,16 +522,16 @@ class user
 		// else no avatar, then as a fallback use gravatar if they have an email left-over
 		else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
 		{
-			if ($_SESSION['theme'] == 'dark')
+			if ($user_data['theme'] == 'dark')
 			{
 				$avatar = core::config('website_url') . "uploads/avatars/no_avatar_dark.png";
 			}
-			else if ($_SESSION['theme'] == 'light')
+			else if ($user_data['theme'] == 'default')
 			{
 				$avatar = core::config('website_url') . "uploads/avatars/no_avatar.png";
 			}
 		}
-
+		
 		return $avatar;
 	}
 

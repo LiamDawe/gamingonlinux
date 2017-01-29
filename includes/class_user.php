@@ -522,11 +522,11 @@ class user
 		// else no avatar, then as a fallback use gravatar if they have an email left-over
 		else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
 		{
-			if ($user_data['theme'] == 'dark')
+			if ($_SESSION['theme'] == 'dark')
 			{
 				$avatar = core::config('website_url') . "uploads/avatars/no_avatar_dark.png";
 			}
-			else if ($user_data['theme'] == 'default')
+			else if ($_SESSION['theme'] == 'default')
 			{
 				$avatar = core::config('website_url') . "uploads/avatars/no_avatar.png";
 			}

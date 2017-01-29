@@ -1,15 +1,15 @@
 <?php
 // not logged in
-if ($_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
+if ((!isset($_SESSION['user_id'])) || ( isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 ) || ( isset($_SESSION['user_id']) && !core::is_number($_SESSION['user_id']) ))
 {
 	header("Location: /index.php?module=login");
 }
 
 // show links
-else if ($_SESSION['user_id'] > 0)
+else if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
 	// sort out private message unread counter
-	$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", array($_SESSION['user_id']), 'header.php');
+	$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", array($_SESSION['user_id']));
 	$unread_counter = $db->num_rows();
 
 	if ($unread_counter == 0)

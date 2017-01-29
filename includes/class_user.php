@@ -224,12 +224,7 @@ class user
 				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the GamingOnLinux website you may want to let <a href=\"https://www.gamingonlinux.com/profiles/1\">liamdawe</a> know and change your password immediately.</p>
 				<div>
 				<hr>
-				Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "
-				<hr>
-				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:contact@gamingonlinux.com\" target=\"_blank\">contact@gamingonlinux.com</a> with some info about what you want us to do about it.</p>
-				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-				<p>-----------------------------------------------------------------------------------------------------------</p>
-				</div>";
+				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>";
 
 				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the GamingOnLinux (https://www.gamingonlinux.com) website you may want to let TheBoss and Levi know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
 

@@ -32,43 +32,21 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 
 		$db->sqlquery("UPDATE `users` SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
 
-		// sort out registration email
-		$to  = $get_active['email'];
-
 		// subject
 		$subject = 'Welcome to GamingOnLinux.com, activation needed!';
 
 		// message
-		$message = "
-		<html>
-		<head>
-		<title>Welcome email for GamingOnLinux.com, activation needed!</title>
-		</head>
-		<body>
-		<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-		<br />
-		<p>Hello {$_SESSION['username']},</p>
-		<p>Thanks for registering on <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, The best source for linux games and news.</p>
+		$html_message = "<p>Hello {$_SESSION['username']},</p>
+		<p>Thanks for registering on <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>!</p>
 		<p><strong><a href=\"" . core::config('website_url') . "index.php?module=activate_user&user_id={$_SESSION['user_id']}&code=$code\">You need to activate your account before you can post! Click here to activate!</a></strong></p>
-		<p>If you&#39;re new, consider saying hello in the <a href=\"" . core::config('website_url') . "forum/\" target=\"_blank\">forum</a>.</p>
-		<br style=\"clear:both\">
-		<div>
-		<hr>
-		<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:" . core::config('contact_email') . "\" target=\"_blank\">" . core::config('contact_email') . "</a> with some info about what you want us to do about it.</p>
-		<p>Please, Don&#39;t reply to this automated message, We do not read any emails recieved on this email address.</p>
-		</div>
-		</body>
-		</html>";
+		<p>If you're new, consider saying hello in the <a href=\"" . core::config('website_url') . "forum/\" target=\"_blank\">forum</a>.</p>";
+		
+		$plain_message = 'Hello ' . $_SESSION['username'] . ', thanks for registering on ' . core::config('website_url') . '! You need to activate your account before you can post, do so here: ' . core::config('website_url') . 'index.php?module=activate_user&user_id=' . $_SESSION['user_id'] . '&code=' . $code;
 
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		$headers .= "From: noreply@gamingonlinux.com\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+		$mail = new mail($get_active['email'], $subject, $html_message, $plain_message);
+		$mail->send();
 
-		// Mail it
-		mail($to, $subject, $message, $headers);
-
-		$core->message("We have re-sent a new activation code {$_SESSION['username']}, <strong>please check your emails to continue using the website properly</strong>! <a href=\"index.php\">Click here if you are not redirected.</a>", "index.php");
+		$core->message("We have re-sent a new activation code {$_SESSION['username']}, <strong>please check your emails for the activation link</strong>! <a href=\"index.php\">Click here to return</a>");
 	}
 
 	else if ($get_active['activated'] == 1)

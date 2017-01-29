@@ -215,9 +215,9 @@ else
 				// update their subscriptions if they are reading the last page
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
-					$db->sqlquery("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `topic_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']));
-					$sub_counter = $db->num_rows();
-					if ($sub_counter == 1)
+					$db->sqlquery("SELECT `send_email` FROM `forum_topics_subscriptions` WHERE `topic_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']));
+					$count_rows = $db->num_rows();
+					if ($count_rows == 1)
 					{
 						$check_sub = $db->fetch();
 
@@ -239,7 +239,7 @@ else
 				// find out if this user has subscribed to the comments
 				if ($_SESSION['user_id'] != 0)
 				{
-					if ($sub_counter == 1)
+					if ($count_rows == 1)
 					{
 						$subscribe_link = "<a href=\"/index.php?module=viewtopic&amp;go=unsubscribe&amp;topic_id={$_GET['topic_id']}\"> <i class=\"icon-trash\"></i>Unsubscribe</a><br />";
 					}
@@ -929,17 +929,7 @@ else
 							$check = $db->fetch();
 							if ($check['count'] == 0)
 							{
-								$subscribe_check = '';
-								if ($_SESSION['auto_subscribe'] == 1 || $sub_counter == 1)
-								{
-									$subscribe_check = 'checked';
-								}
-
-								$subscribe_email_check = '';
-								if ($_SESSION['auto_subscribe_email'] == 1 || (isset($sub_counter) && $sub_counter['emails'] == 1))
-								{
-									$subscribe_email_check = 'selected';
-								}
+								$subscribe_check = $user->check_subscription($_GET['topic_id'], 'forum');
 
 								if (!isset($_SESSION['activated']))
 								{
@@ -955,8 +945,8 @@ else
 									$core->editor('text', '', $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
 
 									$templating->block('reply_buttons', 'viewtopic');
-									$templating->set('subscribe_check', $subscribe_check);
-									$templating->set('subscribe_email_check', $subscribe_email_check);
+									$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
+									$templating->set('subscribe_email_check', $subscribe_check['emails']);
 									$templating->set('url', url);
 									$templating->set('topic_id', $_GET['topic_id']);
 									$templating->set('forum_id', $topic['forum_id']);

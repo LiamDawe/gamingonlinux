@@ -700,4 +700,49 @@ class user
 		$pc_info['counter'] = $counter;
 		return $pc_info;
 	}
+	
+	// check their subscription details to an item (article, forum topic etc)
+	function check_subscription($data_id, $type)
+	{
+		global $db;
+		
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0 && core::is_number($data_id))
+		{
+			$sql_table = '';
+			if ($type == 'article')
+			{
+				$sql_table = 'articles_subscriptions';
+				$sql_id_field = 'article_id';
+			}
+			if ($type == 'forum')
+			{
+				$sql_table = 'forum_topics_subscriptions';
+				$sql_id_field = 'topic_id';
+			}
+			
+			// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+			$subscribe_check = [];
+			$db->sqlquery("SELECT `$sql_id_field`, `emails`, `send_email` FROM `$sql_table` WHERE `user_id` = ? AND `$sql_id_field` = ?", array($_SESSION['user_id'], $data_id));
+			$sub_exists = $db->num_rows();
+
+			if ($sub_exists == 1)
+			{
+				$check_current_sub = $db->fetch();
+			}
+
+			$subscribe_check['auto_subscribe'] = '';
+			if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
+			{
+				$subscribe_check['auto_subscribe'] = 'checked';
+			}
+
+			$subscribe_check['emails'] = '';
+			if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
+			{
+				$subscribe_check['emails'] = 'selected';
+			}
+			
+			return $subscribe_check;
+		}
+	}
 }

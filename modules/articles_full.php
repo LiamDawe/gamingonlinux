@@ -907,26 +907,7 @@ if (!isset($_GET['go']))
 
 								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 								{
-									// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
-									$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
-									$sub_exists = $db->num_rows();
-
-									if ($sub_exists == 1)
-									{
-										$check_current_sub = $db->fetch();
-									}
-
-									$subscribe_check = '';
-									if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
-									{
-										$subscribe_check = 'checked';
-									}
-
-									$subscribe_email_check = '';
-									if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
-									{
-										$subscribe_email_check = 'selected';
-									}
+									$subscribe_check = $user->check_subscription($_GET['aid'], 'article');
 
 									$comment = '';
 									if (isset($_SESSION['acomment']))
@@ -941,8 +922,8 @@ if (!isset($_GET['go']))
 
 									$templating->block('comment_buttons', 'articles_full');
 									$templating->set('url', core::config('website_url'));
-									$templating->set('subscribe_check', $subscribe_check);
-									$templating->set('subscribe_email_check', $subscribe_email_check);
+									$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
+									$templating->set('subscribe_email_check', $subscribe_check['emails']);
 									$templating->set('aid', $_GET['aid']);
 
 									$templating->block('preview', 'articles_full');

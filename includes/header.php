@@ -29,7 +29,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 }
 
 // can be removed eventually, stop-gap to stop errors for people already logged in that don't get the new options
-if ($_SESSION['theme'] = 'light')
+if ($_SESSION['theme'] == 'light')
 {
 	$_SESSION['theme'] = 'default';
 }

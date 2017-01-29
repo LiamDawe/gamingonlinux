@@ -12,13 +12,13 @@ if (isset($_GET['message']))
 {
 	if ($_GET['message'] == 'empty')
 	{
-		$core->message("You have to enter all the fields to contact us!", NULL, 1);
+		$core->message("You don't have to enter a name or an email address, but you do have to write an actual message to send!", NULL, 1);
 	}
 }
 
 if (isset($_POST['act']))
 {
-	if (empty($_POST['name']) || empty($_POST['email']) || empty($_POST['message']))
+	if (empty($_POST['message']))
 	{
 		$_SESSION['aname'] = $_POST['name'];
 		$_SESSION['aemail'] = $_POST['email'];
@@ -48,14 +48,29 @@ if (isset($_POST['act']))
 		else if (($parray['contact_captcha'] == 1 && $res['success']) || $parray['contact_captcha'] == 0)
 		{
 			// send the email
-			$subject = 'GOL Contact Us - ' . htmlentities($_POST['name']);
-
-			$additional_header = "Reply-To: {$_POST['name']} <{$_POST['email']}>";
+			$additional_header = '';
+			if (isset($_POST['name']) && !empty($_POST['name']))
+			{
+				$name = htmlentities($_POST['name']);
+			}
+			else
+			{
+				$name = 'Anonymous';
+			}
+			
+			if (isset($_POST['email']) && !empty($_POST['email']))
+			{
+				$additional_header = "Reply-To: $name <{$_POST['email']}>";
+			}
+			
+			$subject = 'GOL Contact Us - ' . $name;
+			
+			$html_message = '<p>' . $name . ' writes,</p>' . email_bbcode($_POST['message']);
 			
 			// Mail it
             if (core::config('send_emails') == 1)
             {
-				$mail = new mail(core::config('contact_email'), $subject, email_bbcode($_POST['message']), '', $additional_header);
+				$mail = new mail(core::config('contact_email'), $subject, $html_message, '', $additional_header);
 				$mail->send();
 				
 				unset($_SESSION['aname']);

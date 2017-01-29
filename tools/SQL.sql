@@ -584,7 +584,10 @@ INSERT INTO `config` (`id`, `data_key`, `data_value`) VALUES
 (46, 'cookie_domain', ''),
 (47, 'total_featured', '3'),
 (48, 'captcha_disabled', '1'),
-(49, 'twitch_dev_key', '');
+(49, 'twitch_dev_key', ''),
+(50, 'default-comments-per-page', '10'),
+(51, 'hot-article-viewcount', '1500'),
+(52, 'tagline-max-length', '400');
 
 -- --------------------------------------------------------
 
@@ -1198,7 +1201,7 @@ CREATE TABLE `users` (
   `auto_subscribe` tinyint(1) NOT NULL DEFAULT '1',
   `auto_subscribe_email` tinyint(1) NOT NULL DEFAULT '0',
   `email_on_pm` tinyint(1) NOT NULL DEFAULT '1',
-  `theme` varchar(32) COLLATE utf8_bin NOT NULL DEFAULT 'light',
+  `theme` varchar(32) COLLATE utf8_bin NOT NULL DEFAULT 'default',
   `supporter_link` text COLLATE utf8_bin NOT NULL,
   `premium-ends-date` int(11) NOT NULL,
   `hide_developer_status` tinyint(1) NOT NULL DEFAULT '0',

@@ -27,7 +27,13 @@ class mail
 
 		$this->html_message .= $html_message;
 
-		$this->html_message .= "</body></html>";
+		$this->html_message .= "<div>
+		<hr>
+		<p>If you haven't registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:" . core::config('contact_email') . "\" target=\"_blank\">" . core::config('contact_email') . "</a> with some info about what you want us to do about it.</p>
+		<p>Please don't reply to this automated message, as we do not read any emails recieved on this email address.</p>
+		</div>
+		</body>
+		</html>";
 
 		$this->plain_message = $plain_message;
 		$this->to = $to;

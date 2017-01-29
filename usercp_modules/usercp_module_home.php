@@ -59,13 +59,13 @@ if (!isset($_POST['act']))
 		if ($usercpcp['theme'] == 'dark')
 		{
 			$theme_options .= '<option value="dark" selected>dark</option>';
-			$theme_options .= '<option value="light">light</option>';
+			$theme_options .= '<option value="default">default</option>';
 		}
 
 		else
 		{
 			$theme_options .= '<option value="dark">dark</option>';
-			$theme_options .= '<option value="light" selected>light</option>';
+			$theme_options .= '<option value="default" selected>default</option>';
 		}
 
 		$templating->set('theme_options', $theme_options);

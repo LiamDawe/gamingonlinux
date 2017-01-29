@@ -47,27 +47,21 @@ if (isset($_POST['act']))
 
 		else if (($parray['contact_captcha'] == 1 && $res['success']) || $parray['contact_captcha'] == 0)
 		{
-			$contact_emails = array(core::config('contact_email'), 'thesamsai@gmail.com');
-			$to = implode(",", $contact_emails);
 			// send the email
-			$subject = 'GOL Contact Us - ' . $_POST['name'];
+			$subject = 'GOL Contact Us - ' . htmlentities($_POST['name']);
 
-			// To send HTML mail, the Content-type header must be set
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: GOL Contact Us <noreply@gamingonlinux.com>\r\n" . "Reply-To: {$_POST['name']} <{$_POST['email']}>\r\n";
-
-			if (@mail($to, $subject, email_bbcode($_POST['message']), $headers))
-			{
+			$additional_header = "Reply-To: {$_POST['name']} <{$_POST['email']}>";
+			
+			// Mail it
+            if (core::config('send_emails') == 1)
+            {
+				$mail = new mail(core::config('contact_email'), $subject, email_bbcode($_POST['message']), '', $additional_header);
+				$mail->send();
+				
 				unset($_SESSION['aname']);
 				unset($_SESSION['aemail']);
 				unset($_SESSION['amessage']);
 				$core->message("Thank you for emailing us, we try to get back to you as soon as possible if needed!");
-			}
-
-			else
-			{
-				$core->message("Sadly there was an issue sending the mail, <strong>try emailing liamdawe a-t gmail d-o-t com manually.</strong>", NULL, 1);
 			}
 		}
 	}

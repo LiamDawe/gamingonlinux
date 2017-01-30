@@ -64,8 +64,8 @@ $templating->set('url', core::config('website_url'));
 
 $templating->set('categories_list_preview', '<span class="label label-info">Categories Here</span>');
 
-$templating->set('title', $_POST['title']);
-$templating->set('slug', $_POST['slug']);
+$templating->set('title', strip_tags($_POST['title']));
+$templating->set('slug', strip_tags($_POST['slug']));
 $templating->set('author_id', $author_id);
 
 // if there is no registered user info we are previewing

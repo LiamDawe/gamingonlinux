@@ -1,20 +1,21 @@
 [block: category_add]
-<div class="alert alert-info no-bottom-margin"><h4>Add new forum categorys here</h4></div>
-<form method="post" action="admin.php?module=forum">
-	Category names, put each one on a new line.
-	<textarea name="list" cols="100" rows="10"></textarea><br />
-	<input type="submit" name="submit" value="Add" />
-	<input type="hidden" name="act" value="category" />
-</form>
+<div class="box"><div class="head">Add new forum categories here</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=forum">
+			Category names, put each one on a new line.
+			<textarea name="list" cols="100" rows="10"></textarea><br />
+			<input type="submit" name="submit" value="Add" />
+			<input type="hidden" name="act" value="category" />
+		</form>
+	</div>
+</div>
 [/block: category_add]
 
 [block: forum_add]
-<div class="alert alert-info no-bottom-margin"><h4>Add new forum here</h4></div>
-<form method="post" action="admin.php?module=forum">
-	<div class="container">
-	<div class="box">
+<div class="box"><div class="head">Add a new forum here</div>
+<div class="body group">
+	<form method="post" action="admin.php?module=forum">
 		Forum Name
-		</div>
 		<div class="box2">
 		<input type="text" name="forum" />
 		</div>
@@ -106,10 +107,11 @@
 
 [block: forum_end]
 		</table>
-	</div>
-	<input type="submit" value="Add Forum" />
-	<input type="hidden" name="act" value="forum" />
-</form>
+		<button type="submit">Add Forum</button>
+		<input type="hidden" name="act" value="forum" />
+	</form>
+</div>
+</div>
 [/block: forum_end]
 
 [block: category_top]

@@ -48,7 +48,7 @@ if (core::config('articles_rss') == 1)
 	$xml->writeElement('lastBuildDate', $last_date);
 
 	$xml->startElement('atom:link');
-	$xml->writeAttribute('href', 'https://www.gamingonlinux.com/article_rss_new.php');
+	$xml->writeAttribute('href', 'https://www.gamingonlinux.com/article_rss.php');
 	$xml->writeAttribute('rel', 'self');
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();

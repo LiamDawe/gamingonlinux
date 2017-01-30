@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 $file_dir = dirname(__FILE__);
 
 include($file_dir . '/includes/class_core.php');
@@ -87,7 +88,7 @@ foreach ($articles as $line)
 	$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ?", array($line['article_id']));
 	while ($get_categories = $db->fetch())
 	{
-		$categories_list[] = $get_categories['category_name'];
+		$categories_list[] = htmlspecialchars($get_categories['category_name']);
 	}
 
 	$cats = implode(', ', $categories_list);

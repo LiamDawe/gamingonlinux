@@ -79,56 +79,11 @@ if (!isset($_POST['action']))
 			$templating->set('email', $url_email);
 		}
 	}
-
-	else if (isset($_GET['twitter']))
-	{
-		require("includes/twitter/twitteroauth.php");
-
-		// see if they need to stay logged in
-		$stay = 0;
-		if (isset($_POST['stay']))
-		{
-			$stay = 1;
-		}
-		setcookie('request_stay', $stay, time()+(60*60*24*7), '/'); // 1 week
-
-		$twitteroauth = new TwitterOAuth(core::config('tw_consumer_key'), core::config('tw_consumer_skey'));
-
-		// Requesting authentication tokens, the parameter is the URL we will be redirected to
-		$request_token = $twitteroauth->getRequestToken(core::config('website_url') . 'includes/twitter/getTwitterData.php');
-
-		// Saving them into the session
-
-		$_SESSION['oauth_token'] = $request_token['oauth_token'];
-		$_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
-
-		// If everything goes well..
-		if ($twitteroauth->http_code == 200)
-		{
-			// Let's generate the URL and redirect
-			$url = $twitteroauth->getAuthorizeURL($request_token['oauth_token']);
-			header('Location: ' . $url);
-		}
-
-		else
-		{
-			// It's a bad idea to kill the script, but we've got to know when there's an error.
-			die('Something wrong happened.');
-		}
-	}
-
+	
 	else if (isset($_GET['steam']))
 	{
 		require("includes/steam/steam_login.php");
-
-		// see if they need to stay logged in
-		$stay = 0;
-		if (isset($_POST['stay']))
-		{
-			$stay = 1;
-		}
-		setcookie('request_stay', $stay, time()+(60*60*24*7), '/'); // 1 week
-
+	
 		$steam_user = new steam_user;
 		$steam_user->apikey = "AC45D7DB8C91DFD4CC57DC107D6A866A"; // put your API key here
 		$steam_user->domain = "http://www.gamingonlinux.com"; // put your domain
@@ -165,6 +120,35 @@ if (!isset($_POST['action']))
 
 		$steam_user->return_url = $return_url;
 		$steam_user->signIn();
+	}
+	
+	else if (isset($_GET['twitter']))
+	{
+		require("includes/twitter/twitteroauth.php");
+
+		$twitteroauth = new TwitterOAuth(core::config('tw_consumer_key'), core::config('tw_consumer_skey'));
+
+		// Requesting authentication tokens, the parameter is the URL we will be redirected to
+		$request_token = $twitteroauth->getRequestToken(core::config('website_url') . 'includes/twitter/getTwitterData.php');
+
+		// Saving them into the session
+
+		$_SESSION['oauth_token'] = $request_token['oauth_token'];
+		$_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
+
+		// If everything goes well..
+		if ($twitteroauth->http_code == 200)
+		{
+			// Let's generate the URL and redirect
+			$url = $twitteroauth->getAuthorizeURL($request_token['oauth_token']);
+			header('Location: ' . $url);
+		}
+
+		else
+		{
+			// It's a bad idea to kill the script, but we've got to know when there's an error.
+			die('Something wrong happened.');
+		}
 	}
 }
 
@@ -233,6 +217,36 @@ else if (isset($_POST['action']))
 			$_SESSION['login_error_username'] = $_POST['username'];
 			header("Location: /index.php?module=login&message=error");
 		}
+	}
+	
+	// catch anything from post and action them, then do the actual steam login
+	else if ($_POST['action'] == 'steam')
+	{
+		// see if they need to stay logged in
+		$stay = 0;
+		if (isset($_POST['stay']))
+		{
+			$stay = 1;
+		}
+		setcookie('request_stay', $stay, time()+(60*60*24*7), '/', core::config('cookie_domain')); // 1 week
+
+		header("Location: /index.php?module=login&steam");
+		die();
+	}
+	
+	// catch anything from post and action them, then do the actual twitter login
+	else if ($_POST['action'] == 'twitter')
+	{
+		// see if they need to stay logged in
+		$stay = 0;
+		if (isset($_POST['stay']))
+		{
+			$stay = 1;
+		}
+		setcookie('request_stay', $stay, time()+(60*60*24*7), '/', core::config('cookie_domain')); // 1 week
+		
+		header("Location: /index.php?module=login&twitter");
+		die();
 	}
 
 	else if ($_POST['action'] == 'Send')

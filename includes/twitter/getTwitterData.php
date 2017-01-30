@@ -1,20 +1,22 @@
 <?php
-session_start();
-require "../class_mysql.php";
-include('../config.php');
-include('../class_core.php');
-include('../class_mail.php');
-include('../class_user.php');
-require("twitteroauth.php");
-require "functions.php";
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
+
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+
+include($file_dir . '/includes/class_user.php');
+$user = new user();
+
+include($file_dir . '/includes/class_mail.php');
+
+include ($file_dir . "/includes/twitter/twitteroauth.php");
+include ($file_dir . "/includes/twitter/functions.php");
 
 define('YOUR_CONSUMER_KEY', core::config('tw_consumer_key'));
 define('YOUR_CONSUMER_SECRET', core::config('tw_consumer_skey'));
-
-$core = new core();
-$user = new user();
 
 if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empty($_SESSION['oauth_token_secret']))
 {
@@ -27,11 +29,6 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 	// Let's get the user's info
 	$user_info = $twitteroauth->get('account/verify_credentials');
 
-	// Print user's info DEBUG ONLY TO SEE WHATS AVAILABLE
-	//echo '<pre>';
-	//print_r($user_info);
-	//echo '</pre><br/>';
-
 	if (isset($user_info->error))
 	{
 		// Something's wrong, go back to square 1
@@ -41,24 +38,24 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 	else
 	{
 		$uid = $user_info->id;
-    $username = $user_info->screen_name;
-    $twitter_user = new twitter_user();
-    $userdata = $twitter_user->checkUser($uid, 'twitter', $username);
-
-		if (!isset($userdata) || empty($userdata))
-		{
-			die('There was an error getting your user data!');
-		}
+		$username = $user_info->screen_name;
+		$twitter_user = new twitter_user();
+		$userdata = $twitter_user->checkUser($uid, 'twitter', $username);
 
 		// linking account via usercp
-    if ($twitter_user->new == 0)
-    {
+		if ($twitter_user->new == 0)
+		{
 			header("Location: /usercp.php");
-    }
+		}
 
     	// logging in via twitter
-    else if ($twitter_user->new == 1)
-    {
+		else if ($twitter_user->new == 1)
+		{
+			if (!isset($userdata) || empty($userdata))
+			{
+				die('There was an error getting your user data!');
+			}
+		
 			// update IP address and last login
 			$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
@@ -74,12 +71,17 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 				setcookie('gol_session', $generated_session,  time()+31556926, '/', 'gamingonlinux.com');
 			}
 
-      header("Location: /");
-    }
+			header("Location: /");
+		}
 
 		// registering a new account with a twitter handle, send them to register with the twitter data
 		else if($twitter_user->new == 2)
 		{
+			if (!isset($userdata) || empty($userdata))
+			{
+				die('There was an error getting your user data!');
+			}
+			
 			$_SESSION['twitter_data'] = $userdata;
 
 			header("Location: /index.php?module=register&twitter_new");

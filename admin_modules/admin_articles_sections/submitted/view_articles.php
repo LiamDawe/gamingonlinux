@@ -29,7 +29,7 @@ if (!isset($_GET['aid']))
 	{
 		$templating->block('submitted_row', 'admin_modules/admin_articles_sections/submitted_articles');
 		$templating->set('url', core::config('website_url'));
-		$templating->set('article_id', $article['article_id']);
+		$templating->set('article_id', strip_tags($article['article_id']));
 		$templating->set('article_title', $article['title']);
 		if (empty($article['username']))
 		{

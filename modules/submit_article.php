@@ -313,7 +313,7 @@ if (isset($_POST['act']))
         $templating->block('preview_row');
         $templating->set('url',core::config('website_url'));
 
-        $templating->set('title', $_POST['title']);
+        $templating->set('title', strip_tags($_POST['title']));
         $templating->set('user_id', $_SESSION['user_id']);
 
         if ($_SESSION['user_id'] == 0)

@@ -1,14 +1,13 @@
 <?php
-//$path = "/mnt/storage/public_html/";
-$path = "/home/gamingonlinux/public_html/";
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-if ($handle = opendir($path.'uploads/articles/tagline_images/temp/')) {
+if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/')) {
     echo "Entries:<br />";
 
     /* This is the correct way to loop over the directory. */
     while (false !== ($entry = readdir($handle)))
 		{
-			$full_filename = $path . 'uploads/articles/tagline_images/temp/' . $entry;
+			$full_filename = $file_dir . '/uploads/articles/tagline_images/temp/' . $entry;
 			// if the file is older than 24 hours
 			if (time()-filemtime($full_filename) > 24 * 3600)
 			{
@@ -41,13 +40,13 @@ if ($handle = opendir($path.'uploads/articles/tagline_images/temp/')) {
     closedir($handle);
 }
 
-if ($handle = opendir($path.'uploads/articles/tagline_images/temp/thumbnails/')) {
+if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/thumbnails/')) {
     echo "Entries:<br />";
 
     /* This is the correct way to loop over the directory. */
     while (false !== ($entry = readdir($handle)))
 		{
-			$full_filename = $path . 'uploads/articles/tagline_images/temp/thumbnails/' . $entry;
+			$full_filename = $file_dir . '/uploads/articles/tagline_images/temp/thumbnails/' . $entry;
 			// if the file is older than 24 hours
 			if (time()-filemtime($full_filename) > 24 * 3600)
 			{

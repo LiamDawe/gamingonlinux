@@ -1,14 +1,11 @@
 <?php
-define('path', '/home/gamingonlinux/public_html/includes/');
-//define('path', '/mnt/storage/public_html/includes/');
-include(path . 'config.php');
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include(path . 'class_core.php');
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-$core = new core();
-
-include(path . 'class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
 // don't count people who haven't logged in for six months, need to test this more before putting it in
 // last time i ran it, it already cut off a ton of people even though the system has only been around a few weeks, which wasn't right at all

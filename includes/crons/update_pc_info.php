@@ -1,19 +1,16 @@
 <?php
-define('path', '/home/gamingonlinux/public_html/includes/');
-//define('path', '/mnt/storage/public_html/includes/');
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include(path . 'config.php');
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include(path . 'class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include(path. 'class_core.php');
-$core = new core();
-
-include(path . 'bbcode.php');
+include($file_dir . '/includes/bbcode.php');
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
-include(path . 'class_template.php');
+include($file_dir . '/includes/class_template.php');
 
 $templating = new template();
 

@@ -1,20 +1,13 @@
 <?php
-error_reporting(-1);
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-echo "GOG calendar importer started on " .date('d-m-Y H:m:s'). "\n";
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-define('path', '/home/gamingonlinux/public_html/includes/');
-//define('path', '/mnt/storage/public_html/includes/');
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include(path . 'config.php');
-
-include(path . 'class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
-
-include(path . 'class_core.php');
-$core = new core();
-
-include(path . 'class_mail.php');
+include($file_dir . '/includes/class_mail.php');
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 

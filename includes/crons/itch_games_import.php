@@ -1,18 +1,15 @@
 <?php
 echo "Itch importer started on " .date('d-m-Y H:m:s'). "\n";
 
-define('path', '/home/gamingonlinux/public_html/includes/');
-//define('path', '/mnt/storage/public_html/includes/');
+$file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include(path . 'config.php');
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include(path . 'class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include(path . 'class_core.php');
-$core = new core();
-
-include(path . 'class_mail.php');
+include($file_dir . '/includes/class_mail.php');
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 $url = 'https://itch.io/feed/new.xml';

@@ -403,6 +403,8 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 			foreach ($categorys as $name)
 			{
+				$name = strip_tags($name);
+				
 				// find the last order
 				$db->sqlquery("SELECT `order` FROM `forums` WHERE `is_category` = 1 ORDER BY `order` DESC LIMIT 1");
 				$order = $db->fetch();
@@ -420,7 +422,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 	if ($_POST['act'] == 'forum')
 	{
 		// make these safe for queries
-		$name = $_POST['forum'];
+		$name = strip_tags($_POST['forum']);
 		$description = $_POST['description'];
 		$category = $_POST['category'];
 
@@ -567,54 +569,60 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 	{
 		if ($_POST['submit'] == 'Edit')
 		{
-			if (empty($_POST['name']))
+			$name = trim($_POST['name']);
+			$name = strip_tags($name);
+			if (empty($name))
 			{
 				$core->message('The category must be named!');
 			}
 
 			else
 			{
-				$db->sqlquery("UPDATE `forums` SET `name` = ?, `order` = ? WHERE `forum_id` = ?", array($_POST['name'], $_POST['order'], $_POST['category_id']));
+				$db->sqlquery("UPDATE `forums` SET `name` = ?, `order` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['category_id']));
 
-				$core->message("Category {$_POST['name']} has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
+				$core->message("Category $name has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
 			}
 		}
 
 		if ($_POST['submit'] == 'Delete')
 		{
-
-			// check if it has forums
-
-			$db->sqlquery("SELECT `forum_id` FROM `forums` WHERE `parent_id` = ?", array($_POST['category_id']));
-			if ($db->num_rows() > 0)
+			if (isset($_POST['category_id']) && core::is_number($_POST['category_id']))
 			{
-				$core->message('You cannot delete a category that is populated with forums! Delete the forums first, this is a security measure so you don\'t end up deleting lots of forums with posts. <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
-			}
+				// check if it has forums
+				$db->sqlquery("SELECT `forum_id` FROM `forums` WHERE `parent_id` = ?", array($_POST['category_id']));
+				if ($db->num_rows() > 0)
+				{
+					$core->message('You cannot delete a category that is populated with forums! Delete the forums first, this is a security measure so you don\'t end up deleting lots of forums with posts. <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
+				}
 
-			// if it has none
-			else
-			{
-				$db->sqlquery("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['category_id']));
+				// if it has none
+				else
+				{
+					$db->sqlquery("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['category_id']));
 
-				$core->message('Category has been deleted! <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
+					$core->message('Category has been deleted! <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
+				}
 			}
 		}
 	}
 
 	if ($_POST['act'] == 'forummanage')
 	{
+		$name = trim($_POST['name']);
+		$name = strip_tags($name);
+		
 		if ($_POST['submit'] == 'Edit')
 		{
-			if (empty($_POST['name']))
+			if (empty($name))
 			{
 				$core->message('The forum must be named!');
 			}
 
 			else
 			{
-				$db->sqlquery("UPDATE `forums` SET `name` = ?, `order` = ?, `description` = ? WHERE `forum_id` = ?", array($_POST['name'], $_POST['order'], $_POST['description'],  $_POST['forum_id']));
+				$db->sqlquery("UPDATE `forums` SET `name` = ?, `order` = ?, `description` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['description'],  $_POST['forum_id']));
 
-				$core->message("Category {$_POST['name']} has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
+				$core->message("Category $name has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
 			}
 		}
 

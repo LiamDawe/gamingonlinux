@@ -49,7 +49,7 @@ foreach($charts as $chart)
 {
   if (isset($_POST['picker']) && is_numeric($_POST['picker']))
   {
-    $grouping_id = $_POST['picker'];
+    $grouping_id = core::make_safe($_POST['picker']);
   }
   else
   {

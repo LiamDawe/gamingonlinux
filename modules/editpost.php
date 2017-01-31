@@ -6,6 +6,12 @@ $templating->merge('editpost');
 // if its the topic
 if (!isset($_POST['act']))
 {
+	if (!core::is_number($_GET['page']))
+	{
+		header("Location: /index.php?module=forum&message=empty&extra=page-id");
+		die();
+	}
+	
 	$templating->block('post');
 
 	// editing the main topic
@@ -88,6 +94,11 @@ if (!isset($_POST['act']))
 
 if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 {
+	if (!core::is_number($_POST['page']))
+	{
+		header("Location: /index.php?module=forum&message=empty&extra=page-id");
+	}
+	
 	// edit topic
 	if (isset($_GET['topic_id']) && is_numeric($_GET['topic_id']))
 	{

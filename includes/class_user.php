@@ -54,7 +54,7 @@ class user
 	{
 		global $db;
 
-		$db->sqlquery("SELECT `password_salt`, `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+		$db->sqlquery("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
 		if ($db->num_rows() > 0)
 		{
 			$info = $db->fetch();
@@ -66,15 +66,6 @@ class user
 				if ($db->num_rows() == 1)
 				{
 					$user_info = $db->fetch();
-
-					// sort old passwords to new
-					$old_password = hash('sha256', $info['password_salt'] . $password);
-					if ($old_password[0] != '$')
-					{
-							$new_password_hash = password_hash($password, PASSWORD_BCRYPT);
-
-							$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_hash, $user_info['user_id']));
-					}
 
 					$this->check_banned($user_info);
 

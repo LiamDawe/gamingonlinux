@@ -92,11 +92,7 @@ if (isset($_POST['Update']))
 	// message
 	$html_message = "<p>Hello <strong>{$grab_current_password['username']}</strong>,</p>
 	<p>Someone, hopefully you, has changed your password on <a href=\"".core::config('website_url')."\">gamingonlinux.com</a>. If this was you, please ignore this email as it's just a security measure.</p>
-	<hr>
-		<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> !</p>
-		<p>Please don&#39;t reply to this automated message. We do not read any mails recieved on this email address.</p>
-		<p>-----------------------------------------------------------------------------------------------------------</p>
-	</div>";
+	<hr>";
 
 	$plain_message = PHP_EOL."Hello {$grab_current_password['username']}! Someone, hopefully you, has changed your password on ".core::config('website_url').". If this was you, please ignore this email as it's just a security measure.";
 

@@ -23,13 +23,15 @@ include($file_dir . '/includes/class_user.php');
 $user = new user();
 $user->check_session();
 
+include($file_dir . '/includes/class_charts.php');
+
 if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {
 	$user->logout();
 }
 
 // can be removed eventually, stop-gap to stop errors for people already logged in that don't get the new options
-if ($_SESSION['theme'] == 'light')
+if (isset($_SESSION['theme']) && $_SESSION['theme'] == 'light')
 {
 	$_SESSION['theme'] = 'default';
 }

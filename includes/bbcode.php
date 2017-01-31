@@ -5,46 +5,14 @@ HTML is sanatized in files directly, not here
 function do_charts($body)
 {
 	global $db;
-
+	
 	preg_match_all("/\[chart\](.+?)\[\/chart\]/is", $body, $matches);
-
-	$chart_id = 0;
-
-	$how_many = sizeof($matches[1]);
-
-	require_once(core::config('path') . 'includes/SVGGraph/SVGGraph.php');
 
 	foreach ($matches[1] as $id)
 	{
-		$db->sqlquery("SELECT `name`, `h_label` FROM `charts` WHERE `id` = ?", array($id));
-		$chart_info = $db->fetch();
+		$charts = new golchart();
 
-		// set the right labels to the right data
-		$labels = array();
-		$db->sqlquery("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ?", array($id));
-		$get_labels = $db->fetch_all_rows();
-
-    foreach ($get_labels as $label_loop)
-    {
-        $db->sqlquery("SELECT `data`, `label_id` FROM `charts_data` WHERE `chart_id` = ?", array($id));
-        while ($get_data = $db->fetch())
-        {
-            if ($label_loop['label_id'] == $get_data['label_id'])
-            {
-                $labels[$label_loop['name']] = $get_data['data'];
-            }
-        }
-    }
-
-		$settings = array('graph_title' => $chart_info['name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
-		$graph = new SVGGraph(400, 300, $settings);
-		$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
-		$graph->colours = $colours;
-
-    $graph->Values($labels);
-    $get_graph = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
-
-		$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", $get_graph, $body);
+		$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", $charts->render($id), $body);
 	}
 	return $body;
 }
@@ -262,9 +230,6 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 		},
 		$body);
 
-	// replace charts bbcode with the pretty stuff
-	$body = do_charts($body);
-
 	$body = pc_info($body);
 
 	if ($tagline_image != NULL)
@@ -443,8 +408,11 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	{
 		$body = str_replace("!!@codeblock".$key."!!", $codeblock, $body);
 	}
+	
+	// replace charts bbcode with the pretty stuff
+	$body = do_charts($body);
 
-	 return $body;
+	return $body;
 }
 
 function email_bbcode($body)

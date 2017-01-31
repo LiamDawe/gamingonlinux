@@ -1449,15 +1449,18 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .announce a:link {color: #323232; font-style: italic;}
 .dark .announce a {color: #191919; font-style: italic;}
 .dark .announce a:link {color: #191919; font-style: italic;}
-.dark svg.svggraph rect {fill: #000; stroke: grey;}
-svg.svggraph text {font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;}
-.dark svg.svggraph text {fill: #eee; font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;}
-.dark svg.svggraph path {stroke: grey;}
 .dark .breadcrumb {background: #2E2E2E;}
 .dark .collapse_header {background: #000;}
 .vote_done {color: white; background-color: green;}
 .dark .vote_done {color: white; background-color: green;}
 .dark #wrap strong {color: black;}
+/* GOL Charts */
+.dark .golsvg_header {fill: #515151}
+.golsvg_title {fill: white;}
+.dark .golsvg_background {fill: #000000}
+.dark svg text {fill: white;}
+.golsvg_counters {fill: black}
+.dark golsvg_counters {fill: white}
 .patreon {
 	margin-top: 14px;
 	line-height: 30px;

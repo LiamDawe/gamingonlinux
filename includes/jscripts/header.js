@@ -288,11 +288,11 @@ jQuery(document).ready(function()
     },
     minimumInputLength: 2
   });
-  $(".livestream_user_ids").select2({
+  $(".call_usernames").select2({
     selectOnClose: true,
     width: '100%',
     ajax: {
-      url: "/includes/ajax/livestream_users_ajax.php",
+      url: "/includes/ajax/call_usernames.php",
       dataType: 'json',
       delay: 250,
       data: function (params) {

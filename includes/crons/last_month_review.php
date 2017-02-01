@@ -7,18 +7,9 @@ $core = new core($file_dir);
 include($file_dir . '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include($file_dir . '/includes/bbcode.php');
-
-// setup the templating, if not logged in default theme, if logged in use selected theme
-include($file_dir . '/includes/class_template.php');
-$templating = new template();
-
-include($file_dir . '/includes/class_article.php');
-$article_class = new article_class();
-
 $prev_month = date('n', strtotime('-1 months'));
 $year_selector = date('Y');
-if ($prev_month = 12)
+if ($prev_month == 12)
 {
 	$time = strtotime("-1 year", time());
 	$year_selector = date("Y", $time);
@@ -38,41 +29,16 @@ $tagline = "Here is a look back at the 15 most popular articles on GamingOnLinux
 $text = "Here is a look back at the 15 most popular articles on GamingOnLinux for $prevdate, an easy way to for you to keep up to date on what has happened in the past month for Linux & SteamOS Gaming! If you wish to keep track of these overview posts you can with our <a href=\"http://www.gamingonlinux.com/article_rss.php?section=overviews\">Overview RSS</a>.<br /><br />We published a total of <strong>{$counter['counter']} articles last month</strong>! You can see who <a href=\"https://www.gamingonlinux.com/index.php?module=website_stats\">contributed articles on this page.</a><br />";
 
 // sub query = grab the highest ones, then the outer query sorts them in ascending order, so we get the highest viewed articles, and then sorted from lowest to highest
-$db->sqlquery("SELECT a.*
-FROM (SELECT a.`article_id`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as `gallery_tagline_filename`, a.`title`, a.`tagline`, a.`views`, c.`category_id`
-	FROM
-		articles a
-	LEFT JOIN
-		`article_category_reference` c ON a.`article_id` = c.`article_id`
-	LEFT JOIN
-		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
-	WHERE
-		a.`date` >= $first_minute AND a.`date` <= $last_minute AND c.`category_id` NOT IN (63, 92) AND a.`active` = 1 group by `a`.`article_id`
-	ORDER BY
-		a.`views` DESC
-	LIMIT 15
-     ) a
-ORDER BY `views` DESC");
+$db->sqlquery("SELECT a.`article_id` FROM articles a LEFT JOIN `article_category_reference` c ON a.`article_id` = c.`article_id` WHERE a.`date` >= $first_minute AND a.`date` <= $last_minute AND c.`category_id` NOT IN (63, 92) AND a.`active` = 1 group by `a`.`article_id` ORDER BY a.`views` DESC LIMIT 15");
 
 while ($articles = $db->fetch())
 {
-	$nice_link =  $core->nice_title($articles['title']) . '.' . $articles['article_id'];
-	$views = number_format($articles['views'], 0, '.', ',');
-
-	$date = $core->format_date($articles['date']);
-
-	$tagline_image = $article_class->tagline_image($articles);
-	$text .= "<br /><a href=\"http://www.gamingonlinux.com/articles/$nice_link\">{$tagline_image}</a>";
-	$text .= "<br /><a href=\"http://www.gamingonlinux.com/articles/$nice_link\">{$articles['title']}</a> - $date - Views: {$views}";
-	$text .= "<br /><em>{$articles['tagline']}</em><br /><br />";
+	$text .= '[article]' . $articles['article_id'] . '[/article]';
 }
 
 $text .= "<br />All of this is possible thanks to <a href=\"http://patreon.com/liamdawe\">my Patreon campaign</a>, and our Supporters!<br />";
 
 $text .= "<br />What was your favourite Linux Gaming news from $prevdate?";
-
-// DEBUG
-//echo $text;
 
 $slug = $core->nice_title($title);
 

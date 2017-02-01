@@ -52,7 +52,7 @@ if ($editor_pick_count < core::config('editor_picks_limit'))
 	$subject = "You need to set more editor picks on GamingOnLinux.com";
 	
 	// message
-	$html_message = "<p>Hello <strong>liamdawe</strong>,</p>
+	$html_message = "<p>Hello <strong>admin</strong>,</p>
 	<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to " . core::config('editor_picks_limit') . "!</p>
 	<p>Games removed:</p>
 	<p>$games</p>";

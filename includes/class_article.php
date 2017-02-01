@@ -16,15 +16,15 @@ class article_class
     $tagline_image = '';
     if (!empty($data['tagline_image']))
     {
-      $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+      $tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
     }
     if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
     {
-      $tagline_image = "<img alt src=\"".url."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
+      $tagline_image = "<img alt src=\"".core::config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
     }
     if (empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
     {
-      $tagline_image = "<img alt src=\"".url."uploads/articles/tagline_images/defaulttagline.png\">";
+      $tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
     }
 
     return $tagline_image;

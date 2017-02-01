@@ -7,6 +7,8 @@ $core = new core($file_dir);
 include($file_dir. '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
+include($file_dir . '/includes/class_charts.php');
+
 if (core::config('articles_rss') == 1)
 {
 	include($file_dir . '/includes/bbcode.php');

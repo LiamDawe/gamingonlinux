@@ -1,15 +1,13 @@
 <?php
-$path = '/home/gamingonlinux/public_html/';
-//$path = '/mnt/storage/public_html/';
-include($path . 'includes/config.php');
+$file_dir = dirname( dirname(__FILE__) );
 
-include($path . 'includes/class_mysql.php');
-$db = new mysql($database_host, $database_username, $database_password, $database_db);
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-include($path . 'includes/class_core.php');
-$core = new core();
+include($file_dir. '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include($path . 'includes/class_mail.php');
+include($file_dir . 'includes/class_mail.php');
 
 $csv = array_map('str_getcsv', file('patreon.csv'));
 
@@ -42,7 +40,7 @@ foreach ($csv as $line)
         Ps. Don't worry if you have never seen this before, this email was generated from a new script I wrote to help me automate Patreon stuff! It will only be sent to you once a month, just to confirm and so I don't miss anyone.";
 
 
-        $mail = new mail($line[2], 'Thank you for supporting GamingOnLinux, more info may be needed', $html_message, '', 'Reply-To: liamdawe@gmail.com');
+        $mail = new mail($line[2], 'Thank you for supporting GamingOnLinux, more info may be needed', $html_message, '', 'Reply-To: ' . core::config('contact_email'));
         $mail->send();
 
         echo "Email sent to " . $line[2] . '<br />';

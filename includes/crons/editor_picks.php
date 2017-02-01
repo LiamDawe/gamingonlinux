@@ -48,35 +48,19 @@ $editor_pick_count = $db->num_rows();
 
 if ($editor_pick_count < core::config('editor_picks_limit'))
 {
-	$to = "liamdawe@gmail.com";
-
 	// subject
 	$subject = "You need to set more editor picks on GamingOnLinux.com";
-
+	
 	// message
-	$message = "
-	<html>
-	<head>
-		<title>You need to set more editor picks on GamingOnLinux.com</title>
-		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-	</head>
-	<body>
-		<img src=\"" . core::config('website_url') . "/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-		<br />
-		<p>Hello <strong>liamdawe</strong>,</p>
-		<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to " . core::config('editor_picks_limit') . "!</p>
-		<p>Games removed:</p>
-		<p>$games</p>
-		<div>
-
-	</body>
-	</html>";
-
-	// To send HTML mail, the Content-type header must be set
-	$headers  = 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-	$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+	$html_message = "<p>Hello <strong>liamdawe</strong>,</p>
+	<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> to fill it all the way up to " . core::config('editor_picks_limit') . "!</p>
+	<p>Games removed:</p>
+	<p>$games</p>";
 
 	// Mail it
-	mail($to, $subject, $message, $headers);
+	if (core::config('send_emails') == 1)
+	{
+		$mail = new mail(core::config['contact_email'], $subject, $html_message, $plain_message);
+		$mail->send();
+	}
 }

@@ -39,6 +39,19 @@ class core
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$ip = $this->get_client_ip();
 	}
+	
+	// check in_array for a multidimensional array
+	public static function in_array_r($needle, $haystack) 
+	{
+		foreach($haystack as $array)
+		{
+			if(in_array($needle, $array, true))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public static function genEmailCode($id)
 	{
@@ -557,15 +570,15 @@ class core
 	// check for multiple things being empty and return the name of what was empty
 	public static function mempty()
 	{
-	  foreach(func_get_args()[0] as $key => $arg)
+		foreach(func_get_args()[0] as $key => $arg)
 		{
-	    if(empty($arg))
+			if(empty($arg))
 			{
-	      return $key;
+				return $key;
 			}
-	    else
+			else
 			{
-	      continue;
+				continue;
 			}
 		}
 		return true;

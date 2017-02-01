@@ -496,8 +496,24 @@ else
 			{
 				$core->message("We couldn't find the people requested! Have you got the correct username spellings? Please try again.", NULL, 1);
 			}
+			
+			if (isset($_SESSION['mto']) && is_array($_SESSION['mto']) && core::is_number($_SESSION['mto']))
+			{
+				$user_to = '';
+				$sql_ids = [];
+				$total_users = count($_SESSION['mto']);
+				for ($i = 0; $i < $total_users; $i++)
+				{
+					$sql_ids[] = '?';
+				}
+				
+				$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $_SESSION['mto']);
+				while ($check_to = $db->fetch())
+				{
+					$user_to .= '<option value="'.$check_to['user_id'].'" selected>'.$check_to['username'].'</option>';
+				}
+			}
 
-			$user_to = $_SESSION['mto'];
 			$title = $_SESSION['mtitle'];
 			$text = $_SESSION['mtext'];
 		}
@@ -528,15 +544,15 @@ else
 		$text = core::make_safe($text);
 
 		// check empty
-		if (empty($_POST['to']) || empty($title) || empty($text))
+		if (empty($_POST['user_ids']) || empty($title) || empty($text) || !is_array($_POST['user_ids']) || !core::is_number($_POST['user_ids']))
 		{
-			$_SESSION['mto'] = $_POST['to'];
+			$_SESSION['mto'] = $_POST['user_ids'];
 			$_SESSION['mtitle'] = $title;
 			$_SESSION['mtext'] = $text;
 
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: /private-messages/compose/message=empty");
+				header("Location: " . core::config('website_url') . 'private-messages/compose/message=empty');
 				die();
 			}
 			else
@@ -548,24 +564,20 @@ else
 
 		else
 		{
-			// find users
-			$users = explode(',', $_POST['to']);
-
-			$user_id_list = array();
-
-			foreach ($users as $user)
+			// first be sure they exist, even though we searched to find them originally, just be sure
+			$found_users = 0;
+			
+			$sql_ids = [];
+			$total_users = count($_SESSION['mto']);
+			for ($i = 0; $i < $total_users; $i++)
 			{
-				$user = trim($user);
-				$db->sqlquery("SELECT `user_id` FROM `users` WHERE `username` = ?", array($user));
-				$user_id = $db->fetch();
-
-				if ($user_id['user_id'] != $_SESSION['user_id'])
-				{
-					$user_id_list[] = $user_id['user_id'];
-				}
+				$sql_ids[] = '?';
 			}
+			
+			$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $_POST['user_ids']);
+			$recepients_count = $db->fetch();
 
-			if (empty($user_id))
+			if ($recepients_count['count'] == 0)
 			{
 				if (core::config('pretty_urls') == 1)
 				{
@@ -585,7 +597,7 @@ else
 			$conversation_id = $db->grab_id();
 
 			// send message to each user
-			foreach ($user_id_list as $user_id)
+			foreach ($_POST['user_ids'] as $user_id)
 			{
 				// make the duplicate message for other participants
 				$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));

@@ -29,8 +29,8 @@
 	<div class="box">
 		<div class="head">Compose a new private message</div>
 		<div class="body group">
-			To (seperate names by commas, make sure you have their exact username!)<br />
-			<input type="text" name="to" value="{:to}" /><br />
+			Send to: <em>Start entering a username for it to search</em><br />
+			<select tabindex="-1" multiple="" name="user_ids[]" class="call_usernames" style="width:300px" class="populate select2-offscreen">{:to}</select><br />
 			Title<br />
 			<input type="text" name="title" value="{:title}" /><br />
 [/block: compose_top]

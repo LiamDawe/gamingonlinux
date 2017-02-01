@@ -29,16 +29,13 @@ foreach ($csv as $line)
       {
         $html_message = "Hello from Liam at <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>! Thank you for supporting me on Patreon.<br />
         <br />
-        I have tried to match your email up to a username, but I didn't find anything. <br />
+        I have tried to match your Patreon registered email up to a username on the website, but I didn't find anything.<br />
         <br />
         <strong>Don't worry</strong>, if you already have your GOL Supporter badge you can ignore this email! <br />
         <br />
         If you haven't, please reply with your username or email attached to a GOL account. You're likely using a different email address on Patreon to what you use on GOL.<br />
         <br />
-        Thank you.<br />
-        <hr />
-        Ps. Don't worry if you have never seen this before, this email was generated from a new script I wrote to help me automate Patreon stuff! It will only be sent to you once a month, just to confirm and so I don't miss anyone.";
-
+        Thank you.";
 
         $mail = new mail($line[2], 'Thank you for supporting GamingOnLinux, more info may be needed', $html_message, '', 'Reply-To: ' . core::config('contact_email'));
         $mail->send();

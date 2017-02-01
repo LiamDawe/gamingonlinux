@@ -274,14 +274,11 @@ else if (isset($_POST['action']))
 			$url_email = rawurlencode($_POST['email']);
 
 			// send mail with link including the key
-			$html_message = "Please click <a href=\"" . core::config('website_url') . "index.php?module=login&reset&code={$random_string}&email={$url_email}\">this link</a> to reset your password
-			<hr>
-				<p>If you didn't request this, don't worry! Unless someone has access to your email address it isn't an issue!</p>
-				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> to let us know!</p>
-				<p>Please don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-			<hr>";
+			$html_message = '<p>Someone, hopefully you, has requested to reset your password on ' . core::config('website_url') . '!</p>
+			<p>If you didn\'t request this, don\'t worry! Unless someone has access to your email address it isn\'t an issue!</p>
+			<p>Please click <a href="' . core::config('website_url') . 'index.php?module=login&reset&code={$random_string}&email={$url_email}">this link</a> to reset your password</p>';
 
-			$plain_message = "Please go here: " . core::config('website_url') . "index.php?module=login&reset&code={$random_string}&email={$url_email} to change your password. If you didn't request this, you can ignore it as it's not a problem unless anyone has access to your email!";
+			$plain_message = 'Someone, hopefully you, has requested to reset your password on ' . core::config('website_url') . '! Please go here: " . core::config('website_url') . "index.php?module=login&reset&code=' . $random_string . '&email=' . $url_email . ' to change your password. If you didn\'t request this, you can ignore it as it\'s not a problem unless anyone has access to your email!';
 
 			// Mail it
 			if (core::config('send_emails') == 1)

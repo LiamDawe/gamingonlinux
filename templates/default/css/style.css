@@ -1298,6 +1298,8 @@ body.dark {
   .navigation-main #extra {
         display: none;
   }
+	.article_bbcode img{width: 100%; max-width: 100% !important;}
+	.article_bbcode .tagline {margin-left: 0px !important;}
 	.hide-small{display:none;}
 	#navigation-mobile {display: block;}
 }
@@ -1496,3 +1498,9 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 	 padding: 20px;
 	 z-index: 9999;
 	 outline: none;}
+.article_bbcode {border: 1px solid #ccc; border-radius: 5px; padding: 5px; margin-bottom: 10px; width: 100%;}
+.article_bbcode img {margin-right: 15px;
+    float: left;
+	max-width: 100px;
+}
+.article_bbcode .tagline {margin-left: 115px;}

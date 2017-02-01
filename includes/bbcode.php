@@ -198,6 +198,49 @@ function logged_in_code($body)
 	return $body;
 }
 
+// for showing a nicely formatted article info box inside anything called by [article]ID[/article]
+function replace_article($text, $article_id)
+{
+	global $core, $article_class, $db;
+	
+	if (core::is_number($article_id))
+	{
+		$db->sqlquery("SELECT 
+			a.`title`, 
+			a.`article_id`, 
+			a.`tagline`, 
+			a.`tagline_image`, 
+			a.`gallery_tagline`, 
+			a.`views`, 
+			a.`date`,
+			t.`filename` as `gallery_tagline_filename` 
+		FROM 
+			`articles` a 
+		LEFT JOIN 
+			`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
+		WHERE 
+			a.`article_id` = ?", array($article_id));
+		$article_info = $db->fetch();
+			
+		$tagline_image = $article_class->tagline_image($article_info);
+		
+		$nice_link =  $core->nice_title($article_info['title']) . '.' . $article_info['article_id'];
+		
+		$date = $core->format_date($article_info['date']);
+		
+		$views = number_format($article_info['views'], 0, '.', ',');
+			
+		$article_replace = "<div class=\"article_bbcode\">
+			<a href=\"". core::config('website_url') . $nice_link . "\">".$tagline_image."</a>
+			<div class=\"tagline\"><a href=\"". core::config('website_url') . $nice_link . "\">" . $article_info['title'] . "</a> - " . $date . " - Views: " . $views . "<br />".$article_info['tagline']."</div>
+		</div>";
+			
+		$text = preg_replace("/\[article\]".$article_id."\[\/article\]/is", $article_replace, $text);
+	}
+	
+	return $text;
+}
+
 function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $gallery_tagline = NULL)
 {
 	//  get rid of empty BBCode, is there a point in having excess markup?
@@ -385,6 +428,14 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	}
 
 	$body = nl2br($body);
+	
+	if (preg_match_all("/\[article\]([0-9]+)\[\/article\]/is", $body, $article_matches))
+	{
+		foreach ($article_matches[1] as $match)
+		{
+			$body = replace_article($body, $match);
+		}
+	}
 
 	// stop adding breaks to lists
 	$body = str_replace('<ul><br />', '<ul>', $body);
@@ -486,21 +537,21 @@ function email_bbcode($body)
 	);
 
 	$replace = array(
-  "<a href=\"$1\" target=\"_blank\">$2</a>",
+	"<a href=\"$1\" target=\"_blank\">$2</a>",
 	"<a href=\"$1\" target=\"_blank\">$1</a>",
-  "<strong>$1</strong>",
-  "<em>$1</em>",
-  "<span style=\"text-decoration:underline;\">$1</span>",
-  "<del>$1</del>",
-  "$2",
-  "$2",
-  "<div style=\"text-align:center;\">$1</div>",
-  "<div style=\"text-align:right;\">$1</div>",
-  "<div style=\"text-align:left;\">$1</div>",
+	"<strong>$1</strong>",
+	"<em>$1</em>",
+	"<span style=\"text-decoration:underline;\">$1</span>",
+	"<del>$1</del>",
+	"$2",
+	"$2",
+	"<div style=\"text-align:center;\">$1</div>",
+	"<div style=\"text-align:right;\">$1</div>",
+	"<div style=\"text-align:left;\">$1</div>",
 	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>",
-  "<img src=\"$1\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
-  "<img width=\"$1\" height=\"$2\" src=\"$3\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
-  "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
+	"<img src=\"$1\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
+	"<img width=\"$1\" height=\"$2\" src=\"$3\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
+	"<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 	"<span style=\"text-decoration: line-through\">$1</span>",
 	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>", // for xenforo videos
 	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>

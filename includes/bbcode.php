@@ -232,7 +232,7 @@ function replace_article($text, $article_id)
 			
 		$article_replace = "<div class=\"article_bbcode\">
 			<a href=\"". core::config('website_url') . $nice_link . "\">".$tagline_image."</a>
-			<div class=\"tagline\"><a href=\"". core::config('website_url') . $nice_link . "\">" . $article_info['title'] . "</a> - " . $date . " - Views: " . $views . "<br />".$article_info['tagline']."</div>
+			<div class=\"tagline\"><a href=\"". core::config('website_url') . 'articles/' . $nice_link . "\">" . $article_info['title'] . "</a><br /><em>" . $date . " - Views: " . $views . "</em><br />".$article_info['tagline']."</div>
 		</div>";
 			
 		$text = preg_replace("/\[article\]".$article_id."\[\/article\]/is", $article_replace, $text);

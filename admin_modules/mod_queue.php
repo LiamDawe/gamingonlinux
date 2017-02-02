@@ -118,8 +118,8 @@ if (isset($_POST['action']))
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_reply_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
 
 				// get article name for the email and redirect
-				$db->sqlquery("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
-				$title = $db->fetch();
+				$db->sqlquery("SELECT `topic_title`, `topic_text FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
+				$post_info = $db->fetch();
 
 				// email anyone subscribed which isn't you
 				$db->sqlquery("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']));
@@ -140,27 +140,22 @@ if (isset($_POST['action']))
 				// send the emails
 				foreach ($users_array as $email_user)
 				{
-					$email_message = email_bbcode($_POST['text']);
+					$email_message = email_bbcode($post_info['topic_text']);
 
 					// subject
-					$subject = "New reply to forum post {$title['topic_title']} on GamingOnLinux.com";
+					$subject = "New reply to forum post {$post_info['topic_title']} on GamingOnLinux.com";
 
 					// message
 					$html_message = "
 					<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$author_username['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+					<p><strong>{$author_username['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}\">{$post_info['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 					<div>
 					<hr>
 					{$email_message}
 					<hr>
-					You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$_POST['topic_id']}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
-					<hr>
-						<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-						<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-						<p>-----------------------------------------------------------------------------------------------------------</p>
-					</div>";
+					You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$_POST['topic_id']}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.";
 
-					$plain_message = "Hello {$email_user['username']}, {$author_username['username']} has replied to a forum topic you follow on titled \"{$title['topic_title']}\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP. See this new message here: " . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}";
+					$plain_message = "Hello {$email_user['username']}, {$author_username['username']} has replied to a forum topic you follow on titled \"{$post_info['topic_title']}\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP. See this new message here: " . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}";
 
 					// Mail it
 					if (core::config('send_emails') == 1)

@@ -30,7 +30,7 @@ $templating->set('total_comments', number_format($comments_24['total']));
 // list who wrote articles for GOL since the start of last month
 $prev_month = date('n', strtotime('-1 months'));
 $year_selector = date('Y');
-if ($prev_month = 12)
+if ($prev_month == 12)
 {
 	$time = strtotime("-1 year", time());
 	$year_selector = date("Y", $time);

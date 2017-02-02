@@ -542,11 +542,17 @@ else
 		$title = strip_tags($_POST['title']);
 		$text = trim($_POST['text']);
 		$text = core::make_safe($text);
-
+		$user_ids = '';
+		if (isset($_POST['user_ids']))
+		{
+			$user_ids = $_POST['user_ids'];
+		}
+		
 		// check empty
 		if (empty($_POST['user_ids']) || empty($title) || empty($text) || !is_array($_POST['user_ids']) || !core::is_number($_POST['user_ids']))
 		{
-			$_SESSION['mto'] = $_POST['user_ids'];
+
+			$_SESSION['mto'] = $user_ids;
 			$_SESSION['mtitle'] = $title;
 			$_SESSION['mtext'] = $text;
 
@@ -574,7 +580,7 @@ else
 				$sql_ids[] = '?';
 			}
 			
-			$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $_POST['user_ids']);
+			$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids);
 			$recepients_count = $db->fetch();
 
 			if ($recepients_count['count'] == 0)

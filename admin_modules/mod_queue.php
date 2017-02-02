@@ -118,7 +118,7 @@ if (isset($_POST['action']))
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_reply_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
 
 				// get article name for the email and redirect
-				$db->sqlquery("SELECT `topic_title`, `topic_text FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
+				$db->sqlquery("SELECT `topic_title`, `topic_text` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
 				$post_info = $db->fetch();
 
 				// email anyone subscribed which isn't you

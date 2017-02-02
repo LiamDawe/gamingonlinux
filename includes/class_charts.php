@@ -22,11 +22,13 @@ class golchart
 			'#6a3d9a');
 		
 		$this->chart_options['chart_width'] = 600;
+		$this->chart_options['title_background_height'] = 25;
 		$this->chart_options['bar_thickness'] = 30;
 		$this->chart_options['padding_bottom'] = 10;
 		$this->chart_options['bar_counter_left_padding'] = 5;
 		$this->chart_options['counter_font_size'] = 15;
 		$this->chart_options['division_font_size'] = 15;
+		$this->chart_options['label_right_padding'] = 3;
 		
 		// sort out any custom options passed to us
 		if (isset($custom_options) && is_array($custom_options))
@@ -76,11 +78,21 @@ class golchart
 		// get the max number to make the axis and bars
 		$total_labels = count($this->labels);
 		$max_data = $this->data_counts[0];
+
+		/* TESTING LABEL LENGTHS */
+		$label_lengths = [];
+		foreach ($this->labels as $key => $label)
+		{
+			$label_lengths[] = strlen($key);
+		}
+		rsort($label_lengths);
+		// //
+		
+		$chart_bar_start_x = 120.5;
 		
 		// chart sizing
 		$label_y_start = 60;
 		$label_y_increment = 45;
-		$title_background_height = 25;
 		$bottom_padding = $this->chart_options['padding_bottom'];
 		$chart_height = $total_labels * $label_y_increment + $label_y_start + $bottom_padding;
 		
@@ -93,7 +105,7 @@ class golchart
 		$subdivisions = 5;
 		$value_per_division = $max_data / $subdivisions;
 		
-		$division_x_start = 120.5; // they start where the axis outline for labels ends
+		$division_x_start = $chart_bar_start_x; // they start where the axis outline for labels ends
 		$current_value = $value_per_division;
 		$division_x_position = $division_x_start;
 		$divisions = '<text x="'.$division_x_start.'" y="'.$bottom_axis_numbers_y.'" font-size="'.$this->chart_options['division_font_size'].'">0</text>';
@@ -105,7 +117,7 @@ class golchart
 		}
 		
 		// scale is the space between the starting axis line and the last data stroke
-		$scale = (512 - $division_x_start)/$max_data;
+		$scale = ($division_x_position - $chart_bar_start_x)/$max_data;
 		
 		$last_label_y = 0;
 		$label_counter = 0;
@@ -128,6 +140,8 @@ class golchart
 				$this_label_y = $last_label_y + $label_y_increment;
 			}
 			
+			$label_x_position = $chart_bar_start_x - $this->chart_options['label_right_padding']; 
+			
 			// sort long labels into smaller sections to wrap the text nicely
 			$label_title = '';
 			if (strlen($key) > 15)
@@ -149,7 +163,7 @@ class golchart
 				$label_text_spacing = 15;
 				foreach ($split_label as $split)
 				{
-					$label_title .= '<tspan x="115" y="'.$text_initial_y.'">'.$split.'</tspan>';
+					$label_title .= '<tspan x="'.$label_x_position.'" y="'.$text_initial_y.'">'.$split.'</tspan>';
 					$text_initial_y = $text_initial_y + $label_text_spacing;
 				}
 			}
@@ -159,7 +173,7 @@ class golchart
 			}
 			
 			// labels
-			$labels_output_array[] = '<text x="115" y="'.$this_label_y.'" text-anchor="end"><title>'.$key.' ' . $data . '</title>'.$label_title.'</text>';
+			$labels_output_array[] = '<text x="'.$label_x_position.'" y="'.$this_label_y.'" text-anchor="end"><title>'.$key.' ' . $data . '</title>'.$label_title.'</text>';
 			$last_label_y = $this_label_y;
 			
 			// label splitters
@@ -167,16 +181,17 @@ class golchart
 			{
 				$this_split_y = $this_label_y - 25;
 				$this_split_y2 = $this_split_y + 1;
-				$label_splits_array[] = '<line x1="115" y1="'.$this_split_y.'" x2="115" y2="'.$this_split_y2.'" stroke="#757575" stroke-width="10" />';
+				$this_split_x = $chart_bar_start_x - 5;
+				$label_splits_array[] = '<line x1="'.$this_split_x.'" y1="'.$this_split_y.'" x2="'.$this_split_x.'" y2="'.$this_split_y2.'" stroke="#757575" stroke-width="10" />';
 			}
 			
 			// setup bar positions and array of items
 			$this_bar_y = $this_label_y - 18;
 			$bar_width = $data*$scale;
-			$bars_output_array[] = '<rect x="120.5" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$key.' ' . $data . '</title></rect>';
+			$bars_output_array[] = '<rect x="'.$chart_bar_start_x.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$key.' ' . $data . '</title></rect>';
 			
 			// bar counters and their positions
-			$this_counter_x = $bar_width + 120.5 + $this->chart_options['bar_counter_left_padding'];
+			$this_counter_x = $bar_width + $chart_bar_start_x + $this->chart_options['bar_counter_left_padding'];
 			$this_counter_y = $this_bar_y + 21;
 			
 			$counter_array[] = '<text class="golsvg_counters" x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data.'</text>';
@@ -184,15 +199,15 @@ class golchart
 			$label_counter++;
 		}
 		
-		$get_graph = '<div style="text-align: center" width="100%"><svg class="golgraph" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="tiny" version="1.2" viewbox="0 0 '.$this->chart_options['chart_width'].' '.$chart_height.'" width="'.$this->chart_options['chart_width'].'" height="'.$chart_height.'" >
+		$get_graph = '<svg class="golgraph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="tiny" version="1.2" viewbox="0 0 '.$this->chart_options['chart_width'].' '.$chart_height.'" style="max-height: '.$chart_height.'px">
 		<!-- outer box -->
 		<rect class="golsvg_background" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$chart_height.'" fill="#F2F2F2" stroke="#696969" stroke-width="1" />
 		<!-- x/y axis outlines -->
 		<g stroke="#757575" stroke-width="1">
-			<line x1="120.5" y1="64" x2="120.5" y2="'.$axis_outline_y.'" />
-			<line x1="120" y1="'.$axis_outline_y.'" x2="586" y2="'.$axis_outline_y.'" />
+			<line x1="'.$chart_bar_start_x.'" y1="64" x2="'.$chart_bar_start_x.'" y2="'.$axis_outline_y.'" />
+			<line x1="'.$chart_bar_start_x.'" y1="'.$axis_outline_y.'" x2="586" y2="'.$axis_outline_y.'" />
 		</g>
-		<rect class="golsvg_header" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$title_background_height.'" fill="#222222"/>
+		<rect class="golsvg_header" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$this->chart_options['title_background_height'].'" fill="#222222"/>
 		<text class="golsvg_title" x="300" y="19" font-size="17" text-anchor="middle">'.$this->chart_info['name'].'</text>
 		<!-- strokes -->
 		<g stroke="#ccc" stroke-width="1" stroke-opacity="0.6">
@@ -227,7 +242,7 @@ class golchart
 		<g font-size="10" fill="#000000" text-anchor="middle">'.$divisions.'</g>
 		<!-- bottom axis label -->
 		<text x="285" y="'.$y_axis_label_y.'" font-size="15" fill="#000000" text-anchor="start">Total</text>
-		</svg></div>';
+		</svg>';
 		
 		return $get_graph;		
 	}

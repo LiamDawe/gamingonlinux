@@ -25,6 +25,7 @@ class golchart
 		$this->chart_options['title_background_height'] = 25;
 		$this->chart_options['bar_thickness'] = 30;
 		$this->chart_options['padding_bottom'] = 10;
+		$this->chart_options['padding_right'] = 0;
 		$this->chart_options['bar_counter_left_padding'] = 5;
 		$this->chart_options['counter_font_size'] = 15;
 		$this->chart_options['division_font_size'] = 15;
@@ -107,13 +108,16 @@ class golchart
 		
 		$division_x_start = $chart_bar_start_x; // they start where the axis outline for labels ends
 		$current_value = $value_per_division;
-		$division_x_position = $division_x_start;
+		$division_x_position = $division_x_start - $this->chart_options['padding_right'];
 		$divisions = '<text x="'.$division_x_start.'" y="'.$bottom_axis_numbers_y.'" font-size="'.$this->chart_options['division_font_size'].'">0</text>';
 		for ($i = 1; $i <= $subdivisions; $i++)
 		{
 			$division_x_position = $division_x_position + 78;
 			$divisions .= '<text x="'.$division_x_position.'" y="'.$bottom_axis_numbers_y.'" font-size="'.$this->chart_options['division_font_size'].'">'.round($current_value).'</text>';
 			$current_value = $current_value + $value_per_division;
+			
+			// graph counter strokes
+			$strokes_array[] = '<line x1="'.$division_x_position.'" y1="45" x2="'.$division_x_position.'" y2="'.$strokes_height.'"/>';
 		}
 		
 		// scale is the space between the starting axis line and the last data stroke
@@ -210,13 +214,11 @@ class golchart
 		<rect class="golsvg_header" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$this->chart_options['title_background_height'].'" fill="#222222"/>
 		<text class="golsvg_title" x="300" y="19" font-size="17" text-anchor="middle">'.$this->chart_info['name'].'</text>
 		<!-- strokes -->
-		<g stroke="#ccc" stroke-width="1" stroke-opacity="0.6">
-			<line x1="200.5" y1="45" x2="200.5" y2="'.$strokes_height.'"/>
-			<line x1="278.5" y1="45" x2="278.5" y2="'.$strokes_height.'" />
-			<line x1="356" y1="45" x2="356" y2="'.$strokes_height.'" />
-			<line x1="434" y1="45" x2="434" y2="'.$strokes_height.'" />
-			<line x1="512" y1="45" x2="512" y2="'.$strokes_height.'"/>
-		</g>
+		<g stroke="#ccc" stroke-width="1" stroke-opacity="0.6">';
+		
+		$get_graph .= implode('', $strokes_array);
+		
+		$get_graph .= '</g>
 		<!-- labels -->
 		<g font-size="15" fill="#000000">';
 

@@ -9,6 +9,9 @@ $db = new mysql(core::$database['host'], core::$database['username'], core::$dat
 
 include($file_dir . '/includes/class_charts.php');
 
+include($file_dir . '/includes/class_article.php');
+$article_class = new article_class();
+
 if (core::config('articles_rss') == 1)
 {
 	include($file_dir . '/includes/bbcode.php');

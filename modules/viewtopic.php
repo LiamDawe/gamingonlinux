@@ -38,9 +38,14 @@ else
 	{
 		if ($user->check_group(1,2) == true)
 		{
-			if (!isset($_POST['yes']))
+			if (!isset($_POST['yes']) && !isset($_POST['no']))
 			{
 				$core->yes_no("Are you sure you wish to delete that post?", "index.php?module=viewtopic&view=deletepost&post_id={$_GET['post_id']}&topic_id={$_GET['topic_id']}");
+			}
+			
+			else if (isset($_POST['no']))
+			{
+				header("Location: /forum/topic/{$_GET['topic_id']}");
 			}
 
 			else

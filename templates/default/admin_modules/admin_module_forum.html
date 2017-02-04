@@ -115,11 +115,13 @@
 [/block: forum_end]
 
 [block: category_top]
-<div class="alert alert-info">
+<div class="box">
+	<div class="body group">
 	<form method="post" action="admin.php?module=forum">
 	<div class="articles-header">Name <input type="text" name="name" value="{:category_name}" /> Order: <input type="text" name="order" value="{:category_order}" size="3" /> <input type="submit" name="submit" value="Delete" /> <input type="submit" name="submit" value="Edit" /> <input type="hidden" name="category_id" value="{:category_id}" /> <input type="hidden" name="act" value="categorymanage" /></div>
 	</form>
-</div>
+	</div>
+	<div class="body group">
 	<table class="table table-bordered">
 [/block: category_top]
 
@@ -141,11 +143,15 @@
 
 [block: category_bottom]
 	</table>
+	</div>
+</div>
 [/block: category_bottom]
 
 [block: permissions_top]
-<form method="post" action="admin.php?module=forum">
-	Editing forum permissions for <strong>{:forum_name}</strong><br />
+<div class="box">
+	<div class="head">Editing forum permissions for <strong>{:forum_name}</strong></div>
+	<div class="body group">
+	<form method="post" action="admin.php?module=forum">
 		<table width="100%" cellspacing="0" cellpadding="0">
 		<tr>
 			<td>
@@ -221,6 +227,8 @@
 <input type="hidden" name="act" value="permissions" />
 <input type="submit" value="Edit">
 </form>
+</div>
+</div>
 [/block: permissions_bottom]
 
 [block: topic_top]

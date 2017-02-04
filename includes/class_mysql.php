@@ -1,4 +1,6 @@
 <?php
+$file_dir = dirname( dirname( __FILE__ ) );
+
 require_once $file_dir. "/includes/EPDOStatement.php";
 
 class mysql

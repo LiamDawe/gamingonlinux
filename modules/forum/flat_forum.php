@@ -17,15 +17,7 @@ $templating->merge('forum_search');
 $templating->block('small');
 
 // paging for pagination
-if (!isset($_GET['page']) || $_GET['page'] <= 0)
-{
-	$page = 1;
-}
-
-else if (is_numeric($_GET['page']))
-{
-	$page = $_GET['page'];
-}
+$page = core::give_page();
 
 // get the forum ids this user is actually allowed to view
 $db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ( ?, ? ) GROUP BY forum_id ORDER BY f.name ASC", array($_SESSION['user_group'], $_SESSION['secondary_user_group']));
@@ -62,8 +54,8 @@ $templating->set('forum_list', $forum_list);
 $sql_forum_ids = implode(', ', $forum_id_list);
 
 // count how many there is in total
-$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1");
-$total_pages = $db->num_rows();
+$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1 AND `forum_id` IN ($sql_forum_ids)");
+$total_topics = $db->num_rows();
 
 $comments_per_page = core::config('default-comments-per-page');
 if (isset($_SESSION['per-page']))
@@ -71,8 +63,15 @@ if (isset($_SESSION['per-page']))
 	$comments_per_page = $_SESSION['per-page'];
 }
 
+$total_pages = round($total_topics/$comments_per_page);
+
+if ($page > $total_pages)
+{
+	$page = $total_pages;
+}
+
 // sort out the pagination link
-$pagination = $core->pagination_link($comments_per_page, $total_pages, "/forum/", $page);
+$pagination = $core->pagination_link($comments_per_page, $total_topics, "/forum/", $page);
 
 $sql = "
 SELECT
@@ -107,7 +106,7 @@ AND
 	f.forum_id IN ($sql_forum_ids)
 ORDER BY
 	t.`last_post_date`
-DESC LIMIT ?, {$_SESSION['per-page']}";
+DESC LIMIT ?, $comments_per_page";
 
 $db->sqlquery($sql, array($core->start));
 

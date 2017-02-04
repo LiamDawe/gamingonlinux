@@ -96,6 +96,13 @@ if (!isset($_GET['view']))
 		{
 			$per_page = $_SESSION['articles-per-page'];
 		}
+		
+		$last_page = round($total/$per_page);
+		
+		if ($page > $last_page)
+		{
+			$page = $last_page;
+		}
 
 		// sort out the pagination link
 		$pagination = $core->pagination_link($per_page, $total, $pagination_linky, $page);

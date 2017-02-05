@@ -521,10 +521,10 @@ else
 		if (isset($_GET['user']))
 		{
 			// find the username of the person requested
-			$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user']));
+			$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_id` = ?", array($_GET['user']));
 			$user_info = $db->fetch();
 
-			$user_to = $user_info['username'];
+			$user_to = '<option value="'.$user_info['user_id'].'" selected>'.$user_info['username'].'</option>';
 		}
 
 		$templating->block('compose_top', 'private_messages');
@@ -574,7 +574,7 @@ else
 			$found_users = 0;
 			
 			$sql_ids = [];
-			$total_users = count($_SESSION['mto']);
+			$total_users = count($user_ids);
 			for ($i = 0; $i < $total_users; $i++)
 			{
 				$sql_ids[] = '?';

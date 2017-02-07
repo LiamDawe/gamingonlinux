@@ -106,7 +106,7 @@ if ($module == 'home')
 		$templating->set('article_link', $article_link);
 		$templating->set('url', url);
 
-		if ($user->check_group(1,2) == true || $user->check_group(5))
+		if ($user->check_group([1,2,5]) == true)
 		{
 			$templating->set('edit_link', "<a href=\"".url."admin.php?module=articles&amp;view=Edit&amp;article_id={$featured['article_id']}\"><strong>Edit</strong></a>");
 			$templating->set('editors_pick_link', " <a href=\"".url."index.php?module=home&amp;view=removeeditors&amp;article_id={$featured['article_id']}\"><strong>Remove Editors Pick</strong></a>");
@@ -120,7 +120,7 @@ if ($module == 'home')
 	}
 }
 
-if ($user->check_group(6,5) == false && $user->check_group(1,2) == false)
+if ($user->check_group([1,2,6,5]) == false)
 {
 	$templating->block('patreon');
 }

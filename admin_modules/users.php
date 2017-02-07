@@ -1,5 +1,5 @@
 <?php
-if ($user->check_group(1,2) == false)
+if ($user->check_group([1,2]) == false)
 {
 	$core->message("You need to be an editor or an admin to access this section!", NULL, 1);
 }

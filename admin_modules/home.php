@@ -25,7 +25,7 @@ if (!isset($_GET['view']))
 	$templating->set('featured_ctotal', core::config('total_featured'));
 
 	// only show admin/editor comments to admins and editors
-	if ($user->check_group(1,2) == true)
+	if ($user->check_group([1,2]) == true)
 	{
 		$templating->block('comments_top', 'admin_modules/admin_home');
 

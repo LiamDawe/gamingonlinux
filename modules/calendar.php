@@ -63,7 +63,7 @@ $templating->block('top');
 $templating->set('this_month', $counter['count']);
 
 $editor_links = '';
-if ($user->check_group(1,2) || $user->check_group(5))
+if ($user->check_group([1,2,5]))
 {
 	$editor_links = '<span class="fright">Editor Links: <a href="/admin.php?module=games&view=add">Add a game</a></span>';
 }
@@ -171,7 +171,7 @@ $templating->block('head', 'calendar');
 		$templating->set('name', $game_name);
 
 		$edit = '';
-		if ($user->check_group(1,2) == true || $user->check_group(5) == true)
+		if ($user->check_group([1,2,5]))
 		{
 			$edit = ' - <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar">Edit</a>';
 		}

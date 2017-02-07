@@ -145,7 +145,7 @@ if (!isset($_GET['view']))
 			// get the article row template
 			$templating->block('article_row', 'home');
 
-			if ($user->check_group(1,2) == true || $user->check_group(5))
+			if ($user->check_group([1,2,5]))
 			{
 				$templating->set('edit_link', "<p><a href=\"" . url ."admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-pencil\"></span> <strong>Edit</strong></a>");
 
@@ -270,7 +270,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 
 if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 {
-	if ($user->check_group(1,2) == true || $user->check_group(5) == true)
+	if ($user->check_group([1,2,5]))
 	{
 		if (isset($_GET['article_id']) && is_numeric($_GET['article_id']))
 		{

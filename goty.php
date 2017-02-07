@@ -5,7 +5,7 @@ include($file_dir . '/includes/header.php');
 
 if (core::config('goty_page_open') == 0)
 {
-	if ($user->check_group(1,2) == false && $user->check_group(5) == false)
+	if ($user->check_group([1,2,5]) == false)
 	{
 		header("Location: /index.php");
 		die();
@@ -499,7 +499,7 @@ if (isset($_POST['act']))
 				// add it
 				if ($db->num_rows() != 1)
 				{
-					if ($user->check_group(1,2) == false && $user->check_group(5) == false)
+					if ($user->check_group([1,2,5]) == false)
 					{
 						$db->sqlquery("INSERT INTO `goty_games` SET `game` = ?, `category_id` = ?", array($_POST['name'], $_POST['category']));
 						$game_id = $db->grab_id();
@@ -507,7 +507,7 @@ if (isset($_POST['act']))
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'goty_game_submission', core::$date, $game_id));
 						header("Location: " . core::config('website_url') . "goty.php?message=added");
 					}
-					else if ($user->check_group(1,2) == true || $user->check_group(5) == true)
+					else if ($user->check_group([1,2,5]) == true)
 					{
 						$db->sqlquery("INSERT INTO `goty_games` SET `game` = ?, `category_id` = ?, `accepted` = 1", array($_POST['name'], $_POST['category']));
 						$game_id = $db->grab_id();

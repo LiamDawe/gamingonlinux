@@ -260,7 +260,7 @@ else if ($_SESSION['user_id'] > 0)
 	$admin_link = '';
 	$admin_indicator = '';
 	$admin_notes['counter'] = 0;
-	if ($user->check_group(1,2) || $user->check_group(5))
+	if ($user->check_group([1,2,5]))
 	{
 		$db->sqlquery("SELECT count(id) as counter FROM `admin_notifications` WHERE `completed` = 0");
 		$admin_notes = $db->fetch();

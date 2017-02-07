@@ -231,13 +231,13 @@ if (!isset($_GET['go']))
 
 				$templating->set('rules', core::config('rules'));
 
-				if (($user->check_group(1,2) == true || $user->check_group(5) == true) && !isset($_GET['preview']))
+				if (($user->check_group([1,2,5]) == true) && !isset($_GET['preview']))
 				{
 					$templating->set('edit_link', " <a href=\"" . core::config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\">Edit</a>");
 					$templating->set('admin_button', '');
 				}
 
-				else if (($user->check_group(1,2) == true || $user->check_group(5) == true) && isset($_GET['preview']))
+				else if (($user->check_group([1,2,5]) == true) && isset($_GET['preview']))
 				{
 					$page_action = 'admin.php?module=adminreview';
 					if (isset($_GET['submitted']) && $_GET['submitted'] == 1)
@@ -252,7 +252,7 @@ if (!isset($_GET['go']))
 					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . core::config('website_url') . "{$page_action}\">Back</button> <button type=\"submit\" formaction=\"" . core::config('url') . "{$page_action}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
 				}
 
-				if ($user->check_group(1,2) == false && $user->check_group(5) == false)
+				if ($user->check_group([1,2,5]) == false)
 				{
 					$templating->set('edit_link', '');
 					$templating->set('admin_button', '');
@@ -534,7 +534,7 @@ if (!isset($_GET['go']))
 							}
 						}
 
-						if ($user->check_group(1,2) == true)
+						if ($user->check_group([1,2]) == true)
 						{
 							if ($article['comments_open'] == 1)
 							{
@@ -620,7 +620,7 @@ if (!isset($_GET['go']))
 							}
 							if (!empty($comments['guest_username']))
 							{
-								if ($user->check_group(1,2) == true)
+								if ($user->check_group([1,2]) == true)
 								{
 									$username = "<a href=\"/admin.php?module=articles&view=comments&ip_id={$comments['comment_id']}\">{$comments['guest_username']}</a>";
 								}
@@ -835,14 +835,14 @@ if (!isset($_GET['go']))
 						$templating->set('game_developer', $developer_badge);
 
 						$comment_edit_link = '';
-						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
+						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 						{
 							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
 						}
 						$templating->set('edit', $comment_edit_link);
 
 						$comment_delete_link = '';
-						if ($user->check_group(1,2) == true)
+						if ($user->check_group([1,2]) == true)
 						{
 							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 						}
@@ -888,7 +888,7 @@ if (!isset($_GET['go']))
 					// only show comments box if the comments are turned on for this article
 					if (core::config('comments_open') == 1)
 					{
-						if (($article['comments_open'] == 1) || ($article['comments_open'] == 0 && $user->check_group(1,2) == true))
+						if (($article['comments_open'] == 1) || ($article['comments_open'] == 0 && $user->check_group([1,2]) == true))
 						{
 							if ($_SESSION['user_group'] == 4)
 							{
@@ -955,7 +955,7 @@ if (!isset($_GET['go']))
 		$nice_title = $core->nice_title($comment['title']);
 
 		// check if author
-		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group(1,2) == false || $_SESSION['user_id'] == 0)
+		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
 		{
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 			die();
@@ -1131,7 +1131,7 @@ else if (isset($_GET['go']))
 					$title = $db->fetch();
 					$title_nice = $core->nice_title($title['title']);
 
-					if ($title['comments_open'] == 0 && $user->check_group(1,2) == false)
+					if ($title['comments_open'] == 0 && $user->check_group([1,2]) == false)
 					{
 						if (core::config('pretty_urls') == 1)
 						{
@@ -1361,7 +1361,7 @@ else if (isset($_GET['go']))
 		$comment = $db->fetch();
 
 		// check if author or editor/admin
-		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group(1,2) == false || $_SESSION['user_id'] == 0)
+		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
 		{
 			$nice_title = $core->nice_title($comment['title']);
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
@@ -1412,7 +1412,7 @@ else if (isset($_GET['go']))
 
 		$nice_title = $core->nice_title($comment['title']);
 
-		if ($user->check_group(1,2) == false)
+		if ($user->check_group([1,2]) == false)
 		{
 			if (core::config('pretty_urls') == 1)
 			{
@@ -1606,7 +1606,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'open_comments')
 	{
-		if ($user->check_group(1,2) == true)
+		if ($user->check_group([1,2]) == true)
 		{
 			// get info for title
 			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
@@ -1615,7 +1615,7 @@ else if (isset($_GET['go']))
 
 			header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
 
-			if ($user->check_group(1,2) == false)
+			if ($user->check_group([1,2]) == false)
 			{
 				header("Location: /articles/$title_nice.{$comment['article_id']}#comments");
 			}
@@ -1638,7 +1638,7 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'close_comments')
 	{
-		if ($user->check_group(1,2) == true)
+		if ($user->check_group([1,2]) == true)
 		{
 			// get info for title
 			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
@@ -1647,7 +1647,7 @@ else if (isset($_GET['go']))
 
 			header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
 
-			if ($user->check_group(1,2) == false)
+			if ($user->check_group([1,2]) == false)
 			{
 				header("Location: /articles/$title_nice.{$comment['article_id']}#comments");
 			}

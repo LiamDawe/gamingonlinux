@@ -27,7 +27,7 @@ if (core::config('forum_posting_open') == 1)
 	{
 		if ($_POST['act'] == 'Add')
 		{
-			if ($name['is_locked'] == 1 && $user->check_group(1,2) == false)
+			if ($name['is_locked'] == 1 && $user->check_group([1,2]) == false)
 			{
 				$core->message("This topic is locked! <a href=\"index.php?module=viewtopic&amp;topic_id={$topic_id}\">Click here to go back to the topic</a>.");
 			}

@@ -7,6 +7,15 @@ $core = new core($file_dir);
 include($file_dir . '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
+include($file_dir . '/includes/class_user.php');
+$user = new user();
+$user->check_session();
+
+if ($user->check_group([1,2,5]) == false)
+{
+	die('You should not be here.');
+}
+
 $check = 0;
 
 if (isset($_POST['article_id']) && $_POST['article_id'] != 0)

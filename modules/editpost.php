@@ -20,7 +20,7 @@ if (!isset($_POST['act']))
 		$db->sqlquery("SELECT `topic_id`, `author_id`, `topic_title`, `topic_text` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
 		$topic = $db->fetch();
 
-		if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group(1,2) == true)
+		if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 		{
 
 			$reported = 0;
@@ -61,7 +61,7 @@ if (!isset($_POST['act']))
 		$db->sqlquery("SELECT `post_id`, `topic_id`, `author_id`, `reply_text` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
 		$post = $db->fetch();
 
-		if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group(1,2) == true)
+		if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 		{
 			$reported = 0;
 			if (isset($_GET['reported']))
@@ -113,7 +113,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			$db->sqlquery("SELECT `author_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
 			$topic = $db->fetch();
 
-			if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group(1,2) == true)
+			if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 			{
 				// update the topic
 				$message = core::make_safe($_POST['text']);
@@ -144,7 +144,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			$db->sqlquery("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
 			$post = $db->fetch();
 
-			if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group(1,2) == true)
+			if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 			{
 				// update the topic
 				$message = htmlspecialchars($_POST['text'], ENT_QUOTES);

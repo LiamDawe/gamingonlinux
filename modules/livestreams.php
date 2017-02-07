@@ -18,7 +18,7 @@ $templating->load('livestreams');
 
 $templating->block('top', 'livestreams');
 $edit_link = '';
-if ($user->check_group(1,2) == true)
+if ($user->check_group([1,2]))
 {
   $edit_link = '<span class="fright"><a href="admin.php?module=livestreams&amp;view=manage">Edit Livestreams</a></span>';
 }

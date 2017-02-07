@@ -35,12 +35,12 @@ if (!isset($_POST['act']))
 
 	$templating->block('top', 'usercp_modules/usercp_module_home');
 
-	if ($user->check_group(1,2) == TRUE || $user->check_group(6,7))
+	if ($user->check_group([1,2,5,6]) == true)
 	{
 		$templating->block('premium', 'usercp_modules/usercp_module_home');
 		$templating->set('url', core::config('website_url'));
 		$state = 'disabled';
-		if ($user->check_group(1,2) == true || $user->check_group(5,6))
+		if ($user->check_group([1,2,5,6]) == true)
 		{
 			$state = '';
 		}
@@ -122,7 +122,7 @@ if (!isset($_POST['act']))
 	$templating->set('profile_fields', $profile_fields_output);
 
 	$submission_emails = '';
-	if ($user->check_group(1,2) == true || $user->check_group(5) == true)
+	if ($user->check_group([1,2,5]) == true)
 	{
 		$submission_emails_check = '';
 		if ($usercpcp['submission_emails'] == 1)
@@ -256,7 +256,7 @@ else if (isset($_POST['act']))
 		}
 
 		$submission_emails = 0;
-		if ($user->check_group(1,2) == true || $user->check_group(5) == true)
+		if ($user->check_group([1,2,5]) == true)
 		{
 			if (isset($_POST['submission_emails']))
 			{

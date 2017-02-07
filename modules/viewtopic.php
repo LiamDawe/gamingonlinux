@@ -36,7 +36,7 @@ else
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
 	{
-		if ($user->check_group(1,2) == true)
+		if ($user->check_group([1,2]) == true)
 		{
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
 			{
@@ -212,7 +212,7 @@ else
 
 				// sort out edit link if its allowed
 				$edit_link = '';
-				if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group(1,2) == true)
+				if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 				{
 					$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"/index.php?module=editpost&amp;topic_id={$topic['topic_id']}&page=$page\"><span class=\"icon edit\"></span></a></li>";
 				}
@@ -442,7 +442,7 @@ else
 
 					// sort out delete link if it's allowed
 					$delete_link = '';
-					if ($user->check_group(1,2) == true)
+					if ($user->check_group([1,2]) == true)
 					{
 						$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletetopic&topic_id=' . $topic['topic_id'] . '&forum_id='. $topic['forum_id'] . '&author_id=' . $topic['author_id'] . '"><span class="icon delete"></span></a>';
 					}
@@ -657,7 +657,7 @@ else
 
 						// sort out edit link if its allowed
 						$edit_link = '';
-						if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group(1,2) == true)
+						if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 						{
 							$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . core::config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
 						}
@@ -665,7 +665,7 @@ else
 
 						// sort out delete link if it's allowed
 						$delete_link = '';
-						if ($user->check_group(1,2) == true)
+						if ($user->check_group([1,2]) == true)
 						{
 							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '"><span class="icon delete"></span></a>';
 						}
@@ -907,7 +907,7 @@ else
 
 				else if ($parray['reply'] == 1 && $topic['is_locked'] == 1)
 				{
-					if ($user->check_group(1,2) == false)
+					if ($user->check_group([1,2]) == false)
 					{
 						$reply_access = 0;
 					}
@@ -1069,7 +1069,7 @@ else
 	else if (isset($_POST['act']) && $_POST['act'] == 'Go')
 	{
 		$mod_sql = '';
-		if (!empty($_POST['moderator_options']) && $user->check_group(1,2) == true)
+		if (!empty($_POST['moderator_options']) && $user->check_group([1,2]) == true)
 		{
 			if ($_POST['moderator_options'] == 'Move')
 			{

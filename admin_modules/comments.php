@@ -210,14 +210,14 @@ if (!isset($_GET['view']))
 				$templating->set('comment_id', $comments['comment_id']);
 
 				$comment_edit_link = '';
-				if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
+				if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 				{
 					$comment_edit_link = "<a href=\"/index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-edit\"></i> Edit</a>";
 				}
 				$templating->set('edit', $comment_edit_link);
 
 				$comment_delete_link = '';
-				if ($user->check_group(1,2) == true)
+				if ($user->check_group([1,2]) == true)
 				{
 					$comment_delete_link = "<a href=\"/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-remove\"></i> Delete</a>";
 				}
@@ -415,7 +415,7 @@ if (isset($_POST['act']))
 		$comment = $db->fetch();
 
 		// check if author or editor/admin
-		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group(1,2) == false || $_SESSION['user_id'] == 0)
+		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
 		{
 			$nice_title = $core->nice_title($comment['title']);
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");

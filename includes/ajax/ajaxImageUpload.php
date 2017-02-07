@@ -7,6 +7,15 @@ $core = new core($file_dir);
 include($file_dir . '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
+include($file_dir . '/includes/class_user.php');
+$user = new user();
+$user->check_session();
+
+if ($user->check_group([1,2,5]) == false)
+{
+	die('You should not be here.');
+}
+
 define ("MAX_SIZE",9*1024*1024); // 9MB
 function getExtension($str)
 {
@@ -16,7 +25,6 @@ function getExtension($str)
          $ext = substr($str,$i+1,$l);
          return $ext;
 }
-
 
 $valid_formats = array("jpg", "png", "gif", "jpeg", "svg");
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")

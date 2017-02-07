@@ -175,7 +175,7 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 		$templating->set('dlc', $dlc);
 
 		$edit_link = '';
-		if ($user->check_group(1,2) == TRUE || $user->check_group(5) == TRUE)
+		if ($user->check_group([1,2,5]))
 		{
 			$edit_link = '<a class="fright" href="/admin.php?module=games&amp;view=edit&amp;id=' . $game['id'] . '&return=game">Edit</a>';
 		}
@@ -342,7 +342,7 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 			$templating->set('articles', $article_list);
 		}
 
-		if ($user->check_group(1,2) == TRUE || $user->check_group(5) == TRUE)
+		if ($user->check_group([1,2,5]))
 		{
 			$templating->block('main_info_bottom', 'game_database');
 			$edit_link = '<a href="/admin.php?module=games&amp;view=edit&amp;id=' . $game['id'] . '&return=game">Edit</a>';

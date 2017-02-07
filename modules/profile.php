@@ -32,12 +32,12 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 			{
 				$profile = $db->fetch();
 
-				if ($profile['banned'] == 1 && $user->check_group(1,2) == false)
+				if ($profile['banned'] == 1 && $user->check_group([1,2]) == false)
 				{
 					$core->message("That user is banned so you may not view their profile!", NULL, 1);
 				}
 
-				else if (($profile['banned'] == 1 && $user->check_group(1,2) == true) || $profile['banned'] == 0)
+				else if (($profile['banned'] == 1 && $user->check_group([1,2]) == true) || $profile['banned'] == 0)
 				{
 					if ($profile['banned'] == 1)
 					{
@@ -153,7 +153,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					$templating->set('message_link', $message_link);
 
 					$email = '';
-					if ($user->check_group(1,2) == true)
+					if ($user->check_group([1,2]) == true)
 					{
 						$email = "Email: {$profile['email']}<br />";
 					}
@@ -247,7 +247,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					$templating->set('comment_posts', $comment_posts);
 
 					//Do not show end block if it's empty
-					if ($user->check_group(1,2))
+					if ($user->check_group([1,2]))
 					{
 						$templating->block('end', 'profile');
 

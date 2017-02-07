@@ -153,7 +153,7 @@ else
 			$db->sqlquery("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']));
 			$info = $db->fetch();
 
-			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
+			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 			{
 				$page = '';
 				if (!empty($_GET['page']) && is_numeric($_GET['page']))
@@ -340,7 +340,7 @@ else
 			$templating->set('profile_fields', $profile_fields_output);
 
 			$edit_link = '';
-			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $start['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
+			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $start['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 			{
 				$page = '';
 				if (!empty($_GET['page']) && is_numeric($_GET['page']))
@@ -446,7 +446,7 @@ else
 				$templating->set('editor', $editor_bit);
 
 				$edit_link = '';
-				if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $replies['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
+				if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $replies['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 				{
 					$page = '';
 					if (!empty($_GET['page']) && is_numeric($_GET['page']))
@@ -713,7 +713,7 @@ else
 			$db->sqlquery("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']));
 			$info = $db->fetch();
 
-			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group(1,2) == true && $_SESSION['user_id'] != 0)
+			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 			{
 
 				$db->sqlquery("UPDATE `user_conversations_messages` SET `message` = ? WHERE `message_id` = ?", array($text, $_GET['message_id']));

@@ -448,34 +448,36 @@ class user
 
 	// check a users group to perform a certain task, can check two groups
 	// useful for seeing if they are an admin or editor to perform editing, deleting, publishing etc
-	function check_group($group, $group2 = NULL)
+	function check_group($check_groups = NULL)
 	{
-		if (isset($_SESSION['user_group']))
+		if ( isset($_SESSION['user_group']) || isset($_SESSION['secondary_user_group']) )
 		{
-			if ($_SESSION['user_group'] == $group || $_SESSION['secondary_user_group'] == $group)
+			$user_group = (int) $_SESSION['user_group'];
+			$second_group = (int) $_SESSION['secondary_user_group'];
+			
+			if ( is_array($check_groups) )
 			{
-				return true;
-			}
-
-			else if ($group2 != NULL)
-			{
-				if ($_SESSION['user_group'] == $group2 || $_SESSION['secondary_user_group'] == $group2)
+				if ( in_array($user_group, $check_groups) || in_array($second_group, $check_groups) )
 				{
 					return true;
 				}
-
 				else
 				{
 					return false;
 				}
 			}
-
 			else
 			{
-				return false;
+				if ($user_group == $check_groups || $second_group == $check_groups)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
 		}
-
 		else
 		{
 			return false;

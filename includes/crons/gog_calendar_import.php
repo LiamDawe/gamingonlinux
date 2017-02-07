@@ -137,7 +137,7 @@ if (!empty($games_added))
 {
   if (core::config('send_emails') == 1)
   {
-    $mail = new mail('liamdawe@gmail.com', 'The GOG calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from GOG!<br />' . $games_added, '');
+    $mail = new mail(core::config('contact_email'), 'The GOG calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from GOG!<br />' . $games_added, '');
     $mail->send();
   }
 }

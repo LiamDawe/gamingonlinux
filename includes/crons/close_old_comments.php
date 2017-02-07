@@ -21,7 +21,7 @@ while ($closing = $db->fetch())
 $db->sqlquery("UPDATE `articles` SET `comments_open` = 0 WHERE `date` < ?", array($stamp));
 
 // multiple recipients
-$to = 'liamdwe@gmail.com';
+$to = core::config('contact_email');
 $subject = 'GOL Contact Us - Comments Closed';
 
 // To send HTML mail, the Content-type header must be set

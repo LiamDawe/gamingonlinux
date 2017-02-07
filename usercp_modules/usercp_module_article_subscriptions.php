@@ -109,7 +109,7 @@ else if (isset($_GET['go']))
 		}
 		else
 		{
-			$emails = '';
+			$emails = 0;
 			if ($_POST['subscribe-type'] == 'sub-only')
 			{
 				$emails = 0;

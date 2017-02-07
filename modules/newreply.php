@@ -153,7 +153,7 @@ if (core::config('forum_posting_open') == 1)
 								if (empty($users['secret_key']))
 								{
 									$secret_key = core::random_id(15);
-									$db->sqlquery("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $users['user_id'], $article_id));
+									$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `topic_id` = ?", array($secret_key, $users['user_id'], $topic_id));
 
 								}
 								else

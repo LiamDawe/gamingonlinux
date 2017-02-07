@@ -237,6 +237,14 @@ if (isset($_POST['act']))
 		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 0", array($name, $date->format('Y-m-d'), $_POST['link'], $guess));
 
 		$new_id = $db->grab_id();
+		
+		if (isset($_POST['genre_ids']) && is_array($_POST['genre_ids']) && core::is_number($_POST['genre_ids']))
+		{
+			foreach ($_POST['genre_ids'] as $genre_id)
+			{
+				$db->sqlquery("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", array($new_id, $genre_id));
+			}
+		}
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'calendar_submission', core::$date, $new_id));
 

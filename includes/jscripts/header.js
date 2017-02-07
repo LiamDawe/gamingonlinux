@@ -139,6 +139,16 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
+	$(".game_options_select").change(function() {
+		var all_fields = [];
+		
+		$("#games_options option:selected").each(function() {
+			all_fields.push($(this).parent().attr("name") + '=' + $(this).val());
+        });
+		
+		$(location).attr('href', 'index.php?module=game&view=all&' + all_fields.join('&'));
+	});
+  
   // this function may eventually handle pasting rich html from a pre-written doc into gol's editor
   /*$('textarea').on('paste',function(e) {
      e.preventDefault();
@@ -335,6 +345,29 @@ jQuery(document).ready(function()
   minimumInputLength: 2
   });
   $(".clear-games").on("click", function (e) { e.preventDefault(); $gamesMulti.val(null).trigger("change"); });
+	var $genres = $("#genres").select2({
+	selectOnClose: true,
+	width: '100%',
+	ajax: {
+    url: "/includes/ajax/game_genres_ajax.php",
+    dataType: 'json',
+    delay: 250,
+    data: function (params) {
+      return {
+        q: params.term // search term
+      };
+    },
+    processResults: function (data) {
+      return {
+        results: $.map(data, function(obj) {
+          return { id: obj.id, text: obj.text };
+        })
+      };
+    },
+    cache: true,
+  },
+  minimumInputLength: 2
+  });
 }
   var clipboard = new Clipboard('.btn');
 

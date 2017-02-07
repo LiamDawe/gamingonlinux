@@ -1269,7 +1269,7 @@ class core
 		while ($genres = $grab_genres->fetch())
 		{
 			$selected = '';
-			if (isset($_GET['genre']) && self::is_number($_GET['genre']))
+			if (isset($_GET['genre']) && self::is_number($_GET['genre']) && $_GET['genre'] == $genres['id'])
 			{
 				$selected = 'selected';
 			}

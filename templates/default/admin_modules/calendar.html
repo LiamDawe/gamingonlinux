@@ -17,6 +17,8 @@
 					showTime: false
 				});</script>
 				Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
+				Genres<br />
+				<select tabindex="-1" multiple="" name="genre_ids[]" id="genres" class="populate select2-offscreen">{:genre_list}</select><br />
 				<button formaction="admin.php?module=calendar&amp;return=submitted" name="act" value="Approve" type="submit">Approve</button> <button formaction="admin.php?module=games&amp;return=submitted" name="act" value="Delete" type="submit">Delete</button>
 				<input type="hidden" name="id" value="{:id}" />
 			</form>

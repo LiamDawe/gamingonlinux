@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_calendar');
+$templating->merge('admin_modules/calendar');
 
 $years_array = range(2014, 2020);
 
@@ -35,12 +35,12 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'submitted')
 	{
-		$templating->block('submit_main', 'admin_modules/admin_module_calendar');
+		$templating->block('submit_main', 'admin_modules/calendar');
 
 		$db->sqlquery("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE `approved` = 0 ORDER BY `date` ASC");
 		while ($listing = $db->fetch()) // loop through the items
 		{
-			$templating->block('submit_item', 'admin_modules/admin_module_calendar');
+			$templating->block('submit_item', 'admin_modules/calendar');
 			$guess_check = '';
 			if ($listing['best_guess'] == 1)
 			{
@@ -53,8 +53,12 @@ if (isset($_GET['view']))
 
 			$date = new DateTime($listing['date']);
 			$templating->set('date', $date->format('d-m-Y'));
+			
+			// sort out genre tags
+			$genre_list = $core->display_game_genres($listing['id']);
+			$templating->set('genre_list', $genre_list);
 		}
-		$templating->block('submit_bottom', 'admin_modules/admin_module_calendar');
+		$templating->block('submit_bottom', 'admin_modules/calendar');
 	}
 }
 
@@ -85,6 +89,8 @@ if (isset($_POST['act']))
 		}
 
 		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 1, `edit_date` = ? WHERE `id` = ?", array($name, $date->format('Y-m-d'), $_POST['link'], $guess, date("Y-m-d"), $_POST['id']));
+		
+		$core->process_game_genres($_POST['id']);
 
 		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'calendar_submission' AND `data` = ?", array(core::$date, $_POST['id']));
 

@@ -35,28 +35,38 @@ if (isset($_GET['view']))
 			$license_options .= '<option value="' . $license . '" '.$selected.'>'.$license.'</option>';
 		}
 		$templating->set('license_options', $license_options);
-
-		// sort out any filters
-		$additional_sql = '';
-		$license_sql = '';
-		if (isset($_GET['license']) && !empty($_GET['license']))
+		
+		$genres = $core->display_all_genres();
+		$templating->set('genre_options', $genres);
+		
+		$sql_replace = [];
+		$inner_join = '';
+		$sql_where = ' WHERE c.`approved` = 1 AND c.`also_known_as` IS NULL ';
+		
+		if (isset($_GET['license']) && !empty($_GET['license']) && in_array($_GET['license'], $licenses))
 		{
-			$license_sql = str_replace('+', ' ', $_GET['license']);
-			if (in_array($license_sql, $licenses))
-			{
-				$additional_sql = ' AND `license` = \'' . $license_sql . '\' ';
-			}
+			$sql_replace[] = $_GET['license'];
+			$sql_where .= ' AND c.`license` = ? ';
 		}
-
-		$db->sqlquery("SELECT count(id) AS `total` FROM `calendar` WHERE `approved` = 1 AND `also_known_as` IS NULL $additional_sql");
-		$total_games = $db->fetch();
+		
+		$genre = '';
+		if (isset($_GET['genre']) && core::is_number($_GET['genre']))
+		{
+			$sql_replace[] = (int) $_GET['genre'];
+			$inner_join = ' INNER JOIN `game_genres_reference` r ON r.game_id = c.id ';
+			$sql_where .= ' AND r.`genre_id` = ? ';
+		}
+		
+		$get_total = $db->sqlquery("SELECT count(c.id) AS `total` FROM `calendar` c $inner_join $sql_where", $sql_replace);
+		$total_games = $get_total->fetch();
 
 		// sort out the pagination link
 		$pagination = $core->pagination_link(18, $total_games['total'], '/index.php?module=game&amp;view=all&', $page, '#comments');
+		
+		$sql_replace[] = $core->start;
 
-		$grab_games = $db->sqlquery("SELECT `name`, `id` FROM `calendar` WHERE `also_known_as` IS NULL $additional_sql ORDER BY `name` ASC LIMIT ?, 18", array($core->start));
-		$count_found = $db->num_rows();
-		if ($count_found > 0)
+		$grab_games = $db->sqlquery("SELECT c.`name`, c.`id` FROM `calendar` c $inner_join $sql_where ORDER BY c.`name` ASC LIMIT ?, 18", $sql_replace);
+		if ($total_games['total'] > 0)
 		{
 			while ($game = $grab_games->fetch())
 			{
@@ -73,8 +83,6 @@ if (isset($_GET['view']))
 			$templating->set('pagination', '');
 			$core->message("None found with those filters!");
 		}
-
-
 	}
 }
 
@@ -210,10 +218,25 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 			$extra++;
 		}
 
+		// sort out genres
+		$genres_output = [];
+		$db->sqlquery("SELECT g.`name`, g.`id` FROM `game_genres` g INNER JOIN `game_genres_reference` r ON r.genre_id = g.id WHERE r.`game_id` = ?", array($game['id']));
+		while ($genres = $db->fetch())
+		{
+			$genres_output[] = $genres['name'];
+		}
+		
+		if (!empty($genres_output))
+		{
+			$extra = 1;
+		}
+		
+		$genres_output = implode(', ', $genres_output);
+		
 		if ($extra > 0)
 		{
 			$extra_info = $templating->block_store('extra', 'game_database');
-			$extra_info = $templating->store_replace($extra_info, array('price' => $price, 'license' => $license));
+			$extra_info = $templating->store_replace($extra_info, array('price' => $price, 'license' => $license, 'genres' => 'Genres: <ul class="database_extra">'.$genres_output.'</ul>'));
 		}
 		$templating->set('extra_info', $extra_info);
 

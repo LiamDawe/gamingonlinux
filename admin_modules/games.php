@@ -145,6 +145,10 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$base_game = '<option value="'.$game['base_game_id'].'" selected>'.$game['base_game_name'].'</option>';
 				}
 				$templating->set('base_game', $base_game);
+				
+				// sort out genre tags
+				$genre_list = $core->display_game_genres($game['id']);
+				$templating->set('genre_list', $genre_list);
 
 				$text = $game['description'];
 
@@ -269,9 +273,11 @@ if (isset($_POST['act']))
 		$description = trim($_POST['text']);
 
 		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $edit_date, $dlc, $base_game, $free_game, $license, $_POST['id']));
+		
+		$core->process_game_genres($_POST['id']);
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
-
+	
 		if (isset($_GET['return']) && !empty($_GET['return']))
 		{
 			if ($_GET['return'] == 'calendar')

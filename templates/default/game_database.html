@@ -65,7 +65,7 @@
 [/block: main-info]
 
 [block: extra]
-<div style="position: absolute; top: 0; right:0; background-color: #D7D7D7; padding: 5px;"><ul class="database_extra">{:price}{:license}</ul></div>
+<div class="database-extra"><ul class="database_extra">{:price}{:license}</ul>{:genres}</div>
 [/block: extra]
 
 [block: associations]
@@ -84,11 +84,28 @@
 [/block: articles]
 
 [block: game_list]
-<ul class="breadcrumb">
-  <li><a href="/index.php?module=game">Games Database</a></li>
-  <li class="active">Viewing full database</li>
-</ul>
-<div class="box"><div class="head">Filters - More to come soon!</div><div class="body group"><form method="get" style="display:inline;"><input type="hidden" name="module" value="game" /> <input type="hidden" name="view" value="all" /> License: <select name="license" style="width: 150px;">{:license_options}</select><br /><button type="submit" style="float: none;">Filter</button></form></div></div>
+<div class="box">
+	<ul class="breadcrumb">
+	<li><a href="/index.php?module=game">Games Database</a></li>
+	<li class="active">Viewing full database</li>
+	</ul>
+</div>
+<form id="games_options" method="get" style="display:inline;">
+<div class="box game-options">
+	<div class="head">Filters - More to come soon!</div>
+	<div class="body group">
+	<div class="col-2">
+		<input type="hidden" name="module" value="game" /> <input type="hidden" name="view" value="all" /> 
+		License: <br />
+		<select class="game_options_select ays-ignore" name="license" style="width: 150px;">{:license_options}</select>
+	</div>
+	<div class="col-2">
+		Genre: <br />
+		<select class="game_options_select ays-ignore" name="genre" style="width: 150px;">{:genre_options}</select>
+	</div>
+	</div>
+</div>
+</form>
 <div class="masonry">
 [/block: game_list]
 

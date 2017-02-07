@@ -146,6 +146,8 @@ class golchart
 
 		$biggest_label = $this->get_biggest_label($this->labels);
 		
+		$actual_chart_space = $this->chart_options['chart_width'] - $biggest_label[0] - $this->chart_options['padding_right'];
+		
 		// the actual bars and everything else start after the label
 		$chart_bar_start_x = $biggest_label[0];
 		
@@ -164,13 +166,19 @@ class golchart
 		
 		// bottom axis data divisions
 		$this->chart_options['ticks_total'] = 5;
-		$value_per_tick = $max_data / $this->chart_options['ticks_total'];
+		$value_per_tick = floor($max_data / $this->chart_options['ticks_total']);
 		$current_value = $value_per_tick;
 		
 		// divisions always start where the axis lines end
 		$tick_x_start = $this->outlines_x; 
 		
-		$tick_spacing = ($this->chart_options['chart_width'] - $biggest_label[0])/$this->chart_options['ticks_total'] - ($this->chart_options['padding_right']/$this->chart_options['ticks_total']);
+		$max_data = $this->labels[0]['total'];
+		
+		// scale is the space between the starting axis line and the last data stroke
+		$scale = $actual_chart_space / $max_data;
+
+		$tick_spacing = $value_per_tick * $scale;
+		
 		
 		for ($i = 0; $i <= $this->chart_options['ticks_total']; $i++)
 		{
@@ -426,7 +434,7 @@ class golchart
 			
 		// bottom axis data divisions
 		$this->chart_options['ticks_total'] = 5;
-		$value_per_tick = $max_data / $this->chart_options['ticks_total'];
+		$value_per_tick = floor($max_data / $this->chart_options['ticks_total']);
 		$current_value = $value_per_tick;
 			
 		// divisions always start where the axis lines end
@@ -434,7 +442,10 @@ class golchart
 		
 		$actual_chart_space = $this->chart_options['chart_width'] - $biggest_label[0] - $this->chart_options['padding_right'];
 		
-		$tick_spacing = ($this->chart_options['chart_width'] - $biggest_label[0] - $this->chart_options['padding_right'])/$this->chart_options['ticks_total'];
+		// scale is the space between the starting axis line and the last data stroke
+		$scale = $actual_chart_space / $max_data;
+
+		$tick_spacing = $value_per_tick * $scale;
 		
 		for ($i = 0; $i <= $this->chart_options['ticks_total']; $i++)
 		{
@@ -448,14 +459,11 @@ class golchart
 				$tick_x_position = $tick_x_position + $tick_spacing;
 				$current_value = $current_value + $value_per_tick;
 			}
-			$this->divisions .= '<text x="'.$tick_x_position.'" y="'.$bottom_axis_numbers_y.'" font-size="'.$this->chart_options['tick_font_size'].'">'.round($current_value).'</text>';
+			$this->divisions .= '<text x="'.$tick_x_position.'" y="'.$bottom_axis_numbers_y.'" font-size="'.$this->chart_options['tick_font_size'].'">'.$current_value.'</text>';
 				
 			// graph counter strokes
 			$this->strokes_array[] = '<line x1="'.$tick_x_position.'" y1="45" x2="'.$tick_x_position.'" y2="'.$strokes_height.'"/>';
 		}
-		
-		// scale is the space between the starting axis line and the last data stroke
-		$scale = $actual_chart_space/$max_data;
 		
 		$last_label_y = 0;
 		$label_counter = 0;

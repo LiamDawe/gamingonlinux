@@ -45,6 +45,7 @@ class golchart
 		$this->chart_options['label_font_size'] = 15;
 		$this->chart_options['ticks_total'] = 5;
 		$this->chart_options['show_top_10'] = 0;
+		$this->chart_options['use_percentages'] = 0;
 		$this->chart_options['order'] = 'DESC';
 		
 		// sort out any custom options passed to us

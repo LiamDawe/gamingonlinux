@@ -1034,7 +1034,7 @@ class core
 	  }
 	}
 
-	function random_id($length = 10)
+	public static function random_id($length = 10)
 	{
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_()';
 		$characters_length = strlen($characters);

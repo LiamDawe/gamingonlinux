@@ -1218,16 +1218,12 @@ else if (isset($_GET['go']))
 							// check if they are subscribing
 							if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 							{
-								// make sure we don't make lots of doubles
-								$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
-
 								$emails = 0;
 								if ($_POST['subscribe-type'] == 'sub-emails')
 								{
 									$emails = 1;
 								}
-
-								$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $article_id, $emails, $emails));
+								$article_class->subscribe($article_id);
 							}
 
 							/* gather a list of people quoted and let them know
@@ -1259,7 +1255,7 @@ else if (isset($_GET['go']))
 							- Make an array of anyone who needs an email now
 							- Additionally, send a notification to anyone subscribed
 							*/
-							$db->sqlquery("SELECT s.`user_id`, s.emails, s.send_email, u.email, u.username, u.email_options FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, $_SESSION['user_id']));
+							$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key` u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, $_SESSION['user_id']));
 							$users_array = array();
 							$users_to_email = $db->fetch_all_rows();
 							foreach ($users_to_email as $email_user)
@@ -1267,10 +1263,20 @@ else if (isset($_GET['go']))
 								// gather list
 								if ($email_user['emails'] == 1 && $email_user['send_email'] == 1)
 								{
+									if (empty($email_user))
+									{
+										$secret_key = core::random_id(15);
+									}
+									else
+									{
+										$secret_key = $email_user['secret_key'];
+									}
+									
 									$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
 									$users_array[$email_user['user_id']]['email'] = $email_user['email'];
 									$users_array[$email_user['user_id']]['username'] = $email_user['username'];
 									$users_array[$email_user['user_id']]['email_options'] = $email_user['email_options'];
+									$users_array[$email_user['user_id']]['secret_key'] = $secret_key;
 								}
 
 								// notify them, if they haven't been quoted and already given one
@@ -1318,7 +1324,7 @@ else if (isset($_GET['go']))
 							 	<hr>
 							 	<p>You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
 
-								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&key={$email_user['secret_key']}";
 
 								// Mail it
 								if (core::config('send_emails') == 1)

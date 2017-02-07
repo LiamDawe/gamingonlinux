@@ -68,66 +68,72 @@ if (isset($_POST['act']))
 {
   if ($_POST['act'] == 'reporttopic')
   {
-    if (isset($_POST['no']))
-    {
-      if (core::config('pretty_urls') == 1)
-      {
-        header("Location: /forum/topic/{$_GET['topic_id']}/");
-      }
-      else
-      {
-        header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-      }
-      die();
-    }
-    else if (isset($_POST['yes']))
-    {
-      // update admin notifications
-      $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_topic_report', core::$date, $_GET['topic_id']));
+	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+	{
+		if (isset($_POST['no']))
+		{
+		if (core::config('pretty_urls') == 1)
+		{
+			header("Location: /forum/topic/{$_GET['topic_id']}/");
+		}
+		else
+		{
+			header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
+		}
+		die();
+		}
+		else if (isset($_POST['yes']))
+		{
+		// update admin notifications
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_topic_report', core::$date, $_GET['topic_id']));
 
-      // give it a report
-      $db->sqlquery("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+		// give it a report
+		$db->sqlquery("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
 
-      if (core::config('pretty_urls') == 1)
-      {
-        header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
-      }
-      else
-      {
-        header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id'] . "&message=reported");
-      }
+		if (core::config('pretty_urls') == 1)
+		{
+			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
+		}
+		else
+		{
+			header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id'] . "&message=reported");
+		}
+		}
     }
   }
   if ($_POST['act'] == 'reportreply')
   {
-    if (isset($_POST['no']))
-    {
-      if (core::config('pretty_urls') == 1)
-      {
-        header("Location: /forum/topic/{$_GET['topic_id']}/");
-      }
-      else
-      {
-        header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-      }
-      die();
-    }
-    else if (isset($_POST['yes']))
-    {
-      // update admin notifications
-      $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_reply_report', core::$date, $_GET['post_id']));
+  	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+	{
+		if (isset($_POST['no']))
+		{
+		if (core::config('pretty_urls') == 1)
+		{
+			header("Location: /forum/topic/{$_GET['topic_id']}/");
+		}
+		else
+		{
+			header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
+		}
+		die();
+		}
+		else if (isset($_POST['yes']))
+		{
+		// update admin notifications
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_reply_report', core::$date, $_GET['post_id']));
 
-      // give it a report
-      $db->sqlquery("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));
+		// give it a report
+		$db->sqlquery("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));
 
-      if (core::config('pretty_urls') == 1)
-      {
-        header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
-      }
-      else
-      {
-        header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id'] . "&message=reported");
-      }
+		if (core::config('pretty_urls') == 1)
+		{
+			header("Location: /forum/topic/{$_GET['topic_id']}/message=reported");
+		}
+		else
+		{
+			header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id'] . "&message=reported");
+		}
+		}
     }
   }
 }

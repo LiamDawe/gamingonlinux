@@ -58,7 +58,7 @@ foreach($charts as $chart)
     $grouping_id = $default_grouping['grouping_id'];
   }
 
-  $db->sqlquery("SELECT `id`, `grouping_id`,`name` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $grouping_id));
+  $db->sqlquery("SELECT `id`, `grouping_id`,`name`, `h_label` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $grouping_id));
   $get_chart_id = $db->fetch();
 
   $db->sqlquery("SELECT `grouping_id` FROM `user_stats_charts` WHERE `grouping_id` < ? ORDER BY `id` DESC LIMIT 1", array($get_chart_id['grouping_id']));
@@ -66,14 +66,12 @@ foreach($charts as $chart)
 
   $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $previous_group['grouping_id']));
   $get_last_chart_id = $db->fetch();
+  
+  $charts = new golchart();
+  
+  $options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC'];
 
-  $order = '';
-  if (isset($chart['order']))
-  {
-    $order = $chart['order'];
-  }
-
-  $grab_chart = $core->stat_chart($get_chart_id['id'], $order, $get_last_chart_id['id']);
+  $grab_chart = $charts->stat_chart($get_chart_id['id'], $get_last_chart_id['id'], $options);
 
   // only do this once
   if ($counter == 0)
@@ -111,6 +109,6 @@ foreach ($charts as $chart)
 
   $templating->block('trend_chart');
   $templating->set('title', $chart['name']);
-  $templating->set('graph', $grab_chart['graph']);
+  $templating->set('graph', '<div style="text-align:center; width: 100%;">' . $grab_chart['graph'] . '</div>');
 }
 $templating->block('trends_bottom', 'statistics');

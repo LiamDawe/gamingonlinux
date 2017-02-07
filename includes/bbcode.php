@@ -12,7 +12,7 @@ function do_charts($body)
 	{
 		$charts = new golchart();
 
-		$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", '<div style="text-align:center; width: 100%;">' . $charts->render($id) . '</div>', $body);
+		$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", '<div style="text-align:center; width: 100%;">' . $charts->render($id, NULL, 'charts_labels', 'charts_data') . '</div>', $body);
 	}
 	return $body;
 }

@@ -1464,6 +1464,11 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .dark svg text {fill: white;}
 .golsvg_counters {fill: black}
 .dark golsvg_counters {fill: white}
+.dark .select2-selection {background-color: #515151 !important}
+.dark .select2-selection__choice {background-color: #515151 !important}
+.dark .select2-results {background-color: #515151 !important}
+.database-extra{position: absolute; top: 0; right:0; background-color: #D7D7D7; padding: 5px; max-width: 300px;}
+.dark .database-extra{background-color: #515151;}
 .patreon {
 	margin-top: 14px;
 	line-height: 30px;

@@ -21,8 +21,6 @@ class core
 	// any message for image uploader
 	public $error_message;
 
-	public static $user_graphs_js = '';
-
 	protected static $config = array();
 
 	function __construct($file_dir)
@@ -1038,212 +1036,14 @@ class core
 
 	function random_id($length = 10)
 	{
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_()';
-    $characters_length = strlen($characters);
-    $random_string = '';
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_()';
+		$characters_length = strlen($characters);
+		$random_string = '';
 		for ($i = 0; $i < $length; $i++)
 		{
-    	$random_string .= $characters[rand(0, $characters_length - 1)];
+			$random_string .= $characters[rand(0, $characters_length - 1)];
 		}
-    return $random_string;
-	}
-
-	function stat_chart($id, $order = '', $last_id = '')
-	{
-		global $db;
-
-		require_once(core::config('path') . 'includes/SVGGraph/SVGGraph.php');
-
-		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($last_id));
-		$chart_info_old = $db->fetch();
-
-		$res_sort = '';
-		$order_sql = 'd.`data` ASC';
-
-		// set the right labels to the right data (OLD DATA)
-		$labels_old = array();
-		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($last_id));
-		$get_labels_old = $db->fetch_all_rows();
-
-		if ($db->num_rows() > 0)
-		{
-			$top_10_labels = array_slice($get_labels_old, -10);
-
-			if ($chart_info_old['name'] == 'RAM' || $chart_info_old['name'] == 'Resolution')
-			{
-				uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
-			}
-			foreach ($top_10_labels as $label_loop_old)
-			{
-					$label_add = '';
-					if ($chart_info_old['name'] == 'RAM')
-					{
-						$label_add = 'GB';
-					}
-					$labels_old[]['name'] = $label_loop_old['name'] . $label_add;
-					end($labels_old);
-					$last_id_old=key($labels_old);
-					$labels_old[$last_id_old]['total'] = $label_loop_old['data'];
-
-					$labels_old[$last_id_old]['percent'] = round(($label_loop_old['data'] / $chart_info_old['total_answers']) * 100, 2) . '%';
-			}
-		}
-
-		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($id));
-		$chart_info = $db->fetch();
-
-		// set the right labels to the right data (This months data)
-		$labels = array();
-		$db->sqlquery("SELECT $res_sort l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY $order_sql", array($id));
-		$get_labels = $db->fetch_all_rows();
-
-		if ($db->num_rows() > 0)
-		{
-			$top_10_labels = array_slice($get_labels, -10);
-
-			if ($chart_info['name'] == 'RAM' || $chart_info['name'] == 'Resolution')
-			{
-				uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
-			}
-		  foreach ($top_10_labels as $label_loop)
-		  {
-					$label_add = '';
-					if ($chart_info['name'] == 'RAM')
-					{
-						$label_add = 'GB';
-					}
-		      $labels[]['name'] = $label_loop['name'] . $label_add;
-					end($labels);
-					$last_id=key($labels);
-					$labels[$last_id]['total'] = $label_loop['data'];
-					if ($label_loop['name'] == 'Intel')
-					{
-						$labels[$last_id]['colour'] = "#a6cee3";
-					}
-					if ($label_loop['name'] == 'AMD' || $label_loop['name'] == 'Proprietary')
-					{
-						$labels[$last_id]['colour'] = "#e31a1c";
-					}
-					if ($label_loop['name'] == 'Nvidia' || $label_loop['name'] == 'Open Source')
-					{
-						$labels[$last_id]['colour'] = "#33a02c";
-					}
-					$labels[$last_id]['percent'] = round(($label_loop['data'] / $chart_info['total_answers']) * 100, 2);
-		  }
-
-			// this is for the full info expand box, as charts only show 10 items, this expands to show them all
-			$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
-
-			// sort them from highest to lowest
-			usort($get_labels, function($b, $a)
-			{
-				return $a['data'] - $b['data'];
-			});
-			foreach ($get_labels as $k => $all_labels)
-			{
-				$icon = '';
-				if ($chart_info['name'] == "Linux Distributions (Split)")
-				{
-					$icon = '<img src="/templates/default/images/distros/'.$all_labels['name'].'.svg" alt="distro-icon" width="20" height="20" /> ';
-				}
-				if ($chart_info['name'] == "Linux Distributions (Combined)")
-				{
-					if ($all_labels['name'] == 'Ubuntu-based')
-					{
-						$icon_name = 'Ubuntu';
-					}
-					else if ($all_labels['name'] == 'Arch-based')
-					{
-						$icon_name = 'Arch';
-					}
-					else
-					{
-						$icon_name = $all_labels['name'];
-					}
-					$icon = '<img src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
-				}
-				$percent = round(($all_labels['data'] / $chart_info['total_answers']) * 100, 2);
-
-				$old_info = '';
-				foreach ($get_labels_old as $all_old)
-				{
-					if ($all_old['name'] == $all_labels['name'])
-					{
-						$percent_old = round(($all_old['data'] / $chart_info_old['total_answers']) * 100, 2);
-						$difference_percentage = round($percent - $percent_old, 2);
-
-						$difference_people = $all_labels['data'] - $all_old['data'];
-
-						if (strpos($difference_percentage, '-') === FALSE)
-						{
-							$difference_percentage = '+' . $difference_percentage;
-						}
-
-						if ($difference_people > 0)
-						{
-							$difference_people = '+' . $difference_people;
-						}
-						$old_info = ' Difference: (' . $difference_percentage . '% overall, ' . $difference_people .' people)';
-					}
-				}
-
-				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)' . $old_info . '<br />';
-			}
-			$full_info .= '</div></div>';
-
-			$settings = array('units_label' => '%', 'grid_division_h' => 10, 'show_tooltips' => true, 'show_data_labels' => true, 'data_label_position' => 'outside right', 'data_label_shadow_opacity' => 0, 'pad_right' => 35, 'data_label_padding' => 2, 'data_label_type' => 'box', 'minimum_grid_spacing_h'=> 20, 'graph_title' => $chart_info['name'], 'auto_fit'=>true, 'svg_class' => 'svggraph', 'minimum_units_y' => 0, 'units_y' => "%", 'show_grid_h' => false, 'label_h' => $chart_info['h_label'], 'minimum_grid_spacing_h' => 20);
-			$settings['structured_data'] = true;
-			$settings['structure'] = array(
-			'key' => 'name',
-			'value' => 'percent',
-			'colour' => 'colour',
-			'tooltip' => 'total'
-			);
-
-			$graph = new SVGGraph(400, 300, $settings);
-
-		  $graph->Values($labels);
-
-			$colours = array(
-	    '#a6cee3',
-	    '#1f78b4',
-	    '#b2df8a',
-	    '#33a02c',
-	    '#fb9a99',
-	    '#e31a1c',
-	    '#fdbf6f',
-	    '#ff7f00',
-			'#cab2d6',
-			'#6a3d9a'
-	 		);
-	 		$graph->Colours($colours);
-
-		  $get_graph['graph'] = '<div style="width: 60%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
-			$get_graph['full_info'] = $full_info;
-			$get_graph['date'] = $chart_info['generated_date'];
-
-			$total_difference = '';
-			if (isset($chart_info_old['total_answers']))
-			{
-				$total_difference = $chart_info['total_answers'] - $chart_info_old['total_answers'];
-				if ($total_difference > 0)
-				{
-					$total_difference = '+' . $total_difference;
-				}
-				$total_difference = ' (' . $total_difference . ')';
-			}
-
-			$get_graph['total_users_answered'] = $chart_info['total_answers'] . $total_difference;
-
-			core::$user_graphs_js = $graph->FetchJavascript();
-
-			return $get_graph;
-		}
-		else
-		{
-			$get_graph['graph'] = "Graph not generated yet, please stand by!";
-			return $get_graph;
-		}
+		return $random_string;
 	}
 
 	function trends_charts($name, $order = '')
@@ -1433,6 +1233,84 @@ class core
 					if (!in_array($streamer_id, $current_streamers))
 					{
 						$db->sqlquery("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
+					}
+				}
+			}
+		}
+	}
+	
+	// list the genres for the current game
+	function display_game_genres($game_id = NULL)
+	{
+		global $db;
+		
+		// for a specific game
+		if (isset($game_id) && self::is_number($game_id))
+		{
+			// sort out genre tags
+			$genre_list = '';
+			$grab_genres = $db->sqlquery("SELECT g.`id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON r.genre_id = g.id WHERE r.`game_id` = ?", array($game_id));
+			while ($genres = $grab_genres->fetch())
+			{
+				$genre_list .= '<option value="'.$genres['id'].'" selected>'.$genres['name'].'</option>';
+			}
+		}
+		return $genre_list;
+	}
+	
+	// list all genres to select and search
+	function display_all_genres()
+	{
+		global $db;
+		
+		// sort out genre tags
+		$genre_list = '<option value="" selected></option>';
+		$grab_genres = $db->sqlquery("SELECT `id`, `name` FROM `game_genres` ORDER BY `name` ASC");
+		while ($genres = $grab_genres->fetch())
+		{
+			$selected = '';
+			if (isset($_GET['genre']) && self::is_number($_GET['genre']))
+			{
+				$selected = 'selected';
+			}
+			$genre_list .= '<option value="'.$genres['id'].'" '.$selected.'>'.$genres['name'].'</option>';
+		}	
+		return $genre_list;
+	}
+	
+	// for editing a game in the database, adjust what genre's it's linked with
+	function process_game_genres($game_id)
+	{
+		global $db;
+		
+		if (isset($game_id) && is_numeric($game_id))
+		{
+			// delete any existing genres that aren't in the final list for publishing
+			$db->sqlquery("SELECT `id`, `game_id`, `genre_id` FROM `game_genres_reference` WHERE `game_id` = ?", array($game_id));
+			$current_genres = $db->fetch_all_rows();
+
+			if (!empty($current_genres))
+			{
+				foreach ($current_genres as $current_genre)
+				{
+					if (!in_array($current_genre['genre_id'], $_POST['genre_ids']))
+					{
+						$db->sqlquery("DELETE FROM `game_genres_reference` WHERE `genre_id` = ? AND `game_id` = ?", array($current_genre['genre_id'], $game_id));
+					}
+				}
+			}
+
+			// get fresh list of genres, and insert any that don't exist
+			$db->sqlquery("SELECT `genre_id` FROM `game_genres_reference` WHERE `game_id` = ?", array($game_id));
+			$current_genres = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
+
+			if (isset($_POST['genre_ids']) && !empty($_POST['genre_ids']) && core::is_number($_POST['genre_ids']))
+			{
+				foreach($_POST['genre_ids'] as $genre_id)
+				{
+					if (!in_array($genre_id, $current_genres))
+					{
+						$db->sqlquery("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", array($game_id, $genre_id));
 					}
 				}
 			}

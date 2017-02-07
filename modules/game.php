@@ -219,7 +219,7 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 		}
 
 		// sort out genres
-		$genres_output = [];
+		$genres_output = '';
 		$db->sqlquery("SELECT g.`name`, g.`id` FROM `game_genres` g INNER JOIN `game_genres_reference` r ON r.genre_id = g.id WHERE r.`game_id` = ?", array($game['id']));
 		while ($genres = $db->fetch())
 		{
@@ -228,15 +228,14 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 		
 		if (!empty($genres_output))
 		{
-			$extra = 1;
+			$genres_output = 'Genres: <ul class="database_extra">' . implode(', ', $genres_output) . '</ul>';
+			$extra++;
 		}
-		
-		$genres_output = implode(', ', $genres_output);
 		
 		if ($extra > 0)
 		{
 			$extra_info = $templating->block_store('extra', 'game_database');
-			$extra_info = $templating->store_replace($extra_info, array('price' => $price, 'license' => $license, 'genres' => 'Genres: <ul class="database_extra">'.$genres_output.'</ul>'));
+			$extra_info = $templating->store_replace($extra_info, array('price' => $price, 'license' => $license, 'genres' => $genres_output));
 		}
 		$templating->set('extra_info', $extra_info);
 

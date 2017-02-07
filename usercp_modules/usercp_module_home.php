@@ -264,8 +264,7 @@ else if (isset($_POST['act']))
 			}
 		}
 
-		// no nasty html grr
-		$bio = htmlspecialchars($_POST['bio'], ENT_QUOTES);
+		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
 		$user_update_sql = "UPDATE `users` SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `forum_type` = ? WHERE `user_id` = ?";
 		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $forum_type_sql, $_SESSION['user_id']));

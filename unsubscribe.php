@@ -35,7 +35,6 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && isset($_GET['emai
 		{
 			// check secret key
 			$db->sqlquery("SELECT `secret_key` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ? AND `secret_key` = ?", array($_GET['user_id'], $_GET['article_id'], $_GET['secret_key']));
-			$check_key = $db->fetch();
 			$check_exists = $db->num_rows();
 			
 			if ($check_exists == 1)
@@ -53,7 +52,6 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && isset($_GET['emai
 		{
 			// check secret key
 			$db->sqlquery("SELECT `secret_key` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ? AND `secret_key` = ?", array($_GET['user_id'], $_GET['topic_id'], $_GET['secret_key']));
-			$check_key = $db->fetch();
 			$check_exists = $db->num_rows();
 			
 			if ($check_exists == 1)

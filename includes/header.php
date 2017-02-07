@@ -15,6 +15,9 @@ $message_map = new message_map();
 include($file_dir . '/includes/class_article.php');
 $article_class = new article_class();
 
+include($file_dir . '/includes/class_forum.php');
+$forum_class = new forum_class();
+
 include($file_dir . '/includes/class_mail.php');
 
 define('url', core::config('website_url'));

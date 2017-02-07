@@ -133,28 +133,37 @@ if (core::config('forum_posting_open') == 1)
 						// are we subscribing?
 						if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 						{
-							// make sure we aren't doubling up
-							$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
-
 							$emails = 0;
 							if ($_POST['subscribe-type'] == 'sub-emails')
 							{
 								$emails = 1;
 							}
 
-							$db->sqlquery("INSERT INTO `forum_topics_subscriptions` SET `user_id` = ?, `topic_id` = ?, `emails` = ?, `send_email` = ?", array($_SESSION['user_id'], $topic_id, $emails, $emails));
+							$forum_class->subscribe($topic_id, $emails);
 						}
 
 						// email anyone subscribed which isn't you
-						$db->sqlquery("SELECT s.`user_id`, s.`emails`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id));
+						$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id));
 						$users_array = array();
 						while ($users = $db->fetch())
 						{
 							if ($users['user_id'] != $_SESSION['user_id'] && $users['emails'] == 1)
 							{
+								// use existing key, or generate any missing keys
+								if (empty($users['secret_key']))
+								{
+									$secret_key = core::random_id(15);
+									$db->sqlquery("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $users['user_id'], $article_id));
+
+								}
+								else
+								{
+									$secret_key = $email_user['secret_key'];
+								}
 								$users_array[$users['user_id']]['user_id'] = $users['user_id'];
 								$users_array[$users['user_id']]['email'] = $users['email'];
 								$users_array[$users['user_id']]['username'] = $users['username'];
+								$users_array[$users['user_id']]['secret_key'] = $secret_key;
 							}
 						}
 
@@ -183,7 +192,7 @@ if (core::config('forum_posting_open') == 1)
 							<hr>
 					 		{$email_message}
 					 		<hr>
-							You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$topic_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
+							You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$topic_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
 							<hr>
 					  		<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 					  		<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>

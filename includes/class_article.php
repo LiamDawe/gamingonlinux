@@ -497,6 +497,7 @@ class article_class
 			}
 			else if ($count_subs == 1)
 			{
+				$get_key = $db->fetch();
 				if (empty($get_key['secret_key']))
 				{
 					// for unsubscribe link in emails

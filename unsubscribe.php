@@ -70,8 +70,10 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && isset($_GET['emai
 	{
 		header("Location: home/message=cannotunsubscribe");
 	}
-
 }
-
+else
+{
+	header("Location: home/message=cannotunsubscribe");
+}
 
 ?>

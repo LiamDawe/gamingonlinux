@@ -60,7 +60,14 @@ if (isset($_POST['act']))
 			
 			if (isset($_POST['email']) && !empty($_POST['email']))
 			{
-				$additional_header = "Reply-To: $name <{$_POST['email']}>";
+				if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
+				{
+					$additional_header = '';
+				}
+				else
+				{
+					$additional_header = "Reply-To: $name <{$_POST['email']}>";
+				}
 			}
 			
 			$subject = 'GOL Contact Us - ' . $name;

@@ -493,7 +493,7 @@ class article_class
 				// for unsubscribe link in emails
 				$secret_key = core::random_id(15);
 
-				$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $sql_emails, $secret_key));
+				$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $sql_emails, $sql_emails, $secret_key));
 			}
 			else if ($count_subs == 1)
 			{

@@ -35,12 +35,32 @@ class forum_class
 			else if ($count_subs == 1)
 			{
 				$get_key = $db->fetch();
+				// for unsubscribe link in emails
 				if (empty($get_key['secret_key']))
 				{
-					// for unsubscribe link in emails
 					$secret_key = core::random_id(15);
-					$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `topic_id` = ?", array($secret_key, $_SESSION['user_id'], $topic_id));
 				}
+				else
+				{
+					$secret_key = $get_key['secret_key'];
+				}
+				
+				// check over their email options on this new subscription
+				if ($emails == NULL)
+				{
+					// find how they like to normally subscribe
+					$db->sqlquery("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+					
+					$get_email_type = $db->fetch();
+					
+					$sql_emails = $get_email_type['auto_subscribe_email'];
+				}
+				else
+				{
+					$sql_emails = (int) $emails;
+				}
+
+				$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `secret_key` = ?, `emails` = ?, `send_email` = ? WHERE `user_id` = ? AND `topic_id` = ?", array($secret_key, $sql_emails, $sql_emails, $_SESSION['user_id'], $topic_id));
 			}
 		}
 	}

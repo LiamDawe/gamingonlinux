@@ -1223,7 +1223,7 @@ else if (isset($_GET['go']))
 								{
 									$emails = 1;
 								}
-								$article_class->subscribe($article_id);
+								$article_class->subscribe($article_id, $emails);
 							}
 
 							/* gather a list of people quoted and let them know

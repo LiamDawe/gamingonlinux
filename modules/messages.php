@@ -761,7 +761,7 @@ else
 
 			else if (isset($_POST['yes']))
 			{
-				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['username']));
+				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
 				// delete it
 				header("Location: /private-messages/message=deleted");

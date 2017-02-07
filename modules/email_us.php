@@ -72,6 +72,8 @@ if (isset($_POST['act']))
 			
 			$subject = 'GOL Contact Us - ' . $name;
 			
+			$message = core::make_safe($_POST['message']);
+			
 			$html_message = '<p>' . $name . ' writes,</p>' . email_bbcode($_POST['message']);
 			
 			// Mail it

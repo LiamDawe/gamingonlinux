@@ -9,15 +9,17 @@
 [/block: search_bread]
 
 [block: search]
+
 <div class="box">
-	<div class="head">
-		Search for a specific game
-	</div>
 	<div class="body group">
 		<form method="get" action="/index.php?module=game-search">
-			<input type="hidden" name="module" value="game-search" />
-			Game Name: <input type="text" name="q" value="{:search_text}" /><br />
-			<button formaction="/index.php?module=game-search" type="submit">Search</button>
+			<span class="col-10">
+				<input type="hidden" name="module" value="game-search" /> 
+				<input style="margin-bottom: 0px;" placeholder="Search for a game..." style="display: inline; width: 100%;" type="text" name="q" value="{:search_text}" />
+			</span> 
+			<span class="col-2">
+				<button style="display: inline; float: right;" formaction="/index.php?module=game-search" type="submit">Search</button>
+			</span>
 		</form>
 	</div>
 </div>

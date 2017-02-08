@@ -10,7 +10,7 @@ $templating->load('statistics');
 $templating->block('top', 'statistics');
 $templating->set('total_users', core::config('total_users'));
 
-$charts = array(
+$charts_list = array(
   array("name" => "Linux Distributions (Combined)"),
   array("name" => "Linux Distributions (Split)"),
   array("name" => "Desktop Environment"),
@@ -45,7 +45,7 @@ $templating->set('options', $options);
 
 $counter = 0;
 
-foreach($charts as $chart)
+foreach($charts_list as $chart)
 {
   if (isset($_POST['picker']) && is_numeric($_POST['picker']))
   {
@@ -97,7 +97,7 @@ $templating->block('monthly_bottom');
 
 // trends charts
 $templating->block('trends_top');
-foreach ($charts as $chart)
+foreach ($charts_list as $chart)
 {
   $order = '';
   if (isset($chart['order']))

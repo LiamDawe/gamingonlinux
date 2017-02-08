@@ -20,6 +20,8 @@ class core
 
 	// any message for image uploader
 	public $error_message;
+	
+	public static $user_graphs_js;
 
 	protected static $config = array();
 

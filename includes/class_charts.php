@@ -18,6 +18,8 @@ class golchart
 	private $y_axis_label_y = 0;
 	private $label_y_start = 60;
 	private $label_y_increment = 45;
+	private $scale = 0;
+	private $bottom_axis_numbers_y = 0;
 	
 	function setup($custom_options = NULL)
 	{		
@@ -159,48 +161,15 @@ class golchart
 		$bottom_padding = $this->chart_options['padding_bottom'];
 		$this->chart_height = $total_labels * $this->label_y_increment + $this->label_y_start + $bottom_padding;
 		
-		$bottom_axis_numbers_y = $this->chart_height - 20;
-		$this->axis_outline_y = $bottom_axis_numbers_y - 14;
-		$this->y_axis_label_y = $bottom_axis_numbers_y + 15;
-		$strokes_height = $this->chart_height - 35;
+		$this->bottom_axis_numbers_y = $this->chart_height - 20;
+		$this->axis_outline_y = $this->bottom_axis_numbers_y - 14;
+		$this->y_axis_label_y = $this->bottom_axis_numbers_y + 15;
+		$this->strokes_height = $this->chart_height - 35;
 		$this->outlines_x = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 		$bars_x_start = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 		
 		// bottom axis data divisions
-		$value_per_tick = floor($max_data / $this->chart_options['ticks_total']);
-		$current_value = $value_per_tick;
-		
-		// divisions always start where the axis lines end
-		$tick_x_start = $this->outlines_x; 
-		
-		$max_data = $this->labels[0]['total'];
-		
-		// scale is the space between the starting axis line and the last data stroke
-		$scale = $actual_chart_space / $max_data;
-
-		$tick_spacing = $value_per_tick * $scale;
-		
-		
-		for ($i = 0; $i <= $this->chart_options['ticks_total']; $i++)
-		{
-			if ($i == 0)
-			{
-				$tick_x_position = $tick_x_start;
-				$current_value = 0;
-			}
-			else
-			{
-				$tick_x_position = $tick_x_position + $tick_spacing;
-				$current_value = $current_value + $value_per_tick;
-			}
-			$this->divisions .= '<text x="'.$tick_x_position.'" y="'.$bottom_axis_numbers_y.'" font-size="'.$this->chart_options['tick_font_size'].'">'.round($current_value).'</text>';
-			
-			// graph counter strokes
-			$this->strokes_array[] = '<line x1="'.$tick_x_position.'" y1="45" x2="'.$tick_x_position.'" y2="'.$strokes_height.'"/>';
-		}
-		
-		// scale is the space between the starting axis line and the last data stroke
-		$scale = ($this->chart_options['chart_width'] - $biggest_label[0] - $this->chart_options['padding_right'])/$max_data;
+		self::ticks($max_data, $biggest_label[0]);
 		
 		$last_label_y = 0;
 		$label_counter = 0;
@@ -235,7 +204,7 @@ class golchart
 			
 			// setup bar positions and array of items
 			$this_bar_y = $this_label_y - 18;
-			$bar_width = $label['total']*$scale;
+			$bar_width = $label['total']*$this->scale;
 			$this->bars_output_array[] = '<rect x="'.$bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$label['name'].' ' . $label['total'] . '</title></rect>';
 			
 			// bar counters and their positions
@@ -248,6 +217,59 @@ class golchart
 		}
 		
 		return $this->build_svg();
+	}
+	
+	function ticks($max_data, $biggest_label)
+	{
+		// bottom axis data divisions
+		$ticks_total = $this->chart_options['ticks_total'];
+
+		// as we want integer values for ticks, make sure ticks_total is not too large for max_data
+		if ($max_data < $ticks_total)
+		{
+			$ticks_total = ceil($max_data);
+		}
+
+		// get the smallest integer divisible by ticks_total that is larger than $max_data
+		$max_tick = ceil($max_data);
+		if ($max_tick % $ticks_total !== 0)
+		{
+			while ($max_tick % $ticks_total !== 0)
+			{
+				$max_tick += 1;
+			}
+		}
+
+		$value_per_tick = $max_tick / $ticks_total;
+		$current_value = $value_per_tick;
+			
+		// divisions always start where the axis lines end
+		$tick_x_start = $this->outlines_x;
+		
+		$actual_chart_space = $this->chart_options['chart_width'] - $biggest_label - $this->chart_options['padding_right'];
+		
+		// scale is the space between the starting axis line and the last tick
+		$this->scale = $actual_chart_space / $max_tick;
+
+		$tick_spacing = $value_per_tick * $this->scale;
+		
+		for ($i = 0; $i <= $ticks_total; $i++)
+		{
+			if ($i == 0)
+			{
+				$tick_x_position = $tick_x_start;
+				$current_value = 0;
+			}
+			else
+			{
+				$tick_x_position = $tick_x_position + $tick_spacing;
+				$current_value = $current_value + $value_per_tick;
+			}
+			$this->divisions .= '<text x="'.$tick_x_position.'" y="'.$this->bottom_axis_numbers_y.'" font-size="'.$this->chart_options['tick_font_size'].'">'.$current_value.'</text>';
+				
+			// graph counter strokes
+			$this->strokes_array[] = '<line x1="'.$tick_x_position.'" y1="45" x2="'.$tick_x_position.'" y2="'.$this->strokes_height.'"/>';
+		}
 	}
 	
 	function stat_chart($id, $last_id = '', $custom_options)
@@ -307,7 +329,7 @@ class golchart
 			$icon = '';
 			if ($this->chart_info['name'] == "Linux Distributions (Split)")
 			{
-				$icon = '<img src="/templates/default/images/distros/'.$all_labels['name'].'.svg" alt="distro-icon" width="20" height="20" /> ';
+				$icon = '<img class="distro" src="/templates/default/images/distros/'.$all_labels['name'].'.svg" alt="distro-icon" width="20" height="20" /> ';
 			}
 			if ($this->chart_info['name'] == "Linux Distributions (Combined)")
 			{
@@ -323,7 +345,7 @@ class golchart
 				{
 					$icon_name = $all_labels['name'];
 				}
-				$icon = '<img src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
+				$icon = '<img class="distro" src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
 			}
 			
 			$percent = round(($all_labels['data'] / $this->chart_info['total_answers']) * 100, 2);
@@ -374,44 +396,14 @@ class golchart
 		$bottom_padding = $this->chart_options['padding_bottom'];
 		$this->chart_height = $total_labels * $this->label_y_increment + $this->label_y_start + $bottom_padding;
 			
-		$bottom_axis_numbers_y = $this->chart_height - 20;
-		$this->axis_outline_y = $bottom_axis_numbers_y - 14;
-		$this->y_axis_label_y = $bottom_axis_numbers_y + 15;
-		$strokes_height = $this->chart_height - 35;
+		$this->bottom_axis_numbers_y = $this->chart_height - 20;
+		$this->axis_outline_y = $this->bottom_axis_numbers_y - 14;
+		$this->y_axis_label_y = $this->bottom_axis_numbers_y + 15;
+		$this->strokes_height = $this->chart_height - 35;
 		$this->outlines_x = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 		$bars_x_start = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
-			
-		// bottom axis data divisions
-		$value_per_tick = floor($max_data / $this->chart_options['ticks_total']);
-		$current_value = $value_per_tick;
-			
-		// divisions always start where the axis lines end
-		$tick_x_start = $this->outlines_x;
 		
-		$actual_chart_space = $this->chart_options['chart_width'] - $biggest_label[0] - $this->chart_options['padding_right'];
-		
-		// scale is the space between the starting axis line and the last data stroke
-		$scale = $actual_chart_space / $max_data;
-
-		$tick_spacing = $value_per_tick * $scale;
-		
-		for ($i = 0; $i <= $this->chart_options['ticks_total']; $i++)
-		{
-			if ($i == 0)
-			{
-				$tick_x_position = $tick_x_start;
-				$current_value = 0;
-			}
-			else
-			{
-				$tick_x_position = $tick_x_position + $tick_spacing;
-				$current_value = $current_value + $value_per_tick;
-			}
-			$this->divisions .= '<text x="'.$tick_x_position.'" y="'.$bottom_axis_numbers_y.'" font-size="'.$this->chart_options['tick_font_size'].'">'.$current_value.'</text>';
-				
-			// graph counter strokes
-			$this->strokes_array[] = '<line x1="'.$tick_x_position.'" y1="45" x2="'.$tick_x_position.'" y2="'.$strokes_height.'"/>';
-		}
+		self::ticks($max_data, $biggest_label[0]);
 		
 		$last_label_y = 0;
 		$label_counter = 0;
@@ -446,7 +438,7 @@ class golchart
 				
 			// setup bar positions and array of items
 			$this_bar_y = $this_label_y - 18;
-			$bar_width = $data['percent']*$scale;
+			$bar_width = $data['percent']*$this->scale;
 			$this->bars_output_array[] = '<rect x="'.$bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$data['name'].' (' . $data['total'] . ' total votes)</title></rect>';
 				
 			// bar counters and their positions

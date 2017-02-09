@@ -95,6 +95,11 @@ return [
 	],
 	"game_submitted" => [
 		"text" => "You have sent in a game for our database! Thank you for helping to keep us up to date!"
+	],
+	"reported" => [
+		"text" => "That %s was reported to the editors to review!",
+		"additions" => 1,
+		"error" => 0
 	]
 ];
 ?>

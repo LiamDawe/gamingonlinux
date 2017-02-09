@@ -11,11 +11,22 @@ $core->forum_permissions($_GET['forum_id']);
 // permissions for viewforum page
 if($parray['view'] == 0)
 {
-	$core->message('You do not have permission to view this forum!');
+	$core->message('You do not have permission to view this forum!', NULL, 1);
 }
 
 else
 {
+	if (isset ($_GET['message']))
+	{
+		$extra = NULL;
+		if (isset($_GET['extra']))
+		{
+			$extra = $_GET['extra'];
+		}
+		$message = $message_map->get_message($_GET['message'], $extra);
+		$core->message($message['message'], NULL, $message['error']);
+	}
+
 	// paging for pagination
 	$page = core::give_page();
 

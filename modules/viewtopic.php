@@ -6,98 +6,47 @@ if (!core::is_number($_GET['topic_id']))
 
 else
 {
+	if (isset ($_GET['message']))
+	{
+		$extra = NULL;
+		if (isset($_GET['extra']))
+		{
+			$extra = $_GET['extra'];
+		}
+		$message = $message_map->get_message($_GET['message'], $extra);
+		$core->message($message['message'], NULL, $message['error']);
+	}
+
 	$templating->merge('viewtopic');
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletetopic')
 	{
-		$core->forum_permissions($_GET['forum_id']);
-		if ($parray['delete'] == 1)
+		$return = "/index.php?module=viewforum&forum_id=" . $_GET['forum_id'];
+		if (core::config('pretty_urls') == 1)
 		{
-			if (!isset($_POST['yes']) && !isset($_POST['no']))
-			{
-				$templating->set_previous('title', 'Deleting a forum topic', 1);
-				$core->yes_no('Are you sure you want to delete that topic?', "index.php?module=viewtopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}", 'Go', 'Delete', 'moderator_options');
-			}
+			$return_no = '/forum/topic/' . $_GET['topic_id'];
 		}
 		else
 		{
-			if (core::config('pretty_urls') == 1)
-			{
-				$return = '/forum/topic/' . $_GET['topic_id'];
-			}
-			else
-			{
-				$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
-			}
-			header("Location: " . $return);
-			die();
+			$return_no = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
 		}
+			
+		forum_class::delete_topic($return, $return_no, "/index.php?module=viewtopic&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
 	}
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
 	{
-		if ($user->check_group([1,2]) == true)
+		$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
+		if (core::config('pretty_urls') == 1)
 		{
-			if (!isset($_POST['yes']) && !isset($_POST['no']))
-			{
-				$core->yes_no("Are you sure you wish to delete that post?", "index.php?module=viewtopic&view=deletepost&post_id={$_GET['post_id']}&topic_id={$_GET['topic_id']}");
-			}
-			
-			else if (isset($_POST['no']))
-			{
-				header("Location: /forum/topic/{$_GET['topic_id']}");
-			}
-
-			else
-			{
-				// Get the info from the post
-				$db->sqlquery("SELECT r.author_id, r.post_number, r.reported, t.forum_id FROM `forum_replies` r INNER JOIN `forum_topics` t ON r.topic_id = t.topic_id WHERE r.`post_id` = ?", array($_GET['post_id']));
-				$post_info = $db->fetch();
-
-				$db->sqlquery("UPDATE `forum_replies` SET `post_number` = (post_number - 1) WHERE `post_number` > ?", array($post_info['post_number']));
-
-				// remove the post
-				$db->sqlquery("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-
-				// update admin notifications
-				if ($post_info['reported'] == 1)
-				{
-					$db->sqlquery("DELETE FROM `admin_notifications` WHERE `reply_id` = ?", array($_GET['post_id']));
-				}
-
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `completed` = 1, `action` = ?, `created` = ?, `completed_date` = ?, `reply_id` = ?", array("{$_SESSION['username']} deleted a forum reply.", core::$date, core::$date, $_GET['post_id']));
-
-				// update the authors post count
-				if ($post_info['author_id'] != 0)
-				{
-					$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts - 1) WHERE `user_id` = ?", array($post_info['author_id']));
-				}
-
-				// now update the forums post count
-				$db->sqlquery("UPDATE `forums` SET `posts` = (posts - 1) WHERE `forum_id` = ?", array($post_info['forum_id']));
-
-				// update the topics info, get the newest last post and update the topics last info with that ones
-				$db->sqlquery("SELECT `creation_date`, `author_id`, `guest_username` FROM `forum_replies` WHERE `topic_id` = ? ORDER BY `post_id` DESC LIMIT 1", array($_GET['topic_id']));
-				$topic_info = $db->fetch();
-
-				$db->sqlquery("UPDATE `forum_topics` SET `replys` = (replys - 1), `last_post_date` = ?, `last_post_id` = ? WHERE `topic_id` = ?", array($topic_info['creation_date'], $topic_info['author_id'], $_GET['topic_id']));
-
-				// finally check if this is the latest topic we are deleting to update the latest topic info for the forum
-				$db->sqlquery("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($post_info['forum_id']));
-				$last_post = $db->fetch();
-
-				// if it is then we need to get the *now* newest topic and update the forums info
-				if ($last_post['last_post_topic_id'] == $_GET['topic_id'])
-				{
-					$db->sqlquery("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($post_info['forum_id']));
-					$new_info = $db->fetch();
-
-					$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $post_info['forum_id']));
-				}
-
-				$core->message("That post has now been deleted! <a href=\"/forum/topic/{$_GET['topic_id']}\">Click here to return to the forum</a>.");
-			}
+			$return_no = '/forum/topic/' . $_GET['topic_id'];
 		}
+		else
+		{
+			$return_no = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
+		}
+			
+		forum_class::delete_reply($return, $return_no, "/index.php?module=viewtopic&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
 	}
 
 	else if (!isset($_POST['act']) && !isset($_GET['go']) && !isset($_GET['view']))
@@ -161,11 +110,6 @@ else
 			{
 				if (isset($_GET['message']))
 				{
-					if ($_GET['message'] == 'reported')
-					{
-						$core->message('Thank you for reporting the post!');
-					}
-
 					if ($_GET['message'] == 'queue')
 					{
 						$core->message('Your message is now in the mod queue to be manually approved due to spam attacks, please be patient while our editors work. This only happens a few times to start with!', NULL, 1);
@@ -667,7 +611,7 @@ else
 						$delete_link = '';
 						if ($user->check_group([1,2]) == true)
 						{
-							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '"><span class="icon delete"></span></a>';
+							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
 						}
 						$templating->set('delete_link', $delete_link);
 
@@ -1138,109 +1082,6 @@ else
 					$db->sqlquery("INSERT INTO `editor_tracking` SET `action` = ?, `time` = ?", array("{$_SESSION['username']} moved a forum topic.", core::$date));
 
 					$core->message("The topic has been moved! Options: <a href=\"index.php?module=viewforum&amp;forum_id={$_POST['new_forum']}\">View Forum</a> or <a href=\"index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}\">View Topic</a>");
-				}
-			}
-
-			else if ($_POST['moderator_options'] == 'Delete')
-			{
-				if (!isset($_POST['yes']) && !isset($_POST['no']))
-				{
-					$templating->set_previous('title', 'Deleting a forum topic', 1);
-					$core->yes_no('Are you sure you want to delete that topic?', "index.php?module=viewtopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}", 'Go', 'Delete', 'moderator_options');
-				}
-
-				else if (isset($_POST['no']))
-				{
-					if (core::config('pretty_urls') == 1)
-					{
-						$return = '/forum/topic/' . $_GET['topic_id'];
-					}
-					else
-					{
-						$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
-					}
-					header("Location: " . $return);
-					die();
-				}
-
-				else if (isset($_POST['yes']))
-				{
-					// check if its been reported first so we can remove the report
-					$db->sqlquery("SELECT `reported`, `replys` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					$check = $db->fetch();
-
-					if ($check['reported'] == 1)
-					{
-						$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_topic_report' AND `data` = ?", array(core::$date, $_GET['topic_id']));
-					}
-
-					// delete any replies that may have been reported from the admin notifications
-					if ($check['replys'] > 0)
-					{
-						$db->sqlquery("SELECT `post_id`, `reported` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-						$get_replies = $db->fetch_all_rows();
-
-						foreach ($get_replies as $delete_replies)
-						{
-							if ($delete_replies['reported'] == 1)
-							{
-								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report', `data` = ?", array(core::$date, $delete_replies['post_id']));
-							}
-						}
-					}
-
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_topic', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['topic_id']));
-
-					// count all posts including the topic
-					$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					$total_count = $db->num_rows() + 1;
-
-					// Here we get each person who has posted along with their post count for the topic ready to remove it from their post count sql
-					$db->sqlquery("SELECT `author_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					$posts = $db->fetch_all_rows();
-
-					$users_posts = array();
-					foreach ($posts as $post)
-					{
-						$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `author_id` = ? AND `topic_id` = ?", array($post['author_id'], $_GET['topic_id']));
-						$user_post_count = $db->num_rows();
-
-						$users_posts[$post['author_id']]['author_id'] = $post['author_id'];
-						$users_posts[$post['author_id']]['posts'] = $user_post_count;
-					}
-
-					// now we can remove the topic
-					$db->sqlquery("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-
-					// now we can remove all replys
-					$db->sqlquery("DELETE FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-
-					// now update each users post count
-					foreach($users_posts as $post)
-					{
-						$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts - ?) WHERE `user_id` = ?", array($post['posts'], $post['author_id']));
-					}
-
-					// remove a post from the topic author for the topic post itself
-					$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts - 1) WHERE `user_id` = ?", array($_GET['author_id']));
-
-					// now update the forums post count
-					$db->sqlquery("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $_GET['forum_id']));
-
-					// finally check if this is the latest topic we are deleting to update the latest topic info for the forum
-					$db->sqlquery("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_GET['forum_id']));
-					$last_post = $db->fetch();
-
-					// if it is then we need to get the *now* newest topic and update the forums info
-					if ($last_post['last_post_topic_id'] == $_GET['topic_id'])
-					{
-						$db->sqlquery("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($_GET['forum_id']));
-						$new_info = $db->fetch();
-
-						$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_GET['forum_id']));
-					}
-
-					$core->message("That topic has now been deleted! <a href=\"/forum/{$_GET['forum_id']}/\">Click here to return to the forum</a>.");
 				}
 			}
 

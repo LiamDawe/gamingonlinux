@@ -1,10 +1,19 @@
 <?php
 $templating->merge('admin_modules/admin_module_forum');
 
-
-if (isset($_GET['view']) && !isset($_POST['act']))
+if (isset ($_GET['message']))
 {
-	// add article
+  $extra = NULL;
+  if (isset($_GET['extra']))
+  {
+    $extra = $_GET['extra'];
+  }
+  $message = $message_map->get_message($_GET['message'], $extra);
+  $core->message($message['message'], NULL, $message['error']);
+}
+
+if (isset($_GET['view']))
+{
 	if ($_GET['view'] == 'category')
 	{
 		$templating->block('category_add');
@@ -268,6 +277,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 			$templating->set('post_id', $topic['topic_id']);
 			$templating->set('topic_id', $topic['topic_id']);
+			$templating->set('forum_id', $topic['forum_id']);
+			$templating->set('author_id', $topic['author_id']);
 			$templating->set('post_text', bbcode($topic['topic_text'], 0));
 			if ($topic['reported_by_id'] == 0)
 			{
@@ -279,6 +290,12 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			$templating->set('reporter', $reported_by);
 		}
+	}
+	
+	if ($_GET['view'] == 'deletetopic')
+	{
+		$return_page = "/admin.php?module=forum&view=reportedtopics";
+		forum_class::delete_topic($return_page, $return_page, "admin.php?module=forum&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
 	}
 
 	if ($_GET['view'] == 'reportedreplies')
@@ -295,7 +312,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('reply_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON p.author_id = u.user_id LEFT JOIN `users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
+		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, t.forum_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON p.author_id = u.user_id LEFT JOIN `users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('reply', 'admin_modules/admin_module_forum');
@@ -329,6 +346,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 			$templating->set('post_id', $topic['post_id']);
 			$templating->set('topic_id', $topic['topic_id']);
+			$templating->set('forum_id', $topic['forum_id']);
 			$templating->set('post_text', bbcode($topic['reply_text'], 0));
 			if ($topic['reported_by_id'] == 0)
 			{
@@ -340,6 +358,12 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			$templating->set('reporter', $reported_by);
 		}
+	}
+	
+	if ($_GET['view'] == 'deletepost')
+	{
+		$return_page = "/admin.php?module=forum&view=reportedreplies";
+		forum_class::delete_reply($return_page, $return_page, "admin.php?module=forum&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
 	}
 
 	if ($_GET['view'] == 'removetopicreport')
@@ -387,7 +411,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	}
 }
 
-else if (isset($_POST['act']) && !isset($_GET['view']))
+else if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'category')
 	{

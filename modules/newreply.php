@@ -158,7 +158,7 @@ if (core::config('forum_posting_open') == 1)
 								}
 								else
 								{
-									$secret_key = $email_user['secret_key'];
+									$secret_key = $users['secret_key'];
 								}
 								$users_array[$users['user_id']]['user_id'] = $users['user_id'];
 								$users_array[$users['user_id']]['email'] = $users['email'];

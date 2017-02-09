@@ -486,10 +486,19 @@ class user
 
 	public static function sort_avatar($user_data)
 	{
+		if ($_SESSION['theme'] == 'dark')
+		{
+			$default_avatar = core::config('website_url') . "uploads/avatars/no_avatar_dark.png";
+		}
+		else if ($_SESSION['theme'] == 'default')
+		{
+			$default_avatar = core::config('website_url') . "uploads/avatars/no_avatar.png";
+		}
+			
 		$avatar = '';
 		if ($user_data['avatar_gravatar'] == 1)
 		{
-			$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. core::config('website_url') . '/uploads/avatars/no_avatar.png';
+			$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
 		}
 
 		else if ($user_data['avatar_gallery'] != NULL)
@@ -510,14 +519,7 @@ class user
 		// else no avatar, then as a fallback use gravatar if they have an email left-over
 		else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
 		{
-			if ($_SESSION['theme'] == 'dark')
-			{
-				$avatar = core::config('website_url') . "uploads/avatars/no_avatar_dark.png";
-			}
-			else if ($_SESSION['theme'] == 'default')
-			{
-				$avatar = core::config('website_url') . "uploads/avatars/no_avatar.png";
-			}
+			$avatar = $default_avatar;
 		}
 		
 		return $avatar;

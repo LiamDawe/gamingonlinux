@@ -68,7 +68,8 @@ $templating->set('title', strip_tags($_POST['title']));
 $templating->set('slug', strip_tags($_POST['slug']));
 $templating->set('author_id', $author_id);
 
-// if there is no registered user info we are previewing
+$top_image = '';
+$top_image_nobbcode='';
 if (isset($article))
 {
 	if ($article['author_id'] == 0)
@@ -89,6 +90,20 @@ if (isset($article))
 	{
 		$username = "<a href=\"/profiles/{$article['user_id']}\">{$article['username']}</a>";
 	}
+	
+	if (!empty($article['tagline_image']))
+	{
+		$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
+		$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
+	}
+	if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
+	{
+		$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
+		$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+		BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
+		Full Image Url: <a href=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
+	}
 }
 
 // else we are probably just previewing a new post by an editor
@@ -102,21 +117,6 @@ $templating->set('username', $username);
 $templating->set('date', $date);
 $templating->set('submitted_date', 'Submitted ' . $date);
 
-$top_image = '';
-$top_image_nobbcode='';
-if (!empty($article['tagline_image']))
-{
-	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
-	$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-	BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
-}
-if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
-{
-	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
-	$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-	BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-	Full Image Url: <a href=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
-}
 if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
 {
 	$db->sqlquery("SELECT `filename` FROM `articles_tagline_gallery` WHERE `id` = ?", array($_SESSION['gallery_tagline_id']));

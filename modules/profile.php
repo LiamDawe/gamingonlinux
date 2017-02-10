@@ -320,20 +320,39 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					$comment_posts = '';
 					$db->sqlquery("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start));
 					$all_comments = $db->fetch_all_rows();
+					
+					// make an array of all comment ids to search for likes (instead of one query per comment for likes)
+					$like_array = [];
+					$sql_replacers = [];
+					foreach ($all_comments as $id_loop)
+					{
+						$like_array[] = $id_loop['comment_id'];
+						$sql_replacers[] = '?';
+					}
+					if (!empty($sql_replacers))
+					{
+						// Total number of likes for the comments
+						$qtotallikes = $db->sqlquery("SELECT comment_id, COUNT(*) FROM likes WHERE comment_id IN ( ".implode(',', $sql_replacers)." ) GROUP BY comment_id", $like_array);
+						$get_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+					}
+					
 					foreach ($all_comments as $comments)
 					{
-						// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
-						$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
-						$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
-
 						$date = $core->format_date($comments['time_posted']);
 						$title = $comments['title'];
+						
+						// sort out the likes
+						$likes = NULL;
+						if (isset($get_likes[$comments['comment_id']]))
+						{
+							$likes = ' <span class="icon like" style="display: inline-block; background-size: 14px; cursor: default; background-position: bottom center;"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
+						}
 
-						$comment_posts .= "<li class=\"list-group-item\">
-					<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">{$title}</a>
-					<div>".substr(strip_tags(bbcode($text)), 0, 63)."&hellip;</div>
-					<small>{$date}</small>
-				</li>";
+						$comment_posts .= "<div class=\"box\"><div class=\"body group\">
+					<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">{$title}</a><br />
+					<small>{$date}" . $likes ."</small><br />
+					<div>".bbcode($comments['comment_text'])."</div>
+				</div></div>";
 					}
 
 					$templating->set('comment_posts', $comment_posts);

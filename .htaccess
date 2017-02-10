@@ -128,6 +128,10 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^private-messages/([0-9]+)/page\=([0-9]+)?$ /index.php?module=messages&view=message&id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^profiles/([0-9]+)/?$ /index.php?module=profile&user_id=$1 [N,NC,QSA]
+  
+  RewriteRule ^profiles/([0-9]+)/comments/?$ /index.php?module=profile&view=more-comments&user_id=$1 [N,NC,QSA]
+  
+  RewriteRule ^profiles/([0-9]+)/comments/page\=([0-9]+)?$ /index.php?module=profile&view=more-comments&user_id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^users/statistics/?$ /index.php?module=statistics [N,NC,QSA]
 

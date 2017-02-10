@@ -362,7 +362,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					<hr />
 					<div>".bbcode($comments['comment_text'])."</div>
 					<hr />
-					<div><a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/\">View article</a> - <a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/#comments\">View full comments</a></div>
+					<div><a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">View this comment</a> - <a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/\">View article</a> - <a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/#comments\">View full comments</a></div>
 				</div></div>";
 					}
 

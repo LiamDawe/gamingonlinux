@@ -89,3 +89,27 @@
 </div>
 </div>
 [/block: edit_bottom]
+
+[block: add_genre]
+<div class="box"><div class="head">Here you can add a genre tag for the games database</div></div>
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=games" class="form-inline">
+			Genre Name: <input type="text" name="name" placeholder="genre name..." /> <button type="submit" name="act" value="add_genre">Add</button>
+		</form>
+	</div>
+</div>
+<div class="box"><div class="head">Current Categorys:</div></div>
+[/block: add_genre]
+
+[block: genre_row]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=games" class="form-inline">
+		Genre Name: <input type="text" name="name" value="{:name}" /> <button type="submit" name="act" value="edit_genre">Edit</button> <button type="submit" name="act" value="delete_genre">Delete</button>
+		<input type="hidden" name="genre_id" value="{:genre_id}" />
+		</form>
+	</div>
+</div>
+[/block: genre_row]
+

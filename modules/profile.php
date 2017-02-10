@@ -240,7 +240,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						{
 							if (core::config('pretty_urls') == 1)
 							{
-								$more_comments_href = "/profiles/1/comments/";
+								$more_comments_href = "/profiles/".$_GET['user_id']."/comments/";
 							}
 							else
 							{

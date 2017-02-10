@@ -5,14 +5,14 @@ return [
 		"additions" => 1,
 		"error" => 1
 	],
-  "shorttagline" => [
+	"shorttagline" => [
     "text" => "The tagline text was too short!",
 		"error" => 1
-  ],
-  "shorttitle" => [
+	],
+	"shorttitle" => [
     "text" => "The title was too short, make it informative!",
 		"error" => 1
-  ],
+	],
 	"no_categories" => [
 		"text" => "You have to give the article at least one category tag!",
 		"error" => 1

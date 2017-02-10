@@ -1,10 +1,34 @@
 <?php
+if (isset ($_GET['message']))
+{
+  $extra = NULL;
+  if (isset($_GET['extra']))
+  {
+    $extra = $_GET['extra'];
+  }
+  $message = $message_map->get_message($_GET['message'], $extra);
+  $core->message($message['message'], NULL, $message['error']);
+}
+
 $templating->merge('admin_modules/games');
 
 $licenses = array('', 'Closed Source', 'GPL', 'BSD', 'MIT');
 
 if (isset($_GET['view']) && !isset($_POST['act']))
 {
+	if ($_GET['view'] == 'genres')
+	{
+		$templating->block('add_genre');
+		
+		$db->sqlquery("SELECT `id`, `name` FROM `game_genres` ORDER BY `name` ASC");
+		while ($genres = $db->fetch())
+		{
+			$templating->block('genre_row');
+			$templating->set('name', $genres['name']);
+			$templating->set('genre_id', $genres['id']);
+		}
+	}
+	
 	if ($_GET['view'] == 'add')
 	{
 		if (isset($_GET['message']))
@@ -164,6 +188,86 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 if (isset($_POST['act']))
 {
+	if ($_POST['act'] == 'add_genre')
+	{
+		$genre = trim($_POST['name']);
+		$genre = core::make_safe($genre);
+		
+		if (empty($genre))
+		{
+			header("Location: /admin.php?module=games&view=genres&message=missing&extra=name");
+			die();
+		}
+		
+		$db->sqlquery("INSERT INTO `game_genres` SET `name` = ?, `accepted` = 1", array($genre));
+		
+		header("Location: /admin.php?module=games&view=genres&message=saved&extra=genre");
+		die();
+	}
+	
+	if ($_POST['act'] == 'edit_genre')
+	{
+		$genre = trim($_POST['name']);
+		$genre = core::make_safe($genre);
+		if (!core::is_number((int) $_POST['genre_id']))
+		{
+			header("Location: /admin.php?module=games&view=genres&message=missing&extra=id");
+			die();
+		}
+		
+		if (empty($genre))
+		{
+			header("Location: /admin.php?module=games&view=genres&message=missing&extra=name");
+			die();
+		}
+		
+		$db->sqlquery("UPDATE `game_genres` SET `name` = ? WHERE `id` = ?", array($genre, $_POST['genre_id']));
+		
+		header("Location: /admin.php?module=games&view=genres&message=edited&extra=genre");
+		die();
+	}
+	
+	if ($_POST['act'] == 'delete_genre')
+	{
+		$return = '/admin.php?module=games&view=genres';
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$genre_id = (int) $_POST['genre_id'];
+			
+			if (!core::is_number($genre_id))
+			{
+				header("Location: " . $return);
+				die();
+			}
+			
+			$db->sqlquery("SELECT `name` FROM `game_genres` WHERE `id` = ?", array($genre_id));
+			$name = $db->fetch();
+
+			$core->yes_no('Are you sure you want to delete ' . $name['name'] . ' from the game genres list?', "admin.php?module=games&genre_id={$_POST['genre_id']}&return=" . $return, "delete_genre");
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$genre_id = (int) $_GET['genre_id'];
+			
+			if (!core::is_number($genre_id))
+			{
+				header("Location: " . $return);
+				die();
+			}
+			
+			$db->sqlquery("DELETE FROM `game_genres` WHERE `id` = ?", array($genre_id));
+			$db->sqlquery("DELETE FROM `game_genres_reference` WHERE `genre_id` = ?", array($genre_id));
+			
+			header("Location: " . $return . '&message=deleted&extra=genre');
+		}
+	}
+	
 	if ($_POST['act'] == 'Add')
 	{
 		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link'] && empty($_POST['itch_link']))))

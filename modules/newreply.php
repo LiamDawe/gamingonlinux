@@ -225,18 +225,17 @@ if (core::config('forum_posting_open') == 1)
 									$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `send_email` = 0 WHERE `topic_id` = ? AND `user_id` = ?", array($topic_id, $email_user['user_id']));
 								}
 							}
+						}
+						// help stop double postings
+						unset($message);
 
-							// help stop double postings
-							unset($message);
-
-							if (core::config('pretty_urls') == 1)
-							{
-								header("Location: /forum/topic/{$topic_id}/post_id={$post_id}");
-							}
-							else
-							{
-								header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&post_id={$post_id}");
-							}
+						if (core::config('pretty_urls') == 1)
+						{
+							header("Location: /forum/topic/{$topic_id}/post_id={$post_id}");
+						}
+						else
+						{
+							header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&post_id={$post_id}");
 						}
 					}
 

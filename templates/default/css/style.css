@@ -1510,3 +1510,4 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 	max-width: 100px;
 }
 .article_bbcode .tagline {margin-left: 115px;}
+.profile-comments-heart {display: inline-block; background-size: 14px; cursor: default; background-position: bottom center;}

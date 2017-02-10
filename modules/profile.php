@@ -298,10 +298,18 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						$page = $_GET['page'];
 					}
 
-					$pagination_linky = url . "index.php?module=profile&amp;view=more-comments&amp;user_id=".$_GET['user_id']."&amp;";
+					if (core::config('pretty_urls') == 1)
+					{
+						$pagination_linky = "profiles/1/comments/";
+					}
+					else
+					{
+						$pagination_linky = "index.php?module=profile&amp;view=more-comments&amp;user_id=".$_GET['user_id']."&amp;";
+					}
+
 
 					// sort out the pagination link
-					$pagination = $core->pagination_link(10, $total, $pagination_linky, $page);
+					$pagination = $core->pagination_link(10, $total, core::config('website_url')  . $pagination_linky, $page);
 
 					// get top of comments section
 					$templating->block('more_comments');
@@ -345,13 +353,16 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						$likes = NULL;
 						if (isset($get_likes[$comments['comment_id']]))
 						{
-							$likes = ' <span class="icon like" style="display: inline-block; background-size: 14px; cursor: default; background-position: bottom center;"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
+							$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
 						}
 
 						$comment_posts .= "<div class=\"box\"><div class=\"body group\">
 					<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/comment_id={$comments['comment_id']}\">{$title}</a><br />
 					<small>{$date}" . $likes ."</small><br />
+					<hr />
 					<div>".bbcode($comments['comment_text'])."</div>
+					<hr />
+					<div><a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/\">View article</a> - <a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/#comments\">View full comments</a></div>
 				</div></div>";
 					}
 

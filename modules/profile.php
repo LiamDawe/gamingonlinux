@@ -238,7 +238,15 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 
 						if ($count_comments >= 5)
 						{
-							$view_more_comments = '<li class="list-group-item"><a href="/index.php?module=profile&view=more-comments&user_id='.$profile['user_id'].'">View more comments</a></li>';
+							if (core::config('pretty_urls') == 1)
+							{
+								$more_comments_href = "/profiles/1/comments/";
+							}
+							else
+							{
+								$more_comments_href = "index.php?module=profile&amp;view=more-comments&amp;user_id=".$_GET['user_id'];
+							}
+							$view_more_comments = '<li class="list-group-item"><a href="'.$more_comments_href.'">View more comments</a></li>';
 						}
 					}
 

@@ -308,7 +308,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 
 					if (core::config('pretty_urls') == 1)
 					{
-						$pagination_linky = "profiles/1/comments/";
+						$pagination_linky = "profiles/".$_GET['user_id']."/comments/";
 					}
 					else
 					{

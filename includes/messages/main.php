@@ -10,7 +10,7 @@ return [
 		"error" => 1
 	],
 	"shorttitle" => [
-    "text" => "The title was too short, make it informative!",
+    "text" => "The post title was too short!",
 		"error" => 1
 	],
 	"no_categories" => [
@@ -104,6 +104,10 @@ return [
 	"mod_queue" => [
 		"text" => "Your submission is now in the mod queue to be manually approved to prevent spam attacks, please be patient while our editors work. This only happens a few times to start with!",
 		"error" => 0
+	],
+	"more_poll_options" => [
+		"text" => "Polls need at least two options!",
+		"error" => 1
 	]
 ];
 ?>

@@ -57,21 +57,19 @@ else
 
 				$title = '';
 				$text = '';
+				if (isset ($_GET['message']))
+				{
+					$extra = NULL;
+					if (isset($_GET['extra']))
+					{
+						$extra = $_GET['extra'];
+					}
+					$message = $message_map->get_message($_GET['message'], $extra);
+					$core->message($message['message'], NULL, $message['error']);
+				}
+	
 				if (isset($_GET['error']))
 				{
-					if ($_GET['error'] == 'missing')
-					{
-						$core->message('You have to enter a title and message to post a new topic!', NULL, 1);
-					}
-					if ($_GET['error'] == 'moreoptions')
-					{
-						$core->message('Polls need at least two options!', NULL, 1);
-					}
-					if ($_GET['error'] == 'shorttitle')
-					{
-						$core->message('Title was too short!', NULL, 1);
-					}
-
 					$title = $_SESSION['atitle'];
 					$text = $_SESSION['atext'];
 				}
@@ -174,6 +172,7 @@ else
 				}
 				$templating->set('category_options', $cat_options);
 
+				$templating->set('title', $title);
 				$core->editor('text', $text, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
 
 				$templating->block('bottom', 'newtopic');
@@ -208,14 +207,15 @@ else
 							$mod_sql = '`is_locked` = 1,`is_sticky` = 1,';
 						}
 					}
-
-					// check empty
-					if (empty($title) || empty($message))
+					
+					// make sure its not empty
+					$empty_check = core::mempty(compact('title', 'message'));
+					if ($empty_check !== true)
 					{
 						$_SESSION['atitle'] = $title;
 						$_SESSION['atext'] = $message;
 
-						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error=missing");
+						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error&message=empty&extra=" . $empty_check);
 					}
 
 					else if (strlen($title) < 4)
@@ -223,7 +223,7 @@ else
 						$_SESSION['atitle'] = $title;
 						$_SESSION['atext'] = $message;
 
-						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error=shorttitle");
+						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error&message=shorttitle");
 					}
 
 					else
@@ -289,7 +289,7 @@ else
 										$_SESSION['atitle'] = $title;
 										$_SESSION['atext'] = $message;
 
-										header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error=moreoptions");
+										header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&message=more_poll_options");
 										die();
 									}
 								}

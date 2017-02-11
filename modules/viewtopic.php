@@ -108,14 +108,6 @@ else
 
 			else
 			{
-				if (isset($_GET['message']))
-				{
-					if ($_GET['message'] == 'queue')
-					{
-						$core->message('Your message is now in the mod queue to be manually approved due to spam attacks, please be patient while our editors work. This only happens a few times to start with!', NULL, 1);
-					}
-				}
-
 				// update topic views
 				$db->sqlquery("UPDATE `forum_topics` SET `views` = (views + 1) WHERE `topic_id` = ?", array($_GET['topic_id']));
 

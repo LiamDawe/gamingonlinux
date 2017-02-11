@@ -100,6 +100,10 @@ return [
 		"text" => "That %s was reported to the editors to review!",
 		"additions" => 1,
 		"error" => 0
+	],
+	"mod_queue" => [
+		"text" => "Your submission is now in the mod queue to be manually approved to prevent spam attacks, please be patient while our editors work. This only happens a few times to start with!",
+		"error" => 0
 	]
 ];
 ?>

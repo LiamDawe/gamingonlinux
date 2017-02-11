@@ -312,7 +312,7 @@ else
 						{
 							$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue'", array($_SESSION['user_id'], core::$date, $topic_id));
 
-							header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id={$_POST['category']}&message=queue");
+							header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id={$_POST['category']}&message=mod_queue");
 						}
 					}
 				}

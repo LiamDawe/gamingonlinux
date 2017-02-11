@@ -47,11 +47,6 @@ else
 		{
 			$core->message('You have made too many forums topics in a really short time, please wait a while.', NULL, 1);
 		}
-
-		if ($_GET['message'] == 'queue')
-		{
-			$core->message('Your message is now in the mod queue to be manually approved due to spam attacks, please be patient while our editors work. This only happens a few times to start with!', NULL, 1);
-		}
 	}
 
 	$templating->block('main_top', 'viewforum');

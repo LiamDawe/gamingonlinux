@@ -246,7 +246,7 @@ if (core::config('forum_posting_open') == 1)
 
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue_reply'", array($_SESSION['user_id'], core::$date, $post_id));
 
-						header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&message=queue");
+						header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&message=mod_queue");
 					}
 				}
 			}

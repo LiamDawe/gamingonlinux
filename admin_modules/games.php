@@ -31,22 +31,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	
 	if ($_GET['view'] == 'add')
 	{
-		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'added')
-			{
-				$core->message("Game addition completed! <a href=\"/index.php?module=game&game-id={$_GET['id']}\">View in live database</a>.");
-			}
-			if ($_GET['message'] == 'missing')
-			{
-				$core->message('Please fill a name, a release date and at least one link at a minimum!', null, 1);
-			}
-			if ($_GET['message'] == 'exists')
-			{
-				$core->message('That game already exists! <a href="/index.php?module=game&game-id=' . $_GET['id'] . '">View in live database</a>.', NULL, 1);
-			}
-		}
-
 		$templating->set_previous('meta_description', 'Adding a new game', 1);
 		$templating->set_previous('title', 'Adding a game to the database', 1);
 
@@ -270,17 +254,26 @@ if (isset($_POST['act']))
 	
 	if ($_POST['act'] == 'Add')
 	{
-		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link'] && empty($_POST['itch_link']))))
+		$name = trim($_POST['name']);
+		$date = trim($_POST['date']);
+		$link = trim($_POST['link']);
+		$steam_link = trim($_POST['steam_link']);
+		$gog_link = trim($_POST['gog_link']);
+		$itch_link = trim($_POST['itch_link']);
+		
+		// make sure its not empty
+		$empty_check = core::mempty(compact('name', 'date', 'link'));
+		if ($empty_check !== true)
 		{
-			header("Location: /admin.php?module=games&view=add&error=missing");
-			exit;
+			header("Location: /admin.php?module=games&view=add&message=empty&extra=".$empty_check);
+			die();
 		}
 
 		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']));
 		if ($db->num_rows() == 1)
 		{
 			$get_game = $db->fetch();
-			header("Location: /admin.php?module=games&view=add&message=exists&id={$get_game['id']}");
+			header("Location: /admin.php?module=games&view=add&message=game_submit_exists&extra={$get_game['id']}");
 			exit;
 		}
 
@@ -316,7 +309,7 @@ if (isset($_POST['act']))
 			$license = $_POST['license'];
 		}
 
-		$name = trim($_POST['name']);
+		
 		$description = trim($_POST['text']);
 
 		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license));
@@ -324,7 +317,7 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
 
-		header("Location: /admin.php?module=games&view=add&&message=added&id={$new_id}");
+		header("Location: /admin.php?module=games&view=add&&message=saved&extra=game");
 	}
 	if ($_POST['act'] == 'Edit')
 	{

@@ -19,7 +19,6 @@ while ($get_group = $db->fetch())
 
 if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 {
-	if ()
   // tool for making a single user account
   $username = core::make_safe($_POST['username']);
   $email = core::make_safe($_POST['email']);

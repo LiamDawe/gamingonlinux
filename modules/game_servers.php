@@ -14,11 +14,11 @@ while ($servers = $get_servers->fetch())
 	$templating->set('name', $servers['name']);
 	
 	$badge = '';
-    if ($servers['official'] == 1)
+    if ($servers['official'] == 0)
     {
       $badge = '<span class="badge blue">Community Server</span>';
     }
-    else if ($servers['official'] == 0)
+    else if ($servers['official'] == 1)
     {
       $badge = '<span class="badge editor">Official GOL Server</span>';
     }

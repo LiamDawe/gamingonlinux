@@ -287,7 +287,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 		{
 			$file_path = "uploads/tagline_gallery/";
 		}
-		$replace = "<img itemprop=\"image\" src=\"" . core::config('website_url') . $file_path . $tagline_image . "\" class=\"img-responsive\" alt=\"tagline-image\" />";
+		$replace = "<img itemprop=\"image\" src=\"" . core::config('website_url') . $file_path . $tagline_image . "\" alt=\"tagline-image\" />";
 
 		$body = str_replace($find, $replace, $body);
 	}
@@ -303,24 +303,9 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 
 		$body = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $body);
 
+		$find = '~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i';
 
-		$find = array(
-		'~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i'
-		);
-
-		if ($article == 1)
-		{
-			$replace = array(
-			'<a href="$1" target="_blank"><img src="$2" class="img-responsive" alt="image" /></a>'
-			);
-		}
-
-		else if ($article == 0)
-		{
-			$replace = array(
-			'<a href="$1" target="_blank"><img src="$2" class="img-responsive bbcodeimage-comment" alt="image" /></a>'
-			);
-		}
+		$replace = '<a href="$1" target="_blank"><img src="$2" alt="image" /></a>';
 
 		$body = preg_replace($find, $replace, $body);
 
@@ -368,24 +353,6 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	$body = preg_replace($find_lines, $replace_lines, $body);
 
 	$body = quotes($body);
-
-	// replace images and youtube to the correct size if its a comment or forum post (less space!)
-	if ($article == 0)
-	{
-		$find = array(
-		"/\[img\](.+?)\[\/img\]/is",
-		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
-		"/\[youtube\](.+?)\[\/youtube\]/is"
-		);
-
-		$replace = array(
-		"<img src=\"$1\" class=\"img-responsive bbcodeimage-comment\" alt=\"image\" />",
-		"<img width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive bbcodeimage-comment\" alt=\"image\" />",
-		"<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>"
-		);
-
-		$body = preg_replace($find, $replace, $body);
-	}
 
 	$find_replace = array(
 	"/\[url\=(.+?)\](.+?)\[\/url\]/is" => "<a href=\"$1\" target=\"_blank\">$2</a>",

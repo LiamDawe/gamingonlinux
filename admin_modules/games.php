@@ -262,10 +262,16 @@ if (isset($_POST['act']))
 		$itch_link = trim($_POST['itch_link']);
 		
 		// make sure its not empty
-		$empty_check = core::mempty(compact('name', 'date', 'link'));
+		$empty_check = core::mempty(compact('name', 'date'));
 		if ($empty_check !== true)
 		{
 			header("Location: /admin.php?module=games&view=add&message=empty&extra=".$empty_check);
+			die();
+		}
+		
+		if (empty($link) && empty($steam_link) && empty($gog_link) && empty($itch_link))
+		{
+			header("Location: /admin.php?module=games&view=add&message=one_link_needed");
 			die();
 		}
 
@@ -308,7 +314,6 @@ if (isset($_POST['act']))
 		{
 			$license = $_POST['license'];
 		}
-
 		
 		$description = trim($_POST['text']);
 

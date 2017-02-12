@@ -108,6 +108,10 @@ return [
 	"more_poll_options" => [
 		"text" => "Polls need at least two options!",
 		"error" => 1
+	],
+	"one_link_needed" => [
+		"text" => "At least one link is required!",
+		"error" => 1
 	]
 ];
 ?>

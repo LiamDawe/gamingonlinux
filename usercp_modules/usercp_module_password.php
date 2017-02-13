@@ -68,11 +68,11 @@ if (isset($_POST['act']))
 
 		// message
 		$html_message = "<p>Hello <strong>{$grab_current_password['username']}</strong>,</p>
-		<p>Someone, hopefully you, has requested a password for your account on <a href=\"".core::config('website_url')."\">gamingonlinux.com</a>. If this was you, please ignore this email as it's just a security measure.</p>
+		<p>Someone, hopefully you, has requested a password for your account on <a href=\"".core::config('website_url')."\">gamingonlinux.com</a>. If this wasn't you, then someone likely has gained access to your Twitter or Steam account to login to GOL.</p>
 		<p>Your new password is: ".$new_password.", please keep a note of it!</p>
 		<hr>";
 
-		$plain_message = PHP_EOL."Hello {$grab_current_password['username']}! Someone, hopefully you, has requested a password for your account on ".core::config('website_url').". If this was you, please ignore this email as it's just a security measure. Your new password is: ".$new_password . ", please keep a note of it!";
+		$plain_message = PHP_EOL."Hello {$grab_current_password['username']}! Someone, hopefully you, has requested a password for your account on ".core::config('website_url').". If this wasn't you, then someone likely has gained access to your Twitter or Steam account to login to GOL. Your new password is: ".$new_password . ", please keep a note of it!";
 
 		// Mail it
 		if (core::config('send_emails') == 1)

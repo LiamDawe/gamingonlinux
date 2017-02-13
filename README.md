@@ -27,6 +27,12 @@ It is also recommended to have the following php extentions available:
 Setup apache, PHP and MySQL to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
 Import the development SQL database from the stripped SQL file `tools/SQL.sql`  
 
+## Code styling
+
+I do not like shorthand PHP, I like it to be as descriptive and easy to understand as possible!
+
+Please put braces on a new line, I think it looks cleaner and helps define different sections.
+
 ## Crons ##
 
 Various cron jobs are needed to keep it all running smoothly, below are the files and suggested times:

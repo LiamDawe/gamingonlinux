@@ -142,7 +142,7 @@ $templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $c
 $db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL ORDER BY `date` ASC, `name` ASC");
 while ($listing = $db->fetch())
 {
-    if (is_null($last_date) || $last_date !== $listing['date']) 
+    if (!isset($last_date) || $last_date !== $listing['date']) 
     {
         $templating->block('day', 'calendar');
         $templating->set('group_date', $listing['date']);

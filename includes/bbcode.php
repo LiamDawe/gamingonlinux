@@ -370,7 +370,6 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" => "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
 	"/\[email\](.+?)\[\/email\]/is" => "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 	"/\[youtube\](.+?)\[\/youtube\]/is" => "<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
-	"/\[media=youtube\](.+?)\[\/media\]/is" => "<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>", // this one is for old articles, probably from xenforo, do not remove
 	'/\[list\](.*?)\[\/list\]/is' => '<ul>$1</ul>',
 	'/\[\*\](.*?)(\n|\r\n?)/is' => '<ul>$1</ul>',
 	'/\[ul\]/is' => '<ul>',
@@ -488,7 +487,6 @@ function email_bbcode($body)
     "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
     "/\[email\](.+?)\[\/email\]/is",
 	"/\[s\](.+?)\[\/s\]/is",
-	"/\[media=youtube\](.+?)\[\/media\]/is", // This is for videos done by xenforo...
 	"/\[youtube\](.+?)\[\/youtube\]/is",
 	'/\[list\](.*?)\[\/list\]/is',
  	'/\[\*\](.*?)(\n|\r\n?)/is',
@@ -520,7 +518,6 @@ function email_bbcode($body)
 	"<img width=\"$1\" height=\"$2\" src=\"$3\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
 	"<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 	"<span style=\"text-decoration: line-through\">$1</span>",
-	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>", // for xenforo videos
 	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>
 	</iframe>",
 	'<ul>$1</ul>',

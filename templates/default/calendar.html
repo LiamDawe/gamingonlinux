@@ -64,13 +64,17 @@
 [/block: picker]
 
 [block: head]
-<div class="head">
-	<span class="badge"><a href="/index.php?module=calendar&year={:prev_year}&month={:prev}">&lt; Prev</a></span> {:month} <span class="badge"><a href="/index.php?module=calendar&year={:next_year}&month={:next}">Next &gt;</a></span>
-</div>
+	<div class="head">
+		<span class="badge"><a href="/index.php?module=calendar&year={:prev_year}&month={:prev}">&lt; Prev</a></span> {:month} <span class="badge"><a href="/index.php?module=calendar&year={:next_year}&month={:next}">Next &gt;</a></span>
+	</div>
 [/block: head]
 
+[block: day]
+	<div class="subhead">{:group_date}</div>
+[/block: day]
+
 [block: item]
-<div class="body group">{:best_guess} {:day}: {:name} {:edit} {:dlc}</div>
+	<div class="body group">{:best_guess} {:name} {:edit} {:dlc}</div>
 [/block: item]
 
 [block: bottom]

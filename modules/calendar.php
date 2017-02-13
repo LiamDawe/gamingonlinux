@@ -111,81 +111,87 @@ $templating->set('month_options', $month_options);
 
 $templating->block('head', 'calendar');
 
-	$prev_month = $month - 1;
-	$next_month = $month + 1;
-	$prev_year = $year;
-	$next_year = $year;
+$prev_month = $month - 1;
+$next_month = $month + 1;
+$prev_year = $year;
+$next_year = $year;
 
-	if ($month == 1)
+if ($month == 1)
+{
+	$prev_month = 12;
+	$prev_year = $year - 1;
+}
+
+if ($month == 12)
+{
+	$next_month = 1;
+	$next_year = $year + 1;
+}
+
+$templating->set('prev', $prev_month);
+$templating->set('next', $next_month);
+$templating->set('prev_year', $prev_year);
+$templating->set('next_year', $next_year);
+
+// count how many there is
+$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL");
+$counter = $db->fetch();
+
+$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
+
+$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL ORDER BY `date` ASC, `name` ASC");
+while ($listing = $db->fetch())
+{
+    if (is_null($last_date) || $last_date !== $listing['date']) 
+    {
+        $templating->block('day', 'calendar');
+        $templating->set('group_date', $listing['date']);
+    }
+    
+	$get_date = date_parse($listing['date']);
+
+	$templating->block('item', 'calendar');
+	$best_guess = '';
+	if ($listing['best_guess'] == 1)
 	{
-		$prev_month = 12;
-		$prev_year = $year - 1;
+		$best_guess = '<span class="tooltip-top badge blue" title="We haven\'t been given an exact date!">Best Guess</span>';
+	}
+	$templating->set('best_guess', $best_guess);
+	$dlc = '';
+	if ($listing['is_dlc'] == 1)
+	{
+		$dlc = '<span class="badge yellow">DLC</span>';
+	}
+	$templating->set('dlc', $dlc);
+
+	$today = '';
+	if ($get_date['day'] == date('d') && $get_date['month'] == date('m'))
+	{
+		$today = '<span class="badge green">Releasing Today!</span> ';
 	}
 
-	if ($month == 12)
+	$game_name = $today . '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
+
+	$templating->set('name', $game_name);
+		
+	$edit = '';
+	if ($user->check_group([1,2,5]))
 	{
-		$next_month = 1;
-		$next_year = $year + 1;
+		$edit = ' - <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar">Edit</a>';
 	}
+	$templating->set('edit', $edit);
+	
+	$last_date = $listing['date'];
+}
 
-	$templating->set('prev', $prev_month);
-	$templating->set('next', $next_month);
-	$templating->set('prev_year', $prev_year);
-	$templating->set('next_year', $next_year);
+$templating->block('head', 'calendar');
+$templating->set('prev', $prev_month);
+$templating->set('next', $next_month);
+$templating->set('prev_year', $prev_year);
+$templating->set('next_year', $next_year);
+$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-	// count how many there is
-	$db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL");
-	$counter = $db->fetch();
-
-	$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
-
-	$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL ORDER BY `date` ASC, `name` ASC");
-	while ($listing = $db->fetch())
-	{
-		$get_date = date_parse($listing['date']);
-		$current_day = ordinal($get_date['day']);
-
-		$templating->block('item', 'calendar');
-		$best_guess = '';
-		if ($listing['best_guess'] == 1)
-		{
-			$best_guess = '<span class="tooltip-top badge blue" title="We haven\'t been given an exact date!">Best Guess</span>';
-		}
-		$templating->set('best_guess', $best_guess);
-		$dlc = '';
-		if ($listing['is_dlc'] == 1)
-		{
-			$dlc = '<span class="badge yellow">DLC</span>';
-		}
-		$templating->set('dlc', $dlc);
-		$templating->set('day', $current_day);
-
-		$today = '';
-		if ($get_date['day'] == date('d') && $get_date['month'] == date('m'))
-		{
-			$today = '<span class="badge green">Releasing Today!</span> ';
-		}
-
-		$game_name = $today . '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
-
-		$templating->set('name', $game_name);
-
-		$edit = '';
-		if ($user->check_group([1,2,5]))
-		{
-			$edit = ' - <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar">Edit</a>';
-		}
-		$templating->set('edit', $edit);
-	}
-
-	$templating->block('head', 'calendar');
-	$templating->set('prev', $prev_month);
-	$templating->set('next', $next_month);
-	$templating->set('prev_year', $prev_year);
-	$templating->set('next_year', $next_year);
-	$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
-
-	$templating->block('bottom', 'calendar');
+$templating->block('bottom', 'calendar');
 
 if (isset($_POST['act']))
 {

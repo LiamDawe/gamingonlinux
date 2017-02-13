@@ -52,7 +52,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'request')
 	{
-		if (!empty($_POST['current_password']))
+		if (!empty($grab_current_password['password']))
 		{
 			header("Location: /usercp.php?module=password&message=existing-password");
 			die();

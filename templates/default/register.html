@@ -30,33 +30,30 @@
 [/block: main]
 
 [block: twitter_new]
-<style>
-    .hideme{
-        display:none;
-        visibility: hidden;
-	 position: absolute;
-    left: -999em;
-    }
-</style>
+<style>.hideme{display:none;visibility: hidden;position: absolute;left: -999em;}</style>
 <script src="https://www.google.com/recaptcha/api.js"></script>
-You are about to create a new account with twitter, please enter the following details to complete the registration. If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this twitter account.<br />
-<br />
-<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>.</strong>
-	<form method="post" action="/index.php?module=register">
-	Username: <br />
-	<input class="keyup-char ays-ignore" type="text" name="username" /><br />
-  <div class="register-warning"><div class="input-alert-text">We only allow letters, numbers, "-" and "_" characters in usernames.</div></div>
-	Password: <br />
-	<input class="ays-ignore" type="password" name="password" /><br />
-	Verify Password: <br />
-	<input class="ays-ignore" type="password" name="verify_password" /><br />
-	Email, <strong>Valid email address required for verification!</strong> <br />
-	<input class="ays-ignore" type="text" name="uemail" /><br />
-	<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
-	{:captcha}
-	<input type="submit" value="Register" class="btn btn-primary" />
-	<input type="hidden" name="register" value="twitter" />
-	</form>
+<div class="box">
+	<div class="body group">
+		You are about to create a new account with twitter, please enter the following details to complete the registration. If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this twitter account.<br />
+		<br />
+		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>.</strong>
+		<form method="post" action="/index.php?module=register">
+		Username: <br />
+		<input class="keyup-char ays-ignore" type="text" name="username" /><br />
+	<div class="register-warning"><div class="input-alert-text">We only allow letters, numbers, "-" and "_" characters in usernames.</div></div>
+		Password: <br />
+		<input class="ays-ignore" type="password" name="password" /><br />
+		Verify Password: <br />
+		<input class="ays-ignore" type="password" name="verify_password" /><br />
+		Email, <strong>Valid email address required for verification!</strong> <br />
+		<input class="ays-ignore" type="text" name="uemail" /><br />
+		<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
+		{:captcha}
+		<input type="submit" value="Register" class="btn btn-primary" />
+		<input type="hidden" name="register" value="twitter" />
+		</form>
+	</div>
+</div>
 [/block: twitter_new]
 
 [block: steam_new]

@@ -34,17 +34,8 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 }
 
 // can be removed eventually, stop-gap to stop errors for people already logged in that don't get the new options
-if (isset($_SESSION['theme']) && $_SESSION['theme'] == 'light')
-{
-	$_SESSION['theme'] = 'default';
-}
-
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
-	if (!isset($_SESSION['display_comment_alerts']))
-	{
-		$_SESSION['display_comment_alerts'] = 1;
-	}
 	if (!isset($_SESSION['auto_subscribe_email']) || !isset($_SESSION['auto_subscribe']) || !isset($_SESSION['email_options']))
 	{
 		// find if they have auto subscribe on

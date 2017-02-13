@@ -1565,7 +1565,7 @@ else if (isset($_GET['go']))
 			$templating->set_previous('title', 'Reporting a comment', 1);
 
 			// show the comment they are reporting
-			$db->sqlquery("SELECT c.`comment_text`, u.avatar, u.avatar_gravatar, u.gravatar_email, u.avatar_uploaded FROM `articles_comments` c LEFT JOIN users u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
+			$db->sqlquery("SELECT c.`comment_text`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `articles_comments` c LEFT JOIN users u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
 			$comment = $db->fetch();
 			$templating->block('report', 'articles_full');
 			$templating->set('text', bbcode($comment['comment_text']));

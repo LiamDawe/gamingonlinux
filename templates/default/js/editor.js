@@ -208,7 +208,7 @@ function OctusEditor(editorPath) {
         var id;
 		
 		var this_button = document.getElementById('youtube-bbcode');
-		var yt_limit = this_button.getAttribute('data-limit'); // fruitCount = '12'
+		var yt_limit = this_button.getAttribute('data-limit');
 	
         if(input === "") {
             input = window.prompt('Enter YouTube URL, limited to ' + yt_limit + ' per post');

@@ -1009,6 +1009,8 @@ class core
 			$ays_check = 'class="ays-ignore"';
 		}
 		$templating->set('ays_ignore', $ays_check);
+		
+		$templating->set('limit_youtube', core::config('limit_youtube'));
 	}
 
 	// convert bytes to human readable stuffs, only up to MB as we will never be uploading more than MB files directly

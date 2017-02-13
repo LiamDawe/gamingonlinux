@@ -206,8 +206,12 @@ function OctusEditor(editorPath) {
      function getYouTubeID(input)
      {
         var id;
+		
+		var this_button = document.getElementById('youtube-bbcode');
+		var yt_limit = this_button.getAttribute('data-limit'); // fruitCount = '12'
+	
         if(input === "") {
-            input = window.prompt('Enter YouTube URL, limited to 3 per post');
+            input = window.prompt('Enter YouTube URL, limited to ' + yt_limit + ' per post');
         }
         id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
         if(id === null) {

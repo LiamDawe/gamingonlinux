@@ -93,8 +93,8 @@ function markdown($text)
 {
 	// limited markdown support
 	$markdown = ['/\[([^\]]+)\]\(([^\)]+)\)/' => '<a href="$2">$1</a>', // links
-	'/(\*\*|__)(.*?)\1/' => '<strong>$2</strong>', // bold
-	'/(\*|_)(.*?)\1/' => '<em>$2</em>', // emphasis
+	'/(\*\*)(.*?)\1/' => '<strong>$2</strong>', // bold
+	'/(\*)(.*?)\1/' => '<em>$2</em>', // emphasis
 	'/\~\~(.*?)\~\~/' => '<del>$1</del>' // strikethrough
 	];
 	

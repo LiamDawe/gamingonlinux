@@ -207,7 +207,7 @@ function OctusEditor(editorPath) {
      {
         var id;
         if(input === "") {
-            input = window.prompt('Enter YouTube URL');
+            input = window.prompt('Enter YouTube URL, limited to 3 per post');
         }
         id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
         if(id === null) {

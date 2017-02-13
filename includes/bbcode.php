@@ -351,10 +351,21 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	);
 
 	$body = preg_replace($find_lines, $replace_lines, $body);
+	
+	// limit youtube replacing to the config limit
+	$find_replace = [
+	"/\[youtube\](.+?)\[\/youtube\]/is" => ["<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>", core::config('limit_youtube')]
+	];
+
+	foreach ($find_replace as $find => $replace)
+	{
+		$body = preg_replace($find, $replace[0], $body, intval($replace[1]));
+	}
 
 	$body = quotes($body);
 
 	$find_replace = array(
+	"/\[youtube\](.+?)\[\/youtube\]/is" => " <a href=\"https://www.youtube.com/watch?v=$1\" target=\"_blank\">View video on youtube.com</a> ",
 	"/\[url\=(.+?)\](.+?)\[\/url\]/is" => "<a href=\"$1\" target=\"_blank\">$2</a>",
 	"/\[url\](.+?)\[\/url\]/is" => "<a href=\"$1\" target=\"_blank\">$1</a>",
 	"/\[b\](.+?)\[\/b\]/is" => "<strong>$1</strong>",
@@ -369,7 +380,6 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	"/\[img\](.+?)\[\/img\]/is" => "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
 	"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" => "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
 	"/\[email\](.+?)\[\/email\]/is" => "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
-	"/\[youtube\](.+?)\[\/youtube\]/is" => "<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>",
 	'/\[list\](.*?)\[\/list\]/is' => '<ul>$1</ul>',
 	'/\[\*\](.*?)(\n|\r\n?)/is' => '<ul>$1</ul>',
 	'/\[ul\]/is' => '<ul>',

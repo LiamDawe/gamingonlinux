@@ -40,12 +40,8 @@
 		<form method="post" action="/index.php?module=register">
 		Username: <br />
 		<input class="keyup-char ays-ignore" type="text" name="username" /><br />
-	<div class="register-warning"><div class="input-alert-text">We only allow letters, numbers, "-" and "_" characters in usernames.</div></div>
-		Password: <br />
-		<input class="ays-ignore" type="password" name="password" /><br />
-		Verify Password: <br />
-		<input class="ays-ignore" type="password" name="verify_password" /><br />
-		Email, <strong>Valid email address required for verification!</strong> <br />
+		<div class="register-warning"><div class="input-alert-text">We only allow letters, numbers, "-" and "_" characters in usernames.</div></div>
+		Email, <strong>Valid email address required for verification (otherwise Twitter spam bots would get in easily)!</strong> <br />
 		<input class="ays-ignore" type="text" name="uemail" /><br />
 		<div class="hideme"><input type="text" name="email" autocomplete="off" /></div>
 		{:captcha}

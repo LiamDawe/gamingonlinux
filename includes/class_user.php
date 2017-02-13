@@ -6,7 +6,7 @@ class user
 	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
-	`forum_type`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`, `avatar`, `avatar_uploaded`,
+	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`,
 	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`";
 
 	function check_session()
@@ -53,54 +53,62 @@ class user
 	function login($username, $password, $remember_username, $stay)
 	{
 		global $db;
-
-		$db->sqlquery("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
-		if ($db->num_rows() > 0)
+		
+		if (!empty($password))
 		{
-			$info = $db->fetch();
-
-			if (password_verify($password, $info['password']))
+			$db->sqlquery("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+			if ($db->num_rows() > 0)
 			{
-				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+				$info = $db->fetch();
 
-				if ($db->num_rows() == 1)
+				if (password_verify($password, $info['password']))
 				{
-					$user_info = $db->fetch();
+					$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
 
-					$this->check_banned($user_info);
-
-					$generated_session = md5(mt_rand() . $user_info['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
-					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
-
-					$this->new_login($user_info, $generated_session);
-
-					if ($remember_username == 1)
+					if ($db->num_rows() == 1)
 					{
-						setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
-					}
+						$user_info = $db->fetch();
 
-					if ($stay == 1)
-					{
-						setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', core::config('cookie_domain'));
-						setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
-					}
+						$this->check_banned($user_info);
 
-					return true;
+						$generated_session = md5(mt_rand() . $user_info['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
+						// update IP address and last login
+						$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
+
+						$this->new_login($user_info, $generated_session);
+
+						if ($remember_username == 1)
+						{
+							setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
+						}
+
+						if ($stay == 1)
+						{
+							setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', core::config('cookie_domain'));
+							setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
+						}
+
+						return true;
+					}
+				}
+
+				else
+				{
+					$this->message = "Password probably didn't match!";
+					return false;
 				}
 			}
-
 			else
 			{
-				$this->message = "Password probably didn't match!";
+				$this->message = "Couldn't find username!";
 				return false;
 			}
 		}
 		else
 		{
-			$this->message = "Couldn't find username!";
-			return false;
+			$this->message = "You need to enter a password!";
+			return false;			
 		}
 	}
 
@@ -150,7 +158,7 @@ class user
 		}
 	}
 
-	private static function register_session($user_data)
+	public static function register_session($user_data)
 	{
 		$_SESSION['user_id'] = $user_data['user_id'];
 		$_SESSION['username'] = $user_data['username'];

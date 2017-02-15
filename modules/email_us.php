@@ -43,7 +43,7 @@ if (isset($_POST['act']))
 			$additional_header = '';
 			if (isset($_POST['name']) && !empty($_POST['name']))
 			{
-				$name = htmlentities($_POST['name']);
+				$name = htmlspecialchars($_POST['name']);
 			}
 			else
 			{

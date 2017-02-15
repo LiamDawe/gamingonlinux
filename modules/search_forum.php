@@ -2,17 +2,6 @@
 $templating->set_previous('title', 'Forum Search', 1);
 $templating->set_previous('meta_description', 'Search for Linux gaming forum topics on GamingOnLinux.com', 1);
 
-if (isset ($_GET['message']))
-{
-  $extra = NULL;
-  if (isset($_GET['extra']))
-  {
-    $extra = $_GET['extra'];
-  }
-  $message = $message_map->get_message($_GET['message'], $extra);
-  $core->message($message['message'], NULL, $message['error']);
-}
-
 $templating->merge('forum_search');
 $templating->block('top');
 $templating->set('url', core::config('website_url'));

@@ -6,17 +6,6 @@ if (!core::is_number($_GET['topic_id']))
 
 else
 {
-	if (isset ($_GET['message']))
-	{
-		$extra = NULL;
-		if (isset($_GET['extra']))
-		{
-			$extra = $_GET['extra'];
-		}
-		$message = $message_map->get_message($_GET['message'], $extra);
-		$core->message($message['message'], NULL, $message['error']);
-	}
-
 	$templating->merge('viewtopic');
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletetopic')

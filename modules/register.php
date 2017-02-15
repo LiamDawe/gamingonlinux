@@ -9,28 +9,13 @@ if (strpos($data, "<appears>yes</appears>") !== false)
 $templating->set_previous('title', 'Register', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com register page', 1);
 
-if (isset($_GET['message']))
+if (core::config('pretty_urls') == 1)
 {
-	if ($_GET['message'] == 'username-taken')
-	{
-		$core->message('Sorry but that username is taken, please try another! If you have forgotten your password, <a href="https://www.gamingonlinux.com/index.php?module=login&forgot">click here to start a lost password request.</a>', NULL, 1);
-	}
-	if ($_GET['message'] == 'username_characters')
-	{
-		$core->message('Your username is not properly formatted. We only allow numbers, letters, "-" and "_".', NULL, 1);
-	}
-	if ($_GET['message'] == 'email-taken')
-	{
-		$core->message('Sorry but that email is taken, please try another! If you have forgotten your password, <a href="https://www.gamingonlinux.com/index.php?module=login&forgot">click here to start a lost password request.</a>', NULL, 1);
-	}
-	if ($_GET['message'] == 'empty')
-	{
-		$core->message('You left some fields empty, you must fill in all fields when registering', NULL, 1);
-	}
-	if ($_GET['message'] == 'password-match')
-	{
-		$core->message('Passwords did not match!', NULL, 1);
-	}
+	$redirect = '/register/';
+}
+else
+{
+	$redirect = '/index.php?module=register&';
 }
 
 require_once("includes/curl_data.php");
@@ -91,7 +76,7 @@ if (core::config('allow_registrations') == 1)
 
 		if(!ctype_alnum(str_replace($aValid, '', $_POST['username'])))
 		{
-			header("Location: /index.php?module=register&message=username_characters");
+			header("Location: ".$redirect."message=username_characters");
 			die();
 		}
 
@@ -100,30 +85,28 @@ if (core::config('allow_registrations') == 1)
 		{
 			if (empty($_POST['password']))
 			{
-				header("Location: /index.php?module=register&message=empty&extra=password");
+				header("Location: ".$redirect."message=empty&extra=password");
 				die();
 			}
 			
 			// check passwords match
 			if ($_POST['password'] != $_POST['verify_password'])
 			{
-				if (core::config('pretty_urls') == 1)
-				{
-					header("Location: /register/message=password-match");
-				}
-				else
-				{
-					header("Location: /index.php?module=register&message=password-match");
-				}
+				header("Location: ".$redirect."message=password_match");
 				die();
 			}
 			$safe_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 		}
 		
+		$username = $_POST['username'];
+		$email = $_POST['uemail'];
+		
+		$check_empty = core::mempty(compact('username', 'email'));
+		
 		// all registrations need a username and email
-		if (empty($_POST['username']) || empty($_POST['uemail']))
+		if ($check_empty !== true)
 		{
-			header("Location: /index.php?module=register&message=empty");
+			header("Location: ".$redirect."message=empty&extra=".$check_empty);
 			die();
 		}
 
@@ -152,14 +135,7 @@ if (core::config('allow_registrations') == 1)
 				$db->sqlquery("SELECT `username` FROM `users` WHERE `username` = ?", array($_POST['username']));
 				if ($db->fetch())
 				{
-					if (core::config('pretty_urls') == 1)
-					{
-						header("Location: /register/message=username-taken");
-					}
-					else
-					{
-						header("Location: /index.php?module=register&message=username-taken");
-					}
+					header("Location: ".$redirect."message=username_taken");
 					die();
 				}
 
@@ -169,11 +145,11 @@ if (core::config('allow_registrations') == 1)
 				{
 					if (core::config('pretty_urls') == 1)
 					{
-						header("Location: /register/message=email-taken");
+						header("Location: ".$redirect."message=email_taken");
 					}
 					else
 					{
-						header("Location: /index.php?module=register&message=email-taken");
+						header("Location: ".$redirect."message=email_taken");
 					}
 					die();
 				}

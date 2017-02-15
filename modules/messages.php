@@ -8,14 +8,6 @@ if ($_SESSION['user_id'] == 0)
 
 else
 {
-	if (isset($_GET['message']))
-	{
-		if ($_GET['message'] == 'deleted')
-		{
-			$core->message("Message Deleted!", NULL, 1);
-		}
-	}
-
 	// paging for pagination
 	if (!isset($_GET['page']))
 	{
@@ -143,13 +135,6 @@ else
 
 		else
 		{
-			if (isset($_GET['message']))
-			{
-				if ($_GET['message'] == 'emptytext')
-				{
-					$core->message("Message text cannot be empty!", NULL, 1);
-				}
-			}
 			$db->sqlquery("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']));
 			$info = $db->fetch();
 
@@ -180,14 +165,6 @@ else
 	// if viewing a message
 	if (isset($_GET['view']) && $_GET['view'] == 'message')
 	{
-		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'empty')
-			{
-				$core->message('You have to enter a message to reply!', NULL, 1);
-			}
-		}
-
 		// check they can access the message
 		$check_id_now = array();
 		$db->sqlquery("SELECT `owner_id` FROM `user_conversations_info` WHERE `conversation_id` = ?", array($_GET['id']));
@@ -486,17 +463,7 @@ else
 		$user_to = '';
 
 		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'empty')
-			{
-				$core->message("You have to enter in at least 1 person and some text!", NULL, 1);
-			}
-
-			if ($_GET['message'] == 'notfound')
-			{
-				$core->message("We couldn't find the people requested! Have you got the correct username spellings? Please try again.", NULL, 1);
-			}
-			
+		{			
 			if (isset($_SESSION['mto']) && is_array($_SESSION['mto']) && core::is_number($_SESSION['mto']))
 			{
 				$user_to = '';
@@ -549,142 +516,153 @@ else
 		}
 		
 		// check empty
-		if (empty($_POST['user_ids']) || empty($title) || empty($text) || !is_array($_POST['user_ids']) || !core::is_number($_POST['user_ids']))
+		$check_empty = core::mempty(compact('user_ids', 'title', 'text'));
+		if ($check_empty !== true)
 		{
-
 			$_SESSION['mto'] = $user_ids;
 			$_SESSION['mtitle'] = $title;
 			$_SESSION['mtext'] = $text;
 
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: " . core::config('website_url') . 'private-messages/compose/message=empty');
+				header("Location: " . core::config('website_url') . 'private-messages/compose/message=empty&extra='.$check_empty);
 				die();
 			}
 			else
 			{
-				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose&message=empty');
+				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose&message=empty&extra='.$check_empty);
+				die();
+			}
+		}
+		
+		if(!is_array($_POST['user_ids']) || !core::is_number($_POST['user_ids']))
+		{
+			if (core::config('pretty_urls') == 1)
+			{
+				header("Location: " . core::config('website_url') . 'private-messages/compose/message=empty&extra=users');
+				die();
+			}
+			else
+			{
+				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose&message=empty&extra=users');
+				die();
+			}	
+		}
+
+		// first be sure they exist, even though we searched to find them originally, just be sure
+		$found_users = 0;
+			
+		$sql_ids = [];
+		$total_users = count($user_ids);
+		for ($i = 0; $i < $total_users; $i++)
+		{
+			$sql_ids[] = '?';
+		}
+			
+		$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids);
+		$recepients_count = $db->fetch();
+
+		if ($recepients_count['count'] == 0)
+		{
+			if (core::config('pretty_urls') == 1)
+			{
+				header("Location:" . core::config('website_url') . "private-messages/compose/message=notfound");
+				die();
+			}
+			else
+			{
+				header("Location: " . core::config('website_url') . "index.php?module=messages&view=compose&message=notfound");
 				die();
 			}
 		}
 
-		else
+		// make the new message
+		$db->sqlquery("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
+
+		$conversation_id = $db->grab_id();
+
+		// send message to each user
+		foreach ($_POST['user_ids'] as $user_id)
 		{
-			// first be sure they exist, even though we searched to find them originally, just be sure
-			$found_users = 0;
-			
-			$sql_ids = [];
-			$total_users = count($user_ids);
-			for ($i = 0; $i < $total_users; $i++)
+			// make the duplicate message for other participants
+			$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));
+
+			// Add all the participants
+			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
+
+			// also while we are here, email each user to tell them they have a new convo
+			$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']));
+			$email_data = $db->fetch();
+
+			if ($email_data['email_on_pm'] == 1)
 			{
-				$sql_ids[] = '?';
+				// sort out registration email
+				$to  = $email_data['email'];
+
+				// subject
+				$subject = 'New conversation started on GamingOnLinux.com';
+
+				$email_text = email_bbcode($text);
+
+				$message = '';
+
+				// message
+				$html_message = "
+				<html>
+				<head>
+				<title>New conversation started on GamingOnLinux.com</title>
+				</head>
+				<body>
+				<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+				<br />
+				<p>Hello <strong>{$email_data['username']}</strong>,</p>
+				<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
+				<br style=\"clear:both\">
+				<div>
+				<hr>
+				{$email_text}
+				<hr>
+				<p>If you haven&#39;t registered at <a href=\"http://www.gamingonlinux.com\" target=\"_blank\">gamingonlinux.com</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
+				</div>
+				</body>
+				</html>";
+
+				$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has started a new conversation with you on  http://www.gamingonlinux.com/private-messages, titled \"{$_POST['title']}\",\r\n{$_POST['text']}";
+				$boundary = uniqid('np');
+
+				// To send HTML mail, the Content-type header must be set
+				$headers  = 'MIME-Version: 1.0' . "\r\n";
+				$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
+				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+
+				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
+				$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
+				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
+				$message .= $plain_message;
+
+				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
+				$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
+				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
+				$message .= "$html_message";
+				$message .= "\r\n\r\n--" . $boundary . "--";
+
+				// Mail it
+				mail($to, $subject, $message, $headers);
 			}
-			
-			$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids);
-			$recepients_count = $db->fetch();
+		}
 
-			if ($recepients_count['count'] == 0)
-			{
-				if (core::config('pretty_urls') == 1)
-				{
-					header("Location:" . core::config('website_url') . "private-messages/compose/message=notfound");
-					die();
-				}
-				else
-				{
-					header("Location: " . core::config('website_url') . "index.php?module=messages&view=compose&message=notfound");
-					die();
-				}
-			}
+		$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
 
-			// make the new message
-			$db->sqlquery("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
+		$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
 
-			$conversation_id = $db->grab_id();
-
-			// send message to each user
-			foreach ($_POST['user_ids'] as $user_id)
-			{
-				// make the duplicate message for other participants
-				$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));
-
-				// Add all the participants
-				$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
-
-				// also while we are here, email each user to tell them they have a new convo
-				$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']));
-				$email_data = $db->fetch();
-
-				if ($email_data['email_on_pm'] == 1)
-				{
-					// sort out registration email
-					$to  = $email_data['email'];
-
-					// subject
-					$subject = 'New conversation started on GamingOnLinux.com';
-
-					$email_text = email_bbcode($text);
-
-					$message = '';
-
-					// message
-					$html_message = "
-					<html>
-					<head>
-					<title>New conversation started on GamingOnLinux.com</title>
-					</head>
-					<body>
-					<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-					<br />
-					<p>Hello <strong>{$email_data['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
-					<br style=\"clear:both\">
-					<div>
-					<hr>
-					{$email_text}
-			 		<hr>
-			  		<p>If you haven&#39;t registered at <a href=\"http://www.gamingonlinux.com\" target=\"_blank\">gamingonlinux.com</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-			  		<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-					</div>
-					</body>
-					</html>
-					";
-
-					$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has started a new conversation with you on  http://www.gamingonlinux.com/private-messages, titled \"{$_POST['title']}\",\r\n{$_POST['text']}";
-					$boundary = uniqid('np');
-
-					// To send HTML mail, the Content-type header must be set
-					$headers  = 'MIME-Version: 1.0' . "\r\n";
-					$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
-					$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-					$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-					$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
-					$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-					$message .= $plain_message;
-
-					$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-					$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
-					$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-					$message .= "$html_message";
-					$message .= "\r\n\r\n--" . $boundary . "--";
-
-					// Mail it
-					mail($to, $subject, $message, $headers);
-				}
-			}
-
-			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
-
-			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
-
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: /private-messages/");
-			}
-			else {
-				header("Location: " . core::config('website_url') . 'index.php?module=messages');
-			}
+		if (core::config('pretty_urls') == 1)
+		{
+			header("Location: /private-messages/");
+		}
+		else 
+		{
+			header("Location: " . core::config('website_url') . 'index.php?module=messages');
 		}
 	}
 
@@ -705,7 +683,7 @@ else
 
 		else if (empty($text))
 		{
-			header("Location: /index.php?module=messages&view=Edit&message_id=" . $_GET['message_id'] . "&conversation_id=" . $_GET['conversation_id'] . '&message=emptytext');
+			header("Location: /index.php?module=messages&view=Edit&message_id=" . $_GET['message_id'] . "&conversation_id=" . $_GET['conversation_id'] . '&message=empty&extra=message');
 		}
 
 		else
@@ -764,7 +742,7 @@ else
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
 				// delete it
-				header("Location: /private-messages/message=deleted");
+				header("Location: /private-messages/message=deleted&extra=message");
 			}
 		}
 
@@ -788,7 +766,7 @@ else
 
 		else if (empty($text))
 		{
-			header("Location: /private-messages/{$_POST['conversation_id']}/message=empty");
+			header("Location: /private-messages/{$_POST['conversation_id']}/message=empty&extra=message");
 		}
 
 		else

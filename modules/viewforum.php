@@ -16,17 +16,6 @@ if($parray['view'] == 0)
 
 else
 {
-	if (isset ($_GET['message']))
-	{
-		$extra = NULL;
-		if (isset($_GET['extra']))
-		{
-			$extra = $_GET['extra'];
-		}
-		$message = $message_map->get_message($_GET['message'], $extra);
-		$core->message($message['message'], NULL, $message['error']);
-	}
-
 	// paging for pagination
 	$page = core::give_page();
 
@@ -40,14 +29,6 @@ else
 
 	$templating->set_previous('title', "Viewing forum {$name['name']}", 1);
 	$templating->set_previous('meta_description', "GamingOnLinux forum - Viewing forum {$name['name']}", 1);
-
-	if (isset($_GET['message']))
-	{
-		if ($_GET['message'] == 'toomany')
-		{
-			$core->message('You have made too many forums topics in a really short time, please wait a while.', NULL, 1);
-		}
-	}
 
 	$templating->block('main_top', 'viewforum');
 	$templating->set('forum_name', $name['name']);

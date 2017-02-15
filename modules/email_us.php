@@ -8,14 +8,6 @@ $templating->merge('email_us');
 
 $templating->block('top');
 
-if (isset($_GET['message']))
-{
-	if ($_GET['message'] == 'empty')
-	{
-		$core->message("You don't have to enter a name or an email address, but you do have to write an actual message to send!", NULL, 1);
-	}
-}
-
 if (isset($_POST['act']))
 {
 	if (empty($_POST['message']))
@@ -24,7 +16,7 @@ if (isset($_POST['act']))
 		$_SESSION['aemail'] = $_POST['email'];
 		$_SESSION['amessage'] = $_POST['message'];
 
-		header('Location: /email-us/message=empty');
+		header('Location: /email-us/message=empty&extra=message');
 	}
 
 	else

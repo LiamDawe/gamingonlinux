@@ -1,51 +1,6 @@
 <?php
 $templating->set_previous('meta_description', 'GamingOnLinux is the home of Linux and SteamOS gaming. Covering Linux Games, SteamOS, Reviews and more.', 1);
 
-if (isset($_GET['message']))
-{
-	if ($_GET['message'] == 'unsubscribed')
-	{
-		$core->message("You have been unsubscribed!");
-	}
-	if ($_GET['message'] == 'unliked')
-	{
-		$core->message("You have unliked all articles and comments!");
-	}
-	if ($_GET['message'] == 'activated')
-	{
-		$core->message("Your account has been activated!");
-	}
-	if ($_GET['message'] == 'cannotunsubscribe')
-	{
-		$core->message("Sorry your details didn't match up to unsubscribe you!", NULL, 1);
-	}
-	if ($_GET['message'] == 'cannotunlike') // this is from the unlike all function
-	{
-		$core->message("Sorry your details didn't match up to unlike!", NULL, 1);
-	}
-	if ($_GET['message'] == 'banned')
-	{
-		$core->message("You were banned, most likely for spamming!", NULL, 1);
-	}
-	if ($_GET['message'] == 'spam')
-	{
-		$core->message("You have been sent here to due being flagged as a spammer! Please contact us directly if this is false.");
-	}
-	if ($_GET['message'] == 'unpicked')
-	{
-		$core->message("That article is now not an editors pick! What did it do wrong? :(");
-	}
-	if ($_GET['message'] == 'picked')
-	{
-		$core->message("That article is now an editors pick! Remember to give it a featured image!");
-	}
-}
-
-if (isset($_GET['error']) && $_GET['error'] == 'toomanypicks')
-{
-	$core->message("Sorry there are already " . core::config('editor_picks_limit') . " articles set as editor picks!", NULL, 1);
-}
-
 $templating->merge('home');
 
 if (!isset($_GET['view']))
@@ -259,7 +214,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 {
 	if (core::config('total_featured') == core::config('editor_picks_limit'))
 	{
-		header("Location: ".url."index.php?module=home&error=toomanypicks");
+		header("Location: ".url."index.php?module=home&message=toomanypicks");
 	}
 
 	else

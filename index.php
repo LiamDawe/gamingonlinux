@@ -155,6 +155,17 @@ $templating->set('articles_css', $articles_css);
 
 if (in_array($module, $modules_allowed))
 {
+	if (isset($_GET['message']))
+	{
+		$extra = NULL;
+		if (isset($_GET['extra']))
+		{
+			$extra = $_GET['extra'];
+		}
+		$message = $message_map->get_message($module, $_GET['message'], $extra);
+		$core->message($message['message'], NULL, $message['error']);
+	}
+
 	include("modules/$module.php");
 }
 

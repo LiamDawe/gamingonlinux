@@ -2,18 +2,6 @@
 $templating->set_previous('title', 'Livestreaming schedule', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux livestreaming schedule', 1);
 
-if (isset($_GET['message']))
-{
-  if ($_GET['message'] == 'sent')
-  {
-    $core->message('Thank you! That livestream has been sent for admin review!');
-  }
-  if ($_GET['message'] == 'missing')
-  {
-    $core->message('Required fields were missing. It needs a title, both date fields filled and a stream url!', NULL, 1);
-  }
-}
-
 $templating->load('livestreams');
 
 $templating->block('top', 'livestreams');
@@ -112,11 +100,15 @@ if (isset($_POST['act']))
     $community_name = strip_tags($community_name);
     $stream_url = trim($_POST['stream_url']);
     $stream_url = strip_tags($stream_url);
-
-    if (empty($title) || empty($_POST['date']) || empty($_POST['end_date']) || empty($stream_url))
+    $date = $_POST['date'];
+    $end_date = $_POST['end_date'];
+    
+	$empty_check = core::mempty(compact('title', 'date', 'end_date', 'stream_url'));
+	
+    if ($empty_check !== true)
     {
-      header("Location: /index.php?module=livestreams&message=missing");
-      die();
+		header("Location: /index.php?module=livestreams&message=empty&extra=".$empty_check);
+		die();
     }
 
     $date = new DateTime($_POST['date']);
@@ -131,6 +123,6 @@ if (isset($_POST['act']))
 
     $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'new_livestream_submission', core::$date, $new_id));
 
-    header("Location: /index.php?module=livestreams&message=sent");
+    header("Location: /index.php?module=livestreams&message=livestream_submitted");
   }
 }

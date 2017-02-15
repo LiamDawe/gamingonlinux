@@ -13,17 +13,6 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 	// paging for pagination
 	$page = core::give_page();
 
-	if (isset($_GET['message']))
-	{
-		$extra = NULL;
-		if (isset($_GET['extra']))
-		{
-			$extra = $_GET['extra'];
-		}
-		$message = $message_map->get_message($_GET['message'], $extra);
-		$core->message($message['message'], NULL, $message['error']);
-	}
-
 	// searching multiple categories
 	if ($_GET['view'] == 'multiple')
 	{

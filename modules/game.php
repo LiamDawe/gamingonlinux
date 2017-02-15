@@ -1,17 +1,6 @@
 <?php
 $templating->merge('game_database');
 
-if (isset($_GET['message']))
-{
-	$extra = NULL;
-	if (isset($_GET['extra']))
-	{
-		$extra = $_GET['extra'];
-	}
-	$message = $message_map->get_message($_GET['message'], $extra);
-	$core->message($message['message'], NULL, $message['error']);
-}
-
 if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'all')
@@ -151,18 +140,6 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 
 		$templating->set_previous('meta_description', 'GamingOnLinux games database: '.$game['name'], 1);
 		$templating->set_previous('title', $game['name'], 1);
-
-		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'edited')
-			{
-				$core->message('Game edit completed!');
-			}
-			if ($_GET['message'] == 'missing')
-			{
-				$core->message('Please fill a name, a release date and an official website link at a minimum!', null, 1);
-			}
-		}
 
 		$templating->block('top', 'game_database');
 		$templating->set('name', $game['name']);

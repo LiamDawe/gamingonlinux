@@ -28,31 +28,6 @@ else if (isset($_GET['month']) && !is_numeric($_GET['month']))
 $templating->set_previous('title', 'Linux Game Release Calendar', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com maintained list of Linux game releases', 1);
 
-if (isset ($_GET['message']))
-{
-  $extra = NULL;
-  if (isset($_GET['extra']))
-  {
-    $extra = $_GET['extra'];
-  }
-  $message = $message_map->get_message($_GET['message'], $extra);
-  $core->message($message['message'], NULL, $message['error']);
-}
-
-// cheers stack overflow http://stackoverflow.com/questions/3109978/php-display-number-with-ordinal-suffix
-function ordinal($number)
-{
-	$ends = array('th','st','nd','rd','th','th','th','th','th','th');
-	if ((($number % 100) >= 11) && (($number%100) <= 13))
-	{
-		return $number. 'th';
-	}
-	else
-	{
-		return $number. $ends[$number % 10];
-	}
-}
-
 $templating->merge('calendar');
 
 // count how many there is due this month

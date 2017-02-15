@@ -146,8 +146,7 @@ if (!isset($_POST['action']))
 
 		else
 		{
-			// It's a bad idea to kill the script, but we've got to know when there's an error.
-			die('Something wrong happened.');
+			$core->message('We were unable to autheticate you, Twitter might be having issues. If this persists please contact the admins.');
 		}
 	}
 }

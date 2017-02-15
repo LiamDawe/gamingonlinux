@@ -45,24 +45,6 @@ if (isset($_GET['view']))
             $_SESSION['image_rand'] = rand();
         }
 
-        if (isset ($_GET['error']))
-        {
-            if ($_GET['error'] == 'email')
-            {
-                $core->message('You have to fill in your email since you are not logged in!', NULL, 1);
-            }
-
-            else if ($_GET['error'] == 'empty')
-            {
-                $core->message('You have to fill in a title and text!', NULL, 1);
-            }
-
-            else if ($_GET['error'] == 'captcha')
-            {
-                $core->message("You need to complete the captcha to prove you are human and not a bot!", NULL, 1);
-            }
-        }
-
         // if they have done it before set guest name and email
         $guest_username = '';
         if (isset($_SESSION['aname']))
@@ -142,6 +124,7 @@ if (isset($_POST['act']))
         if ($db->num_rows() > 0)
         {
             header('Location: /index.php');
+            die();
         }
 
         $data = $core->file_get_contents_curl("http://api.stopforumspam.org/api?ip=" . core::$ip);
@@ -168,6 +151,15 @@ if (isset($_POST['act']))
         {
 			$guest_email = core::make_safe($_POST['email']);
         }
+        
+		if (core::config('pretty_urls') == 1)
+		{
+			$redirect = '/submit-article/';
+		}
+		else
+		{
+			$redirect = '/index.php?module=submit_article&view=Submit&';
+		}
 
         if ($_SESSION['user_id'] == 0 && empty($_POST['email']))
         {
@@ -175,27 +167,28 @@ if (isset($_POST['act']))
             $_SESSION['atext'] = $text;
             $_SESSION['aname'] = $name;
             $_SESSION['aemail'] = $guest_email;
-
-            header("Location: /submit-article/error=email");
+            
+            header("Location: " . $redirect . "message=empty&extra=email&error");
+            die();
         }
-
-        // make sure its not empty
-        else if (empty($_POST['title']) || empty($_POST['text']))
+        
+        $check_empty = core::mempty(compact('title', 'text'));
+        
+        if ($check_empty !== true)
         {
             $_SESSION['atitle'] = $title;
             $_SESSION['atext'] = $text;
             $_SESSION['aname'] = $name;
             $_SESSION['aemail'] = $guest_email;
 
-            header("Location: /submit-article/error=empty");
+            header("Location: " . $redirect . "message=empty&extra=".$check_empty.'&error');
+            die();
         }
 
-        else
-        {
-            if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1)
-            {
-              if (isset($_POST['g-recaptcha-response']))
-              {
+		if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1)
+		{
+			if (isset($_POST['g-recaptcha-response']))
+			{
                 $recaptcha=$_POST['g-recaptcha-response'];
                 $google_url="https://www.google.com/recaptcha/api/siteverify";
                 $secret='6LcT0gATAAAAAJrRJK0USGyFE4pFo-GdRTYcR-vg';
@@ -203,22 +196,24 @@ if (isset($_POST['act']))
                 $url=$google_url."?secret=".$secret."&response=".$recaptcha."&remoteip=".$ip;
                 $res=getCurlData($url);
                 $res= json_decode($res, true);
-              }
-              else
-              {
-                header("Location: /submit-article/error=captcha");
-              }
-            }
+			}
+			else
+			{
+				header("Location: " . $redirect . "message=empty&extra=captcha&error");
+				die();
+			}
+		}
 
-            if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && !$res['success'])
-            {
-				$_SESSION['atitle'] = $title;
-				$_SESSION['atext'] = $text;
-				$_SESSION['aname'] = $name;
-				$_SESSION['aemail'] = $guest_email;
-
-                header("Location: /submit-article/error=captcha");
-            }
+		if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && !$res['success'])
+		{
+			$_SESSION['atitle'] = $title;
+			$_SESSION['atext'] = $text;
+			$_SESSION['aname'] = $name;
+			$_SESSION['aemail'] = $guest_email;
+			
+			header("Location: " . $redirect . "message=empty&extra=captcha&error");
+			die();
+		}
 
             // carry on and submit the article
             if ((core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0 || core::config('captcha_disabled') == 1)
@@ -267,8 +262,6 @@ if (isset($_POST['act']))
                     $core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
                 }
 
-                $core->message('Article has been sent to the admins for review before it is posted! <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
-
                 // get all the editor and admin emails apart from sinead
                 $editor_emails = array();
 
@@ -291,6 +284,8 @@ if (isset($_POST['act']))
                     $mail->send();
                   }
                 }
+                
+                $core->message('Article has been sent to the admins for review before it is posted! <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
 
                 unset($_SESSION['atitle']);
                 unset($_SESSION['atext']);
@@ -298,7 +293,7 @@ if (isset($_POST['act']))
                 unset($_SESSION['aemail']);
                 unset($_SESSION['image_rand']);
             }
-        }
+        
     }
 
     if ($_POST['act'] == 'Preview')

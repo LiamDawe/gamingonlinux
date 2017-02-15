@@ -21,14 +21,6 @@ if (!isset($_GET['go']))
 
 		else
 		{
-			if (isset($_GET['message']))
-			{
-				if ($_GET['message'] == 'nocomment')
-				{
-					$core->message('Sorry, couldn\'t find that linked comment! It may have been removed or you have followed a wrong link!', NULL, 1);
-				}
-			}
-
 			// get the article
 			$db->sqlquery("SELECT
 				a.`article_id`,
@@ -446,14 +438,6 @@ if (!isset($_GET['go']))
 					$templating->block('patreon', 'articles_full');
 				}
 
-				if (isset($_GET['message']))
-				{
-					if ($_GET['message'] == 'tipsent')
-					{
-						$core->message('Thank you for the correction!');
-					}
-				}
-
 				if ($_SESSION['user_id'] > 0)
 				{
 					$templating->block('corrections', 'articles_full');
@@ -565,14 +549,6 @@ if (!isset($_GET['go']))
 					$pagination = $core->pagination_link($_SESSION['per-page'], $total_comments, $pagination_linking, $page, '#comments');
 					$pagination_head = $core->head_pagination($_SESSION['per-page'], $total_comments, $pagination_linking, $page, '#comments');
 
-					if (isset($_GET['message']))
-					{
-						if ($_GET['message'] == 'reported')
-						{
-							$core->message('Thanks, reported that comment! We appreciate the help!');
-						}
-					}
-
 					//
 					/* COMMENTS SECTION */
 					//
@@ -604,7 +580,7 @@ if (!isset($_GET['go']))
 						$per_page = $_SESSION['per-page'];
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array($_GET['aid'], $core->start, $per_page));
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array($_GET['aid'], $core->start, $per_page));
 
 					$comments_get = $db->fetch_all_rows();
 
@@ -674,7 +650,7 @@ if (!isset($_GET['go']))
 						$templating->set('editor', $editor_bit);
 						$templating->set('comment_avatar', $comment_avatar);
 						$templating->set('date', $comment_date);
-						$templating->set('tzdate', date('c',$comments['time_posted']) ); //piratelv timeago
+						$templating->set('tzdate', date('c',$comments['time_posted']) );
 						$templating->set('pc_info_link', $pc_info);
 
 						$cake_bit = '';
@@ -688,9 +664,15 @@ if (!isset($_GET['go']))
 						$templating->set('new_user_badge', $new_badge);
 
 						$last_edited = '';
+						$edit_counter = '';
 						if ($comments['last_edited'] != 0)
 						{
-							$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' at ' . $core->format_date($comments['last_edited_time']) . '[/i]';
+							if ($comments['edit_counter'] > 1)
+							{
+								$edit_counter = '. Edited ' . $comments['edit_counter'] . ' times.';
+							}
+							
+							$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' at ' . $core->format_date($comments['last_edited_time']) . $edit_counter . '[/i]';
 						}
 
 						$templating->set('article_id', $_GET['aid']);
@@ -1018,8 +1000,7 @@ else if (isset($_GET['go']))
 			die();
 		}
 
-		// had to put this in, as somehow a guest was able to comment even without showing a textarea to them (HIGHLY CONFUSED HOW)
-		else if ($_SESSION['user_id'] == 0)
+		else if (!isset($_SESSION['user_id']) || ( isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 ) )
 		{
 			$core->message('You do not have permisions to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
 		}
@@ -1086,20 +1067,11 @@ else if (isset($_GET['go']))
 		// make sure news id is a number
 		if (!isset($_POST['aid']) || !is_numeric($_POST['aid']))
 		{
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: " . core::config('website_url'));
-			}
-			else
-			{
-				header("Location: " . core::config('website_url'));
-			}
-
+			header("Location: " . core::config('website_url'));
 			die();
 		}
 
-		// had to put this in, as somehow a guest was able to comment even without showing a textarea to them (HIGHLY CONFUSED HOW)
-		else if ($_SESSION['user_id'] == 0)
+		else if (!isset($_SESSION['user_id']) || ( isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 ) )
 		{
 			$core->message('You do not have permisions to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
 		}
@@ -1137,7 +1109,8 @@ else if (isset($_GET['go']))
 						{
 							header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=locked#commentbox");
 						}
-						else {
+						else 
+						{
 							header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=locked#commentbox");
 						}
 
@@ -1167,7 +1140,8 @@ else if (isset($_GET['go']))
 							{
 								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=doublecomment#commentbox");
 							}
-							else {
+							else 
+							{
 								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
 							}
 
@@ -1181,7 +1155,8 @@ else if (isset($_GET['go']))
 							{
 								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=emptycomment#commentbox");
 							}
-							else {
+							else 
+							{
 								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
 							}
 
@@ -1383,7 +1358,7 @@ else if (isset($_GET['go']))
 			// check empty
 			if (empty($comment_text))
 			{
-				$core->message('You cannot post an empty comment');
+				$core->message('You cannot post an empty comment!', NULL, 1);
 			}
 
 			// update comment
@@ -1391,7 +1366,7 @@ else if (isset($_GET['go']))
 			{
 				$comment_text = core::make_safe($comment_text);
 
-				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], core::$date, $_POST['comment_id']));
+				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ?, `edit_counter` = (edit_counter + 1) WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], core::$date, $_POST['comment_id']));
 
 				$nice_title = $core->nice_title($comment['title']);
 
@@ -1427,7 +1402,8 @@ else if (isset($_GET['go']))
 			{
 				header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 			}
-			else {
+			else 
+			{
 				header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
 			}
 
@@ -1441,7 +1417,8 @@ else if (isset($_GET['go']))
 				{
 					header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 				}
-				else {
+				else 
+				{
 					header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
 				}
 			}
@@ -1460,7 +1437,8 @@ else if (isset($_GET['go']))
 					{
 						header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 					}
-					else {
+					else 
+					{
 						header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
 					}
 
@@ -1604,10 +1582,11 @@ else if (isset($_GET['go']))
 
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: /articles/{$title}.{$_GET['article_id']}/message=reported#comments");
+				header("Location: /articles/{$title}.{$_GET['article_id']}/message=reported&extra=comment#comments");
 			}
-			else {
-				header("Location: /index.php?module=articles_full&aid={$_GET['article_id']}&title={$title}&message=reported#comments");
+			else 
+			{
+				header("Location: /index.php?module=articles_full&aid={$_GET['article_id']}&title={$title}&message=reported&extra=comment#comments");
 			}
 
 		}

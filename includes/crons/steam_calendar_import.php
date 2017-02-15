@@ -14,9 +14,6 @@ $core = new core($file_dir);
 include($file_dir . '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include($file_dir . '/includes/class_core.php');
-$core = new core();
-
 include($file_dir . '/includes/class_mail.php');
 
 $stop = 0;

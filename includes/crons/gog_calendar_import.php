@@ -47,37 +47,17 @@ do {
 		if ($games['linux_compatible'] == 1)
 		{
 			$dont_use = 0;
-			// don't give us soundtracks, they are DLC but we don't want them!
-			if (strpos($games['title'], 'Soundtrack') !== false)
+			
+			$website = $games['short_link'];
+			
+			// we don't want any of this junk, they aren't games
+			$dont_want = ['Soundtrack', 'Soundtracks', 'Sound Track', ' OST', ' Pre-Order', ' Demo', 'Artbook'];
+			foreach ($dont_want as $check_for)
 			{
-				$dont_use = 1;
-			}
-			if (strpos($games['title'], 'Soundtracks') !== false)
-			{
-				$dont_use = 1;
-			}
-			if (strpos($games['title'], 'Sound Track') !== false)
-			{
-				$dont_use = 1;
-			}
-			//include space to not end up finding games with "OST" in the name
-			if (strpos($games['title'], ' OST') !== false)
-			{
-				$dont_use = 1;
-			}
-			// don't include pre-order games, as GOG is an arse about them and changes the title and the url at release
-			if (strpos($games['title'], ' Pre-Order') !== false)
-			{
-				$dont_use = 1;
-			}
-			if (strpos($games['title'], ' Demo') !== false)
-			{
-				$dont_use = 1;
-			}
-			// we dont want artbooks either
-			if (strpos($games['title'], ' Artbook') !== false)
-			{
-				$dont_use = 1;
+				if (strpos($games['title'], $check_for) !== false)
+				{
+					$dont_use = 1;
+				}
 			}
 			
 			// we don't want upgrades, they aren't games
@@ -86,7 +66,7 @@ do {
 				$dont_use = 1;
 			}
 
-			// what the fuck GOG, seriously, stop re-ordering the fucking "The"
+			// what the fuck GOG, seriously, stop re-ordering the fucking "The", "Witcher 2, The" is not natural or pretty
 			if (strpos($games['title'], ', The - The') !== false)
 			{
 				$games['title'] = str_replace(', The - The', ' - The', $games['title']);
@@ -100,8 +80,6 @@ do {
 
 			if ($dont_use == 0)
 			{
-				$website = $games['short_link'];
-				
 				$dlc = 0;
 				if (strpos($website, '_dlc') !== false)
 				{

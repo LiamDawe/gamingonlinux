@@ -1,10 +1,8 @@
 <?php
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/')) {
-    echo "Entries:<br />";
-
-    /* This is the correct way to loop over the directory. */
+if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/')) 
+{
     while (false !== ($entry = readdir($handle)))
 		{
 			$full_filename = $file_dir . '/uploads/articles/tagline_images/temp/' . $entry;
@@ -32,7 +30,6 @@ if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/')) {
 				// if we managed to read it, it's an image, if the file extension matches (to be 100% certain it's an image) we can delete it
 				if (in_array($file_ext, $types))
 				{
-					echo 'Deleted: ' . $entry . '</br>';
 					unlink($full_filename);
 				}
 			}
@@ -40,10 +37,8 @@ if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/')) {
     closedir($handle);
 }
 
-if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/thumbnails/')) {
-    echo "Entries:<br />";
-
-    /* This is the correct way to loop over the directory. */
+if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/thumbnails/')) 
+{
     while (false !== ($entry = readdir($handle)))
 		{
 			$full_filename = $file_dir . '/uploads/articles/tagline_images/temp/thumbnails/' . $entry;
@@ -71,7 +66,6 @@ if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/thumbnail
 				// if we managed to read it, it's an image, if the file extension matches (to be 100% certain it's an image) we can delete it
 				if (in_array($file_ext, $types))
 				{
-					echo 'Deleted: ' . $entry . '</br>';
 					unlink($full_filename);
 				}
 			}

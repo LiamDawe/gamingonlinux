@@ -31,13 +31,13 @@ if (!isset($_GET['go']))
 
 	// count how many there is in total
 	$db->sqlquery("SELECT s.user_id, a.`article_id` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id WHERE s.`user_id` = ?", array($_SESSION['user_id']));
-	$total_pages = $db->num_rows();
+	$total_subs = $db->num_rows();
 
 	// sort out the pagination link
-	$pagination = $core->pagination_link(9, $total_pages, "usercp.php?module=article_subscriptions&", $page);
+	$pagination = $core->pagination_link(10, $total_subs, "usercp.php?module=article_subscriptions&", $page);
 
 	// get the articles
-	$db->sqlquery("SELECT a.article_id, a.title, a.date, s.user_id, s.emails, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id INNER JOIN `users` u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 9", array($_SESSION['user_id'], $core->start));
+	$db->sqlquery("SELECT a.article_id, a.title, a.date, s.user_id, s.emails, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id LEFT JOIN `users` u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 10", array($_SESSION['user_id'], $core->start));
 
 	while ($post = $db->fetch())
 	{

@@ -136,8 +136,7 @@ if (isset($_POST['act']))
 
 		// message
 		$html_message = "<p>Hello <strong>{$grab_current_password['username']}</strong>,</p>
-		<p>Someone, hopefully you, has changed your password on <a href=\"".core::config('website_url')."\">gamingonlinux.com</a>. If this was you, please ignore this email as it's just a security measure.</p>
-		<hr>";
+		<p>Someone, hopefully you, has changed your password on <a href=\"".core::config('website_url')."\">gamingonlinux.com</a>. If this was you, please ignore this email as it's just a security measure.</p>";
 
 		$plain_message = PHP_EOL."Hello {$grab_current_password['username']}! Someone, hopefully you, has changed your password on ".core::config('website_url').". If this was you, please ignore this email as it's just a security measure.";
 

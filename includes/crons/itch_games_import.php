@@ -1,6 +1,4 @@
 <?php
-echo "Itch importer started on " .date('d-m-Y H:m:s'). "\n";
-
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
 include($file_dir . '/includes/class_core.php');
@@ -70,4 +68,3 @@ if (!empty($games_added))
     $mail->send();
   }
 }
-echo "End of Itch.io import @ " . date('d-m-Y H:m:s');

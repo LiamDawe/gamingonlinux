@@ -1,18 +1,4 @@
 <?php
-/*
-function telegram($link)
-{
-    if (!empty(core::config('telegram_bot_key')))
-    {
-        $botToken = core::config('telegram_bot_key');
-        $chat_id = "@linuxgaming";
-        $message = $link;
-        $bot_url    = "https://api.telegram.org/bot$botToken/";
-        $url = $bot_url."sendMessage?chat_id=".$chat_id."&text=".urlencode($message);
-        file_get_contents($url);
-    }
-}*/
-
 define('BOT_TOKEN', core::config('telegram_bot_key'));
 define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
 

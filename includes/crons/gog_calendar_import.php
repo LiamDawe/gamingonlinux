@@ -79,6 +79,12 @@ do {
 			{
 				$dont_use = 1;
 			}
+			
+			// we don't want upgrades, they aren't games
+			if (strpos($website, '_upgrade') !== false)
+			{
+				$dont_use = 1;
+			}
 
 			// what the fuck GOG, seriously, stop re-ordering the fucking "The"
 			if (strpos($games['title'], ', The - The') !== false)
@@ -95,6 +101,12 @@ do {
 			if ($dont_use == 0)
 			{
 				$website = $games['short_link'];
+				
+				$dlc = 0;
+				if (strpos($website, '_dlc') !== false)
+				{
+					$dlc = 1;
+				}
 
 				$games['title'] = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $games['title']);
 
@@ -109,7 +121,7 @@ do {
 				// if it does exist, make sure it's not from GOG already
 				if ($check_rows == 0)
 				{
-					$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `gog_link` = ?, `date` = ?, `approved` = 1", array($games['title'], $games['short_link'], $games['original_release_date']));
+					$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `gog_link` = ?, `date` = ?, `approved` = 1, `is_dlc` = ?", array($games['title'], $games['short_link'], $games['original_release_date'], $dlc));
 
 					$calendar_id = $db->grab_id();
 
@@ -121,7 +133,7 @@ do {
 				// if we already have it, just update it
 				else if ($check_rows == 1 && $grab_info['gog_link'] == NULL)
 				{
-					$db->sqlquery("UPDATE `calendar` SET `gog_link` = ? WHERE `name` = ?", array($games['short_link'], $games['title']));
+					$db->sqlquery("UPDATE `calendar` SET `gog_link` = ?, `is_dlc` = ? WHERE `name` = ?", array($games['short_link'], $dlc, $games['title']));
 
 					echo "Updated {$games['title']} with the latest information<br />";
 				}

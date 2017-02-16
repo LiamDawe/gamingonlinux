@@ -183,6 +183,13 @@ if (isset($_POST['act']))
 			die();
 		}
 		
+		$db->sqlquery("SELECT `name` FROM `game_genres` WHERE `name` = ?", array($genre));
+		if ($db->num_rows() == 1)
+		{
+			header("Location: /admin.php?module=games&view=genres&message=genre_exists");
+			die();	
+		}
+		
 		$db->sqlquery("INSERT INTO `game_genres` SET `name` = ?, `accepted` = 1", array($genre));
 		
 		header("Location: /admin.php?module=games&view=genres&message=saved&extra=genre");

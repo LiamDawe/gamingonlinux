@@ -131,5 +131,3 @@ if (!empty($games_added))
     $mail->send();
   }
 }
-
-echo "End of GOG import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

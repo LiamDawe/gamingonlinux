@@ -15,10 +15,7 @@ $stamp = time() - $timeout;
 $db->sqlquery("SELECT `filename` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($stamp));
 while ($grabber = $db->fetch())
 {
-	if(unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $grabber['filename']))
-	{
-		echo 'Deleted: ' . $grabber['filename'];
-	}
+	unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $grabber['filename']);
 }
 
 $db->sqlquery("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($stamp));

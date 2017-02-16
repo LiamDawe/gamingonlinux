@@ -1,6 +1,4 @@
 <?php
-echo "Steam Store importer started on " .date('d-m-Y H:m:s'). "<br />\n";
-
 // http://simplehtmldom.sourceforge.net/
 include('simple_html_dom.php');
 
@@ -122,5 +120,3 @@ if (!empty($games_added_list))
     $mail->send();
   }
 }
-
-echo "End of Steam Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

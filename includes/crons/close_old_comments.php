@@ -20,8 +20,6 @@ while ($closing = $db->fetch())
 
 $db->sqlquery("UPDATE `articles` SET `comments_open` = 0 WHERE `date` < ?", array($stamp));
 
-// multiple recipients
-$to = core::config('contact_email');
 $subject = 'GOL Contact Us - Comments Closed';
 
 // To send HTML mail, the Content-type header must be set
@@ -29,5 +27,4 @@ $headers  = 'MIME-Version: 1.0' . "\r\n";
 $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 $headers .= "From: GOL Contact Us <noreply@gamingonlinux.com>\r\n";
 
-mail($to, $subject, "Comments closed on these articles: " . $closed, $headers);
-echo "Comments closed on these articles: " . $closed;
+mail(core::config('contact_email'), $subject, "Comments closed on these articles: " . $closed, $headers);

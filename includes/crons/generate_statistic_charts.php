@@ -17,7 +17,7 @@ $last_login = core::$date - $cutoff;
 $db->sqlquery("SELECT `grouping_id` FROM `user_stats_charts` ORDER BY `id` DESC LIMIT 1");
 if ($db->num_rows() == 0)
 {
-  $grouping_id = 1;
+	$grouping_id = 1;
 }
 else
 {
@@ -161,5 +161,3 @@ foreach ($charts as $chart)
 }
 
 $db->sqlquery("INSERT INTO `user_stats_grouping` SET `grouping_id` = ?", array($grouping_id));
-
-echo "Generation Done";

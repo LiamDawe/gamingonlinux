@@ -50,7 +50,7 @@ foreach ($search_array[0] as $item)
 if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) || isset($_GET['message']) && $_GET['message'] != 'none_found' ) )
 {
 	// do the search query
-	$db->sqlquery("SELECT a.`article_id`, a.`title` , a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
+	$db->sqlquery("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
 	FROM  `articles` a
 	LEFT JOIN  `users` u ON a.`author_id` = u.`user_id`
 	WHERE a.`active` = 1
@@ -94,7 +94,7 @@ if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) ||
 
 			$templating->set('date', $date);
 			$templating->set('title', $found['title']);
-			$templating->set('article_link', $core->nice_title($found['title']) . '.' . $found['article_id']);
+			$templating->set('article_link', article_class::get_link($found['article_id'], $found['slug']));
 
 			if ($found['author_id'] == 0)
 			{
@@ -117,23 +117,16 @@ if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) ||
 			{
 				if (in_array($found['article_id'], $category_list))
 				{
-					$category_name = str_replace(' ', '-', $category_list['category_name']);
-					if (core::config('pretty_urls') == 1)
-					{
-						$category_url = "/articles/category/{$category_name}/";
-					}
-					else
-					{
-						$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
-					}
+					$tag_link = article_class::tag_link($category_list['category_name']);
+
 					if ($category_list['category_id'] == 60)
 					{
-						$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+						$categories_list .= " <li class=\"ea\"><a href=\"$tag_link\">{$category_list['category_name']}</a></li> ";
 					}
 
 					else
 					{
-						$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+						$categories_list .= " <li><a href=\"$tag_link\">{$category_list['category_name']}</a></li> ";
 					}
 				}
 			}
@@ -160,7 +153,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 	$pagination = $core->pagination_link(15, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
 	// do the search query
-	$db->sqlquery("SELECT a.article_id, a.`title`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start), 'search.php');
+	$db->sqlquery("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start), 'search.php');
 	$found_search = $db->fetch_all_rows();
 
 	if ($total > 0)
@@ -190,7 +183,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 			$templating->set('date', $date);
 			$templating->set('title', $found['title']);
-			$templating->set('article_link', $core->nice_title($found['title']) . '.' . $found['article_id']);
+			$templating->set('article_link', article_class::get_link($found['article_id'], $found['slug']));
 
 			if ($found['author_id'] == 0)
 			{
@@ -208,14 +201,16 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 			$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']));
 			while ($get_categories = $db->fetch())
 			{
+				$tag_link = article_class::tag_link($get_categories['category_name']);
+				
 				if ($get_categories['category_id'] == 60)
 				{
-					$categories_list .= " <li class=\"ea\"><a href=\"/articles/category/{$get_categories['category_id']}\">{$get_categories['category_name']}</a></li> ";
+					$categories_list .= " <li class=\"ea\"><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
 				}
 
 				else
 				{
-					$categories_list .= " <li><a href=\"/articles/category/{$get_categories['category_id']}\">{$get_categories['category_name']}</a></li> ";
+					$categories_list .= " <li><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
 				}
 			}
 

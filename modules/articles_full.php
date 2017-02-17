@@ -588,14 +588,30 @@ if (!isset($_GET['go']))
 					$sql_replacers = [];
 					foreach ($comments_get as $id_loop)
 					{
-						$like_array[] = $id_loop['comment_id'];
+						$like_array[] = (int) $id_loop['comment_id'];
 						$sql_replacers[] = '?';
 					}
+					
 					if (!empty($sql_replacers))
 					{
+						$to_replace = implode(',', $sql_replacers);
+						
 						// Total number of likes for the comments
-						$qtotallikes = $db->sqlquery("SELECT comment_id, COUNT(*) FROM likes WHERE comment_id IN ( ".implode(',', $sql_replacers)." ) GROUP BY comment_id", $like_array);
+						$grab_total_likes = $db->sqlquery("SELECT comment_id, COUNT(*) FROM likes WHERE comment_id IN ( $to_replace ) GROUP BY comment_id", $like_array);
 						$get_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+						
+						// this users likes
+						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+						{
+							$replace = [$_SESSION['user_id']];
+							foreach ($like_array as $comment_id)
+							{
+								$replace[] = $comment_id;
+							}
+
+							$grab_user_likes = $db->sqlquery("SELECT `comment_id` FROM likes WHERE user_id = ? AND comment_id IN ( $to_replace )", $replace);
+							$get_user_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN);
+						}
 					}
 
 					foreach ($comments_get as $comments)
@@ -733,20 +749,16 @@ if (!isset($_GET['go']))
 							$like_text = "Like";
 							$like_class = "like";
 							if ($_SESSION['user_id'] != 0)
-							{
-								// Checks current login user liked this status or not
-								$qnumlikes = $db->sqlquery("SELECT `like_id` FROM likes WHERE user_id = ? AND comment_id = ?", array($_SESSION['user_id'], $comments['comment_id']));
-								$numlikes = $db->num_rows();
-
-								if ($numlikes == 0)
+							{								
+								if (in_array($comments['comment_id'], $get_user_likes))
+								{
+									$like_text = "Unlike";
+									$like_class = "unlike";									
+								}
+								else
 								{
 									$like_text = "Like";
 									$like_class = "like";
-								}
-								else if ($numlikes >= 1)
-								{
-									$like_text = "Unlike";
-									$like_class = "unlike";
 								}
 							}
 							$logged_in_options = $templating->block_store('logged_in_options', 'articles_full');

@@ -160,11 +160,11 @@ if (core::config('forum_posting_open') == 1)
 
 					// email anyone subscribed which isn't you
 					$users_array = array();
-					$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id));
+					$fetch_subs = $db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id));
 					$check_rows = $db->num_rows();
 					if ($check_rows > 0)
 					{
-						while ($users_fetch = $db->fetch())
+						while ($users_fetch = $fetch_subs->fetch())
 						{
 							if ($users_fetch['user_id'] != $_SESSION['user_id'] && $users_fetch['emails'] == 1)
 							{

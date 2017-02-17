@@ -25,15 +25,7 @@ $articles_categorys = '';
 $db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
 while ($categorys = $db->fetch())
 {
-	$category_name = str_replace(' ', '-', $categorys['category_name']);
-	if (core::config('pretty_urls') == 1)
-	{
-		$category_jump_link = "/articles/category/$category_name";
-	}
-	else {
-		$category_jump_link = url . "index.php?module=articles&amp;view=cat&amp;catid=$category_name";
-	}
-	$articles_categorys .= "<option value=\"$category_jump_link\">{$categorys['category_name']}</option>\r\n";
+	$articles_categorys .= '<option value="'.article_class::tag_link($categorys['category_name']).'">'.$categorys['category_name'].'</option>';
 }
 $templating->set('category_links', $articles_categorys);
 
@@ -43,16 +35,10 @@ $templating->set('category_links', $articles_categorys);
 $timestamp = strtotime("-7 days");
 
 $hot_articles = '';
-$db->sqlquery("SELECT `article_id`, `title`, `views`, `date` FROM `articles` WHERE `date` > ? AND `views` > ".core::config('hot-article-viewcount')." AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4", array($timestamp));
+$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ? AND `views` > ".core::config('hot-article-viewcount')." AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4", array($timestamp));
 while ($top_articles = $db->fetch())
 {
-	if (core::config('pretty_urls') == 1)
-	{
-		$hot_articles .= "<li class=\"list-group-item\"><a href=\"/articles/{$core->nice_title($top_articles['title'])}.{$top_articles['article_id']}\">{$top_articles['title']}</a></li>";
-	}
-	else {
-		$hot_articles .= '<li class="list-group-item"><a href="' . core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $top_articles['article_id'] . '">' . $top_articles['title'] . '</a></li>';
-	}
+	$hot_articles .= '<li class="list-group-item"><a href="'.article_class::get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a></li>';
 }
 
 $templating->set('top_articles', $hot_articles);

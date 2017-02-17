@@ -81,10 +81,34 @@ while ($fetch_authors = $article_list->fetch())
 		$username = '<a href="'. $profile_url . $fetch_authors['user_id'] . '">' . $fetch_authors['username'] . '</a>';
 	}
 
-	$author_list .= '<li>' . $username . ': ' . $article_count . '<br />
-	Last article: ' . $core->format_date($fetch_authors['last_date']) . '</li>';
+	$author_list .= '<li>' . $username . ' (' . $article_count . ') <em>Last article: ' . $core->format_date($fetch_authors['last_date']) . '</em></li>';
 	$counter++;
 }
 $templating->set('author_list', $author_list);
 
+// top articles this week
+$templating->block('hot_articles');
+
+$timestamp = strtotime("-3 months");
+
+$hot_articles = '';
+$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp));
+while ($get_hot = $db->fetch())
+{
+	$hot_articles .= '<li><a href="'.article_class::get_link($get_hot['article_id'], $get_hot['title']).'">'.$get_hot['title'].'</a> ('.number_format($get_hot['views']).')</li>';
+}
+
+$templating->set('hot_articles', $hot_articles);
+
+// top articles of all time
+$templating->block('top_articles');
+
+$article_list = '';
+// top 10 articles of all time by views
+$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` ORDER BY `views` DESC LIMIT 5");
+while ($top_articles = $db->fetch())
+{
+	$article_list .= '<li><a href="'.article_class::get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
+}
+$templating->set('article_list', $article_list);
 ?>

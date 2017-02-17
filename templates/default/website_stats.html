@@ -24,3 +24,26 @@
   </div>
 </div>
 [/block: articles]
+
+[block: hot_articles]
+<div class="box">
+  <div class="head">Our 5 most viewed articles of the last 3 months</div>
+  <div class="body list">
+    <ul>
+      {:hot_articles}
+    </ul>
+  </div>
+</div>
+[/block: hot_articles]
+
+
+[block: top_articles]
+<div class="box">
+  <div class="head">Our 5 most viewed articles of all time</div>
+  <div class="body list">
+    <ul>
+      {:article_list}
+    </ul>
+  </div>
+</div>
+[/block: top_articles]

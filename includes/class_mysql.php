@@ -88,7 +88,7 @@ class mysql
 			$trace = $error->getTrace();
 			if (isset($_SESSION['user_group']) && ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2))
 			{
-				$core->message( $error->getMessage() . '<br /><strong>Query:</strong> ' . htmlspecialchars($sql), NULL, 1);
+				$core->message( $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $STH->interpolateQuery(), NULL, 1);
 				echo $templating->output();
 				die();
 			}

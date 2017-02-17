@@ -104,9 +104,9 @@ if (isset($_POST['action']))
 
 		else if ($_POST['is_topic'] == 0)
 		{
-			$db->sqlquery("SELECT `approved` FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
-			$find_approval = $db->fetch();
-			if ($find_approval['approved'] == 0)
+			$db->sqlquery("SELECT `approved`, `reply_text` FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
+			$find_post = $db->fetch();
+			if ($find_post['approved'] == 0)
 			{
 				$db->sqlquery("UPDATE `forum_replies` SET `approved` = 1, `creation_date` = ? WHERE `post_id` = ?", array(core::$date, $_POST['post_id']));
 
@@ -118,8 +118,8 @@ if (isset($_POST['action']))
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_reply_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
 
 				// get article name for the email and redirect
-				$db->sqlquery("SELECT `topic_title`, `topic_text` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
-				$post_info = $db->fetch();
+				$db->sqlquery("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
+				$topic_info = $db->fetch();
 
 				// email anyone subscribed which isn't you
 				$db->sqlquery("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']));
@@ -140,22 +140,22 @@ if (isset($_POST['action']))
 				// send the emails
 				foreach ($users_array as $email_user)
 				{
-					$email_message = email_bbcode($post_info['topic_text']);
+					$email_message = email_bbcode($find_post['reply_text']);
 
 					// subject
-					$subject = "New reply to forum post {$post_info['topic_title']} on GamingOnLinux.com";
+					$subject = "New reply to forum post {$topic_info['topic_title']} on GamingOnLinux.com";
 
 					// message
 					$html_message = "
 					<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$author_username['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}\">{$post_info['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+					<p><strong>{$author_username['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}\">{$topic_info['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 					<div>
 					<hr>
 					{$email_message}
 					<hr>
 					You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$_POST['topic_id']}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.";
 
-					$plain_message = "Hello {$email_user['username']}, {$author_username['username']} has replied to a forum topic you follow on titled \"{$post_info['topic_title']}\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP. See this new message here: " . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}";
+					$plain_message = "Hello {$email_user['username']}, {$author_username['username']} has replied to a forum topic you follow on titled \"{$topic_info['topic_title']}\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP. See this new message here: " . core::config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}";
 
 					// Mail it
 					if (core::config('send_emails') == 1)
@@ -192,7 +192,7 @@ if (isset($_POST['action']))
 				die();
 			}
 		}
-		else if ($find_approval['approved'] == 1)
+		else if ($find_post['approved'] == 1)
 		{
 			header("Location: /admin.php?module=mod_queue&view=manage&message=already-approved");
 			die();

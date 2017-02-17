@@ -293,22 +293,15 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 				{
 					if (in_array($article['article_id'], $category_list))
 					{
-						$category_name = str_replace(' ', '-', $category_list['category_name']);
-						if (core::config('pretty_urls') == 1)
-						{
-							$category_url = "/articles/category/{$category_name}/";
-						}
-						else
-						{
-							$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
-						}
+						$category_link = article_class::tag_link($category_list['category_name']);
+
 						if ($category_list['category_id'] == 60)
 						{
-							$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+							$categories_list .= " <li class=\"ea\"><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
 						}
 						else
 						{
-							$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+							$categories_list .= " <li><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
 						}
 					}
 				}
@@ -321,8 +314,8 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 
 				// set last bit to 0 so we don't parse links in the tagline
 				$templating->set('text', bbcode($article['tagline'], 1, 0));
-
-				$templating->set('article_link', $article['slug'] . '.' . $article['article_id']);
+				
+				$templating->set('article_link', article_class::get_link($article['article_id'], $article['slug']));
 				$templating->set('comment_count', $article['comment_count']);
 			}
 

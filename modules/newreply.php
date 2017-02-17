@@ -164,70 +164,51 @@ if (core::config('forum_posting_open') == 1)
 					$check_rows = $db->num_rows();
 					if ($check_rows > 0)
 					{
-						while ($users = $db->fetch())
+						while ($users_fetch = $db->fetch())
 						{
-							if ($users['user_id'] != $_SESSION['user_id'] && $users['emails'] == 1)
+							if ($users_fetch['user_id'] != $_SESSION['user_id'] && $users_fetch['emails'] == 1)
 							{
 								// use existing key, or generate any missing keys
-								if (empty($users['secret_key']))
+								if (empty($users_fetch['secret_key']))
 								{
 									$secret_key = core::random_id(15);
-									$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `topic_id` = ?", array($secret_key, $users['user_id'], $topic_id));
+									$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `topic_id` = ?", array($secret_key, $users_fetch['user_id'], $topic_id));
 								}
 								else
 								{
-									$secret_key = $users['secret_key'];
+									$secret_key = $users_fetch['secret_key'];
 								}
-								$users_array[$users['user_id']]['user_id'] = $users['user_id'];
-								$users_array[$users['user_id']]['email'] = $users['email'];
-								$users_array[$users['user_id']]['username'] = $users['username'];
-								$users_array[$users['user_id']]['secret_key'] = $secret_key;
+								$users_array[$users_fetch['user_id']]['user_id'] = $users_fetch['user_id'];
+								$users_array[$users_fetch['user_id']]['email'] = $users_fetch['email'];
+								$users_array[$users_fetch['user_id']]['username'] = $users_fetch['username'];
+								$users_array[$users_fetch['user_id']]['secret_key'] = $secret_key;
 							}
 						}
 
 						// send the emails
 						foreach ($users_array as $email_user)
 						{
-							$email_message = email_bbcode($_POST['text']);
-
-							$to  = $email_user['email'];
+							$email_message = email_bbcode($message);
 
 							// subject
 							$subject = "New reply to forum post {$title['topic_title']} on GamingOnLinux.com";
 
 							// message
-							$message = "
-							<html>
-							<head>
-							<title>New reply to a forum topic you follow on GamingOnLinux.com</title>
-							</head>
-							<body>
-							<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-							<br />
-							<p>Hello <strong>{$email_user['username']}</strong>,</p>
+							$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
 							<p><strong>{$_SESSION['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$topic_id}/post_id={$post_id}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 							<div>
 							<hr>
 							{$email_message}
 							<hr>
-							You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$topic_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
-							<hr>
-							<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-							<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-							<p>-----------------------------------------------------------------------------------------------------------</p>
-							</div>
-							</body>
-							</html>";
-
-							// To send HTML mail, the Content-type header must be set
-							$headers  = 'MIME-Version: 1.0' . "\r\n";
-							$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-							$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress($topic_id,'forum')."\r\n";
+							You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$topic_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.";
+							
+							$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has replied to a forum topic you follow on titled {$title['topic_title']} find it here: " . core::config('website_url') . 'forum/topic/' . $topic_id . '/post_id=' . $post_id;
 
 							// Mail it
 							if (core::config('send_emails') == 1)
 							{
-								mail($to, $subject, $message, $headers);
+								$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
+								$mail->send();
 							}
 
 							// remove anyones send_emails subscription setting if they have it set to email once

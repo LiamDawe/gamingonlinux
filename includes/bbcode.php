@@ -293,7 +293,8 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	$body = pc_info($body);
 
 	if ($tagline_image != NULL)
-	{
+	{	
+		// plain image, no resizing
 		$find = "[img]tagline-image[/img]";
 
 		if ($gallery_tagline == NULL)
@@ -307,6 +308,20 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 		$replace = "<img itemprop=\"image\" src=\"" . core::config('website_url') . $file_path . $tagline_image . "\" alt=\"tagline-image\" />";
 
 		$body = str_replace($find, $replace, $body);
+		
+		// if they have set a size on it
+		$find_resize = "/\[img=([0-9]+)x([0-9]+)?\]tagline-image\[\/img\]/";
+		if ($gallery_tagline == NULL)
+		{
+			$file_path = "uploads/articles/tagline_images/";
+		}
+		else
+		{
+			$file_path = "uploads/tagline_gallery/";
+		}
+		$replace_resize = "<img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"" . core::config('website_url') . $file_path . $tagline_image . "\" alt=\"tagline-image\" />";
+		
+		$body = preg_replace($find_resize, $replace_resize, $body);
 	}
 
 	if ($parse_links == 1)

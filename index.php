@@ -13,15 +13,8 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 	if (!empty($featured_grabber['article_id']))
 	{
 		$db->sqlquery("UPDATE `editor_picks` SET `hits` = (hits + 1) WHERE `article_id` = ?", array($_GET['aid']));
-
-		if (core::config('pretty_urls') == 1)
-		{
-			header("Location: /articles/" . $featured_grabber['slug'] . '.' . $featured_grabber['article_id']);
-		}
-		else
-		{
-			header("Location: " . url . 'index.php?module=articles_full&aid=' . $featured_grabber['article_id'] . '&amp;title=' . $featured_grabber['slug']);
-		}
+		
+		header('Location: ' . article_class::get_link($featured_grabber['article_id'], $featured_grabber['slug']));
 	}
 }
 

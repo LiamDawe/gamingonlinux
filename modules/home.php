@@ -148,16 +148,7 @@ if (!isset($_GET['view']))
 				$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
 			}
 
-			if (core::config('pretty_urls') == 1)
-			{
-				$article_link = "/articles/" . $article['slug'] . '.' . $article['article_id'];
-			}
-			else
-			{
-				$article_link = url . 'index.php?module=articles_full&amp;aid=' . $article['article_id'] . '&amp;title=' . $article['slug'];
-			}
-
-			$templating->set('article_link', $article_link);
+			$templating->set('article_link', article_class::get_link($article['article_id'], $article['slug']));
 
 			$templating->set('username', $username);
 			$templating->set('date', $date);
@@ -172,23 +163,16 @@ if (!isset($_GET['view']))
 			{
 				if (in_array($article['article_id'], $category_list))
 				{
-					$category_name = str_replace(' ', '-', $category_list['category_name']);
-					if (core::config('pretty_urls') == 1)
-					{
-						$category_url = "/articles/category/{$category_name}/";
-					}
-					else
-					{
-						$category_url = "/index.php?module=articles&view=cat&catid={$category_name}";
-					}
+					$category_link = article_class::tag_link($category_list['category_name']);
+
 					if ($category_list['category_id'] == 60)
 					{
-						$categories_list .= " <li class=\"ea\"><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+						$categories_list .= " <li class=\"ea\"><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
 					}
 
 					else
 					{
-						$categories_list .= " <li><a href=\"$category_url\">{$category_list['category_name']}</a></li> ";
+						$categories_list .= " <li><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
 					}
 				}
 			}

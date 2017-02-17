@@ -45,7 +45,7 @@ if (!isset($_GET['go']))
 
 		$templating->set('title', $post['title']);
 		$templating->set('article_id', $post['article_id']);
-		$templating->set('article_link', $core->nice_title($post['title']) . '.' . $post['article_id']);
+		$templating->set('article_link', article_class::get_link($post['article_id'], $post['title']));
 		$templating->set('author_id', $post['user_id']);
 		$templating->set('date', $core->format_date($post['date']));
 		$templating->set('author', $post['username']);

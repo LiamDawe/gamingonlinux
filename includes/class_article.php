@@ -562,5 +562,34 @@ class article_class
     $templating->block('history', 'admin_modules/admin_module_articles');
     $templating->set('history', $history);
   }
+  
+	public static function get_link($id, $title)
+	{
+		$link = '';
+		$nice_title = core::nice_title($title);
+		if (core::config('pretty_urls') == 1)
+		{
+			$link = '/articles/'.$nice_title.'.'.$id;
+		}
+		else
+		{
+			$link = '/index.php?module=articles_full&aid='.$id.'&title='.$nice_title;
+		}
+		return $link;
+	}
+	
+	public static function tag_link($name)
+	{
+		$name = str_replace(' ', '-', $name);
+		if (core::config('pretty_urls') == 1)
+		{
+			$link = '/articles/category/'.$name;
+		}
+		else
+		{
+			$link = '/index.php?module=articles&amp;view=cat&amp;catid='.$name;
+		}
+		return $link;
+	}
 }
 ?>

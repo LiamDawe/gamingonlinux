@@ -7,19 +7,19 @@ $templating->set_previous('title', 'New article ' . $templating->get('title', 1)
 // only refresh the tagline image session identifier on a brand new page, if there's an error or we are publishing, we need it the same to compare
 if (!isset($_GET['error']) && !isset($_POST['act']))
 {
-  $_SESSION['image_rand'] = rand();
-  $article_class->reset_sessions();
+	$_SESSION['image_rand'] = rand();
+	$article_class->reset_sessions();
 }
 
 if (isset ($_GET['error']))
 {
-  $extra = NULL;
-  if (isset($_GET['extra']))
-  {
-    $extra = $_GET['extra'];
-  }
-  $message = $message_map->get_message($_GET['error'], $extra);
-  $core->message($message['message'], NULL, $message['error']);
+	$extra = NULL;
+	if (isset($_GET['extra']))
+	{
+		$extra = $_GET['extra'];
+	}
+	$message = $message_map->get_message($_GET['error'], $extra);
+	$core->message($message['message'], NULL, $message['error']);
 }
 
 $templating->block('add', 'admin_modules/admin_module_articles');
@@ -34,13 +34,13 @@ $categorys_list = '';
 $db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
 while ($categorys = $db->fetch())
 {
-  if (isset($_GET['error']) || isset($_GET['dump']))
-  {
-    if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
-    {
-      $categorys_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
-    }
-  }
+	if (isset($_GET['error']) || isset($_GET['dump']))
+	{
+		if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
+		{
+			$categorys_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
+		}
+	}
 }
 
 // get games list
@@ -56,13 +56,13 @@ $previously_uploaded = '';
 
 if (isset($_GET['error']) || isset($_GET['dump']))
 {
-  $title = $_SESSION['atitle'];
-  $tagline = $_SESSION['atagline'];
-  $text = $_SESSION['atext'];
-  $slug = $_SESSION['aslug'];
+	$title = $_SESSION['atitle'];
+	$tagline = $_SESSION['atagline'];
+	$text = $_SESSION['atext'];
+	$slug = $_SESSION['aslug'];
 
-  // sort out previously uploaded images
-  $previously_uploaded	= $article_class->display_previous_uploads();
+	// sort out previously uploaded images
+	$previously_uploaded	= $article_class->display_previous_uploads();
 }
 
 $tagline_image = $article_class->display_tagline_image();
@@ -85,7 +85,7 @@ $grab_subscribe = $db->fetch();
 $auto_subscribe = '';
 if ($grab_subscribe['auto_subscribe_new_article'] == 1)
 {
-  $auto_subscribe = 'checked';
+	$auto_subscribe = 'checked';
 }
 
 $core->editor('text', $text, 1);
@@ -152,28 +152,17 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 
   	include(core::config('path') . 'includes/telegram_poster.php');
 
-  	if (core::config('pretty_urls') == 1 && !isset($_POST['show_block']))
+  	$article_link = article_class::get_link($article_id, $checked['slug']);
+
+  	if (!isset($_POST['show_block']))
   	{
-  		telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $article_id);
-  		header("Location: /articles/" . $checked['slug'] . '.' . $article_id);
+  		telegram($checked['title'] . ' ' . $article_link);
+  		header("Location: ".$article_link);
   	}
-  	else if (core::config('pretty_urls') == 1 && isset($_POST['show_block']))
+  	else if (isset($_POST['show_block']))
   	{
-  		telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $article_id);
-  		header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
-  	}
-  	else
-  	{
-  		if (!isset($_POST['show_block']))
-  		{
-  			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$checked['slug']}");
-  			header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$checked['slug']}");
-  		}
-  		else
-  		{
-  			telegram($title . ' ' . core::config('website_url') . "index.php?module=articles_full&aid={$article_id}&title={$checked['slug']}");
-  			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$article_id}");
-  		}
+  		telegram($checked['title'] . ' ' . $article_link);
+  		header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
   	}
   }
 }

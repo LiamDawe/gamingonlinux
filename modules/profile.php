@@ -186,7 +186,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					}
 
 					// gather latest articles
-					$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']));
+					$db->sqlquery("SELECT `article_id`, `title`, `slug` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']));
 					if ($db->num_rows() != 0)
 					{
 						$templating->block('articles_top');
@@ -194,9 +194,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						{
 							$templating->block('articles');
 
-							$safe_title = $core->nice_title($article_link['title']);
-
-							$templating->set('latest_article_link', "<a href=\"/articles/{$safe_title}.{$article_link['article_id']}\">{$article_link['title']}</a>");
+							$templating->set('latest_article_link', '<a href="'.article_class::get_link($article_link['article_id'], $article_link['slug']).'">'.$article_link['title'].'</a>');
 						}
 						$templating->block('articles_bottom');
 						$templating->set('user_id', $profile['user_id']);

@@ -1345,5 +1345,18 @@ class core
 			}
 		}
 	}
+
+	function check_ip_from_stopforumspam($ip)
+	{
+		$url = "https://api.stopforumspam.org/api?f=json&ip=" . $ip;
+		$json = self::file_get_contents_curl($url);
+		$json = json_decode($json, true);
+		if ( $json["ip"]["appears"] == 1 )
+	        {
+			header('Location: /index.php?module?home&message=spam');
+			die();
+		}
+	}
+
 }
 ?>

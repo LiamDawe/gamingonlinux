@@ -1,10 +1,6 @@
 <?php
-$data = $core->file_get_contents_curl("http://api.stopforumspam.org/api?ip=" . core::$ip);
-if (strpos($data, "<appears>yes</appears>") !== false)
-{
-	header('Location: /index.php?module=home&message=spam');
-	die();
-}
+
+$core->check_ip_from_stopforumspam(core::$ip);
 
 $templating->set_previous('title', 'Register', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com register page', 1);

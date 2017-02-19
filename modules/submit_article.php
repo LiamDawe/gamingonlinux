@@ -16,12 +16,7 @@ if (isset($_GET['view']))
             die();
         }
 
-        $data = $core->file_get_contents_curl("http://api.stopforumspam.org/api?ip=" . core::$ip);
-        if (strpos($data, "<appears>yes</appears>") !== false)
-        {
-            header('Location: /index.php?module=home&message=spam');
-            die();
-        }
+	$core->check_ip_from_stopforumspam(core::$ip);
 
         // allow people to go back from say previewing (if they hit the back button) and not have some browsers wipe what they wrote
         // only do this if they haven't just logged in (to prevent the cache'd content showing guest boxes)
@@ -127,12 +122,7 @@ if (isset($_POST['act']))
             die();
         }
 
-        $data = $core->file_get_contents_curl("http://api.stopforumspam.org/api?ip=" . core::$ip);
-        if (strpos($data, "<appears>yes</appears>") !== false)
-        {
-            header('Location: /index.php?module=home&message=spam');
-            die();
-        }
+	$core->check_ip_from_stopforumspam(core::$ip);
 
         $templating->set_previous('title', 'Submit An Article', 1);
         

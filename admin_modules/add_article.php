@@ -156,12 +156,12 @@ if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 
   	if (!isset($_POST['show_block']))
   	{
-  		telegram($checked['title'] . ' ' . $article_link);
+  		telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
   		header("Location: ".$article_link);
   	}
   	else if (isset($_POST['show_block']))
   	{
-  		telegram($checked['title'] . ' ' . $article_link);
+  		telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
   		header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
   	}
   }

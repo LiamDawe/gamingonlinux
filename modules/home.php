@@ -5,7 +5,7 @@ $templating->merge('home');
 
 if (!isset($_GET['view']))
 {
-	$templating->set_previous('title', 'Linux & SteamOS gaming news', 1);
+	$templating->set_previous('title', 'Linux & SteamOS gaming community', 1);
 
 	$db->sqlquery("SELECT count(id) as count FROM `announcements`");
 	$count_announcements = $db->fetch();

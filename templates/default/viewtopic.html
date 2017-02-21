@@ -31,9 +31,10 @@
 [/block: poll_results]
 
 [block: topic]
+					<a class="anchor" id="r{:post_id}"></a>
 					<div class="head">{:topic_title}</div>
 					<div class="body group">
-						<div id="r{:post_id}" class="comment group">
+						<div class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
 									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:topic_date}</abbr> {:subscribe_link}
@@ -71,9 +72,10 @@
 [/block: topic]
 
 [block: reply_notopic]
+					<a class="anchor" id="r{:post_id}"></a>
 					<div class="head">{:topic_title}</div>
 					<div class="body group">
-						<div id="r{:post_id}" class="comment group">
+						<div class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
 									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:reply_date}</abbr> {:subscribe_link}
@@ -111,8 +113,9 @@
 [/block: reply_notopic]
 
 [block: reply]
+					<a class="anchor" id="r{:post_id}"></a>
 					<div class="body group">
-						<div id="r{:post_id}" class="comment group">
+						<div class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
 									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:reply_date}</abbr>

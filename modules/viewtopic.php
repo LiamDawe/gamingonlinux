@@ -522,24 +522,24 @@ else
 
 						if (core::config('pretty_urls') == 1)
 						{
-							header("Location: /forum/topic/{$_GET['topic_id']}/page=$last_page#{$_GET['post_id']}");
+							header("Location: /forum/topic/{$_GET['topic_id']}/page=$last_page#r{$_GET['post_id']}");
 						}
 						else
 						{
 
-							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}&page=$last_page#{$_GET['post_id']}");
+							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}&page=$last_page#r{$_GET['post_id']}");
 						}
 					}
 					else
 					{
 						if (core::config('pretty_urls') == 1)
 						{
-							header("Location: /forum/topic/{$_GET['topic_id']}#{$_GET['post_id']}");
+							header("Location: /forum/topic/{$_GET['topic_id']}#r{$_GET['post_id']}");
 						}
 						else
 						{
 
-							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}#{$_GET['post_id']}");
+							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}#r{$_GET['post_id']}");
 						}
 					}
 				}

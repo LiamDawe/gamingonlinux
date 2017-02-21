@@ -27,6 +27,10 @@ if (!isset($_GET['view']))
 	$core->check_old_pc_info($_SESSION['user_id']);
 
 	$templating->block('articles_top', 'home');
+	
+	$templating->set('editorial_link', article_class::tag_link('Editorial'));
+	$templating->set('interview_link', article_class::tag_link('Interview'));
+	$templating->set('howto_link', article_class::tag_link('HOWTO'));
 
 	// paging for pagination
 	$page = core::give_page();

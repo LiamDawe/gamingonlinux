@@ -1,23 +1,34 @@
 // scroll to an element if it's not in view, all other ways I could find completely sucked
-jQuery.fn.scrollMinimal = function(smooth) {
-  var cTop = this.offset().top;
-  var cHeight = this.outerHeight(true);
-  var windowTop = $(window).scrollTop();
-  var visibleHeight = $(window).height();
+jQuery.fn.scrollMinimal = function(smooth)
+{
+	var cTop = this.offset().top;
+	var cHeight = this.outerHeight(true);
+	var windowTop = $(window).scrollTop();
+	var visibleHeight = $(window).height();
 
-  if (cTop < windowTop) {
-    if (smooth) {
-      $('body').animate({'scrollTop': cTop}, 'slow', 'swing');
-    } else {
-      $(window).scrollTop(cTop);
-    }
-  } else if (cTop + cHeight > windowTop + visibleHeight) {
-    if (smooth) {
-      $('body').animate({'scrollTop': cTop - visibleHeight + cHeight}, 'slow', 'swing');
-    } else {
-      $(window).scrollTop(cTop - visibleHeight + cHeight);
-    }
-  }
+	if (cTop < windowTop)
+	{
+		if (smooth) 
+		{
+			$('body').animate({'scrollTop': cTop}, 'slow', 'swing');
+		}
+		else 
+		{
+			$(window).scrollTop(cTop);
+		}
+	} 
+	else if (cTop + cHeight > windowTop + visibleHeight) 
+	{
+		if (smooth)
+		{
+			$('body').animate({'scrollTop': cTop - visibleHeight + cHeight}, 'slow', 'swing');
+			
+		}
+		else 
+		{
+			$(window).scrollTop(cTop - visibleHeight + cHeight);
+		}
+	}
 };
 
 jQuery.fn.highlight = function () {
@@ -37,25 +48,28 @@ jQuery.fn.highlight = function () {
     });
 }
 
-function disableFunction() {
-    document.getElementById("send").disabled = 'true';
+function disableFunction()
+{
+	document.getElementById("send").disabled = 'true';
 }
 
-function validateEmail(email) {
-  var charReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-  return charReg.test(email);
+function validateEmail(email) 
+{
+	var charReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+	return charReg.test(email);
 }
 
 function resetFormElement(e)
 {
-  e.wrap('<form>').closest('form').get(0).reset();
-  e.unwrap();
+	e.wrap('<form>').closest('form').get(0).reset();
+	e.unwrap();
 }
 
 function countchars()
 {
 	jQuery("#count").text('Tagline Characters: ' + jQuery('#tagline').val().length);
 }
+
 var slug_enabled=false;
 var current_url = $(location).attr('pathname') + $(location).attr('search');
 if (current_url == '/admin.php?module=add_article')
@@ -82,41 +96,48 @@ function slug(update)
 	}
 }
 
-$(function(){
-    $("#slug_edit").on("click", function(event){
+$(function()
+{
+	$("#slug_edit").on("click", function(event)
+	{
         event.preventDefault();
 		slug_enabled=false;
 		document.getElementById("slug").removeAttribute("readonly");
     });
 });
 
-$(function(){
-    $("#slug_update").on("click", function(event){
-        event.preventDefault();
+$(function()
+{
+    $("#slug_update").on("click", function(event)
+	{
+		event.preventDefault();
 		slug(1);
     });
 });
 
-
-
-$(function(){
-    $(document).on('click','.trash',function(){
-        var image_id= $(this).attr('id');
+$(function()
+{
+    $(document).on('click','.trash',function()
+	{
+		var image_id= $(this).attr('id');
         $.ajax({
             type:'POST',
             url:'/includes/ajax/delete_image.php',
             data:{'image_id':image_id},
-            success: function(data){
-                 if(data=="YES"){
-			$("div[id='"+image_id+"']").replaceWith('<div class="col-md-12" style="background-color: #15e563; padding: 5px;">Image Deleted</div>');
-			$('html, body').animate({scrollTop: $("#preview").offset().top}, 0);
-                 }else{
-                        alert("can't delete the row")
+            success: function(data)
+			{
+				if(data=="YES")
+				{
+					$("div[id='"+image_id+"']").replaceWith('<div class="col-md-12" style="background-color: #15e563; padding: 5px;">Image Deleted</div>');
+					$('html, body').animate({scrollTop: $("#preview").offset().top}, 0);
+                }
+				else
+				{
+					alert("can't delete the row")
                  }
              }
-
-            });
-        });
+		});
+	});
 });
 $(function(){
     $(document).on('click','.trash_tagline',function(){
@@ -225,6 +246,7 @@ jQuery(document).ready(function()
     $("#trends").hide();
     $("#monthly").show();
   });
+  
   // navbar toggle menu
   $(".toggle-nav > a").on('click', function(event){
     event.preventDefault();
@@ -244,6 +266,12 @@ jQuery(document).ready(function()
   // hide the toggle-nav if you click outside of it
   $(document).on("click", function () {
     $(".toggle-content").removeClass('toggle-active');
+  });
+  
+  // hide the navbar on window resize, to prevent menus for small screens still appearing if open
+  $(window).on('resize', function()
+  {
+	  $(".toggle-content").removeClass('toggle-active');
   });
 
   // for checking usernames
@@ -899,22 +927,23 @@ function(data){
     });
   });
 
-  $(document).on('click', ".gallery_item", function() {
-    var filename = $(this).data('filename');
-    var id = $(this).data('id');
-    $('#preview2').html('<img src="/uploads/tagline_gallery/' + filename + '" alt="image" />');
-    $.fancybox.close();
-    $.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id, 'filename':filename });
-  });
+	$(document).on('click', ".gallery_item", function() 
+	{
+		var filename = $(this).data('filename');
+		var id = $(this).data('id');
+		$('#preview2').html('<img src="/uploads/tagline_gallery/' + filename + '" alt="image" />');
+		$.fancybox.close();
+		$.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id, 'filename':filename });
+	});
 
-  $('#preview_text_button').click(function()
-  {
-    var text = $('#editor_content').val();
-    $('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
-    $('.preview_pm').show();
-    $('#preview').scrollMinimal();
-    $(".preview_pm").highlight();
-  });
+	$('#preview_text_button').click(function()
+	{
+		var text = $('#editor_content').val();
+		$('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
+		$('.preview_pm').show();
+		$('#preview').scrollMinimal();
+		$(".preview_pm").highlight();
+	});
 
 	$('#markdown-info').click(function(e)
 	{

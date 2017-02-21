@@ -31,6 +31,7 @@ if (!isset($_GET['view']))
 	$templating->set('editorial_link', article_class::tag_link('Editorial'));
 	$templating->set('interview_link', article_class::tag_link('Interview'));
 	$templating->set('howto_link', article_class::tag_link('HOWTO'));
+	$templating->set('reviews_link', article_class::tag_link('Review'));
 
 	// paging for pagination
 	$page = core::give_page();

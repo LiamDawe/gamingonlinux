@@ -65,11 +65,12 @@
 
 [block: head]
 	<div class="head">
-		<span class="badge"><a href="/index.php?module=calendar&year={:prev_year}&month={:prev}">&lt; Prev</a></span> {:month} <span class="badge"><a href="/index.php?module=calendar&year={:next_year}&month={:next}">Next &gt;</a></span>
+		<span class="badge"><a href="/index.php?module=calendar&year={:prev_year}&month={:prev}">&lt; Prev</a></span> {:month} <span class="badge"><a href="/index.php?module=calendar&year={:next_year}&month={:next}">Next &gt;</a></span> <a href="/index.php?module=calendar&today">Jump to today</a>
 	</div>
 [/block: head]
 
 [block: day]
+	{:today}
 	<div class="subhead">{:group_date}</div>
 [/block: day]
 

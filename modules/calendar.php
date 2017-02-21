@@ -1,4 +1,9 @@
 <?php
+if (isset($_GET['today']))
+{
+	header("Location: /index.php?module=calendar#today");
+}
+
 if (!isset($_GET['year']) || empty($_GET['year']))
 {
 	$year = date("Y");
@@ -121,7 +126,16 @@ while ($listing = $db->fetch())
     {
         $templating->block('day', 'calendar');
         $templating->set('group_date', $listing['date']);
-    }
+        
+        if ($listing['date'] == date('Y-m-d'))
+        {
+			$templating->set('today', '<a class="anchor" id="today"></a>');
+		}
+		else
+		{
+			$templating->set('today', '');
+		}
+	}
     
 	$get_date = date_parse($listing['date']);
 

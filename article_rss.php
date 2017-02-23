@@ -47,7 +47,7 @@ if (core::config('articles_rss') == 1)
 	$xml->startElement('channel');
 	$xml->writeElement('title', 'GamingOnLinux.com Latest Articles');
 	$xml->writeElement('link', 'https://www.gamingonlinux.com');
-	$xml->writeElement('description', 'The latest news from GamingOnLinux.com');
+	$xml->writeElement('description', 'The latest articles from GamingOnLinux.com');
 	$xml->writeElement('pubDate', $last_date);
 	$xml->writeElement('language', 'en-us');
 	$xml->writeElement('lastBuildDate', $last_date);

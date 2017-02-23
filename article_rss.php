@@ -86,8 +86,8 @@ if (core::config('articles_rss') == 1)
 		$xml->writeElement('author', "contact@gamingonlinux.com ($username)");
 		
 		$article_link = article_class::get_link($line['article_id'], $line['title']);
-		$xml->writeElement('link', "https://www.gamingonlinux.com".$article_link);
-		$xml->writeElement('guid', "https://www.gamingonlinux.com".$article_link);
+		$xml->writeElement('link', core::config('website_url').$article_link);
+		$xml->writeElement('guid', core::config('website_url').$article_link);
 		
 		// sort out the categories (tags)
 		$tag_list = [];

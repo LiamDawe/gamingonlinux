@@ -994,15 +994,9 @@ if (!isset($_GET['go']))
 		$templating->set('comment_id', $comment['comment_id']);
 		$templating->set('url', core::config('website_url'));
 		$templating->set('page', $page);
+		
+		$cancel_action = core::config('website_url') . article_class::get_link($comment['article_id'], $nice_title);
 
-		if (core::config('pretty_urls') == 1)
-		{
-			$cancel_action = '/articles/' . $nice_title . '.' . $comment['article_id'];
-		}
-		else
-		{
-			$cancel_action = '/index.php?module=articles_full&aid=' . $comment['article_id'] . '&title=' . $nice_title;
-		}
 		$templating->set('cancel_action', $cancel_action);
 		$templating->block('preview', 'articles_full');
 	}
@@ -1396,15 +1390,10 @@ else if (isset($_GET['go']))
 				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ?, `edit_counter` = (edit_counter + 1) WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], core::$date, $_POST['comment_id']));
 
 				$nice_title = $core->nice_title($comment['title']);
+				
+				$edit_redirect = article_class::get_link($comment['article_id'], $nice_title, 'comment_id=' . $_POST['comment_id']);
 
-				if (core::config('pretty_urls') == 1)
-				{
-					header("Location: /articles/$nice_title.{$comment['article_id']}/page={$_GET['page']}#comments");
-				}
-				else {
-					header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}&page={$_GET['page']}#comments");
-				}
-
+				header("Location: ".core::config('website_url').$edit_redirect);
 			}
 		}
 	}

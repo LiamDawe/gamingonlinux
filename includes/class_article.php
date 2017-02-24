@@ -563,17 +563,17 @@ class article_class
     $templating->set('history', $history);
   }
   
-	public static function get_link($id, $title)
+	public static function get_link($id, $title, $additional = NULL)
 	{
 		$link = '';
 		$nice_title = core::nice_title($title);
 		if (core::config('pretty_urls') == 1)
 		{
-			$link = 'articles/'.$nice_title.'.'.$id;
+			$link = 'articles/'.$nice_title.'.'.$id . '/' . $additional;
 		}
 		else
 		{
-			$link = 'index.php?module=articles_full&aid='.$id.'&title='.$nice_title;
+			$link = 'index.php?module=articles_full&aid='.$id.'&title='.$nice_title . '&' . $additional;
 		}
 		return $link;
 	}

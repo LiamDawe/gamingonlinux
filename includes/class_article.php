@@ -567,13 +567,24 @@ class article_class
 	{
 		$link = '';
 		$nice_title = core::nice_title($title);
+		
 		if (core::config('pretty_urls') == 1)
 		{
-			$link = 'articles/'.$nice_title.'.'.$id . '/' . $additional;
+			$link = 'articles/'.$nice_title.'.'.$id;
+			
+			if ($additional != NULL)
+			{
+				$link = $link . '/' . $additional;
+			}
 		}
 		else
 		{
-			$link = 'index.php?module=articles_full&aid='.$id.'&title='.$nice_title . '&' . $additional;
+			$link = 'index.php?module=articles_full&aid='.$id.'&title='.$nice_title;
+			
+			if ($additional != NULL)
+			{
+				$link = $link . '&' . $additional;
+			}
 		}
 		return $link;
 	}

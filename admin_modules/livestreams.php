@@ -19,6 +19,10 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			{
 				$core->message('Please fill a title, and a date!', null, 1);
 			}
+			if ($_GET['message'] == 'date_backwards')
+			{
+				$core->message('The livestream end date cannot be before it starts!', null, 1);
+			}
 		}
 
 		$templating->set_previous('meta_description', 'Managing livestreams', 1);
@@ -168,7 +172,7 @@ if (isset($_POST['act']))
 	{
 		if (empty($_POST['title']) || empty($_POST['date']))
 		{
-			header("Location: /admin.php?module=livestreams&view=add&error=missing");
+			header("Location: /admin.php?module=livestreams&view=manage&error=missing");
 			die();
 		}
 
@@ -177,6 +181,12 @@ if (isset($_POST['act']))
 		$title = trim($_POST['title']);
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);
+		
+		if ($end_date < $date)
+		{
+			header("Location: /admin.php?module=livestreams&view=manage&message=date_backwards");
+			die();
+		}
 
 		$date_created = date('Y-m-d H:i:s');
 

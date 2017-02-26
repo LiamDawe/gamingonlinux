@@ -53,6 +53,17 @@ else
 
 if (in_array($module, $modules_allowed))
 {
+	if (isset($_GET['message']))
+	{
+		$extra = NULL;
+		if (isset($_GET['extra']))
+		{
+			$extra = $_GET['extra'];
+		}
+		$message = $message_map->get_message('admin/'.$module, $_GET['message'], $extra);
+		$core->message($message['message'], NULL, $message['error']);
+	}
+	
 	include($file_dir . "/admin_modules/$module.php");
 }
 

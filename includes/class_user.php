@@ -273,7 +273,7 @@ class user
 				if ($db->num_rows() == 1)
 				{
 					setcookie('gol_stay', "",  time()-60, '/');
-					$this->message = "You are banned!";
+					$this->message = "banned";
 					return false;
 				}
 
@@ -301,7 +301,7 @@ class user
 				{
 					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array(core::$ip));
 				}
-				$this->message = "You are banned!";
+				$this->message = "banned";
 				return false;
 			}
 		}

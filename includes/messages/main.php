@@ -64,14 +64,6 @@ return [
 		"additions" => 1,
 		"error" => 0
 	],
-	"banned" => [
-		"text" => "That user is now banned!",
-		"error" => 1
-	],
-	"unbanned" => [
-		"text" => "That user is now unbanned!",
-		"error" => 0
-	],
 	"password-match" => [
 		"text" => "Your password did not match what we have for you!",
 		"error" => 1

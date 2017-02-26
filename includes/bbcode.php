@@ -89,23 +89,6 @@ function remove_bbcode($string)
 	return preg_replace($pattern, $replace, $string);
 }
 
-function markdown($text)
-{
-	// limited markdown support
-	$markdown = ['/\[([^\]]+)\]\(([^\)]+)\)/' => '<a href="$2">$1</a>', // links
-	'/(\*\*)(.*?)\1/' => '<strong>$2</strong>', // bold
-	'/(\*)(.*?)\1/' => '<em>$2</em>', // emphasis
-	'/\~\~(.*?)\~\~/' => '<del>$1</del>' // strikethrough
-	];
-	
-	foreach ($markdown as $find => $replace)
-	{
-		$text = preg_replace($find, $replace, $text);
-	}
-	
-	return $text;
-}
-
 // this is the replacement function the the article dump module in admin, it sorts the different sections and splits them
 function article_dump($dump)
 {
@@ -262,7 +245,7 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 {
 	//  get rid of empty BBCode, is there a point in having excess markup?
 	$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
-
+	
 	$body = logged_in_code($body);
 
 	if (preg_match_all("/\[giveaway\](.+?)\[\/giveaway\]/is", $body, $giveaway_matches))
@@ -434,8 +417,6 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	{
 		$body = preg_replace($find, $replace, $body);
 	}
-	
-	$body = markdown($body);
 
 	$body = nl2br($body);
 	
@@ -576,8 +557,6 @@ function email_bbcode($body)
 	'Code:<br /><code>$1</code>',
 	'SPOILER: View the website if you wish to see it.'
 	);
-	
-	$body = markdown($body);
 
 	$body = emoticons($body);
 

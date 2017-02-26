@@ -944,23 +944,4 @@ function(data){
 		$('#preview').scrollMinimal();
 		$(".preview_pm").highlight();
 	});
-
-	$('#markdown-info').click(function(e)
-	{
-		e.preventDefault();
-		// change the link to hide
-		if($('.markdown-help').is(':visible'))
-		{
-			$('#markdown-info').html('markdown');
-			$('.markdown-help').hide();
-		}
-		else
-		{
-			$('#markdown-info').html('hide markdown help');
-			
-			$('.markdown-help').show();
-			$('.markdown-help').scrollMinimal();
-			$(".markdown-help").highlight();
-		}
-	});
 });

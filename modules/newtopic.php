@@ -175,8 +175,8 @@ else
 				{
 					// make safe
 					$title = strip_tags($_POST['title']);
-					$message = core::make_safe($_POST['text']);
-					$message = trim($message);
+					$text = core::make_safe($_POST['text']);
+					$text = trim($text);
 					$author = $_SESSION['user_id'];
 
 					$mod_sql = '';
@@ -199,11 +199,11 @@ else
 					}
 					
 					// make sure its not empty
-					$empty_check = core::mempty(compact('title', 'message'));
+					$empty_check = core::mempty(compact('title', 'text'));
 					if ($empty_check !== true)
 					{
 						$_SESSION['atitle'] = $title;
-						$_SESSION['atext'] = $message;
+						$_SESSION['atext'] = $text;
 
 						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error&message=empty&extra=" . $empty_check);
 					}
@@ -211,7 +211,7 @@ else
 					else if (strlen($title) < 4)
 					{
 						$_SESSION['atitle'] = $title;
-						$_SESSION['atext'] = $message;
+						$_SESSION['atext'] = $text;
 
 						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error&message=shorttitle");
 					}
@@ -235,7 +235,7 @@ else
 						}
 
 						// add the topic
-						$db->sqlquery("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($_POST['category'], $author, $title, $message, core::$date, core::$date, $author, $approved));
+						$db->sqlquery("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($_POST['category'], $author, $title, $text, core::$date, core::$date, $author, $approved));
 						$topic_id = $db->grab_id();
 
 						// update forums post counter and last post info
@@ -277,7 +277,7 @@ else
 									else
 									{
 										$_SESSION['atitle'] = $title;
-										$_SESSION['atext'] = $message;
+										$_SESSION['atext'] = $text;
 
 										header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&message=more_poll_options");
 										die();

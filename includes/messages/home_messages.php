@@ -24,7 +24,7 @@ return [
 	],
 	"banned" =>
 	[
-		"text" => "You were banned, most likely for spamming!",
+		"text" => "You were banned, possibly from spam detection or for breaking our rules!",
 		"error" => 1
 	],
 	"spam" => 

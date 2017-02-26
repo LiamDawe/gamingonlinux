@@ -212,9 +212,8 @@ else if (isset($_POST['action']))
 
 		else
 		{
-			$_SESSION['login_error'] = $user->message;
 			$_SESSION['login_error_username'] = $_POST['username'];
-			header("Location: /index.php?module=login&message=error");
+			header("Location: /index.php?module=login&message=" . $user->message);
 		}
 	}
 	

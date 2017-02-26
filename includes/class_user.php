@@ -95,19 +95,19 @@ class user
 
 				else
 				{
-					$this->message = "Password probably didn't match!";
+					$this->message = "password_match";
 					return false;
 				}
 			}
 			else
 			{
-				$this->message = "Couldn't find username!";
+				$this->message = "bad_username";
 				return false;
 			}
 		}
 		else
 		{
-			$this->message = "You need to enter a password!";
+			$this->message = "no_password";
 			return false;			
 		}
 	}

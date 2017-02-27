@@ -127,14 +127,19 @@ while ($listing = $db->fetch())
         $templating->block('day', 'calendar');
         $templating->set('group_date', $listing['date']);
         
+		// if the date is today
+		$today_anchor = '';
+		$today_css = '';
+		$today_text = '';
         if ($listing['date'] == date('Y-m-d'))
         {
-			$templating->set('today', '<a class="anchor" id="today"></a>');
+			$today_anchor = '<a class="anchor" id="today"></a>';
+			$today_css = 'id="calendar_today"';
+			$today_text = '<span class="badge green">Releasing Today!</span> ';
 		}
-		else
-		{
-			$templating->set('today', '');
-		}
+		$templating->set('today_anchor', $today_anchor);
+		$templating->set('today_css', $today_css);
+		$templating->set('today_text', $today_text);
 	}
     
 	$get_date = date_parse($listing['date']);
@@ -153,13 +158,7 @@ while ($listing = $db->fetch())
 	}
 	$templating->set('dlc', $dlc);
 
-	$today = '';
-	if ($get_date['day'] == date('d') && $get_date['month'] == date('m'))
-	{
-		$today = '<span class="badge green">Releasing Today!</span> ';
-	}
-
-	$game_name = $today . '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
+	$game_name = '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
 
 	$templating->set('name', $game_name);
 		

@@ -17,7 +17,7 @@ for ($i = 1; $i <= $article_total; $i++)
 {
   // generate the article
   $title = 'This is a test title from the make articles tool ' . $i;
-  $slug = $core->nice_title($title);
+  $slug = core::nice_title($title);
   $tagline = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.";
   $text = "Lorem Ipsum is simply [u]dummy text[/u] of the printing and [i]typesetting industry[/i]. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more [b]recently with desktop publishing software[/b] like Aldus PageMaker including versions of Lorem Ipsum.";
 

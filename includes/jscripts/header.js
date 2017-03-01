@@ -209,15 +209,24 @@ jQuery(document).ready(function()
   // detect if there's a # in the url
   if(window.location.hash)
   {
+	var hash = window.location.hash.substring(1);
+	
     var current_module = getUrlParameter('module');
     // if it isn't set, it's likely we're using apache rewrite urls, check there too
     if (typeof current_module === 'undefined')
     {
-      var current_module = document.location.pathname.match(/[^\/]+$/)[0];
+		to_check = {"users/statistics": 'statistics'};
+		$.each(to_check, function(index, value) 
+		{
+			if (window.location.href.indexOf(index) > -1)
+			{
+				var current_module = value;
+			}
+		});
     }
-    var hash = window.location.hash.substring(1);
+    
     // if it's the stats page, show them the stats they want
-    if (current_module == 'statistics')
+    if (typeof current_module !== 'undefined' && current_module == 'statistics')
     {
       if (hash == 'trends')
       {

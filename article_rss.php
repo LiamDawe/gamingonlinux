@@ -58,8 +58,12 @@ if (core::config('articles_rss') == 1)
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();
 
-	$db->sqlquery("SELECT a.*, u.username
-	FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id $sql_join
+	$db->sqlquery("SELECT a.*, t.`filename` as `gallery_tagline_filename`, u.username
+	FROM `articles` a 
+	LEFT JOIN
+		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` 
+	LEFT JOIN 
+		`users` u ON a.author_id = u.user_id $sql_join
 	WHERE a.`active` = 1 $sql_addition
 	ORDER BY a.`date` DESC
 	LIMIT 15");
@@ -106,9 +110,9 @@ if (core::config('articles_rss') == 1)
 		{
 			$tagline_bbcode  = $line['tagline_image'];
 		}
-		if (!empty($article['gallery_tagline']))
+		if (!empty($line['gallery_tagline']))
 		{
-			$tagline_bbcode = $article['gallery_tagline_filename'];
+			$tagline_bbcode = $line['gallery_tagline_filename'];
 			$bbcode_tagline_gallery = 1;
 		}
 

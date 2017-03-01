@@ -42,7 +42,7 @@ $text .= "<br />All of this is possible thanks to <a href=\"http://patreon.com/l
 
 $text .= "<br />What was your favourite Linux Gaming news from $prevdate?";
 
-$slug = $core->nice_title($title);
+$slug = core::nice_title($title);
 
 $db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'monthlyoverview.png', `active` = 0, `admin_review` = 1", array(core::$date, $title, $slug, $tagline, $text));
 

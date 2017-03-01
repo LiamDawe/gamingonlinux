@@ -7,7 +7,26 @@ $templating->merge('comments_latest');
 $templating->block('list');
 
 $comment_posts = '';
-$db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, c.`comment_text`, c.guest_username, a.`title`, a.comment_count, a.active, u.username, u.user_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id LEFT JOIN users u ON u.user_id = c.author_id WHERE a.active = 1 ORDER BY `comment_id` DESC limit 20");
+$db->sqlquery("SELECT 
+	comment_id, 
+	c.`article_id`, 
+	c.`time_posted`, 
+	c.`comment_text`, 
+	c.guest_username, 
+	a.`title`, 
+	a.`slug`,
+	a.comment_count, 
+	a.active, 
+	u.username, 
+	u.user_id 
+FROM 
+	`articles_comments` c 
+INNER JOIN 
+	`articles` a ON c.article_id = a.article_id 
+LEFT JOIN 
+	users u ON u.user_id = c.author_id 
+WHERE 
+	a.active = 1 ORDER BY `comment_id` DESC limit 20");
 while ($comments = $db->fetch())
 {
 	$date = $core->format_date($comments['time_posted']);
@@ -40,9 +59,11 @@ while ($comments = $db->fetch())
 	{
 		$username = "<a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a>";
 	}
+	
+	$article_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#r' . $comments['comment_id']);
 
 	$comment_posts .= "<li class=\"list-group-item\">
-	<a href=\"/articles/{core::nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#{$comments['comment_id']}\">{$title}</a><br />
+	<a href=\"".$article_link."\">{$title}</a><br />
 	$text<br />
 	<small>by {$username} {$date}</small>
 </li>";

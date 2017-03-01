@@ -160,13 +160,26 @@ $(function(){
 });
 jQuery(document).ready(function()
 {
-	$(".game_options_select").change(function() {
+	$("#game-options").change(function() 
+	{
 		var all_fields = [];
-		
 		$("#games_options option:selected").each(function() {
 			all_fields.push($(this).parent().attr("name") + '=' + $(this).val());
         });
-		
+				
+		$('input[type="checkbox"]').each(function(i)
+		{
+			var data = {};
+			if(this.checked)
+			{
+				if(!data.hasOwnProperty(this.name))
+				{
+					data[this.name] = [];
+				}
+				all_fields.push($(this).attr("name") + '=' + $(this).val());
+			}
+		});
+
 		$(location).attr('href', 'index.php?module=game&view=all&' + all_fields.join('&'));
 	});
   

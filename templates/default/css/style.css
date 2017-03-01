@@ -1525,3 +1525,7 @@ a.anchor {
     visibility: hidden;
 }
 #calendar_today {background-color: #005880; color: white;}
+.scrollbox {
+  height:100px;
+  overflow:auto;
+}

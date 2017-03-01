@@ -39,11 +39,17 @@ if (isset($_GET['view']))
 		}
 		
 		$genre = '';
-		if (isset($_GET['genre']) && core::is_number($_GET['genre']))
+		if (isset($_GET['genre']) && is_array($_GET['genre']))
 		{
-			$sql_replace[] = (int) $_GET['genre'];
+			$sql_values = [];
+			foreach ($_GET['genre'] as $genre)
+			{
+				$sql_values[] = '?';
+				$sql_replace[] = (int) $genre;
+			}
+			
 			$inner_join = ' INNER JOIN `game_genres_reference` r ON r.game_id = c.id ';
-			$sql_where .= ' AND r.`genre_id` = ? ';
+			$sql_where .= ' AND r.`genre_id` IN ('.implode(',',$sql_values).') ';
 		}
 		
 		$get_total = $db->sqlquery("SELECT count(c.id) AS `total` FROM `calendar` c $inner_join $sql_where", $sql_replace);

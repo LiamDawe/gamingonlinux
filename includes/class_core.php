@@ -1268,16 +1268,15 @@ class core
 		global $db;
 		
 		// sort out genre tags
-		$genre_list = '<option value="" selected></option>';
 		$grab_genres = $db->sqlquery("SELECT `id`, `name` FROM `game_genres` ORDER BY `name` ASC");
 		while ($genres = $grab_genres->fetch())
 		{
 			$selected = '';
-			if (isset($_GET['genre']) && self::is_number($_GET['genre']) && $_GET['genre'] == $genres['id'])
+			if (isset($_GET['genre']) && is_array($_GET['genre']) && in_array($genres['id'], $_GET['genre']))
 			{
-				$selected = 'selected';
+				$selected = 'checked';
 			}
-			$genre_list .= '<option value="'.$genres['id'].'" '.$selected.'>'.$genres['name'].'</option>';
+			$genre_list .= '<label><input class="ays-ignore" name="genre[]" type="checkbox" value="'.$genres['id'].'" '.$selected.'> '.$genres['name'].'</label>';
 		}	
 		return $genre_list;
 	}

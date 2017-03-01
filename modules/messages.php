@@ -28,12 +28,19 @@ else
 
 		if (core::config('pretty_urls') == 1)
 		{
-			$compose_link = '/private-messages/compose/';
+			$compose_link = core::config('website_url') . 'private-messages/compose/';
+			$view_all = core::config('website_url') . 'private-messages/';
 		}
-		else {
+		else 
+		{
 			$compose_link = core::config('website_url') . "index.php?module=messages&view=compose";
+			$view_all = core::config('website_url') . 'index.php?module=messages';
 		}
 		$templating->set('compose_link', $compose_link);
+		$templating->set('view_all', $view_all);
+		
+		$templating->block('search');
+		$templating->set('search_term', '');
 
 		// count them for pagination
 		$db->sqlquery("SELECT i.`conversation_id` FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id` WHERE i.`owner_id` = ?", array($_SESSION['user_id']));
@@ -504,6 +511,100 @@ else
 
 		$templating->block('compose_bottom', 'private_messages');
 		$templating->block('preview', 'private_messages');
+	}
+	
+	if (isset($_POST['act']) && $_POST['act'] == 'search_title')
+	{
+		$templating->block('top');
+		
+		if (core::config('pretty_urls') == 1)
+		{
+			$compose_link = core::config('website_url') . 'private-messages/compose/';
+			$view_all = core::config('website_url') . 'private-messages/';
+		}
+		else 
+		{
+			$compose_link = core::config('website_url') . "index.php?module=messages&view=compose";
+			$view_all = core::config('website_url') . 'index.php?module=messages';
+		}
+		$templating->set('compose_link', $compose_link);
+		$templating->set('view_all', $view_all);
+		
+		$title = core::make_safe($_POST['search_title']);
+		
+		$templating->block('search');
+		$templating->set('search_term', $title);
+		
+		$db->sqlquery("SELECT
+			i.`conversation_id`,
+			i.`title`,
+			i.`creation_date`,
+			i.`replies`,
+			i.`last_reply_date`,
+			i.`owner_id`,
+			u.`username`,
+			u.`user_id`,
+			u2.`username` as last_username,
+			u2.`user_id` as last_user_id,
+			p.`unread`
+		FROM
+			`user_conversations_info` i
+		INNER JOIN
+			`users` u ON u.`user_id` = i.`author_id`
+		INNER JOIN
+			user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id`
+		LEFT JOIN
+			`users` u2 ON u2.`user_id` = i.`last_reply_id`
+		WHERE
+			i.`owner_id` = ?
+		AND 
+			i.`title` LIKE ?
+		ORDER BY
+			i.`last_reply_date` DESC", array($_SESSION['user_id'], '%' . $title . '%'));
+		$total_found = $db->num_rows();
+		if ($total_found > 0)
+		{
+			while ($search = $db->fetch())
+			{
+				$templating->block('message_row');
+
+				if (core::config('pretty_urls') == 1)
+				{
+					$pm_url = "/private-messages/{$search['conversation_id']}/";
+				}
+				else 
+				{
+					$pm_url = core::config('website_url') . "index.php?module=messages&view=message&id={$search['conversation_id']}";
+				}
+
+				$templating->set('pm_url', $pm_url);
+
+				$unread = '';
+				$new_bg = '';
+				$mail_icon ='<span class="icon envelope-open"></span> ';
+				if ($search['unread'] == 1)
+				{
+					$unread = 'class="strong"';
+					$new_bg = 'new-message-bg';
+					$mail_icon = '<span class="icon envelope"></span> ';
+
+				}
+				$templating->set('new_message_bolding', $unread);
+				$templating->set('new_message_bg', $new_bg);
+				$templating->set('mail_icon', $mail_icon);
+
+				$templating->set('title', $search['title']);
+				$templating->set('reply_count', $search['replies']);
+				$templating->set('last_reply_date', $core->format_date($search['last_reply_date']));
+				$templating->set('author', "<a href=\"/profiles/{$search['user_id']}/\">{$search['username']}</a>");
+				$templating->set('creation_date', $core->format_date($search['creation_date']));
+				$templating->set('last_reply_username', "<a href=\"/profiles/{$search['last_user_id']}/\">{$search['last_username']}</a>");
+			}
+		}
+		else
+		{
+			$core->message('Nothing was found with those search terms.');
+		}
 	}
 
 	if (isset($_POST['act']) && $_POST['act'] == 'New')

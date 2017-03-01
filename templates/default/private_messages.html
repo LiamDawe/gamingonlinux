@@ -1,9 +1,15 @@
 [block: top]
 <div class="box">
 	<div class="head">Your private messages</div>
-	<div class="body group"><a href="{:compose_link}">Compose New PM</a></div>
+	<div class="body group"><a href="{:view_all}">View all</a> | <a href="{:compose_link}">Compose New PM</a></div>
 </div>
 [/block: top]
+
+[block: search]
+<div class="box">
+	<div class="body group"><form method="post" action="/index.php?module=messages"><span class="col-8"><input type="text" name="search_title" placeholder="Search by message title..." value="{:search_term}" /><br /> </span><span class="col-4"><button type="submit" name="act" value="search_title" style="display: inline; float: right;">Search</button></span></form></div>
+</div>
+[/block: search]
 
 [block: message_row]
 <div class="box {:new_message_bg}">

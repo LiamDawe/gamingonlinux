@@ -95,19 +95,19 @@ class user
 
 				else
 				{
-					$this->message = "password_match";
+					$_SESSION['message'] = "password_match";
 					return false;
 				}
 			}
 			else
 			{
-				$this->message = "bad_username";
+				$_SESSION['message'] = "bad_username";
 				return false;
 			}
 		}
 		else
 		{
-			$this->message = "no_password";
+			$_SESSION['message'] = "no_password";
 			return false;			
 		}
 	}

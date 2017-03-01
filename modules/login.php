@@ -10,11 +10,6 @@ if (!isset($_POST['action']))
 	{
 		if ($_SESSION['user_id'] == 0)
 		{
-			if (isset($_GET['message']) && $_GET['message'] == 'error' && isset($_SESSION['login_error']))
-			{
-				$core->message($_SESSION['login_error'], NULL, 1);
-			}
-
 			$templating->block('main', 'login');
 
 			$username = '';
@@ -179,12 +174,12 @@ else if (isset($_POST['action']))
 			{
 				if (isset($url['query']))
 				{
-					if ($url['query'] == 'module=login' || $url['query'] == 'module=login&message=error' || $url['query'] == 'module=register' || $url['query'] == 'module=register&twitter_new')
+					if ($url['query'] == 'module=login' || $url['query'] == 'module=register' || $url['query'] == 'module=register&twitter_new')
 					{
 						header("Location: index.php");
 					}
 
-					else if ($url['query'] != 'module=login' && $url['query'] != 'module=login&message=error' && $url['query'] != 'module=register' && $url['query'] != 'module=register&twitter_new')
+					else if ($url['query'] != 'module=login' && $url['query'] != 'module=register' && $url['query'] != 'module=register&twitter_new')
 					{
 						header("Location: {$_SERVER['HTTP_REFERER']}");
 					}
@@ -213,7 +208,7 @@ else if (isset($_POST['action']))
 		else
 		{
 			$_SESSION['login_error_username'] = $_POST['username'];
-			header("Location: /index.php?module=login&message=" . $user->message);
+			header("Location: /index.php?module=login");
 		}
 	}
 	

@@ -286,7 +286,7 @@ else if (isset($_GET['aid']))
 	{
 		$templating->set('title', htmlentities($article['title'], ENT_QUOTES));
 		$templating->set('tagline', $article['tagline']);
-		$templating->set('slug', $core->nice_title($article['title']));
+		$templating->set('slug', core::nice_title($article['title']));
 	}
 
 	$tagline_image = $article_class->display_tagline_image($article);
@@ -343,7 +343,7 @@ if (isset($_POST['act']))
 			// get article name for the email and redirect
 			$db->sqlquery("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']), 'articles_full.php');
 			$title = $db->fetch();
-			$title_nice = $core->nice_title($title['title']);
+			$title_nice = core::nice_title($title['title']);
 
 			$page = 1;
 			if ($title['comment_count'] > 9)

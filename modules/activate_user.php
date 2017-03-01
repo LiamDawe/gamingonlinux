@@ -14,8 +14,8 @@ if (!isset($_GET['redo']))
 			$db->sqlquery("UPDATE `users` SET `activated` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['activated'] = 1;
-
-			header("Location: /index.php?module=home&message=activated");
+			$_SESSION['message'] = 'activated';
+			header("Location: /index.php?module=home");
 		}
 	}
 }

@@ -21,38 +21,41 @@ if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION
 				$db->sqlquery("DELETE FROM `likes` WHERE `user_id` = ?", array($_SESSION['user_id']));
 				$db->sqlquery("DELETE FROM `article_likes` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
+				$_SESSION['message'] = 'unliked';
 				if (core::config('pretty_urls') == 1)
 				{
-					header("Location: home/message=unliked");
+					header("Location: " . core::config('website_url') . 'home/');
 				}
 				else
 				{
-					header("Location: /index.php?module=home&message=unliked");
+					header("Location: " . core::config('website_url') . 'index.php?module=home');
 				}
 		}
 
 		else
 		{
+			$_SESSION['message'] = 'cannotunlike';
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: home/message=cannotunlike");
+				header("Location: " . core::config('website_url') . 'home/');
 			}
 			else
 			{
-				header("Location: /index.php?module=home&message=cannotunlike");
+				header("Location: " . core::config('website_url') . 'index.php?module=home');
 			}
 		}
 	}
 }
 else
 {
+	$_SESSION['message'] = 'cannotunlike';
 	if (core::config('pretty_urls') == 1)
 	{
-		header("Location: home/message=cannotunlike");
+		header("Location: " . core::config('website_url') . 'home/');
 	}
 	else
 	{
-		header("Location: /index.php?module=home&message=cannotunlike");
+		header("Location: /index.php?module=home");
 	}
 }
 ?>

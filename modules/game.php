@@ -128,7 +128,9 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 {
 	if (!core::is_number($_GET['game-id']))
 	{
-		header("Location: /index.php?module=game&message=no_id&extra=game");
+		$_SESSION['message'] = 'no_id';
+		$_SESSION['message_extra'] = 'game id';
+		header("Location: /index.php?module=game");
 		die();
 	}
 

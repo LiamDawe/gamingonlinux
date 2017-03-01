@@ -20,7 +20,7 @@ if (isset($_SESSION['per-page']))
 }
 
 $comment_posts = '';
-$db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, a.`title`, a.`comment_count`, a.`active` FROM `articles_comments` c INNER JOIN `articles` a ON c.`article_id` = a.`article_id` WHERE a.`active` = 1 ORDER BY `comment_id` DESC limit 5");
+$db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.`comment_count`, a.`active` FROM `articles_comments` c INNER JOIN `articles` a ON c.`article_id` = a.`article_id` WHERE a.`active` = 1 ORDER BY `comment_id` DESC limit 5");
 while ($comments = $db->fetch())
 {
 	$date = $core->format_date($comments['time_posted']);
@@ -41,9 +41,11 @@ while ($comments = $db->fetch())
 	{
 		$page = ceil($comments['comment_count'] / $comments_per_page);
 	}
+	
+	$article_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#' . $comments['comment_id']);
 
 	$comment_posts .= "<li class=\"list-group-item\">
-	<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#{$comments['comment_id']}\">{$title}</a><br />
+	<a href=\"{$article_link}\">{$title}</a><br />
 	<small>{$date}</small>
 </li>";
 }

@@ -39,7 +39,7 @@ foreach ($articles as $line)
 {
 	// make date human readable
 	$date = date("D, d M Y H:i:s O", $line['date']);
-	$nice_title = $core->nice_title($line['title']); // ~~ Piratelv @ 28/08/13
+	$nice_title = core::nice_title($line['title']); // ~~ Piratelv @ 28/08/13
 
 	$title = str_replace("&#039;", '\'', $line['title']);
 	$title = str_replace("&", "&amp;", $title);

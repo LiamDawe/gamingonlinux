@@ -6,6 +6,20 @@ $templating->merge('forum_search');
 $templating->block('top');
 $templating->set('url', core::config('website_url'));
 
+$search_sql = '';
+if (isset($_GET['forums']) && $_GET['forums'] != 'all')
+{
+	if ( (!isset($_GET['forums']) || empty($_GET['forums'])) || (isset($_GET['forums']) && !core::is_number($_GET['forums'])) )
+	{
+		$_SESSION['message'] = 'no_id';
+		$_SESSION['message_extra'] = 'forum';
+		header("Location: /index.php?module=search_forum&q=".$_GET['q']);
+		die();
+	}
+	$forum_id = (int) $_GET['forums'];
+	$search_sql = ' AND t.`forum_id` IN ('.$forum_id.')';
+}
+
 $db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 0 ORDER BY `name` ASC");
 $options = '';
 while ($forum_list = $db->fetch())
@@ -32,16 +46,6 @@ $templating->set('search_text', $search_text);
 
 if (isset($search_text) && !empty($search_text))
 {
-	$search_sql = '';
-	if ($_GET['forums'] != 'all')
-	{
-		if ( (!isset($_GET['forums']) || empty($_GET['forums'])) || (isset($_GET['forums']) && !core::is_number($_GET['forums'])) )
-		{
-			header("Location: /index.php?module=search_forum&message=no_id&extra=forum");
-			die();
-		}
-		$search_sql = ' AND t.`forum_id` IN ('.$_GET['forums'].')';
-	}
 	if (!isset($_GET['strict']))
 	{
 		// do the search query
@@ -95,8 +99,7 @@ if (isset($search_text) && !empty($search_text))
 	}
 	else
 	{
-		header("Location: /index.php?module=search_forum&message=none_found&extra=posts");
-		die();
+		$core->message('Nothing was found with those search terms.');
 	}
 }
 ?>

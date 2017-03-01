@@ -50,7 +50,7 @@ $pagination = $core->pagination_link(9, $total_pages, "admin.php?module=correcti
         $username = "<a href=\"/profiles/{$corrections['user_id']}\">{$corrections['username']}</a>";
       }
 
-      $nice_title = $core->nice_title($corrections['title']);
+      $nice_title = core::nice_title($corrections['title']);
 
       if (core::config('pretty_urls') == 1)
       {

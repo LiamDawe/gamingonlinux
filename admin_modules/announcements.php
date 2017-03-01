@@ -3,29 +3,6 @@ $templating->merge('admin_modules/admin_module_announcements');
 
 if (isset($_GET['view']))
 {
-	if (isset($_GET['message']))
-	{
-		if ($_GET['message'] == 'added')
-		{
-			$core->message("That announcement has now been added!");
-		}
-		if ($_GET['message'] == 'deleted')
-		{
-			$core->message("That announcement has now been deleted!");
-		}
-		if ($_GET['message'] == 'updated')
-		{
-			$core->message("That announcement has now been updated!");
-		}
-		if ($_GET['message'] == 'empty')
-		{
-			$core->message("You cannot leave it empty!", NULL, 1);
-		}
-		if ($_GET['message'] == 'id')
-		{
-			$core->message("The ID cannot be empty or not a number, this is likely a bug, tell Liam!", NULL, 1);
-		}
-	}
 	if ($_GET['view'] == 'manage')
 	{
 		$templating->block('add', 'admin_modules/admin_module_announcements');
@@ -47,7 +24,8 @@ if (isset($_GET['view']))
 				$templating->set('id', $announce['id']);
 			}
 		}
-		else {
+		else 
+		{
 			$core->message('No announcements found!');
 		}
 	}
@@ -60,29 +38,31 @@ if (isset($_POST['act']))
 		$text = trim($_POST['text']);
 		if (empty($text))
 		{
-			header("Location: /admin.php?module=announcements&view=manage&message=empty");
+			header("Location: /admin.php?module=announcements&view=manage&message=empty&message=text");
 			die();
 		}
 
 		$db->sqlquery("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?", array($text, $_SESSION['user_id']));
-		header("Location: /admin.php?module=announcements&view=manage&message=added");
+		header("Location: /admin.php?module=announcements&view=manage&message=saved&extra=announcement");
 	}
 	if ($_POST['act'] == 'edit')
 	{
 		$text = trim($_POST['text']);
+		$id = (int) $_POST['id'];
+		
 		if (empty($text))
 		{
-			header("Location: /admin.php?module=announcements&view=manage&message=empty");
+			header("Location: /admin.php?module=announcements&view=manage&message=empty&extra=text");
 			die();
 		}
-		if (empty($_POST['id']) || !is_numeric($_POST['id']))
+		if (empty($id) || !is_numeric($id))
 		{
-			header("Location: /admin.php?module=announcements&view=manage&message=id");
+			header("Location: /admin.php?module=announcements&view=manage&message=empty&extra=id");
 			die();
 		}
 
 		$db->sqlquery("UPDATE `announcements` SET `text` = ? WHERE `id` = ?", array($text, $_POST['id']));
-		header("Location: /admin.php?module=announcements&view=manage&message=updated");
+		header("Location: /admin.php?module=announcements&view=manage&message=edited&extra=announcement");
 	}
 
 	if ($_POST['act'] == 'delete')
@@ -98,7 +78,7 @@ if (isset($_POST['act']))
 		else if (isset($_POST['yes']))
 		{
 			$db->sqlquery("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
-			header("Location: /admin.php?module=announcements&view=manage&message=deleted");
+			header("Location: /admin.php?module=announcements&view=manage&message=deleted&extra=announcement");
 		}
 	}
 }

@@ -6,7 +6,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	$title = strip_tags($_POST['title']);
 	$tagline = trim($_POST['tagline']);
 	$text = trim($_POST['text']);
-	$slug = $core->nice_title($_POST['slug']);
+	$slug = core::nice_title($_POST['slug']);
 
 	$article_class->gallery_tagline($grab_author);
 

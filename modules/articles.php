@@ -25,7 +25,9 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 		{
 			if (!is_array($_GET['catid']))
 			{
-				header("Location: /index.php?module=articles&view=cat&message=none_found&extra=categories");
+				$_SESSION['message'] = 'none_found';
+				$_SESSION['message_extra'] = 'categories';
+				header("Location: /index.php?module=articles&view=cat");
 				die();
 			}
 			$categorys_ids = $_GET['catid'];
@@ -42,7 +44,9 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 			$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `category_name` = ?", array($safe_category));
 			if ($db->num_rows() == 0)
 			{
-				header("Location: /index.php?module=articles&view=cat&message=none_found&extra=categories");
+				$_SESSION['message'] = 'none_found';
+				$_SESSION['message_extra'] = 'categories';
+				header("Location: /index.php?module=articles&view=cat");
 				die();
 			}
 			$get_category = $db->fetch();
@@ -148,7 +152,9 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 
 		if ($total_items == 0)
 		{
-			header("Location: /index.php?module=articles&view=multiple&message=none_found&extra=articles");
+			$_SESSION['message'] = 'none_found';
+			$_SESSION['message_extra'] = 'articles';
+			header("Location: /index.php?module=articles&view=multiple");
 			die();
 		}
 
@@ -326,6 +332,8 @@ if (isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multipl
 }
 else 
 {
-	header("Location: /index.php?module=search&message=empty&extra=view");
+	$_SESSION['message'] = 'empty';
+	$_SESSION['message_extra'] = 'category';
+	header("Location: /index.php?module=search");
 	die();
 }

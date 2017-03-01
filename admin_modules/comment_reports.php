@@ -81,7 +81,7 @@ if (!isset($_GET['ip_id']))
       $templating->set('reported_by', "<a href=\"/profiles/{$comments['spam_report_by']}\">{$comments['reported_by_username']}</a>");
       $templating->set('comment_id', $comments['comment_id']);
       $templating->set('article_title', $comments['title']);
-      $templating->set('article_link', $core->nice_title($comments['title']) . '.' . $comments['article_id']);
+      $templating->set('article_link', core::nice_title($comments['title']) . '.' . $comments['article_id']);
     }
 
     $templating->block('comment_reports_bottom', 'admin_modules/comment_reports');

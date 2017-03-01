@@ -72,7 +72,8 @@ if (core::config('allow_registrations') == 1)
 
 		if(!ctype_alnum(str_replace($aValid, '', $_POST['username'])))
 		{
-			header("Location: ".$redirect."message=username_characters");
+			$_SESSION['message'] = 'username_characters';
+			header("Location: ".$redirect);
 			die();
 		}
 
@@ -81,14 +82,17 @@ if (core::config('allow_registrations') == 1)
 		{
 			if (empty($_POST['password']))
 			{
-				header("Location: ".$redirect."message=empty&extra=password");
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'password';
+				header("Location: ".$redirect);
 				die();
 			}
 			
 			// check passwords match
 			if ($_POST['password'] != $_POST['verify_password'])
 			{
-				header("Location: ".$redirect."message=password_match");
+				$_SESSION['message'] = 'password_match';
+				header("Location: ".$redirect);
 				die();
 			}
 			$safe_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
@@ -102,7 +106,9 @@ if (core::config('allow_registrations') == 1)
 		// all registrations need a username and email
 		if ($check_empty !== true)
 		{
-			header("Location: ".$redirect."message=empty&extra=".$check_empty);
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $check_empty;
+			header("Location: ".$redirect);
 			die();
 		}
 
@@ -131,7 +137,8 @@ if (core::config('allow_registrations') == 1)
 				$db->sqlquery("SELECT `username` FROM `users` WHERE `username` = ?", array($_POST['username']));
 				if ($db->fetch())
 				{
-					header("Location: ".$redirect."message=username_taken");
+					$_SESSION['message'] = 'username_taken';
+					header("Location: ".$redirect);
 					die();
 				}
 
@@ -139,13 +146,16 @@ if (core::config('allow_registrations') == 1)
 				$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['uemail']));
 				if ($db->fetch())
 				{
+					$_SESSION['message'] = 'email_taken';
+					
 					if (core::config('pretty_urls') == 1)
 					{
-						header("Location: ".$redirect."message=email_taken");
+						
+						header("Location: ".$redirect);
 					}
 					else
 					{
-						header("Location: ".$redirect."message=email_taken");
+						header("Location: ".$redirect);
 					}
 					die();
 				}

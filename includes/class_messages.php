@@ -16,8 +16,10 @@ class message_map
 		}
 	}
 
-	public function get_message($file = NULL, $key, $extras = NULL)
+	public function display_message($file = NULL, $key, $extras = NULL)
 	{
+		global $templating;
+		
 		if ($file != NULL)
 		{
 			$module_file = 'includes/messages/' . $file . '_messages.php';
@@ -33,7 +35,7 @@ class message_map
 			$extras_output = '';
 			if ((isset($this->messages[$key]['additions']) && $this->messages[$key]['additions'] == 1) && $extras != NULL)
 			{
-				$extras_output = htmlspecialchars($extras);
+				$extras_output = $extras;
 			}
 		
 			$error = 0;
@@ -42,12 +44,30 @@ class message_map
 				$error = $this->messages[$key]['error'];
 			}
 	
-			return ["message" => sprintf($this->messages[$key]['text'], $extras_output), "error" => $error];
+			$stored_message = sprintf($this->messages[$key]['text'], $extras_output);
 		}
 		else
 		{
-			return 'We tried to give a message with the key "'.$key.'" but we couldn\'t find that message.';
+			$error = 1;
+			$stored_message = 'We tried to give a message with the key "'.$key.'" but we couldn\'t find that message.';
 		}
+
+		$templating->merge('messages');
+
+		if ($error == 0)
+		{
+			$templating->block('message');
+		}
+
+		else if ($error == 1)
+		{
+			$templating->block('errormessage');
+		}
+
+		$templating->set('message', $stored_message);
+		
+		unset($_SESSION['message']);
+		unset($_SESSION['message_extra']);
 	}
 }
 

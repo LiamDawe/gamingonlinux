@@ -112,7 +112,7 @@ if (!isset($_GET['view']))
 			{
 				$get_title = $db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($tracking['data']));
 				$title = $get_title->fetch();
-				$link = str_replace('{:title}', $core->nice_title($title['title']), $link);
+				$link = str_replace('{:title}', core::nice_title($title['title']), $link);
 			}
 
 			// replace id numbers

@@ -42,12 +42,10 @@ while ($comments = $db->fetch())
 	}
 
 	$comment_posts .= "<li class=\"list-group-item\">
-	<a href=\"/articles/{$core->nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#{$comments['comment_id']}\">{$title}</a><br />
+	<a href=\"/articles/{core::nice_title($comments['title'])}.{$comments['article_id']}/page={$page}#{$comments['comment_id']}\">{$title}</a><br />
 	$text<br />
 	<small>by {$username} {$date}</small>
 </li>";
-
-
 }
 
 $templating->set('comment_posts', $comment_posts);

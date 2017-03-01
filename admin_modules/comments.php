@@ -289,7 +289,7 @@ if (isset($_POST['act']))
 			// get article name for the email and redirect
 			$db->sqlquery("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']), 'articles_full.php');
 			$title = $db->fetch();
-			$title_nice = $core->nice_title($title['title']);
+			$title_nice = core::nice_title($title['title']);
 
 			$page = 1;
 			if ($title['comment_count'] > 9)
@@ -417,7 +417,7 @@ if (isset($_POST['act']))
 		// check if author or editor/admin
 		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
 		{
-			$nice_title = $core->nice_title($comment['title']);
+			$nice_title = core::nice_title($comment['title']);
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 		}
 
@@ -438,7 +438,7 @@ if (isset($_POST['act']))
 
 				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ? WHERE `comment_id` = ?", array($comment_text, $_POST['comment_id']));
 
-				$nice_title = $core->nice_title($comment['title']);
+				$nice_title = core::nice_title($comment['title']);
 
 				if (core::config('pretty_urls') == 1)
 				{

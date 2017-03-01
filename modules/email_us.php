@@ -14,9 +14,18 @@ if (isset($_POST['act']))
 	{
 		$_SESSION['aname'] = $_POST['name'];
 		$_SESSION['aemail'] = $_POST['email'];
-		$_SESSION['amessage'] = $_POST['message'];
+		$_SESSION['atext'] = $_POST['message'];
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'email text';
 
-		header('Location: /email-us/message=empty&extra=message');
+		if (core::config('pretty_urls') == 1)
+		{
+			header('Location: /email-us/');
+		}
+		else
+		{
+			header('Location: /index.php?module=email_us');
+		}
 	}
 
 	else
@@ -34,7 +43,19 @@ if (isset($_POST['act']))
 
 		if ($parray['contact_captcha'] == 1 && !$res['success'])
 		{
-			$core->message("You need to complete the captcha to prove you are human and not a bot!", NULL, 1);
+			$_SESSION['aname'] = $_POST['name'];
+			$_SESSION['aemail'] = $_POST['email'];
+			$_SESSION['atext'] = $_POST['message'];
+			$_SESSION['message'] = 'captcha';
+			
+			if (core::config('pretty_urls') == 1)
+			{
+				header('Location: /email-us/');
+			}
+			else
+			{
+				header('Location: /index.php?module=email_us');
+			}
 		}
 
 		else if (($parray['contact_captcha'] == 1 && $res['success']) || $parray['contact_captcha'] == 0)
@@ -76,7 +97,7 @@ if (isset($_POST['act']))
 				
 				unset($_SESSION['aname']);
 				unset($_SESSION['aemail']);
-				unset($_SESSION['amessage']);
+				unset($_SESSION['atext']);
 				$core->message("Thank you for emailing us, we try to get back to you as soon as possible if needed!");
 			}
 		}
@@ -97,11 +118,11 @@ if (($_SESSION['user_id'] != 0) && (!isset($_GET['message']) || isset($_GET['mes
 	$email = $get_email['email'];
 }
 
-if (isset($_GET['message']) && $_GET['message'] == 'empty')
+if (isset($_SESSION['message']) && $_SESSION['message'] == 'empty')
 {
 	$name = $_SESSION['aname'];
 	$email = $_SESSION['aemail'];
-	$message = $_SESSION['amessage'];
+	$message = $_SESSION['atext'];
 }
 
 $templating->block('main', 'email_us');

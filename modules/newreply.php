@@ -29,13 +29,15 @@ if (core::config('forum_posting_open') == 1)
 		{
 			if ($name['is_locked'] == 1 && $user->check_group([1,2]) == false)
 			{
+				$_SESSION['message'] = 'locked';
+				$_SESSION['message_extra'] = 'forum post';
 				if (core::config('pretty_urls') == 1)
 				{
-					$redirect = '/forum/topic/'.$topic_id.'/message=locked';
+					$redirect = '/forum/topic/'.$topic_id.'/';
 				}
 				else
 				{
-					$redirect = '/index.php?module=viewtopic&topic_id='.$topic_id.'&message=locked';
+					$redirect = '/index.php?module=viewtopic&topic_id='.$topic_id;
 				}
 				header("Location: ".$redirect."");
 				die();
@@ -49,13 +51,15 @@ if (core::config('forum_posting_open') == 1)
 			// check empty
 			if (empty($message))
 			{
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'text';
 				if (core::config('pretty_urls') == 1)
 				{
-					$redirect = '/forum/topic/'.$topic_id.'/message=empty&extra=message';
+					$redirect = '/forum/topic/'.$topic_id;
 				}
 				else
 				{
-					$redirect = '/index.php?module=viewtopic&topic_id='.$topic_id.'&message=empty&extra=message';
+					$redirect = '/index.php?module=viewtopic&topic_id='.$topic_id;
 				}
 				header("Location: ".$redirect."");
 				die();
@@ -240,8 +244,10 @@ if (core::config('forum_posting_open') == 1)
 					unset($message);
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue_reply'", array($_SESSION['user_id'], core::$date, $post_id));
+					
+					$_SESSION['message'] = 'mod_queue';
 
-					header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&message=mod_queue");
+					header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
 				}
 			}
 		}

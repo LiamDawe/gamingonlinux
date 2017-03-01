@@ -16,7 +16,9 @@ if (isset($_GET['q']))
 
 	if (empty($search))
 	{
-		header("Location: /index.php?module=game-search&message=empty&extra=search-term");
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'search text';
+		header("Location: /index.php?module=game-search");
 		die();
 	}
 }

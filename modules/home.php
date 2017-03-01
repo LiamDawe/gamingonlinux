@@ -203,12 +203,13 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 {
 	if (core::config('total_featured') == core::config('editor_picks_limit'))
 	{
-		header("Location: ".url."index.php?module=home&message=toomanypicks");
+		$_SESSION['message'] = 'toomanypicks';
+		header("Location: ".core::config('website_url')."index.php?module=home");
 	}
 
 	else
 	{
-		header("Location: ".url."admin.php?module=featured&view=add&article_id={$_GET['article_id']}");
+		header("Location: ".core::config('website_url')."admin.php?module=featured&view=add&article_id={$_GET['article_id']}");
 	}
 }
 
@@ -228,7 +229,8 @@ if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 
 			$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 
-			header("Location: ".url."index.php?module=home&message=unpicked");
+			$_SESSION['message'] = 'unpicked';
+			header("Location: ".core::config('website_url')."index.php?module=home");
 		}
 	}
 }

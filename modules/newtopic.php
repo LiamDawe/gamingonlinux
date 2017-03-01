@@ -38,13 +38,14 @@ else
 
 			if ($amountOfPosts['c'] > 5)
 			{
+				$_SESSION['message'] = 'toomany';
 				if (core::config('pretty_urls') == 1)
 				{
-					header("Location: /forum/message=toomany");
+					header("Location: /forum/");
 				}
 				else
 				{
-					header("Location: /index.php?module=forum&message=toomany");
+					header("Location: /index.php?module=forum");
 				}
 			}
 
@@ -204,16 +205,21 @@ else
 					{
 						$_SESSION['atitle'] = $title;
 						$_SESSION['atext'] = $text;
+						
+						$_SESSION['message'] = 'empty';
+						$_SESSION['message_extra'] = $empty_check;
 
-						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error&message=empty&extra=" . $empty_check);
+						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error");
 					}
 
 					else if (strlen($title) < 4)
 					{
 						$_SESSION['atitle'] = $title;
 						$_SESSION['atext'] = $text;
+						
+						$_SESSION['message'] = 'shorttitle';
 
-						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error&message=shorttitle");
+						header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&error");
 					}
 
 					else
@@ -278,8 +284,10 @@ else
 									{
 										$_SESSION['atitle'] = $title;
 										$_SESSION['atext'] = $text;
+										
+										$_SESSION['message'] = 'more_poll_options';
 
-										header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}&message=more_poll_options");
+										header("Location: /index.php?module=newtopic&forum_id={$_POST['category']}");
 										die();
 									}
 								}
@@ -302,7 +310,9 @@ else
 						{
 							$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue'", array($_SESSION['user_id'], core::$date, $topic_id));
 
-							header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id={$_POST['category']}&message=mod_queue");
+							$_SESSION['message'] = 'mod_queue';
+							
+							header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id={$_POST['category']}");
 						}
 					}
 				}

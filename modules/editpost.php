@@ -8,7 +8,9 @@ if (!isset($_POST['act']))
 {
 	if (!core::is_number($_GET['page']))
 	{
-		header("Location: /index.php?module=forum&message=empty&extra=page-id");
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'page id';
+		header("Location: /index.php?module=forum");
 		die();
 	}
 	
@@ -51,7 +53,18 @@ if (!isset($_POST['act']))
 		}
 		else
 		{
-			$core->message('You are not authorised to edit the topic!');
+			$_SESSION['message'] = 'not_authorized';
+			
+			if (core::config('pretty_urls') == 1)
+			{
+				$redirect = '/forum/topic/' . $topic['topic_id'];
+			}
+			else
+			{
+				$redirect = '/index.php?module=viewtopic&topic_id=' . $topic['topic_id'];
+			}
+			
+			header("Location: $redirect");
 		}
 	}
 
@@ -87,7 +100,18 @@ if (!isset($_POST['act']))
 		}
 		else
 		{
-			$core->message('You are not authorised to edit the post!');
+			$_SESSION['message'] = 'not_authorized';
+			
+			if (core::config('pretty_urls') == 1)
+			{
+				$redirect = '/forum/topic/' . $post['topic_id'];
+			}
+			else
+			{
+				$redirect = '/index.php?module=viewtopic&topic_id=' . $post['topic_id'];
+			}
+			
+			header("Location: $redirect");
 		}
 	}
 }
@@ -96,7 +120,9 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 {
 	if (!core::is_number($_POST['page']))
 	{
-		header("Location: /index.php?module=forum&message=empty&extra=page-id");
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'page id';
+		header("Location: /index.php?module=forum");
 	}
 	
 	// edit topic
@@ -125,7 +151,18 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 
 			else
 			{
-				$core->message('You are not authorised to edit the topic!');
+				$_SESSION['message'] = 'not_authorized';
+				
+				if (core::config('pretty_urls') == 1)
+				{
+					$redirect = '/forum/topic/' . $_GET['topic_id'];
+				}
+				else
+				{
+					$redirect = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
+				}
+				
+				header("Location: $redirect");
 			}
 		}
 	}
@@ -156,7 +193,18 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 
 			else
 			{
-				$core->message('You are not authorised to edit the post!');
+				$_SESSION['message'] = 'not_authorized';
+				
+				if (core::config('pretty_urls') == 1)
+				{
+					$redirect = '/forum/topic/' . $_POST['topic_id'];
+				}
+				else
+				{
+					$redirect = '/index.php?module=viewtopic&topic_id=' . $_POST['topic_id'];
+				}
+				
+				header("Location: $redirect");
 			}
 		}
 	}

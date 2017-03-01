@@ -47,7 +47,7 @@ foreach ($search_array[0] as $item)
 }
 
 // check there wasn't none found to prevent loops
-if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) || isset($_GET['message']) && $_GET['message'] != 'none_found' ) )
+if (isset($search_text) && !empty($search_text))
 {
 	// do the search query
 	$db->sqlquery("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
@@ -58,18 +58,19 @@ if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) ||
 	ORDER BY a.`date` DESC
 	LIMIT 0 , 100", array($search_through));
 	$total = $db->num_rows();
-	$found_search = $db->fetch_all_rows();
-
-	$article_id_array = array();
-
-	foreach ($found_search as $article)
-	{
-		$article_id_array[] = $article['article_id'];
-	}
-	$article_id_sql = implode(', ', $article_id_array);
 
 	if ($total > 0)
 	{
+		$found_search = $db->fetch_all_rows();
+
+		$article_id_array = array();
+
+		foreach ($found_search as $article)
+		{
+			$article_id_array[] = $article['article_id'];
+		}
+		$article_id_sql = implode(', ', $article_id_array);
+	
 		// this is required to properly count up the rank for the tags
 		$db->sqlquery("SET @rank=null, @val=null");
 
@@ -135,8 +136,7 @@ if (isset($search_text) && !empty($search_text) && ( !isset($_GET['message']) ||
 	}
 	else
 	{
-		header("Location: /index.php?module=search&q=".$search_text.'&message=none_found&extra=articles');
-		die();
+		$core->message('Nothing was found with those search terms.');
 	}
 }
 

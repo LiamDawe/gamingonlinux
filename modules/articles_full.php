@@ -89,41 +89,25 @@ if (!isset($_GET['go']))
 						$current_number = $db->fetch();
 
 						$last_page = ceil($current_number['counter']/$_SESSION['per-page']);
+						
+						$article_link = core::config('website_url') . article_class::get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
 
-						if (core::config('pretty_urls') == 1)
-						{
-							header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/page=$last_page#r{$_GET['comment_id']}");
-						}
-						else
-						{
+						header("Location: " . $article_link);
 
-							header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&page=$last_page#r{$_GET['comment_id']}");
-						}
 					}
 					else
 					{
-						if (core::config('pretty_urls') == 1)
-						{
-							header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}#r{$_GET['comment_id']}");
-						}
-						else
-						{
+						$article_link = core::config('website_url') . article_class::get_link($article['article_id'], $article['slug'], '#r' . $_GET['comment_id']);
 
-							header("Location: /index.php?module=articles_full&aid={$_GET['aid']}#r{$_GET['comment_id']}");
-						}
+						header("Location: " . $article_link);
 					}
 				}
 				else
 				{
-					if (core::config('pretty_urls') == 1)
-					{
-						header("Location: /articles/{$core->nice_title($article['title'])}.{$_GET['aid']}/message=nocomment");
-					}
-					else
-					{
+					$_SESSION['message'] = 'nocomment';
+					$article_link = core::config('website_url') . article_class::get_link($article['article_id'], $article['slug']);
 
-						header("Location: /index.php?module=articles_full&aid={$_GET['aid']}&message=nocomment");
-					}
+					header("Location: " . $article_link);
 				}
 			}
 
@@ -185,7 +169,7 @@ if (!isset($_GET['go']))
 					$article_meta_image = core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}";
 				}
 
-				$nice_title = $core->nice_title($article['title']);
+				$nice_title = core::nice_title($article['title']);
 
 				// twitter info card
 				$twitter_card = "<!-- twitter card -->\n";
@@ -871,29 +855,6 @@ if (!isset($_GET['go']))
 					$templating->block('bottom', 'articles_full');
 					$templating->set('pagination', $pagination);
 
-					if (isset($_GET['error']))
-					{
-						if ($_GET['error'] == 'emptycomment')
-						{
-							$core->message('You cannot post an empty comment dummy!', NULL, 1);
-						}
-
-						if ($_GET['error'] == 'doublecomment')
-						{
-							$core->message('You cannot post the same comment twice dummy!', NULL, 1);
-						}
-
-						if ($_GET['error'] == 'locked')
-						{
-							$core->message('Sorry, the comments were locked while you were writing your reply!', NULL, 1);
-						}
-
-						if ($_GET['error'] == 'noid')
-						{
-							$core->message('Article id was not a number! Stop trying to do something naughty!');
-						}
-					}
-
 					// only show comments box if the comments are turned on for this article
 					if (core::config('comments_open') == 1)
 					{
@@ -961,7 +922,7 @@ if (!isset($_GET['go']))
 		$db->sqlquery("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']), 'articles_full.php');
 		$comment = $db->fetch();
 
-		$nice_title = $core->nice_title($comment['title']);
+		$nice_title = core::nice_title($comment['title']);
 
 		// check if author
 		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
@@ -1009,14 +970,9 @@ else if (isset($_GET['go']))
 		// make sure news id is a number
 		if (!isset($_POST['article_id']) || !is_numeric($_POST['article_id']))
 		{
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: " . core::config('website_url'));
-			}
-			else
-			{
-				header("Location: " . core::config('website_url'));
-			}
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'Article ID';
+			header("Location: " . core::config('website_url'));
 
 			die();
 		}
@@ -1046,20 +1002,17 @@ else if (isset($_GET['go']))
 			$correction = core::make_safe($correction, ENT_QUOTES);
 
 			// get article name for the email and redirect
-			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 			$title = $db->fetch();
-			$title_nice = $core->nice_title($title['title']);
+			
+			$article_link = core::config('website_url') . article_class::get_link($_POST['article_id'], $title['slug']);
 
 			if (empty($correction))
 			{
-				if (core::config('pretty_urls') == 1)
-				{
-					header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['article_id']}/error=emptycomment#commentbox");
-				}
-				else
-				{
-					header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&error=emptycomment#commentbox");
-				}
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'correction text';
+
+				header("Location: " . $article_link);
 
 				die();
 			}
@@ -1070,15 +1023,8 @@ else if (isset($_GET['go']))
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `type` = ?, `data` = ?, `completed` = 0", array($_SESSION['user_id'], core::$date, 'article_correction', $correction_id));
 
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['article_id']}/message=tipsent#corrections");
-			}
-			else
-			{
-				header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}&message=tipsent#corrections");
-			}
-
+			$_SESSION['message'] = 'tip_sent';
+			header("Location: " . $article_link);
 		}
 
 	}
@@ -1120,20 +1066,17 @@ else if (isset($_GET['go']))
 				else
 				{
 					// get article name for the email and redirect
-					$db->sqlquery("SELECT `title`, `comment_count`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
+					$db->sqlquery("SELECT `title`, `comment_count`, `comments_open`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
 					$title = $db->fetch();
-					$title_nice = $core->nice_title($title['title']);
+					$title_nice = core::nice_title($title['title']);
 
 					if ($title['comments_open'] == 0 && $user->check_group([1,2]) == false)
 					{
-						if (core::config('pretty_urls') == 1)
-						{
-							header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=locked#commentbox");
-						}
-						else 
-						{
-							header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=locked#commentbox");
-						}
+						$_SESSION['message'] = 'locked';
+						$_SESSION['message_extra'] = 'article comments';
+						$article_link = article_class::get_link($_POST['aid'], $title['slug']);
+
+						header("Location: " . core::config('website_url') . $article_link);
 
 						die();
 					}
@@ -1157,14 +1100,10 @@ else if (isset($_GET['go']))
 
 						if ($check_comment['comment_text'] == $comment)
 						{
-							if (core::config('pretty_urls') == 1)
-							{
-								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=doublecomment#commentbox");
-							}
-							else 
-							{
-								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=doublecomment#commentbox");
-							}
+							$_SESSION['message'] = 'double_comment';
+							$article_link = article_class::get_link($_POST['aid'], $title['slug']);
+							
+							header("Location: " . core::config('website_url') . $article_link);
 
 							die();
 						}
@@ -1172,14 +1111,11 @@ else if (isset($_GET['go']))
 						// check if it's an empty comment
 						if (empty($comment))
 						{
-							if (core::config('pretty_urls') == 1)
-							{
-								header("Location: " . core::config('website_url') . "articles/$title_nice.{$_POST['aid']}/error=emptycomment#commentbox");
-							}
-							else 
-							{
-								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['aid']}&error=emptycomment#commentbox");
-							}
+							$_SESSION['message'] = 'empty';
+							$_SESSION['message_extra'] = 'text';
+							$article_link = article_class::get_link($_POST['aid'], $title['slug']);
+
+							header("Location: " . core::config('website_url') . $article_link);
 
 							die();
 						}
@@ -1344,15 +1280,10 @@ else if (isset($_GET['go']))
 
 							// clear any comment or name left from errors
 							unset($_SESSION['acomment']);
+							
+							$article_link = article_class::get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
 
-							if (core::config('pretty_urls') == 1)
-							{
-								header("Location: /articles/$title_nice.$article_id/page={$comment_page}#{$new_comment_id}");
-							}
-							else
-							{
-								header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&page={$comment_page}#{$new_comment_id}");
-							}
+							header("Location: " . core::config('website_url') . $article_link);
 						}
 					}
 				}
@@ -1362,13 +1293,13 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'editcomment')
 	{
-		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_POST['comment_id']));
+		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_POST['comment_id']));
 		$comment = $db->fetch();
 
 		// check if author or editor/admin
 		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
 		{
-			$nice_title = $core->nice_title($comment['title']);
+			$nice_title = core::nice_title($comment['title']);
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 		}
 
@@ -1379,7 +1310,13 @@ else if (isset($_GET['go']))
 			// check empty
 			if (empty($comment_text))
 			{
-				$core->message('You cannot post an empty comment!', NULL, 1);
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'text';
+				$article_link = article_class::get_link($comment['article_id'], $comment['slug']);
+
+				header("Location: " . core::config('website_url') . $article_link);
+
+				die();
 			}
 
 			// update comment
@@ -1388,12 +1325,10 @@ else if (isset($_GET['go']))
 				$comment_text = core::make_safe($comment_text);
 
 				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ?, `edit_counter` = (edit_counter + 1) WHERE `comment_id` = ?", array($comment_text, $_SESSION['user_id'], core::$date, $_POST['comment_id']));
-
-				$nice_title = $core->nice_title($comment['title']);
 				
-				$edit_redirect = article_class::get_link($comment['article_id'], $nice_title, 'comment_id=' . $_POST['comment_id']);
+				$edit_redirect = article_class::get_link($comment['article_id'], $comment['slug'], 'comment_id=' . $_POST['comment_id']);
 
-				header("Location: ".core::config('website_url').$edit_redirect);
+				header("Location: ".core::config('website_url') . $edit_redirect);
 			}
 		}
 	}
@@ -1407,36 +1342,21 @@ else if (isset($_GET['go']))
 			die();
 		}
 		
-		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
+		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($_GET['comment_id']));
 		$comment = $db->fetch();
 
-		$nice_title = $core->nice_title($comment['title']);
+		$article_link = article_class::get_link($comment['article_id'], $comment['slug'], '#comments');
 
 		if ($user->check_group([1,2]) == false)
 		{
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
-			}
-			else 
-			{
-				header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
-			}
-
+			header("Location: ".core::config('website_url').$article_link);
 		}
 
 		else
 		{
 			if ($comment['author_id'] == 1 && $_SESSION['user_id'] != 1)
 			{
-				if (core::config('pretty_urls') == 1)
-				{
-					header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
-				}
-				else 
-				{
-					header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
-				}
+				header("Location: ".core::config('website_url').$article_link);
 			}
 
 			else
@@ -1449,15 +1369,7 @@ else if (isset($_GET['go']))
 
 				else if (isset($_POST['no']))
 				{
-					if (core::config('pretty_urls') == 1)
-					{
-						header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
-					}
-					else 
-					{
-						header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
-					}
-
+					header("Location: ".core::config('website_url').$article_link);
 				}
 
 				else if (isset($_POST['yes']))
@@ -1515,14 +1427,7 @@ else if (isset($_GET['go']))
 						}
 					}
 
-					if (core::config('pretty_urls') == 1)
-					{
-						header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
-					}
-					else
-					{
-						header("Location: ".url."index.php?module=articles_full&aid={$comment['article_id']}#comments");
-					}
+					header("Location: ".core::config('website_url').$article_link);
 				}
 			}
 		}
@@ -1535,7 +1440,7 @@ else if (isset($_GET['go']))
 		// get info for title
 		$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 		$title = $db->fetch();
-		$title = $core->nice_title($title['title']);
+		$title = core::nice_title($title['title']);
 
 		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
 	}
@@ -1547,7 +1452,7 @@ else if (isset($_GET['go']))
 		// get info for title
 		$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 		$title = $db->fetch();
-		$title = $core->nice_title($title['title']);
+		$title = core::nice_title($title['title']);
 
 		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
 	}
@@ -1574,11 +1479,12 @@ else if (isset($_GET['go']))
 		else if (isset($_POST['no']))
 		{
 			// get info for title
-			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
+			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
-			$title = $core->nice_title($title['title']);
+			
+			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug'], '#comments');
 
-			header("Location: /articles/{$title}.{$_GET['article_id']}/#comments");
+			header("Location: ".$article_link);
 		}
 
 		else
@@ -1592,19 +1498,15 @@ else if (isset($_GET['go']))
 			}
 
 			// get info for title
-			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
+			$db->sqlquery("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
-			$title = $core->nice_title($title['title']);
+			
+			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug']);
 
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: /articles/{$title}.{$_GET['article_id']}/message=reported&extra=comment#comments");
-			}
-			else 
-			{
-				header("Location: /index.php?module=articles_full&aid={$_GET['article_id']}&title={$title}&message=reported&extra=comment#comments");
-			}
+			$_SESSION['message'] = 'reported';
+			$_SESSION['message_extra'] = 'comment';
 
+			header("Location: ".$article_link);
 		}
 	}
 
@@ -1613,15 +1515,16 @@ else if (isset($_GET['go']))
 		if ($user->check_group([1,2]) == true)
 		{
 			// get info for title
-			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
+			$db->sqlquery("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
-			$title_nice = $core->nice_title($title['title']);
+			
+			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug']);
 
-			header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
+			header("Location: ".$article_link);
 
 			if ($user->check_group([1,2]) == false)
 			{
-				header("Location: /articles/$title_nice.{$comment['article_id']}#comments");
+				header("Location: ".$article_link);
 			}
 
 			else
@@ -1631,12 +1534,14 @@ else if (isset($_GET['go']))
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, 'opened_comments', core::$date, $_GET['article_id']));
 
-			header("Location: /articles/{$title_nice}.{$_GET['article_id']}#comments");
+			$_SESSION['message'] = 'comments_opened';
+			header("Location: ".$article_link);
 		}
 
 		else
 		{
-			header("Location: ".url);
+			$_SESSION['message'] = 'no_permission';
+			header("Location: ".$article_link);
 		}
 	}
 
@@ -1645,15 +1550,16 @@ else if (isset($_GET['go']))
 		if ($user->check_group([1,2]) == true)
 		{
 			// get info for title
-			$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
+			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
-			$title_nice = $core->nice_title($title['title']);
+			
+			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug']);
 
-			header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
+			header("Location: ".$article_link);
 
 			if ($user->check_group([1,2]) == false)
 			{
-				header("Location: /articles/$title_nice.{$comment['article_id']}#comments");
+				header("Location: ".$article_link);
 			}
 
 			else
@@ -1663,12 +1569,14 @@ else if (isset($_GET['go']))
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, 'closed_comments', core::$date, $_GET['article_id']));
 
-			header("Location: /articles/{$title_nice}.{$_GET['article_id']}#comments");
+			$_SESSION['message'] = 'comments_closed';
+			header("Location: ".$article_link);
 		}
 
 		else
 		{
-			header("Location: ".url);
+			$_SESSION['message'] = 'no_permission';
+			header("Location: ".$article_link);
 		}
 	}
 }

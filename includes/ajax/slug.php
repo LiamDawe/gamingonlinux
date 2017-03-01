@@ -8,6 +8,6 @@ if(isset($_POST))
 {
 		$title = $_POST['title'];
 
-		echo $core->nice_title($title);
+		echo core::nice_title($title);
 }
 ?>

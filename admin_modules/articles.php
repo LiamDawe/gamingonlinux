@@ -411,7 +411,7 @@ if (isset($_GET['view']))
 					$templating->set('article_id', $article['article_id']);
 					$templating->set('comment_count', $article['comment_count']);
 					$templating->set('views', $article['views']);
-					$templating->set('article_link', $core->nice_title($article['title']) . '.' . $article['article_id']);
+					$templating->set('article_link', core::nice_title($article['title']) . '.' . $article['article_id']);
 				}
 
 				$templating->block('manage_bottom');
@@ -472,7 +472,7 @@ if (isset($_GET['view']))
 				$templating->set('article_id', $article['article_id']);
 				$templating->set('comment_count', $article['comment_count']);
 				$templating->set('views', $article['views']);
-				$templating->set('article_link', $core->nice_title($article['title']) . '.' . $article['article_id']);
+				$templating->set('article_link', core::nice_title($article['title']) . '.' . $article['article_id']);
 			}
 
 			$templating->block('manage_bottom');
@@ -534,7 +534,7 @@ else if (isset($_POST['act']))
 			// get article name for the email and redirect
 			$db->sqlquery("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
 			$title = $db->fetch();
-			$title_nice = $core->nice_title($title['title']);
+			$title_nice = core::nice_title($title['title']);
 
 			$page = 1;
 			if ($title['comment_count'] > 9)
@@ -894,7 +894,7 @@ else if (isset($_POST['act']))
 					// subject
 					$subject = 'Your article was reviewed and edited on GamingOnLinux.com!';
 
-					$nice_title = $core->nice_title($_POST['title']);
+					$nice_title = core::nice_title($_POST['title']);
 
 					// message
 					$message = "
@@ -962,7 +962,7 @@ else if (isset($_POST['act']))
 
 		else
 		{
-			$db->sqlquery("SELECT `title`,`tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("SELECT `title`,`tagline_image`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 			$article = $db->fetch();
 
 			// remove old image
@@ -974,9 +974,7 @@ else if (isset($_POST['act']))
 
 			$db->sqlquery("UPDATE `articles` SET `tagline_image` = '' WHERE `article_id` = ?", array($_POST['article_id']));
 
-			$nice_title = $core->nice_title($article['title']);
-
-			$core->message("The articles top image has now been deleted from \"{$article['title']}\"! <a href=\"/articles/$nice_title.{$_POST['article_id']}\">Click here to view the article.</a>");
+			$core->message("The articles top image has now been deleted from \"{$article['title']}\"! <a href=\"/articles/{$article['slug']}.{$_POST['article_id']}\">Click here to view the article.</a>");
 		}
 	}
 }

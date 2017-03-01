@@ -42,8 +42,6 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^home/banned?$ /index.php?module=home&message=banned [N]
 
-  RewriteRule ^home/message=(.+?)/?$ /index.php?module=home&message=$1 [N,NC,QSA]
-
   RewriteRule ^sales/?$ /sales.php [N]
 
   RewriteRule ^irc/?$ /irc.php [N]
@@ -55,8 +53,6 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^sales/message=(.+?)/?$ /sales.php?message=$1 [N,NC,QSA]
 
   RewriteRule ^register/?$ /index.php?module=register [N]
-
-  RewriteRule ^register/message=(.+?)/?$ /index.php?module=register&message=$1 [N,NC,QSA]
 
   RewriteRule ^forum/?$ /index.php?module=forum [N]
 
@@ -72,8 +68,6 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^email-us/?$ /index.php?module=email_us [N]
 
-  RewriteRule ^email-us/message=(.+?)/?$ /index.php?module=email_us&message=$1 [N,NC,QSA]
-
   RewriteRule ^links/?$ /index.php?module=friend_links [N]
 
   RewriteRule ^support-us/?$ /index.php?module=support_us [N]
@@ -85,8 +79,6 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^articles/(.+?)\.([0-9]+)/?$ /index.php?module=articles_full&title=$1&aid=$2 [N,NC,QSA]
 
   RewriteRule ^articles/(.+?)\.([0-9]+)/error=(.+?)?$ /index.php?module=articles_full&aid=$2&title=$1&error=$3 [N,NC,QSA]
-
-  RewriteRule ^articles/(.+?)\.([0-9]+)/message=(.+?)?$ /index.php?module=articles_full&aid=$2&title=$1&message=$3 [N,NC,QSA]
 
   RewriteRule ^articles/(.+?)\.([0-9]+)/page\=([0-9]+)?$ /index.php?module=articles_full&aid=$2&title=$1&page=$3 [N,NC,QSA]
 
@@ -110,20 +102,13 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^forum/topic/([0-9]+)/post_id\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&post_id=$2 [N,NC,QSA]
 
-  RewriteRule ^forum/topic/([0-9]+)/message=(.+?)?$ /index.php?module=viewtopic&topic_id=$1&message=$2 [N,NC,QSA]
-
   RewriteRule ^private-messages/page\=([0-9]+)?$ /index.php?module=messages&page=$1 [N,NC,QSA]
 
   RewriteRule ^private-messages/compose/(\d+)*$ /index.php?module=messages&view=compose [N]
 
-  RewriteRule ^private-messages/compose/message=(.+?)$ /index.php?module=messages&view=compose&message=$1 [N,NC,QSA]
-
   RewriteRule ^private-messages/compose/user\=([0-9]+)?$ /index.php?module=messages&view=compose&user=$1 [N,NC,QSA]
 
   RewriteRule ^private-messages/([0-9]+)/?$ /index.php?module=messages&view=message&id=$1 [N,NC,QSA]
-  RewriteRule ^private-messages/([0-9]+)/message=(.+?)?$ /index.php?module=messages&view=message&id=$1&message=$2 [N,NC,QSA]
-
-  RewriteRule ^private-messages/message\=(.+?)$ /index.php?module=messages&message=$1 [N,NC,QSA]
 
   RewriteRule ^private-messages/([0-9]+)/page\=([0-9]+)?$ /index.php?module=messages&view=message&id=$1&page=$2 [N,NC,QSA]
 

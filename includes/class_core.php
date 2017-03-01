@@ -698,7 +698,7 @@ class core
 		}
 	}
 
-	function nice_title($title)
+	public static function nice_title($title)
 	{
 		$clean = trim($title);
 		$clean = iconv('UTF-8', 'ASCII//TRANSLIT', $title);

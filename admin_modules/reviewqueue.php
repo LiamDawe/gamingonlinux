@@ -311,7 +311,7 @@ if (isset($_POST['act']))
 			// get article name for the email and redirect
 			$db->sqlquery("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']), 'articles_full.php');
 			$title = $db->fetch();
-			$title_nice = $core->nice_title($title['title']);
+			$title_nice = core::nice_title($title['title']);
 
 			$page = 1;
 			if ($title['comment_count'] > 9)

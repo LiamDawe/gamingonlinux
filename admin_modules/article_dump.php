@@ -25,6 +25,6 @@ if (isset($_GET['dump']))
 		}
 	}
 
-	$_SESSION['aslug'] = $core->nice_title($sections['title']);
+	$_SESSION['aslug'] = core::nice_title($sections['title']);
 	header("Location: /admin.php?module=add_article&dump");
 }

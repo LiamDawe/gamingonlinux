@@ -107,7 +107,9 @@ if (isset($_POST['act']))
 	
     if ($empty_check !== true)
     {
-		header("Location: /index.php?module=livestreams&message=empty&extra=".$empty_check);
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = $empty_check;
+		header("Location: /index.php?module=livestreams");
 		die();
     }
 
@@ -123,6 +125,7 @@ if (isset($_POST['act']))
 
     $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'new_livestream_submission', core::$date, $new_id));
 
-    header("Location: /index.php?module=livestreams&message=livestream_submitted");
+	$_SESSION['message'] = 'livestream_submitted';
+    header("Location: /index.php?module=livestreams");
   }
 }

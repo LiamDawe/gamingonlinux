@@ -75,7 +75,8 @@ else
 			{
 				$pm_url = "/private-messages/{$message['conversation_id']}/";
 			}
-			else {
+			else 
+			{
 				$pm_url = core::config('website_url') . "index.php?module=messages&view=message&id={$message['conversation_id']}";
 			}
 
@@ -110,7 +111,8 @@ else
 			{
 				$compose_link = '/private-messages/compose/';
 			}
-			else {
+			else 
+			{
 				$compose_link = core::config('website_url') . 'index.php?module=messages&view=compose';
 			}
 			$templating->set('compose_link', $compose_link);
@@ -523,28 +525,32 @@ else
 			$_SESSION['mtitle'] = $title;
 			$_SESSION['mtext'] = $text;
 
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $check_empty;
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: " . core::config('website_url') . 'private-messages/compose/message=empty&extra='.$check_empty);
+				header("Location: " . core::config('website_url') . 'private-messages/compose/');
 				die();
 			}
 			else
 			{
-				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose&message=empty&extra='.$check_empty);
+				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose');
 				die();
 			}
 		}
 		
 		if(!is_array($_POST['user_ids']) || !core::is_number($_POST['user_ids']))
 		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'usernames';
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: " . core::config('website_url') . 'private-messages/compose/message=empty&extra=users');
+				header("Location: " . core::config('website_url') . 'private-messages/compose/');
 				die();
 			}
 			else
 			{
-				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose&message=empty&extra=users');
+				header("Location: " . core::config('website_url') . 'index.php?module=messages&view=compose');
 				die();
 			}	
 		}
@@ -564,14 +570,16 @@ else
 
 		if ($recepients_count['count'] == 0)
 		{
+			$_SESSION['message'] = 'notfound';
+			
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location:" . core::config('website_url') . "private-messages/compose/message=notfound");
+				header("Location:" . core::config('website_url') . "private-messages/compose/");
 				die();
 			}
 			else
 			{
-				header("Location: " . core::config('website_url') . "index.php?module=messages&view=compose&message=notfound");
+				header("Location: " . core::config('website_url') . "index.php?module=messages&view=compose");
 				die();
 			}
 		}
@@ -656,6 +664,7 @@ else
 
 		$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
 
+		$_SESSION['message'] = 'pm_sent';
 		if (core::config('pretty_urls') == 1)
 		{
 			header("Location: /private-messages/");
@@ -683,7 +692,9 @@ else
 
 		else if (empty($text))
 		{
-			header("Location: /index.php?module=messages&view=Edit&message_id=" . $_GET['message_id'] . "&conversation_id=" . $_GET['conversation_id'] . '&message=empty&extra=message');
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'text';
+			header("Location: /index.php?module=messages&view=Edit&message_id=" . $_GET['message_id'] . "&conversation_id=" . $_GET['conversation_id']);
 		}
 
 		else
@@ -741,8 +752,11 @@ else
 			{
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
-				// delete it
-				header("Location: /private-messages/message=deleted&extra=message");
+				
+				$_SESSION['message'] = 'deleted';
+				$_SESSION['message_extra'] = 'private message';
+				
+				header("Location: /private-messages/");
 			}
 		}
 
@@ -766,7 +780,9 @@ else
 
 		else if (empty($text))
 		{
-			header("Location: /private-messages/{$_POST['conversation_id']}/message=empty&extra=message");
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'text';
+			header("Location: /private-messages/{$_POST['conversation_id']}/");
 		}
 
 		else
@@ -862,6 +878,8 @@ else
 			{
 				$page = ceil($get_info['replies']/9);
 			}
+			
+			$_SESSION['message'] = 'pm_sent';
 
 			if (core::config('pretty_urls') == 1)
 			{

@@ -1,15 +1,4 @@
 <?php
-if (isset ($_GET['message']))
-{
-  $extra = NULL;
-  if (isset($_GET['extra']))
-  {
-    $extra = $_GET['extra'];
-  }
-  $message = $message_map->get_message($_GET['message'], $extra);
-  $core->message($message['message'], NULL, $message['error']);
-}
-
 $templating->merge('admin_modules/games');
 
 $licenses = array('', 'Closed Source', 'GPL', 'BSD', 'MIT');
@@ -278,7 +267,8 @@ if (isset($_POST['act']))
 		
 		if (empty($link) && empty($steam_link) && empty($gog_link) && empty($itch_link))
 		{
-			header("Location: /admin.php?module=games&view=add&message=one_link_needed");
+			$_SESSION['message'] = 'one_link_needed';
+			header("Location: /admin.php?module=games&view=add");
 			die();
 		}
 

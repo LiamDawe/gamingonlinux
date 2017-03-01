@@ -122,7 +122,7 @@ if (isset($_POST['act']))
             die();
         }
 
-	$core->check_ip_from_stopforumspam(core::$ip);
+		$core->check_ip_from_stopforumspam(core::$ip);
 
         $templating->set_previous('title', 'Submit An Article', 1);
         
@@ -158,7 +158,10 @@ if (isset($_POST['act']))
             $_SESSION['aname'] = $name;
             $_SESSION['aemail'] = $guest_email;
             
-            header("Location: " . $redirect . "message=empty&extra=email&error");
+            $_SESSION['message'] = 'empty';
+            $_SESSION['message_extra'] = 'email address';
+            
+            header("Location: " . $redirect . "&error");
             die();
         }
         
@@ -170,8 +173,11 @@ if (isset($_POST['act']))
             $_SESSION['atext'] = $text;
             $_SESSION['aname'] = $name;
             $_SESSION['aemail'] = $guest_email;
+            
+			$_SESSION['message'] = 'empty';
+            $_SESSION['message_extra'] = $check_empty;
 
-            header("Location: " . $redirect . "message=empty&extra=".$check_empty.'&error');
+            header("Location: " . $redirect . '&error');
             die();
         }
 
@@ -189,7 +195,8 @@ if (isset($_POST['act']))
 			}
 			else
 			{
-				header("Location: " . $redirect . "message=empty&extra=captcha&error");
+				$_SESSION['message'] = 'captcha';
+				header("Location: " . $redirect . "error");
 				die();
 			}
 		}
@@ -201,7 +208,8 @@ if (isset($_POST['act']))
 			$_SESSION['aname'] = $name;
 			$_SESSION['aemail'] = $guest_email;
 			
-			header("Location: " . $redirect . "message=empty&extra=captcha&error");
+			$_SESSION['message'] = 'captcha';
+			header("Location: " . $redirect . "&error");
 			die();
 		}
 
@@ -232,7 +240,7 @@ if (isset($_POST['act']))
                 }
 
                 // make the slug
-                $title_slug = $core->nice_title($_POST['title']);
+                $title_slug = core::nice_title($_POST['title']);
 
                 // insert the article itself
                 $db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));

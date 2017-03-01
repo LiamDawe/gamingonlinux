@@ -148,15 +148,14 @@ $templating->set('articles_css', $articles_css);
 
 if (in_array($module, $modules_allowed))
 {
-	if (isset($_GET['message']))
+	if (isset($_SESSION['message']))
 	{
 		$extra = NULL;
-		if (isset($_GET['extra']))
+		if (isset($_SESSION['message_extra']))
 		{
-			$extra = $_GET['extra'];
+			$extra = $_SESSION['message_extra'];
 		}
-		$message = $message_map->get_message($module, $_GET['message'], $extra);
-		$core->message($message['message'], NULL, $message['error']);
+		$message_map->display_message($module, $_SESSION['message'], $extra);
 	}
 
 	include("modules/$module.php");

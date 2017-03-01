@@ -224,7 +224,7 @@ function replace_article($text, $article_id)
 			
 		$tagline_image = $article_class->tagline_image($article_info);
 		
-		$nice_link =  $core->nice_title($article_info['title']) . '.' . $article_info['article_id'];
+		$nice_link =  core::nice_title($article_info['title']) . '.' . $article_info['article_id'];
 		
 		$date = $core->format_date($article_info['date']);
 		
@@ -380,35 +380,64 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	$body = quotes($body);
 
 	$find_replace = array(
-	"/\[youtube\](.+?)\[\/youtube\]/is" => " <a href=\"https://www.youtube.com/watch?v=$1\" target=\"_blank\">View video on youtube.com</a> ",
-	"/\[url\=(.+?)\](.+?)\[\/url\]/is" => "<a href=\"$1\" target=\"_blank\">$2</a>",
-	"/\[url\](.+?)\[\/url\]/is" => "<a href=\"$1\" target=\"_blank\">$1</a>",
-	"/\[b\](.+?)\[\/b\]/is" => "<strong>$1</strong>",
-	"/\[i\](.+?)\[\/i\]/is" => "<em>$1</em>",
-	"/\[u\](.+?)\[\/u\]/is" => "<span style=\"text-decoration:underline;\">$1</span>",
-	"/\[s\](.+?)\[\/s\]/is" => "<del>$1</del>",
-	"/\[color\=(.+?)\](.+?)\[\/color\]/is" => "$2",
-	"/\[font\=(.+?)\](.+?)\[\/font\]/is" => "$2",
-	"/\[center\](.+?)\[\/center\]/is" => "<div style=\"text-align:center;\">$1</div>",
-	"/\[right\](.+?)\[\/right\]/is" => "<div style=\"text-align:right;\">$1</div>",
-	"/\[left\](.+?)\[\/left\]/is" => "<div style=\"text-align:left;\">$1</div>",
-	"/\[img\](.+?)\[\/img\]/is" => "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
-	"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" => "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
-	"/\[email\](.+?)\[\/email\]/is" => "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
-	'/\[list\](.*?)\[\/list\]/is' => '<ul>$1</ul>',
-	'/\[\*\](.*?)(\n|\r\n?)/is' => '<ul>$1</ul>',
-	'/\[ul\]/is' => '<ul>',
-	'/\[\/ul\]/is' => '</ul>',
-	'/\[li\]/is' => '<li>',
-	'/\[\/li\]/is' => '</li>',
-	"/\[size\=(.+?)\](.+?)\[\/size\]/is" => '$2', // disallow size
-	"/\[email\=(.+?)\](.+?)\[\/email\]/is" => '<a href="mailto:$1">$2</a>',
-	"/\[justify\](.+?)\[\/justify\]/is" => '$1',
-	"/\[code\](.+?)\[\/code\]/is" => '<code>$1</code>',
-	"/\[sup\](.+?)\[\/sup\]/is" => '<sup>$1</sup>',
-	"/\[spoiler](.+?)\[\/spoiler\]/is" => '<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
-	"/\[mp3](.+?)\[\/mp3\]/is" => '<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
-	"/\[ogg](.+?)\[\/ogg\]/is" => '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
+	"/\[youtube\](.+?)\[\/youtube\]/is" 
+		=> " <a href=\"https://www.youtube.com/watch?v=$1\" target=\"_blank\">View video on youtube.com</a> ",
+	"/\[url\=(.+?)\](.+?)\[\/url\]/is" 
+		=> "<a href=\"$1\" target=\"_blank\">$2</a>",
+	"/\[url\](.+?)\[\/url\]/is" 
+		=> "<a href=\"$1\" target=\"_blank\">$1</a>",
+	"/\[b\](.+?)\[\/b\]/is" 
+		=> "<strong>$1</strong>",
+	"/\[i\](.+?)\[\/i\]/is" 
+		=> "<em>$1</em>",
+	"/\[u\](.+?)\[\/u\]/is" 
+		=> "<span style=\"text-decoration:underline;\">$1</span>",
+	"/\[s\](.+?)\[\/s\]/is" 
+		=> "<del>$1</del>",
+	"/\[color\=(.+?)\](.+?)\[\/color\]/is" 
+		=> "$2",
+	"/\[font\=(.+?)\](.+?)\[\/font\]/is" 
+		=> "$2",
+	"/\[center\](.+?)\[\/center\]/is" 
+		=> "<div style=\"text-align:center;\">$1</div>",
+	"/\[right\](.+?)\[\/right\]/is" 
+		=> "<div style=\"text-align:right;\">$1</div>",
+	"/\[left\](.+?)\[\/left\]/is" 
+		=> "<div style=\"text-align:left;\">$1</div>",
+	"/\[img\](.+?)\[\/img\]/is" 
+		=> "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
+	"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" 
+		=> "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
+	"/\[email\](.+?)\[\/email\]/is" 
+		=> "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
+	'/\[list\](.*?)\[\/list\]/is' 
+		=> '<ul>$1</ul>',
+	'/\[\*\](.*?)(\n|\r\n?)/is' 
+		=> '<ul>$1</ul>',
+	'/\[ul\]/is' 
+		=> '<ul>',
+	'/\[\/ul\]/is' 
+		=> '</ul>',
+	'/\[li\]/is' 
+		=> '<li>',
+	'/\[\/li\]/is' 
+		=> '</li>',
+	"/\[size\=(.+?)\](.+?)\[\/size\]/is" 
+		=> '$2', // disallow size
+	"/\[email\=(.+?)\](.+?)\[\/email\]/is" 
+		=> '<a href="mailto:$1">$2</a>',
+	"/\[justify\](.+?)\[\/justify\]/is" 
+		=> '$1',
+	"/\[code\](.+?)\[\/code\]/is" 
+		=> '<code>$1</code>',
+	"/\[sup\](.+?)\[\/sup\]/is" 
+		=> '<sup>$1</sup>',
+	"/\[spoiler](.+?)\[\/spoiler\]/is" 
+		=> '<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
+	"/\[mp3](.+?)\[\/mp3\]/is" 
+		=> '<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
+	"/\[ogg](.+?)\[\/ogg\]/is" 
+		=> '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
 	);
 
 	$body = emoticons($body);
@@ -507,7 +536,6 @@ function email_bbcode($body)
     "/\[center\](.+?)\[\/center\]/is",
     "/\[right\](.+?)\[\/right\]/is",
     "/\[left\](.+?)\[\/left\]/is",
-	"/\[img\]http\:\/\/img\.youtube.com\/vi\/(.+?)\/0\.jpg\[\/img\]/is", //youtube videos done by the old tinymce plugin...
     "/\[img\](.+?)\[\/img\]/is",
     "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
     "/\[email\](.+?)\[\/email\]/is",
@@ -538,12 +566,11 @@ function email_bbcode($body)
 	"<div style=\"text-align:center;\">$1</div>",
 	"<div style=\"text-align:right;\">$1</div>",
 	"<div style=\"text-align:left;\">$1</div>",
-	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>",
-	"<img src=\"$1\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
-	"<img width=\"$1\" height=\"$2\" src=\"$3\" class=\"bbcodeimage img-polaroid\" alt=\"[img]\" />",
+	"<img src=\"$1\" alt=\"[img]\" />",
+	"<img width=\"$1\" height=\"$2\" src=\"$3\" alt=\"[img]\" />",
 	"<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 	"<span style=\"text-decoration: line-through\">$1</span>",
-	"<iframe class=\"youtube-player\" width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>
+	"<iframe width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>
 	</iframe>",
 	'<ul>$1</ul>',
 	'<li>$1</li>',
@@ -634,12 +661,26 @@ function rss_stripping($text, $tagline_image = NULL, $gallery_tagline = NULL)
 	$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$1</blockquote>", $text);
 	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$2</blockquote>", $text);
 
-	$text = preg_replace("/\[youtube\](.+?)\[\/youtube\]/is", '', $text);
-
 	$text = preg_replace("/\[timer=(.+?)](.+?)\[\/timer]/is", ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see the timer ', $text);
 
-	$text = preg_replace('/\[users-only\](.+?)\[\/users-only\]/is', ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see this bit, this is for logged in users only ', $text);
-
+	$find_replace = [
+	'/\[users-only\](.+?)\[\/users-only\]/is'
+		=> ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see this bit, this is for logged in users only ',
+    "/\[img\](.+?)\[\/img\]/is"
+		=> "<img src=\"$1\" alt=\"image\" />",
+    "/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is"
+		=> "<img width=\"$1\" height=\"$2\" src=\"$3\" alt=\"image\" />",
+	"/\[youtube\](.+?)\[\/youtube\]/is"
+		=> "<iframe width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>",
+	"/\[spoiler\](.+?)\[\/spoiler\]/is"
+		=> 'SPOILER: View the website if you wish to see it.'
+	];
+	
+	foreach ($find_replace as $find => $replace)
+	{
+		$text = preg_replace($find, $replace, $text);
+	}
+	
 	return $text;
 }
 

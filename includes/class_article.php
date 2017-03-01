@@ -342,11 +342,11 @@ class article_class
     // check its set, if not hard-set it based on the article title
     if (isset($_POST['slug']) && !empty($_POST['slug']))
     {
-      $slug = $core->nice_title($_POST['slug']);
+      $slug = core::nice_title($_POST['slug']);
     }
     else
     {
-      $slug = $core->nice_title($_POST['title']);
+      $slug = core::nice_title($_POST['title']);
     }
 
     // make sure its not empty

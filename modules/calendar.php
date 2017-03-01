@@ -199,7 +199,9 @@ if (isset($_POST['act']))
 
 		if ($check_empty !== true)
 		{
-			header("Location: /index.php?module=calendar&message=empty&extra=".$check_empty);
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $check_empty;
+			header("Location: /index.php?module=calendar");
 			die();
 		}
 
@@ -207,7 +209,9 @@ if (isset($_POST['act']))
 		{
 			if (strpos($_POST['link'], "www.") === false && strpos($_POST['link'], "http") === false)
 			{
-				header("Location: /index.php?module=calendar&message=empty&extra=link");
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'link';
+				header("Location: /index.php?module=calendar");
 				die();
 			}
 		}
@@ -216,8 +220,10 @@ if (isset($_POST['act']))
 		if ($db->num_rows() == 1)
 		{
 			$game = $db->fetch();
-			header("Location: /index.php?module=calendar&message=exists&extra=" . $game['id']);
-			exit;
+			$_SESSION['message'] = 'exists';
+			$_SESSION['message_extra'] = $game['id'];
+			header("Location: /index.php?module=calendar");
+			die();
 		}
 
 		$date = new DateTime($_POST['date']);
@@ -242,6 +248,7 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'calendar_submission', core::$date, $new_id));
 
-		header("Location: /index.php?module=calendar&message=game_submitted");
+		$_SESSION['message'] = 'game_submitted';
+		header("Location: /index.php?module=calendar");
 	}
 }

@@ -2,7 +2,7 @@
 // livestreams submission page
 return [ 
 	"password_match" => [
-		"text" => "It looks like the password you entered didn't match watch we have!",
+		"text" => "It looks like the password you entered didn't match what we have!",
 		"error" => 1
 	],
 	"bad_username" => [

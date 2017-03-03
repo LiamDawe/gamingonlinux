@@ -20,6 +20,10 @@ class golchart
 	private $label_y_increment = 45;
 	private $scale = 0;
 	private $bottom_axis_numbers_y = 0;
+	private $total_labels = 0;
+	private $bars_x_start = 0;
+	private $chart_bar_start_x = 0;
+	private $biggest_label = 0;
 	
 	function setup($custom_options = NULL)
 	{		
@@ -66,7 +70,7 @@ class golchart
 	{
 		global $db;
 		
-		$db->sqlquery("SELECT `id`, `name`, `h_label` FROM `charts` WHERE `id` = ?", array($chart_id));
+		$db->sqlquery("SELECT `id`, `name`, `sub_title`, `h_label` FROM `charts` WHERE `id` = ?", array($chart_id));
 		$this->chart_info = $db->fetch();
 	}
 	
@@ -136,7 +140,32 @@ class golchart
 		}
 		rsort($label_lengths);
 		
-		return $biggest_label = array_slice($label_lengths[0], 0, 1);
+		$this->biggest_label = array_slice($label_lengths[0], 0, 1);
+	}
+	
+	function chart_sizing()
+	{
+		self::get_biggest_label($this->labels);
+		
+		$actual_chart_space = $this->chart_options['chart_width'] - $this->biggest_label[0] - $this->chart_options['padding_right'];
+		
+		// the actual bars and everything else start after the label
+		$this->chart_bar_start_x = $this->biggest_label[0];
+		
+		$this->label_y_increment = 45;
+		$this->chart_height = $this->total_labels * $this->label_y_increment + $this->label_y_start + $this->chart_options['padding_bottom'];
+		if (isset($this->chart_info['sub_title']) && $this->chart_info['sub_title'] != NULL)
+		{
+			$this->chart_height = $this->chart_height + 18;
+			$this->label_y_start = $this->label_y_start + 18;
+		}
+		
+		$this->strokes_height = $this->chart_height - 35;
+		$this->bottom_axis_numbers_y = $this->chart_height - 20;
+		$this->axis_outline_y = $this->bottom_axis_numbers_y - 14;
+		$this->y_axis_label_y = $this->bottom_axis_numbers_y + 15;
+		$this->outlines_x = $this->chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
+		$this->bars_x_start = $this->chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];		
 	}
 	
 	function render($id, $pass_options = NULL, $labels_table = NULL, $data_table = NULL)
@@ -146,30 +175,13 @@ class golchart
 		$this->get_labels($this->chart_info['id'], $labels_table, $data_table);
 		
 		// get the max number to make the axis and bars
-		$total_labels = count($this->labels);
+		$this->total_labels = count($this->labels);
 		$max_data = $this->data_counts[0];
 
-		$biggest_label = $this->get_biggest_label($this->labels);
-		
-		$actual_chart_space = $this->chart_options['chart_width'] - $biggest_label[0] - $this->chart_options['padding_right'];
-		
-		// the actual bars and everything else start after the label
-		$chart_bar_start_x = $biggest_label[0];
-		
-		// chart sizing
-		$this->label_y_increment = 45;
-		$bottom_padding = $this->chart_options['padding_bottom'];
-		$this->chart_height = $total_labels * $this->label_y_increment + $this->label_y_start + $bottom_padding;
-		
-		$this->bottom_axis_numbers_y = $this->chart_height - 20;
-		$this->axis_outline_y = $this->bottom_axis_numbers_y - 14;
-		$this->y_axis_label_y = $this->bottom_axis_numbers_y + 15;
-		$this->strokes_height = $this->chart_height - 35;
-		$this->outlines_x = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
-		$bars_x_start = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
+		self::chart_sizing();
 		
 		// bottom axis data divisions
-		self::ticks($max_data, $biggest_label[0]);
+		self::ticks($max_data, $this->biggest_label[0]);
 		
 		$last_label_y = 0;
 		$label_counter = 0;
@@ -187,7 +199,7 @@ class golchart
 				$this_label_y = $last_label_y + $this->label_y_increment;
 			}
 			
-			$label_x_position = $chart_bar_start_x + $this->chart_options['label_left_padding']; 
+			$label_x_position = $this->chart_bar_start_x + $this->chart_options['label_left_padding']; 
 			
 			// labels
 			$this->labels_output_array[] = '<text x="'.$label_x_position.'" y="'.$this_label_y.'" text-anchor="end"><title>'.$label['name'].' ' . $label['total'] . '</title>'.$label['name'].'</text>';
@@ -198,17 +210,17 @@ class golchart
 			{
 				$this_split_y = $this_label_y - 25;
 				$this_split_y2 = $this_split_y + 1;
-				$this_split_x = $chart_bar_start_x - 5 + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
+				$this_split_x = $this->chart_bar_start_x - 5 + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 				$this->label_splits_array[] = '<line x1="'.$this_split_x.'" y1="'.$this_split_y.'" x2="'.$this_split_x.'" y2="'.$this_split_y2.'" stroke="#757575" stroke-width="10" />';
 			}
 			
 			// setup bar positions and array of items
 			$this_bar_y = $this_label_y - 18;
 			$bar_width = $label['total']*$this->scale;
-			$this->bars_output_array[] = '<rect x="'.$bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$label['name'].' ' . $label['total'] . '</title></rect>';
+			$this->bars_output_array[] = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$label['name'].' ' . $label['total'] . '</title></rect>';
 			
 			// bar counters and their positions
-			$this_counter_x = $bar_width + $chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
+			$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
 			$this_counter_y = $this_bar_y + 21;
 			
 			$this->counter_array[] = '<text class="golsvg_counters" x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$label['total'].'</text>';
@@ -267,8 +279,11 @@ class golchart
 			}
 			$this->divisions .= '<text x="'.$tick_x_position.'" y="'.$this->bottom_axis_numbers_y.'" font-size="'.$this->chart_options['tick_font_size'].'">'.$current_value.'</text>';
 				
-			// graph counter strokes
-			$this->strokes_array[] = '<line x1="'.$tick_x_position.'" y1="45" x2="'.$tick_x_position.'" y2="'.$this->strokes_height.'"/>';
+			// graph counter strokes, don't make the zero stroke as it covers up the graph line
+			if ($i > 0)
+			{
+				$this->strokes_array[] = '<line x1="'.$tick_x_position.'" y1="60" x2="'.$tick_x_position.'" y2="'.$this->strokes_height.'"/>';
+			}
 		}
 	}
 	
@@ -310,7 +325,7 @@ class golchart
 			}
 		}
 
-		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($id));
+		$db->sqlquery("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($id));
 		$this->chart_info = $db->fetch();
 
 		// set the right labels to the right data (This months data)
@@ -378,7 +393,7 @@ class golchart
 		$full_info .= '</div></div>';
 			
 		// get the max number to make the axis and bars
-		$total_labels = count($this->labels);
+		$this->total_labels = count($this->labels);
 			
 		usort($this->labels, function($a, $b) 
 		{
@@ -387,23 +402,9 @@ class golchart
 		
 		$max_data = $this->labels[0]['percent'];
 			
-		$biggest_label = $this->get_biggest_label($this->labels);
-
-		// the actual bars and everything else start after the label
-		$chart_bar_start_x = $biggest_label[0];
-			
-
-		$bottom_padding = $this->chart_options['padding_bottom'];
-		$this->chart_height = $total_labels * $this->label_y_increment + $this->label_y_start + $bottom_padding;
-			
-		$this->bottom_axis_numbers_y = $this->chart_height - 20;
-		$this->axis_outline_y = $this->bottom_axis_numbers_y - 14;
-		$this->y_axis_label_y = $this->bottom_axis_numbers_y + 15;
-		$this->strokes_height = $this->chart_height - 35;
-		$this->outlines_x = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
-		$bars_x_start = $chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
+		self::chart_sizing();
 		
-		self::ticks($max_data, $biggest_label[0]);
+		self::ticks($max_data, $this->biggest_label[0]);
 		
 		$last_label_y = 0;
 		$label_counter = 0;
@@ -421,7 +422,7 @@ class golchart
 				$this_label_y = $last_label_y + $this->label_y_increment;
 			}
 				
-			$label_x_position = $chart_bar_start_x + $this->chart_options['label_left_padding']; 
+			$label_x_position = $this->chart_bar_start_x + $this->chart_options['label_left_padding']; 
 				
 			// labels
 			$this->labels_output_array[] = '<text x="'.$label_x_position.'" y="'.$this_label_y.'" text-anchor="end"><title>'.$data['name'].' (' . $data['total'] . ' total votes)</title>'.$data['name'].'</text>';
@@ -432,17 +433,17 @@ class golchart
 			{
 				$this_split_y = $this_label_y - 25;
 				$this_split_y2 = $this_split_y + 1;
-				$this_split_x = $chart_bar_start_x - 5 + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
+				$this_split_x = $this->chart_bar_start_x - 5 + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 				$this->label_splits_array[] = '<line x1="'.$this_split_x.'" y1="'.$this_split_y.'" x2="'.$this_split_x.'" y2="'.$this_split_y2.'" stroke="#757575" stroke-width="10" />';
 			}
 				
 			// setup bar positions and array of items
 			$this_bar_y = $this_label_y - 18;
 			$bar_width = $data['percent']*$this->scale;
-			$this->bars_output_array[] = '<rect x="'.$bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$data['name'].' (' . $data['total'] . ' total votes)</title></rect>';
+			$this->bars_output_array[] = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$data['name'].' (' . $data['total'] . ' total votes)</title></rect>';
 				
 			// bar counters and their positions
-			$this_counter_x = $bar_width + $chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
+			$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
 			$this_counter_y = $this_bar_y + 21;
 				
 			$this->counter_array[] = '<text class="golsvg_counters" x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data['percent'].'%</text>';
@@ -471,7 +472,7 @@ class golchart
 		return $get_graph;
 	}
 	
-		function build_svg()
+	function build_svg()
 	{
 		$get_graph = '<svg class="golgraph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="tiny" version="1.2" viewbox="0 0 '.$this->chart_options['chart_width'].' '.$this->chart_height.'" style="max-height: '.$this->chart_height.'px">
 		<!-- outer box -->
@@ -482,8 +483,14 @@ class golchart
 			<line x1="'.$this->outlines_x.'" y1="'.$this->axis_outline_y.'" x2="586" y2="'.$this->axis_outline_y.'" />
 		</g>
 		<rect class="golsvg_header" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$this->chart_options['title_background_height'].'" fill="#222222"/>
-		<text class="golsvg_title" x="300" y="19" font-size="17" text-anchor="middle">'.$this->chart_info['name'].'</text>
-		<!-- strokes -->
+		<text class="golsvg_title" x="300" y="19" font-size="17" text-anchor="middle">'.$this->chart_info['name'].'</text>';
+		
+		if (isset($this->chart_info['sub_title']) && $this->chart_info['sub_title'] != NULL)
+		{
+			$get_graph .= '<text class="golsvg_subtitle" x="300" y="45" font-size="16" text-anchor="middle">'.$this->chart_info['sub_title'].'</text>';
+		}
+		
+		$get_graph .= '<!-- strokes -->
 		<g stroke="#ccc" stroke-width="1" stroke-opacity="0.6">';
 		
 		$get_graph .= implode('', $this->strokes_array);
@@ -513,7 +520,7 @@ class golchart
 		$get_graph .= '<!-- bottom axis numbers -->
 		<g font-size="10" fill="#000000" text-anchor="middle">'.$this->divisions.'</g>
 		<!-- bottom axis label -->
-		<text x="285" y="'.$this->y_axis_label_y.'" font-size="15" fill="#000000" text-anchor="start">'.$this->chart_info['h_label'].'</text>
+		<text x="285" y="'.$this->y_axis_label_y.'" font-size="15" fill="#000000" text-anchor="middle">'.$this->chart_info['h_label'].'</text>
 		</svg>';
 		
 		return $get_graph;	

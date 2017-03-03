@@ -1467,6 +1467,7 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .golgraph{display: block; margin-left:auto; margin-right:auto;}
 .dark .golsvg_header {fill: #515151}
 .golsvg_title {fill: white;}
+.golsvg_subtitle{fill: black;}
 .dark .golsvg_background {fill: #000000}
 .dark svg text {fill: white;}
 .golsvg_counters {fill: black}

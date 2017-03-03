@@ -8,6 +8,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	if ($_GET['view'] == 'add')
 	{
 		$name = '';
+		$sub_title = '';
 		$labels = '';
 		$data = '';
 		$h_label = '';
@@ -30,6 +31,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 
 			$name = $_SESSION['e_name'];
+			$sub_title = $_SESSION['e_subtitle'];
 			$labels = $_SESSION['e_labels'];
 			$data = $_SESSION['e_data'];
 			$h_label = $_SESSION['e_h_label'];
@@ -37,6 +39,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('add_chart', 'admin_modules/admin_module_charts');
 		$templating->set('name', $name);
+		$templating->set('sub_title', $sub_title);
 		$templating->set('labels', $labels);
 		$templating->set('data', $data);
 		$templating->set('h_label', $h_label);
@@ -109,6 +112,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		if (empty($_POST['name']) || empty($_POST['labels']) || empty($_POST['data']))
 		{
 			$_SESSION['e_name'] = $_POST['name'];
+			$_SESSION['e_subtitle'] = $_POST['sub_title'];
 			$_SESSION['e_labels'] = $_POST['labels'];
 			$_SESSION['e_data'] = $_POST['data'];
 			$_SESSION['e_h_label'] = $_POST['h_label'];
@@ -118,7 +122,13 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 		else
 		{
-			$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name']));
+			$sub_title = trim($_POST['sub_title']);
+			if (empty($sub_title))
+			{
+				$sub_title = NULL;
+			}
+			
+			$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title));
 
 			$new_chart_id = $db->grab_id();
 
@@ -129,6 +139,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			if (sizeof($labels) != sizeof($data))
 			{
 				$_SESSION['e_name'] = $_POST['name'];
+				$_SESSION['e_subtitle'] = $_POST['sub_title'];
 				$_SESSION['e_labels'] = $_POST['labels'];
 				$_SESSION['e_data'] = $_POST['data'];
 				$_SESSION['e_h_label'] = $_POST['h_label'];

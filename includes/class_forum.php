@@ -264,5 +264,30 @@ class forum_class
 			header("Location: " . $return_page_done . '&message=deleted&extra=post');
 		}
 	}
+	
+	public static function get_link($id, $additional = NULL)
+	{
+		$link = '';
+		
+		if (core::config('pretty_urls') == 1)
+		{
+			$link = 'forum/topic/'.$id;
+			
+			if ($additional != NULL)
+			{
+				$link = $link . '/' . $additional;
+			}
+		}
+		else
+		{
+			$link = 'index.php?module=viewtopic&topic_id='.$id;
+			
+			if ($additional != NULL)
+			{
+				$link = $link . '&' . $additional;
+			}
+		}
+		return core::config('website_url') . $link;
+	}
 }
 ?>

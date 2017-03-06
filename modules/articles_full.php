@@ -691,15 +691,6 @@ if (!isset($_GET['go']))
 
 						$templating->set('article_id', $_GET['aid']);
 						$templating->set('comment_id', $comments['comment_id']);
-						if (core::config('pretty_urls') == 1)
-						{
-							$comment_link = '/articles/'.$article['slug'].'.'.$_GET['aid'].'/comment_id=' . $comments['comment_id'];
-						}
-						else
-						{
-							$comment_link = '/index.php?module=articles_full&aid='.$_GET['aid'].'&title='.$article['slug'].'&comment_id=' . $comments['comment_id'];
-						}
-						$templating->set('comment_link', $comment_link);
  						
  						$total_likes = 0;
  						if (isset($get_likes[$comments['comment_id']][0]))

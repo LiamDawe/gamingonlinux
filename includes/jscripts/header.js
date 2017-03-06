@@ -432,29 +432,42 @@ jQuery(document).ready(function()
 		openEffect	: 'none',
 		closeEffect	: 'none'
 	});
+	
+	$(".post_link").fancybox({
+		maxWidth	: 800,
+		maxHeight	: 300,
+		fitToView	: false,
+		width		: '70%',
+		height		: '28%',
+		autoSize	: false,
+		closeClick	: false,
+		openEffect	: 'none',
+		closeEffect	: 'none',
+		title : null
+	});
 
-  $(".who_likes").fancybox({
-    maxWidth	: 800,
-    maxHeight	: 600,
-    fitToView	: false,
-    width		: '70%',
-    height		: '60%',
-    autoSize	: false,
-    closeClick	: false,
-    openEffect	: 'none',
-    closeEffect	: 'none'
-  });
+	$(".who_likes").fancybox({
+		maxWidth	: 800,
+		maxHeight	: 600,
+		fitToView	: false,
+		width		: '70%',
+		height		: '60%',
+		autoSize	: false,
+		closeClick	: false,
+		openEffect	: 'none',
+		closeEffect	: 'none'
+	});
 
-  $(".gallery_tagline").fancybox({
-    fitToView	: false,
-    width		: '80%',
-    height		: '80%',
-    autoSize	: false,
-    closeClick	: false,
-    openEffect	: 'none',
-    closeEffect	: 'none',
-    autoCenter : false
-  });
+	$(".gallery_tagline").fancybox({
+		fitToView	: false,
+		width		: '80%',
+		height		: '80%',
+		autoSize	: false,
+		closeClick	: false,
+		openEffect	: 'none',
+		closeEffect	: 'none',
+		autoCenter : false
+	});
 
   // Enable on all forms
   $('form').areYouSure();

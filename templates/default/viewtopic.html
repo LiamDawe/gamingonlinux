@@ -6,6 +6,7 @@
 				</ul>
 				{:pagination}
 				<div class="box comments group">
+				<div class="head">{:topic_title} - {:subscribe_link}</div>
 [/block: top]
 
 [block: poll_vote]
@@ -32,12 +33,11 @@
 
 [block: topic]
 					<a class="anchor" id="r{:post_id}"></a>
-					<div class="head">{:topic_title}</div>
 					<div class="body group">
 						<div class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:topic_date}</abbr> {:subscribe_link}
+									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:topic_date}</abbr>
 								</div>
 								<div class="comment-actions">
 									<ul>
@@ -45,14 +45,14 @@
 										{:delete_link}
 										{:user_options}
 										{:bookmark}
-										<li><a class="tooltip-top" href="//www.gamingonlinux.com/forum/topic/{:post_id}" title="Link to this comment"><span class="icon link">Link</span></a></li>
+										<li><a class="post_link fancybox.ajax tooltip-top" data-fancybox-type="ajax" href="/includes/ajax/call_post_link.php?post_id={:post_id}&type=forum_topic" title="Link to this post"><span class="icon link">Link</span></a></li>
 									</ul>
 								</div>
 							</div>
 							<div class="comment-author">
 								<img class="avatar" alt="" src="{:avatar}" />
 								<ul class="comment-badges">
-                  {:editor}
+									{:editor}
 									{:donator_badge}
 									{:game_developer}
 									{:pc_info_link}
@@ -71,47 +71,6 @@
 					</div>
 [/block: topic]
 
-[block: reply_notopic]
-					<a class="anchor" id="r{:post_id}"></a>
-					<div class="head">{:topic_title}</div>
-					<div class="body group">
-						<div class="comment group">
-							<div class="comment-meta group">
-								<div class="comment-post">
-									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:reply_date}</abbr> {:subscribe_link}
-								</div>
-								<div class="comment-actions">
-									<ul>
-										{:edit_link}
-										{:delete_link}
-										{:user_options}
-										{:bookmark}
-										<li><a class="tooltip-top" href="{:post_link}" title="Link to this post"><span class="icon link">Link</span></a></li>
-									</ul>
-								</div>
-							</div>
-							<div class="comment-author">
-								<img class="avatar" alt="" src="{:avatar}" />
-								<ul class="comment-badges">
-                  {:editor}
-									{:donator_badge}
-									{:game_developer}
-									{:pc_info_link}
-									{:new_user_badge}
-								</ul>
-								<ul class="comment-social">
-									{:profile_fields}
-								</ul>
-							</div>
-							<div id="{:post_id}" class="comment-body">
-								<div id="{:post_id}">
-									<p>{:post_text}</p>
-								</div>
-							</div>
-						</div>
-					</div>
-[/block: reply_notopic]
-
 [block: reply]
 					<a class="anchor" id="r{:post_id}"></a>
 					<div class="body group">
@@ -126,14 +85,14 @@
 										{:delete_link}
 										{:user_options}
 										{:bookmark}
-										<li><a class="tooltip-top" href="{:post_link}" title="Link to this post"><span class="icon link">Link</span></a></li>
+										<li><a class="post_link fancybox.ajax tooltip-top" data-fancybox-type="ajax" href="/includes/ajax/call_post_link.php?post_id={:post_id}&type=forum_reply" title="Link to this post"><span class="icon link">Link</span></a></li>
 									</ul>
 								</div>
 							</div>
 							<div class="comment-author">
 								<img class="avatar" alt="" src="{:avatar}" />
 								<ul class="comment-badges">
-                  {:editor}
+									{:editor}
 									{:donator_badge}
 									{:game_developer}
 									{:pc_info_link}

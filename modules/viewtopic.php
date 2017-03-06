@@ -191,6 +191,7 @@ else
 				$templating->set('pagination', $pagination);
 				$templating->set('forum_id', $topic['forum_id']);
 				$templating->set('forum_name', $topic['forum_name']);
+				$templating->set('subscribe_link', $subscribe_link);
 
 				if (core::config('pretty_urls') == 1)
 				{
@@ -363,7 +364,6 @@ else
 					$templating->set('topic_date', $topic_date);
 					$templating->set('tzdate', date('c',$topic['creation_date']) ); // timeago
 					$templating->set('edit_link', $edit_link);
-					$templating->set('subscribe_link', $subscribe_link);
 
 					// sort out delete link if it's allowed
 					$delete_link = '';
@@ -474,34 +474,22 @@ else
 					$db->sqlquery("SELECT `replys` FROM `forum_topics` WHERE `topic_id` = ? AND `approved` = 1", array($_GET['topic_id']));
 					$count = $db->fetch();
 
-					if ($count['replys'] > $_SESSION['per-page'])
+					if ($count['replys'] + 1 > $_SESSION['per-page'])
 					{
 						$db->sqlquery("SELECT count(`post_id`) as counter FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ? AND `approved` = 1", array($_GET['topic_id'], $_GET['post_id']));
 						$number = $db->fetch();
 
 						$last_page = ceil($number['counter']/$_SESSION['per-page']);
+						
+						$redirect = forum_class::get_link($_GET['topic_id'], 'page=' . $last_page . '#r' . $_GET['post_id']);
 
-						if (core::config('pretty_urls') == 1)
-						{
-							header("Location: /forum/topic/{$_GET['topic_id']}/page=$last_page#r{$_GET['post_id']}");
-						}
-						else
-						{
-
-							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}&page=$last_page#r{$_GET['post_id']}");
-						}
+						header("Location: " . $redirect);
 					}
 					else
 					{
-						if (core::config('pretty_urls') == 1)
-						{
-							header("Location: /forum/topic/{$_GET['topic_id']}#r{$_GET['post_id']}");
-						}
-						else
-						{
+						$redirect = forum_class::get_link($_GET['topic_id'], '#r' . $_GET['post_id']);
 
-							header("Location: /index.php?module=viewtopic&topic_id={$_GET['topic_id']}#r{$_GET['post_id']}");
-						}
+						header("Location: " . $redirect);
 					}
 				}
 
@@ -523,17 +511,7 @@ else
 					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
 					while ($post = $get_replies->fetch())
 					{
-						if ($page > 1 && $reply_count == 0)
-						{
-							$templating->block('reply_notopic', 'viewtopic');
-							$templating->set('topic_title', $topic['topic_title']);
-							$templating->set('subscribe_link', $subscribe_link);
-						}
-
-						else
-						{
-							$templating->block('reply', 'viewtopic');
-						}
+						$templating->block('reply', 'viewtopic');
 
 						$reply_date = $core->format_date($post['creation_date']);
 						$templating->set('tzdate', date('c',$post['creation_date']) ); // timeago

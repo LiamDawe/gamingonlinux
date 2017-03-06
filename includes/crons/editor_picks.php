@@ -62,7 +62,7 @@ if ($editor_pick_count < core::config('editor_picks_limit'))
 	// Mail it
 	if (core::config('send_emails') == 1)
 	{
-		$mail = new mail(core::config['contact_email'], $subject, $html_message, $plain_message);
+		$mail = new mail(core::config('contact_email'), $subject, $html_message, $plain_message);
 		$mail->send();
 	}
 }

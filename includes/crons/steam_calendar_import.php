@@ -22,7 +22,6 @@ $url = "http://store.steampowered.com/search/?os=linux&filter=comingsoon&categor
 
 do
 {
-  echo 'Moving onto page ' . $page . '<br />';
   $html = file_get_html($url . $page);
 
   $get_games = $html->find('div.responsive_search_name_combined');
@@ -70,12 +69,7 @@ do
 
             if ($dont_use == 0)
             {
-              echo 'Title: ' . $element->find('span.title', 0)->plaintext . '<br />';
-
-              echo 'Release date: ' . $parsed_release_date . ' original ('.$release_date->plaintext.')' . '<br />';
-
               $link = $element->parent()->href;
-              echo  'Link: ' . $link . '<br /><br />';
 
               $db->sqlquery("SELECT `id`, `name`, `steam_link` FROM `calendar` WHERE `name` = ?", array($title));
 
@@ -90,8 +84,6 @@ do
 
                 $game_id = $db->grab_id();
 
-                echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
-
                 $games_added_list .= $title . ' - Date: ' . $parsed_release_date . '<br /><br />';
               }
 
@@ -99,8 +91,6 @@ do
               else if ($check_rows == 1 && $grab_info['steam_link'] == NULL)
               {
                 $db->sqlquery("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $grab_info['id']));
-
-                echo "Updated {$title} with the latest information<br />";
               }
             }
           }
@@ -109,8 +99,6 @@ do
       $page++;
     }
   } while ($stop == 0);
-
-echo '<br />Last page hit: ' . $page . '<br /><br />';
 
 if (!empty($games_added_list))
 {

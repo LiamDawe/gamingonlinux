@@ -1267,6 +1267,8 @@ class core
 	{
 		global $db;
 		
+		$genre_list = '';
+		
 		// sort out genre tags
 		$grab_genres = $db->sqlquery("SELECT `id`, `name` FROM `game_genres` ORDER BY `name` ASC");
 		while ($genres = $grab_genres->fetch())

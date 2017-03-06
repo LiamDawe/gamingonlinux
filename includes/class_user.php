@@ -744,4 +744,57 @@ class user
 			return $subscribe_check;
 		}
 	}
+	
+	public static function user_profile_icons($profile_fields, $data)
+	{
+		$profile_fields_output = '';
+
+		foreach ($profile_fields as $field)
+		{
+			if (!empty($data[$field['db_field']]))
+			{
+				if ( $data[$field['db_field']] == $field['base_link'] )
+				{
+					//Skip if it's only the first part of the url
+					continue;
+				}
+								
+				if ($field['db_field'] == 'website')
+				{
+					$url = parse_url($data[$field['db_field']]);
+					if((!isset($url['scheme'])) || (isset($url['scheme']) && $url['scheme'] != 'https' && $url['scheme'] != 'http'))
+					{
+						$data[$field['db_field']] = 'http://' . $data[$field['db_field']];
+					}
+				}
+
+				$url = '';
+				if ($field['base_link_required'] == 1 && strpos($data[$field['db_field']], $field['base_link']) === false ) //base_link_required and not already in the database
+				{
+					$url = $field['base_link'];
+				}
+
+				$image = '';
+				if (isset($field['image']) && $field['image'] != NULL)
+				{
+					$image = "<img src=\"{$field['image']}\" alt=\"{$field['name']}\" />";
+				}
+
+				$span = '';
+				if (isset($field['span']))
+				{
+					$span = $field['span'];
+				}
+				$into_output = '';
+				if ($field['name'] != 'Distro')
+				{
+					$into_output .= "<li><a href=\"$url{$data[$field['db_field']]}\">$image$span</a></li>";
+				}
+
+				$profile_fields_output .= $into_output;
+			}
+		}
+		
+		return $profile_fields_output;
+	}
 }

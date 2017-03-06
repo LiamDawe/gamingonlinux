@@ -108,12 +108,13 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						{
 							if ($field['db_field'] == 'website')
 							{
-								if (substr($profile[$field['db_field']], 0, 7) != 'http://')
+								$url = parse_url($profile[$field['db_field']]);
+								if((!isset($url['scheme'])) || (isset($url['scheme']) && $url['scheme'] != 'https' && $url['scheme'] != 'http'))
 								{
 									$profile[$field['db_field']] = 'http://' . $profile[$field['db_field']];
 								}
 							}
-
+							
 							$url = '';
 							if ($field['base_link_required'] == 1 && strpos($profile[$field['db_field']], $field['base_link']) === false ) //base_link_required and not already in the database
 							{

@@ -1,5 +1,4 @@
 <?php
-global $profile_fields;
 $profile_fields = array();
 
 $profile_fields['steam']['name'] = 'Steam ID:';
@@ -63,4 +62,6 @@ $profile_fields['twitch']['base_link'] = NULL;
 $profile_fields['twitch']['base_link_required'] = 0;
 $profile_fields['twitch']['link'] = 1;
 $profile_fields['twitch']['image'] = NULL;
+
+return $profile_fields;
 ?>

@@ -40,7 +40,7 @@ else
 
 	else if (!isset($_POST['act']) && !isset($_GET['go']) && !isset($_GET['view']))
 	{
-		include('includes/profile_fields.php');
+		$profile_fields = include 'includes/profile_fields.php';
 
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)
@@ -428,46 +428,7 @@ else
 						$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
 					}
 
-					$profile_fields_output = '';
-
-					foreach ($profile_fields as $field)
-					{
-						if (!empty($topic[$field['db_field']]))
-						{
-								if ($field['db_field'] == 'website')
-								{
-									if (substr($topic[$field['db_field']], 0, 7) != 'http://')
-									{
-										$topic[$field['db_field']] = 'http://' . $topic[$field['db_field']];
-									}
-								}
-
-								$url = '';
-								if ($field['base_link_required'] == 1 && strpos($topic[$field['db_field']], $field['base_link']) === false ) //base_link_required and not already in the database
-								{
-									$url = $field['base_link'];
-								}
-
-								$image = '';
-								if ($field['image'] != NULL)
-								{
-									$image = "<img src=\"{$field['image']}\" alt=\"{$field['name']}\" />";
-								}
-
-								$span = '';
-								if (isset($field['span']))
-								{
-									$span = $field['span'];
-								}
-								$into_output = '';
-								if ($field['name'] != 'Distro')
-								{
-									$into_output .= "<li><a href=\"$url{$topic[$field['db_field']]}\">$image$span</a></li>";
-								}
-
-								$profile_fields_output .= $into_output;
-						}
-					}
+					$profile_fields_output = user::user_profile_icons($profile_fields, $topic);
 
 					$templating->set('profile_fields', $profile_fields_output);
 
@@ -655,47 +616,7 @@ else
 							$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
 						}
 
-						$profile_fields_output = '';
-
-						foreach ($profile_fields as $field)
-						{
-							if (!empty($post[$field['db_field']]))
-							{
-								if ($field['db_field'] == 'website')
-								{
-									if (substr($post[$field['db_field']], 0, 7) != 'http://')
-									{
-										$post[$field['db_field']] = 'http://' . $post[$field['db_field']];
-									}
-								}
-
-								$url = '';
-								if ($field['base_link_required'] == 1)
-								{
-									$url = $field['base_link'];
-								}
-
-								$image = '';
-								if ($field['image'] != NULL)
-								{
-									$image = "<img src=\"{$field['image']}\" alt=\"{$field['name']}\" />";
-								}
-
-								$span = '';
-								if (isset($field['span']))
-								{
-									$span = $field['span'];
-								}
-
-								$into_output = '';
-								if ($field['name'] != 'Distro')
-								{
-									$into_output .= "<li><a href=\"$url{$post[$field['db_field']]}\">$image$span</a></li>";
-								}
-
-								$profile_fields_output .= $into_output;
-							}
-						}
+						$profile_fields_output = user::user_profile_icons($profile_fields, $post);
 
 						$templating->set('profile_fields', $profile_fields_output);
 

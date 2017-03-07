@@ -6,6 +6,9 @@ class core
 	
 	// the current date and time for the mysql
 	public static $date;
+	
+	// the time and date right now in the MySQL timestamp format
+	public static $sql_date_now;
 
 	// the users ip address
 	public static $ip;
@@ -37,6 +40,7 @@ class core
 		
 		core::$database = include  $this->_file_dir . '/includes/config.php';
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
+		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
 	}
 	

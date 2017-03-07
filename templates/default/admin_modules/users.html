@@ -86,7 +86,8 @@
 <div class="box">
 	<div class="body group">
 		<form method="post" action="admin.php?module=users">
-		IP: {:ip} <button type="submit" class="button" name="act" value="unipban">UnBan</button> <button type="submit" class="button" name="act" value="editipban">Edit</button>
+		IP: {:ip}<br />
+		Banned until: {:removal_date} <br /><button type="submit" class="button" name="act" value="unipban">UnBan</button> <button type="submit" class="button" name="act" value="editipban">Edit</button>
 		<input type="hidden" name="id" value="{:id}" />
 		</form>
 	</div>
@@ -95,10 +96,14 @@
 
 [block: editip]
 <div class="box">
-	<form method="post" action="admin.php?module=users">
-	Edit the IP
-	IP: <input type="text" name="ip" value="{:ip}" /><button type="submit" class="button">Edit IP</button>
-	<input type="hidden" name="act" value="editipban" /> <input type="hidden" name="id" value="{:id}" /> <input type="hidden" name="act2" value="go" />
-	</form>
+	<div class="head">Editing a banned IP address</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=users">
+		IP: <input type="text" name="ip" value="{:ip}" /><br />
+		Banned until: {:removal_date} <br />
+		<button type="submit" class="button">Edit IP</button>
+		<input type="hidden" name="act" value="editipban" /> <input type="hidden" name="id" value="{:id}" /> <input type="hidden" name="act2" value="go" />
+		</form>
+	</div>
 </div>
 [/block: editip]

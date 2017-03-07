@@ -193,7 +193,7 @@ else
 		{
 			$templating->block('ipban');
 			
-			$db->sqlquery("SELECT `id`, `ip` FROM `ipbans` ORDER BY `id` DESC");
+			$db->sqlquery("SELECT `id`, `ip`, `ban_date` FROM `ipbans` ORDER BY `id` DESC");
 			$total = $db->num_rows();
 			if ($total > 0)
 			{
@@ -201,6 +201,12 @@ else
 				{
 					$templating->block('iprow');
 					$templating->set('ip', $ip['ip']);
+					
+					$banned_until = new DateTime($ip['ban_date']);
+					$banned_until->add(new DateInterval('P'.core::config('ip_ban_length').'D'));
+					
+					$templating->set('removal_date', $banned_until->format('Y-m-d H:i:s'));
+					
 					$templating->set('id', $ip['id']);
 				}
 			}
@@ -383,10 +389,16 @@ else
 			{
 				$templating->block('editip');
 
-				$db->sqlquery("SELECT `id`, `ip` FROM `ipbans` WHERE `id` = ?", array($_POST['id']));
+				$db->sqlquery("SELECT `id`, `ip`, `ban_date` FROM `ipbans` WHERE `id` = ?", array($_POST['id']));
 				$ip = $db->fetch();
 
 				$templating->set('ip', $ip['ip']);
+				
+				$banned_until = new DateTime($ip['ban_date']);
+				$banned_until->add(new DateInterval('P'.core::config('ip_ban_length').'D'));
+					
+				$templating->set('removal_date', $banned_until->format('Y-m-d H:i:s'));
+				
 				$templating->set('id', $ip['id']);
 			}
 

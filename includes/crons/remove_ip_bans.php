@@ -7,6 +7,6 @@ $core = new core($file_dir);
 include($file_dir . '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-$timeout = 30;
+$timeout = core::config('ip_ban_length');
 
 $db->sqlquery("DELETE FROM `ipbans` WHERE `ban_date` < NOW() - INTERVAL $timeout DAY");

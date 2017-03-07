@@ -525,7 +525,7 @@ else
 						{
 							if ($comment_loop['spam'] == 1)
 							{
-								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'reported_comment' AND `data` = ?", array(core::$date, $_GET['user_id'], $comment_loop['comment_id']));
+								$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'reported_comment' AND `data` = ?", array(core::$date, $comment_loop['comment_id']));
 							}
 						}
 

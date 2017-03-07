@@ -513,7 +513,7 @@ else
 		$templating->block('preview', 'private_messages');
 	}
 	
-	if (isset($_POST['act']) && $_POST['act'] == 'search_title')
+	if (isset($_GET['view']) && $_GET['view'] == 'search_title')
 	{
 		$templating->block('top');
 		
@@ -530,10 +530,24 @@ else
 		$templating->set('compose_link', $compose_link);
 		$templating->set('view_all', $view_all);
 		
-		$title = core::make_safe($_POST['search_title']);
+		$title = str_replace("+", ' ', $_GET['search_title']);
+		$title = core::make_safe($title);
 		
 		$templating->block('search');
 		$templating->set('search_term', $title);
+		
+		$page = core::give_page();
+		
+		$db->sqlquery("SELECT COUNT(`conversation_id`) as `total` FROM `user_conversations_info` WHERE `owner_id` = ? AND `title` LIKE ?", array($_SESSION['user_id'], '%' . $title . '%'));
+		$total_pms = $db->fetch();
+		
+		$per_page = 15;
+		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
+		{
+			$per_page = $_SESSION['per-page'];
+		}
+		
+		$pagination = $core->pagination_link($per_page, $total_pms['total'], '/index.php?module=messages&view=search_title&', $page, '&search_title='.$title);
 		
 		$db->sqlquery("SELECT
 			i.`conversation_id`,
@@ -560,7 +574,7 @@ else
 		AND 
 			i.`title` LIKE ?
 		ORDER BY
-			i.`last_reply_date` DESC", array($_SESSION['user_id'], '%' . $title . '%'));
+			i.`last_reply_date` DESC LIMIT ?, ?", array($_SESSION['user_id'], '%' . $title . '%', $core->start, $per_page));
 		$total_found = $db->num_rows();
 		if ($total_found > 0)
 		{
@@ -605,6 +619,9 @@ else
 		{
 			$core->message('Nothing was found with those search terms.');
 		}
+		$templating->block('pagination', 'private_messages');
+		$templating->set('pagination', $pagination);
+		$templating->block('bottom', 'private_messages');
 	}
 
 	if (isset($_POST['act']) && $_POST['act'] == 'New')

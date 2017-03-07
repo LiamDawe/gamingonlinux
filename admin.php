@@ -60,7 +60,7 @@ if (in_array($module, $modules_allowed))
 		{
 			$extra = $_SESSION['message_extra'];
 		}
-		$message_map->display_message($module, $_SESSION['message'], $extra);
+		$message_map->display_message('admin/'.$module, $_SESSION['message'], $extra);
 	}
 	
 	include($file_dir . "/admin_modules/$module.php");

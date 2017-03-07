@@ -11,17 +11,6 @@ else
 	{
 		if ($_GET['view'] == 'search')
 		{
-			if (isset($_GET['message']))
-			{
-				$extra = NULL;
-				if (isset($_GET['extra']))
-				{
-					$extra = $_GET['extra'];
-				}
-				$message = $message_map->get_message($_GET['message'], $extra);
-				$core->message($message['message'], NULL, $message['error']);
-			}
-
 			$templating->block('search','admin_modules/users');
 
 			$username = '';
@@ -82,17 +71,6 @@ else
 			else
 			{
 				$templating->block('search','admin_modules/users');
-
-				if (isset($_GET['message']))
-				{
-					$extra = NULL;
-					if (isset($_GET['extra']))
-					{
-						$extra = $_GET['extra'];
-					}
-					$message = $message_map->get_message($_GET['message'], $extra);
-					$core->message($message['message'], NULL, $message['error']);
-				}
 
 				$db->sqlquery("SELECT * FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$user_info = $db->fetch();
@@ -211,19 +189,24 @@ else
 			}
 		}
 
-		if ($_GET['view'] == 'ipban')
-		{
-			$templating->block('ipban');
-		}
-
 		if ($_GET['view'] == 'ipbanmanage')
 		{
+			$templating->block('ipban');
+			
 			$db->sqlquery("SELECT `id`, `ip` FROM `ipbans` ORDER BY `id` DESC");
-			while ($ip = $db->fetch())
+			$total = $db->num_rows();
+			if ($total > 0)
 			{
-				$templating->block('iprow');
-				$templating->set('ip', $ip['ip']);
-				$templating->set('id', $ip['id']);
+				while ($ip = $db->fetch())
+				{
+					$templating->block('iprow');
+					$templating->set('ip', $ip['ip']);
+					$templating->set('id', $ip['id']);
+				}
+			}
+			else
+			{
+				$core->message('No IP bans are currently in place!');
 			}
 		}
 	}
@@ -238,7 +221,9 @@ else
 			$empty_check = core::mempty(compact('username', 'email'));
 			if ($empty_check !== true)
 			{
-				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=empty&extra=$empty_check");
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = $empty_check;
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
 			}
 
 			else
@@ -279,7 +264,9 @@ else
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'edited_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=edited&extra=user");
+				$_SESSION['message'] = 'edited';
+				$_SESSION['message_extra'] = 'user account';
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
 			}
 		}
 
@@ -306,7 +293,8 @@ else
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'banned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=banned");
+					$_SESSION['message'] = 'user_banned';
+					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
 				}
 			}
 		}
@@ -317,8 +305,8 @@ else
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unbanned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-
-			header('Location: /admin.php?module=users&view=edituser&user_id='.$_GET['user_id'].'&message=unbanned');
+			$_SESSION['message'] = 'user_unbanned';
+			header('Location: /admin.php?module=users&view=edituser&user_id='.$_GET['user_id']);
 		}
 
 		if ($_POST['act'] == 'ipban')
@@ -330,11 +318,12 @@ else
 
 			else
 			{
-				$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($_POST['ip']));
+				$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_POST['ip'], core::$sql_date_now));
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'ip_banned', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_POST['ip'], core::$date, core::$date));
 
-				$core->message("That IP {$_POST['ip']} has now been banned!");
+				$_SESSION['message'] = 'ip_ban';
+				header("Location: /admin.php?module=users&view=ipbanmanage");
 			}
 		}
 
@@ -364,11 +353,12 @@ else
 				else
 				{
 					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
-					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($_SESSION['ban_ip']));
+					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_SESSION['ban_ip'], core::$sql_date_now));
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'total_ban', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=banned");
+					$_SESSION['message'] = 'user_banned';
+					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
 					unset($_SESSION['ban_ip']);
 				}
 			}
@@ -383,7 +373,8 @@ else
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unban_ip', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $get_ip_ban['ip'], core::$date, core::$date));
 
-			$core->message("That IP has now been unbanned!");
+			$_SESSION['message'] = 'ip_unban';
+			header("Location: /admin.php?module=users&view=ipbanmanage");
 		}
 
 		if ($_POST['act'] == 'editipban')
@@ -409,7 +400,10 @@ else
 				else
 				{
 					$db->sqlquery("UPDATE `ipbans` SET `ip` = ? WHERE `id` = ?", array($_POST['ip'], $_POST['id']));
-					$core->message("That IP {$_POST['ip']} has now been edited!");
+					
+					$_SESSION['message'] = 'edited';
+					$_SESSION['message_extra'] = 'IP address ban';
+					header("Location: /admin.php?module=users&view=ipbanmanage");
 				}
 			}
 		}
@@ -427,6 +421,8 @@ else
 
 			$db->sqlquery("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
 
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'avatar';
 			header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=deleted&extra=avatar");
 		}
 
@@ -463,7 +459,9 @@ else
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
 
-				header("Location: /admin.php?module=users&view=search&message=deleted&extra=user");
+				$_SESSION['message'] = 'deleted';
+				$_SESSION['message_extra'] = 'user account';
+				header("Location: /admin.php?module=users&view=search");
 			}
 		}
 
@@ -471,6 +469,8 @@ else
 		{
 			if (!isset($_GET['user_id']))
 			{
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message_extra'] = 'user id';
 				header("Location: /admin.php?module=users&view=search&message=no_id&extra=user");
 			}
 			else
@@ -537,7 +537,9 @@ else
 						// alert admins this was done
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'deleted_user_content', `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
-						header("Location: /admin.php?module=users&view=search&message=deleted&extra=user-content");
+						$_SESSION['message'] = 'user_content_deleted';
+						$_SESSION['message_extra'] = 'user content';
+						header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
 					}
 				}
 			}

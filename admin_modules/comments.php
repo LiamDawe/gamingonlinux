@@ -282,7 +282,7 @@ if (isset($_POST['act']))
 		if (!is_numeric($_GET['aid']))
 		{
 			$_SESSION['message'] = 'no_id';
-			$_SESSION['message_extra'] = 'comment'
+			$_SESSION['message_extra'] = 'comment';
 			header("Location: /admin.php");
 		}
 

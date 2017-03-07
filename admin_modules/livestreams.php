@@ -188,7 +188,7 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$date_created = date('Y-m-d H:i:s');
+		$date_created = core::$sql_date_now;
 
 		$community = 0;
 		if (isset($_POST['community']))

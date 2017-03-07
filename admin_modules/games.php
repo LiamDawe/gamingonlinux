@@ -336,7 +336,7 @@ if (isset($_POST['act']))
 		}
 
 		$date = new DateTime($_POST['date']);
-		$edit_date = date('Y-m-d H:i:s');
+		$edit_date = core::$sql_date_now;
 
 		$guess = 0;
 		if (isset($_POST['guess']))

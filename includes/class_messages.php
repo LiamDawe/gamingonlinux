@@ -1,6 +1,7 @@
 <?php
 class message_map
 {
+	public static $error = 0;
 	public $messages = [];
 
 	function __construct($file='main')
@@ -66,8 +67,11 @@ class message_map
 
 		$templating->set('message', $stored_message);
 		
+		self::$error = $error;
+		
 		unset($_SESSION['message']);
 		unset($_SESSION['message_extra']);
+		unset($_SESSION['error']);
 	}
 }
 

@@ -304,165 +304,168 @@ class article_class
     return $tagline_image;
   }
 
-  // this function will check over everything necessary for an article to be correctly done
-  function check_article_inputs($return_page)
-  {
-    global $db, $core;
+	// this function will check over everything necessary for an article to be correctly done
+	function check_article_inputs($return_page)
+	{
+		global $db, $core;
 
-    // if this is set to 1, we've come across an issue, so redirect
-    $redirect = 0;
+		// if this is set to 1, we've come across an issue, so redirect
+		$redirect = 0;
 
-    // count how many editors picks we have
-    $editor_picks = array();
+		// count how many editors picks we have
+		$editor_picks = array();
 
-    $db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-    while($editor_get = $db->fetch())
-    {
-      $editor_picks[] = $editor_get['article_id'];
-    }
+		$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
+		while($editor_get = $db->fetch())
+		{
+			$editor_picks[] = $editor_get['article_id'];
+		}
 
-    $editor_pick_count = $db->num_rows();
+		$editor_pick_count = $db->num_rows();
 
-    $temp_tagline = 0;
-    if ( (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand']) || (!empty($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand']))
-    {
-      $temp_tagline = 1;
-    }
+		$temp_tagline = 0;
+		if ( (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand']) || (!empty($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand']))
+		{
+			$temp_tagline = 1;
+		}
 
-    if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
-    {
-      $db->sqlquery("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-      $check_article = $db->fetch();
-    }
+		if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
+		{
+			$db->sqlquery("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+			$check_article = $db->fetch();
+		}
 
-    $title = strip_tags($_POST['title']);
-    $tagline = trim($_POST['tagline']);
-    $text = trim($_POST['text']);
+		$title = strip_tags($_POST['title']);
+		$tagline = trim($_POST['tagline']);
+		$text = trim($_POST['text']);
 
-    // check its set, if not hard-set it based on the article title
-    if (isset($_POST['slug']) && !empty($_POST['slug']))
-    {
-      $slug = core::nice_title($_POST['slug']);
-    }
-    else
-    {
-      $slug = core::nice_title($_POST['title']);
-    }
+		// check its set, if not hard-set it based on the article title
+		if (isset($_POST['slug']) && !empty($_POST['slug']))
+		{
+			$slug = core::nice_title($_POST['slug']);
+		}
+		else
+		{
+			$slug = core::nice_title($_POST['title']);
+		}
 
-    // make sure its not empty
-    $empty_check = core::mempty(compact('title', 'tagline', 'text'));
-    if ($empty_check !== true)
-    {
-      $redirect = 1;
+		// make sure its not empty
+		$empty_check = core::mempty(compact('title', 'tagline', 'text'));
+		if ($empty_check !== true)
+		{
+			$redirect = 1;
 
-      $return_error = 'empty&extra=' . $empty_check;
-    }
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $empty_check;
+		}
 
 		else if (strlen($tagline) < 100)
 		{
-      $redirect = 1;
+			$redirect = 1;
 
-      $return_error = 'shorttagline';
+			$_SESSION['message'] = 'shorttagline';
 		}
 
 		else if (strlen($tagline) > core::config('tagline-max-length'))
 		{
-      $redirect = 1;
+			$redirect = 1;
 
-      $return_error = 'taglinetoolong&extra=' . core::config('tagline-max-length');
+			$_SESSION['message'] = 'taglinetoolong';
+			$_SESSION['message_extra'] = core::config('tagline-max-length');
 		}
 
 		else if (strlen($title) < 10)
 		{
-      $redirect = 1;
+			$redirect = 1;
 
-      $return_error = 'shorttitle';
+			$_SESSION['message'] = 'shorttitle';
 		}
 
 		else if (isset($_POST['show_block']) && $editor_pick_count == core::config('editor_picks_limit'))
 		{
-      $redirect = 1;
+			$redirect = 1;
+			
+			$_SESSION['message'] = 'editor_picks_full';
+			$_SESSION['message_extra'] = core::config('editor_picks_limit');
+		}
 
-      $return_error = 'editor_picks_full&extra=' . core::config('editor_picks_limit');
-    }
+		// if it's an existing article, check tagline image
+		// if database tagline_image is empty and there's no upload OR upload doesn't match (previous left over)
+		else if (isset($_POST['article_id']))
+		{
+			if ((empty($check_article['tagline_image']) && $check_article['gallery_tagline'] == 0 && !isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) && (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) && (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
+			{
+				$redirect = 1;
+				
+				$_SESSION['message'] = 'noimageselected';
+			}
+		}
 
-    // if it's an existing article, check tagline image
-    // if database tagline_image is empty and there's no upload OR upload doesn't match (previous left over)
-    else if (isset($_POST['article_id']))
-    {
-      if ((empty($check_article['tagline_image']) && $check_article['gallery_tagline'] == 0 && !isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) && (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) && (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
-      {
-        $redirect = 1;
+		// if it's a new article, check for tagline image in a simpler way
+		// if there's no upload, or upload doesn't match
+		else if (!isset($_POST['article_id']))
+		{
+			if ( (!isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']) || (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) )
+			{
+				$redirect = 1;
 
-        $return_error = 'noimageselected';
-      }
-    }
+				$_SESSION['message'] = 'noimageselected';
+			}
+		}
 
-    // if it's a new article, check for tagline image in a simpler way
-    // if there's no upload, or upload doesn't match
-    else if (!isset($_POST['article_id']))
-    {
-      if ( (!isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']) || (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) )
-      {
-        $redirect = 1;
+		if ($redirect == 1)
+		{
+			$_SESSION['atitle'] = $title;
+			$_SESSION['aslug'] = $slug;
+			$_SESSION['atagline'] = $tagline;
+			$_SESSION['atext'] = $text;
 
-        $return_error = 'noimageselected';
-      }
-    }
+			if (isset($_POST['categories']) && !empty($_POST['categories']))
+			{
+				$_SESSION['acategories'] = $_POST['categories'];
+			}
 
-    if ($redirect == 1)
-    {
-      $_SESSION['atitle'] = $title;
-      $_SESSION['aslug'] = $slug;
-      $_SESSION['atagline'] = $tagline;
-      $_SESSION['atext'] = $text;
+			if (isset($_POST['games']) && !empty($_POST['games']))
+			{
+				$_SESSION['agames'] = $_POST['games'];
+			}
 
-      if (isset($_POST['categories']) && !empty($_POST['categories']))
-      {
-        $_SESSION['acategories'] = $_POST['categories'];
-      }
+			if (isset($_POST['show_article']))
+			{
+				$_SESSION['aactive'] = 1;
+			}
+			else
+			{
+				$_SESSION['aactive'] = 0;
+			}
 
-      if (isset($_POST['games']) && !empty($_POST['games']))
-      {
-        $_SESSION['agames'] = $_POST['games'];
-      }
+			$self = 0;
+			if (isset($_POST['submit_as_self']))
+			{
+				$self = 1;
+			}
 
-      if (isset($_POST['show_article']))
-      {
-        $_SESSION['aactive'] = 1;
-      }
-      else
-      {
-        $_SESSION['aactive'] = 0;
-      }
+			header("Location: $return_page&self=$self&temp_tagline=$temp_tagline");
+			die();
+		}
 
-      $self = 0;
-      if (isset($_POST['submit_as_self']))
-      {
-        $self = 1;
-      }
+		// only set them, if they actually exists
+		$article_id = '';
+		if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
+		{
+			$article_id = $_POST['article_id'];
+		}
 
-      header("Location: $return_page&error=$return_error&self=$self&temp_tagline=$temp_tagline");
-      die();
-    }
+		$tagline_image = '';
+		if (isset($check_article['tagline_image']))
+		{
+			$tagline_image = $check_article['tagline_image'];
+		}
 
-    // only set them, if they actually exists
-    $article_id = '';
-    if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
-    {
-      $article_id = $_POST['article_id'];
-    }
+		$content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug, 'article_id' => $article_id, 'tagline_image' => $tagline_image);
 
-    $tagline_image = '';
-    if (isset($check_article['tagline_image']))
-    {
-      $tagline_image = $check_article['tagline_image'];
-    }
-
-    $content_array = array('title' => $title, 'text' => $text, 'tagline' => $tagline, 'slug' => $slug, 'article_id' => $article_id, 'tagline_image' => $tagline_image);
-
-    return $content_array;
-  }
+		return $content_array;
+	}
 
 	// this will subscribe them to an article and generate any possible missing secret key for emails
 	function subscribe($article_id, $emails = NULL)
@@ -527,41 +530,41 @@ class article_class
 		}
 	}
 
-  function unsubscribe($article_id)
-  {
-    global $db;
+	function unsubscribe($article_id)
+	{
+		global $db;
 
-    if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
-    {
-      $db->sqlquery("SELECT `user_id`, `article_id` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
-      $count_subs = $db->num_rows();
-      if ($count_subs == 1)
-      {
-        $db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
-      }
-    }
-  }
+		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+		{
+			$db->sqlquery("SELECT `user_id`, `article_id` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+			$count_subs = $db->num_rows();
+			if ($count_subs == 1)
+			{
+				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+			}
+		}
+	}
 
-  function article_history($article_id)
-  {
-    global $db, $templating, $core;
-    $db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
-    $history = '';
-    while ($grab_history = $db->fetch())
-    {
-      $view_link = '';
-      if ($grab_history['text'] != NULL && !empty($grab_history['text']))
-      {
-        $view_link = '- <a href="/admin.php?module=article_history&id='.$grab_history['id'].'">View text</a>';
-      }
-      $date = $core->format_date($grab_history['date']);
-      $history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> '.$view_link.' - ' . $date . '</li>';
-    }
+	function article_history($article_id)
+	{
+		global $db, $templating, $core;
+		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
+		$history = '';
+		while ($grab_history = $db->fetch())
+		{
+			$view_link = '';
+			if ($grab_history['text'] != NULL && !empty($grab_history['text']))
+			{
+				$view_link = '- <a href="/admin.php?module=article_history&id='.$grab_history['id'].'">View text</a>';
+			}
+			$date = $core->format_date($grab_history['date']);
+			$history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> '.$view_link.' - ' . $date . '</li>';
+		}
 
-    $templating->merge('admin_modules/admin_module_articles');
-    $templating->block('history', 'admin_modules/admin_module_articles');
-    $templating->set('history', $history);
-  }
+		$templating->merge('admin_modules/admin_module_articles');
+		$templating->block('history', 'admin_modules/admin_module_articles');
+		$templating->set('history', $history);
+	}
   
 	public static function get_link($id, $title, $additional = NULL)
 	{

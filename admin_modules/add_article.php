@@ -5,21 +5,10 @@ $templating->set('article_css', 'articleadmin');
 $templating->set_previous('title', 'New article ' . $templating->get('title', 1)  , 1);
 
 // only refresh the tagline image session identifier on a brand new page, if there's an error or we are publishing, we need it the same to compare
-if (!isset($_GET['error']) && !isset($_POST['act']))
+if (!isset($_SESSION['error']) && !isset($_POST['act']))
 {
 	$_SESSION['image_rand'] = rand();
 	$article_class->reset_sessions();
-}
-
-if (isset ($_GET['error']))
-{
-	$extra = NULL;
-	if (isset($_GET['extra']))
-	{
-		$extra = $_GET['extra'];
-	}
-	$message = $message_map->get_message($_GET['error'], $extra);
-	$core->message($message['message'], NULL, $message['error']);
 }
 
 $templating->block('add', 'admin_modules/admin_module_articles');
@@ -34,7 +23,7 @@ $categorys_list = '';
 $db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
 while ($categorys = $db->fetch())
 {
-	if (isset($_GET['error']) || isset($_GET['dump']))
+	if (isset($_SESSION['error']) || isset($_GET['dump']))
 	{
 		if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 		{
@@ -54,7 +43,7 @@ $tagline = '';
 $tagline_image = '';
 $previously_uploaded = '';
 
-if (isset($_GET['error']) || isset($_GET['dump']))
+if ($message_map::$error == 1 || isset($_GET['dump']))
 {
 	$title = $_SESSION['atitle'];
 	$tagline = $_SESSION['atagline'];
@@ -62,7 +51,7 @@ if (isset($_GET['error']) || isset($_GET['dump']))
 	$slug = $_SESSION['aslug'];
 
 	// sort out previously uploaded images
-	$previously_uploaded	= $article_class->display_previous_uploads();
+	$previously_uploaded = $article_class->display_previous_uploads();
 }
 
 $tagline_image = $article_class->display_tagline_image();
@@ -96,7 +85,7 @@ $templating->set('subscribe_check', $auto_subscribe);
 
 if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 {
-  $return_page = "admin.php?module=add_article&error=empty";
+  $return_page = "admin.php?module=add_article";
   if ($checked = $article_class->check_article_inputs($return_page))
   {
   	// show in the editors pick block section

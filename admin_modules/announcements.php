@@ -38,7 +38,9 @@ if (isset($_POST['act']))
 		$text = trim($_POST['text']);
 		if (empty($text))
 		{
-			header("Location: /admin.php?module=announcements&view=manage&message=empty&message=text");
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'announcement text';
+			header("Location: /admin.php?module=announcements&view=manage");
 			die();
 		}
 
@@ -52,17 +54,23 @@ if (isset($_POST['act']))
 		
 		if (empty($text))
 		{
-			header("Location: /admin.php?module=announcements&view=manage&message=empty&extra=text");
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'announcement text';
+			header("Location: /admin.php?module=announcements&view=manage");
 			die();
 		}
 		if (empty($id) || !is_numeric($id))
 		{
-			header("Location: /admin.php?module=announcements&view=manage&message=empty&extra=id");
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'announcement';
+			header("Location: /admin.php?module=announcements&view=manage");
 			die();
 		}
 
 		$db->sqlquery("UPDATE `announcements` SET `text` = ? WHERE `id` = ?", array($text, $_POST['id']));
-		header("Location: /admin.php?module=announcements&view=manage&message=edited&extra=announcement");
+		$_SESSION['message'] = 'edited';
+		$_SESSION['message_extra'] = 'announcement';
+		header("Location: /admin.php?module=announcements&view=manage");
 	}
 
 	if ($_POST['act'] == 'delete')
@@ -78,7 +86,9 @@ if (isset($_POST['act']))
 		else if (isset($_POST['yes']))
 		{
 			$db->sqlquery("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
-			header("Location: /admin.php?module=announcements&view=manage&message=deleted&extra=announcement");
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'announcement';
+			header("Location: /admin.php?module=announcements&view=manage");
 		}
 	}
 }

@@ -21,12 +21,6 @@ return [
 		"text" => "You have to give the article at least one category tag!",
 		"error" => 1
 	],
-	"taglinetoolong" => 
-	[
-		"text" => "The tagline was too long, it needs to be %d characters or less!",
-		"additions" => 1,
-		"error" => 1
-	],
 	"editor_picks_full" => 
 	[
 		"text" => "There are already enough editor picks, the max is %d!",

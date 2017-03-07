@@ -281,7 +281,9 @@ if (isset($_POST['act']))
 		// make sure news id is a number
 		if (!is_numeric($_GET['aid']))
 		{
-			$core->message('Article id was not a number! Stop trying to do something naughty!');
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'comment'
+			header("Location: /admin.php");
 		}
 
 		else
@@ -306,14 +308,17 @@ if (isset($_POST['act']))
 
 			if ($check_comment['comment_text'] == $comment)
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=comments&aid={$_GET['aid']}&error=doublecomment#commentbox");
+				$_SESSION['message'] = 'double_comment';
+				header("Location: " . core::config('website_url') . "admin.php?module=comments&aid={$_GET['aid']}");
 
 				die();
 			}
 
 			if (empty($comment))
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=comments&aid={$_POST['aid']}&error=emptycomment#commentbox");
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'comment';
+				header("Location: " . core::config('website_url') . "admin.php?module=comments&aid={$_POST['aid']}");
 
 				die();
 			}
@@ -428,7 +433,9 @@ if (isset($_POST['act']))
 			// check empty
 			if (empty($comment_text))
 			{
-				$core->message('You cannot post an empty comment');
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'comment';
+				header("Location: " . core::config('website_url') . "admin.php?module=comments&aid={$_POST['aid']}");
 			}
 
 			// update comment

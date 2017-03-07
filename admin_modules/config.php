@@ -8,13 +8,6 @@ if ($_SESSION['user_group'] != 1)
 
 else
 {
-	if (isset($_GET['message']))
-	{
-		if ($_GET['message'] == 'done')
-		{
-			$core->message('Config updated!');
-		}
-	}
 	if (!isset($_POST['Submit']))
 	{
 		$templating->merge('admin_modules/config');
@@ -115,6 +108,8 @@ else
 
 			$core->set_config($debug, 'show_debug');
 
+			$_SESSION['message'] = 'edited';
+			$_SESSION['message_extra'] = 'config';
 			header("Location: /admin.php?module=config&message=done");
 		}
 	}

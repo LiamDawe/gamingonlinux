@@ -16,19 +16,6 @@ else if (is_numeric($_GET['page']))
 
 $templating->block('top', 'admin_modules/corrections');
 
-// if we have just deleted one tell us
-if (isset($_GET['message']))
-{
-  if ($_GET['message'] == 'deleted')
-  {
-    $core->message('That correction submission has been deleted.');
-  }
-  if ($_GET['message'] == 'noid')
-  {
-    $core->message("Not a correct id!", NULL, 1);
-  }
-}
-
 // count how many there is in total
 $db->sqlquery("SELECT `row_id` FROM `article_corrections`");
 $total_pages = $db->num_rows();
@@ -80,20 +67,24 @@ else
 
 if (isset($_POST['act']) && $_POST['act'] == 'delete')
 {
-  if (!isset($_POST['correction_id']) || !is_numeric($_POST['correction_id']))
-  {
-    header("Location: /admin.php?module=corrections&message=noid");
-    die();
-  }
+	if (!isset($_POST['correction_id']) || !is_numeric($_POST['correction_id']))
+	{
+		$_SESSION['message'] = 'no_id';
+		$_SESSION['message_extra'] = 'correction';
+		header("Location: /admin.php?module=corrections");
+		die();
+	}
 
-  else
-  {
-    $db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'article_correction' AND `data` = ?", array(core::$date, $_POST['correction_id']));
-    $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_correction', $_POST['correction_id']));
+	else
+	{
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'article_correction' AND `data` = ?", array(core::$date, $_POST['correction_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_correction', $_POST['correction_id']));
 
-    $db->sqlquery("DELETE FROM `article_corrections` WHERE `row_id` = ?", array($_POST['correction_id']));
+		$db->sqlquery("DELETE FROM `article_corrections` WHERE `row_id` = ?", array($_POST['correction_id']));
 
-    header("Location: /admin.php?module=corrections&message=deleted");
-  }
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'correction';
+		header("Location: /admin.php?module=corrections&message=deleted");
+	}
 }
 ?>

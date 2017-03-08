@@ -40,6 +40,8 @@ class golchart
 		'#cab2d6',
 		'#6a3d9a'];
 		
+		$this->chart_options['title_color'] = '';
+		
 		$this->chart_options['chart_width'] = 600;
 		$this->chart_options['title_background_height'] = 25;
 		$this->chart_options['bar_thickness'] = 30;
@@ -482,8 +484,16 @@ class golchart
 			<line x1="'.$this->outlines_x.'" y1="64" x2="'.$this->outlines_x.'" y2="'.$this->axis_outline_y.'" />
 			<line x1="'.$this->outlines_x.'" y1="'.$this->axis_outline_y.'" x2="586" y2="'.$this->axis_outline_y.'" />
 		</g>
-		<rect class="golsvg_header" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$this->chart_options['title_background_height'].'" fill="#222222"/>
-		<text class="golsvg_title" x="300" y="19" font-size="17" text-anchor="middle">'.$this->chart_info['name'].'</text>';
+		<rect class="golsvg_header" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$this->chart_options['title_background_height'].'" fill="#222222"/>';
+		
+		// only really used for chart exports
+		$title_fill = '';
+		if (isset($this->chart_options['title_colour']) && !empty($this->chart_options['title_colour']))
+		{
+			$title_fill = 'fill="'.$this->chart_options['title_colour'].'"';
+		}
+		
+		$get_graph .= '<text class="golsvg_title" '.$title_fill.' x="300" y="19" font-size="17" text-anchor="middle">'.$this->chart_info['name'].'</text>';
 		
 		if (isset($this->chart_info['sub_title']) && $this->chart_info['sub_title'] != NULL)
 		{

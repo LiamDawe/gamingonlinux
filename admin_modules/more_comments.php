@@ -1,19 +1,6 @@
 <?php
 $templating->merge('admin_modules/admin_module_more_comments');
 
-if (isset($_GET['message']))
-{
-	if ($_GET['message'] == 'added')
-	{
-		$core->message('Added the comment!');
-	}
-
-	if ($_GET['message'] == 'emptycomment')
-	{
-		$core->message('You can\'t submit an empty admin area comment silly!', NULL, 1);
-	}
-}
-
 if (isset($_GET['view']) && $_GET['view'] == 'editors')
 {
 	// paging for pagination
@@ -75,19 +62,18 @@ if (isset($_POST['act']))
 
 		if (empty($text))
 		{
-			header('Location: /admin.php?module=more_comments&message=emptycomment');
-			exit;
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'comment';
+			header('Location: /admin.php?module=more_comments&view=editors');
+			die();
 		}
 
-		$date = core::$date;
-		$db->sqlquery("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
+		$db->sqlquery("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, core::$date));
 
 		$db->sqlquery("SELECT `username`, `email` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
 
 		while ($emailer = $db->fetch())
 		{
-			$to = $emailer['email'];
-
 			$subject = "A new editor area comment on GamingOnLinux.com";
 
 			$comment_email = email_bbcode($text);
@@ -107,6 +93,8 @@ if (isset($_POST['act']))
 			}
 		}
 
-		header('Location: /admin.php?module=more_comments&view=editors&message=added');
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'comment';
+		header('Location: /admin.php?module=more_comments&view=editors');
 	}
 }

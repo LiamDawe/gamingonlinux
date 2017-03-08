@@ -394,7 +394,7 @@ class article_class
 		else if (isset($_POST['article_id']) && !empty($_POST['article_id']))
 		{
 			$has_tagline_img = 0;
-			if (!empty($check_article['tagline_image']) || $check_article['gallery_tagline'] == 1)
+			if (!empty($check_article['tagline_image']) || $check_article['gallery_tagline'] > 0)
 			{
 				$has_tagline_img = 1;
 			}

@@ -5,17 +5,6 @@ $templating->merge('admin_modules/admin_articles_sections/admin_review');
 
 if (!isset($_GET['aid']))
 {
-	if (isset($_GET['message']))
-	{
-		$extra = NULL;
-		if (isset($_GET['extra']))
-		{
-			$extra = $_GET['extra'];
-		}
-		$message = $message_map->get_message($_GET['message'], $extra);
-		$core->message($message['message'], NULL, $message['error']);
-	}
-
 	$templating->block('review_top', 'admin_modules/admin_articles_sections/admin_review');
 
 	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `admin_review` = 1");
@@ -50,16 +39,6 @@ else
 		{
 			$core->message('You have added your comments and anyone else involved has been emailed!');
 		}
-	}
-	if (isset ($_GET['error']))
-	{
-		$extra = NULL;
-	  if (isset($_GET['extra']))
-	  {
-	    $extra = $_GET['extra'];
-	  }
-	  $message = $message_map->get_message($_GET['error'], $extra);
-	  $core->message($message['message'], NULL, $message['error']);
 	}
 
 	$query = "SELECT

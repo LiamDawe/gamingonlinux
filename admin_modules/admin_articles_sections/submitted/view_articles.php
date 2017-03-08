@@ -57,7 +57,7 @@ if (!isset($_GET['aid']))
 
 else if (isset($_GET['aid']))
 {
-	if (!isset($_GET['error']))
+	if (!isset($message_map::$error) || $message_map::$error == 0)
 	{
 		$_SESSION['image_rand'] = rand();
 		$article_class->reset_sessions();
@@ -68,16 +68,6 @@ else if (isset($_GET['aid']))
 		{
 			$core->message('Edit completed!');
 		}
-	}
-	if (isset ($_GET['error']))
-	{
-		$extra = NULL;
-	  if (isset($_GET['extra']))
-	  {
-	    $extra = $_GET['extra'];
-	  }
-	  $message = $message_map->get_message($_GET['error'], $extra);
-	  $core->message($message['message'], NULL, $message['error']);
 	}
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');
@@ -269,13 +259,14 @@ else if (isset($_GET['aid']))
 	{
 		$user_ip = $article['guest_ip'];
 	}
-	else {
+	else 
+	{
 		$user_ip = 'No IP was found';
 	}
 	$templating->set('ip_address', $user_ip);
 
 	// if they have done it before set title, text and tagline
-	if (isset($_GET['error']))
+	if (isset($message_map::$error) && $message_map::$error == 1)
 	{
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
@@ -295,9 +286,9 @@ else if (isset($_GET['aid']))
 	$templating->set('max_height', core::config('article_image_max_height'));
 	$templating->set('max_width', core::config('article_image_max_width'));
 
-	// if they have done it before set title, text and tagline
+	// if they have done it before set the text
 	$text = $article['text'];
-	if (isset($_GET['error']))
+	if (isset($message_map::$error) && $message_map::$error == 1)
 	{
 		$text = $_SESSION['atext'];
 	}
@@ -314,7 +305,7 @@ else if (isset($_GET['aid']))
 	$previously_uploaded = '';
 
 	// add in uploaded images from database
-	$previously_uploaded	= $article_class->display_previous_uploads($article['article_id']);
+	$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 
 	$templating->set('previously_uploaded', $previously_uploaded);
 	$self_check = '';

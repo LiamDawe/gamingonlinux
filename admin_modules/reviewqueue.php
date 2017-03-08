@@ -165,7 +165,7 @@ else
 	$db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
 	while ($categorys = $db->fetch())
 	{
-		if ($message_map::$error == 1)
+		if (isset($message_map::$error) && $message_map::$error == 1)
 		{
 			if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 			{
@@ -202,7 +202,7 @@ else
 	$templating->set('username', $article['username']);
 
 	// if they have done it before set title, text and tagline
-	if ($message_map::$error == 1)
+	if (isset($message_map::$error) && $message_map::$error == 1)
 	{
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
@@ -262,95 +262,104 @@ else
 	$article_class->article_history($article['article_id']);
 }
 
-// For editing a post from another admin in the review pool
-if (isset($_POST['act']) && $_POST['act'] == 'edit')
+if (isset($_POST['act']))
 {
-	if ($checked = $article_class->check_article_inputs("/admin.php?module=reviewqueue&aid={$_POST['article_id']}"))
+	if ($_POST['act'] == 'Approve_Admin')
 	{
-		$block = 0;
-		if (isset($_POST['show_block']))
+		$return_page = "/admin.php?module=reviewqueue&aid={$_POST['article_id']}";
+		article_class::publish_article(['return_page' => $return_page, 'type' => 'admin_review', 'new_notification_type' => 'article_admin_queue_approved', 'clear_notification_type' => 'article_admin_queue']);
+	}
+	
+	// For editing a post from another admin in the review pool
+	if ($_POST['act'] == 'edit')
+	{
+		if ($checked = $article_class->check_article_inputs("/admin.php?module=reviewqueue&aid={$_POST['article_id']}"))
 		{
-			$block = 1;
-		}
-
-		$article_class->gallery_tagline($checked);
-
-		$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
-
-		if (isset($_SESSION['uploads']))
-		{
-			foreach($_SESSION['uploads'] as $key)
+			$block = 0;
+			if (isset($_POST['show_block']))
 			{
-				$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
+				$block = 1;
 			}
-		}
 
-		$article_class->process_categories($_POST['article_id']);
+			$article_class->gallery_tagline($checked);
 
-		$article_class->process_game_assoc($_POST['article_id']);
+			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
 
-		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-		{
-			$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
-		}
-
-		// update history
-		$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
-
-		// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
-		unset($_SESSION['atitle']);
-		unset($_SESSION['atagline']);
-		unset($_SESSION['atext']);
-		unset($_SESSION['acategories']);
-		unset($_SESSION['agames']);
-		unset($_SESSION['aactive']);
-		unset($_SESSION['uploads']);
-		unset($_SESSION['uploads_tagline']);
-		unset($_SESSION['image_rand']);
-		unset($_SESSION['aslug']);
-		unset($_SESSION['original_text']);
-		unset($_SESSION['gallery_tagline_id']);
-		unset($_SESSION['gallery_tagline_rand']);
-		unset($_SESSION['gallery_tagline_filename']);
-
-		if ($_POST['author_id'] != $_SESSION['user_id'])
-		{
-			// find the authors email
-			$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
-			$author_email = $db->fetch();
-
-
-			// subject
-			$subject = 'Your article was reviewed and edited on GamingOnLinux.com!';
-
-			$nice_title = core::nice_title($_POST['title']);
-
-			// message
-			$message = "
-			<html>
-			<head>
-			<title>$subject</title>
-			</head>
-			<body>
-			<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-			<br />
-			<p>{$_SESSION['username']} has reviewed and edited your article on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>, here's a link to the article: <a href=\"http://www.gamingonlinux.com/admin.php?module=reviewqueue&aid={$_POST['article_id']}/\">{$_POST['title']}</a></p>
-			</body>
-			</html>";
-
-			// To send HTML mail, the Content-type header must be set
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: GamingOnLinux.com Editor Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-			// Mail it
-			if (core::config('send_emails') == 1)
+			if (isset($_SESSION['uploads']))
 			{
-				mail($author_email['email'], $subject, $message, $headers);
+				foreach($_SESSION['uploads'] as $key)
+				{
+					$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
+				}
 			}
-		}
 
-		$_SESSION['message'] = 'admin_edited';
-		header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
+			$article_class->process_categories($_POST['article_id']);
+
+			$article_class->process_game_assoc($_POST['article_id']);
+
+			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+			{
+				$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
+			}
+
+			// update history
+			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+
+			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
+			unset($_SESSION['atitle']);
+			unset($_SESSION['atagline']);
+			unset($_SESSION['atext']);
+			unset($_SESSION['acategories']);
+			unset($_SESSION['agames']);
+			unset($_SESSION['aactive']);
+			unset($_SESSION['uploads']);
+			unset($_SESSION['uploads_tagline']);
+			unset($_SESSION['image_rand']);
+			unset($_SESSION['aslug']);
+			unset($_SESSION['original_text']);
+			unset($_SESSION['gallery_tagline_id']);
+			unset($_SESSION['gallery_tagline_rand']);
+			unset($_SESSION['gallery_tagline_filename']);
+
+			if ($_POST['author_id'] != $_SESSION['user_id'])
+			{
+				// find the authors email
+				$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
+				$author_email = $db->fetch();
+
+
+				// subject
+				$subject = 'Your article was reviewed and edited on GamingOnLinux.com!';
+
+				$nice_title = core::nice_title($_POST['title']);
+
+				// message
+				$message = "
+				<html>
+				<head>
+				<title>$subject</title>
+				</head>
+				<body>
+				<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+				<br />
+				<p>{$_SESSION['username']} has reviewed and edited your article on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>, here's a link to the article: <a href=\"http://www.gamingonlinux.com/admin.php?module=reviewqueue&aid={$_POST['article_id']}/\">{$_POST['title']}</a></p>
+				</body>
+				</html>";
+
+				// To send HTML mail, the Content-type header must be set
+				$headers  = 'MIME-Version: 1.0' . "\r\n";
+				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+				$headers .= "From: GamingOnLinux.com Editor Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+
+				// Mail it
+				if (core::config('send_emails') == 1)
+				{
+					mail($author_email['email'], $subject, $message, $headers);
+				}
+			}
+
+			$_SESSION['message'] = 'admin_edited';
+			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
+		}
 	}
 }

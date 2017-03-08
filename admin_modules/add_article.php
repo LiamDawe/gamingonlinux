@@ -5,7 +5,7 @@ $templating->set('article_css', 'articleadmin');
 $templating->set_previous('title', 'New article ' . $templating->get('title', 1)  , 1);
 
 // only refresh the tagline image session identifier on a brand new page, if there's an error or we are publishing, we need it the same to compare
-if (!isset($_SESSION['error']) && !isset($_POST['act']))
+if ((isset($message_map::$error) && $message_map::$error == 0) && !isset($_POST['act']))
 {
 	$_SESSION['image_rand'] = rand();
 	$article_class->reset_sessions();
@@ -43,7 +43,7 @@ $tagline = '';
 $tagline_image = '';
 $previously_uploaded = '';
 
-if ($message_map::$error == 1 || isset($_GET['dump']))
+if ((isset($message_map::$error) && $message_map::$error == 1) || isset($_GET['dump']))
 {
 	$title = $_SESSION['atitle'];
 	$tagline = $_SESSION['atagline'];
@@ -85,74 +85,7 @@ $templating->set('subscribe_check', $auto_subscribe);
 
 if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 {
-  $return_page = "admin.php?module=add_article";
-  if ($checked = $article_class->check_article_inputs($return_page))
-  {
-  	// show in the editors pick block section
-  	$block = 0;
-  	if (isset($_POST['show_block']))
-  	{
-  		$block = 1;
-  	}
-
-  	// since it's now up we need to add 1 to total article count, it now exists, yaay have a beer on me, just kidding get your wallet!
-  	$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
-
-    $gallery_tagline_sql = $article_class->gallery_tagline();
-
-  	$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date));
-
-  	$article_id = $db->grab_id();
-
-  	$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, 'new_article_published', core::$date, $article_id));
-
-  	// upload attached images
-  	if (isset($_SESSION['uploads']))
-  	{
-  		foreach($_SESSION['uploads'] as $key)
-  		{
-  			$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
-  		}
-  	}
-
-  	$article_class->process_categories($article_id);
-
-  	$article_class->process_game_assoc($article_id);
-
-  	// move new uploaded tagline image, and save it to the article
-  	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-  	{
-  		$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
-  	}
-
-  	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
-  	unset($_SESSION['atitle']);
-  	unset($_SESSION['aslug']);
-  	unset($_SESSION['atagline']);
-  	unset($_SESSION['atext']);
-  	unset($_SESSION['acategories']);
-  	unset($_SESSION['agame']);
-  	unset($_SESSION['uploads']);
-  	unset($_SESSION['image_rand']);
-  	unset($_SESSION['uploads_tagline']);
-    unset($_SESSION['gallery_tagline_id']);
-    unset($_SESSION['gallery_tagline_rand']);
-    unset($_SESSION['gallery_tagline_filename']);
-
-  	include(core::config('path') . 'includes/telegram_poster.php');
-
-  	$article_link = article_class::get_link($article_id, $checked['slug']);
-
-  	if (!isset($_POST['show_block']))
-  	{
-  		telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
-  		header("Location: ".$article_link);
-  	}
-  	else if (isset($_POST['show_block']))
-  	{
-  		telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
-  		header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
-  	}
-  }
+	$return_page = "/admin.php?module=add_article";
+	article_class::publish_article(['return_page' => $return_page, 'type' => 'new_article', 'new_notification_type' => 'new_article_published']);
 }
 ?>

@@ -39,7 +39,7 @@ class article_class
 
     if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
     {
-      if ($data != NULL)
+      if ($data != NULL && $data['article_id'] != NULL)
       {
         if (!empty($data['tagline_image']))
         {
@@ -49,7 +49,7 @@ class article_class
 
         $db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
       }
-      else
+      else if ($data == NULL || $data['article_id'] == NULL)
       {
         $gallery_tagline_sql = ", `gallery_tagline` = {$_SESSION['gallery_tagline_id']}";
         return $gallery_tagline_sql;
@@ -275,7 +275,7 @@ class article_class
       }
     }
 
-    if (isset($_GET['error']))
+    if (isset(message_map::$error) && message_map::$error == 1)
     {
       if ($_GET['temp_tagline'] == 1)
       {
@@ -391,9 +391,25 @@ class article_class
 
 		// if it's an existing article, check tagline image
 		// if database tagline_image is empty and there's no upload OR upload doesn't match (previous left over)
-		else if (isset($_POST['article_id']))
+		else if (isset($_POST['article_id']) && !empty($_POST['article_id']))
 		{
-			if ((empty($check_article['tagline_image']) && $check_article['gallery_tagline'] == 0 && !isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) && (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) && (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']))
+			$has_tagline_img = 0;
+			if (!empty($check_article['tagline_image']) || $check_article['gallery_tagline'] == 1)
+			{
+				$has_tagline_img = 1;
+			}
+			
+			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+			{
+				$has_tagline_img = 1;
+			}
+			
+			if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+			{
+				$has_tagline_img = 1;
+			}
+			
+			if ($has_tagline_img == 0)
 			{
 				$redirect = 1;
 				
@@ -402,13 +418,24 @@ class article_class
 		}
 
 		// if it's a new article, check for tagline image in a simpler way
-		// if there's no upload, or upload doesn't match
+		// if there's no upload, gallery or they don't match (one from a previous article that wasn't wiped)
 		else if (!isset($_POST['article_id']))
 		{
-			if ( (!isset($_SESSION['uploads_tagline']) && !isset($_SESSION['gallery_tagline_id'])) || (isset($_SESSION['uploads_tagline']['image_rand']) && $_SESSION['uploads_tagline']['image_rand'] != $_SESSION['image_rand']) || (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] != $_SESSION['image_rand']) )
+			$has_tagline_img = 0;
+			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+			{
+				$has_tagline_img = 1;
+			}
+			
+			if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+			{
+				$has_tagline_img = 1;
+			}
+			
+			if ($has_tagline_img == 0)
 			{
 				$redirect = 1;
-
+				
 				$_SESSION['message'] = 'noimageselected';
 			}
 		}
@@ -450,7 +477,7 @@ class article_class
 		}
 
 		// only set them, if they actually exists
-		$article_id = '';
+		$article_id = NULL;
 		if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
 		{
 			$article_id = $_POST['article_id'];
@@ -604,6 +631,233 @@ class article_class
 			$link = 'index.php?module=articles&amp;view=cat&amp;catid='.$name;
 		}
 		return $link;
+	}
+	
+	public static function publish_article($options)
+	{
+		global $db, $core;
+		
+		if (isset($_POST['article_id']))
+		{
+			// check it hasn't been accepted already
+			$db->sqlquery("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']));
+			$check_article = $db->fetch();
+			if ($check_article['active'] == 1)
+			{
+				$_SESSION['message'] = 'already_approved';
+				header("Location: ".$options['return_page']);
+			}
+		}
+			
+		// check everything is set correctly
+		$checked = self::check_article_inputs($options['return_page']);
+			
+		// check if it's an editors pick
+		$editors_pick = 0;
+		if (isset($_POST['show_block']))
+		{
+			$editors_pick = 1;
+		}
+		
+		$gallery_tagline_sql = self::gallery_tagline($checked);
+		
+		// an existing article needs cleaning up and updating
+		if (isset($_POST['article_id']) && !empty($_POST['article_id']))
+		{
+			// this is for user submissions, if we are submitting it as ourselves, to auto thank them for the submission
+			if (isset($_POST['submit_as_self']))
+			{
+				$author_id = $_SESSION['user_id'];
+				$submission_date = '';
+
+				if (!empty($check_article['username']))
+				{
+					$submitted_by_user = $check_article['username'];
+				}
+
+				else if (!empty($check_article['guest_username']))
+				{
+					$submitted_by_user = $check_article['guest_username'];
+				}
+
+				else
+				{
+					$submitted_by_user = "a guest submitter";
+				}
+
+				$checked['text'] = $checked['text'] . "\r\n\r\n[i]Thanks to " . $submitted_by_user . ' for letting us know![/i]';
+			}
+			else
+			{
+				$author_id = $check_article['author_id'];
+			}
+		
+			$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
+			
+			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], $options['clear_notification_type']));
+			
+			$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
+			
+			// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
+			if ($_SESSION['original_text'] != $checked['text'])
+			{
+				$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+			}
+			
+			if ($_SESSION['user_id'] == $author_id)
+			{
+				if (isset($_POST['subscribe']))
+				{
+					$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $_POST['article_id']));
+				}
+			}
+			
+			$article_id = $_POST['article_id'];
+		}
+		// otherwise make the new article
+		else
+		{
+			$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date));
+			
+			$article_id = $db->grab_id();
+			
+			if (isset($_POST['subscribe']))
+			{
+				$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
+			}
+		}
+		
+		// upload attached images
+		if (isset($_SESSION['uploads']))
+		{
+			foreach($_SESSION['uploads'] as $key)
+			{
+				$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
+			}
+		}
+		
+		self::process_categories($article_id);
+
+		self::process_game_assoc($article_id);
+		
+		// move new uploaded tagline image, and save it to the article
+		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+		{
+			$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
+		}
+		
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $options['new_notification_type'], core::$date, core::$date, $article_id));
+		
+		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
+		
+		unset($_SESSION['atitle']);
+		unset($_SESSION['aslug']);
+		unset($_SESSION['atagline']);
+		unset($_SESSION['atext']);
+		unset($_SESSION['acategories']);
+		unset($_SESSION['agame']);
+		unset($_SESSION['uploads']);
+		unset($_SESSION['image_rand']);
+		unset($_SESSION['uploads_tagline']);
+		unset($_SESSION['original_text']);
+		unset($_SESSION['gallery_tagline_id']);
+		unset($_SESSION['gallery_tagline_rand']);
+		unset($_SESSION['gallery_tagline_filename']);
+		
+		// if the person publishing it is not the author then email them
+		if ($options['type'] == 'admin_review')
+		{
+			if ($_POST['author_id'] != $_SESSION['user_id'])
+			{
+				// find the authors email
+				$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
+				$author_email = $db->fetch();
+
+				// subject
+				$subject = 'Your article was reviewed and published on GamingOnLinux.com!';
+
+				// message
+				$message = "
+				<html>
+				<head>
+				<title>Your article was review and approved GamingOnLinux.com!</title>
+				</head>
+				<body>
+				<img src=\"http://www.gamingonlinux.com/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
+				<br />
+				<p><strong>{$_SESSION['username']}</strong> has reviewed and published your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"https://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>.</p>
+				</body>
+				</html>";
+
+				// To send HTML mail, the Content-type header must be set
+				$headers  = 'MIME-Version: 1.0' . "\r\n";
+				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+
+				// Mail it
+				if (core::config('send_emails') == 1)
+				{
+					mail($author_email['email'], $subject, $message, $headers);
+				}
+			}
+		}
+		
+		if ($options['type'] == 'submitted_article')
+		{
+			// pick the email to use
+			$email = '';
+			if (!empty($check_article['guest_email']))
+			{
+				$email = $check_article['guest_email'];
+			}
+
+			else if (!empty($check_article['email']))
+			{
+				$email = $check_article['email'];
+			}
+
+			// subject
+			$subject = 'Your article was approved on GamingOnLinux.com!';
+
+			// message
+			$message = "
+			<html>
+			<head>
+			<title>Your article was approved GamingOnLinux.com!</title>
+			</head>
+			<body>
+			<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+			<br />
+			<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>
+			</body>
+			</html>";
+
+			// To send HTML mail, the Content-type header must be set
+			$headers  = 'MIME-Version: 1.0' . "\r\n";
+			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+
+			if (core::config('send_emails') == 1)
+			{
+				mail($email, $subject, $message, $headers);
+			}
+		}
+		
+		include(core::config('path') . 'includes/telegram_poster.php');
+		
+		$article_link = self::get_link($article_id, $checked['slug']);
+
+		if (!isset($_POST['show_block']))
+		{
+			telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
+			header("Location: ".$article_link);
+		}
+		else if (isset($_POST['show_block']))
+		{
+			telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
+			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
+		}
 	}
 }
 ?>

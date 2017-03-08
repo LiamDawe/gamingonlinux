@@ -786,16 +786,8 @@ else if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'Approve')
 	{
-		include('admin_articles_sections/submitted/approve_submitted.php');
-	}
-
-	/*
-	// APPROVE AN EDITOR SUBMITTED ARTICLE
-	*/
-
-	if ($_POST['act'] == 'Approve_Admin')
-	{
-		include('admin_articles_sections/review/approve_review.php');
+		$return_page = '/admin.php?module=articles&view=Submitted&aid=' . $_POST['article_id'];
+		article_class::publish_article(['return_page' => $return_page, 'type' => 'submitted_article', 'new_notification_type' => 'approve_submitted_article', 'clear_notification_type' => 'submitted_article']);
 	}
 
 	// For editing a post from another admin in the review pool

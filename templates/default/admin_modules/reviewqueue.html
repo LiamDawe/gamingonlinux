@@ -23,9 +23,9 @@
 	<div class="body group">
 		<form method="post" role="form">
 			<strong>{:article_title}</strong> by {:username} submitted on {:date_submitted} <br />
-			<button type="submit" class="btn btn-primary" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}">Edit</button>
-			<button type="submit" class="btn btn-info" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview & Comments</button>
-			<button type="submit" name="act" value="Delete" class="btn btn-danger" formaction="{:url}admin.php?module=articles&article_id={:article_id}&review=1">Delete</button>
+			<button type="submit" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}">Edit</button>
+			<button type="submit" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview & Comments</button>
+			<button type="submit" name="act" value="Delete" formaction="{:url}admin.php?module=articles&article_id={:article_id}&review=1">Delete</button>
 		</form>
 	</div>
 </div>
@@ -40,7 +40,7 @@
 		<label class="checkbox">
 			<input type="checkbox" name="show_block" /> Editors Pick? <em>This will show the article under the Editors Pick heading on the Articles block!</em>
 		</label>
-		<button type="submit" name="act" value="Approve_Admin" class="btn btn-primary" {:edit_state}/>Publish Now</button> <button type="submit" name="act" value="Edit_Admin" class="btn btn-primary" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Preview" {:preview_action} class="btn btn-info" />{:preview_text}</button>
+		<button type="submit" name="act" value="Approve_Admin" {:edit_state}/>Publish Now</button> <button type="submit" name="act" value="edit" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Preview" {:preview_action} />{:preview_text}</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />
 		<input type="hidden" name="author_id" value="{:author_id}" />
 		<input type="hidden" name="check" value="Review" />

@@ -12,7 +12,7 @@ if (isset($_GET['view']))
 	if ($_GET['view'] == 'Edit')
 	{
 		$templating->set_previous('title', 'Edit article' . $templating->get('title', 1)  , 1);
-		if (!isset($_GET['error']))
+		if (!isset($message_map::$error) || $message_map::$error == 0)
 		{
 			$_SESSION['image_rand'] = rand();
 
@@ -184,8 +184,9 @@ if (isset($_GET['view']))
 			$text = $article['text'];
 			$previously_uploaded = '';
 			// if they have done it before set title, text and tagline
-			if (isset($_GET['error']))
+			if (isset($message_map::$error) && $message_map::$error == 1)
 			{
+				die();
 				$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 				$templating->set('tagline', $_SESSION['atagline']);
 				$templating->set('slug', $_SESSION['aslug']);

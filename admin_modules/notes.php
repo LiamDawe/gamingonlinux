@@ -1,12 +1,4 @@
 <?php
-if (isset($_GET['message']))
-{
-	if ($_GET['message'] == 'updated')
-	{
-		$core->message('Notes updated!');
-	}
-}
-
 $templating->merge('admin_modules/admin_module_notes');
 
 $templating->block('notes', 'admin_modules/admin_module_notes');
@@ -32,6 +24,8 @@ if (isset($_POST['act']))
 		$notes_text = trim($_POST['text']);
 		$db->sqlquery("UPDATE `admin_notes` SET `text` = ? WHERE `user_id` = ?", array($notes_text, $_SESSION['user_id']));
 		
-		header('Location: /admin.php?module=notes&message=updated');
+		$_SESSION['message'] = 'edited';
+		$_SESSION['message_extra'] = 'note';
+		header('Location: /admin.php?module=notes');
 	}
 }

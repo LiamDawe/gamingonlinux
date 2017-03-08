@@ -1,23 +1,6 @@
 <?php
 $templating->set_previous('title', 'Forum moderation queue', 1);
 
-if (isset($_GET['message']))
-{
-	if ($_GET['message'] == 'approved')
-	{
-		$core->message('You have approved that message');
-	}
-	if ($_GET['message'] == 'already-approved')
-	{
-		$core->message('Slowpoke! Someone else has already approved it!');
-	}
-
-	if ($_GET['message'] == 'removed')
-	{
-		$core->message('You have removed that message');
-	}
-}
-
 $templating->merge('admin_modules/mod_queue');
 
 $templating->block('top', 'admin_modules/mod_queue');
@@ -32,16 +15,16 @@ if (isset($_GET['view']))
 		{
 			while ($results = $db->fetch())
 			{
-					$templating->block('approve_topic', 'admin_modules/mod_queue');
-					$templating->set('username', $results['username']);
-					$templating->set('topic_id', $results['topic_id']);
-					$templating->set('post_id', '');
-					$templating->set('is_topic', 1);
-					$templating->set('topic_title', $results['topic_title']);
-					$templating->set('text', bbcode($results['topic_text']));
-					$templating->set('author_id', $results['author_id']);
-					$templating->set('forum_id', $results['forum_id']);
-					$templating->set('creation_date', $results['creation_date']);
+				$templating->block('approve_topic', 'admin_modules/mod_queue');
+				$templating->set('username', $results['username']);
+				$templating->set('topic_id', $results['topic_id']);
+				$templating->set('post_id', '');
+				$templating->set('is_topic', 1);
+				$templating->set('topic_title', $results['topic_title']);
+				$templating->set('text', bbcode($results['topic_text']));
+				$templating->set('author_id', $results['author_id']);
+				$templating->set('forum_id', $results['forum_id']);
+				$templating->set('creation_date', $results['creation_date']);
 			}
 		}
 
@@ -52,16 +35,16 @@ if (isset($_GET['view']))
 		{
 			while ($results = $db->fetch())
 			{
-					$templating->block('approve_topic', 'admin_modules/mod_queue');
-					$templating->set('username', $results['username']);
-					$templating->set('topic_id', $results['topic_id']);
-					$templating->set('post_id', $results['post_id']);
-					$templating->set('is_topic', 0);
-					$templating->set('topic_title', '<a href="/index.php?module=viewtopic&topic_id='.$results['topic_id'].'">'.$results['topic_title'].'</a>');
-					$templating->set('text', bbcode($results['reply_text']));
-					$templating->set('author_id', $results['author_id']);
-					$templating->set('forum_id', $results['forum_id']);
-					$templating->set('creation_date', $results['creation_date']);
+				$templating->block('approve_topic', 'admin_modules/mod_queue');
+				$templating->set('username', $results['username']);
+				$templating->set('topic_id', $results['topic_id']);
+				$templating->set('post_id', $results['post_id']);
+				$templating->set('is_topic', 0);
+				$templating->set('topic_title', '<a href="/index.php?module=viewtopic&topic_id='.$results['topic_id'].'">'.$results['topic_title'].'</a>');
+				$templating->set('text', bbcode($results['reply_text']));
+				$templating->set('author_id', $results['author_id']);
+				$templating->set('forum_id', $results['forum_id']);
+				$templating->set('creation_date', $results['creation_date']);
 			}
 		}
 	}
@@ -92,12 +75,16 @@ if (isset($_POST['action']))
 				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
-				header("Location: /admin.php?module=mod_queue&view=manage&message=approved");
+				$_SESSION['message'] = 'accepted';
+				$_SESSION['message_extra'] = 'post';
+				header("Location: /admin.php?module=mod_queue&view=manage");
 				die();
 			}
 			else if ($find_approval['approved'] == 1)
 			{
-				header("Location: /admin.php?module=mod_queue&view=manage&message=already-approved");
+				$_SESSION['message'] = 'already_approved';
+				$_SESSION['message_extra'] = 'post';
+				header("Location: /admin.php?module=mod_queue&view=manage");
 				die();
 			}
 		}
@@ -188,13 +175,17 @@ if (isset($_POST['action']))
 				}
 				$db->sqlquery("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
 
-				header("Location: /admin.php?module=mod_queue&view=manage&message=approved");
+				$_SESSION['message'] = 'accepted';
+				$_SESSION['message_extra'] = 'post';
+				header("Location: /admin.php?module=mod_queue&view=manage");
 				die();
 			}
 		}
 		else if ($find_post['approved'] == 1)
 		{
-			header("Location: /admin.php?module=mod_queue&view=manage&message=already-approved");
+			$_SESSION['message'] = 'already_approved';
+			$_SESSION['message_extra'] = 'post';
+			header("Location: /admin.php?module=mod_queue&view=manage");
 			die();
 		}
 	}
@@ -217,7 +208,9 @@ if (isset($_POST['action']))
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
-		header("Location: /admin.php?module=mod_queue&view=manage&message=removed");
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'post';
+		header("Location: /admin.php?module=mod_queue&view=manage");
 		die();
 	}
 
@@ -247,7 +240,9 @@ if (isset($_POST['action']))
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed_ban', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
-		header("Location: /admin.php?module=mod_queue&view=manage&message=removed");
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'post';
+		header("Location: /admin.php?module=mod_queue&view=manage");
 		die();
 	}
 }

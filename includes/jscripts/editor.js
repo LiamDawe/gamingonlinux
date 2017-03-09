@@ -119,11 +119,8 @@ function OctusEditor(editorPath) {
 	 */
     function createTag(field, tag, subtag) {
         var selected,
-            selected2,
             ins,
             sel,
-            startPos,
-            endPos,
             popUpData;
         // Add a sub tag?
         if (typeof subtag != 'undefined') {
@@ -131,39 +128,31 @@ function OctusEditor(editorPath) {
         } else {
             subtag = '';
         }
-        // Use new or old method?
-        if (document.selection) {
-            field.focus();
-            selected = document.selection.createRange().text;
-            popUpData = popUp(tag, subtag, selected);
-            if(popUpData === null) {
-                return;
-            }
-            tag      = popUpData[0];
-            subtag   = popUpData[1];
-            selected = popUpData[2];
-            ins = '[' + tag + '' + subtag + ']' + selected + '[/' + tag +']';
-            selected2 = document.selection.createRange();
-            sel = document.selection.createRange();
-            selected2.moveStart ('character', -field.value.length);
-            sel.text = '[' + tag + '' + subtag + ']' + selected + '[/' + tag+']';
-            sel.moveStart('character', selected2.text.length + ins.length - selected.length);
-        } else if (field.selectionStart || field.selectionStart === 0) {
-            startPos = field.selectionStart;
-            endPos = field.selectionEnd;
-            selected = field.value.substring(startPos, endPos);
-            popUpData = popUp(tag, subtag, selected);
-            if(popUpData === null) {
-                return;
-            }
-            tag      = popUpData[0];
-            subtag   = popUpData[1];
-            selected = popUpData[2];
-            ins = '[' + tag + '' + subtag + ']' + selected + '[/' + tag +']';
-            field.focus();
-            field.value = field.value.substring(0, startPos) + ins + field.value.substring(endPos, field.value.length);
-            field.setSelectionRange(endPos+ins.length, endPos+ins.length-selected.length);
+
+		field.focus();
+
+        if (typeof field.selectionStart != 'undefined') 
+		{
+            selected = field.value.slice(field.selectionStart, field.selectionEnd);
+        } 
+        else if (document.selection && document.selection.type != 'Control') // for IE compatibility
+		{ 
+			selected = document.selection.createRange().text;
+		}
+		
+		popUpData = popUp(tag, subtag, selected);
+		if(popUpData === null || typeof popUpData == 'undefined') 
+		{
+            return;
         }
+        tag      = popUpData[0];
+        subtag   = popUpData[1];
+        selected = popUpData[2];
+        ins = '[' + tag + '' + subtag + ']' + selected + '[/' + tag +']';
+        if (!document.execCommand("insertText", false, ins)) 
+		{
+            field.value = field.value.slice(0, field.selectionStart) + ins + field.value.slice(field.selectionEnd);
+		}
     }
 
     /*

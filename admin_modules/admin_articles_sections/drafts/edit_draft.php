@@ -39,9 +39,11 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	unset($_SESSION['gallery_tagline_rand']);
 	unset($_SESSION['gallery_tagline_filename']);
 
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}&message=editdone");
+	$_SESSION['message'] = 'edited';
+	$_SESSION['message_extra'] = 'draft';
+	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}");
 }
 else
 {
-		header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts");
+	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts");
 }

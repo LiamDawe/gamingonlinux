@@ -39,5 +39,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	unset($_SESSION['gallery_tagline_rand']);
 	unset($_SESSION['gallery_tagline_filename']);
 
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}&message=editdone");
+	$_SESSION['message'] = 'edited';
+	$_SESSION['message_extra'] = 'submitted';
+	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}");
 }

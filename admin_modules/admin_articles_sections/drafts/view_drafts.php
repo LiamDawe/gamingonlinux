@@ -53,18 +53,10 @@ if (!isset($_GET['aid']))
 
 else
 {
-	if (!isset($_GET['error']))
+	if (!isset($message_map::$error) || $message_map::$error == 0)
 	{
 		$_SESSION['image_rand'] = rand();
 		$article_class->reset_sessions();
-	}
-
-	if (isset ($_GET['message']))
-	{
-		if ($_GET['message'] == 'editdone')
-		{
-			$core->message('Post Edited!');
-		}
 	}
 
 	$templating->block('single_draft_top', 'admin_modules/admin_articles_sections/drafts');
@@ -134,7 +126,7 @@ else
 
 	// if they have done it before set title, text and tagline
 	$text = $article['text'];
-	if (isset($_GET['error']))
+	if (isset($message_map::$error) && $message_map::$error == 1)
 	{
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);

@@ -481,7 +481,8 @@ else if (isset($_POST['act']))
 	*/
 	if ($_POST['act'] == 'add_draft')
 	{
-		include('admin_articles_sections/drafts/publish_draft.php');
+		$return_page = '/admin.php?module=articles&view=drafts&aid=' . $_POST['article_id'];
+		article_class::publish_article(['return_page' => $return_page, 'type' => 'draft', 'new_notification_type' => 'new_article_published', 'clear_notification_type' => 'draft']);
 	}
 
 	if ($_POST['act'] == 'Add_Review_Comment')

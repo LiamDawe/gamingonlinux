@@ -11,7 +11,7 @@ $cat_array = array();
 
 if(isset($_GET['q']))
 {
-		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'));
+		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'));
 		$get_data = $db->fetch_all_rows();
 		// Make sure we have a result
 		if(count($get_data) > 0)

@@ -349,7 +349,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					if (!empty($sql_replacers))
 					{
 						// Total number of likes for the comments
-						$qtotallikes = $db->sqlquery("SELECT comment_id, COUNT(*) FROM likes WHERE comment_id IN ( ".implode(',', $sql_replacers)." ) GROUP BY comment_id", $like_array);
+						$qtotallikes = $db->sqlquery("SELECT data_id, COUNT(*) FROM likes WHERE data_id IN ( ".implode(',', $sql_replacers)." ) AND `type` = 'comment' GROUP BY data_id", $like_array);
 						$get_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 					}
 					

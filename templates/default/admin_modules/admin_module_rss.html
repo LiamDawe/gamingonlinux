@@ -1,9 +1,0 @@
-[block: main]
-Enable/Disable the articles RSS Feed and adjust the limit.<br />
-<form method="post" action="admin.php?module=rss">
-<label><input type="checkbox" name="enable" {:rss_check}/>Enable RSS feed for articles?</label><br />
-Amount of items to show<br />
-<input type="text" name="limit" value="{:limit}" /><br />
-<input type="submit" name="Submit" value="Edit" />
-</form>
-[/block: main]

@@ -40,6 +40,13 @@ else
 			$register_captcha_check = 'checked';
 		}
 		$templating->set('register_captcha_check', $register_captcha_check);
+		
+		$rss_check = '';
+		if (core::config('articles_rss') == 1)
+		{
+			$rss_check = 'checked';
+		}
+		$templating->set('article_rss_check', $rss_check);
 
 		$templating->set('popular_counter', core::config('hot-article-viewcount'));
 
@@ -67,6 +74,12 @@ else
 		if (isset($_POST['register_captcha']))
 		{
 			$register_captcha = 1;
+		}
+		
+		$article_rss = 0;
+		if (isset($_POST['article_rss']))
+		{
+			$article_rss = 1;
 		}
 
 		$debug = 0;
@@ -107,10 +120,12 @@ else
 			$core->set_config($popular_counter, 'hot-article-viewcount');
 
 			$core->set_config($debug, 'show_debug');
+			
+			$core->set_config($article_rss, 'articles_rss');
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';
-			header("Location: /admin.php?module=config&message=done");
+			header("Location: /admin.php?module=config");
 		}
 	}
 }

@@ -581,7 +581,7 @@ if (!isset($_GET['go']))
 						$to_replace = implode(',', $sql_replacers);
 						
 						// Total number of likes for the comments
-						$grab_total_likes = $db->sqlquery("SELECT comment_id, COUNT(*) FROM likes WHERE comment_id IN ( $to_replace ) GROUP BY comment_id", $like_array);
+						$grab_total_likes = $db->sqlquery("SELECT data_id, COUNT(*) FROM `likes` WHERE `data_id` IN ( $to_replace ) AND `type` = 'comment' GROUP BY data_id", $like_array);
 						$get_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 						
 						// this users likes
@@ -593,7 +593,7 @@ if (!isset($_GET['go']))
 								$replace[] = $comment_id;
 							}
 
-							$grab_user_likes = $db->sqlquery("SELECT `comment_id` FROM likes WHERE user_id = ? AND comment_id IN ( $to_replace )", $replace);
+							$grab_user_likes = $db->sqlquery("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'comment'", $replace);
 							$get_user_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN);
 						}
 					}

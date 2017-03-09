@@ -16,7 +16,9 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
   {
     $pinsid = $_POST['comment_id'];
     $table = 'likes';
-    $field = 'comment_id';
+    $field = 'data_id';
+    $type_insert = "`type` = 'comment', ";
+    $type_delete = "`type` = 'comment' AND ";
 
   }
   if ($_POST['type'] == 'article')
@@ -24,6 +26,8 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
     $pinsid = $_POST['article_id'];
     $table = 'article_likes';
     $field = 'article_id';
+    $type_insert = '';
+    $type_delete = '';
   }
 
   $status=$_POST['sta'];
@@ -47,7 +51,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
     }
     if($chknum==0)
     {
-      $add = $db->sqlquery("INSERT INTO `$table` SET `$field` = ?, `user_id` = ?, `date` = ?", array($pinsid, $_SESSION['user_id'], core::$date));
+      $add = $db->sqlquery("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($pinsid, $_SESSION['user_id'], core::$date));
       echo 'liked';
       return true;
     }
@@ -66,7 +70,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
         if ($current_likes['total'] >= 2)
         {
           // find the last available like now (second to last row)
-          $db->sqlquery("SELECT `user_id`, `comment_id`, `date` FROM `likes` where `comment_id` = ? ORDER BY `date` DESC LIMIT 1 OFFSET 1", array($_POST['comment_id']));
+          $db->sqlquery("SELECT `user_id`, `data_id`, `date` FROM `likes` WHERE `data_id` = ? ORDER BY `date` DESC LIMIT 1 OFFSET 1", array($_POST['comment_id']));
           $last_like = $db->fetch();
           $seen = '';
 
@@ -88,7 +92,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
           $db->sqlquery("DELETE FROM `user_notifications` WHERE `id` = ?", array($current_likes['id']));
         }
       }
-      $rem=$db->sqlquery("DELETE FROM `$table` WHERE `$field` = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
+      $rem=$db->sqlquery("DELETE FROM `$table` WHERE $type_delete `$field` = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
       echo 'unliked';
       return true;
     }

@@ -66,7 +66,9 @@ else
 		{
 			if (!isset($_GET['user_id']) || isset($_GET['user_id']) && empty($_GET['user_id']))
 			{
-				header("Location: admin.php?module=users&view=search&message=no_id&extra=user");
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message_extra'] = 'user id';
+				header("Location: admin.php?module=users&view=search");
 			}
 			else
 			{

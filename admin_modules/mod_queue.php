@@ -9,13 +9,13 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
 	{
-		$db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0");
+		$topics = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0");
 		$topic_counter = $db->num_rows();
 		if ($topic_counter > 0)
 		{
-			while ($results = $db->fetch())
+			while ($results = $topics->fetch())
 			{
-				$templating->block('approve_topic', 'admin_modules/mod_queue');
+				$templating->block('approve_forum', 'admin_modules/mod_queue');
 				$templating->set('username', $results['username']);
 				$templating->set('topic_id', $results['topic_id']);
 				$templating->set('post_id', '');
@@ -28,14 +28,14 @@ if (isset($_GET['view']))
 			}
 		}
 
-		$db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0");
+		$replies = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0");
 		$reply_counter = $db->num_rows();
 
 		if ($reply_counter > 0)
 		{
-			while ($results = $db->fetch())
+			while ($results = $replies->fetch())
 			{
-				$templating->block('approve_topic', 'admin_modules/mod_queue');
+				$templating->block('approve_forum', 'admin_modules/mod_queue');
 				$templating->set('username', $results['username']);
 				$templating->set('topic_id', $results['topic_id']);
 				$templating->set('post_id', $results['post_id']);

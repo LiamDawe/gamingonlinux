@@ -293,9 +293,9 @@ if (isset($_POST['act']))
 				}
 			}
 
-			$article_class->process_categories($_POST['article_id']);
+			article_class::process_categories($_POST['article_id']);
 
-			$article_class->process_game_assoc($_POST['article_id']);
+			article_class::process_game_assoc($_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{

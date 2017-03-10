@@ -31,7 +31,7 @@ class article_class
   }
 
   // if they have set a tagline image from the gallery, remove any existing images
-  function gallery_tagline($data = NULL)
+  public static function gallery_tagline($data = NULL)
   {
     global $db;
 
@@ -145,7 +145,7 @@ class article_class
     return $games_list;
   }
 
-  function process_categories($article_id)
+  public static function process_categories($article_id)
   {
     global $db;
 
@@ -183,7 +183,7 @@ class article_class
     }
   }
 
-  function process_game_assoc($article_id)
+  public static function process_game_assoc($article_id)
   {
     global $db;
 
@@ -305,7 +305,7 @@ class article_class
   }
 
 	// this function will check over everything necessary for an article to be correctly done
-	function check_article_inputs($return_page)
+	public static function check_article_inputs($return_page)
 	{
 		global $db, $core;
 

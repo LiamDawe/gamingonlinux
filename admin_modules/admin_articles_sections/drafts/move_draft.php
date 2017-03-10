@@ -18,9 +18,9 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
 	}
 
-	$article_class->process_categories($_POST['article_id']);
+	article_class::process_categories($_POST['article_id']);
 
-	$article_class->process_game_assoc($_POST['article_id']);
+	article_class::process_game_assoc($_POST['article_id']);
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 	unset($_SESSION['atitle']);

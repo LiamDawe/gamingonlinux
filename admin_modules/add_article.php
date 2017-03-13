@@ -80,6 +80,7 @@ if ($grab_subscribe['auto_subscribe_new_article'] == 1)
 $core->editor('text', $text, 1);
 
 $templating->block('add_bottom', 'admin_modules/admin_module_articles');
+$templating->set('website_url', core::config('website_url'));
 $templating->set('previously_uploaded', $previously_uploaded);
 $templating->set('subscribe_check', $auto_subscribe);
 

@@ -25,38 +25,53 @@ function replace_giveaways($text, $giveaway_id)
 
 	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	{
-		$get_name = $db->sqlquery("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id));
-		$game_info = $get_name->fetch();
-
-		$get_keys = $db->sqlquery("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", array($giveaway_id));
-		$keys_left = $get_keys->fetch();
-
-		$grab_your_key = $db->sqlquery("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", array($_SESSION['user_id'], $giveaway_id));
-		$your_key = $grab_your_key->fetch();
-
-		// they have a key already
-		if ($your_key['counter'] == 1)
+		// check their registration date is older than one day
+		$check_reg = $db->sqlquery("SELECT `register_date` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$reg_fetch = $check_reg->fetch();
+		
+		$day_ago = time() - 24 * 3600;
+		
+		$nope_message = '[b]Grab a key[/b]<br />You must be logged in to grab a key, your account must also be older than one day!';
+		
+		if ($day_ago > $reg_fetch['register_date'])
 		{
-			$key_claim = '[b]Grab a key[/b]<br />You already claimed one: ' . $your_key['game_key'];
-		}
-		// they do not have a key
-		else if ($your_key['counter'] == 0)
-		{
-			if ($keys_left['counter'] == 0)
-			{
-				$key_claim = '[b]Grab a key[/b]<br />All keys are now gone, sorry!';
-			}
-			else if ($keys_left['counter'] > 0)
-			{
-				$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
-			}
-		}
+			$get_name = $db->sqlquery("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id));
+			$game_info = $get_name->fetch();
 
-		$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", $key_claim, $text);
+			$get_keys = $db->sqlquery("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", array($giveaway_id));
+			$keys_left = $get_keys->fetch();
+
+			$grab_your_key = $db->sqlquery("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", array($_SESSION['user_id'], $giveaway_id));
+			$your_key = $grab_your_key->fetch();
+
+			// they have a key already
+			if ($your_key['counter'] == 1)
+			{
+				$key_claim = '[b]Grab a key[/b]<br />You already claimed one: ' . $your_key['game_key'];
+			}
+			// they do not have a key
+			else if ($your_key['counter'] == 0)
+			{
+				if ($keys_left['counter'] == 0)
+				{
+					$key_claim = '[b]Grab a key[/b]<br />All keys are now gone, sorry!';
+				}
+				else if ($keys_left['counter'] > 0)
+				{
+					$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
+				}
+			}
+
+			$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", $key_claim, $text);
+		}
+		else
+		{
+			$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", $nope_message, $text);
+		}
 	}
 	else
 	{
-		$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", '[b]Grab a key[/b]<br />You must be logged in to grab a key!', $text);
+		$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", $nope_message, $text);
 	}
 
 	return $text;

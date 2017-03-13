@@ -283,7 +283,7 @@ if (isset($_POST['act']))
                   }
                 }
                 
-                $core->message('Article has been sent to the admins for review before it is posted! <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
+                $core->message('Thank you for submitting an article to us! The article has been sent to the admins for review before it is posted, please allow time for us to go over it properly. Keep an eye on your email in case we send it back to you with feedback. <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
 
                 unset($_SESSION['atitle']);
                 unset($_SESSION['atext']);

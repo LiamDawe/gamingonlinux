@@ -636,7 +636,7 @@ class article_class
 	public static function publish_article($options)
 	{
 		global $db, $core;
-		
+
 		if (isset($_POST['article_id']))
 		{
 			// check it hasn't been accepted already
@@ -848,15 +848,15 @@ class article_class
 		}
 		
 		include(core::config('path') . 'includes/telegram_poster.php');
-		
+
 		$article_link = self::get_link($article_id, $checked['slug']);
 
 		if (!isset($_POST['show_block']))
 		{
 			telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
-			header("Location: ".$article_link);
+			header("Location: ".core::config('website_url').$article_link);			
 		}
-		else if (isset($_POST['show_block']))
+		else
 		{
 			telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
 			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);

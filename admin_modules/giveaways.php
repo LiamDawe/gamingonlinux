@@ -30,8 +30,8 @@ else if (isset($_GET['manage']))
 	$templating->block('key_list_top');
 	$templating->set('name', $giveaway['game_name']);
 
-	$db->sqlquery("SELECT SUM(CASE WHEN claimed = 1 AND game_id = 3 THEN 1 ELSE 0 END) AS claimed,
-  SUM(CASE WHEN game_id = 3 THEN 1 ELSE 0 END) AS total
+	$db->sqlquery("SELECT SUM(CASE WHEN claimed = 1 AND game_id = ? THEN 1 ELSE 0 END) AS claimed,
+  SUM(CASE WHEN game_id = ? THEN 1 ELSE 0 END) AS total
 	FROM game_giveaways_keys", array($_GET['manage'], $_GET['manage']));
 	$key_totals = $db->fetch();
 	$templating->set('claimed', $key_totals['claimed']);

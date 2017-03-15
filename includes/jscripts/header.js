@@ -35,8 +35,8 @@ jQuery.fn.highlight = function () {
     $(this).each(function () {
         var el = $(this);
         $("<div/>")
-        .width(el.outerWidth())
-        .height(el.outerHeight())
+        .width(el.width())
+        .height(el.height())
         .css({
             "position": "absolute",
             "left": el.offset().left,
@@ -499,12 +499,14 @@ jQuery(document).ready(function()
 	 input_counter--;
 	});
 
-    $(".collapse_header").click(function () {
-    $header = $(this);
-    //getting the next element
-    $content = $header.next();
-    //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
-    $content.slideToggle(500)});
+	$(document).on('click', ".collapse_header", function()
+	{
+		$header = $(this);
+		//getting the next element
+		$content = $header.next();
+		//open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+		$content.slideToggle(500)
+	});
 
 	$('.quote_function').click(function()
 	{
@@ -977,6 +979,6 @@ function(data){
 		$('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
 		$('.preview_pm').show();
 		$('#preview').scrollMinimal();
-		$(".preview_pm").highlight();
+		$('.preview_pm').highlight();
 	});
 });

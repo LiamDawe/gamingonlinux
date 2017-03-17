@@ -265,7 +265,7 @@ if (!isset($_GET['view']))
 			$templating->block('form_top');
 			$templating->set('article_id', $_GET['aid']);
 
-			$core->editor('text', $comment);
+			$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
 
 			$templating->block('form_bottom', 'admin_modules/admin_module_comments');
 			$templating->set('subscribe_check', $subscribe_check);

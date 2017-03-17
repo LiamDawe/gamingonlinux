@@ -1,11 +1,6 @@
 [block: editor]
-<script type="text/javascript">
-window.onload = function() {
-	window.OctusEditor = new OctusEditor();
-};
-</script>
 <a id="{:anchor_name}"></a><strong>Make sure your post follows our rules, <a href="{:url}index.php?module=rules" target="_blank">click here for them</a>.  Also be sure to check out the <a href="{:url}index.php?module=guidelines" target="_blank">Article Guide</a> for guidelines on what to include in articles.</strong><br />
-	<div class="octus-editor group">
+	<div id="bar_{:editor_id}" class="octus-editor group">
         	<div class="styles group">
 			    <ul>
 				<li data-tag="b" class="bold" accesskey="B">B</li>
@@ -24,7 +19,6 @@ window.onload = function() {
 				<li data-tag="spoiler">spoiler</li>
 				<li data-tag="users-only">logged in only</li>
 				{:page_button}
-
 			    </ul>
 					{:timer_button}
 			    <ul>
@@ -55,7 +49,7 @@ window.onload = function() {
 		</div>
 			<noscript><div class="no-script">This content editor needs javascript, please enable javascript to use this editor!</div></noscript>
 			<div class="textarea group">
-			    <textarea name="{:name}" rows="3" cols="17" {:ays_ignore} id="editor_content" {:disabled}>{:content}</textarea>
+			    <textarea name="{:name}" class="bbcode_editor" rows="3" cols="17" {:ays_ignore} id="{:editor_id}" {:disabled} >{:content}</textarea>
 			</div>
 	</div>
 [/block: editor]

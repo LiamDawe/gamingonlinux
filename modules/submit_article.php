@@ -101,7 +101,7 @@ if (isset($_GET['view']))
             $captcha = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
         }
 
-        $core->editor('text', $text, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+        $core->editor(['name' => 'text', 'editor_id' => 'article_text']);
 
         $templating->block('submit_bottom', 'submit_article');
         $templating->set('captcha', $captcha);
@@ -390,7 +390,7 @@ if (isset($_POST['act']))
             $captcha = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
         }
 
-        $core->editor('text', $text);
+        $core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text']);
 
         $templating->block('submit_bottom', 'submit_article');
         $templating->set('captcha', $captcha);

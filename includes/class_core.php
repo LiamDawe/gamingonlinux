@@ -25,6 +25,8 @@ class core
 	public $error_message;
 	
 	public static $user_graphs_js;
+	
+	public static $editor_js;
 
 	protected static $config = array();
 
@@ -972,22 +974,46 @@ class core
 		}
 	}
 
+	/* For generating a bbcode editor form, options are:
+	name - name of the textarea
+	content
+	article_editor
+	disabled
+	anchor_name
+	ays_ignore
+	editor_id
+	*/
 	// include this anywhere to show the bbcode editor
-	function editor($name, $content, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 0)
+	function editor($custom_options)
 	{
 		global $templating;
-
+		
+		if (!is_array($custom_options))
+		{
+			die('BBCode editor not setup correctly!');
+		}
+		
+		// sort some defaults
+		$editor['article_editor'] = 0;
+		$editor['disabled'] = 0;
+		$editor['ays_ignore'] = 0;
+		$editor['content'] = '';
+		$editor['anchor_name'] = 'commentbox';
+		
+		foreach ($custom_options as $option => $value)
+		{
+			$editor[$option] = $value;
+		}
+		
 		$templating->merge('editor');
 		$templating->block('editor');
 		$templating->set('url', $this->config('website_url'));
-		$templating->set('name', $name);
-		$templating->set('content', $content);
-		$templating->set('anchor_name', $anchor_name);
-		if ($disabled == 0)
-		{
-			$disabled = '';
-		}
-		else
+		$templating->set('name', $editor['name']);
+		$templating->set('content', $editor['content']);
+		$templating->set('anchor_name', $editor['anchor_name']);
+		
+		$disabled = '';
+		if ($editor['disabled'] == 1)
 		{
 			$disabled = 'disabled';
 		}
@@ -995,7 +1021,7 @@ class core
 
 		$page_button = '';
 		$timer_button = '';
-		if ($article_editor == 1)
+		if ($editor['article_editor'] == 1)
 		{
 			$page_button = '<li data-snippet="<*PAGE*>">page</li>';
 			//$timer_button = '<li data-snippet="[timer=timer1]'.date('Y/m/d H:m:s').'[/timer]">timer</li>';
@@ -1004,17 +1030,18 @@ class core
 		$templating->set('page_button', $page_button);
 		$templating->set('timer_button', $timer_button);
 
-		if ($ays_ignore == 0)
-		{
-			$ays_check = '';
-		}
-		else if ($ays_ignore == 1)
+		$ays_check = '';
+		if ($editor['ays_ignore'] == 1)
 		{
 			$ays_check = 'class="ays-ignore"';
 		}
 		$templating->set('ays_ignore', $ays_check);
 		
 		$templating->set('limit_youtube', core::config('limit_youtube'));
+		
+		$templating->set('editor_id', $editor['editor_id']);
+		
+		core::$editor_js[] = 'gol_editor(\''.$editor['editor_id'].'\');';
 	}
 
 	// convert bytes to human readable stuffs, only up to MB as we will never be uploading more than MB files directly

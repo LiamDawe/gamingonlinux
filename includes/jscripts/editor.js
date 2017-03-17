@@ -1,44 +1,17 @@
 /*
  * Forked from Octus Editor: https://github.com/julianrichen/octus-editor MIT license
  */
-function OctusEditor(editorPath) 
+function gol_editor(editor_id) 
 {
-    /*
-     * Vars
-     */
-    var masterEditor;
+	var editor_bar = 'bar_' + editor_id;
+	var this_editor = document.getElementById(editor_id);
 
-    /*
-	 * Do we need a default value?
-	 */
-    if(!editorPath) 
+	function start() 
 	{
-        editorPath = '.octus-editor';
-    }
+		var quotes  = document.querySelectorAll('[data-quote]');
 
-	/*
-	 * init()
-	 *
-	 * Start editors
-	 */
-	function init() 
-	{
-		var editors = document.querySelectorAll(editorPath),
-            quotes  = document.querySelectorAll('[data-quote]');
-
-        // First register every editor
-		for (var i = 0; i < editors.length; i++) 
-		{
-			console.log('Editor id: ' + i);
-            // Set master editor
-            if(i === 0) 
-			{
-                masterEditor =  'octus-editor-' + i;
-            }
-            editors[i].setAttribute('id', 'octus-editor-' + i);
-            // Register tags
-            registerElements('octus-editor-' + i);
-		}
+		// Register tags
+		registerElements(editor_bar);
 
         // Register all possible quotes.
 		for (var x = 0; x < quotes.length; x++) 
@@ -55,8 +28,8 @@ function OctusEditor(editorPath)
     function registerElements(id) 
 	{
         // Get all styles
-        var tags    = document.querySelectorAll('#' + id + ' .styles ul li[data-tag]'),
-            snippet = document.querySelectorAll('#' + id + ' .styles ul li[data-snippet]');
+        var tags    = document.querySelectorAll('#' + editor_bar + ' .styles ul li[data-tag]'),
+            snippet = document.querySelectorAll('#' + editor_bar + ' .styles ul li[data-snippet]');
         // register all the tags
 		for (var i = 0; i < tags.length; i++) 
 		{
@@ -84,19 +57,18 @@ function OctusEditor(editorPath)
     function registerTag() 
 	{
         // Get textarea
-        var field   = document.querySelector('#' + this.editor_id + ' .textarea textarea'),
-            dataTag = this.dataset.tag;
+        var dataTag = this.dataset.tag;
 			
         // Do we have a sub class?
         if(this.dataset.subtag) 
 		{
             // Fire tag
-            createTag(field, dataTag, this.dataset.subtag);
+            createTag(dataTag, this.dataset.subtag);
         } 
         else 
 		{
             // Fire tag
-            createTag(field, dataTag);
+            createTag(dataTag);
         }
     }
 
@@ -106,11 +78,9 @@ function OctusEditor(editorPath)
 	 * Get tag from each editor
 	 */
     function registerSnippet() 
-	{
-        // Get textarea
-        var field = document.querySelector('#' + this.editor_id + ' .textarea textarea');
+	{		
         // Fire snippet
-        snippet(field, this.dataset.snippet);
+        snippet(this.dataset.snippet);
     }
 
     /*
@@ -124,13 +94,35 @@ function OctusEditor(editorPath)
         var text = this.dataset.comment;
         quote(text, username);
     }
+    
+	/*
+	 * quote()
+	 *
+	 * Insert a quote, decodeEntities sorts out the html for the textarea
+	 */
+     function decodeEntities(encodedString)
+     {
+         var textArea = document.createElement('textarea');
+         textArea.innerHTML = encodedString;
+         return textArea.value;
+     }
+
+     function quote(text, name)
+     {
+         text = decodeEntities(text);
+
+         content = "[quote=" + name + "]" + text;
+         content += "[/quote]";
+
+		 this_editor.value += content;
+     }
 
     /*
 	 * bbcode()
 	 *
 	 * Insert tag
 	 */
-    function createTag(field, tag, subtag) 
+    function createTag(tag, subtag) 
 	{
         var selected,
             ins,
@@ -146,11 +138,11 @@ function OctusEditor(editorPath)
             subtag = '';
         }
 
-		field.focus();
+		this_editor.focus();
 
-        if (typeof field.selectionStart != 'undefined') 
+        if (typeof this_editor.selectionStart != 'undefined') 
 		{
-            selected = field.value.slice(field.selectionStart, field.selectionEnd);
+            selected = this_editor.value.slice(this_editor.selectionStart, this_editor.selectionEnd);
         } 
         else if (document.selection && document.selection.type != 'Control') // for IE compatibility
 		{ 
@@ -168,7 +160,7 @@ function OctusEditor(editorPath)
         ins = '[' + tag + '' + subtag + ']' + selected + '[/' + tag +']';
         if (!document.execCommand("insertText", false, ins)) 
 		{
-            field.value = field.value.slice(0, field.selectionStart) + ins + field.value.slice(field.selectionEnd);
+            this_editor.value = this_editor.value.slice(0, this_editor.selectionStart) + ins + this_editor.value.slice(this_editor.selectionEnd);
 		}
     }
 
@@ -177,17 +169,17 @@ function OctusEditor(editorPath)
 	 *
 	 * Insert snippet
 	 */
-    function snippet(field, tag) 
+    function snippet(tag) 
 	{
         var selected,
             ins,
             sel;
 			
-		field.focus();
+		this_editor.focus();
 
-        if (typeof field.selectionStart != 'undefined') 
+        if (typeof this_editor.selectionStart != 'undefined') 
 		{
-            selected = field.value.slice(field.selectionStart, field.selectionEnd);
+            selected = this_editor.value.slice(this_editor.selectionStart, this_editor.selectionEnd);
         } 
         else if (document.selection && document.selection.type != 'Control') // for IE compatibility
 		{ 
@@ -204,7 +196,7 @@ function OctusEditor(editorPath)
         ins = tag + selected;
         if (!document.execCommand("insertText", false, ins)) 
 		{
-            field.value = field.value.slice(0, field.selectionStart) + ins + field.value.slice(field.selectionEnd);
+            this_editor.value = this_editor.value.slice(0, this_editor.selectionStart) + ins + this_editor.value.slice(this_editor.selectionEnd);
 		}
     }
 
@@ -215,7 +207,7 @@ function OctusEditor(editorPath)
 	 */
      function getYouTubeID(input)
      {
-        var id;
+        var video_id;
 		
 		var this_button = document.getElementById('youtube-bbcode');
 		var yt_limit = this_button.getAttribute('data-limit');
@@ -224,37 +216,24 @@ function OctusEditor(editorPath)
 		{
             input = window.prompt('Enter YouTube URL, limited to ' + yt_limit + ' per post');
         }
-        id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
-        if(id === null) 
+        if (input != null)
 		{
-            return null;
-        }
-        return id[1];
+			video_id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
+			if(video_id === null) 
+			{
+				return null;
+			}
+			else
+			{
+				return video_id[1];
+			}
+		}
+		else
+		{
+			return null;
+		}
+        
     }
-
-    /*
-	 * quote()
-	 *
-	 * Insert a quote, decodeEntities sorts out the html for the textarea
-	 */
-     function decodeEntities(encodedString)
-     {
-         var textArea = document.createElement('textarea');
-         textArea.innerHTML = encodedString;
-         return textArea.value;
-     }
-
-     function quote(text, name)
-     {
-         var field   = document.querySelector('#' + masterEditor + ' .textarea textarea'),
-
-         text = decodeEntities(text);
-
-         content = "[quote=" + name + "]" + text;
-         content += "[/quote]";
-
-         field.value += content;
-     }
 
     /*
 	 * popUp()
@@ -315,7 +294,7 @@ function OctusEditor(editorPath)
 	 */
     document.onkeydown = function(e) 
 	{
-        var field = document.getElementById("editor_content");
+        var field = document.getElementById(editor_id);
 		if (field === document.activeElement)
 		{
 			var key = e.keyCode || e.which;
@@ -345,6 +324,5 @@ function OctusEditor(editorPath)
 		}
     };
 
-    // Init
-    init();
+    start();
 }

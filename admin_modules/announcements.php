@@ -7,7 +7,7 @@ if (isset($_GET['view']))
 	{
 		$templating->block('add', 'admin_modules/admin_module_announcements');
 		$templating->block('row', 'admin_modules/admin_module_announcements');
-		$core->editor('text', '', 1);
+		$core->editor(['name' => 'text', 'editor_id' => 'announcement']);
 		$templating->block('bottom_add', 'admin_modules/admin_module_announcements');
 
 		$templating->block('manage', 'admin_modules/admin_module_announcements');
@@ -19,7 +19,7 @@ if (isset($_GET['view']))
 			while ($announce = $db->fetch())
 			{
 				$templating->block('row', 'admin_modules/admin_module_announcements');
-				$core->editor('text', $announce['text'], 1);
+				$core->editor(['name' => 'text', 'content' => $announce['text'], 'editor_id' => 'announcement-' . $announce['id']]);
 				$templating->block('bottom_edit', 'admin_modules/admin_module_announcements');
 				$templating->set('id', $announce['id']);
 			}

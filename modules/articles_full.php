@@ -834,7 +834,7 @@ if (!isset($_GET['go']))
 									$templating->set('url', core::config('website_url'));
 									$templating->set('article_id', $_GET['aid']);
 
-									$core->editor('text', $comment, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+									$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment_text']);
 
 									$templating->block('comment_buttons', 'articles_full');
 									$templating->set('url', core::config('website_url'));
@@ -895,7 +895,7 @@ if (!isset($_GET['go']))
 
 		$templating->block('edit_top', 'articles_full');
 
-		$core->editor('text', $comment_text, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+		$core->editor(['name' => 'text', 'content' => $comment_text, 'editor_id' => 'comment_text']);
 
 		$templating->block('edit_comment_buttons', 'articles_full');
 		$templating->set('comment_id', $comment['comment_id']);

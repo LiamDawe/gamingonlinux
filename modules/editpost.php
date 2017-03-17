@@ -35,7 +35,7 @@ if (!isset($_POST['act']))
 			$templating->block('edit_top');
 			$templating->set('title', htmlentities($topic['topic_title'], ENT_QUOTES));
 
-			$core->editor('text', $topic['topic_text'], $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+			$core->editor(['name' => 'text', 'content' => $topic['topic_text'], 'editor_id' => 'post_text']);
 
 			$templating->block('edit_bottom', 'editpost');
 			$templating->set('page', $_GET['page']);
@@ -82,7 +82,7 @@ if (!isset($_POST['act']))
 				$reported = 1;
 			}
 
-			$core->editor('text', $post['reply_text'], $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+			$core->editor(['name' => 'text', 'content' => $post['reply_text'], 'editor_id' => 'post_text']);
 
 			$templating->block('edit_bottom', 'editpost');
 			$templating->set('page', $_GET['page']);

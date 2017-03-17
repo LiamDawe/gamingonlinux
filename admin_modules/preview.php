@@ -251,7 +251,7 @@ $templating->set('slug', $_POST['slug']);
 $templating->set('max_height', core::config('article_image_max_height'));
 $templating->set('max_width', core::config('article_image_max_width'));
 
-$core->editor('text', $_POST['text'], 1);
+$core->editor(['name' => 'text', 'content' => $_POST['text'], 'editor_id' => 'comment_text', 'article_editor' => 1]);
 
 $templating->block('preview_bottom', 'admin_modules/admin_module_articles');
 
@@ -326,7 +326,7 @@ $previously_uploaded = $article_class->display_previous_uploads();
 if (isset($_POST['check']) && isset($article))
 {
 	// add in uploaded images from database
-	$previously_uploaded	= $article_class->display_previous_uploads($article['article_id']);
+	$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 }
 
 $templating->set('previously_uploaded', $previously_uploaded);

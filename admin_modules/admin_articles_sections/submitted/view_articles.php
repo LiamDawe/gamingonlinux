@@ -293,7 +293,7 @@ else if (isset($_GET['aid']))
 		$text = $_SESSION['atext'];
 	}
 
-	$core->editor('text', $text, 1, $editor_disabled);
+	$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment_text', 'article_editor' => 1, 'disabled' => $editor_disabled]);
 
 	$templating->block('submitted_bottom', 'admin_modules/admin_articles_sections/submitted_articles');
 	$templating->set('edit_state', $edit_state);

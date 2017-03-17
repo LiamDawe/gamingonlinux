@@ -17,14 +17,21 @@ if ($user->check_group(1) == true && core::config('show_debug') == 1)
 }
 $templating->set('debug', $debug);
 
+// user stat trending charts
+$svg_js = '';
 if (!empty(core::$user_graphs_js) || isset(core::$user_graphs_js))
 {
 	$svg_js = core::$user_graphs_js;
 }
-else {
-	$svg_js = '';
+$templating->set('user_graph_js', $svg_js);
+
+// editor js
+$editor_js = '';
+if (!empty(core::$editor_js) || isset(core::$editor_js))
+{
+	$editor_js = '<script type="text/javascript">' . implode("\n", core::$editor_js) . '</script>';
 }
-$templating->set('svggraph_js', $svg_js);
+$templating->set('editor_js', $editor_js);
 
 echo $templating->output();
 

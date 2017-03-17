@@ -147,14 +147,14 @@ else
 	$templating->set('max_height', core::config('article_image_max_height'));
 	$templating->set('max_width', core::config('article_image_max_width'));
 
-	$core->editor('text', $text, 1);
+	$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text', 'article_editor' => 1]);
 
 	$templating->block('drafts_bottom', 'admin_modules/admin_articles_sections/drafts');
 	$templating->set('article_id', $article['article_id']);
 	$templating->set('author_id', $article['author_id']);
 
 	// add in uploaded images from database
-	$previously_uploaded	= $article_class->display_previous_uploads($article['article_id']);
+	$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 
 	$templating->set('previously_uploaded', $previously_uploaded);
 

@@ -164,7 +164,7 @@ else
 				$templating->set('category_options', $cat_options);
 
 				$templating->set('title', $title);
-				$core->editor('text', $text, $article_editor = 0, $disabled = 0, $anchor_name = 'commentbox', $ays_ignore = 1);
+				$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment_text']);
 
 				$templating->block('bottom', 'newtopic');
 				$templating->set('options', $options);

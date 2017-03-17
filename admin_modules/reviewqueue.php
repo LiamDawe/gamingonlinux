@@ -224,7 +224,7 @@ else
 	$templating->set('max_height', core::config('article_image_max_height'));
 	$templating->set('max_width', core::config('article_image_max_width'));
 
-	$core->editor('text', $text, 1, $editor_disabled);
+	$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text', 'article_editor' => 1, 'disabled' => $editor_disabled]);
 
 	$templating->block('review_bottom', 'admin_modules/reviewqueue');
 	$templating->set('edit_state', $edit_state);

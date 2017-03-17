@@ -33,6 +33,7 @@ function OctusEditor(editorPath)
         // First register every editor
 		for (var i = 0; i < editors.length; i++) 
 		{
+			console.log('Editor id: ' + i);
             // Set master editor
             if(i === 0) 
 			{
@@ -89,6 +90,7 @@ function OctusEditor(editorPath)
         // Get textarea
         var field   = document.querySelector('#' + this.editor_id + ' .textarea textarea'),
             dataTag = this.dataset.tag;
+			
         // Do we have a sub class?
         if(this.dataset.subtag) 
 		{
@@ -317,27 +319,34 @@ function OctusEditor(editorPath)
 	 */
     document.onkeydown = function(e) 
 	{
-        var field = document.activeElement;
-        var key = e.keyCode || e.which;
-        if (e.ctrlKey) 
+        var field = document.getElementById("editor_content");
+		if (field === document.activeElement)
 		{
-            switch (key) 
+			var key = e.keyCode || e.which;
+			if (e.ctrlKey) 
 			{
-                //http://help.adobe.com/en_US/AS2LCR/Flash_10.0/00000520.html
-                case 66: // Ctrl+B
-                    e.preventDefault();
-                    createTag(field, 'b');
-                    break;
-                case 73: // Ctrl+I
-                    e.preventDefault();
-                    createTag(field, 'i');
-                    break;
-                case 85: // Ctrl+U
-                    e.preventDefault();
-                    createTag(field, 'u');
-                    break;
-            }
-        }
+				switch (key) 
+				{
+					//http://help.adobe.com/en_US/AS2LCR/Flash_10.0/00000520.html
+					case 66: // Ctrl+B
+						e.preventDefault();
+						createTag(field, 'b');
+						break;
+					case 73: // Ctrl+I
+						e.preventDefault();
+						createTag(field, 'i');
+						break;
+					case 85: // Ctrl+U
+						e.preventDefault();
+						createTag(field, 'u');
+						break;
+					case 76: // CTRL+L
+						e.preventDefault();
+						createTag(field, 'url');
+						break;
+				}
+			}
+		}
     };
 
     // Init

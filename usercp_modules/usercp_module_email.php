@@ -63,9 +63,11 @@ if (isset($_POST['Update']))
 		header("Location: /usercp.php?module=email&message=not-that-email");
 		die();
 	}
+	
+	$new_email = trim($_POST['new_email']);
 
 	// update to the new email address
-	$db->sqlquery("UPDATE `users` SET `email` = ? WHERE `user_id` = ?", array($_POST['new_email'], $_SESSION['user_id']));
+	$db->sqlquery("UPDATE `users` SET `email` = ? WHERE `user_id` = ?", array($new_email, $_SESSION['user_id']));
 
 	// send an email to their old address to let them know
 	$subject = "Email changed on GamingOnLinux.com";

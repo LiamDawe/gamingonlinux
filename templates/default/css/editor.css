@@ -248,6 +248,9 @@
 	border-right: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
 }
+.dark .octus-editor .textarea {
+	background: #222222;
+}
 .octus-editor .textarea > textarea {
 	border: none;
 	color: #444444;

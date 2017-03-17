@@ -1,9 +1,5 @@
 /*
- * Octus Editor 1.0
- *
- * FireDart Studios
- * Copyright 2014, MIT License
- *
+ * Forked from Octus Editor: https://github.com/julianrichen/octus-editor MIT license
  */
 function OctusEditor(editorPath) 
 {

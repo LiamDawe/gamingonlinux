@@ -60,7 +60,7 @@ function OctusEditor(editorPath)
         // Get all styles
         var tags    = document.querySelectorAll('#' + id + ' .styles ul li[data-tag]'),
             snippet = document.querySelectorAll('#' + id + ' .styles ul li[data-snippet]');
-        // First register every editor
+        // register all the tags
 		for (var i = 0; i < tags.length; i++) 
 		{
             // Log editor id
@@ -69,7 +69,7 @@ function OctusEditor(editorPath)
             tags[i].addEventListener("click", registerTag, false);
         }
 
-        // First register every editor
+        // register all the snippets
 		for (var x = 0; x < snippet.length; x++) 
 		{
             // Log editor id
@@ -267,27 +267,40 @@ function OctusEditor(editorPath)
 	{
         var data;
 
-        if(tag == 'youtube') {
+        if(tag == 'youtube') 
+		{
             selected = getYouTubeID(selected);
-            if(selected === null) {
+            if(selected === null) 
+			{
                 return null;
             }
-        } else if(tag == 'url' && selected != "") {
+        } 
+        else if(tag == 'url' && selected != "") 
+		{
             subtag = window.prompt('Enter a valid URL');
-            if(subtag === null || subtag === '') {
+            if(subtag === null || subtag === '') 
+			{
                 return null;
-            } else {
+            } 
+            else 
+			{
                 subtag = '=' + subtag;
             }
-        } else if(tag == 'url' && selected === "") {
+        } 
+        else if(tag == 'url' && selected === "") 
+		{
             subtag = window.prompt('Enter a valid URL');
-            if(subtag === null || subtag === '') {
+            if(subtag === null || subtag === '') 
+			{
                 return null;
-            } else {
+            } 
+            else 
+			{
                 subtag = '=' + subtag;
             }
             selected = window.prompt('URL link text');
-            if(selected === null || selected === '') {
+            if(selected === null || selected === '') 
+			{
                 selected = 'link';
             }
         }

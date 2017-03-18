@@ -714,6 +714,17 @@ class core
 
 		return $clean;
 	}
+	
+	public static function check_url($link)
+	{
+		$url = parse_url($link);
+		if((!isset($url['scheme'])) || (isset($url['scheme']) && $url['scheme'] != 'https' && $url['scheme'] != 'http'))
+		{
+			$link = 'http://' . $link;
+		}
+		
+		return $link;
+	}
 
 	// move previously uploaded tagline image to correct directory
 	function move_temp_image($article_id, $file)

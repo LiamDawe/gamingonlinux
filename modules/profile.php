@@ -108,11 +108,8 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						{
 							if ($field['db_field'] == 'website')
 							{
-								$url = parse_url($profile[$field['db_field']]);
-								if((!isset($url['scheme'])) || (isset($url['scheme']) && $url['scheme'] != 'https' && $url['scheme'] != 'http'))
-								{
-									$profile[$field['db_field']] = 'http://' . $profile[$field['db_field']];
-								}
+								$profile[$field['db_field']] = core::check_url($profile[$field['db_field']]);
+								
 							}
 							
 							$url = '';

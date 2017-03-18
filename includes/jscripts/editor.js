@@ -305,19 +305,19 @@ function gol_editor(editor_id)
 					//http://help.adobe.com/en_US/AS2LCR/Flash_10.0/00000520.html
 					case 66: // Ctrl+B
 						e.preventDefault();
-						createTag(field, 'b');
+						createTag('b');
 						break;
 					case 73: // Ctrl+I
 						e.preventDefault();
-						createTag(field, 'i');
+						createTag('i');
 						break;
 					case 85: // Ctrl+U
 						e.preventDefault();
-						createTag(field, 'u');
+						createTag('u');
 						break;
 					case 76: // CTRL+L
 						e.preventDefault();
-						createTag(field, 'url');
+						createTag('url');
 						break;
 				}
 			}

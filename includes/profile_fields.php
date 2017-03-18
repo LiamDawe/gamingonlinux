@@ -28,6 +28,7 @@ $profile_fields['google']['base_link_required'] = 1;
 $profile_fields['google']['span'] = '<span class="inline icon google-plus">G+</span>';
 $profile_fields['google']['link'] = 1;
 $profile_fields['google']['image'] = NULL;
+$profile_fields['google']['preinput'] = 'https://plus.google.com/u/0/';
 
 $profile_fields['website']['name'] = 'Website:';
 $profile_fields['website']['db_field'] = 'website';

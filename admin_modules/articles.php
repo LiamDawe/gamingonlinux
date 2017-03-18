@@ -234,7 +234,7 @@ if (isset($_GET['view']))
 			$templating->set('max_height', core::config('article_image_max_height'));
 			$templating->set('max_width', core::config('article_image_max_width'));
 
-			$core->editor('text', $text, 1, $editor_disabled);
+			$core->editor(['name' => 'text', 'content' => $text, 'disabled' => $editor_disabled, 'editor_id' => 'article_text']);
 
 			$templating->block('edit_bottom', 'admin_modules/admin_module_articles');
 			$templating->set('edit_state', $edit_state);

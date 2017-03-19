@@ -923,10 +923,11 @@ function(data){
     });
   });
 
-  $(".uploads").on("click", ".add_button", function(){
-	var text = $(this).data('bbcode');
-	$('#editor_content').val($('#editor_content').val() + text);
-  });
+	$(".uploads").on("click", ".add_button", function()
+	{
+		var text = $(this).data('bbcode');
+		$('.bbcode_editor').val($('.bbcode_editor').val() + text);
+	});
 
   $('#generate_preview').click(function()
   {

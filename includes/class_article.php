@@ -71,10 +71,24 @@ class article_class
       foreach($article_images as $value)
       {
         $bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$value['filename']}[/img]";
-        $previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$value['id']}\"><img src=\"/uploads/articles/article_images/{$value['filename']}\" class='imgList'><br />
-        BBCode: <input id=\"img{$value['id']}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
-        <button class=\"btn\" data-clipboard-target=\"#img{$value['id']}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$value['id']}\" class=\"trash\">Delete image</button>
-        </div></div></div>";
+        $bbcode_thumb = "[img]" . core::config('website_url') . "uploads/articles/article_images/thumbs/{$value['filename']}[/img]";
+        
+        // for old uploads where no thumbnail was made
+        $show_thumb = '';
+        $main_image = core::config('website_url') . 'uploads/articles/article_images/'.$value['filename'];
+        if (file_exists(core::config('path') . 'uploads/articles/article_images/thumbs/'.$value['filename']))
+        {
+			$main_image = core::config('website_url') . 'uploads/articles/article_images/thumbs/'.$value['filename'];
+			$show_thumb = 'BBCode (thumbnail): <input id="img'.$value['id'].'_thumb" type="text" class="form-control" value="'.$bbcode_thumb.'" /> <button class="btn" data-clipboard-target="#img'.$value['id'].'_thumb">Copy</button> <button data-bbcode="'.$bbcode_thumb.'" class="add_button">Add to editor</button>';
+        }
+        
+        $previously_uploaded .= '<div class="box"><div class="body group"><div id="'.$value['id'].'"><img src="'.$main_image.'" class="imgList"><br />
+        BBCode: <input id="img'.$value['id'].'" type="text" class="form-control" value="'.$bbcode.'" />
+        <button class="btn" data-clipboard-target="#img'.$value['id'].'">Copy</button> <button data-bbcode="'.$bbcode.'" class="add_button">Add to editor</button> ' . $show_thumb .'
+        <button id="'.$value['id'].'" class="trash">Delete image</button>
+        </div>
+        </div>
+        </div>';
       }
     }
     else if ($article_id == NULL)

@@ -420,6 +420,20 @@ jQuery(document).ready(function()
   });
 }
   var clipboard = new Clipboard('.btn');
+  
+  	$(".fancybox-thumb").fancybox({
+		prevEffect	: 'none',
+		nextEffect	: 'none',
+		helpers	: {
+			title	: {
+				type: 'outside'
+			},
+			thumbs	: {
+				width	: 50,
+				height	: 50
+			}
+		}
+	});
 
 	$(".computer_deets").fancybox({
 		maxWidth	: 800,

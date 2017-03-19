@@ -71,7 +71,7 @@ class article_class
       foreach($article_images as $value)
       {
         $bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$value['filename']}[/img]";
-        $bbcode_thumb = "[img]" . core::config('website_url') . "uploads/articles/article_images/thumbs/{$value['filename']}[/img]";
+        $bbcode_thumb = "[img-thumb]" . core::config('website_url') . "uploads/articles/article_images/thumbs/{$value['filename']}[/img-thumb]";
         
         // for old uploads where no thumbnail was made
         $show_thumb = '';

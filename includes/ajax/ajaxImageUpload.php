@@ -75,7 +75,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					}
 
 					$bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$image_name}[/img]";
-					$bbcode_thumb = "[img]" . core::config('website_url') . "uploads/articles/article_images/thumbs/{$image_name}[/img]";
+					$bbcode_thumb = "[img-thumb]" . core::config('website_url') . "uploads/articles/article_images/thumbs/{$image_name}[/img-thumb]";
 
 					echo "<div class=\"box\">
 					<div class=\"body group\">

@@ -55,10 +55,6 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$image_func->load($_FILES['photos2']['tmp_name']);
 					$image_func->scale(550);
 					$image_func->save($_FILES['photos2']['tmp_name']);
-
-					// compress it a bit
-					$oldImage = imagecreatefrompng($_FILES['photos2']['tmp_name']);
-					imagepng($oldImage, $_FILES['photos2']['tmp_name'], 7);
 				}
 
 				clearstatcache();

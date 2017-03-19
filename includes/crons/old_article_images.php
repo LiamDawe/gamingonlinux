@@ -16,6 +16,7 @@ $db->sqlquery("SELECT `filename` FROM `article_images` WHERE `date_uploaded` < ?
 while ($grabber = $db->fetch())
 {
 	unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $grabber['filename']);
+	unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/thumbs/' . $grabber['filename']);
 }
 
 $db->sqlquery("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($stamp));

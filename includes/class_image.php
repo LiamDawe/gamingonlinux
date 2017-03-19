@@ -112,21 +112,7 @@ class SimpleImage
 
 	function scale($width)
 	{
-		// Set a maximum height and width
-		$width = 350;
-		$height = 220;
-
-		$ratio_orig = $this->getWidth()/$this->getHeight();
-
-		if ($width/$height > $ratio_orig)
-		{
-   		$width = $height*$ratio_orig;
-		}
-		else
-		{
-			$height = $width/$ratio_orig;
-		}
-		$this->resize($width,$height);
+		$this->image = imagescale($this->image, $width, -1, IMG_BICUBIC);
 	}
 
 	function resize($width,$height)

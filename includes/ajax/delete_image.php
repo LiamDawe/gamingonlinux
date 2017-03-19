@@ -18,7 +18,7 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 	$result=$db->sqlquery($qry2, array($_POST['image_id']));
 	if(isset($result))
 	{
-		if(unlink($file_dir . '/uploads/articles/article_images/' . $grabber['filename']))
+		if(unlink($file_dir . '/uploads/articles/article_images/' . $grabber['filename']) && unlink($file_dir . '/uploads/articles/article_images/thumbs/' . $grabber['filename']))
 		{
 			unset($_SESSION['uploads'][$grabber['id']]);
 			echo "YES";

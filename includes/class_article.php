@@ -867,12 +867,12 @@ class article_class
 
 		if (!isset($_POST['show_block']))
 		{
-			telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
-			header("Location: ".core::config('website_url').$article_link);			
+			telegram($checked['title'] . ' ' . $article_link);
+			header("Location: ".$article_link);			
 		}
 		else
 		{
-			telegram($checked['title'] . ' ' . core::config('website_url') . $article_link);
+			telegram($checked['title'] . ' ' $article_link);
 			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
 		}
 	}

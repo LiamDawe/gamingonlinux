@@ -374,7 +374,8 @@ if (isset($_GET['view']))
 
 		if ($check['reported'] == 0)
 		{
-			header("Location: /admin.php?module=forum&view=reportedtopics&message=alreadydone");
+			$_SESSION['message'] = 'already_done';
+			header("Location: /admin.php?module=forum&view=reportedtopics");
 		}
 
 		else
@@ -384,7 +385,9 @@ if (isset($_GET['view']))
 			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_topic_report', $_GET['topic_id']));
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_topic_report', $_GET['topic_id']));
 
-			header("Location: /admin.php?module=forum&view=reportedtopics&message=done");
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'report';
+			header("Location: /admin.php?module=forum&view=reportedtopics");
 		}
 	}
 
@@ -396,7 +399,8 @@ if (isset($_GET['view']))
 
 		if ($check['reported'] == 0)
 		{
-			header("Location: /admin.php?module=forum&view=reportedreplies&message=alreadydone");
+			$_SESSION['message'] = 'already_done';
+			header("Location: /admin.php?module=forum&view=reportedreplies");
 		}
 
 		else
@@ -406,7 +410,9 @@ if (isset($_GET['view']))
 			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_reply_report', $_GET['post_id']));
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_reply_report', $_GET['post_id']));
 
-			header("Location: /admin.php?module=forum&view=reportedreplies&message=done");
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'report';
+			header("Location: /admin.php?module=forum&view=reportedreplies");
 		}
 	}
 }

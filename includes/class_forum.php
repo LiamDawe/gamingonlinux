@@ -121,7 +121,7 @@ class forum_class
 				{
 					if ($delete_replies['reported'] == 1)
 					{
-						$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report', `data` = ?", array(core::$date, $delete_replies['post_id']));
+						$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report' AND `data` = ?", array(core::$date, $delete_replies['post_id']));
 					}
 				}
 			}
@@ -177,7 +177,9 @@ class forum_class
 				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_GET['forum_id']));
 			}
 
-			header("Location: " . $return_page_done . '&message=deleted&extra=topic');
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'post';
+			header("Location: " . $return_page_done);
 		}
 	}
 	
@@ -261,7 +263,9 @@ class forum_class
 				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $post_info['forum_id']));
 			}
 			
-			header("Location: " . $return_page_done . '&message=deleted&extra=post');
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'post';
+			header("Location: " . $return_page_done);
 		}
 	}
 	

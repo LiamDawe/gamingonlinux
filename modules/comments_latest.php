@@ -60,7 +60,7 @@ while ($comments = $db->fetch())
 		$username = "<a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a>";
 	}
 	
-	$article_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#r' . $comments['comment_id']);
+	$article_link = article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#r' . $comments['comment_id']);
 
 	$comment_posts .= "<li class=\"list-group-item\">
 	<a href=\"".$article_link."\">{$title}</a><br />

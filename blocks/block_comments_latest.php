@@ -42,7 +42,7 @@ while ($comments = $db->fetch())
 		$page = ceil($comments['comment_count'] / $comments_per_page);
 	}
 	
-	$article_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#' . $comments['comment_id']);
+	$article_link = article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#' . $comments['comment_id']);
 
 	$comment_posts .= "<li class=\"list-group-item\">
 	<a href=\"{$article_link}\">{$title}</a><br />

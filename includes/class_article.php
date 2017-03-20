@@ -630,7 +630,7 @@ class article_class
 				$link = $link . '&' . $additional;
 			}
 		}
-		return $link;
+		return core::config('website_url') . $link;
 	}
 	
 	public static function tag_link($name)

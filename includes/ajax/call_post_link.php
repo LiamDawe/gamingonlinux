@@ -29,7 +29,7 @@ if(isset($_GET['post_id']))
 				include($file_dir . '/includes/class_article.php');
 				$article_class = new article_class();
 				
-				$permalink = core::config('website_url') . article_class::get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
+				$permalink = article_class::get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
 				$templating->set('permalink', $permalink);
 			}
 			else

@@ -90,14 +90,14 @@ if (!isset($_GET['go']))
 
 						$last_page = ceil($current_number['counter']/$_SESSION['per-page']);
 						
-						$article_link = core::config('website_url') . article_class::get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
+						$article_link = article_class::get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
 
 						header("Location: " . $article_link);
 
 					}
 					else
 					{
-						$article_link = core::config('website_url') . article_class::get_link($article['article_id'], $article['slug'], '#r' . $_GET['comment_id']);
+						$article_link = article_class::get_link($article['article_id'], $article['slug'], '#r' . $_GET['comment_id']);
 
 						header("Location: " . $article_link);
 					}
@@ -105,7 +105,7 @@ if (!isset($_GET['go']))
 				else
 				{
 					$_SESSION['message'] = 'nocomment';
-					$article_link = core::config('website_url') . article_class::get_link($article['article_id'], $article['slug']);
+					$article_link = article_class::get_link($article['article_id'], $article['slug']);
 
 					header("Location: " . $article_link);
 				}
@@ -902,7 +902,7 @@ if (!isset($_GET['go']))
 		$templating->set('url', core::config('website_url'));
 		$templating->set('page', $page);
 		
-		$cancel_action = core::config('website_url') . article_class::get_link($comment['article_id'], $nice_title);
+		$cancel_action = article_class::get_link($comment['article_id'], $nice_title);
 
 		$templating->set('cancel_action', $cancel_action);
 		$templating->block('preview', 'articles_full');
@@ -951,7 +951,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = core::config('website_url') . article_class::get_link($_POST['article_id'], $title['slug']);
+			$article_link = article_class::get_link($_POST['article_id'], $title['slug']);
 
 			if (empty($correction))
 			{
@@ -1022,7 +1022,7 @@ else if (isset($_GET['go']))
 						$_SESSION['message_extra'] = 'article comments';
 						$article_link = article_class::get_link($_POST['aid'], $title['slug']);
 
-						header("Location: " . core::config('website_url') . $article_link);
+						header("Location: " . $article_link);
 
 						die();
 					}
@@ -1049,7 +1049,7 @@ else if (isset($_GET['go']))
 							$_SESSION['message'] = 'double_comment';
 							$article_link = article_class::get_link($_POST['aid'], $title['slug']);
 							
-							header("Location: " . core::config('website_url') . $article_link);
+							header("Location: " . $article_link);
 
 							die();
 						}
@@ -1061,7 +1061,7 @@ else if (isset($_GET['go']))
 							$_SESSION['message_extra'] = 'text';
 							$article_link = article_class::get_link($_POST['aid'], $title['slug']);
 
-							header("Location: " . core::config('website_url') . $article_link);
+							header("Location: " . $article_link);
 
 							die();
 						}
@@ -1229,7 +1229,7 @@ else if (isset($_GET['go']))
 							
 							$article_link = article_class::get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
 
-							header("Location: " . core::config('website_url') . $article_link);
+							header("Location: " . $article_link);
 						}
 					}
 				}
@@ -1260,7 +1260,7 @@ else if (isset($_GET['go']))
 				$_SESSION['message_extra'] = 'text';
 				$article_link = article_class::get_link($comment['article_id'], $comment['slug']);
 
-				header("Location: " . core::config('website_url') . $article_link);
+				header("Location: " . $article_link);
 
 				die();
 			}
@@ -1274,7 +1274,7 @@ else if (isset($_GET['go']))
 				
 				$edit_redirect = article_class::get_link($comment['article_id'], $comment['slug'], 'comment_id=' . $_POST['comment_id']);
 
-				header("Location: ".core::config('website_url') . $edit_redirect);
+				header("Location: ".$edit_redirect);
 			}
 		}
 	}
@@ -1295,14 +1295,14 @@ else if (isset($_GET['go']))
 
 		if ($user->check_group([1,2]) == false)
 		{
-			header("Location: ".core::config('website_url').$article_link);
+			header("Location: ".$article_link);
 		}
 
 		else
 		{
 			if ($comment['author_id'] == 1 && $_SESSION['user_id'] != 1)
 			{
-				header("Location: ".core::config('website_url').$article_link);
+				header("Location: ".$article_link);
 			}
 
 			else
@@ -1428,7 +1428,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug'], '#comments');
+			$article_link = article_class::get_link($_GET['article_id'], $title['slug'], '#comments');
 
 			header("Location: ".$article_link);
 		}
@@ -1447,7 +1447,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug']);
+			$article_link = article_class::get_link($_GET['article_id'], $title['slug']);
 
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'comment';
@@ -1464,7 +1464,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug']);
+			$article_link = article_class::get_link($_GET['article_id'], $title['slug']);
 
 			header("Location: ".$article_link);
 
@@ -1499,7 +1499,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = core::config('website_url') . article_class::get_link($_GET['article_id'], $title['slug']);
+			$article_link = article_class::get_link($_GET['article_id'], $title['slug']);
 
 			header("Location: ".$article_link);
 

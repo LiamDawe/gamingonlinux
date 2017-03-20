@@ -192,7 +192,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						{
 							$templating->block('articles');
 
-							$templating->set('latest_article_link', '<a href="' . core::config('website_url') . article_class::get_link($article_link['article_id'], $article_link['slug']).'">'.$article_link['title'].'</a>');
+							$templating->set('latest_article_link', '<a href="' . article_class::get_link($article_link['article_id'], $article_link['slug']).'">'.$article_link['title'].'</a>');
 						}
 						$templating->block('articles_bottom');
 						$templating->set('user_id', $profile['user_id']);
@@ -225,7 +225,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 							$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
 							$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
 							
-							$article_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+							$article_link = article_class::get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
 
 							$comment_posts .= "<li class=\"list-group-item\">
 						<a href=\"".$article_link."\">{$title}</a>
@@ -362,9 +362,9 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 							$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
 						}
 						
-						$view_comment_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
-						$view_article_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug']);
-						$view_comments_full_link = core::config('website_url') . article_class::get_link($comments['article_id'], $comments['slug'], '#comments');
+						$view_comment_link = article_class::get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+						$view_article_link = article_class::get_link($comments['article_id'], $comments['slug']);
+						$view_comments_full_link = article_class::get_link($comments['article_id'], $comments['slug'], '#comments');
 
 						$comment_posts .= "<div class=\"box\"><div class=\"body group\">
 						<a href=\"".$view_comment_link."\">{$title}</a><br />

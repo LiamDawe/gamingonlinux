@@ -153,7 +153,7 @@ if (!isset($_GET['view']))
 				$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
 			}
 
-			$templating->set('article_link', core::config('website_url') . article_class::get_link($article['article_id'], $article['slug']));
+			$templating->set('article_link', article_class::get_link($article['article_id'], $article['slug']));
 
 			$templating->set('username', $username);
 			$templating->set('date', $date);

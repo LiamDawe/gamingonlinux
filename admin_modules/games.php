@@ -41,7 +41,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		$templating->set('license_options', $license_options);
 
-		$core->editor('text', '');
+		$core->editor(['name' => 'text', 'editor_id' => 'game_text']);
 
 		$templating->block('add_bottom', 'admin_modules/games');
 	}

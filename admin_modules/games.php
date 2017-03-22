@@ -149,7 +149,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 				$text = $game['description'];
 
-				$core->editor('text', $text);
+				$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'game_text']);
 
 				$templating->block('edit_bottom', 'admin_modules/games');
 				$templating->set('return', $return);

@@ -22,7 +22,8 @@ if (isset($_GET['article_id']))
 $empty_check = core::mempty(compact('user_id', 'email', 'article_id'));
 if($empty_check !== true)
 {
-	header("Location: home/message=cannotunsubscribe&extra=$empty_check");
+	$_SESSION['message'] = 'cannotunsubscribe';
+	header("Location: home/");
 	die();
 }
 
@@ -40,11 +41,13 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && isset($_GET['emai
 			if ($check_exists == 1)
 			{
 				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_GET['user_id'], $_GET['article_id']));
-				header("Location: home/message=unsubscribed");
+				$_SESSION['message'] = 'cannotunsubscribe';
+				header("Location: home/");
 			}
 			else
 			{
-				header("Location: home/message=cannotunsubscribe");
+				$_SESSION['message'] = 'cannotunsubscribe';
+				header("Location: home/");
 			}
 		}
 
@@ -57,23 +60,27 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && isset($_GET['emai
 			if ($check_exists == 1)
 			{
 				$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_GET['user_id'], $_GET['topic_id']));
-				header("Location: home/message=unsubscribed");
+				$_SESSION['message'] = 'unsubscribed';
+				header("Location: home/");
 			}
 			else
 			{
-				header("Location: home/message=cannotunsubscribe");
+				$_SESSION['message'] = 'cannotunsubscribe';
+				header("Location: home/");
 			}
 		}
 	}
 
 	else
 	{
-		header("Location: home/message=cannotunsubscribe");
+		$_SESSION['message'] = 'cannotunsubscribe';
+		header("Location: home/");
 	}
 }
 else
 {
-	header("Location: home/message=cannotunsubscribe");
+	$_SESSION['message'] = 'cannotunsubscribe';
+	header("Location: home/");
 }
 
 ?>

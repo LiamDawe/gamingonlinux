@@ -876,5 +876,141 @@ class article_class
 			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
 		}
 	}
+	
+	public static function display_article_list($article_list, $get_categories)
+	{
+		global $db, $templating, $core, $user;
+
+		foreach ($article_list as $article)
+		{
+			// make date human readable
+			$date = $core->format_date($article['date']);
+
+			// get the article row template
+			$templating->block('article_row');
+
+			if ($user->check_group(1) == true)
+			{
+				$templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
+				if ($article['show_in_menu'] == 0)
+				{
+					$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><strong>Make Editors Pick</strong></a></p>");
+				}
+				else if ($article['show_in_menu'] == 1)
+				{
+					$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><strong>Remove Editors Pick</strong></a></p>");
+				}
+			}
+
+			else
+			{
+				$templating->set('edit_link', '');
+				$templating->set('editors_pick_link', '');
+			}
+
+			$templating->set('title', $article['title']);
+			$templating->set('user_id', $article['author_id']);
+
+			if ($article['author_id'] == 0)
+			{
+				if (empty($article['guest_username']))
+				{
+					$username = 'Guest';
+				}
+
+				else
+				{
+					$username = $article['guest_username'];
+				}
+			}
+
+			else
+			{
+				$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
+			}
+
+			$templating->set('username', $username);
+
+			$templating->set('date', $date);
+
+			$editors_pick = '';
+			if ($article['show_in_menu'] == 1)
+			{
+				$editors_pick = '<li><a href="#">Editors Pick</a></li>';
+			}
+			$categories_list = $editors_pick;
+
+			foreach ($get_categories as $k => $category_list)
+			{
+				if (in_array($article['article_id'], $category_list))
+				{
+					$category_link = article_class::tag_link($category_list['category_name']);
+
+					if ($category_list['category_id'] == 60)
+					{
+						$categories_list .= " <li class=\"ea\"><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
+					}
+					else
+					{
+						$categories_list .= " <li><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
+					}
+				}
+			}
+
+			$templating->set('categories_list', $categories_list);
+
+			$tagline_image = self::tagline_image($article);
+
+			$templating->set('top_image', $tagline_image);
+
+			// set last bit to 0 so we don't parse links in the tagline
+			$templating->set('text', bbcode($article['tagline'], 1, 0));
+				
+			$templating->set('article_link', article_class::get_link($article['article_id'], $article['slug']));
+			$templating->set('comment_count', $article['comment_count']);
+		}
+	}
+	
+	public static function display_category_picker($categorys_ids = NULL)
+	{
+		global $templating, $db;
+		
+		// show the category selection box
+		$templating->block('articles_top', 'articles');
+		$options = '';
+		$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
+		while ($get_cats = $db->fetch())
+		{
+			$selected = '';
+			if (isset($categorys_ids) && in_array($get_cats['category_id'], $categorys_ids))
+			{
+				$selected = 'selected';
+			}
+			if (isset($_GET['catid']) && !is_array($_GET['catid']) && $_GET['catid'] == $get_cats['category_name'])
+			{
+				$selected = 'selected';
+			}
+			$options .= '<option value="'.$get_cats['category_id'].'" ' . $selected . '>'.$get_cats['category_name'].'</option>';
+		}
+		$templating->set('options', $options);
+		
+		$all_check = '';
+		$any_check = 'checked';
+		if (isset($_GET['type']))
+		{
+			if ($_GET['type'] == 'any')
+			{
+				$any_check = 'checked';
+				$all_check = '';
+			}
+			if ($_GET['type'] == 'all')
+			{
+				$all_check = 'checked';
+				$any_check = '';
+			}
+		}
+		$templating->set('any_check', $any_check);
+		$templating->set('all_check', $all_check);
+	}
 }
 ?>

@@ -1,15 +1,23 @@
 [block: add_chart]
 <div class="box">
-	<div class="head">Add new chart</div>
+	<div class="head">Add new grouped chart</div>
 	<div class="body group">
 		<form method="post" action="admin.php?module=charts">
 			Chart name: <input type="text" name="name" value="{:name}" /><br />
 			Sub title: <input type="text" name="sub_title" value="{:sub_title}" /><br />
+			<label><input type="checkbox" id="chart_grouped" name="grouped" /> Grouped chart? (for data comparisons like OpenGL vs Vulkan on different settings</label>
 			Horizontal Axis Label (bottom of the chart): <input type="text" name="h_label" value="{:h_label}" /><br />
-			Label names, put each one on a new line.
-			<textarea name="labels" cols="100" rows="10">{:labels}</textarea><br />
-			Data values, put each one on a new line to match each label line
-			<textarea name="data" cols="100" rows="10">{:data}</textarea><br />
+			Labels
+			<div id="label_container">
+				<div id="label-1" class="input-field box"><span class="addon">Label #1:</span><input class="labels" type="text" name="labels[]" placeholder="label 1" /></div>
+				<div id="label-2" class="input-field box"><span class="addon">Label #2:</span><input class="labels" type="text" name="labels[]" placeholder="label 2" /></div>
+			</div>
+			<button id="add_label" type="button">Add Label</button> <button id="remove_label" type="button">Remove Label</button><br />
+			<div id="data_container">
+				For data groups, add the group name after the number like "45,OpenGL":<br />
+				<div id="data-1" class="box">Data for Label #1<input class="data" name="data-1">{:data}</input></div>
+				<div id="data-2" class="box">Data for Label #2<input class="data" name="data-2">{:data}</input></div>
+			</div>
 			<input type="submit" name="submit" value="Add" />
 			<input type="hidden" name="act" value="add_chart" />
 		</form>
@@ -23,3 +31,10 @@
 </div>
 {:chart_list}
 [/block: manage_charts]
+
+[block: chart]
+<div class="box">
+	<div class="head">Here's how it looks currently</div>
+</div>
+{:chart}
+[/block: chart]

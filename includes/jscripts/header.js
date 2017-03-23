@@ -996,4 +996,53 @@ function(data){
 		$('#preview').scrollMinimal();
 		$('.preview_pm').highlight();
 	});
+	
+	var label_inputs = $('.labels').length;
+	var data_inputs = $('.data').length;
+	console.log('label inputs: ' + label_inputs);
+	// for the grouped charts admin section
+	$(document).on('click', "#add_label", function() 
+	{
+		label_inputs++;
+		data_inputs++;
+		$('#label_container').append('<div id="label-'+label_inputs+'" class="input-field box"><span class="addon">Label #'+label_inputs+':</span><input type="text" class="labels" name="labels[]" placeholder="label '+label_inputs+'" /></div>');
+		if ($('#chart_grouped').prop('checked')==true)
+		{ 
+			$('#data_container').append('<div id="data-'+data_inputs+'" class="box">Data for Label #'+data_inputs+'<textarea class="data" name="data-'+data_inputs+'" cols="100" rows="10"></textarea></div>');
+		}
+		else
+		{
+			$('#data_container').append('<div id="data-'+data_inputs+'" class="box">Data for Label #'+data_inputs+'<input class="data" type="text" name="data-'+data_inputs+'" /></div>');
+		}
+	});
+	$(document).on('click', "#remove_label", function() 
+	{
+		$("#label-" + label_inputs).remove();
+		$("#data-" + data_inputs).remove();
+		label_inputs--;
+		data_inputs--;
+	});
+	$(document).on('click', "#chart_grouped", function()
+	{
+		if ($(this).prop('checked')==true)
+		{ 
+			$('input.data').each(function () 
+			{
+
+				var current_name = $(this).attr("name");
+				var textbox = $(document.createElement('textarea')).attr("class", "data").attr("name", current_name).attr("rows", 10);
+				$(this).replaceWith(textbox);
+			});
+		}
+		else
+		{
+			$('textarea.data').each(function () 
+			{
+				var current_name = $(this).attr("name");
+				var textbox = $(document.createElement('input')).attr("class", "data").attr("name", current_name).attr("type", "text");
+				$(this).replaceWith(textbox);
+			});			
+		}
+	});
+	
 });

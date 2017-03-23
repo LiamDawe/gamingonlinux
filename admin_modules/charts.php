@@ -4,7 +4,6 @@ $templating->merge('admin_modules/admin_module_charts');
 
 if (isset($_GET['view']) && !isset($_POST['act']))
 {
-	// add article
 	if ($_GET['view'] == 'add')
 	{
 		$name = '';
@@ -44,6 +43,46 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->set('data', $data);
 		$templating->set('h_label', $h_label);
 	}
+	
+	if ($_GET['view'] == 'add_grouped')
+	{
+		$name = '';
+		$sub_title = '';
+		$labels = '';
+		$data = '';
+		$h_label = '';
+
+		if (isset($_GET['message']))
+		{
+			$core->message('You have created the new chart!');
+		}
+
+		if (isset($_GET['error']))
+		{
+			if ($_GET['error'] == 'empty')
+			{
+				$core->message('You have to fill in all fields', NULL, 1);
+			}
+
+			if ($_GET['error'] == 'notenough')
+			{
+				$core->message('The amount of labels doesn\'t match the amount of data! You might have missed a label, or a bit of data to be included.', NULL, 1);
+			}
+
+			$name = $_SESSION['e_name'];
+			$sub_title = $_SESSION['e_subtitle'];
+			$labels = $_SESSION['e_labels'];
+			$data = $_SESSION['e_data'];
+			$h_label = $_SESSION['e_h_label'];
+		}
+
+		$templating->block('add_grouped_chart', 'admin_modules/admin_module_charts');
+		$templating->set('name', $name);
+		$templating->set('sub_title', $sub_title);
+		$templating->set('labels', $labels);
+		$templating->set('data', $data);
+		$templating->set('h_label', $h_label);
+	}
 
 	if ($_GET['view'] == 'manage')
 	{
@@ -57,7 +96,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('manage_charts', 'admin_modules/admin_module_charts');
 
 		$chart_list = '';
-		$db->sqlquery("SELECT * FROM `charts` WHERE `owner` = ? AND `user_stats_chart` = 0 ORDER BY `id` DESC", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT * FROM `charts` WHERE `owner` = ? ORDER BY `id` DESC", array($_SESSION['user_id']));
 		while($charts = $db->fetch())
 		{
 			$chart_list .= '<div class="box"><div class="body group"><a href="/admin.php?module=charts&view=edit&id='.$charts['id'].'">'.$charts['name'].'</a> - [chart]'.$charts['id'].'[/chart] - Generated: '.$charts['generated_date'].'<br />
@@ -103,13 +142,24 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->set('chart_list', $chart_list);
 	}
+	
+	if ($_GET['view'] == 'edit')
+	{
+		$charts = new golchart();
+		$chart_id = (int) $_GET['id'];
+		$templating->block('chart', 'admin_modules/admin_module_charts');
+		$templating->set('chart', $charts->render($chart_id, NULL, 'charts_labels', 'charts_data'));
+	}
 }
 
 else if (isset($_POST['act']) && !isset($_GET['view']))
-{
+{	
 	if ($_POST['act'] == 'add_chart')
 	{
-		if (empty($_POST['name']) || empty($_POST['labels']) || empty($_POST['data']))
+		$name = core::make_safe($_POST['name']);
+		$labels = $_POST['labels'];
+		$check_empty = core::mempty(compact('name', 'labels'));
+		if ($check_empty != true)
 		{
 			$_SESSION['e_name'] = $_POST['name'];
 			$_SESSION['e_subtitle'] = $_POST['sub_title'];
@@ -117,7 +167,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$_SESSION['e_data'] = $_POST['data'];
 			$_SESSION['e_h_label'] = $_POST['h_label'];
 
-			header("Location: /admin.php?module=charts&add&error=empty");
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $check_empty;
+			header("Location: /admin.php?module=charts&add");
 		}
 
 		else
@@ -128,54 +180,47 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				$sub_title = NULL;
 			}
 			
-			$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title));
+			$grouped = 0;
+			if (isset($_POST['grouped']))
+			{
+				$grouped = 1;
+			}
+			
+			$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?, `grouped` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title, $grouped));
 
 			$new_chart_id = $db->grab_id();
 
-			// split the labels and data into lines
-			$labels = preg_split('/(\\n|\\r)/', $_POST['labels'], -1, PREG_SPLIT_NO_EMPTY);
-			$data = preg_split('/(\\n|\\r)/', $_POST['data'], -1, PREG_SPLIT_NO_EMPTY);
-
-			if (sizeof($labels) != sizeof($data))
+			$label_counter = 1;
+			foreach ($_POST['labels'] as $label)
 			{
-				$_SESSION['e_name'] = $_POST['name'];
-				$_SESSION['e_subtitle'] = $_POST['sub_title'];
-				$_SESSION['e_labels'] = $_POST['labels'];
-				$_SESSION['e_data'] = $_POST['data'];
-				$_SESSION['e_h_label'] = $_POST['h_label'];
-
-				header("Location: /admin.php?module=charts&add&error=notenough");
-				die();
-			}
-
-			$label_counter = 0;
-			foreach ($labels as $label)
-			{
+				$label = core::make_safe($label);
 				$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+				$new_label_id = $db->grab_id();
 
-				// get the first id
-				if ($label_counter == 0)
+				$data = preg_split('/(\\n|\\r)/', $_POST['data-'.$label_counter], -1, PREG_SPLIT_NO_EMPTY);
+				// put in the data
+				foreach ($data as $dat)
 				{
-					$label_counter++;
-
-					$new_label_id = $db->grab_id();
+					if (isset($_POST['grouped']))
+					{
+						$data_series = explode(',',$dat);
+						$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?", array($new_chart_id, $new_label_id, $data_series[0], $data_series[1]));
+					}
+					else
+					{
+						$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $dat));
+					}
+					$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?", array($new_chart_id, $new_label_id, $data_series[0], $data_series[1]));
+					$core->message("Data $dat added!");
 				}
 
-				$core->message("Label $label added!");
+				$core->message("Label $label and it's data added!");
+				$label_counter++;
 			}
 
-			$core->message('Now putting in the Data.');
-
-			$set_label_id = $new_label_id;
-			// put in the data
-			foreach ($data as $dat)
-			{
-				$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $set_label_id, $dat));
-				$set_label_id++;
-				$core->message("Data $dat added!");
-			}
-
-			header("Location: /admin.php?module=charts&view=add&message=done");
+			$_SESSION['message'] = 'saved';
+			$_SESSION['message_extra'] = 'chart';
+			header("Location: /admin.php?module=charts&view=edit&id=".$new_chart_id);
 		}
 	}
 

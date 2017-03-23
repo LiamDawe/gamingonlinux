@@ -86,7 +86,7 @@ foreach($charts_list as $chart)
   $download_link = '';
   if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
   {
-    $download_link = '<div style="text-align: center;"><em>Download Graph: (<a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats&download">SVG</a>)</em></div>';
+    $download_link = '<div style="text-align: center;"><em>Download Graph: (<a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats&download">SVG</a>)</em> | <a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats">Graph Link</a></div>';
   }
   $templating->set('download_link', $download_link);
   $templating->set('total_users', $grab_chart['total_users_answered']);

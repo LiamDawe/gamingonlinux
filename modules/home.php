@@ -96,103 +96,10 @@ if (!isset($_GET['view']))
 		WHERE rank < 5";
 		$db->sqlquery($category_tag_sql);
 		$get_categories = $db->fetch_all_rows();
+		
+		$templating->merge('articles');
 
-		foreach ($articles_get as $article)
-		{
-			// make date human readable
-			$date = $core->format_date($article['date']);
-
-			// get the article row template
-			$templating->block('article_row', 'home');
-
-			if ($user->check_group([1,2,5]))
-			{
-				$templating->set('edit_link', "<p><a href=\"" . url ."admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-pencil\"></span> <strong>Edit</strong></a>");
-
-				if ($article['show_in_menu'] == 0)
-				{
-					if (core::config('total_featured') < 5)
-					{
-						$editor_pick_expiry = $core->format_date($article['date'] + 1209600, 'd/m/y');
-						$templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
-					}
-					else if (core::config('total_featured') == 5)
-					{
-						$templating->set('editors_pick_link', "");
-					}
-				}
-				else if ($article['show_in_menu'] == 1)
-				{
-					$templating->set('editors_pick_link', " <a href=\"".url."index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-remove-circle\"></span> <strong>Remove Editors Pick</strong></a></p>");
-				}
-			}
-
-			else
-			{
-				$templating->set('edit_link', '');
-				$templating->set('editors_pick_link', '');
-			}
-
-			$templating->set('title', $article['title']);
-
-			if ($article['author_id'] == 0)
-			{
-				if (empty($article['guest_username']))
-				{
-					$username = 'Guest';
-				}
-
-				else
-				{
-					$username = $article['guest_username'];
-				}
-			}
-
-			else
-			{
-				$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
-			}
-
-			$templating->set('article_link', article_class::get_link($article['article_id'], $article['slug']));
-
-			$templating->set('username', $username);
-			$templating->set('date', $date);
-
-			$editors_pick = '';
-			if ($article['show_in_menu'] == 1)
-			{
-				$editors_pick = '<li><a href="#">Editors Pick</a></li>';
-			}
-			$categories_list = $editors_pick;
-			foreach ($get_categories as $k => $category_list)
-			{
-				if (in_array($article['article_id'], $category_list))
-				{
-					$category_link = article_class::tag_link($category_list['category_name']);
-
-					if ($category_list['category_id'] == 60)
-					{
-						$categories_list .= " <li class=\"ea\"><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
-					}
-
-					else
-					{
-						$categories_list .= " <li><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
-					}
-				}
-			}
-
-			$templating->set('categories_list', $categories_list);
-
-			$tagline_image = $article_class->tagline_image($article);
-
-			$templating->set('top_image', $tagline_image);
-
-			// set last bit to 0 so we don't parse links in the tagline
-			$templating->set('text', $article['tagline']);
-
-			$templating->set('comment_count', $article['comment_count']);
-		}
+		article_class::display_article_list($articles_get, $get_categories);
 
 		$templating->block('bottom', 'home');
 		$templating->set('pagination', $pagination);

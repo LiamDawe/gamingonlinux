@@ -887,14 +887,22 @@ class article_class
 			$date = $core->format_date($article['date']);
 
 			// get the article row template
-			$templating->block('article_row');
+			$templating->block('article_row', 'articles');
 
-			if ($user->check_group(1) == true)
+			if ($user->check_group([1,2,5]))
 			{
 				$templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
 				if ($article['show_in_menu'] == 0)
 				{
-					$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><strong>Make Editors Pick</strong></a></p>");
+					if (core::config('total_featured') < 5)
+					{
+						$editor_pick_expiry = $core->format_date($article['date'] + 1209600, 'd/m/y');
+						$templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
+					}
+					else if (core::config('total_featured') == 5)
+					{
+						$templating->set('editors_pick_link', "");
+					}
 				}
 				else if ($article['show_in_menu'] == 1)
 				{

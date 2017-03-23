@@ -25,7 +25,7 @@ $articles_categorys = '';
 $db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
 while ($categorys = $db->fetch())
 {
-	$articles_categorys .= '<option value="'.core::config('website_url').article_class::tag_link($categorys['category_name']).'">'.$categorys['category_name'].'</option>';
+	$articles_categorys .= '<option value="'.article_class::tag_link($categorys['category_name']).'">'.$categorys['category_name'].'</option>';
 }
 $templating->set('category_links', $articles_categorys);
 

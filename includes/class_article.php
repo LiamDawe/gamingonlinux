@@ -644,7 +644,7 @@ class article_class
 		{
 			$link = 'index.php?module=articles&amp;view=cat&amp;catid='.$name;
 		}
-		return $link;
+		return core::config('website_url') . $link;
 	}
 	
 	public static function publish_article($options)

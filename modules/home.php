@@ -168,7 +168,7 @@ if (!isset($_GET['view']))
 			{
 				if (in_array($article['article_id'], $category_list))
 				{
-					$category_link = core::config('website_url') . article_class::tag_link($category_list['category_name']);
+					$category_link = article_class::tag_link($category_list['category_name']);
 
 					if ($category_list['category_id'] == 60)
 					{

@@ -1315,7 +1315,7 @@ else if (isset($_GET['go']))
 
 				else if (isset($_POST['no']))
 				{
-					header("Location: ".core::config('website_url').$article_link);
+					header("Location: ".$article_link);
 				}
 
 				else if (isset($_POST['yes']))
@@ -1330,7 +1330,7 @@ else if (isset($_GET['go']))
 
 					$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
 					$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_GET['comment_id']));
-					$db->sqlquery("DELETE FROM `likes` WHERE `comment_id` = ?", array($_GET['comment_id']));
+					$db->sqlquery("DELETE FROM `likes` WHERE `data_id` = ?", array($_GET['comment_id']));
 
 					// update notifications
 
@@ -1373,7 +1373,7 @@ else if (isset($_GET['go']))
 						}
 					}
 
-					header("Location: ".core::config('website_url').$article_link);
+					header("Location: ".$article_link);
 				}
 			}
 		}

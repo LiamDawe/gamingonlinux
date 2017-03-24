@@ -106,6 +106,12 @@ function gol_editor(editor_id)
          textArea.innerHTML = encodedString;
          return textArea.value;
      }
+     
+     function list(text)
+	 {
+		text = '[li]' + text.replace(/\r\n/g, "\r\n[/li]").replace(/[\r\n]/g, '[/li]\r\n[li]') + '[/li]';
+		return text;
+	 }
 
      function quote(text, name)
      {
@@ -149,6 +155,15 @@ function gol_editor(editor_id)
 			selected = document.selection.createRange().text;
 		}
 		
+		// list bbcode
+		if (tag == 'list')
+		{
+			list_data = list(selected);
+			selected = list_data;
+			tag = 'ul';
+		}
+		
+		// if there's data from a pop-up like Youtube
 		popUpData = popUp(tag, subtag, selected);
 		if(popUpData === null || typeof popUpData == 'undefined') 
 		{
@@ -157,6 +172,7 @@ function gol_editor(editor_id)
         tag      = popUpData[0];
         subtag   = popUpData[1];
         selected = popUpData[2];
+		
         ins = '[' + tag + '' + subtag + ']' + selected + '[/' + tag +']';
         if (!document.execCommand("insertText", false, ins)) 
 		{
@@ -186,6 +202,7 @@ function gol_editor(editor_id)
 			selected = document.selection.createRange().text;
 		}
 		
+		// if there's data from a pop-up like Youtube
 		popUpData = popUp(tag, selected);
 		if(popUpData === null || typeof popUpData == 'undefined') 
 		{

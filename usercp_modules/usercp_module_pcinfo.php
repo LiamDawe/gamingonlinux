@@ -154,7 +154,7 @@ if (!isset($_POST['act']))
 	// Monitors
 	$monitor_options = '';
 	$monitor_selected = '';
-	for ($i = 1; $i <= 5; $i++)
+	for ($i = 1; $i <= 10; $i++)
 	{
 		if ($i == $additional['monitor_count'])
 		{

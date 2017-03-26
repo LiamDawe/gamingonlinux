@@ -1413,9 +1413,7 @@ class core
 			$tz = new DateTimeZone($timezone);
 			$timezone_offsets[$timezone] = $tz->getOffset(new DateTime);
 		}
-
-		// sort timezone by offset
-		asort($timezone_offsets);
+		
 		foreach( $timezone_offsets as $timezone => $offset )
 		{
 			$offset_prefix = $offset < 0 ? '-' : '+';
@@ -1432,7 +1430,7 @@ class core
 			{
 				$selected = 'selected';
 			}
-			$timezone_list .= '<option value="'.$timezone.'" '.$selected.'>('.$pretty_offset.') '.$timezone.'</option>';
+			$timezone_list .= '<option value="'.$timezone.'" '.$selected.'>'.$timezone.' ('.$pretty_offset.')</option>';
 		}
 		
 		$timezone_list .= '</select>';

@@ -59,6 +59,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 			$end_date = new DateTime($streams['end_date']);
 			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
+			
+			$templating->set('timezones_list', '');
 
 			$streamer_list = '';
 			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN users u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
@@ -225,8 +227,9 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$start_time = core::adjust_time($_POST['date'], $_POST['timezone']);
-		$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone']);
+		$date = new DateTime($_POST['date']);
+		$end_date = new DateTime($_POST['end_date']);
+
 		$title = trim($_POST['title']);
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);
@@ -237,7 +240,7 @@ if (isset($_POST['act']))
 			$community = 1;
 		}
 
-		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $start_time, $end_time, $community, $community_name, $stream_url, $_POST['id']));
+		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url, $_POST['id']));
 
 		$core->process_livestream_users($_POST['id']);
 

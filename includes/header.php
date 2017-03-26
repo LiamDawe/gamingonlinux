@@ -49,7 +49,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	
 	if (!isset($_SESSION['timezone']))
 	{
-		$_SESSION['timezone'] = 'Europe/London';
+		$_SESSION['timezone'] = 'UTC';
 	}
 }
 
@@ -72,7 +72,7 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
 		$_SESSION['single_article_page'] = 0;
-		$_SESSION['timezone'] = 'Europe/London';
+		$_SESSION['timezone'] = 'UTC';
 	}
 }
 

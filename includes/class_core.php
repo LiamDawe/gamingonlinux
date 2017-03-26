@@ -1428,6 +1428,10 @@ class core
 			{
 				$selected = 'selected';
 			}
+			else if ($current_timezone == NULL || empty($current_timezone) && $timezone == 'UTC')
+			{
+				$selected = 'selected';
+			}
 			$timezone_list .= '<option value="'.$timezone.'" '.$selected.'>('.$pretty_offset.') '.$timezone.'</option>';
 		}
 		

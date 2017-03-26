@@ -29,7 +29,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `forum_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `forum_type`, `timezone` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
@@ -73,6 +73,8 @@ if (!isset($_POST['act']))
 
 	$templating->block('main', 'usercp_modules/usercp_module_home');
 	$templating->set('url', core::config('website_url'));
+	
+	$templating->set('timezone_list', core::timezone_list($usercpcp['timezone']));
 
 	$profile_fields_output = '';
 
@@ -266,14 +268,15 @@ else if (isset($_POST['act']))
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
-		$user_update_sql = "UPDATE `users` SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `forum_type` = ? WHERE `user_id` = ?";
-		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $forum_type_sql, $_SESSION['user_id']));
+		$user_update_sql = "UPDATE `users` SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `forum_type` = ?, `timezone` = ? WHERE `user_id` = ?";
+		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $forum_type_sql, $_POST['timezone'], $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;
 		$_SESSION['forum_type'] = $forum_type_sql;
 		$_SESSION['single_article_page'] = $single_article_page;
-
+		$_SESSION['timezone'] = $_POST['timezone'];
+		
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)
 		{

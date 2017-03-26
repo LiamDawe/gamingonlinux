@@ -8,13 +8,15 @@ $templating->block('top', 'livestreams');
 $edit_link = '';
 if ($user->check_group([1,2]))
 {
-  $edit_link = '<span class="fright"><a href="admin.php?module=livestreams&amp;view=manage">Edit Livestreams</a></span>';
+	$edit_link = '<span class="fright"><a href="admin.php?module=livestreams&amp;view=manage">Edit Livestreams</a></span>';
 }
 $templating->set('edit_link', $edit_link);
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'])
 {
-  $templating->block('submit', 'livestreams');
+	$templating->block('submit', 'livestreams');
+	$timezones = core::timezone_list($_SESSION['timezone']);
+	$templating->set('timezones_list', $timezones);
 }
 
 $db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC");
@@ -44,8 +46,11 @@ if ($db->num_rows() > 0)
     $templating->set('stream_url', $stream_url);
 
     $templating->set('title', $streams['title']);
-    $templating->set('time', $streams['date']);
-    $templating->set('end_time', $streams['end_date']);
+    
+    $templating->set('local_time', core::adjust_time($streams['date'], $_SESSION['timezone']));
+    $templating->set('local_time_end', core::adjust_time($streams['end_date'], $_SESSION['timezone']));
+    $templating->set('original_time', $streams['date']);
+    $templating->set('original_time_end', $streams['end_date']);
 
     $countdown = '<span id="timer'.$streams['row_id'].'"></span><script type="text/javascript">var timer' . $streams['row_id'] . ' = moment.tz("'.$streams['date'].'", "UTC"); $("#timer'.$streams['row_id'].'").countdown(timer'.$streams['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
     $templating->set('countdown', $countdown);
@@ -100,10 +105,10 @@ if (isset($_POST['act']))
     $community_name = strip_tags($community_name);
     $stream_url = trim($_POST['stream_url']);
     $stream_url = strip_tags($stream_url);
-    $date = $_POST['date'];
-    $end_date = $_POST['end_date'];
+	$start_time = core::adjust_time($_POST['date'], $_POST['timezone']);
+	$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone']);
     
-	$empty_check = core::mempty(compact('title', 'date', 'end_date', 'stream_url'));
+	$empty_check = core::mempty(compact('title', 'start_time', 'end_time', 'stream_url'));
 	
     if ($empty_check !== true)
     {
@@ -113,12 +118,9 @@ if (isset($_POST['act']))
 		die();
     }
 
-    $date = new DateTime($_POST['date']);
-    $end_date = new DateTime($_POST['end_date']);
-
     $date_created = date('Y-m-d H:i:s');
 
-    $db->sqlquery("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 0, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = 1, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $title, $date_created, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community_name, $stream_url));
+    $db->sqlquery("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 0, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = 1, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $title, $date_created, $start_time, $end_time, $community_name, $stream_url));
     $new_id = $db->grab_id();
 
     $core->process_livestream_users($new_id);

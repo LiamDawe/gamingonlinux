@@ -7,7 +7,7 @@ class user
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`,
-	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`";
+	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
 
 	function check_session()
 	{
@@ -179,6 +179,7 @@ class user
 		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
 		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
 		$_SESSION['distro'] = $user_data['distro'];
+		$_SESSION['timezone'] = $user_data['timezone'];
 
 		session_regenerate_id(true);
 		$_SESSION['canary'] = time();
@@ -335,7 +336,8 @@ class user
 		unset($_SESSION['auto_subscribe']);
 		unset($_SESSION['auto_subscribe_email']);
 		unset($_SESSION['avatar']);
-
+		
+		$_SESSION['timezone'] = 'Europe/London';
 		$_SESSION['per-page'] = core::config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';

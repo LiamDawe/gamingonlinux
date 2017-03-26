@@ -23,7 +23,9 @@
 							<div class="body group">
 								<form method="post">
 									Title: <em>Keep it as short as possible and to the point, if it isn't in English, please put a shorthand language in brackets like (GER)</em><input type="text" name="title" /><br />
-									Start Date (UTC only!): <br />
+									Select your timezone (we will convert this to UTC for you):<br />
+									{:timezones_list}
+									Start Date: <br />
 									<input name="date" id="datetimepicker1" type="text" />
 									<script>
 									var timepicker = new Pikaday(
@@ -37,7 +39,7 @@
 											autoClose: false,
 											use24hour: false
 										});</script>
-										End Date (UTC only!): <br />
+										End Date: <br />
 										<input name="end_date" id="datetimepickere2" type="text"/>
 										<script>
 										var timepicker = new Pikaday(
@@ -68,8 +70,8 @@
 [block: item]
 <div class="box">
 	<div class="head">{:badge} <a href="{:stream_url}">{:title}</a></div>
-	<div class="body group">Start time: {:time} UTC<br />
-		End time: {:end_time} UTC<br />
+	<div class="body group">Start time: {:local_time} ({:original_time} UTC)<br />
+		End time: {:local_time_end} ({:original_time_end} UTC)<br />
 		<br />Starts in: {:countdown}<br />
 		<br />
 		Stream presented by: {:profile_links}<br />

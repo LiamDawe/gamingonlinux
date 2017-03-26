@@ -46,6 +46,11 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		$_SESSION['auto_subscribe'] = $subscribe_info['auto_subscribe'];
 		$_SESSION['email_options'] = $subscribe_info['email_options'];
 	}
+	
+	if (!isset($_SESSION['timezone']))
+	{
+		$_SESSION['timezone'] = 'Europe/London';
+	}
 }
 
 // If they are not logged in make them a guest (group 4)
@@ -67,6 +72,7 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
 		$_SESSION['single_article_page'] = 0;
+		$_SESSION['timezone'] = 'Europe/London';
 	}
 }
 

@@ -1395,11 +1395,57 @@ class core
 		$json = self::file_get_contents_curl($url);
 		$json = json_decode($json, true);
 		if ( $json["ip"]["appears"] == 1 )
-	        {
+		{
 			header('Location: /index.php?module?home&message=spam');
 			die();
 		}
 	}
 
+	// this makes an auto-generated list of all timezones
+	public static function timezone_list($current_timezone = NULL)
+	{
+		$timezone_list = '<select name="timezone">';
+		$tz_list = DateTimeZone::listIdentifiers( DateTimeZone::ALL );
+
+		$timezone_offsets = array();
+		foreach( $tz_list as $timezone )
+		{
+			$tz = new DateTimeZone($timezone);
+			$timezone_offsets[$timezone] = $tz->getOffset(new DateTime);
+		}
+
+		// sort timezone by offset
+		asort($timezone_offsets);
+		foreach( $timezone_offsets as $timezone => $offset )
+		{
+			$offset_prefix = $offset < 0 ? '-' : '+';
+			$offset_formatted = gmdate( 'H:i', abs($offset) );
+
+			$pretty_offset = "UTC${offset_prefix}${offset_formatted}";
+			
+			$selected = '';
+			if ($current_timezone != NULL && !empty($current_timezone) && $current_timezone == $timezone)
+			{
+				$selected = 'selected';
+			}
+			$timezone_list .= '<option value="'.$timezone.'" '.$selected.'>('.$pretty_offset.') '.$timezone.'</option>';
+		}
+		
+		$timezone_list .= '</select>';
+
+		return $timezone_list;
+	}
+	
+	public static function adjust_time($date, $user_timezone)
+	{
+		$userTimezone = new DateTimeZone($user_timezone);
+		$gmtTimezone = new DateTimeZone('GMT');
+		$myDateTime = new DateTime($date, $gmtTimezone);
+		$offset = $userTimezone->getOffset($myDateTime);
+		$myInterval=DateInterval::createFromDateString((string)$offset . 'seconds');
+		$myDateTime->add($myInterval);
+		$result = $myDateTime->format('Y-m-d H:i:s');
+		return $result;
+	}
 }
 ?>

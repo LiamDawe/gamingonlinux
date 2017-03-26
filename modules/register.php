@@ -36,6 +36,7 @@ if (core::config('allow_registrations') == 1)
 
 		$templating->set('rules', core::config('rules'));
 		$templating->set('captcha', $captcha);
+		$templating->set('timezone_list', core::timezone_list());
 
 		// set time to check against registration time to prevent really fast bots
 		$_SESSION['register_time'] = time();
@@ -47,6 +48,7 @@ if (core::config('allow_registrations') == 1)
 
 		$templating->set('rules', core::config('rules'));
 		$templating->set('captcha', $captcha);
+		$templating->set('timezone_list', core::timezone_list());
 
 		// set time to check against registration time to prevent really fast bots
 		$_SESSION['register_time'] = time();
@@ -60,6 +62,7 @@ if (core::config('allow_registrations') == 1)
 
 		$templating->set('rules', core::config('rules'));
 		$templating->set('captcha', $captcha);
+		$templating->set('timezone_list', core::timezone_list());
 
 		// set time to check against registration time to prevent really fast bots
 		$_SESSION['register_time'] = time();
@@ -174,17 +177,17 @@ if (core::config('allow_registrations') == 1)
 					// register away
 					if ($_POST['register'] == 'Register')
 					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code, $_POST['timezone']));
 					}
 
 					if ($_POST['register'] == 'twitter')
 					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $_POST['timezone']));
 					}
 
 					if ($_POST['register'] == 'steam')
 					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
 					}
 
 					$last_id = $db->grab_id();

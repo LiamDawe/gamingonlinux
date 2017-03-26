@@ -13,7 +13,7 @@
 [block: submit_top]
 <div class="box">
 	<div class="head">
-		Manage livestream event submissions
+		Manage livestream event submissions (All times here are in <strong>UTC</strong>)
 	</div>
 </div>
 [/block: submit_top]
@@ -24,7 +24,8 @@
 	<div class="box">
 			<div class="body group">
 					Title: <input type="text" name="title" value="{:title}" /><br />
-					Start Date (UTC only!): <br />
+					{:timezones_list}
+					Start Date: <br />
 					<input name="date" id="datetimepicker{:id}" type="text" value="{:date} "/>
 					<script>
 					var timepicker = new Pikaday(
@@ -38,7 +39,7 @@
 							autoClose: false,
 							use24hour: false
 						});</script>
-						End Date (UTC only!): <br />
+						End Date: <br />
 						<input name="end_date" id="datetimepickere{:id}" type="text" value="{:end_date} "/>
 						<script>
 						var timepicker = new Pikaday(

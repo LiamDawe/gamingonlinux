@@ -47,7 +47,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		$_SESSION['email_options'] = $subscribe_info['email_options'];
 	}
 	
-	if (!isset($_SESSION['timezone']))
+	if (!isset($_SESSION['timezone']) || (isset($_SESSION['timezone']) && empty($_SESSION['timezone'])))
 	{
 		$_SESSION['timezone'] = 'UTC';
 	}

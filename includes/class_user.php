@@ -179,7 +179,12 @@ class user
 		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
 		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
 		$_SESSION['distro'] = $user_data['distro'];
-		$_SESSION['timezone'] = $user_data['timezone'];
+		
+		$_SESSION['timezone'] = 'UTC';
+		if (isset($user_data['timezone']) && !empty($user_data['timezone']))
+		{
+			$_SESSION['timezone'] = $user_data['timezone'];
+		}
 
 		session_regenerate_id(true);
 		$_SESSION['canary'] = time();

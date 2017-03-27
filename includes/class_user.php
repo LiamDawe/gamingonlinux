@@ -146,13 +146,14 @@ class user
 				$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array(core::$ip));
 			}
 
+			$_SESSION['message'] = 'banned';
 			if (core::config('pretty_urls') == 1)
 			{
-				header("Location: /home/banned");
+				header("Location: /home/");
 			}
 			else
 			{
-				header("Location: index.php?module=home&message=banned");
+				header("Location: index.php?module=home");
 			}
 			exit;
 		}
@@ -180,6 +181,7 @@ class user
 		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
 		$_SESSION['distro'] = $user_data['distro'];
 		
+		// force a default and only set it if it's properly set by the user
 		$_SESSION['timezone'] = 'UTC';
 		if (isset($user_data['timezone']) && !empty($user_data['timezone']))
 		{

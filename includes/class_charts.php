@@ -88,11 +88,11 @@ class golchart
 		
 		if ($type == 'normal')
 		{
-			$db->sqlquery("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped` FROM `charts` WHERE `id` = ?", array($chart_id));
+			$db->sqlquery("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped`, `enabled` FROM `charts` WHERE `id` = ?", array($chart_id));
 		}
 		if ($type == 'stat_chart')
 		{
-			$db->sqlquery("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `grouped` FROM `user_stats_charts` WHERE `id` = ?", array($chart_id));
+			$db->sqlquery("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `grouped`, `enabled` FROM `user_stats_charts` WHERE `id` = ?", array($chart_id));
 		}
 		$this->chart_info = $db->fetch();
 	}
@@ -253,8 +253,16 @@ class golchart
 	
 	function render($id, $pass_options = NULL, $labels_table = NULL, $data_table = NULL)
 	{
+		global $user;
+		
 		$this->setup($pass_options);
 		$this->get_chart($id);
+		
+		if ($this->chart_info['enabled'] == 0 && $user->check_group([1,2,5]) == false)
+		{
+			return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="tiny" version="1.2" width="660" height="20"><text x="1" y="15">This chart is not currently enabled!</text></svg>';
+		}
+		
 		$this->get_labels($this->chart_info['id'], $labels_table, $data_table);
 
 		self::chart_sizing();

@@ -49,8 +49,6 @@ if ($db->num_rows() > 0)
     
     $templating->set('local_time', core::adjust_time($streams['date'], $_SESSION['timezone']));
     $templating->set('local_time_end', core::adjust_time($streams['end_date'], $_SESSION['timezone']));
-    $templating->set('original_time', $streams['date']);
-    $templating->set('original_time_end', $streams['end_date']);
 
     $countdown = '<span id="timer'.$streams['row_id'].'"></span><script type="text/javascript">var timer' . $streams['row_id'] . ' = moment.tz("'.$streams['date'].'", "UTC"); $("#timer'.$streams['row_id'].'").countdown(timer'.$streams['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
     $templating->set('countdown', $countdown);

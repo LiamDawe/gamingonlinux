@@ -1438,7 +1438,7 @@ class core
 		return $timezone_list;
 	}
 	
-	public static function adjust_time($date, $user_timezone)
+	public static function adjust_time($date, $user_timezone = 'UTC')
 	{
 		$userTimezone = new DateTimeZone($user_timezone);
 		$gmtTimezone = new DateTimeZone('GMT');

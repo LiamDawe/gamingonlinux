@@ -183,26 +183,38 @@ jQuery(document).ready(function()
 		$(location).attr('href', 'index.php?module=game&view=all&' + all_fields.join('&'));
 	});
   
-  // this function may eventually handle pasting rich html from a pre-written doc into gol's editor
-  /*$('textarea').on('paste',function(e) {
-     e.preventDefault();
-     var text = (e.originalEvent || e).clipboardData.getData('text/html') || prompt('Paste something..');
-     var jqTxt = jQuery(text);
+	// this function may eventually handle pasting rich html from a pre-written doc into gol's editor
+	/*$('textarea').on('paste',function(e) 
+	{
+		e.preventDefault();
+		var text = (e.originalEvent || e).clipboardData.getData('text/html') || prompt('Paste something..');
+		text = "<div>" + text + "</div>";
+		console.log(text);
+		
+		var jqTxt = jQuery(text);
 
-     console.log(text);
+		jqTxt.find("a").each(function(item, el)
+		{
+			$(el).replaceWith("[url=" + el.href + "]" + el.textContent + "[/url]");
+		});
 
-     jqTxt.find("a").each(function(item, el)
-     {
-       $(el).replaceWith("[url=" + el.href + "]" + el.textContent + "[/url]");
-     });
-
-     jqTxt.find("br").each(function(item, el)
-     {
-       $(el).replaceWith("\n");
-     });
-
-     window.document.execCommand('insertText', false, jqTxt.text());
-});*/
+		jqTxt.find("br").each(function(item, el)
+		{
+			$(el).replaceWith("\n");
+		});
+		
+		jqTxt.find("b").each(function(item, el)
+		{
+			$(el).replaceWith("[b]" + el.textContent + "[/b]");
+		});
+		
+		jqTxt.find("p").each(function(item, el)
+		{
+			$(el).replaceWith(el.textContent+"\r\n");
+		});
+		
+		window.document.execCommand('insertText', false, jqTxt.text());
+	});*/
   // this will grab any url parameter like ?module=test and give you "test" if you search for "module"
   var getUrlParameter = function getUrlParameter(sParam) {
       var sPageURL = decodeURIComponent(window.location.search.substring(1)),

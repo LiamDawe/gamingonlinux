@@ -37,4 +37,17 @@
 	<div class="head">Here's how it looks currently</div>
 </div>
 {:chart}
+<div class="box">
+	<div class="body group">
+		<form method="post" formaction="/admin.php?module=charts">
+			<label><input type="checkbox" name="enabled" {:enabled_check} />Chart enabled and viewable?</label>
+			Chart name:<br />
+			<input type="text" name="name" value="{:name}"/><br />
+			Chart subtitle:<br />
+			<input type="text" name="sub_title" value="{:sub_title}"/><br />
+			<input type="hidden" name="chart_id" value="{:chart_id}" />
+			<button type="submit" name="act" value="edit_chart" formaction="/admin.php?module=charts">Edit Chart</button>
+		</form>
+	</div>
+</div>
 [/block: chart]

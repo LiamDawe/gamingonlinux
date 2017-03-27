@@ -13,7 +13,6 @@ class golchart
 	private $labels_output_array = [];
 	private $bars_output_array = [];
 	private $counter_array =[];
-	private $label_splits_array = [];
 	private $divisions = '';
 	private $y_axis_label_y = 0;
 	private $label_y_start = 0;
@@ -35,6 +34,7 @@ class golchart
 	private $chart_end_x = 0;
 	private $get_labels_old;
 	private $chart_info_old;
+	private $y_axis_outline_y_start = 0;
 	
 	function setup($custom_options = NULL)
 	{
@@ -61,6 +61,7 @@ class golchart
 		$this->chart_options['bar_counter_left_padding'] = 5;
 		$this->chart_options['counter_font_size'] = 15;
 		$this->chart_options['tick_font_size'] = 15;
+		$this->chart_options['subtitle_font_size'] = 16;
 		$this->chart_options['label_right_padding'] = 3;
 		$this->chart_options['label_left_padding'] = 5;
 		$this->chart_options['label_font_size'] = 15;
@@ -215,31 +216,34 @@ class golchart
 	
 	function chart_sizing()
 	{
+		$this->actual_chart_space = $this->chart_options['chart_width'] - $this->biggest_label[0] - $this->chart_options['padding_right'];
+		
+		// if we have a grouped graph, adjust actual space to accomodate series legend
 		if ($this->chart_info['grouped'] == 1)
 		{
 			self::biggest_series_label($this->data_series);
+			$this->actual_chart_space = $this->actual_chart_space - $this->biggest_series * 2;
 		}
-		
-		$this->actual_chart_space = $this->chart_options['chart_width'] - $this->biggest_label[0] - $this->chart_options['padding_right'];
 		
 		// the actual bars and everything else start after the label
 		$this->chart_bar_start_x = $this->biggest_label[0];
 		
+		// non-grouped graph, need it here due to stat charts
 		if ($this->chart_info['grouped'] == 0)
 		{
 			$this->chart_height = $this->label_y_start + $this->total_bars * $this->label_y_increment + $this->chart_options['padding_bottom'];
 		}
-		else
-		{
-			$this->chart_height = $this->label_y_start;
-			$this->actual_chart_space = $this->actual_chart_space - $this->biggest_series * 2;
-		}
 		
-		if (isset($this->chart_info['sub_title']) && $this->chart_info['sub_title'] != NULL)
+		if (isset($this->chart_info['sub_title']) && $this->chart_info['sub_title'] != NULL && !empty($this->chart_info['sub_title']))
 		{
-			$this->chart_height = $this->chart_height + 16;
+			if ($this->chart_info['grouped'] == 0)
+			{
+				$this->chart_height = $this->chart_height + $this->chart_options['subtitle_font_size'];
+			}
 			$this->label_y_start = $this->label_y_start + 18;
 		}
+		
+		$this->y_axis_outline_y_start = $this->label_y_start - 18;
 		
 		$this->outlines_x = $this->chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 		$this->bars_x_start = $this->chart_bar_start_x + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
@@ -302,15 +306,6 @@ class golchart
 			}
 			$last_label_y = $this_label_y;
 			
-			// label splitters
-			if ($label_counter > 0)
-			{
-				$this_split_y = $this_label_y - 25;
-				$this_split_y2 = $this_split_y + 1;
-				$this_split_x = $this->chart_bar_start_x - 5 + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
-				$this->label_splits_array[] = '<line x1="'.$this_split_x.'" y1="'.$this_split_y.'" x2="'.$this_split_x.'" y2="'.$this_split_y2.'" stroke="#757575" stroke-width="10" />';
-			}
-			
 			// setup bar positions and array of items
 			if ($this->chart_info['grouped'] == 0)
 			{
@@ -364,8 +359,10 @@ class golchart
 			$label_counter++;
 			$last_label_name = $k;
 		}
-		$this->chart_height = $this->chart_height + $last_bar_y;
-		
+		if ($this->chart_info['grouped'] == 1)
+		{
+			$this->chart_height = $last_bar_y + $this->chart_options['padding_bottom'] + $this->chart_options['bar_thickness'] + $this->chart_options['title_background_height'];
+		}
 		return $this->build_svg();
 	}
 	
@@ -533,15 +530,6 @@ class golchart
 			$this->labels_output_array[] = '<text x="'.$label_x_position.'" y="'.$this_label_y.'" text-anchor="end"><title>'.$data['name'] . $label_add .' (' . $data['total'] . ' total votes)</title>'.$data['name'].'</text>';
 			$last_label_y = $this_label_y;
 				
-			// label splitters
-			if ($label_counter > 0)
-			{
-				$this_split_y = $this_label_y - 25;
-				$this_split_y2 = $this_split_y + 1;
-				$this_split_x = $this->chart_bar_start_x - 5 + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
-				$this->label_splits_array[] = '<line x1="'.$this_split_x.'" y1="'.$this_split_y.'" x2="'.$this_split_x.'" y2="'.$this_split_y2.'" stroke="#757575" stroke-width="10" />';
-			}
-				
 			// setup bar positions and array of items
 			$this_bar_y = $this_label_y - 18;
 			$bar_width = $data['percent']*$this->scale;
@@ -594,7 +582,7 @@ class golchart
 		<rect class="golsvg_background" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$this->chart_height.'" fill="#F2F2F2" stroke="#696969" stroke-width="1" />
 		<!-- x/y axis outlines -->
 		<g stroke="#757575" stroke-width="1">
-			<line x1="'.$this->outlines_x.'" y1="64" x2="'.$this->outlines_x.'" y2="'.$this->axis_outline_y.'" />
+			<line x1="'.$this->outlines_x.'" y1="'.$this->y_axis_outline_y_start.'" x2="'.$this->outlines_x.'" y2="'.$this->axis_outline_y.'" />
 			<line x1="'.$this->outlines_x.'" y1="'.$this->axis_outline_y.'" x2="'.$this->chart_end_x.'" y2="'.$this->axis_outline_y.'" />
 		</g>
 		<rect class="golsvg_header" x="0" y="0" width="'.$this->chart_options['chart_width'].'" height="'.$this->chart_options['title_background_height'].'" fill="#222222"/>';
@@ -653,6 +641,8 @@ class golchart
 			}
 		}
 		
+		$get_graph.= '</g>';
+		
 		// only really used for chart exports
 		$title_fill = '';
 		if (isset($this->chart_options['title_colour']) && !empty($this->chart_options['title_colour']))
@@ -667,7 +657,7 @@ class golchart
 			$get_graph .= '<text class="golsvg_subtitle" x="300" y="45" font-size="16" text-anchor="middle">'.$this->chart_info['sub_title'].'</text>';
 		}
 		
-		$get_graph .= '</g>
+		$get_graph .= '
 		<!-- labels -->
 		<g font-size="'.$this->chart_options['label_font_size'].'" font-family="monospace" fill="#000000">';
 
@@ -684,10 +674,7 @@ class golchart
 			
 		$get_graph .= implode('', $this->counter_array);
 			
-		$get_graph .= '</g>
-		<!-- bar splitters -->';
-
-		$get_graph .= implode('', $this->label_splits_array);
+		$get_graph .= '</g>';
 
 		$get_graph .= '<!-- bottom axis numbers -->
 		<g font-size="10" fill="#000000" text-anchor="middle">'.$this->divisions.'</g>

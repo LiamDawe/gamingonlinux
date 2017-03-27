@@ -215,7 +215,7 @@ function logged_in_code($body)
 // for showing a nicely formatted article info box inside anything called by [article]ID[/article]
 function replace_article($text, $article_id)
 {
-	global $core, $article_class, $db;
+	global $core, $db;
 	
 	if (core::is_number($article_id))
 	{
@@ -236,7 +236,7 @@ function replace_article($text, $article_id)
 			a.`article_id` = ?", array($article_id));
 		$article_info = $db->fetch();
 			
-		$tagline_image = $article_class->tagline_image($article_info);
+		$tagline_image = article_class::tagline_image($article_info);
 		
 		$nice_link =  core::nice_title($article_info['title']) . '.' . $article_info['article_id'];
 		

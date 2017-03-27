@@ -11,7 +11,7 @@ class article_class
     unset($_SESSION['gallery_tagline_filename']);
   }
 
-  function tagline_image($data)
+  public static function tagline_image($data)
   {
     $tagline_image = '';
     if (!empty($data['tagline_image']))

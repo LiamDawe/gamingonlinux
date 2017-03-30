@@ -47,8 +47,8 @@ if ($db->num_rows() > 0)
 
 		$templating->set('title', $streams['title']);
 		
-		$templating->set('local_time', core::adjust_time($streams['date'], $_SESSION['timezone']));
-		$templating->set('local_time_end', core::adjust_time($streams['end_date'], $_SESSION['timezone']));
+		$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $_SESSION['timezone']));
+		$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $_SESSION['timezone']));
 
 		$countdown = '<span id="timer'.$streams['row_id'].'"></span><script type="text/javascript">var timer' . $streams['row_id'] . ' = moment.tz("'.$streams['date'].'", "UTC"); $("#timer'.$streams['row_id'].'").countdown(timer'.$streams['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
 		$templating->set('countdown', $countdown);
@@ -103,8 +103,8 @@ if (isset($_POST['act']))
 		$community_name = strip_tags($community_name);
 		$stream_url = trim($_POST['stream_url']);
 		$stream_url = strip_tags($stream_url);
-		$start_time = core::adjust_time($_POST['date'], $_POST['timezone']);
-		$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone']);
+		$start_time = core::to_utc_time($_POST['date'], $_POST['timezone'], 'UTC');
+		$end_time = core::to_utc_time($_POST['end_date'], $_POST['timezone'], 'UTC');
 		
 		$empty_check = core::mempty(compact('title', 'start_time', 'end_time', 'stream_url'));
 		

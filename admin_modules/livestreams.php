@@ -183,8 +183,8 @@ if (isset($_POST['act']))
 			die();
 		}
 		
-		$start_time = core::adjust_time($_POST['date'], $_POST['timezone']);
-		$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone']);
+		$start_time = core::adjust_time($_POST['date'], $_POST['timezone'], 'UTC');
+		$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone'], 'UTC');
 		
 		$title = trim($_POST['title']);
 		$community_name = trim($_POST['community_name']);

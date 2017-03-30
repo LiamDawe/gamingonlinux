@@ -1438,10 +1438,10 @@ class core
 		return $timezone_list;
 	}
 	
-	public static function adjust_time($date, $user_timezone = 'UTC')
+	public static function adjust_time($date, $from = 'UTC', $to = 'UTC')
 	{
-		$given = new DateTime($date, new DateTimeZone($user_timezone));
-		$given->setTimezone(new DateTimeZone("UTC"));
+		$given = new DateTime($date, new DateTimeZone($from));
+		$given->setTimezone(new DateTimeZone($to));
 		$output = $given->format("Y-m-d H:i:s"); 
 		
 		return $output;

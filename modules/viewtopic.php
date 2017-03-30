@@ -357,6 +357,8 @@ else
 				if ($page == 1)
 				{
 					$templating->block('topic', 'viewtopic');
+					$permalink = forum_class::get_link($topic['topic_id']);
+					$templating->set('permalink', $permalink);
 					$templating->set('pc_info_link', $pc_info);
 					$templating->set('topic_title', $topic['topic_title']);
 
@@ -512,6 +514,9 @@ else
 					while ($post = $get_replies->fetch())
 					{
 						$templating->block('reply', 'viewtopic');
+						
+						$permalink = forum_class::get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
+						$templating->set('permalink', $permalink);
 
 						$reply_date = $core->format_date($post['creation_date']);
 						$templating->set('tzdate', date('c',$post['creation_date']) ); // timeago

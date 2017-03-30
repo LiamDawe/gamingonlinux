@@ -659,6 +659,8 @@ if (!isset($_GET['go']))
 						}
 
 						$templating->block('article_comments', 'articles_full');
+						$permalink = article_class::get_link($article['article_id'], $article['slug'], 'comment_id=' . $comments['comment_id']);
+						$templating->set('comment_permalink', $permalink);
 						$templating->set('user_id', $comments['author_id']);
 						$templating->set('username', $into_username . $username);
 						$templating->set('editor', $editor_bit);

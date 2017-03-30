@@ -45,7 +45,7 @@
 										{:delete_link}
 										{:user_options}
 										{:bookmark}
-										<li><a class="post_link fancybox.ajax tooltip-top" data-fancybox-type="ajax" href="/includes/ajax/call_post_link.php?post_id={:post_id}&type=forum_topic" title="Link to this post"><span class="icon link">Link</span></a></li>
+										<li><a class="post_link tooltip-top" data-type="forum_topic" data-post-id="{:post_id}" href="{:permalink}" title="Link to this post"><span class="icon link">Link</span></a></li>
 									</ul>
 								</div>
 							</div>
@@ -65,6 +65,7 @@
 							<div id="{:post_id}" class="comment-body">
 								<div id="{:post_id}">
 									<p>{:post_text}</p>
+									
 								</div>
 							</div>
 						</div>
@@ -85,7 +86,7 @@
 										{:delete_link}
 										{:user_options}
 										{:bookmark}
-										<li><a class="post_link fancybox.ajax tooltip-top" data-fancybox-type="ajax" href="/includes/ajax/call_post_link.php?post_id={:post_id}&type=forum_reply" title="Link to this post"><span class="icon link">Link</span></a></li>
+										<li><a class="post_link tooltip-top" data-type="forum_reply" data-post-id="{:post_id}" href="{:permalink}" title="Link to this post"><span class="icon link">Link</span></a></li>
 									</ul>
 								</div>
 							</div>
@@ -105,6 +106,7 @@
 							<div id="{:post_id}" class="comment-body">
 								<div id="{:post_id}">
 									<p>{:post_text}</p>
+									
 								</div>
 							</div>
 						</div>

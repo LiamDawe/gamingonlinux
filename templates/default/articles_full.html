@@ -87,7 +87,7 @@
 									<ul>
 										{:report_link}
 										{:edit} {:delete} {:bookmark}
-										<li><a class="post_link fancybox.ajax tooltip-top" data-fancybox-type="ajax" href="/includes/ajax/call_post_link.php?post_id={:comment_id}&type=comment" title="Link to this comment"><span class="icon link">Link</span></a></li>
+										<li><a class="post_link tooltip-top" data-post-id="{:comment_id}" data-type="comment" href="{:comment_permalink}" title="Link to this comment"><span class="icon link">Link</span></a></li>
 										{:logged_in_options}
 									</ul>
 								</div>

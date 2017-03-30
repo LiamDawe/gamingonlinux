@@ -433,6 +433,8 @@ jQuery(document).ready(function()
 }
   var clipboard = new Clipboard('.btn');
   
+
+  
   	$(".fancybox-thumb").fancybox({
 		prevEffect	: 'none',
 		nextEffect	: 'none',
@@ -458,18 +460,26 @@ jQuery(document).ready(function()
 		openEffect	: 'none',
 		closeEffect	: 'none'
 	});
-	
-	$(".post_link").fancybox({
-		maxWidth	: 800,
-		maxHeight	: 300,
-		fitToView	: false,
-		width		: '70%',
-		height		: '28%',
-		autoSize	: false,
-		closeClick	: false,
-		openEffect	: 'none',
-		closeEffect	: 'none',
-		title : null
+	$('.post_link').on('click', function(e)
+	{
+		e.preventDefault();
+		var post_id = $(this).attr("data-post-id");
+		var type = $(this).attr("data-type");
+		console.log(post_id);
+		$.fancybox({
+			maxWidth	: 800,
+			maxHeight	: 300,
+			fitToView	: false,
+			width		: '70%',
+			height		: '28%',
+			autoSize	: false,
+			closeClick	: false,
+			openEffect	: 'none',
+			closeEffect	: 'none',
+			title : null,
+			href: '/includes/ajax/call_post_link.php?post_id=' + post_id + '&type=' + type,
+			type: 'ajax'
+		});
 	});
 
 	$(".who_likes").fancybox({

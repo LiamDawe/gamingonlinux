@@ -1440,14 +1440,11 @@ class core
 	
 	public static function adjust_time($date, $user_timezone = 'UTC')
 	{
-		$userTimezone = new DateTimeZone($user_timezone);
-		$gmtTimezone = new DateTimeZone('GMT');
-		$myDateTime = new DateTime($date, $gmtTimezone);
-		$offset = $userTimezone->getOffset($myDateTime);
-		$myInterval=DateInterval::createFromDateString((string)$offset . 'seconds');
-		$myDateTime->add($myInterval);
-		$result = $myDateTime->format('Y-m-d H:i:s');
-		return $result;
+		$given = new DateTime($date, new DateTimeZone($user_timezone));
+		$given->setTimezone(new DateTimeZone("UTC"));
+		$output = $given->format("Y-m-d H:i:s"); 
+		
+		return $output;
 	}
 }
 ?>

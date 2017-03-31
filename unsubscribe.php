@@ -41,7 +41,7 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && isset($_GET['emai
 			if ($check_exists == 1)
 			{
 				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_GET['user_id'], $_GET['article_id']));
-				$_SESSION['message'] = 'cannotunsubscribe';
+				$_SESSION['message'] = 'unsubscribed';
 				header("Location: home/");
 				die();
 			}

@@ -172,7 +172,7 @@ $templating->block('top');
 $templating->set('url', url);
 
 // april fools, because why not
-if (date('dm') == '0104')
+if (date('dm') == '0104' && date('H') < 14)
 {
 	$icon = 'windows_logo.png';
 	$site_title = 'Gaming On Windows 10';

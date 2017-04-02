@@ -329,22 +329,19 @@ class user
 			$db->sqlquery("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($_SESSION['user_id'], $_COOKIE['gol-device']));
 		}
 
-		unset($_SESSION['user_id']);
-		unset($_SESSION['username']);
-		unset($_SESSION['user_group']);
-		unset($_SESSION['secondary_user_group']);
-		unset($_SESSION['theme']);
-		unset($_SESSION['uploads']);
-		unset($_SESSION['new_login']);
-		unset($_SESSION['activated']);
-		unset($_SESSION['in_mod_queue']);
-		unset($_SESSION['logged_in']);
-		unset($_SESSION['email_options']);
-		unset($_SESSION['auto_subscribe']);
-		unset($_SESSION['auto_subscribe_email']);
-		unset($_SESSION['avatar']);
+		// remove all session information
+		$_SESSION = array();
 		
-		$_SESSION['timezone'] = 'Europe/London';
+		// delete the session cookie
+		$params = session_get_cookie_params();
+		setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+		);
+		
+		session_destroy();
+		
+		$_SESSION['timezone'] = 'UTC';
 		$_SESSION['per-page'] = core::config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';

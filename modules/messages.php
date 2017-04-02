@@ -232,7 +232,7 @@ else
 				$db_grab_fields .= "u.`{$field['db_field']}`,";
 			}
 
-			$db->sqlquery("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']));
+			$db->sqlquery("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']));
 			$start = $db->fetch();
 
 			$templating->block('view_row', 'private_messages');
@@ -244,21 +244,7 @@ else
 			$templating->set('text_plain', htmlspecialchars($start['message'], ENT_QUOTES));
 
 			// sort out the avatar
-			// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-			if (empty($start['avatar']) || $start['avatar_gravatar'] == 1)
-			{
-				$avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $start['gravatar_email'] ) ) ) . "?d=http://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-			}
-
-			// either uploaded or linked an avatar
-			else
-			{
-				$avatar = $start['avatar'];
-				if ($start['avatar_uploaded'] == 1)
-				{
-					$avatar = "/uploads/avatars/{$start['avatar']}";
-				}
-			}
+			$avatar = user::sort_avatar($start);
 
 			$templating->set('avatar', $avatar);
 			$templating->set('username', $start['username']);
@@ -339,7 +325,7 @@ else
 			$templating->set('edit_link', $edit_link);
 
 			// replies
-			$get_replies = $db->sqlquery("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
+			$get_replies = $db->sqlquery("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
 			while ($replies = $get_replies->fetch())
 			{
 				$templating->block('view_row_reply', 'private_messages');
@@ -350,21 +336,7 @@ else
 				$templating->set('text_plain', htmlspecialchars($replies['message'], ENT_QUOTES));
 
 				// sort out the avatar
-				// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-				if (empty($replies['avatar']) || $replies['avatar_gravatar'] == 1)
-				{
-					$avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $replies['gravatar_email'] ) ) ) . "?d=http://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-				}
-
-				// either uploaded or linked an avatar
-				else
-				{
-					$avatar = $replies['avatar'];
-					if ($replies['avatar_uploaded'] == 1)
-					{
-						$avatar = "/uploads/avatars/{$replies['avatar']}";
-					}
-				}
+				$avatar = user::sort_avatar($replies);
 
 				$templating->set('avatar', $avatar);
 				$templating->set('username', $replies['username']);

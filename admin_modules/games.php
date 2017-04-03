@@ -319,7 +319,9 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
 
-		header("Location: /admin.php?module=games&view=add&&message=saved&extra=game");
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'game';
+		header("Location: /admin.php?module=games&view=add");
 	}
 	if ($_POST['act'] == 'Edit')
 	{

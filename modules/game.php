@@ -195,11 +195,9 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 		$license = '';
 		if (!empty($game['license']) || $game['license'] != NULL)
 		{
-			$license = $game['license'];
-		}
-		if (!empty($license))
-		{
-			$license = '<li>License: ' . $license . '</li>';
+			$license_name = $game['license'];
+			$license_url = str_replace(' ', '+', $license_name);
+			$license = '<li>License: <a href="/index.php?module=game&view=all&license='.$license_url.'">' . $license_name . '</a></li>';
 			$extra++;
 		}
 
@@ -208,7 +206,7 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 		$db->sqlquery("SELECT g.`name`, g.`id` FROM `game_genres` g INNER JOIN `game_genres_reference` r ON r.genre_id = g.id WHERE r.`game_id` = ?", array($game['id']));
 		while ($genres = $db->fetch())
 		{
-			$genres_output[] = $genres['name'];
+			$genres_output[] = '<a href="/index.php?module=game&view=all&genre[]='.$genres['id'].'">' . $genres['name'] . '</a>';
 		}
 		
 		if (!empty($genres_output))

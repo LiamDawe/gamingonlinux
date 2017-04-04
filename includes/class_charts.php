@@ -40,16 +40,16 @@ class golchart
 	{
 		// set some defaults
 		$this->chart_options['colours'] = [
-		'#a6cee3',
-		'#1f78b4',
-		'#b2df8a',
-		'#33a02c',
-		'#fb9a99',
-		'#e31a1c',
-		'#fdbf6f',
-		'#ff7f00',
-		'#cab2d6',
-		'#6a3d9a'];
+		0 => '#a6cee3',
+		1 => '#1f78b4',
+		2 => '#b2df8a',
+		3 => '#33a02c',
+		4 => '#fb9a99',
+		5 => '#e31a1c',
+		6 => '#fdbf6f',
+		7 => '#ff7f00',
+		8 => '#cab2d6',
+		9 => '#6a3d9a'];
 		
 		$this->chart_options['title_color'] = '';
 		
@@ -69,6 +69,11 @@ class golchart
 		$this->chart_options['show_top_10'] = 0;
 		$this->chart_options['use_percentages'] = 0;
 		$this->chart_options['order'] = 'DESC';
+		
+		$this->chart_options['special_colours'] = [
+		'OpenGL' => '#a6cee3',
+		'Vulkan' => '#e31a1c'
+		];
 		
 		// sort out any custom options passed to us
 		if (isset($custom_options) && is_array($custom_options))
@@ -111,7 +116,8 @@ class golchart
 		{
 			$get_labels = array_slice($this->labels_raw_data, -10);
 		}
-		
+
+		$label_loop_counter = 0;
 		// make up the data array of labels for this chart
 		foreach ($get_labels as $label_loop)
 		{
@@ -125,12 +131,22 @@ class golchart
 			else
 			{
 				$this->labels[$label_loop['name']][$label_loop['data_series']] = $label_loop['data'];
-				if (!in_array($label_loop['data_series'], $this->data_series))
+				if (!in_array($label_loop['data_series'], $this->data_series[$label_loop['data_series']]))
 				{
-					$this->data_series[] = $label_loop['data_series'];
+					$this->data_series[$label_loop['data_series']]['name'] = $label_loop['data_series'];
+					
+					// sort the bar colouring, taking into account any special colouring
+					$bar_colour = $this->chart_options['colours'][$label_loop_counter];
+					if (array_key_exists($label_loop['data_series'], $this->chart_options['special_colours']))
+					{
+						$bar_colour = $this->chart_options['special_colours'][$label_loop['data_series']];
+					}
+					$this->data_series[$label_loop['data_series']]['colour'] = $bar_colour;
+					$label_loop_counter++;
 				}
 			}
 			$this->data_counts[] = $label_loop['data'];
+			
 		}
 		
 		$this->max_data = $this->data_counts[0];
@@ -206,7 +222,7 @@ class golchart
 	{
 		foreach ($series as $key => $text)
 		{
-			$get_series_length = $this->text_size($text, $this->chart_options['label_font_size'], 0.6, 'UTF-8');
+			$get_series_length = $this->text_size($text['name'], $this->chart_options['label_font_size'], 0.6, 'UTF-8');
 			$series_lengths[] = $get_series_length;
 		}
 		rsort($series_lengths);
@@ -344,7 +360,8 @@ class golchart
 					}
 					
 					$bar_width = $data*$this->scale;
-					$this->bars_output_array[] = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$data_series_counter].'"><title>'.$k.' ' . $data . '</title></rect>';
+					
+					$this->bars_output_array[] = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->data_series[$k]['colour'].'"><title>'.$k.' ' . $data . '</title></rect>';
 				
 					// bar counters and their positions
 					$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
@@ -600,10 +617,12 @@ class golchart
 			$get_graph .= '<!-- legend -->';
 			$legend_start_x = $this->chart_end_x + 50;
 			$legend_start_y = $this->label_y_start;
+			$series_legend_loop = 0;
+			ksort($this->data_series);
 			foreach ($this->data_series as $key => $series)
 			{
 				// setup label vertical positions
-				if ($key == 0)
+				if ($series_legend_loop == 0)
 				{
 					$this_legend_y = $legend_start_y;
 				}
@@ -614,9 +633,10 @@ class golchart
 				$this_text_y = $this_legend_y + 10;
 				$this_legend_text_x = $legend_start_x + 13;
 				
-				$get_graph .= '<rect x="'.$legend_start_x.'" y="'.$this_legend_y.'" width="10" height="10" rx="3" ry="3" fill="'.$this->chart_options['colours'][$key].'" /> <text x="'.$this_legend_text_x.'" y="'.$this_text_y.'">'.$series.'</text>';
+				$get_graph .= '<rect x="'.$legend_start_x.'" y="'.$this_legend_y.'" width="10" height="10" rx="3" ry="3" fill="'.$series['colour'].'" /> <text x="'.$this_legend_text_x.'" y="'.$this_text_y.'">'.$series['name'].'</text>';
 				
 				$legend_last_y = $this_legend_y;
+				$series_legend_loop++;
 			}
 
 		}

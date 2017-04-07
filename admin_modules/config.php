@@ -14,6 +14,8 @@ else
 
 		$templating->block('main');
 		$templating->set('form_url', core::config('website_url'));
+		
+		$templating->set('title', core::config('site_title'));
 
 		$templating->set('contact_email', core::config('contact_email'));
 
@@ -122,6 +124,8 @@ else
 			$core->set_config($debug, 'show_debug');
 			
 			$core->set_config($article_rss, 'articles_rss');
+			
+			$core->set_config($_POST['title'], 'site_title');
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';

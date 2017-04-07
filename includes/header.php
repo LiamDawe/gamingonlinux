@@ -138,6 +138,7 @@ if ($_SESSION['user_id'] != 0 && $user->check_group(6) == false)
 // get the header template html
 $templating->load('header');
 $templating->block('header', 'header');
+$templating->set('meta_keywords', core::config('meta_keywords'));
 $templating->set('url', url);
 
 // add a gol premium class tag to the body html tag, this is used to ignore gol premium and editors from the ad-blocking stats gathering

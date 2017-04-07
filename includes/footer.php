@@ -1,6 +1,7 @@
 <?php
 $templating->merge('footer');
 $templating->block('footer');
+$templating->set('site_title', core::config('site_title'));
 $templating->set('url', url);
 $templating->set('year', date('Y'));
 

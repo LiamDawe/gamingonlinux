@@ -138,6 +138,7 @@ if ($_SESSION['user_id'] != 0 && $user->check_group(6) == false)
 // get the header template html
 $templating->load('header');
 $templating->block('header', 'header');
+$templating->set('site_title', core::config('site_title'));
 $templating->set('meta_keywords', core::config('meta_keywords'));
 $templating->set('url', url);
 
@@ -186,7 +187,7 @@ else if (date('m') == '12')
 else
 {
 	$icon = 'icon.svg';
-	$site_title = 'Gaming On Linux';
+	$site_title = core::config('site_title');
 }
 $templating->set('icon', $icon);
 $templating->set('site_title', $site_title);

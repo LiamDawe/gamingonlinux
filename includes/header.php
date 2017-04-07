@@ -182,11 +182,11 @@ if (date('dm') == '0104' && date('H') < 14)
 else if (date('m') == '12')
 {
 	$icon = 'icon_xmas.png';
-	$site_title = 'Gaming On Linux';
+	$site_title = core::config('site_title');
 }
 else
 {
-	$icon = 'icon.svg';
+	$icon = core::config('navbar_logo_icon');
 	$site_title = core::config('site_title');
 }
 $templating->set('icon', $icon);

@@ -83,6 +83,7 @@ foreach ($category_array as $category)
 		if ($forum['parent'] == $category['id'])
 		{
 			$templating->block('forum_row', 'normal_forum');
+			$templating->set('url', core::config('website_url'));
 
 			if (core::config('pretty_urls') == 1)
 			{
@@ -144,6 +145,7 @@ foreach ($category_array as $category)
 }
 
 $templating->block('latest', 'normal_forum');
+$templating->set('url', core::config('website_url'));
 
 // lastest posts block below forums
 $forum_posts = '';

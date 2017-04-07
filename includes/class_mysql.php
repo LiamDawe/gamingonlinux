@@ -137,11 +137,11 @@ class mysql
 		$message = "
 		<html>
 		<head>
-		<title>A PDO Error Report For GamingOnLinux.com</title>
+		<title>A PDO Error Report For ".core::config('site_name')."</title>
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>
-		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"Gaming On Linux\">
+		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_name')."\">
 		<br />
 		$exception on page <br />
 		<strong>URL:</strong> $make_url_safe<br />

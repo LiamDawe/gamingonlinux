@@ -44,7 +44,7 @@ class mail
 		// To send HTML mail, the Content-type header must be set
 		$this->headers[] = 'MIME-Version: 1.0';
 		$this->headers[] = "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $this->boundary;
-		$this->headers[] = "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>";
+		$this->headers[] = "From: ".core::config('site_title')." Notification <".core::config('mailer_email').">";
 
 		if (is_string($headers_additional) && !empty($headers_additional))
 		{

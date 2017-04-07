@@ -249,6 +249,7 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 	$templating->set('user_link', '<li><a href="/index.php?module=login">Login</a></li><li><a href="/index.php?module=register">Register</a></li>');
 
 	$login_menu = $templating->block_store('login_menu');
+	$login_menu = $templating->store_replace($login_menu, array('url' => core::config('website_url')));
 
 	$templating->set('user_menu', $login_menu);
 	$templating->set('notifications_menu', '');

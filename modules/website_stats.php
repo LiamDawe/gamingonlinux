@@ -5,8 +5,10 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 $templating->merge('website_stats');
 
 $templating->block('top');
+$templating->set('site_title', core::config('site_title'));
 
 $templating->block('users');
+$templating->set('site_title', core::config('site_title'));
 $templating->set('total_users', number_format(core::config('total_users')));
 
 $count_new_users = $db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM `users` WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
@@ -42,6 +44,7 @@ $article_list = $db->sqlquery("SELECT COUNT( DISTINCT a.article_id ) AS `counter
 WHERE a.`date` >= $last_month_start AND a.`date` <= $now AND a.`active` = 1 AND c.`category_id` NOT IN (63) AND a.author_id != 1844 GROUP BY u.`username` ORDER BY `counter` DESC, a.date DESC");
 
 $templating->block('articles', 'website_stats');
+$templating->set('site_title', core::config('site_title'));
 $author_list = '';
 
 $last_month = date("j M Y", strtotime("first day of previous month"));

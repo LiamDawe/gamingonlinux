@@ -1,5 +1,5 @@
 [block: top]
-<div class="box"><div class="head">General website statistics for GamingOnLinux</div>
+<div class="box"><div class="head">General website statistics for {:site_title}</div>
   <div class="body group">We love being open about everything, so here's some statistics on us and the website itself!</div>
 </div>
 [/block: top]
@@ -7,7 +7,7 @@
 [block: users]
 <div class="box">
   <div class="body group">
-    There are <strong>{:total_users}</strong> registered users on GamingOnLinux and <strong>{:users_month}</strong> new users joined us this month so far!<br />
+    There are <strong>{:total_users}</strong> registered users on {:site_title} and <strong>{:users_month}</strong> new users joined us this month so far!<br />
     <br />
     We have a total of <strong>{:total_articles}</strong> articles live on the site and in the last 24 hours <strong>{:total_comments}</strong> comments have been posted!
   </div>
@@ -16,7 +16,7 @@
 
 [block: articles]
 <div class="box">
-  <div class="head">Here is a list of who has written for GOL between {:last_month} and {:now_date}</div>
+  <div class="head">Here is a list of who has written for {:site_title} between {:last_month} and {:now_date}</div>
   <div class="body list">
     <ul>
       {:author_list}

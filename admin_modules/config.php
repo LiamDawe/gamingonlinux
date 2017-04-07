@@ -20,9 +20,6 @@ else
 		$templating->set('contact_email', core::config('contact_email'));
 		$templating->set('mailer_email', core::config('mailer_email'));
 
-		// set the current template
-		$templating->set('template', core::config('template'));
-
 		// set the default module
 		$templating->set('default_module', core::config('default_module'));
 
@@ -62,6 +59,10 @@ else
 		$templating->set('debug_check', $debug_check);
 
 		$templating->set('url', core::config('website_url'));
+		
+		// THEMING
+		$templating->set('navbar_logo_icon', core::config('navbar_logo_icon'));
+		$templating->set('template', core::config('template'));
 	}
 
 	// We have been asked to edit the config
@@ -129,6 +130,8 @@ else
 			$core->set_config($_POST['title'], 'site_title');
 			
 			$core->set_config($_POST['mailer_email'], 'mailer_email');
+			
+			$core->set_config($_POST['navbar_logo_icon'], 'navbar_logo_icon');
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';

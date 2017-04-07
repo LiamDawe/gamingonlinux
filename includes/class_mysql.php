@@ -128,7 +128,7 @@ class mysql
 		$to = core::config('contact_email');
 
 		// subject
-		$subject = "GOL PDO Error";
+		$subject = "GOL PDO Error: " . core::config('site_name');
 
 		$make_sql_safe = core::make_safe($sql);
 		$make_url_safe = core::make_safe($url);

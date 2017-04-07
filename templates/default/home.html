@@ -1,18 +1,7 @@
 [block: articles_top]
 				<div class="box" style="margin: 0;">
 					<div class="head">Latest Articles 
-						<div class="toggle-nav fright">
-							<div class="quick-tags">Go to: <a class="link_button" href="{:editorial_link}">Editorials</a> <a class="link_button" href="{:interview_link}">Interviews</a> <a class="link_button" href="{:howto_link}">HOWTOs</a> <a class="link_button" href="{:reviews_link}">Reviews</a> </div>
-							<a class="link_button quick-nav-slider" href="#">Quick Tags</a>
-							<div class="toggle-content">
-								<ul>
-									<li><a href="{:editorial_link}">Editorials</a></li>
-									<li><a href="{:interview_link}">Interviews</a></li>
-									<li><a href="{:howto_link}">HOWTOs</a></li>
-									<li><a href="{:reviews_link}">Reviews</a></li>
-								</ul>
-							</div>
-						</div>
+						{:quick_nav}
 					</div>
 				</div>
 [/block: articles_top]
@@ -21,3 +10,13 @@
 	<div class="clearer"> </div>
 	{:pagination}
 [/block: bottom]
+
+[block: quick_nav]
+<div class="toggle-nav fright">
+	<div class="quick-tags">Go to: {:quick_tag_normal} </div>
+	<a class="link_button quick-nav-slider" href="#">Quick Tags</a>
+	<div class="toggle-content">
+	<ul>{:quick_tag_hidden}</ul>
+	</div>
+	</div>
+[/block: quick_nav]

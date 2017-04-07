@@ -28,10 +28,24 @@ if (!isset($_GET['view']))
 
 	$templating->block('articles_top', 'home');
 	
-	$templating->set('editorial_link', article_class::tag_link('Editorial'));
-	$templating->set('interview_link', article_class::tag_link('Interview'));
-	$templating->set('howto_link', article_class::tag_link('HOWTO'));
-	$templating->set('reviews_link', article_class::tag_link('Review'));
+	$quick_nav = '';
+	if (core::config('quick_nav') == 1)
+	{
+		$quick_nav = $templating->block_store('quick_nav', 'home');
+		
+		$quick_tag_hidden = [];
+		$quick_tag_normal = [];
+		$db->sqlquery("SELECT `category_name` FROM `articles_categorys` WHERE `quick_nav` = 1");
+		while ($get_quick = $db->fetch())
+		{
+			$quick_tag_hidden[] = '<li><a href="'.article_class::tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a></li>';
+			$quick_tag_normal[] = ' <a class="link_button" href="'.article_class::tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a> ';
+		}
+		
+		$quick_nav = $templating->store_replace($quick_nav, ['quick_tag_hidden' => implode($quick_tag_hidden), 'quick_tag_normal' => implode($quick_tag_normal)]);
+	}
+	
+	$templating->set('quick_nav', $quick_nav);
 
 	// paging for pagination
 	$page = core::give_page();

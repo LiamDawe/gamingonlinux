@@ -18,6 +18,7 @@ else
 		$templating->set('title', core::config('site_title'));
 
 		$templating->set('contact_email', core::config('contact_email'));
+		$templating->set('mailer_email', core::config('mailer_email'));
 
 		// set the current template
 		$templating->set('template', core::config('template'));
@@ -126,6 +127,8 @@ else
 			$core->set_config($article_rss, 'articles_rss');
 			
 			$core->set_config($_POST['title'], 'site_title');
+			
+			$core->set_config($_POST['mailer_email'], 'mailer_email');
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';

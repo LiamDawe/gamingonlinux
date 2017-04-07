@@ -4,14 +4,12 @@ $templating->block('menu');
 
 if (isset($_SESSION['theme']) && $_SESSION['theme'] == 'default' || !isset($_SESSION['theme']))
 {
-	$embed = "<a class=\"twitter-timeline\" href=\"https://twitter.com/gamingonlinux\" data-widget-id=\"381375312019218432\" style=\"width: 400px\">Tweets by @gamingonlinux</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+\"://platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");</script>";
+	$embed = "<a class=\"twitter-timeline\" href=\"https://twitter.com/".core::config('twitter_username')."\">Tweets by ".core::config('twitter_username')."</a> <script async src=\"//platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>";
 }
 
 else
 {
-	$embed = "<a class=\"twitter-timeline\" href=\"https://twitter.com/gamingonlinux\" data-widget-id=\"456133589034209280\" style=\"width: 400px\">Tweets by @gamingonlinux</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+\"://platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");</script>";
+	$embed = "<a class=\"twitter-timeline\" data-theme=\"dark\" href=\"https://twitter.com/".core::config('twitter_username')."\">Tweets by ".core::config('twitter_username')."</a> <script async src=\"//platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>";
 }
 
 $templating->set('embed', $embed);

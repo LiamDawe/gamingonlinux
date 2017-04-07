@@ -1,9 +1,10 @@
 <?php
 $templating->set_previous('title', 'About Us', 1);
-$templating->set_previous('meta_description', 'About Us information for GamingOnLinux.com', 1);
+$templating->set_previous('meta_description', 'About Us information for ' . core::config('site_title'), 1);
 
 $templating->merge('about_us');
 $templating->block('top');
+$templating->set('about_text', core::config('about_text'));
 
 $db->sqlquery("SELECT `user_id`, `username`, `article_bio` FROM `users` WHERE `user_group` IN (1,2) ORDER BY `user_id`");
 while ($editors = $db->fetch())

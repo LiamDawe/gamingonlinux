@@ -19,27 +19,9 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 }
 
 // Here we sort out what modules we are allowed to load
-$modules_allowed = [];
-$module_links = '';
-$db->sqlquery('SELECT `module_file_name` FROM `modules` WHERE `activated` = 1');
-while ($modules = $db->fetch())
-{
-	// modules allowed for loading
-	$modules_allowed[] = $modules['module_file_name'];
-}
+core::load_modules(['db_table' => 'modules']);
 
-// modules loading, first are we asked to load a module, if not use the default
-if (isset($_GET['module']))
-{
-	$module = $_GET['module'];
-}
-
-else
-{
-	$module = core::config('default_module');
-}
-
-if ($module == 'home')
+if (core::$current_module == 'home')
 {
 	$db->sqlquery("SELECT a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> ''");
 	$count_total = $db->num_rows();
@@ -116,6 +98,7 @@ if ($module == 'home')
 if ($user->check_group([1,2,6,5]) == false)
 {
 	$templating->block('patreon');
+	$templating->set('url', url);
 }
 
 // let them know they aren't activated yet
@@ -137,33 +120,35 @@ if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
 $templating->block('left', 'mainpage');
 
 // so mainpage.html knows to put "articles" class in the left block or not
-if ($module == 'home' || ($module == 'articles' && isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multiple')))
+if (core::$current_module == 'home' || (core::$current_module == 'articles' && isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multiple')))
 {
 	$articles_css = 'articles';
 }
-else {
+else 
+{
 	$articles_css = '';
 }
 $templating->set('articles_css', $articles_css);
 
-if (in_array($module, $modules_allowed))
+if (isset($_SESSION['message']))
 {
-	if (isset($_SESSION['message']))
+	$extra = NULL;
+	if (isset($_SESSION['message_extra']))
 	{
-		$extra = NULL;
-		if (isset($_SESSION['message_extra']))
-		{
-			$extra = $_SESSION['message_extra'];
-		}
-		$message_map->display_message($module, $_SESSION['message'], $extra);
+		$extra = $_SESSION['message_extra'];
 	}
-
-	include("modules/$module.php");
+	$message_map->display_message($module, $_SESSION['message'], $extra);
 }
 
+if (in_array(core::$current_module, core::$allowed_modules))
+{
+	include('modules/'.core::$current_module.'.php');
+}
 else
 {
-	$templating->set_previous('title', ' - Error', 1);
+	http_response_code(404);
+	$templating->set_previous('meta_data', '', 1);
+	$templating->set_previous('title', '404', 1);
 	$core->message('Not a valid module name or the module may not be active!');
 }
 

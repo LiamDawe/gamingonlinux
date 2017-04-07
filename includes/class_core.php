@@ -29,6 +29,10 @@ class core
 	public static $editor_js;
 
 	protected static $config = array();
+	
+	public static $allowed_modules = [];
+	
+	public static $current_module = [];
 
 	function __construct($file_dir)
 	{	
@@ -660,7 +664,7 @@ class core
 		{
 			$parray['topic'] = 1;
 		}
-
+		$modules_allowed = [];
 		$parray['reply'] = 0;
 		if ($permission['can_reply'] == 1)
 		{
@@ -1445,6 +1449,30 @@ class core
 		$output = $given->format("Y-m-d H:i:s"); 
 		
 		return $output;
+	}
+	
+	public static function load_modules($options)
+	{
+		global $db;
+		
+		$module_links = '';
+		$fetch_modules = $db->sqlquery('SELECT `module_file_name` FROM `'.$options['db_table'].'` WHERE `activated` = 1');
+		while ($modules = $fetch_modules->fetch())
+		{
+			// modules allowed for loading
+			self::$allowed_modules[] = $modules['module_file_name'];
+		}
+
+		// modules loading, first are we asked to load a module, if not use the default
+		if (isset($_GET['module']))
+		{
+			self::$current_module = $_GET['module'];
+		}
+
+		else
+		{
+			self::$current_module = core::config('default_module');
+		}
 	}
 }
 ?>

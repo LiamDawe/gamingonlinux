@@ -1,14 +1,14 @@
 <?php
-$templating->set_previous('meta_description', 'GamingOnLinux is the home of Linux and SteamOS gaming. Covering Linux Games, SteamOS, Reviews and more.', 1);
+$templating->set_previous('meta_description', core::config('meta_description'), 1);
 
 $templating->merge('home');
 
 if (!isset($_GET['view']))
 {
-	$templating->set_previous('title', 'Linux & SteamOS gaming community', 1);
+	$templating->set_previous('title', core::config('meta_homepage_title'), 1);
 
-	$db->sqlquery("SELECT count(id) as count FROM `announcements`");
-	$count_announcements = $db->fetch();
+	$get_announcements = $db->sqlquery("SELECT count(id) as count FROM `announcements`");
+	$count_announcements = $get_announcements->fetch();
 	if ($count_announcements['count'] > 0)
 	{
 		$templating->merge('announcements');

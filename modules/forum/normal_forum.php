@@ -1,6 +1,6 @@
 <?php
-$templating->set_previous('title', 'Linux Gamers Forum', 1);
-$templating->set_previous('meta_description', 'GamingOnLinux forum', 1);
+$templating->set_previous('title', 'Forum', 1);
+$templating->set_previous('meta_description', 'Forum', 1);
 
 $templating->merge('normal_forum');
 $templating->block('top');

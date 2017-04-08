@@ -140,7 +140,8 @@ $templating->load('header');
 $templating->block('header', 'header');
 $templating->set('site_title', core::config('site_title'));
 $templating->set('meta_keywords', core::config('meta_keywords'));
-$templating->set('url', url);
+$templating->set('url', core::config('website_url'));
+$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
 
 // add a gol premium class tag to the body html tag, this is used to ignore gol premium and editors from the ad-blocking stats gathering
 $body_class = '';
@@ -171,7 +172,7 @@ if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'art
 $templating->merge('mainpage');
 
 $templating->block('top');
-$templating->set('url', url);
+$templating->set('url', core::config('website_url'));
 
 // april fools, because why not
 if (date('dm') == '0104' && date('H') < 14)
@@ -205,26 +206,26 @@ if (core::config('pretty_urls') == 1)
 	{
 		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
 		{
-			$submit_a = url . 'admin.php?module=add_article';
+			$submit_a = core::config('website_url') . 'admin.php?module=add_article';
 		}
 	}
 	$submit_e = '/email-us/';
 }
 else {
-	$donate_link = url . 'index.php?module=support_us';
-	$statistics_link = url . 'index.php?module=statistics';
-	$forum_link = url . 'index.php?module=forum';
-	$irc_link = url . 'irc.php';
-	$contact_link = url . 'index.php?module=contact';
-	$submit_a = url . 'index.php?module=submit_article&view=Submit';
+	$donate_link = core::config('website_url') . 'index.php?module=support_us';
+	$statistics_link = core::config('website_url') . 'index.php?module=statistics';
+	$forum_link = core::config('website_url') . 'index.php?module=forum';
+	$irc_link = core::config('website_url') . 'irc.php';
+	$contact_link = core::config('website_url') . 'index.php?module=contact';
+	$submit_a = core::config('website_url') . 'index.php?module=submit_article&view=Submit';
 	if (isset($_SESSION['user_group']))
 	{
 		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
 		{
-			$submit_a = url . 'admin.php?module=add_article';
+			$submit_a = core::config('website_url') . 'admin.php?module=add_article';
 		}
 	}
-	$submit_e = url . 'index.php?module=email_us';
+	$submit_e = core::config('website_url') . 'index.php?module=email_us';
 }
 $templating->set('donate_link', $donate_link);
 $templating->set('statistics_link', $statistics_link);
@@ -275,8 +276,8 @@ else if ($_SESSION['user_id'] > 0)
 		{
 			$admin_indicator = 0;
 		}
-		$admin_link = '<li><a href="'.url.'admin.php">Admin CP</a></li>';
-		$admin_line = '<li><a href="'.url.'admin.php">'.$admin_indicator.' new admin notifications</a></li>';
+		$admin_link = '<li><a href="'.core::config('website_url').'admin.php">Admin CP</a></li>';
+		$admin_line = '<li><a href="'.core::config('website_url').'admin.php">'.$admin_indicator.' new admin notifications</a></li>';
 	}
 
 	// for the mobile navigation
@@ -292,8 +293,8 @@ else if ($_SESSION['user_id'] > 0)
 	}
 	else
 	{
-		$profile_link = url . "index.php?module=profile&user_id={$_SESSION['user_id']}";
-		$messages_html_link = url . "index.php?module=messages";
+		$profile_link = core::config('website_url') . "index.php?module=profile&user_id={$_SESSION['user_id']}";
+		$messages_html_link = core::config('website_url') . "index.php?module=messages";
 	}
 	
 	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link));

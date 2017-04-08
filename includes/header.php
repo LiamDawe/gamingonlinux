@@ -79,7 +79,7 @@ if (!isset($_SESSION['logged_in']))
 // setup the templating, if not logged in default theme, if logged in use selected theme
 include($file_dir . '/includes/class_template.php');
 
-$templating = new template('default');
+$templating = new template(core::config('template'));
 
 if ($_SESSION['user_id'] != 0 && $_SESSION['theme'] != 'default')
 {

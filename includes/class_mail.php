@@ -22,7 +22,7 @@ class mail
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>
-		<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+		<img src=\"" . core::config('website_url') . "templates/".core::config('template')."/images/icon.png\" alt=\"".core::config('site_title')."\">
 		<br />";
 
 		$this->html_message .= $html_message;

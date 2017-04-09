@@ -18,7 +18,7 @@ class user
 		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			// we know it's numeric, but doubly be sure and don't allow any html
-			$safe_id = core::make_safe($_SESSION['user_id']);
+			$safe_id = (int) $_SESSION['user_id'];
 
 			// check if they actually have any saved sessions, if they don't then logout to cancel everything
 			// this is also if we need to remove everyone being logged in due to any security issues
@@ -153,9 +153,9 @@ class user
 			}
 			else
 			{
-				header("Location: index.php?module=home");
+				header("Location: ".core::config('website_url')."index.php?module=home");
 			}
-			exit;
+			die();
 		}
 	}
 
@@ -228,14 +228,14 @@ class user
 			{
 				// send email about new device
 				$message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
-				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the GamingOnLinux website you may want to let <a href=\"https://www.gamingonlinux.com/profiles/1\">liamdawe</a> know and change your password immediately.</p>
+				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the ".core::config('site_title')." ".core::config('website_url')." website you may want to let the admin know and change your password immediately.</p>
 				<div>
 				<hr>
 				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>";
 
-				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the GamingOnLinux (https://www.gamingonlinux.com) website you may want to let TheBoss and Levi know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
+				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".core::config('site_title')." ".core::config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
 
-				$mail = new mail($user_data['email'], "GamingOnLinux: New Login Notification", $message, $plain_message);
+				$mail = new mail($user_data['email'], core::config('site_title') . ": New Login Notification", $message, $plain_message);
 				$mail->send();
 			}
 		}
@@ -354,7 +354,7 @@ class user
 		session_regenerate_id(true);
 		$_SESSION['canary'] = time();
 
-		header("Location: index.php");
+		header("Location: ".core::config('website_url')."index.php");
 	}
 
 	function avatar()

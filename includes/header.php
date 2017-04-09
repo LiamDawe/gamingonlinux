@@ -106,7 +106,7 @@ if ($_SESSION['user_id'] != 0)
 		$_SESSION['user_id'] = 0;
 		$_SESSION['user_group'] = 4;
 		$_SESSION['secondary_user_group'] = 4;
-		header("Location: /index.php");
+		header("Location: ".core::config('website_url')."index.php");
 	}
 }
 
@@ -172,6 +172,7 @@ if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'art
 $templating->merge('mainpage');
 
 $templating->block('top');
+$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
 $templating->set('url', core::config('website_url'));
 
 // april fools, because why not
@@ -297,7 +298,7 @@ else if ($_SESSION['user_id'] > 0)
 		$messages_html_link = core::config('website_url') . "index.php?module=messages";
 	}
 	
-	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link));
+	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link, 'url' => core::config('website_url')));
 	$templating->set('user_menu', $user_menu);
 
 	/* This section is for general user notifications, it covers:
@@ -367,7 +368,8 @@ else if ($_SESSION['user_id'] > 0)
 	'message_count' => $messages_indicator,
 	'comments_line' => $new_comments_line,
 	'messages_link' => $messages_html_link,
-	'admin_line' => $admin_line));
+	'admin_line' => $admin_line,
+	'this_template' => core::config('website_url') . 'templates/' . core::config('template')));
 
 	$templating->set('notifications_menu', $notifications_menu);
 }

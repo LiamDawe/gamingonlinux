@@ -8,7 +8,7 @@ include($file_dir. '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
 include($file_dir . '/includes/class_template.php');
-$templating = new template('default');
+$templating = new template(core::config('template'));
 
 $groups = '';
 $db->sqlquery("SELECT * FROM `user_groups` ORDER BY `group_name` ASC");

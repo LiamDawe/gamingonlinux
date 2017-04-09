@@ -161,7 +161,7 @@ else
 
 $templating->set('body_class', $body_class);
 
-$templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for GamingOnLinux" href="https://www.gamingonlinux.com/article_rss.php" />');
+$templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for '.core::config('site_title').'" href="'.core::config('website_url').'article_rss.php" />');
 
 // set a blank article image as its set again in articles_full.php
 if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'articles_full' || $_GET['module'] == 'articles_full' && isset($_GET['go']))

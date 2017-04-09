@@ -45,15 +45,15 @@ if (core::config('articles_rss') == 1)
 	$xml->writeAttribute( 'xmlns:atom', 'http://www.w3.org/2005/Atom' );
 
 	$xml->startElement('channel');
-	$xml->writeElement('title', 'GamingOnLinux.com Latest Articles');
-	$xml->writeElement('link', 'https://www.gamingonlinux.com');
-	$xml->writeElement('description', 'The latest articles from GamingOnLinux.com');
+	$xml->writeElement('title', core::config('site_title') . ' Latest Articles');
+	$xml->writeElement('link', core::config('website_url'));
+	$xml->writeElement('description', 'The latest articles from ' . core::config('site_title'));
 	$xml->writeElement('pubDate', $last_date);
 	$xml->writeElement('language', 'en-us');
 	$xml->writeElement('lastBuildDate', $last_date);
 
 	$xml->startElement('atom:link');
-	$xml->writeAttribute('href', 'https://www.gamingonlinux.com/article_rss.php');
+	$xml->writeAttribute('href', core::config('website_url') . 'article_rss.php');
 	$xml->writeAttribute('rel', 'self');
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();

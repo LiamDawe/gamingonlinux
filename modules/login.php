@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Login', 1);
-$templating->set_previous('meta_description', 'GamingOnLinux.com login forum', 1);
+$templating->set_previous('meta_description', 'Login page for ' . core::config('site_title'), 1);
 
 $templating->merge('login');
 
@@ -11,6 +11,7 @@ if (!isset($_POST['action']))
 		if ($_SESSION['user_id'] == 0)
 		{
 			$templating->block('main', 'login');
+			$templating->set('url', core::config('website_url'));
 
 			$username = '';
 			$username_remembered = '';
@@ -166,49 +167,14 @@ else if (isset($_POST['action']))
 		{
 			unset($_SESSION['login_error']);
 			unset($_SESSION['login_error_username']);
-			$url = parse_url($_SERVER['HTTP_REFERER']);
-
-			// added 127 for testing on local machine so it still works
-			// this checks the last page was from GOL to refer it back to where they were
-			if ('www.gamingonlinux.com' == parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_HOST ) || '127.0.0.1' == parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_HOST))
-			{
-				if (isset($url['query']))
-				{
-					if ($url['query'] == 'module=login' || $url['query'] == 'module=register' || $url['query'] == 'module=register&twitter_new')
-					{
-						header("Location: index.php");
-					}
-
-					else if ($url['query'] != 'module=login' && $url['query'] != 'module=register' && $url['query'] != 'module=register&twitter_new')
-					{
-						header("Location: {$_SERVER['HTTP_REFERER']}");
-					}
-				}
-
-				else if (!isset($url['query']) && $url['path'] != '/index.php')
-				{
-					header("Location: {$_SERVER['HTTP_REFERER']}");
-				}
-
-				// if there is no php query page, or no url path from within gol, just go to the index
-				else
-				{
-					header("Location: index.php");
-				}
-
-			}
-
-			// if they aren't from within GOL, go to the index
-			else
-			{
-				header("Location: index.php");
-			}
+			
+			header("Location: ".core::config('website_url'));
 		}
 
 		else
 		{
 			$_SESSION['login_error_username'] = $_POST['username'];
-			header("Location: /index.php?module=login");
+			header("Location: ".core::config('website_url')."/index.php?module=login");
 		}
 	}
 	
@@ -223,7 +189,7 @@ else if (isset($_POST['action']))
 		}
 		setcookie('request_stay', $stay, time()+(60*60*24*7), '/', core::config('cookie_domain')); // 1 week
 
-		header("Location: /index.php?module=login&steam");
+		header("Location: ".core::config('website_url')."/index.php?module=login&steam");
 		die();
 	}
 	
@@ -238,7 +204,7 @@ else if (isset($_POST['action']))
 		}
 		setcookie('request_stay', $stay, time()+(60*60*24*7), '/', core::config('cookie_domain')); // 1 week
 		
-		header("Location: /index.php?module=login&twitter");
+		header("Location: ".core::config('website_url')."/index.php?module=login&twitter");
 		die();
 	}
 
@@ -248,7 +214,7 @@ else if (isset($_POST['action']))
 		$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['email']));
 		if ($db->num_rows() == 0)
 		{
-			header("Location: /index.php?module=login&forgot&bademail");
+			header("Location: ".core::config('website_url')."index.php?module=login&forgot&bademail");
 		}
 
 		else
@@ -276,7 +242,7 @@ else if (isset($_POST['action']))
 			// Mail it
 			if (core::config('send_emails') == 1)
 			{
-				$mail = new mail($_POST['email'], 'GamingOnLinux.com password reset request', $html_message, $plain_message);
+				$mail = new mail($_POST['email'], core::config('site_title') . ' password reset request', $html_message, $plain_message);
 				$mail->send();
 
 				$core->message("An email has been sent to {$_POST['email']} with instructions on how to change your password.");
@@ -297,7 +263,7 @@ else if (isset($_POST['action']))
 			// drop any previous requested
 			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
 
-			$core->message("That reset request has expired, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
+			$core->message("That reset request has expired, you will need to <a href=\"".core::config('website_url')."/index.php?module=login&forgot\">request a new code!</a>");
 		}
 
 		else
@@ -306,7 +272,7 @@ else if (isset($_POST['action']))
 			$db->sqlquery("SELECT `user_email` FROM `password_reset` WHERE `user_email` = ? AND `secret_code` = ?", array($email, $code));
 			if ($db->num_rows() != 1)
 			{
-				$core->message("That is not a correct password reset request! <a href=\"index.php?module=login\">Go back.</a>");
+				$core->message("That is not a correct password reset request! <a href=\"".core::config('website_url')."index.php?module=login\">Go back.</a>");
 			}
 
 			else
@@ -314,7 +280,7 @@ else if (isset($_POST['action']))
 				// check the passwords match
 				if ($_POST['password'] != $_POST['password_again'])
 				{
-					$core->message("The new passwords didn't match! <a href=\"index.php?module=login\">Go back.</a>");
+					$core->message("The new passwords didn't match! <a href=\"".core::config('website_url')."index.php?module=login\">Go back.</a>");
 				}
 
 				// change the password
@@ -328,7 +294,7 @@ else if (isset($_POST['action']))
 					// drop any previous requested
 					$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
 
-					$core->message("Your password has been updated! <a href=\"index.php?module=login\">Click here to now login.</a>");
+					$core->message("Your password has been updated! <a href=\"".core::config('website_url')."index.php?module=login\">Click here to now login.</a>");
 				}
 			}
 		}

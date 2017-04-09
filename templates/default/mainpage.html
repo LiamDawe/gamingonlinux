@@ -19,7 +19,7 @@
 						</ul>
 					</div>
 				</div>
-				<li class="gol-icon"><a href="{:url}" title="{:site_title} Home"><img src="{:url}templates/default/images/{:icon}" width="35" height="35" alt="{:site_title}"></a></li>
+				<li class="gol-icon"><a href="{:url}" title="{:site_title} Home"><img src="{:this_template}/images/{:icon}" width="35" height="35" alt="{:site_title}"></a></li>
 				<li class="nav-title"><a href="{:url}">{:site_title}</a></li>
 				<li class="dropdown hide-small">
 					<a href="#" onclick="return false;">Sections <b class="caret-down"></b></a>
@@ -74,10 +74,10 @@
 					<li style="padding:5px;"><strong>{:username}</strong></li>
 					<li class="divider"></li>
 					<li><a href="{:profile_link}">View Profile</a></li>
-					<li><a href="/usercp.php">User CP</a></li>
-					<li><a href="/usercp.php?module=bookmarks">Bookmarks</a></li>
+					<li><a href="{:url}usercp.php">User CP</a></li>
+					<li><a href="{:url}usercp.php?module=bookmarks">Bookmarks</a></li>
 					{:admin_link}
-					<li><a href="/index.php?act=Logout">Logout</a></li>
+					<li><a href="{:url}index.php?act=Logout">Logout</a></li>
 				</ul>
 		</div>
 	</div>
@@ -85,7 +85,7 @@
 
 [block: notifications]
 	<div id="alert_box" class="toggle-nav alerts-box right alerts-box-{:alert_box_type}">
-		<a href="#">{:notifications_total} <img src="/templates/default/images/comments/{:alerts_icon}.png" alt=""/></a>
+		<a href="#">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.png" alt=""/></a>
 		<div class="toggle-content">
 				<ul>
 					{:admin_line}

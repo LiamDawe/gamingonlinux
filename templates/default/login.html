@@ -1,7 +1,7 @@
 [block: main]
         <div class="box">
 					<div class="body group">
-						<form method="post" action="/index.php?module=login">
+						<form method="post" action="{:url}index.php?module=login">
 							<input class="ays-ignore" name="username" type="text" value="{:username}" placeholder="Username or Email" />
 							<input class="ays-ignore" name="password" type="password" placeholder="Password" autocomplete="off" />
 							<label>
@@ -33,7 +33,7 @@
         <div class="box">
 					<div class="body group">
 						<p>Due to spam you need to <a href="//www.gamingonlinux.com/register/">Register</a> and <a href="//www.gamingonlinux.com/index.php?module=login">Login</a> to comment.</p>
-						<form method="post" action="/index.php?module=login">
+						<form method="post" action="{:url}index.php?module=login">
 							<input class="ays-ignore" name="username" type="text" value="" placeholder="Username or Email" />
 							<input class="ays-ignore" name="password" type="password" placeholder="Password" autocomplete="off" />
 							<label>

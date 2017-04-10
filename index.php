@@ -115,6 +115,7 @@ if (isset($_GET['user_id']))
 if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
 {
 	$templating->block('activation', 'mainpage');
+	$templating->set('url', core::config('website_url'));
 }
 
 $templating->block('left', 'mainpage');
@@ -137,7 +138,7 @@ if (isset($_SESSION['message']))
 	{
 		$extra = $_SESSION['message_extra'];
 	}
-	$message_map->display_message($module, $_SESSION['message'], $extra);
+	$message_map->display_message(core::$current_module, $_SESSION['message'], $extra);
 }
 
 if (in_array(core::$current_module, core::$allowed_modules))

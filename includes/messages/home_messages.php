@@ -12,6 +12,11 @@ return [
 	[
 		"text" => "Your account has been activated!"
 	],
+	"cannot_activate" => 
+	[
+		"text" => "Your account could not be activated, that is the wrong code!",
+		"error" => 1
+	],
 	"cannotunsubscribe" => 
 	[
 		"text" => "Sorry your details didn't match up to unsubscribe you!",

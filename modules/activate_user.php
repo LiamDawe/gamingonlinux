@@ -9,13 +9,19 @@ if (!isset($_GET['redo']))
 	else
 	{
 		$db->sqlquery("SELECT `user_id` FROM `users` WHERE `user_id` = ? AND `activation_code` = ?", array($_GET['user_id'], $_GET['code']));
-		if ($db->num_rows() == 1)
+		$count_rows = $db->num_rows();
+		if ($count_rows == 1)
 		{
 			$db->sqlquery("UPDATE `users` SET `activated` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['activated'] = 1;
 			$_SESSION['message'] = 'activated';
-			header("Location: /index.php?module=home");
+			header("Location: ".core::config('website_url')."index.php?module=home");
+		}
+		else
+		{
+			$_SESSION['message'] = 'cannot_activate';
+			header("Location: ".core::config('website_url')."index.php?module=home");
 		}
 	}
 }
@@ -33,7 +39,7 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 		$db->sqlquery("UPDATE `users` SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
 
 		// subject
-		$subject = 'Welcome to GamingOnLinux.com, activation needed!';
+		$subject = 'Welcome to '.core::config('site_title').', activation needed!';
 
 		// message
 		$html_message = "<p>Hello {$_SESSION['username']},</p>
@@ -51,7 +57,7 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 
 	else if ($get_active['activated'] == 1)
 	{
-		header("Location: /index.php");
+		header("Location: ".core::config('website_url'));
 	}
 }
 ?>

@@ -1472,7 +1472,7 @@ class core
 				{
 					$section_link = core::config('website_urls') . $modules['nice_link'];
 				}
-				self::$top_bar_links[] = '<li><a href="'.$section_link.'">'.$modules['nice_title'].'</li>';
+				self::$top_bar_links[] = '<li><a href="'.$section_link.'">'.$modules['nice_title'].'</a></li>';
 			}
 		}
 

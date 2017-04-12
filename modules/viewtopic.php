@@ -853,6 +853,8 @@ else
 									}
 
 									$templating->set('moderator_options', $reply_options);
+									
+									$templating->block('preview', 'viewtopic');
 								}
 								else
 								{

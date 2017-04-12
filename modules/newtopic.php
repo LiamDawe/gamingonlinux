@@ -168,6 +168,8 @@ else
 
 				$templating->block('bottom', 'newtopic');
 				$templating->set('options', $options);
+				
+				$templating->block('preview', 'newtopic');
 			}
 
 			else if (isset($_POST['act']))

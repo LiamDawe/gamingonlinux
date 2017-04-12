@@ -102,12 +102,12 @@ class golchart
 		$this->chart_info = $db->fetch();
 	}
 	
-	 function get_labels($chart_id, $labels_table, $data_table)
+	function get_labels($chart_id, $labels_table, $data_table)
 	{
 		global $db;
 		
 		// set the right labels to the right data
-		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data`, d.`data_series` FROM `".$labels_table."` l LEFT JOIN `".$data_table."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_id));
+		$db->sqlquery("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`data_series` FROM `".$labels_table."` l LEFT JOIN `".$data_table."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_id));
 		$this->labels_raw_data = $db->fetch_all_rows();
 		
 		// if we are requesting the top 10, cut it down
@@ -127,16 +127,20 @@ class golchart
 				end($this->labels);
 				$last_id=key($this->labels);
 				$this->labels[$last_id]['total'] = $label_loop['data'];
+				$this->labels[$last_id]['colour'] = $label_loop['colour'];
 			}
 			else
 			{
 				$this->labels[$label_loop['name']][$label_loop['data_series']] = $label_loop['data'];
-				if (!in_array($label_loop['data_series'], $this->data_series[$label_loop['data_series']]))
+				if (!array_key_exists($label_loop['data_series'], $this->data_series))
 				{
 					$this->data_series[$label_loop['data_series']]['name'] = $label_loop['data_series'];
 					
 					// sort the bar colouring, taking into account any special colouring
-					$bar_colour = $this->chart_options['colours'][$label_loop_counter];
+					// start off with the basic colour label_loop
+					$bar_colour = $this->chart_options['colours'][$label_loop_counter];			
+					
+					// lastly, if we have them in the list of special colours, force that
 					if (array_key_exists($label_loop['data_series'], $this->chart_options['special_colours']))
 					{
 						$bar_colour = $this->chart_options['special_colours'][$label_loop['data_series']];
@@ -146,7 +150,6 @@ class golchart
 				}
 			}
 			$this->data_counts[] = $label_loop['data'];
-			
 		}
 		
 		$this->max_data = $this->data_counts[0];
@@ -238,7 +241,8 @@ class golchart
 		if ($this->chart_info['grouped'] == 1)
 		{
 			self::biggest_series_label($this->data_series);
-			$this->actual_chart_space = $this->actual_chart_space - $this->biggest_series * 2;
+			// make space for the series labels in the legend AND the coloured squares
+			$this->actual_chart_space = $this->actual_chart_space - $this->biggest_series - 13;
 		}
 		
 		// the actual bars and everything else start after the label
@@ -614,9 +618,11 @@ class golchart
 		
 		if ($this->chart_info['grouped'] == 1)
 		{
-			$get_graph .= '<!-- legend -->';
-			$legend_start_x = $this->chart_end_x + 50;
+			$legend_start_x = $this->chart_options['chart_width'] - $this->biggest_series - 14;
 			$legend_start_y = $this->label_y_start;
+			
+			$get_graph .= '<!-- legend --><g font-size="'.$this->chart_options['label_font_size'].'" font-family="monospace">';
+			
 			$series_legend_loop = 0;
 			ksort($this->data_series);
 			foreach ($this->data_series as $key => $series)
@@ -631,14 +637,16 @@ class golchart
 					$this_legend_y = $legend_last_y + $this->chart_options['label_font_size'];
 				}
 				$this_text_y = $this_legend_y + 10;
+				
+				// setup legend x (horizontal) positioning
 				$this_legend_text_x = $legend_start_x + 13;
 				
-				$get_graph .= '<rect x="'.$legend_start_x.'" y="'.$this_legend_y.'" width="10" height="10" rx="3" ry="3" fill="'.$series['colour'].'" /> <text x="'.$this_legend_text_x.'" y="'.$this_text_y.'">'.$series['name'].'</text>';
+				$get_graph .= '<rect x="'.$legend_start_x.'" y="'.$this_legend_y.'" width="10" height="10" rx="3" ry="3" fill="'.$series['colour'].'" /> <text x="'.$this_legend_text_x.'" y="'.$this_text_y.'"  text-anchor="start">'.$series['name'].'</text>';
 				
 				$legend_last_y = $this_legend_y;
 				$series_legend_loop++;
 			}
-
+			$get_graph .= '</g>';
 		}
 		
 		$get_graph .= '<!-- strokes -->

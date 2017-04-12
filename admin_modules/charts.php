@@ -167,7 +167,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			
 			foreach ($_POST['labels'] as $key => $label)
 			{
-				trim($labels);
+				trim($label);
 				if (empty($label))
 				{
 					$_SESSION['message'] = 'empty';
@@ -184,10 +184,17 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$label_counter = 1;
 			foreach ($_POST['labels'] as $key => $label)
 			{
+				$this_label_colour = NULL;
+				if (isset($_POST['colours'][$key]) && !empty($_POST['colours'][$key]))
+				{
+					$this_label_colour = $_POST['colours'][$key];
+				}
+
 				$label = core::make_safe($label);
-				$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $label));
+				$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?, `colour` = ?", array($new_chart_id, $label, $this_label_colour));
 				$new_label_id = $db->grab_id();
 
+				// sort the data out for grouped charts
 				if (isset($_POST['grouped']))
 				{
 					$data = preg_split('/(\\n|\\r)/', $_POST['data-'.$label_counter], -1, PREG_SPLIT_NO_EMPTY);
@@ -195,12 +202,14 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 					foreach ($data as $dat)
 					{
 						$data_series = explode(',',$dat);
-						$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?", array($new_chart_id, $new_label_id, $data_series[0], $data_series[1]));
+						
+						$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?", array($new_chart_id, $new_label_id, $data_series[0], trim($data_series[1])));
 
 						$core->message("Data $dat added!");
 					}
 					
 				}
+				// sort the data out for normal charts
 				else
 				{
 					$data_key = $key+1;

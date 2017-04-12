@@ -44,7 +44,7 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^sales/?$ /sales.php [N]
 
-  RewriteRule ^irc/?$ /irc.php [N]
+  RewriteRule ^irc/?$ /index.php?module=irc [N]
 
   RewriteRule ^sales/page=([0-9]+)/?$ /sales.php?page=$1 [N,NC,QSA]
 

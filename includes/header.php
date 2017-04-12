@@ -216,7 +216,7 @@ else {
 	$donate_link = core::config('website_url') . 'index.php?module=support_us';
 	$statistics_link = core::config('website_url') . 'index.php?module=statistics';
 	$forum_link = core::config('website_url') . 'index.php?module=forum';
-	$irc_link = core::config('website_url') . 'irc.php';
+	$irc_link = core::config('website_url') . 'index.php?module=irc';
 	$contact_link = core::config('website_url') . 'index.php?module=contact';
 	$submit_a = core::config('website_url') . 'index.php?module=submit_article&view=Submit';
 	if (isset($_SESSION['user_group']))

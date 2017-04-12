@@ -33,6 +33,8 @@ class core
 	public static $allowed_modules = [];
 	
 	public static $current_module = [];
+	
+	public static $top_bar_links = [];
 
 	function __construct($file_dir)
 	{	
@@ -1456,11 +1458,22 @@ class core
 		global $db;
 		
 		$module_links = '';
-		$fetch_modules = $db->sqlquery('SELECT `module_file_name` FROM `'.$options['db_table'].'` WHERE `activated` = 1');
+		$fetch_modules = $db->sqlquery('SELECT `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC');
 		while ($modules = $fetch_modules->fetch())
 		{
 			// modules allowed for loading
 			self::$allowed_modules[] = $modules['module_file_name'];
+			
+			if ($modules['sections_link'] == 1)
+			{
+				// sort out links to be placed in the navbar
+				$section_link = core::config('website_urls') . 'index.php?module=' . $modules['module_file_name'];
+				if (core::config('pretty_urls') == 1)
+				{
+					$section_link = core::config('website_urls') . $modules['nice_link'];
+				}
+				self::$top_bar_links[] = '<li><a href="'.$section_link.'">'.$modules['nice_title'].'</li>';
+			}
 		}
 
 		// modules loading, first are we asked to load a module, if not use the default
@@ -1473,6 +1486,12 @@ class core
 		{
 			self::$current_module = core::config('default_module');
 		}
+	}
+	
+	// this pulls in extra links to include on the navbar
+	public static function load_navbar_links()
+	{
+		$fetch_links = $db->sqlquery("SELECT `title` FROM `navbar_links` ORDER BY `order` ASC");
 	}
 }
 ?>

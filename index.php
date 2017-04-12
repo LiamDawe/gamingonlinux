@@ -18,9 +18,6 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 	}
 }
 
-// Here we sort out what modules we are allowed to load
-core::load_modules(['db_table' => 'modules']);
-
 if (core::$current_module == 'home')
 {
 	$db->sqlquery("SELECT a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> ''");

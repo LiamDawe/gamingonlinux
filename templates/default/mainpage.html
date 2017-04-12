@@ -7,15 +7,12 @@
 					<div class="toggle-content" id="nav-hidden">
 						<ul>
 							{:user_link}
-							<li><a href="/index.php?module=livestreams">Livestreams</a></li>
-							<li><a href="{:statistics_link}">Statistics</a></li>
-							<li><a href="{:donate_link}">Support Us</a></li>
+							{:sections_links}
 							<li><a href="/wiki/">Wiki</a></li>
 							<li><a href="{:contact_link}">Contact Us</a></li>
 							<li><a href="{:forum_link}">Forum</a></li>
 							<li><a href="{:irc_link}">IRC</a></li>
 							<li><a href="/index.php?module=search">Search</a></li>
-							<li><a href="/index.php?module=game_servers">Game Servers</a></li>
 						</ul>
 					</div>
 				</div>
@@ -24,12 +21,7 @@
 				<li class="dropdown hide-small">
 					<a href="#" onclick="return false;">Sections <b class="caret-down"></b></a>
 					<ul class="dropdown-menu">
-						<li><a href="/index.php?module=livestreams">Livestreams</a></li>
-						<li><a href="{:statistics_link}">Statistics</a></li>
-						<li><a href="/index.php?module=calendar">Release Calendar</a></li>
-						<li><a href="/index.php?module=game">Games Database</a></li>
-						<li><a href="/index.php?module=game_servers">Game Servers</a></li>
-						<li><a href="{:donate_link}">Support Us</a></li>
+						{:sections_links}
 						<li><a href="/wiki/">Wiki</a></li>
 					</ul>
 				</li>

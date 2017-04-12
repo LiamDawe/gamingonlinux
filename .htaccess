@@ -28,8 +28,6 @@ Options +SymLinksifOwnerMatch
 
   RewriteCond %{SCRIPT_FILENAME} !-f
 
-  RewriteRule ^crowdfunding/?(index.php/?)?(.*)$ /wiki/$2 [R=301,NC,L]
-
   RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
 
   RewriteRule ^home/?$ /index.php?module=home [N]
@@ -41,8 +39,6 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^latest-comments/?$ /index.php?module=comments_latest [N]
 
   RewriteRule ^home/banned?$ /index.php?module=home&message=banned [N]
-
-  RewriteRule ^sales/?$ /sales.php [N]
 
   RewriteRule ^irc/?$ /index.php?module=irc [N]
 

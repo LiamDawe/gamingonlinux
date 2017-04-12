@@ -205,8 +205,6 @@ $templating->set('sections_links', $section_links);
 // sort the links out
 if (core::config('pretty_urls') == 1)
 {
-	$donate_link = '/support-us/';
-	$statistics_link = '/users/statistics';
 	$forum_link = '/forum/';
 	$irc_link = '/irc/';
 	$contact_link = '/contact-us/';
@@ -220,9 +218,8 @@ if (core::config('pretty_urls') == 1)
 	}
 	$submit_e = '/email-us/';
 }
-else {
-	$donate_link = core::config('website_url') . 'index.php?module=support_us';
-	$statistics_link = core::config('website_url') . 'index.php?module=statistics';
+else 
+{
 	$forum_link = core::config('website_url') . 'index.php?module=forum';
 	$irc_link = core::config('website_url') . 'index.php?module=irc';
 	$contact_link = core::config('website_url') . 'index.php?module=contact';
@@ -236,8 +233,6 @@ else {
 	}
 	$submit_e = core::config('website_url') . 'index.php?module=email_us';
 }
-$templating->set('donate_link', $donate_link);
-$templating->set('statistics_link', $statistics_link);
 $templating->set('forum_link', $forum_link);
 $templating->set('irc_link', $irc_link);
 $templating->set('contact_link', $contact_link);

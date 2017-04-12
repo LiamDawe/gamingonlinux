@@ -1467,10 +1467,10 @@ class core
 			if ($modules['sections_link'] == 1)
 			{
 				// sort out links to be placed in the navbar
-				$section_link = core::config('website_urls') . 'index.php?module=' . $modules['module_file_name'];
-				if (core::config('pretty_urls') == 1)
+				$section_link = core::config('website_url') . 'index.php?module=' . $modules['module_file_name'];
+				if (core::config('pretty_urls') == 1 && !empty($modules['nice_link']) && $modules['nice_link'] != NULL)
 				{
-					$section_link = core::config('website_urls') . $modules['nice_link'];
+					$section_link = core::config('website_url') . $modules['nice_link'];
 				}
 				self::$top_bar_links[] = '<li><a href="'.$section_link.'">'.$modules['nice_title'].'</a></li>';
 			}

@@ -197,8 +197,6 @@ $templating->set('site_title', $site_title);
 // Here we sort out what modules we are allowed to load, this also grabs links needed for the navbar
 core::load_modules(['db_table' => 'modules']);
 
-print_r($top_bar_links);
-
 $section_links = implode('', core::$top_bar_links);
 $templating->set('sections_links', $section_links);
 

@@ -50,6 +50,7 @@ if (!isset($_POST['act']))
 				$cancel_action = '/index.php?module=viewtopic&topic_id=' . $topic['topic_id'];
 			}
 			$templating->set('cancel_action', $cancel_action);
+			$templating->block('preview', 'editpost');
 		}
 		else
 		{
@@ -97,6 +98,7 @@ if (!isset($_POST['act']))
 				$cancel_action = '/index.php?module=viewtopic&topic_id=' . $post['topic_id'];
 			}
 			$templating->set('cancel_action', $cancel_action);
+			$templating->block('preview', 'editpost');
 		}
 		else
 		{

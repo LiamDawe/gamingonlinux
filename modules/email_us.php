@@ -34,9 +34,8 @@ if (isset($_POST['act']))
 		{
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";
-			$secret='6LcT0gATAAAAAJrRJK0USGyFE4pFo-GdRTYcR-vg';
 			$ip=core::$ip;
-			$url=$google_url."?secret=".$secret."&response=".$recaptcha."&remoteip=".$ip;
+			$url=$google_url."?secret=".core::config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
 			$res=getCurlData($url);
 			$res= json_decode($res, true);
 		}
@@ -133,7 +132,7 @@ $templating->set('url', url);
 
 if ($parray['contact_captcha'] == 1)
 {
-	$captcha = '<noscript><strong>You need Javascript turned on to see the captcha, otherwise you won\'t be able to email us!</strong></noscript><div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
+	$captcha = '<noscript><strong>You need Javascript turned on to see the captcha, otherwise you won\'t be able to email us!</strong></noscript><div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';
 }
 
 else

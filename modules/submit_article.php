@@ -16,7 +16,7 @@ if (isset($_GET['view']))
             die();
         }
 
-	$core->check_ip_from_stopforumspam(core::$ip);
+		$core->check_ip_from_stopforumspam(core::$ip);
 
         // allow people to go back from say previewing (if they hit the back button) and not have some browsers wipe what they wrote
         // only do this if they haven't just logged in (to prevent the cache'd content showing guest boxes)
@@ -98,7 +98,7 @@ if (isset($_GET['view']))
         $captcha = '';
         if (core::config('captcha_disabled') == 0 && $parray['article_comments_captcha'] == 1)
         {
-            $captcha = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
+            $captcha = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';
         }
 
         $core->editor(['name' => 'text', 'editor_id' => 'article_text']);
@@ -187,9 +187,8 @@ if (isset($_POST['act']))
 			{
                 $recaptcha=$_POST['g-recaptcha-response'];
                 $google_url="https://www.google.com/recaptcha/api/siteverify";
-                $secret='6LcT0gATAAAAAJrRJK0USGyFE4pFo-GdRTYcR-vg';
                 $ip=core::$ip;
-                $url=$google_url."?secret=".$secret."&response=".$recaptcha."&remoteip=".$ip;
+                $url=$google_url."?secret=".core::config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
                 $res=getCurlData($url);
                 $res= json_decode($res, true);
 			}

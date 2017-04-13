@@ -64,7 +64,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					$donator_badge = '';
 					if (($profile['secondary_user_group'] == 6 || $profile['secondary_user_group'] == 7) && $profile['user_group'] != 1 && $profile['user_group'] != 2)
 					{
-						$donator_badge = ' <span class="badge supporter">GOL Supporter</span> ';
+						$donator_badge = ' <span class="badge supporter">Supporter</span> ';
 					}
 
 					$templating->set('supporter_badge', $donator_badge);

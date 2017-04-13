@@ -60,7 +60,7 @@ if (!isset($_GET['ip_id']))
       $donator_badge = '';
       if (($comments['secondary_user_group'] == 6 || $comments['secondary_user_group'] == 7) && $comments['user_group'] != 1 && $comments['user_group'] != 2)
       {
-        $donator_badge = ' <li><span class="badge supporter">GOL Supporter</span></li>';
+        $donator_badge = ' <li><span class="badge supporter">Supporter</span></li>';
       }
 
       $developer_badge = '';

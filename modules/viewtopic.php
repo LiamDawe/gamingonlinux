@@ -420,7 +420,7 @@ else
 
 					if (($topic['secondary_user_group'] == 6 || $topic['secondary_user_group'] == 7) && $topic['user_group'] != 1 && $topic['user_group'] != 2)
 					{
-						$donator_badge = ' <li><span class="badge supporter">GOL Supporter</span></li>';
+						$donator_badge = ' <li><span class="badge supporter">Supporter</span></li>';
 					}
 
 					$developer_badge = '';
@@ -589,7 +589,7 @@ else
 
 						if (($post['secondary_user_group'] == 6 || $post['secondary_user_group'] == 7) && $post['user_group'] != 1 && $post['user_group'] != 2)
 						{
-							$donator_badge = '<li><span class="badge supporter">GOL Supporter</span></li>';
+							$donator_badge = '<li><span class="badge supporter">Supporter</span></li>';
 						}
 
 						$developer_badge = '';

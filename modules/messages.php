@@ -259,7 +259,7 @@ else
 
 			if (($start['secondary_user_group'] == 6 || $start['secondary_user_group'] == 7) && $start['user_group'] != 1 && $start['user_group'] != 2)
 			{
-				$donator_badge = '<li><span class="badge supporter">GOL Supporter</span></li>';
+				$donator_badge = '<li><span class="badge supporter">Supporter</span></li>';
 			}
 			$templating->set('donator_badge', $donator_badge);
 
@@ -351,7 +351,7 @@ else
 
 				if (($replies['secondary_user_group'] == 6 || $replies['secondary_user_group'] == 7) && $replies['user_group'] != 1 && $replies['user_group'] != 2)
 				{
-					$donator_badge = '<li><span class="badge supporter">GOL Supporter</span></li>';
+					$donator_badge = '<li><span class="badge supporter">Supporter</span></li>';
 				}
 				$templating->set('donator_badge', $donator_badge);
 

@@ -726,13 +726,13 @@ display: inline-block;
          -o-border-radius: 3px;
             border-radius: 3px;
 }
-.badge.editor {
+.badge.pale-green {
     background: #5cb85c;
 }
-.badge.contributing-editor {
-    background: #5cb85c;
+.badge.red {
+	background: #B20000;
 }
-.badge.supporter {
+.badge.orange {
     background: #f0ad4e;
 }
 .badge.blue {

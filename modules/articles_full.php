@@ -639,19 +639,6 @@ if (!isset($_GET['go']))
 						// sort out the avatar
 						$comment_avatar = user::sort_avatar($comments);
 
-						$editor_bit = '';
-						// check if editor or admin
-						if ($comments['user_group'] == 1 || $comments['user_group'] == 2)
-						{
-							$editor_bit = "<li><span class=\"badge editor\">Editor</span></li>";
-						}
-
-						// check if accepted submitter
-						if ($comments['user_group'] == 5)
-						{
-							$editor_bit = "<li><span class=\"badge editor\">Contributing Editor</span></li>";
-						}
-
 						$into_username = '';
 						if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
 						{
@@ -663,7 +650,6 @@ if (!isset($_GET['go']))
 						$templating->set('comment_permalink', $permalink);
 						$templating->set('user_id', $comments['author_id']);
 						$templating->set('username', $into_username . $username);
-						$templating->set('editor', $editor_bit);
 						$templating->set('comment_avatar', $comment_avatar);
 						$templating->set('date', $comment_date);
 						$templating->set('tzdate', date('c',$comments['time_posted']) );
@@ -675,9 +661,6 @@ if (!isset($_GET['go']))
 							$cake_bit = $user->cake_day($comments['register_date'], $comments['username']);
 						}
 						$templating->set('cake_icon', $cake_bit);
-
-						$new_badge = $user->new_user_badge($comments['register_date']);
-						$templating->set('new_user_badge', $new_badge);
 
 						$last_edited = '';
 						$edit_counter = '';
@@ -755,25 +738,12 @@ if (!isset($_GET['go']))
 						$templating->set('logged_in_options', $logged_in_options);
 						$templating->set('bookmark', $bookmark_comment);
 
-						$donator_badge = '';
-						if (($comments['secondary_user_group'] == 6 || $comments['secondary_user_group'] == 7) && $comments['user_group'] != 1 && $comments['user_group'] != 2)
-						{
-							$donator_badge = ' <li><span class="badge supporter">Supporter</span></li>';
-						}
-
-						$developer_badge = '';
-						if ($comments['game_developer'] == 1)
-						{
-							$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
-						}
+						$badges = user::user_badges($comments, 1);
+						$templating->set('badges', implode(' ', $badges));
 						
 						$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
 
 						$templating->set('profile_fields', $profile_fields_output);
-
-						$templating->set('donator_badge', $donator_badge);
-
-						$templating->set('game_developer', $developer_badge);
 
 						$comment_edit_link = '';
 						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)

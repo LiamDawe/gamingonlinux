@@ -27,6 +27,10 @@ It is also recommended to have the following php extentions available:
 Setup apache, PHP and MySQL to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
 Import the development SQL database from the stripped SQL file `tools/SQL.sql`  
 
+## User Groups
+
+Leave the existing user group IDs 1-6 in place, removing them will cause issues. Consider those reserved for normal function.
+
 ## Code styling
 
 I do not like shorthand PHP, I like it to be as descriptive and easy to understand as possible!

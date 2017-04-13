@@ -2,6 +2,8 @@
 class user
 {
 	public $message;
+	
+	public static $user_group_list;
 
 	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
@@ -562,16 +564,6 @@ class user
 		return $cake_icon;
 	}
 
-	public function new_user_badge($reg_date)
-	{
-		$new_user_badge = '';
-		if ($reg_date > strtotime("-7 days"))
-		{
-			$new_user_badge = '<span class="badge blue">New User</span>';
-		}
-		return $new_user_badge;
-	}
-
 	public function delete_user_notification($note_id)
 	{
 		global $db;
@@ -802,5 +794,63 @@ class user
 		}
 		
 		return $profile_fields_output;
+	}
+	
+	public static function grab_user_groups()
+	{
+		global $db;
+		
+		$db->sqlquery("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC");
+		self::$user_group_list = $db->fetch_all_rows(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+	}
+	
+	public static function user_badges($data, $list = 0)
+	{
+		$badges = [];
+		if (isset($data['game_developer']) && $data['game_developer'] == 1)
+		{
+			$text = '<span class="badge yellow">Game Dev</span>';
+			
+			if ($list == 1)
+			{
+				$text = '<li>'.$text.'</li>';
+			}
+			
+			$badges[] = $text;
+		}
+		if (isset($data['register_date']) && $data['register_date'] > strtotime("-7 days"))
+		{
+			$text = '<span class="badge blue">New User</span>';
+			
+			if ($list == 1)
+			{
+				$text = '<li>'.$text.'</li>';
+			}
+			
+			$badges[] = $text;
+		}
+		if (array_key_exists($data['user_group'], self::$user_group_list) && self::$user_group_list[$data['user_group']]['show_badge'] == 1)
+		{
+			$text = '<span class="badge '.self::$user_group_list[$data['user_group']]['badge_colour'].'">'.self::$user_group_list[$data['user_group']]['badge_text'].'</span>';
+			if ($list == 1)
+			{
+				$text = '<li>'.$text.'</li>';
+			}
+			$badges[] = $text;
+		}
+		if (array_key_exists($data['secondary_user_group'], self::$user_group_list) && self::$user_group_list[$data['secondary_user_group']]['show_badge'] == 1)
+		{
+			// admins and main editors should not get the supporter badge
+			if ($data['secondary_user_group'] == 6 && $data['user_group'] != 1 && $data['user_group'] != 2)
+			{
+				$text = '<span class="badge '.self::$user_group_list[$data['secondary_user_group']]['badge_colour'].'">'.self::$user_group_list[$data['secondary_user_group']]['badge_text'].'</span>';
+				if ($list == 1)
+				{
+					$text = '<li>'.$text.'</li>';
+				}
+				$badges[] = $text;
+			}
+		}
+		return $badges;
 	}
 }

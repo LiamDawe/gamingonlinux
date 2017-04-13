@@ -250,31 +250,11 @@ else
 			$templating->set('username', $start['username']);
 			$cake_bit = $user->cake_day($start['register_date'], $start['username']);
 			$templating->set('cake_icon', $cake_bit);
-			$new_user = $user->new_user_badge($start['register_date']);
-			$templating->set('new_user_badge', $new_user);
 			$templating->set('user_id', $start['user_id']);
 			$templating->set('message_text', bbcode($start['message']));
 
-			$donator_badge = '';
-
-			if (($start['secondary_user_group'] == 6 || $start['secondary_user_group'] == 7) && $start['user_group'] != 1 && $start['user_group'] != 2)
-			{
-				$donator_badge = '<li><span class="badge supporter">Supporter</span></li>';
-			}
-			$templating->set('donator_badge', $donator_badge);
-
-			$editor_bit = '';
-			// check if editor or admin
-			if ($start['user_group'] == 1 || $start['user_group'] == 2)
-			{
-				$editor_bit = "<li><span class=\"badge editor\">Editor</span></li>";
-			}
-			// check if accepted submitter
-			if ($start['user_group'] == 5)
-			{
-				$editor_bit = "<li><span class=\"badge editor\">Contributing Editor</span></li>";
-			}
-			$templating->set('editor', $editor_bit);
+			$badges = user::user_badges($start, 1);
+			$templating->set('badges', implode(' ', $badges));
 
 			$profile_fields_output = '';
 
@@ -342,18 +322,8 @@ else
 				$templating->set('username', $replies['username']);
 				$cake_bit = $user->cake_day($replies['register_date'], $replies['username']);
 				$templating->set('cake_icon', $cake_bit);
-				$new_user = $user->new_user_badge($replies['register_date']);
-				$templating->set('new_user_badge', $new_user);
 				$templating->set('user_id', $replies['user_id']);
 				$templating->set('message_text', bbcode($replies['message']));
-
-				$donator_badge = '';
-
-				if (($replies['secondary_user_group'] == 6 || $replies['secondary_user_group'] == 7) && $replies['user_group'] != 1 && $replies['user_group'] != 2)
-				{
-					$donator_badge = '<li><span class="badge supporter">Supporter</span></li>';
-				}
-				$templating->set('donator_badge', $donator_badge);
 
 				$profile_fields_output = '';
 
@@ -390,18 +360,8 @@ else
 
 				$templating->set('profile_fields', $profile_fields_output);
 
-				$editor_bit = '';
-				// check if editor or admin
-				if ($replies['user_group'] == 1 || $replies['user_group'] == 2)
-				{
-					$editor_bit = "<li><span class=\"badge editor\">Editor</span></li>";
-				}
-				// check if accepted submitter
-				if ($replies['user_group'] == 5)
-				{
-					$editor_bit = "<li><span class=\"badge editor\">Contributing Editor</span></li>";
-				}
-				$templating->set('editor', $editor_bit);
+				$badges = user::user_badges($replies, 1);
+				$templating->set('badges', implode(' ', $badges));
 
 				$edit_link = '';
 				if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $replies['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)

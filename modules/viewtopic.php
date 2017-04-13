@@ -384,7 +384,6 @@ else
 					if (!empty($topic['distro']) && $topic['distro'] != 'Not Listed')
 					{
 						$into_username .= "<img title=\"{$topic['distro']}\" class=\"distro tooltip-top\" alt=\"\" src=\"/templates/default/images/distros/{$topic['distro']}.svg\" />";
-
 					}
 
 					$templating->set('username', $into_username . $username);
@@ -392,51 +391,16 @@ else
 					$cake_bit = $user->cake_day($topic['register_date'], $topic['username']);
 					$templating->set('cake_icon', $cake_bit);
 
-					$new_user = $user->new_user_badge($topic['register_date']);
-					$templating->set('new_user_badge', $new_user);
-
-					$new_user = $user->new_user_badge($topic['register_date']);
-					$templating->set('new_user_badge', $new_user);
-
 					// sort out the avatar
 					$avatar = user::sort_avatar($topic);
 					$templating->set('avatar', $avatar);
 
-					$editor_bit = '';
-					$donator_badge = '';
-					$dev_badge = '';
-
-					// check if editor or admin
-					if ($topic['user_group'] == 1 || $topic['user_group'] == 2)
-					{
-						$editor_bit = "<li><span class=\"badge editor\">Editor</span></li>";
-					}
-
-					// check if accepted submitter
-					if ($topic['user_group'] == 5)
-					{
-						$editor_bit = "<li><span class=\"badge editor\">Contributing Editor</span></li>";
-					}
-
-					if (($topic['secondary_user_group'] == 6 || $topic['secondary_user_group'] == 7) && $topic['user_group'] != 1 && $topic['user_group'] != 2)
-					{
-						$donator_badge = ' <li><span class="badge supporter">Supporter</span></li>';
-					}
-
-					$developer_badge = '';
-
-					if ($topic['game_developer'] == 1)
-					{
-						$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
-					}
+					$badges = user::user_badges($topic, 1);
+					$templating->set('badges', implode(' ', $badges));
 
 					$profile_fields_output = user::user_profile_icons($profile_fields, $topic);
 
 					$templating->set('profile_fields', $profile_fields_output);
-
-					$templating->set('editor', $editor_bit);
-					$templating->set('donator_badge', $donator_badge);
-					$templating->set('game_developer', $developer_badge);
 
 					$templating->set('post_id', $topic['topic_id']);
 					$templating->set('topic_id', $topic['topic_id']);
@@ -554,9 +518,6 @@ else
 						$cake_bit = $user->cake_day($post['register_date'], $post['username']);
 						$templating->set('cake_icon', $cake_bit);
 
-						$new_user = $user->new_user_badge($post['register_date']);
-						$templating->set('new_user_badge', $new_user);
-
 						$pc_info = '';
 						if ($post['pc_info_public'] == 1)
 						{
@@ -572,40 +533,13 @@ else
 						$avatar = user::sort_avatar($post);
 						$templating->set('avatar', $avatar);
 
-						$editor_bit = '';
-						$donator_badge = '';
-
-						// check if editor or admin
-						if ($post['user_group'] == 1 || $post['user_group'] == 2)
-						{
-							$editor_bit = "<li><span class=\"badge editor\">Editor</span></li>";
-						}
-
-						// check if accepted submitter
-						if ($post['user_group'] == 5)
-						{
-							$editor_bit = "<li><span class=\"badge editor\">Contributing Editor</span></li>";
-						}
-
-						if (($post['secondary_user_group'] == 6 || $post['secondary_user_group'] == 7) && $post['user_group'] != 1 && $post['user_group'] != 2)
-						{
-							$donator_badge = '<li><span class="badge supporter">Supporter</span></li>';
-						}
-
-						$developer_badge = '';
-
-						if ($post['game_developer'] == 1)
-						{
-							$developer_badge = ' <li><span class="badge yellow">Game Dev</span></li>';
-						}
+						$badges = user::user_badges($post, 1);
+						$templating->set('badges', implode(' ', $badges));
 
 						$profile_fields_output = user::user_profile_icons($profile_fields, $post);
 
 						$templating->set('profile_fields', $profile_fields_output);
 
-						$templating->set('editor', $editor_bit);
-						$templating->set('donator_badge', $donator_badge);
-						$templating->set('game_developer', $developer_badge);
 
 						$templating->set('post_id', $post['post_id']);
 						$templating->set('topic_id', $_GET['topic_id']);

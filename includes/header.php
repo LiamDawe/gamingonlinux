@@ -25,6 +25,7 @@ define('url', core::config('website_url'));
 include($file_dir . '/includes/class_user.php');
 $user = new user();
 $user->check_session();
+$user->grab_user_groups();
 
 include($file_dir . '/includes/class_charts.php');
 

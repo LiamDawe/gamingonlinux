@@ -57,39 +57,9 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 
 					$cake_bit = $user->cake_day($profile['register_date'], $profile['username']);
 					$templating->set('cake_icon', $cake_bit);
-
-					$new_user = $user->new_user_badge($profile['register_date']);
-					$templating->set('new_user_badge', $new_user);
-
-					$donator_badge = '';
-					if (($profile['secondary_user_group'] == 6 || $profile['secondary_user_group'] == 7) && $profile['user_group'] != 1 && $profile['user_group'] != 2)
-					{
-						$donator_badge = ' <span class="badge supporter">Supporter</span> ';
-					}
-
-					$templating->set('supporter_badge', $donator_badge);
-
-					$editor_badge = '';
-					if ($profile['user_group'] == 1 || $profile['user_group'] == 2)
-					{
-						$editor_badge = " <span class=\"badge editor\">Editor</span> ";
-					}
-
-					// check if accepted submitter
-					if ($profile['user_group'] == 5)
-					{
-						$editor_badge = " <span class=\"badge editor\">Contributing Editor</span> ";
-					}
-
-					$developer_badge = '';
-					if ($profile['game_developer'] == 1)
-					{
-						$developer_badge = ' <span class="badge yellow">Game Dev</span>';
-					}
-
-					$templating->set('developer_badge', $developer_badge);
-
-					$templating->set('editor_badge', $editor_badge);
+					
+					$badges = user::user_badges($profile);
+					$templating->set('badges', implode(' ', $badges));
 
 					$registered_date = $core->format_date($profile['register_date']);
 					$templating->set('registered_date', $registered_date);

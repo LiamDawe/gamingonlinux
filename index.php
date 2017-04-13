@@ -18,7 +18,7 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 	}
 }
 
-if (core::$current_module == 'home')
+if (core::$current_module['module_file_name'] == 'home')
 {
 	$db->sqlquery("SELECT a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> ''");
 	$count_total = $db->num_rows();
@@ -92,10 +92,75 @@ if (core::$current_module == 'home')
 	}
 }
 
-if ($user->check_group([1,2,6,5]) == false)
+$get_announcements = $db->sqlquery("SELECT count(id) as count FROM `announcements`");
+$count_announcements = $get_announcements->fetch();
+if ($count_announcements['count'] > 0)
 {
-	$templating->block('patreon');
-	$templating->set('url', url);
+	$templating->merge('announcements');
+	$templating->block('announcement_top', 'announcements');
+	
+	$get_announcements = $db->sqlquery("SELECT `text`, `user_groups`, `type`, `modules` FROM `announcements` ORDER BY `id` DESC");
+	while ($announcement = $get_announcements->fetch())
+	{
+		$show = 0;
+		
+		// one to show to everyone (generic announcement)
+		if ((empty($announcement['user_groups']) || $announcement['user_groups'] == NULL) && (empty($announcement['modules']) || $announcement['modules'] == NULL))
+		{
+			$show = 1;
+		}
+		// otherwise, we need to do some checks
+		else
+		{
+			$module_show = 0;
+			$group_show = 0;
+			
+			// check if the currently loaded module is allow to show it
+			if (!empty($announcement['modules'] && $announcement['modules'] != NULL))
+			{
+				$modules_array = unserialize($announcement['modules']);
+				
+				if (in_array(core::$current_module['module_id'], $modules_array))
+				{
+					$module_show = 1;
+				}
+			}
+			else
+			{
+				$module_show = 1;
+			}
+			
+			// check their user group against the setting
+			if (!empty($announcement['user_groups'] && $announcement['user_groups'] != NULL))
+			{
+				$group_ids_array = unserialize($announcement['user_groups']);
+				
+				// if this is to only be shown to specific groups, is the user in that group?
+				if ($announcement['type'] == 'in_groups' && $user->check_group($group_ids_array) == true)
+				{
+					$group_show = 1;				
+				}
+				
+				// if it's to only be shown if they aren't in those groups
+				if ($announcement['type'] == 'not_in_groups' && $user->check_group($group_ids_array) == false)
+				{
+					$group_show = 1;			
+				}
+			}
+			else
+			{
+				$group_show = 1;	
+			}
+		}
+		
+		if ($show == 1 || ($module_show == 1 && $group_show == 1))
+		{
+			$templating->block('announcement', 'announcements');
+			$templating->set('text', bbcode($announcement['text']));
+		}
+	}
+
+	$templating->block('announcement_bottom', 'announcements');
 }
 
 // let them know they aren't activated yet
@@ -118,7 +183,7 @@ if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
 $templating->block('left', 'mainpage');
 
 // so mainpage.html knows to put "articles" class in the left block or not
-if (core::$current_module == 'home' || (core::$current_module == 'articles' && isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multiple')))
+if (core::$current_module['module_file_name'] == 'home' || (core::$current_module['module_file_name'] == 'articles' && isset($_GET['view']) && ($_GET['view'] == 'cat' || $_GET['view'] == 'multiple')))
 {
 	$articles_css = 'articles';
 }
@@ -138,17 +203,7 @@ if (isset($_SESSION['message']))
 	$message_map->display_message(core::$current_module, $_SESSION['message'], $extra);
 }
 
-if (in_array(core::$current_module, core::$allowed_modules))
-{
-	include('modules/'.core::$current_module.'.php');
-}
-else
-{
-	http_response_code(404);
-	$templating->set_previous('meta_data', '', 1);
-	$templating->set_previous('title', '404', 1);
-	$core->message('Not a valid module name or the module may not be active!');
-}
+include('modules/'.core::$current_module['module_file_name'].'.php');
 
 $templating->block('left_end', 'mainpage');
 

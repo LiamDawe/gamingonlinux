@@ -7,23 +7,6 @@ if (!isset($_GET['view']))
 {
 	$templating->set_previous('title', core::config('meta_homepage_title'), 1);
 
-	$get_announcements = $db->sqlquery("SELECT count(id) as count FROM `announcements`");
-	$count_announcements = $get_announcements->fetch();
-	if ($count_announcements['count'] > 0)
-	{
-		$templating->merge('announcements');
-		$templating->block('announcement_top', 'announcements');
-
-		$get_announcements = $db->sqlquery("SELECT `text` FROM `announcements` ORDER BY `id` DESC");
-		while ($announcement = $get_announcements->fetch())
-		{
-			$templating->block('announcement', 'announcements');
-			$templating->set('text', bbcode($announcement['text']));
-		}
-
-		$templating->block('announcement_bottom', 'announcements');
-	}
-
 	$core->check_old_pc_info($_SESSION['user_id']);
 
 	$templating->block('articles_top', 'home');

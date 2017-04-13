@@ -17,12 +17,23 @@
 [/block: row]
 
 [block: bottom_add]
-		<button type="submit" formaction="/admin.php?module=announcements" name="act" value="add">Add</button></form>
+		User Groups: <em>Enter the names of some groups, leave blank to show to everyone</em><br />
+		<select tabindex="-1" multiple="" name="group_ids[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen"></select><br />
+		Who to show it to (ignore if not setting any): <select name="type">{:types_list}</select>
+		Modules: <em>Enter the names of some modules, leave blank to show on all</em><br />
+		<select tabindex="-1" multiple="" name="module_ids[]" class="call_modules" style="width:300px" class="populate select2-offscreen"></select><br />
+		<button type="submit" formaction="/admin.php?module=announcements" name="act" value="add">Add</button>
+		</form>
 	</div>
 </div>
 [/block: bottom_add]
 
 [block: bottom_edit]
+		User Groups: <em>Enter the names of some groups, leave blank to show to everyone</em><br />
+		<select tabindex="-1" multiple="" name="group_ids[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen">{:group_ids}</select><br />
+		Who to show it to (ignore if not setting any): <select name="type">{:types_list}</select>
+		Modules: <em>Enter the names of some modules, leave blank to show on all</em><br />
+		<select tabindex="-1" multiple="" name="module_ids[]" class="call_modules" style="width:300px" class="populate select2-offscreen">{:module_ids}</select><br />
 		<input type="hidden" name="id" value="{:id}" />
 		<button type="submit" formaction="/admin.php?module=announcements" name="act" value="edit">Edit</button> <button type="submit" formaction="/admin.php?module=announcements" name="act" value="delete">Delete</button></form>
 	</div>

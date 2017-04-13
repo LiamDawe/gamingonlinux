@@ -383,6 +383,52 @@ jQuery(document).ready(function()
     },
     minimumInputLength: 2
   });
+    $(".call_user_groups").select2({
+    selectOnClose: true,
+    width: '100%',
+    ajax: {
+      url: "/includes/ajax/call_user_groups.php",
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term // search term
+        };
+      },
+      processResults: function (data) {
+        return {
+          results: $.map(data, function(obj) {
+            return { id: obj.id, text: obj.text };
+          })
+        };
+      },
+      cache: true,
+    },
+    minimumInputLength: 2
+  });
+	$(".call_modules").select2({
+    selectOnClose: true,
+    width: '100%',
+    ajax: {
+      url: "/includes/ajax/call_modules.php",
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term // search term
+        };
+      },
+      processResults: function (data) {
+        return {
+          results: $.map(data, function(obj) {
+            return { id: obj.id, text: obj.text };
+          })
+        };
+      },
+      cache: true,
+    },
+    minimumInputLength: 2
+  });
   var $gamesMulti = $("#articleGames").select2({
   selectOnClose: true,
   width: '100%',

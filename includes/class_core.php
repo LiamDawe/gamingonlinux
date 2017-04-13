@@ -1458,11 +1458,11 @@ class core
 		global $db;
 		
 		$module_links = '';
-		$fetch_modules = $db->sqlquery('SELECT `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC');
+		$fetch_modules = $db->sqlquery('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC');
 		while ($modules = $fetch_modules->fetch())
 		{
 			// modules allowed for loading
-			self::$allowed_modules[] = $modules['module_file_name'];
+			self::$allowed_modules[$modules['module_file_name']] = $modules;
 			
 			if ($modules['sections_link'] == 1)
 			{
@@ -1479,12 +1479,19 @@ class core
 		// modules loading, first are we asked to load a module, if not use the default
 		if (isset($_GET['module']))
 		{
-			self::$current_module = $_GET['module'];
+			if (array_key_exists($_GET['module'], self::$allowed_modules))
+			{
+				self::$current_module = self::$allowed_modules[$_GET['module']];
+			}
+			else
+			{
+				self::$current_module = self::$allowed_modules['404'];
+			}
 		}
 
 		else
 		{
-			self::$current_module = core::config('default_module');
+			self::$current_module = self::$allowed_modules[core::config('default_module')];
 		}
 	}
 	

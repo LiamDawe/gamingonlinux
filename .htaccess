@@ -6,7 +6,7 @@ Options +SymLinksifOwnerMatch
 
   ErrorDocument 401 default
   ErrorDocument 403 default
-  ErrorDocument 404 /404.php
+  ErrorDocument 404 /index.php?module=404
   ErrorDocument 500 /down.html
 
   # BEGIN EXPIRES

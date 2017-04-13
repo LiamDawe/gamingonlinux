@@ -1,6 +1,8 @@
 <?php
 $templating->merge('admin_modules/admin_module_announcements');
 
+$group_types = ['' => '', 'in_groups' => 'Only those groups', 'not_in_groups' => 'Not in those groups'];
+
 if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
@@ -9,19 +11,65 @@ if (isset($_GET['view']))
 		$templating->block('row', 'admin_modules/admin_module_announcements');
 		$core->editor(['name' => 'text', 'editor_id' => 'announcement']);
 		$templating->block('bottom_add', 'admin_modules/admin_module_announcements');
+		$types_list = '';
+		foreach ($group_types as $value => $text)
+		{
+			$types_list .= '<option value="'.$value.'">'.$text.'</option>';
+		}
+		$templating->set('types_list', $types_list);
 
 		$templating->block('manage', 'admin_modules/admin_module_announcements');
 
 		// get existing announcements
-		$db->sqlquery("SELECT `id`, `text`, `author_id` FROM `announcements` ORDER BY `id` ASC");
+		$get_announcements = $db->sqlquery("SELECT `id`, `text`, `author_id`, `user_groups`, `type`, `modules` FROM `announcements` ORDER BY `id` ASC");
 		if ($db->num_rows() >= 1)
 		{
-			while ($announce = $db->fetch())
+			while ($announce = $get_announcements->fetch())
 			{
 				$templating->block('row', 'admin_modules/admin_module_announcements');
 				$core->editor(['name' => 'text', 'content' => $announce['text'], 'editor_id' => 'announcement-' . $announce['id']]);
+				
 				$templating->block('bottom_edit', 'admin_modules/admin_module_announcements');
 				$templating->set('id', $announce['id']);
+				
+				// get groups
+				$group_ids_array = unserialize($announce['user_groups']);
+				$groups_list = '';
+				$get_groups = $db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_name` ASC");
+				while ($groups = $get_groups->fetch())
+				{
+					if (!empty($group_ids_array) && in_array($groups['group_id'], $group_ids_array))
+					{
+						$groups_list .= "<option value=\"{$groups['group_id']}\" selected>{$groups['group_name']}</option>";
+					}
+				}
+				$templating->set('group_ids', $groups_list);
+				
+				$types_list = '';
+				foreach ($group_types as $value => $text)
+				{
+					$selected = '';
+					if ($announce['type'] == $value)
+					{
+						$selected = 'selected';
+					}
+					
+					$types_list .= '<option value="'.$value.'" '.$selected.'>'.$text.'</option>';
+				}
+				$templating->set('types_list', $types_list);
+				
+				// get modules
+				$module_ids_array = unserialize($announce['modules']);
+				$modules_list = '';
+				$get_modules = $db->sqlquery("SELECT `nice_title`, `module_id` FROM `modules` ORDER BY `nice_title` ASC");
+				while ($modules = $get_modules->fetch())
+				{
+					if (!empty($module_ids_array) && in_array($modules['module_id'], $module_ids_array))
+					{
+						$modules_list .= "<option value=\"{$modules['module_id']}\" selected>{$modules['nice_title']}</option>";
+					}
+				}
+				$templating->set('module_ids', $modules_list);
 			}
 		}
 		else 
@@ -43,8 +91,20 @@ if (isset($_POST['act']))
 			header("Location: /admin.php?module=announcements&view=manage");
 			die();
 		}
+		
+		$user_groups = NULL;
+		if (!empty($_POST['group_ids']))
+		{
+			$user_groups = serialize($_POST['group_ids']);
+		}
+		
+		$modules = NULL;
+		if (!empty($_POST['module_ids']))
+		{
+			$modules = serialize($_POST['module_ids']);
+		}
 
-		$db->sqlquery("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?", array($text, $_SESSION['user_id']));
+		$db->sqlquery("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?, `user_groups` = ?, `type` = ?, `modules` = ?", array($text, $_SESSION['user_id'], $user_groups, $_POST['type'], $modules));
 		header("Location: /admin.php?module=announcements&view=manage&message=saved&extra=announcement");
 	}
 	if ($_POST['act'] == 'edit')
@@ -66,8 +126,20 @@ if (isset($_POST['act']))
 			header("Location: /admin.php?module=announcements&view=manage");
 			die();
 		}
+		
+		$user_groups = NULL;
+		if (!empty($_POST['group_ids']))
+		{
+			$user_groups = serialize($_POST['group_ids']);
+		}
+		
+		$modules = NULL;
+		if (!empty($_POST['module_ids']))
+		{
+			$modules = serialize($_POST['module_ids']);
+		}
 
-		$db->sqlquery("UPDATE `announcements` SET `text` = ? WHERE `id` = ?", array($text, $_POST['id']));
+		$db->sqlquery("UPDATE `announcements` SET `text` = ?, `user_groups` = ?, `type` = ?, `modules` = ? WHERE `id` = ?", array($text, $user_groups, $_POST['type'], $modules, $_POST['id']));
 		$_SESSION['message'] = 'edited';
 		$_SESSION['message_extra'] = 'announcement';
 		header("Location: /admin.php?module=announcements&view=manage");

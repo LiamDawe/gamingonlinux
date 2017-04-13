@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Forum Search', 1);
-$templating->set_previous('meta_description', 'Search for Linux gaming forum topics on GamingOnLinux.com', 1);
+$templating->set_previous('meta_description', 'Search the forum on ' . core::config('site_title'), 1);
 
 $templating->merge('forum_search');
 $templating->block('top');

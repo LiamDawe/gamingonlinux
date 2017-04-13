@@ -2,8 +2,8 @@
 $templating->merge('search');
 if (!isset($_GET['author_id']))
 {
-	$templating->set_previous('title', 'Search linux gaming articles', 1);
-	$templating->set_previous('meta_description', 'Search for Linux gaming articles on GamingOnLinux.com', 1);
+	$templating->set_previous('title', 'Article Search', 1);
+	$templating->set_previous('meta_description', 'Search for articles on ' . core::config('site_title'), 1);
 
 	$templating->block('top');
 	$templating->set('url', core::config('website_url'));

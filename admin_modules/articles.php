@@ -542,7 +542,7 @@ else if (isset($_POST['act']))
 				}
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
+				$db->sqlquery("SELECT s.`user_id`, s.emails, s.secret_key, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
 				$users_array = array();
 				while ($users = $db->fetch())
 				{
@@ -551,58 +551,34 @@ else if (isset($_POST['act']))
 						$users_array[$users['user_id']]['user_id'] = $users['user_id'];
 						$users_array[$users['user_id']]['email'] = $users['email'];
 						$users_array[$users['user_id']]['username'] = $users['username'];
+						$users_array[$users['user_id']]['secret_key'] = $users['secret_key'];
 					}
 				}
 
 				// send the emails
 				foreach ($users_array as $email_user)
 				{
-					$to = $email_user['email'];
-
-					// set the title to upper case
-					$title_upper = $title['title'];
-
 					// subject
-					$subject = "New comment on your unpublished article {$title_upper} on GamingOnLinux.com";
-
-					$username = $_SESSION['username'];
+					$subject = "New comment on your unpublished article {$title['title']} on " . core::config('site_title');
 
 					$comment_email = email_bbcode($comment);
 
 					// message
-					$message = "
-					<html>
-					<head>
-					<title>New comment on your unpublished article on GamingOnLinux.com</title>
-					<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-					</head>
-					<body>
-					<img src=\"" . core::config('website_url') . "/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
-					<br />
-					<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$username}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"" . core::config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title_upper}</a></strong>\".</p>
+					$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"" . core::config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title['title']}</a></strong>\".</p>
 					<div>
-				 	<hr>
-				 	{$comment_email}
-				 	<hr>
-				 	You can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "/usercp.php\">User Control Panel</a>.
-				 	<hr>
-				  	<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-				  	<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-					</div>
-					</body>
-					</html>
-					";
+					<hr>
+					{$comment_email}
+					<hr>
+					<p>You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
 
-					// To send HTML mail, the Content-type header must be set
-					$headers  = 'MIME-Version: 1.0' . "\r\n";
-					$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-					$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} has replied to an article you sent for review on titled \"{$title['title']}\" " . core::config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
 
 					// Mail it
 					if (core::config('send_emails') == 1)
 					{
-						mail($to, $subject, $message, $headers);
+						$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
+						$mail->send();
 					}
 				}
 

@@ -82,7 +82,7 @@ if (isset($_POST['act']))
 				}
 			}
 			
-			$subject = 'GOL Contact Us - ' . $name;
+			$subject = core::config('site_title') . ' Contact Us - ' . $name;
 			
 			$message = core::make_safe($_POST['message']);
 			

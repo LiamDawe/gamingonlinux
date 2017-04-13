@@ -28,7 +28,7 @@ class steam_user
 		if(!$openid->mode)
 		{
 			$openid->identity = 'http://steamcommunity.com/openid';
-			$openid->returnUrl = 'http://www.gamingonlinux.com/index.php?module=login&steam&real_return=' . $this->return_url;
+			$openid->returnUrl = core::config('website_url') . 'index.php?module=login&steam&real_return=' . $this->return_url;
 			header('Location: ' . $openid->authUrl());
 		}
 		elseif($openid->mode == 'cancel')

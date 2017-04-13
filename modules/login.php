@@ -81,40 +81,9 @@ if (!isset($_POST['action']))
 		require("includes/steam/steam_login.php");
 	
 		$steam_user = new steam_user;
-		$steam_user->apikey = "AC45D7DB8C91DFD4CC57DC107D6A866A"; // put your API key here
-		$steam_user->domain = "http://www.gamingonlinux.com"; // put your domain
-
-		// added 127 for testing on local machine so it still works
-		// this checks the last page was from GOL to refer it back to where they were
-		if ('www.gamingonlinux.com' == parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_HOST ) || '127.0.0.1' == parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_HOST))
-		{
-			if (isset($url['query']))
-			{
-				if ($url['query'] == 'module=login' || $url['query'] == 'module=login&message=error' || $url['query'] == 'module=register' || $url['query'] == 'module=register&twitter_new')
-				{
-					$return_url = "index.php";
-				}
-
-				else if ($url['query'] != 'module=login' && $url['query'] != 'module=login&message=error' && $url['query'] != 'module=register' && $url['query'] != 'module=register&twitter_new')
-				{
-					$return_url = $_SERVER['HTTP_REFERER'];
-				}
-			}
-
-			else if (!isset($url['query']) && $url['path'] != '/index.php')
-			{
-				$return_url = $_SERVER['HTTP_REFERER'];
-			}
-
-			// if there is no php query page, or no url path from within gol, just go to the index
-			else
-			{
-				$return_url = "index.php";
-			}
-
-		}
-
-		$steam_user->return_url = $return_url;
+		$steam_user->apikey = core::config('steam_openid_key'); // put your API key here
+		$steam_user->domain = core::config('website_url'); // put your domain
+		$steam_user->return_url = core::config('website_url');
 		$steam_user->signIn();
 	}
 	

@@ -49,6 +49,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					if ($_SESSION['user_id'] == $_GET['user_id'])
 					{
 						$templating->block('top');
+						$templating->set('url', core::config('website_url'));
 					}
 
 					$templating->block('main', 'profile');

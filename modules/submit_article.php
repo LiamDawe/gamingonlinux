@@ -32,7 +32,7 @@ if (isset($_GET['view']))
             header_remove("Last-Modified");
         }
 
-        $templating->set_previous('meta_description', 'Submit an article to GamingOnLinux, news, reviews, interviews', 1);
+        $templating->set_previous('meta_description', 'Submit an article to ' . core::config('site_title'), 1);
         $templating->set_previous('title', 'Submit An Article', 1);
 
         if (!isset($_GET['error']))
@@ -263,9 +263,9 @@ if (isset($_POST['act']))
                 // get all the editor and admin emails apart from sinead
                 $editor_emails = array();
 
-                $subject = "GamingOnLinux.com article submission from {$username}";
+                $subject = core::config('site_title') . " article submission from {$username}";
 
-                $db->sqlquery("SELECT `email`, `username` FROM `users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5) AND `username` != 'gamingonlinux'");
+                $db->sqlquery("SELECT `email`, `username` FROM `users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5)");
                 while ($get_emails = $db->fetch())
                 {
                   // message
@@ -296,7 +296,7 @@ if (isset($_POST['act']))
 
     if ($_POST['act'] == 'Preview')
     {
-        $templating->set_previous('meta_description', 'Previewing a submitted article to GamingOnLinux', 1);
+        $templating->set_previous('meta_description', 'Previewing a submitted article to ' . core::config('site_title'), 1);
         $templating->set_previous('title', 'Submit An Article Preview', 1);
 
         // make date human readable

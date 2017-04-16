@@ -61,36 +61,21 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	}
 
 	// subject
-	$subject = "GamingOnLinux.com article submitted for review by {$_SESSION['username']}";
+	$subject = core::config('site_title') . ": article submitted for review by {$_SESSION['username']}";
 
 	foreach ($users_array as $email_user)
 	{
-		$to = $email_user['email'];
-
-		// message
-		$message = '
-		<html>
-		<head>
-		<title>GamingOnLinux.com article submitted for review by ' . $_SESSION['username'] . '</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		</head>
-		<body>
-		<img src="' . core::config('website_url') . 'templates/default/images/logo.png" alt="Gaming On Linux">
-		<br />
-		<p>Hello <strong>' . $email_user['username'] . '</strong>,</p>
-		<p><strong>' . $_SESSION['username'] . '</strong> has sent an article to be reviewed before publishing "<strong><a href="' . core::config('website_url') . 'admin.php?module=articles&view=adminreview&aid=' . $article_id . '">' . $title . '</a></strong>".</p>
+		$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
+		<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . core::config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}\">{$checked['title']}</a></strong>\".</p>
 		</body>
-		</html>';
+		</html>";
+		
+		$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has sent an article to be reviewed before publishing on: " . core::config('website_url') . " You can review it here: " . core::config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}";
 
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-		// Mail it
 		if (core::config('send_emails') == 1)
 		{
-			mail($to, $subject, $message, $headers);
+			$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
+			$mail->send();
 		}
 	}
 

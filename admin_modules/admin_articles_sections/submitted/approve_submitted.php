@@ -104,34 +104,26 @@ else
 		{
 			$email = $check_article['email'];
 		}
+		
+		$article_link = article_class::get_link($_POST['article_id'], $checked['slug']);
 
 		// subject
-		$subject = 'Your article was approved on GamingOnLinux.com!';
+		$subject = 'Your article was approved and published on ' . core::config('site_title');
+		
+		$html_message = '<p>We have accepted your article titled "<a href="'.$article_link.'">'.$checked['title'].'</a>" on <a href="'.core::config('website_url').'" target="_blank">'.core::config('site_title').'</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome!</p>';
 
 		// message
-		$message = "
-		<html>
-		<head>
-		<title>Your article was approved GamingOnLinux.com!</title>
-		</head>
-		<body>
-		<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-		<br />
-		<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>
-		</body>
-		</html>";
-
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+		$plain_message = 'We have accepted your article titled "'.$checked['title'].'" on '.core::config('site_title').', you can see it here: '.$article_link;
+		
+		if (core::config('send_emails') == 1)
+		{
+			$mail = new mail($email, $subject, $html_message, $plain_message);
+			$mail->send();
+		}
 
 		include(core::config('path') . 'includes/telegram_poster.php');
 
-		// Mail it
-		mail($email, $subject, $message, $headers);
-
-		telegram($checked['title'] . ' ' . core::config('website_url') . "articles/" . $checked['slug'] . '.' . $_POST['article_id']);
+		telegram($checked['title'] . ' ' . $article_link);
 
 		if (!isset($_POST['show_block']))
 		{

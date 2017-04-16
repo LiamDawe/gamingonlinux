@@ -83,7 +83,7 @@ foreach ($category_array as $category)
 		if ($forum['parent'] == $category['id'])
 		{
 			$templating->block('forum_row', 'normal_forum');
-			$templating->set('url', core::config('website_url'));
+			$templating->set('this_template', core::config('website_url') . '/templates/' . core::config('template'));
 
 			if (core::config('pretty_urls') == 1)
 			{
@@ -145,37 +145,44 @@ foreach ($category_array as $category)
 }
 
 $templating->block('latest', 'normal_forum');
-$templating->set('url', core::config('website_url'));
+$templating->set('this_template', core::config('website_url') . '/templates/' . core::config('template'));
 
 // lastest posts block below forums
 $forum_posts = '';
 $db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit 7");
-while ($topics = $db->fetch())
+if ($db->num_rows() >= 1)
 {
-	$date = $core->format_date($topics['last_post_date']);
-
-	$post_count = $topics['replys'];
-	// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-	if ($post_count <= $_SESSION['per-page'])
+	while ($topics = $db->fetch())
 	{
-		// it will be the first page
-		$postPage = 1;
-		$postNumber = 1;
+		$date = $core->format_date($topics['last_post_date']);
+
+		$post_count = $topics['replys'];
+		// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
+		if ($post_count <= $_SESSION['per-page'])
+		{
+			// it will be the first page
+			$postPage = 1;
+			$postNumber = 1;
+		}
+
+		// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
+		if ($post_count >= $_SESSION['per-page'])
+		{
+			$rows_per_page = $_SESSION['per-page'];
+
+			// page we are going to
+			$postPage = ceil($post_count / $rows_per_page);
+
+			// the post we are going to
+			$postNumber = (($post_count - 1) % $rows_per_page) + 1;
+		}
+
+		$forum_posts .= "<a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\"><i class=\"icon-comment\"></i> {$topics['topic_title']}</a> {$date}<br />";
 	}
-
-	// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-	if ($post_count >= $_SESSION['per-page'])
-	{
-		$rows_per_page = $_SESSION['per-page'];
-
-		// page we are going to
-		$postPage = ceil($post_count / $rows_per_page);
-
-		// the post we are going to
-		$postNumber = (($post_count - 1) % $rows_per_page) + 1;
-	}
-
-	$forum_posts .= "<a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\"><i class=\"icon-comment\"></i> {$topics['topic_title']}</a> {$date}<br />";
+}
+else
+{
+	$forum_posts = 'No one has posted yet!';
 }
 
 $templating->set('forum_posts', $forum_posts);

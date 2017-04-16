@@ -12,6 +12,9 @@ $db = new mysql(core::$database['host'], core::$database['username'], core::$dat
 include($file_dir . '/includes/class_messages.php');
 $message_map = new message_map();
 
+include($file_dir . '/includes/class_plugins.php');
+$plugins = new plugins($file_dir);
+
 include($file_dir . '/includes/class_article.php');
 $article_class = new article_class();
 

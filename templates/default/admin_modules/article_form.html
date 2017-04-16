@@ -25,10 +25,9 @@
 				{:main_formaction}
 				<div class="box">
 					<div class="body group">
-							Categories:<br />
+						Categories:<br />
 						<select tabindex="-1" multiple="" name="categories[]" id="articleCategories" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:categories_list}</select><br />
-						Attach the article to a related game in the database:<br />
-					<select tabindex="-1" multiple="" name="games[]" id="articleGames" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:games_list}</select>
+						{:article_form_top}
 					</div>
 				</div>
 					<div class="box">

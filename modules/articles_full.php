@@ -316,14 +316,6 @@ if (!isset($_GET['go']))
 
 				$templating->set('paging', $article_pagination);
 
-				$games_list = '';
-				// sort out the games tags
-				$db->sqlquery("SELECT c.`name`, c.`id` FROM `calendar` c INNER JOIN `article_game_assoc` r ON c.id = r.game_id WHERE r.article_id = ? ORDER BY c.`name` ASC", array($article['article_id']));
-				while ($get_games = $db->fetch())
-				{
-					$games_list .= " <li><a href=\"/index.php?module=game&game-id={$get_games['id']}\">{$get_games['name']}</a></li> ";
-				}
-
 				$categories_list = '';
 				// sort out the categories (tags)
 				$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($article['article_id']));
@@ -340,11 +332,12 @@ if (!isset($_GET['go']))
 						$categories_list .= " <li><a href=\"/articles/category/$category_name\">{$get_categories['category_name']}</a></li> ";
 					}
 				}
+				
+				$categories_list .= plugins::do_hooks('display_article_tags_list', $article['article_id']);
 
-				if (!empty($categories_list) || !empty($games_list))
+				if (!empty($categories_list))
 				{
 					$templating->block('tags', 'articles_full');
-					$templating->set('games_list', $games_list);
 					$templating->set('categories_list', $categories_list);
 				}
 

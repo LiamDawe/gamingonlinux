@@ -32,8 +32,8 @@ while ($categorys = $db->fetch())
 	}
 }
 
-// get games list
-$games_list = $article_class->display_game_assoc();
+$article_form_top = plugins::do_hooks('article_form_top');
+$templating->set('article_form_top', $article_form_top);
 
 // if they have done it before set text and tagline
 $title = '';
@@ -64,7 +64,6 @@ $templating->set('tagline', $tagline);
 $templating->set('text', $text);
 
 $templating->set('categories_list', $categorys_list);
-$templating->set('games_list', $games_list);
 $templating->set('max_height', core::config('article_image_max_height'));
 $templating->set('max_width', core::config('article_image_max_width'));
 

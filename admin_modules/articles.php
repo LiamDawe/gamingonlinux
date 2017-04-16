@@ -176,10 +176,8 @@ if (isset($_GET['view']))
 
 			$templating->set('categories_list', $categorys_list);
 
-			// get games list
-			$games_list = $article_class->display_game_assoc($article['article_id']);
-
-			$templating->set('games_list', $games_list);
+			$article_form_top = plugins::do_hooks('article_form_top', $article['article_id']);
+			$templating->set('article_form_top', $article_form_top);
 
 			$text = $article['text'];
 			$previously_uploaded = '';
@@ -225,7 +223,7 @@ if (isset($_GET['view']))
 			$temp_tagline_image = '';
 
 			// add in uploaded images from database
-			$previously_uploaded	= $article_class->display_previous_uploads($article['article_id']);
+			$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 
 			$templating->set('previously_uploaded', $previously_uploaded);
 
@@ -632,7 +630,7 @@ else if (isset($_POST['act']))
 
 			article_class::process_categories($_POST['article_id']);
 
-			article_class::process_game_assoc($_POST['article_id']);
+			plugins::do_hooks('article_database_entry', $_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
@@ -658,7 +656,6 @@ else if (isset($_POST['act']))
 			unset($_SESSION['atagline']);
 			unset($_SESSION['atext']);
 			unset($_SESSION['acategories']);
-			unset($_SESSION['agames']);
 			unset($_SESSION['aactive']);
 			unset($_SESSION['uploads']);
 			unset($_SESSION['uploads_tagline']);

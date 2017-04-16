@@ -9,11 +9,11 @@
 						</div>
 					</div>
 					<div class="share group">
-						<span><img src="{:url}templates/default/images/social/white/share.svg" alt="" /> <span>Share</span></span>
+						<span><img src="{:this_template}/images/social/white/share.svg" alt="" /> <span>Share</span></span>
 						<a class="button small fnone" href="#" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{:share_url}'), 'height=279, width=575'); return false;" target="_blank"><img src="{:url}templates/default/images/social/facebook.svg" alt="" /></a>
 						<a class="button small fnone" href="https://plusone.google.com/_/+1/confirm?hl=en&url={:share_url}" target="_blank"><img src="{:url}templates/default/images/social/google-plus.svg" alt="" /></a>
 						<a class="button small fnone" href="https://twitter.com/intent/tweet?text={:title}%20%23Linux&amp;url={:share_url}&amp;via=gamingonlinux" target="_blank"><img src="{:url}templates/default/images/social/twitter.svg" alt="" /></a>
-						<a class="button small fnone" href="http://www.gamingonlinux.com/article_rss.php" target="_blank"><img src="{:url}templates/default/images/social/rss.svg" alt="" /></a>
+						<a class="button small fnone" href="{:url}article_rss.php" target="_blank"><img src="{:this_template}/images/social/rss.svg" alt="" /></a>
 					</div>
 					<div class="content group">
 						{:text}
@@ -24,7 +24,7 @@
 [block: tags]
 <div class="tags group">
 	<ul>
-		{:games_list} {:categories_list}
+		{:categories_list}
 	</ul>
 </div>
 [/block: tags]

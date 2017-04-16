@@ -14,11 +14,11 @@
 
 [block: forum_row]
 	<tr>
-		<td width="60px" id="forum-post"><img src="{:url}templates/default/images/forum_icon.png" alt="icon" /></td>
+		<td width="60px" id="forum-post"><img src="{:this_template}/images/forum_icon.png" alt="icon" /></td>
 		<td width="425px" id="forum-post"><a href="{:forum_link}" class="strong">{:forum_name}</a><br />
 		{:forum_description}<br />
 		Posts: {:forum_posts}</td>
-		<td width="35px" id="forum-post"><img src="{:url}templates/default/images/last_post.png" alt="" /></td>
+		<td width="35px" id="forum-post"><img src="{:this_template}/images/last_post.png" alt="" /></td>
 		<td width="200px" id="forum-post"valign="top">Last Post: {:last_post_title}<br />
 		by {:last_post_username} <br />
 		{:last_post_time}</td>
@@ -31,7 +31,7 @@
 
 [block: latest]
 				<div class="box">
-					<div class="head">Latest posts <a href="/forum_rss.php"><img src="{:url}templates/default/images/social/white/rss.svg" alt="" class="fright" width="23px"></a></div>
+					<div class="head">Latest posts <a href="/forum_rss.php"><img src="{:this_template}/images/social/white/rss.svg" alt="" class="fright" width="23px"></a></div>
 				</div>
 				<div class="box">
 					<div class="body group">

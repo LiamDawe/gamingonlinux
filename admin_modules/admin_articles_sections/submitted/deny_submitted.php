@@ -32,7 +32,8 @@ else
 
 		if (isset($_POST['message']))
 		{
-			if (!empty($_POST['message']))
+			$message = trim($_POST['message']);
+			if (!empty($message))
 			{
 				// pick the email to use
 				$email = '';
@@ -46,39 +47,23 @@ else
 					$email = $check['email'];
 				}
 
-				// sort out registration email
-				$to = $email;
-
 				// subject
-				$subject = 'Your article was denied on GamingOnLinux.com sorry!';
+				$subject = 'Your article was denied on ' . core::config('site_title');
+				
+				$html_message = '<p>Your article submission on ' . core::config('site_title') . ' was denied and the editor left a message for you below:</p>
+				<p>'.$_POST['message'].'</p>
+				<p>Here is a copy below are your article:<br />
+				Title: '.$check['title'].'<br />
+				' . $check['text']. '</p>';
 
 				// message
-				$message = "
-				<html>
-				<head>
-				<title>Your article was denied on GamingOnLinux.com sorry!</title>
-				</head>
-				<body>
-				<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-				<br />
-				<p>Sorry but this time we have denied publishing your article on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>, you are free to submit it again anytime it could just be minor issues but here is what the reviewer had to say:</p>
-				<p>{$_POST['message']}</p>
-				<br style=\"clear:both\">
-				<div>
-				<hr>
-				<p>Article Title: {$check['title']}, text below:</p>
-				<p>{$check['text']}</p>
-				</div>
-				</body>
-				</html>";
-
-				// To send HTML mail, the Content-type header must be set
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-				// Mail it
-				mail($to, $subject, $message, $headers);
+				$plain_message = 'Your article submission on ' . core::config('site_title') . ' was denied and the editor said this' . "\n\n" . $_POST['message'] . "\n\n" . 'Here\'s a copy of your article below' . "\n\n" . $check['text'];
+				
+				if (core::config('send_emails') == 1)
+				{
+					$mail = new mail($email, $subject, $html_message, $plain_message);
+					$mail->send();
+				}
 			}
 		}
 

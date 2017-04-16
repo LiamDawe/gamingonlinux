@@ -70,6 +70,23 @@ class template
 			$this->last_file = $file;
 		}
 	}
+	
+	// for plugins
+	public function merge_plugin($file)
+	{
+		global $core;
+
+		if (!file_exists(core::config('path') . "plugins/{$file}.html"))
+		{
+			$core->message("Error merging plugin template file, cannot find ({$this->template}/$file).", NULL, 1);
+		}
+
+		else
+		{
+			$this->files[$file] = file_get_contents(core::config('path') . "plugins/{$file}.html");
+			$this->last_file = $file;
+		}
+	}
 
 	/*
 		set the current block to work with and later display

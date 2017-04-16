@@ -17,6 +17,8 @@ if (!isset($_POST['act']))
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_pcinfo');
 	$templating->set('user_id', $_SESSION['user_id']);
+	$templating->set('url', core::config('website_url'));
+	$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
 
 	if (!isset($additional['date_updated']))
 	{

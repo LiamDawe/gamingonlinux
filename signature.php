@@ -49,7 +49,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
       }
     }
 
-    $base_image = imagecreatefrompng($file_dir . '/templates/default/images/signature.png');
+    $base_image = imagecreatefrompng($file_dir . '/templates/'.core::config('template').'/images/signature.png');
 
     $distro_image_picker = 'linux_icon';
     if (!empty($user_info['distro']))
@@ -57,12 +57,12 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
       $distro_image_picker = $user_info['distro'];
     }
 
-    $distro = @imagecreatefrompng($file_dir . '/templates/default/images/distros/' . $distro_image_picker . '.png');
+    $distro = @imagecreatefrompng($file_dir . '/templates/'.core::config('template').'/images/distros/' . $distro_image_picker . '.png');
 
     if (!$distro)
     {
       // if it didn't work, they might have somehow picked a distro image we don't have, so force the standard Linux "tux" image
-      $distro = @imagecreatefrompng($file_dir . '/templates/default/images/distros/linux_icon.png');
+      $distro = @imagecreatefrompng($file_dir . '/templates/'.core::config('template').'/images/distros/linux_icon.png');
     }
 
     // only do this if it actually worked
@@ -77,7 +77,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
     putenv('GDFONTPATH=' . realpath('.'));
     $font = 'Ubuntu-L.ttf';
 
-    imagettftext($base_image, 11, 0, 257, 14, $text_colour, $font, "GamingOnLinux.com");
+    imagettftext($base_image, 11, 0, 257, 14, $text_colour, $font, core::config('site_title'));
 
     imagettftext($base_image, 11, 0, 3, 14, $text_colour, $font, $username);
     if (!empty($desktop_text))
@@ -98,28 +98,28 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
   }
   else
   {
-    $base_image = imagecreatefrompng($file_dir . '/templates/default/images/signature.png');
-    $distro = @imagecreatefrompng($file_dir . '/templates/default/images/distros/linux_icon.png');
+    $base_image = imagecreatefrompng($file_dir . '/templates/'.core::config('template').'/images/signature.png');
+    $distro = @imagecreatefrompng($file_dir . '/templates/'.core::config('template').'/images/distros/linux_icon.png');
     imagecopy($base_image, $distro, (imagesx($base_image)/2)-(imagesx($distro)/2), (imagesy($base_image)/2)-(imagesy($distro)/2), 0, 0, imagesx($distro), imagesy($distro));
     $text_colour = imagecolorallocate($base_image, 0, 0, 0);
     $height = imagesy($base_image);
     $font = 4;
     imagestring($base_image, $font, 1, $height-70, "ERROR: That users PC info is not public!", $text_colour);
-    imagestring($base_image, $font, 260, $height-20, "GamingOnLinux.com", $text_colour);
+    imagestring($base_image, $font, 260, $height-20, core::config('site_title'), $text_colour);
     header('Content-Type: image/png');
     imagepng($base_image);
   }
 }
 else
 {
-  $base_image = imagecreatefrompng($file_dir . '/templates/default/images/signature.png');
-  $distro = @imagecreatefrompng($file_dir . '/templates/default/images/distros/linux_icon.png');
+  $base_image = imagecreatefrompng($file_dir . '/templates/'.core::config('template').'/images/signature.png');
+  $distro = @imagecreatefrompng($file_dir . '/templates/'.core::config('template').'/images/distros/linux_icon.png');
   imagecopy($base_image, $distro, (imagesx($base_image)/2)-(imagesx($distro)/2), (imagesy($base_image)/2)-(imagesy($distro)/2), 0, 0, imagesx($distro), imagesy($distro));
   $text_colour = imagecolorallocate($base_image, 0, 0, 0);
   $height = imagesy($base_image);
   $font = 4;
   imagestring($base_image, $font, 1, $height-70, "ERROR: No User ID set", $text_colour);
-  imagestring($base_image, $font, 260, $height-20, "GamingOnLinux.com", $text_colour);
+  imagestring($base_image, $font, 260, $height-20, core::config('site_title'), $text_colour);
   header('Content-Type: image/png');
   imagepng($base_image);
 }

@@ -14,7 +14,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	article_class::process_categories($_POST['article_id']);
 
-	article_class::process_game_assoc($_POST['article_id']);
+	plugins::do_hooks('article_database_entry', $_POST['article_id']);
 
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
@@ -29,7 +29,6 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	unset($_SESSION['atext2']);
 	unset($_SESSION['atext3']);
 	unset($_SESSION['acategories']);
-	unset($_SESSION['agames']);
 	unset($_SESSION['aactive']);
 	unset($_SESSION['uploads']);
 	unset($_SESSION['uploads_tagline']);

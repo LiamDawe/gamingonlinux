@@ -116,9 +116,8 @@ else
 
 	$templating->set('categories_list', $categorys_list);
 
-	$games_list = $article_class->display_game_assoc($article['article_id']);
-
-	$templating->set('games_list', $games_list);
+	$article_form_top = plugins::do_hooks('article_form_top', $article['article_id']);
+	$templating->set('article_form_top', $article_form_top);
 
 	$templating->set('username', $article['username']);
 

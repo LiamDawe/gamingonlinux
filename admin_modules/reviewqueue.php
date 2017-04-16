@@ -195,9 +195,8 @@ else
 
 	$templating->set('categories_list', $categorys_list);
 
-	$games_list = $article_class->display_game_assoc($article['article_id']);
-
-	$templating->set('games_list', $games_list);
+	$article_form_top = plugins::do_hooks('article_form_top', $article['article_id']);
+	$templating->set('article_form_top', $article_form_top);
 
 	$templating->set('username', $article['username']);
 
@@ -294,8 +293,8 @@ if (isset($_POST['act']))
 			}
 
 			article_class::process_categories($_POST['article_id']);
-
-			article_class::process_game_assoc($_POST['article_id']);
+			
+			plugins::do_hooks('article_database_entry', $_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
@@ -310,7 +309,6 @@ if (isset($_POST['act']))
 			unset($_SESSION['atagline']);
 			unset($_SESSION['atext']);
 			unset($_SESSION['acategories']);
-			unset($_SESSION['agames']);
 			unset($_SESSION['aactive']);
 			unset($_SESSION['uploads']);
 			unset($_SESSION['uploads_tagline']);
@@ -329,7 +327,7 @@ if (isset($_POST['act']))
 
 
 				// subject
-				$subject = 'Your article was reviewed and edited on GamingOnLinux.com!';
+				$subject = 'Your article was reviewed and edited on ' . core::config('site_title');
 
 				$nice_title = core::nice_title($_POST['title']);
 
@@ -359,7 +357,7 @@ if (isset($_POST['act']))
 			}
 
 			$_SESSION['message'] = 'admin_edited';
-			header("Location: /admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
+			header("Location: ".core::config('website_url')."admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
 		}
 	}
 }

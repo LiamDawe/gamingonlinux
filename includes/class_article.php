@@ -1,15 +1,15 @@
 <?php
 class article_class
 {
-  // clear out any left overs, since there's no error we don't need them, stop errors with them
-  function reset_sessions()
-  {
-    unset($_SESSION['uploads']);
-    unset($_SESSION['uploads_tagline']);
-    unset($_SESSION['gallery_tagline_id']);
-    unset($_SESSION['gallery_tagline_rand']);
-    unset($_SESSION['gallery_tagline_filename']);
-  }
+	// clear out any left overs, since there's no error we don't need them, stop errors with them
+	function reset_sessions()
+	{
+		unset($_SESSION['uploads']);
+		unset($_SESSION['uploads_tagline']);
+		unset($_SESSION['gallery_tagline_id']);
+		unset($_SESSION['gallery_tagline_rand']);
+		unset($_SESSION['gallery_tagline_filename']);
+	}
 
   public static function tagline_image($data)
   {
@@ -112,53 +112,6 @@ class article_class
     return $previously_uploaded;
   }
 
-  function display_game_assoc($article_id = NULL)
-  {
-    global $db;
-
-    if ($article_id != NULL)
-    {
-      // get games list
-      $games_check_array = array();
-      $db->sqlquery("SELECT `game_id` FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
-      while($games_check = $db->fetch())
-      {
-        $games_check_array[] = $games_check['game_id'];
-      }
-    }
-
-    $games_list = '';
-    $db->sqlquery("SELECT `id`, `name` FROM `calendar` ORDER BY `name` ASC");
-    while ($games = $db->fetch())
-    {
-      // if there was some sort of error, we use the games set on the error
-      if (isset($_GET['error']))
-      {
-        if (!empty($_SESSION['agames']) && in_array($games['id'], $_SESSION['agames']))
-        {
-          $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
-        }
-      }
-
-      // otherwise if we are submitting a form, like on a preview
-      else if (!empty($_POST['games']) && !isset($_GET['error']))
-      {
-        if (in_array($games['id'], $_POST['games']))
-        {
-          $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
-        }
-      }
-
-      // lastly, if we are viewing an existing article
-      else if (($article_id != NULL) && isset($games_check_array) && in_array($games['id'], $games_check_array))
-      {
-        $games_list .= "<option value=\"{$games['id']}\" selected>{$games['name']}</option>";
-      }
-    }
-
-    return $games_list;
-  }
-
   public static function process_categories($article_id)
   {
     global $db;
@@ -197,44 +150,6 @@ class article_class
     }
   }
 
-  public static function process_game_assoc($article_id)
-  {
-    global $db;
-
-    if (isset($article_id) && is_numeric($article_id))
-    {
-      // delete any existing games that aren't in the final list for publishing
-      $db->sqlquery("SELECT `id`, `article_id`, `game_id` FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
-      $current_games = $db->fetch_all_rows();
-
-      if (!empty($current_games))
-      {
-        foreach ($current_games as $current_game)
-        {
-          if (!in_array($current_game['game_id'], $_POST['games']))
-          {
-            $db->sqlquery("DELETE FROM `article_game_assoc` WHERE `id` = ?", array($current_game['id']));
-          }
-        }
-      }
-
-      // get fresh list of games, and insert any that don't exist
-      $db->sqlquery("SELECT `game_id`, `id`, `article_id` FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
-      $current_games = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
-
-      if (isset($_POST['games']) && !empty($_POST['games']))
-      {
-        foreach($_POST['games'] as $game)
-        {
-          if (!in_array($game, $current_games))
-          {
-            $db->sqlquery("INSERT INTO `article_game_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
-          }
-        }
-      }
-    }
-  }
-
   function delete_article($article)
   {
     global $db;
@@ -242,9 +157,11 @@ class article_class
     $db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
     $db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
     $db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
-    $db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($article['article_id']));
     $db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
     $db->sqlquery("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
+    
+    plugins::do_hooks('article_deletion', $article['article_id']);
+    
     $db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
     $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article_id, 'deleted_article', core::$date, core::$date));
 
@@ -756,7 +673,7 @@ class article_class
 		
 		self::process_categories($article_id);
 
-		self::process_game_assoc($article_id);
+		plugins::do_hooks('article_database_entry', $article_id);
 		
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

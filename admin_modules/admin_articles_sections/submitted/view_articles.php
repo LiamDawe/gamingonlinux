@@ -169,11 +169,11 @@ else if (isset($_GET['aid']))
 	$lock_button = '';
 	if ($article['locked'] == 0)
 	{
-		$lock_button = '<a class="button_link" href="/admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a><hr />';
+		$lock_button = '<a class="button_link" href="'.core::config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a><hr />';
 	}
 	else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$lock_button = '<a class="button_link" href="/admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a><hr />';
+		$lock_button = '<a class="button_link" href="'.core::config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a><hr />';
 	}
 	$templating->set('lock_button', $lock_button);
 
@@ -231,9 +231,8 @@ else if (isset($_GET['aid']))
 
 	$templating->set('categories_list', $categorys_list);
 
-	$games_list = $article_class->display_game_assoc($article['article_id']);
-
-	$templating->set('games_list', $games_list);
+	$article_form_top = plugins::do_hooks('article_form_top', $article['article_id']);
+	$templating->set('article_form_top', $article_form_top);
 
 	if (empty($article['username']))
 	{

@@ -453,7 +453,9 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	"/\[mp3](.+?)\[\/mp3\]/is" 
 		=> '<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
 	"/\[ogg](.+?)\[\/ogg\]/is" 
-		=> '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>'
+		=> '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>',
+	"/(\[split\])(\s)*/is"
+		=> '<hr class="content_split">'
 	);
 
 	$body = emoticons($body);
@@ -488,7 +490,6 @@ function bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $g
 	// stop big gaps after embedding a tweet from twitter
 	$body = str_replace('</a></blockquote><br />', '</a></blockquote>', $body);
 	$body = str_replace('</script><br />', '</script>', $body);
-
 
 	// Put the code blocks back in
 	foreach ($codeBlocks as $key => $codeblock)

@@ -1530,3 +1530,7 @@ a.anchor {
   height:100px;
   overflow:auto;
 }
+hr.content_split { 
+	background-color: #fff;
+	border-top: 2px dotted #8c8b8b;
+} 

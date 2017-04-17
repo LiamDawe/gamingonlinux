@@ -1534,3 +1534,6 @@ hr.content_split {
 	background-color: #fff;
 	border-top: 2px dotted #8c8b8b;
 } 
+.table-stripes {border-collapse: collapse;}
+.table-stripes tr:nth-child(even) {background: #e5e5e5}
+.table-stripes tr:nth-child(odd) {background: #FFF}

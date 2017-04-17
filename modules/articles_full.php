@@ -303,6 +303,8 @@ if (!isset($_GET['go']))
 					$article_body = str_replace('<*PAGE*>', '', $article['text']);
 					$article_page_count = 1;
 				}
+				
+				$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
 
 				$templating->set('text', bbcode($article_body, 1, 1, $tagline_bbcode, $bbcode_tagline_gallery) . $article_bottom);
 
@@ -631,12 +633,9 @@ if (!isset($_GET['go']))
 
 						// sort out the avatar
 						$comment_avatar = user::sort_avatar($comments);
-
+						
 						$into_username = '';
-						if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
-						{
-							$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . core::config('website_url') . 'templates/default/images/distros/' . $comments['distro'] . '.svg" />';
-						}
+						$into_username = plugins::do_hooks('into_post_username', $comments);
 
 						$templating->block('article_comments', 'articles_full');
 						$permalink = article_class::get_link($article['article_id'], $article['slug'], 'comment_id=' . $comments['comment_id']);

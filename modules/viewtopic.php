@@ -381,10 +381,7 @@ else
 					}
 
 					$into_username = '';
-					if (!empty($topic['distro']) && $topic['distro'] != 'Not Listed')
-					{
-						$into_username .= "<img title=\"{$topic['distro']}\" class=\"distro tooltip-top\" alt=\"\" src=\"/templates/default/images/distros/{$topic['distro']}.svg\" />";
-					}
+					$into_username = plugins::do_hooks('into_post_username', $topic);
 
 					$templating->set('username', $into_username . $username);
 
@@ -510,10 +507,7 @@ else
 						}
 
 						$into_username = '';
-						if (!empty($post['distro']) && $post['distro'] != 'Not Listed')
-						{
-							$into_username .= "<img title=\"{$post['distro']}\" class=\"distro tooltip-top\" alt=\"\" src=\"/templates/default/images/distros/{$post['distro']}.svg\" />";
-						}
+						$into_username = plugins::do_hooks('into_post_username', $post);
 
 						$cake_bit = $user->cake_day($post['register_date'], $post['username']);
 						$templating->set('cake_icon', $cake_bit);

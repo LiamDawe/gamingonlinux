@@ -230,20 +230,20 @@ $templating->set('categories_list', $categories_list);
 $edit_state = '';
 if (isset($article))
 {
-	$games_list = $article_class->display_game_assoc($article['article_id']);
-
 	if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
 	{
 		$edit_state = 'disabled';
 	}
+	$article_form_top = plugins::do_hooks('article_form_top', $article['article_id']);
+	
 }
 else
 {
-	$games_list = $article_class->display_game_assoc();
+	$article_form_top = plugins::do_hooks('article_form_top', $article['article_id']);
 }
+$templating->set('article_form_top', $article_form_top);
 
 $templating->set('categories_list', $categories_list);
-$templating->set('games_list', $games_list);
 
 $templating->set('title', htmlentities($_POST['title'], ENT_QUOTES));
 $templating->set('slug', $_POST['slug']);

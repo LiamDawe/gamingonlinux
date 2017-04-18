@@ -47,6 +47,13 @@ else
 			$rss_check = 'checked';
 		}
 		$templating->set('article_rss_check', $rss_check);
+		
+		$forum_rss_check = '';
+		if (core::config('forum_rss') == 1)
+		{
+			$forum_rss_check = 'checked';
+		}
+		$templating->set('forum_rss_check', $forum_rss_check);
 
 		$templating->set('popular_counter', core::config('hot-article-viewcount'));
 
@@ -84,6 +91,12 @@ else
 		if (isset($_POST['article_rss']))
 		{
 			$article_rss = 1;
+		}
+		
+		$forum_rss = 0;
+		if (isset($_POST['forum_rss']))
+		{
+			$forum_rss = 1;
 		}
 
 		$debug = 0;
@@ -126,6 +139,8 @@ else
 			$core->set_config($debug, 'show_debug');
 			
 			$core->set_config($article_rss, 'articles_rss');
+			
+			$core->set_config($forum_rss, 'forum_rss');
 			
 			$core->set_config($_POST['title'], 'site_title');
 			

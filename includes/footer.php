@@ -5,6 +5,22 @@ $templating->set('site_title', core::config('site_title'));
 $templating->set('url', url);
 $templating->set('year', date('Y'));
 
+// social and sharing icons
+$article_rss = '';
+if (core::config('articles_rss') == 1)
+{
+	$article_rss = '<li><a href="'.core::config('website_url').'article_rss.php" target="_blank"><img alt src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/white/rss-website.svg" width="30" height="30" /></a></li>';
+}
+$templating->set('article_rss', $article_rss);
+
+$forum_rss = '';
+if (core::config('forum_rss') == 1)
+{
+	$forum_rss = '<li><a href="'.core::config('website_url').'forum_rss.php" target="_blank"><img alt src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/white/rss-forum.svg" width="30" height="30" /></a></li>';
+}
+$templating->set('forum_rss', $forum_rss);
+
+
 // info for admins to see execution time and mysql queries per page
 $debug = '';
 if ($user->check_group(1) == true && core::config('show_debug') == 1)

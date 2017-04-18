@@ -10,7 +10,7 @@ $db = new mysql(core::$database['host'], core::$database['username'], core::$dat
 include($file_dir . '/includes/class_template.php');
 $templating = new template(core::config('template'));
 
-if (core::config('articles_rss') == 1)
+if (core::config('forum_rss') == 1)
 {
 	header('Content-Type: text/xml; charset=utf-8', true);
 	header("Cache-Control: max-age=3600");
@@ -28,7 +28,7 @@ if (core::config('articles_rss') == 1)
 	$xml->startElement('channel');
 	$xml->writeElement('title', core::config('site_title') . ' Latest forum posts');
 	$xml->writeElement('link', core::config('website_url'));
-	$xml->writeElement('description', 'The latest news from ' . core::config('site_title'));
+	$xml->writeElement('description', 'The latest forum posts from ' . core::config('site_title'));
 	$xml->writeElement('pubDate', $now);
 	$xml->writeElement('language', 'en-us');
 	$xml->writeElement('lastBuildDate', $now);

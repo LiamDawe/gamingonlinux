@@ -1024,6 +1024,7 @@ class core
 		
 		$templating->merge('editor');
 		$templating->block('editor');
+		$templating->set('this_template', $this->config('website_url') . 'templates/' . $this->config('template'));
 		$templating->set('url', $this->config('website_url'));
 		$templating->set('name', $editor['name']);
 		$templating->set('content', $editor['content']);

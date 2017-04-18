@@ -1,15 +1,4 @@
 <?php
-if (isset($_GET['message']))
-{
-	$extra = NULL;
-	if (isset($_GET['extra']))
-	{
-		$extra = $_GET['extra'];
-	}
-	$message = $message_map->get_message($_GET['message'], $extra);
-	$core->message($message['message'], NULL, $message['error']);
-}
-
 $db->sqlquery("SELECT `email`, `username` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 $grab_email = $db->fetch();
 
@@ -21,14 +10,18 @@ if (isset($_POST['Update']))
 {
 	if (empty($_POST['new_email']))
 	{
-		header("Location: /usercp.php?module=email&message=empty&extra=email");
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'email';
+		header("Location: /usercp.php?module=email");
 		$core->message('If you want to update your email you need to fill the field in!', NULL, 1);
 		die();
 	}
 
 	if (empty($_POST['password']))
 	{
-		header("Location: /usercp.php?module=email&message=empty&extra=password");
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'password';
+		header("Location: /usercp.php?module=email");
 		die();
 	}
 
@@ -41,7 +34,8 @@ if (isset($_POST['Update']))
 		// check the originals match
 		if (!password_verify($_POST['password'], $grab_current_password['password']))
 		{
-			header("Location: /usercp.php?module=email&message=password-match");
+			$_SESSION['message'] = 'password-match';
+			header("Location: /usercp.php?module=email");
 			die();
 		}
 	}
@@ -60,7 +54,8 @@ if (isset($_POST['Update']))
 	$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['new_email']));
 	if ($db->num_rows() >= 1)
 	{
-		header("Location: /usercp.php?module=email&message=not-that-email");
+		$_SESSION['message'] = 'email_used';
+		header("Location: /usercp.php?module=email");
 		die();
 	}
 	
@@ -70,16 +65,11 @@ if (isset($_POST['Update']))
 	$db->sqlquery("UPDATE `users` SET `email` = ? WHERE `user_id` = ?", array($new_email, $_SESSION['user_id']));
 
 	// send an email to their old address to let them know
-	$subject = "Email changed on GamingOnLinux.com";
+	$subject = "Email changed on " . core::config('site_title');
 
 	// message
 	$html_message = "<p>Hello <strong>{$grab_email['username']}</strong>,</p>
-	<p>Someone, hopefully you, has changed your email address on <a href=\"".core::config('website_url')."\">gamingonlinux.com</a> to: {$_POST['new_email']}. If this was you, please ignore this email as it's just a security measure.</p>
-	<hr>
-		<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> !</p>
-		<p>Please don&#39;t reply to this automated message. We do not read any mails recieved on this email address.</p>
-		<p>-----------------------------------------------------------------------------------------------------------</p>
-	</div>";
+	<p>Someone, hopefully you, has changed your email address on <a href=\"".core::config('website_url')."\">".core::config('site_title')."</a> to: {$_POST['new_email']}. If this was you, please ignore this email as it's just a security measure.</p>";
 
 	$plain_message = PHP_EOL."Hello {$grab_email['username']}! Someone, hopefully you, has changed your email address on ".core::config('website_url')." to: {$_POST['new_email']}. If this was you, please ignore this email as it's just a security measure.";
 
@@ -90,7 +80,9 @@ if (isset($_POST['Update']))
 		$mail->send();
 	}
 
+	$_SESSION['message'] = 'saved';
+	$_SESSION['message_extra'] = 'email address';
 	// redirect and tell them it's done
-	header("Location: /usercp.php?module=email&message=saved&extra=email");
+	header("Location: /usercp.php?module=email");
 }
 ?>

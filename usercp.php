@@ -43,6 +43,16 @@ else
 	$module = 'home';
 }
 
+if (isset($_SESSION['message']))
+{
+	$extra = NULL;
+	if (isset($_SESSION['message_extra']))
+	{
+		$extra = $_SESSION['message_extra'];
+	}
+	$message_map->display_message(core::$current_module['module_file_name'], $_SESSION['message'], $extra);
+}
+
 if (in_array($module, $modules_allowed))
 {
 	include($file_dir . "/usercp_modules/usercp_module_$module.php");

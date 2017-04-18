@@ -13,7 +13,6 @@ if (isset($_POST['Update']))
 		$_SESSION['message'] = 'empty';
 		$_SESSION['message_extra'] = 'email';
 		header("Location: /usercp.php?module=email");
-		$core->message('If you want to update your email you need to fill the field in!', NULL, 1);
 		die();
 	}
 

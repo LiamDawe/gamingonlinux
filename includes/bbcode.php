@@ -622,28 +622,30 @@ function email_bbcode($body)
 
 function emoticons($text)
 {
+	$smilie_location = core::config('website_url') . 'templates/' . core::config('template');
+	
 	$smilies = array(
-	":><:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/angry.png" alt="" />',
-	":&gt;&lt;:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/angry.png" alt="" />', // for comments as they are made html-safe
-	":'(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/cry.png" alt="" />', // for comments as they are made html-safe
-	":&#039;(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/cry.png" alt="" />',
-	":dizzy:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/dizzy.png" alt="" />',
-	":D" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/grin.png" alt="" />',
-	"^_^" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/happy.png" alt="" />',
-	"<3" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/heart.png" alt="" />',
-	"&lt;3" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/heart.png" alt="" />', // for comments as they are made html-safe
-	":huh:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/huh.png" alt="" />',
-	":|" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/pouty.png" alt="" />',
-	":(" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/sad.png" alt=""/>',
-	":O" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/shocked.png" alt="" />',
-	":sick:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/sick.png" alt="" />',
-	":)" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/smile.png" alt="" />',
-	":P" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/tongue.png" alt="" />',
-	":S:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/unsure.png" alt="" />',
-	":woot:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/w00t.png" alt="" />',
-	":whistle:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/whistle.png" alt="" />',
-	";)" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/wink.png" alt="" />',
-	":wub:" => '<img src="'.core::config('website_url').'templates/default/images/emoticons/wub.png" alt="" />'
+	":><:" => '<img src="'.$smilie_location.'/images/emoticons/angry.png" alt="" />',
+	":&gt;&lt;:" => '<img src="'.$smilie_location.'/images/emoticons/angry.png" alt="" />', // for comments as they are made html-safe
+	":'(" => '<img src="'.$smilie_location.'/images/emoticons/cry.png" alt="" />', // for comments as they are made html-safe
+	":&#039;(" => '<img src="'.$smilie_location.'/images/emoticons/cry.png" alt="" />',
+	":dizzy:" => '<img src="'.$smilie_location.'/images/emoticons/dizzy.png" alt="" />',
+	":D" => '<img src="'.$smilie_location.'/images/emoticons/grin.png" alt="" />',
+	"^_^" => '<img src="'.$smilie_location.'/images/emoticons/happy.png" alt="" />',
+	"<3" => '<img src="'.$smilie_location.'/images/emoticons/heart.png" alt="" />',
+	"&lt;3" => '<img src="'.$smilie_location.'/images/emoticons/heart.png" alt="" />', // for comments as they are made html-safe
+	":huh:" => '<img src="'.$smilie_location.'/images/emoticons/huh.png" alt="" />',
+	":|" => '<img src="'.$smilie_location.'/images/emoticons/pouty.png" alt="" />',
+	":(" => '<img src="'.$smilie_location.'/images/emoticons/sad.png" alt=""/>',
+	":O" => '<img src="'.$smilie_location.'/images/emoticons/shocked.png" alt="" />',
+	":sick:" => '<img src="'.$smilie_location.'/images/emoticons/sick.png" alt="" />',
+	":)" => '<img src="'.$smilie_location.'/images/emoticons/smile.png" alt="" />',
+	":P" => '<img src="'.$smilie_location.'/images/emoticons/tongue.png" alt="" />',
+	":S:" => '<img src="'.$smilie_location.'/images/emoticons/unsure.png" alt="" />',
+	":woot:" => '<img src="'.$smilie_location.'/images/emoticons/w00t.png" alt="" />',
+	":whistle:" => '<img src="'.$smilie_location.'/images/emoticons/whistle.png" alt="" />',
+	";)" => '<img src="'.$smilie_location.'/images/emoticons/wink.png" alt="" />',
+	":wub:" => '<img src="'.$smilie_location.'/images/emoticons/wub.png" alt="" />'
 	);
 
 	$text = str_replace( array_keys( $smilies ), array_values( $smilies ), $text );

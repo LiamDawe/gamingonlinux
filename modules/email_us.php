@@ -130,6 +130,29 @@ $templating->set('email', $email);
 $templating->set('message', $message);
 $templating->set('url', url);
 
+// social and sharing icons
+$social_icons = [
+'twitter_username' => ['config' => 'twitter_username', 'icon' => 'twitter.svg'],
+'gplus_page' => ['config' => 'gplus_page', 'icon' => 'google-plus.svg'],
+'facebook_page' => ['config' => 'facebook_page', 'icon' => 'facebook.svg']
+];
+
+$social_output = '';
+foreach ($social_icons as $social)
+{
+	$extra_url = '';
+	if (!empty(core::config($social['config'])))
+	{
+		if ($social['config'] == 'twitter_username')
+		{
+			$extra_url = 'https://www.twitter.com/';
+		}
+		
+		$social_output .= '<a class="button small fnone" href="'.$extra_url.core::config($social['config']).'" target="_blank"><img src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/'.$social['icon'].'"></a>';
+	}
+}
+$templating->set('social_icons', $social_output);
+
 if ($parray['contact_captcha'] == 1)
 {
 	$captcha = '<noscript><strong>You need Javascript turned on to see the captcha, otherwise you won\'t be able to email us!</strong></noscript><div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';

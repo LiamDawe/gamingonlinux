@@ -193,7 +193,25 @@ if (!isset($_GET['go']))
 
 				$templating->block('article', 'articles_full');
 				$templating->set('url', core::config('website_url'));
-				$templating->set('share_url', "https://www.gamingonlinux.com/articles/$nice_title.{$_GET['aid']}");
+				
+				$share_url = article_class::get_link($_GET['aid'], $nice_title);
+				
+				$twitter_share = '';
+				if (!empty(core::config('twitter_username')))
+				{
+					$twitter_share = '<a class="button small fnone" href="https://twitter.com/intent/tweet?text='.$article['title'].'%20%23Linux&amp;url='.$share_url.'&amp;via='.core::config('twitter_username').'" target="_blank"><img src="'.core::config('website_url') . 'templates/' . core::config('template') .'/images/social/twitter.svg" alt="" /></a>';
+				}
+				$templating->set('twitter_share', $twitter_share);
+
+				$fb_onclick = "window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('$share_url'), 'height=279, width=575'); return false;";
+				
+				$facebook_share = '<a class="button small fnone" href="#" onclick="'.$fb_onclick.'" target="_blank"><img src="'.core::config('website_url') . 'templates/' . core::config('template') .'/images/social/facebook.svg" alt="" /></a>';
+				$templating->set('facebook_share', $facebook_share);
+				
+				
+				
+				$gplus_share = '<a class="button small fnone" href="https://plusone.google.com/_/+1/confirm?hl=en&url='.$share_url.'" target="_blank"><img src="'.core::config('website_url') . 'templates/' . core::config('template') .'/images/social/google-plus.svg" alt="" /></a>';
+				$templating->set('gplus_share', $gplus_share);
 
 				if (core::config('pretty_urls') == 1)
 				{
@@ -411,11 +429,6 @@ if (!isset($_GET['go']))
 				$templating->set('like_button', $like_button);
 
 				$templating->block('article_bottom', 'articles_full');
-
-				if (!$user->check_group(6))
-				{
-					$templating->block('patreon', 'articles_full');
-				}
 
 				if ($_SESSION['user_id'] > 0)
 				{

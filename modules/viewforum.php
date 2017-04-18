@@ -129,7 +129,7 @@ else
 		$templating->block('post_row', 'viewforum');
 
 		// sort out topic icon
-		$topic_pip = '/templates/default/images/topic_icon.png';
+		$topic_pip = core::config('website_url') . 'templates/' . core::config('template') . '/images/topic_icon.png';
 
 		// Let them know if it's a sticky post or not
 		$sticky = '';

@@ -4,6 +4,7 @@ $templating->set_previous('title', 'Support ' . core::config('site_title'), 1);
 
 $templating->merge('support_us');
 $templating->block('main');
+$templating->set('config_support_us_text', core::config('support_us_text'));
 
 $templating->block('list_top');
 

@@ -95,7 +95,7 @@ $templating->block('hot_articles');
 $timestamp = strtotime("-3 months");
 
 $hot_articles = '';
-$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp));
+$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 AND `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp));
 while ($get_hot = $db->fetch())
 {
 	$hot_articles .= '<li><a href="'.article_class::get_link($get_hot['article_id'], $get_hot['title']).'">'.$get_hot['title'].'</a> ('.number_format($get_hot['views']).')</li>';
@@ -108,7 +108,7 @@ $templating->block('top_articles');
 
 $article_list = '';
 // top 10 articles of all time by views
-$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` ORDER BY `views` DESC LIMIT 5");
+$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 ORDER BY `views` DESC LIMIT 5");
 while ($top_articles = $db->fetch())
 {
 	$article_list .= '<li><a href="'.article_class::get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';

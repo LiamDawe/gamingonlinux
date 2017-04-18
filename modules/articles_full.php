@@ -774,6 +774,20 @@ if (!isset($_GET['go']))
 							{
 								$templating->merge('login');
 								$templating->block('small');
+								
+								$twitter_button = '';
+								if (core::config('twitter_login') == 1)
+								{
+									$twitter_button = '<button type="submit" name="action" value="twitter" class="fright"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -3px;"><image xlink:href="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/twitter.svg" src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/twitter.png" width="18" height="18" /></svg> Twitter</button>';
+								}
+								$templating->set('twitter_button', $twitter_button);
+			
+								$steam_button = '';
+								if (core::config('steam_login') == 1)
+								{
+									$steam_button = '<button type="submit" name="action" value="steam" class="fleft"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -4px;"><image xlink:href="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/steam.svg" src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/steam.png" width="18" height="18" /></svg> Steam</button>';
+								}
+								$templating->set('steam_button', $steam_button);
 							}
 
 							else

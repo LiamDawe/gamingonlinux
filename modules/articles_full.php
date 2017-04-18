@@ -781,6 +781,7 @@ if (!isset($_GET['go']))
 							{
 								$templating->merge('login');
 								$templating->block('small');
+								$templating->set('url', core::config('website_url'));
 								
 								$twitter_button = '';
 								if (core::config('twitter_login') == 1)

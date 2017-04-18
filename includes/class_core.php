@@ -1403,7 +1403,8 @@ class core
 		$json = json_decode($json, true);
 		if ( $json["ip"]["appears"] == 1 )
 		{
-			header('Location: /index.php?module?home&message=spam');
+			$_SESSION['message'] = 'spam';
+			header('Location: /index.php?module=home');
 			die();
 		}
 	}

@@ -9,7 +9,7 @@ $db = new mysql(core::$database['host'], core::$database['username'], core::$dat
 
 include($file_dir . '/includes/class_template.php');
 
-$templating = new template('default');
+$templating = new template(core::config('template'));
 
 include($file_dir . '/includes/class_user.php');
 $user = new user();

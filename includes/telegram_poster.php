@@ -86,7 +86,7 @@ function apiRequest($method, $parameters)
 function processMessage($message)
 {
 	// process incoming message
-	$chat_id = "@linuxgaming";
+	$chat_id = "@" . core::config('telegram_news_channel');
 	if (isset($message))
 	{
 		apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $message));

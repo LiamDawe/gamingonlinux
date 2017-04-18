@@ -67,6 +67,16 @@ else
 
 		$templating->set('url', core::config('website_url'));
 		
+		// SOCIAL
+		$templating->set('twitter', core::config('twitter_username'));
+		$templating->set('telegram_group', core::config('telegram_group'));
+		$templating->set('telegram_bot_key', core::config('telegram_bot_key'));
+		$templating->set('discord', core::config('discord'));
+		$templating->set('steam_group', core::config('steam_group'));
+		$templating->set('facebook_page', core::config('facebook_page'));
+		$templating->set('gplus_page', core::config('gplus_page'));
+		$templating->set('youtube_channel', core::config('youtube_channel'));
+		
 		// THEMING
 		$templating->set('navbar_logo_icon', core::config('navbar_logo_icon'));
 		$templating->set('template', core::config('template'));
@@ -122,8 +132,6 @@ else
 		{
 			$core->set_config($_POST['contact_email'], 'contact_email');
 
-			$core->set_config($_POST['template'], 'template');
-
 			$core->set_config($_POST['default_module'], 'default_module');
 
 			$core->set_config($allow_registrations, 'allow_registrations');
@@ -146,11 +154,23 @@ else
 			
 			$core->set_config($_POST['mailer_email'], 'mailer_email');
 			
+			// SOCIAL
+			$core->set_config($_POST['twitter'], 'twitter_username');
+			$core->set_config($_POST['telegram_group'], 'telegram_group');
+			$core->set_config($_POST['telegram_bot_key'], 'telegram_bot_key');
+			$core->set_config($_POST['discord'], 'discord');
+			$core->set_config($_POST['steam_group'], 'steam_group');
+			$core->set_config($_POST['facebook_page'], 'facebook_page');
+			$core->set_config($_POST['gplus_page'], 'gplus_page');
+			$core->set_config($_POST['youtube_channel'], 'youtube_channel');
+			
+			// THEMING
+			$core->set_config($_POST['template'], 'template');
 			$core->set_config($_POST['navbar_logo_icon'], 'navbar_logo_icon');
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';
-			header("Location: /admin.php?module=config");
+			header('Location: '.core::config('website_url').'admin.php?module=config');
 		}
 	}
 }

@@ -5,7 +5,6 @@ $templating->set('site_title', core::config('site_title'));
 $templating->set('url', url);
 $templating->set('year', date('Y'));
 
-// social and sharing icons
 $article_rss = '';
 if (core::config('articles_rss') == 1)
 {
@@ -20,6 +19,32 @@ if (core::config('forum_rss') == 1)
 }
 $templating->set('forum_rss', $forum_rss);
 
+// social and sharing icons
+$social_icons = [
+'twitter_username' => ['config' => 'twitter_username', 'icon' => 'twitter.svg'],
+'telegram_group' => ['config' => 'telegram_group', 'icon' => 'telegram.svg'],
+'discord' => ['config' => 'discord', 'icon' => 'discord.svg'],
+'steam_group' => ['config' => 'steam_group', 'icon' => 'steam.svg'],
+'twitch_channel' => ['config' => 'twitch_channel', 'icon' => 'twitch.svg'],
+'youtube_channel' => ['config' => 'youtube_channel', 'icon' => 'youtube.svg'],
+'gplus_page' => ['config' => 'gplus_page', 'icon' => 'google-plus.svg'],
+'facebook_page' => ['config' => 'facebook_page', 'icon' => 'facebook.svg']
+];
+
+$social_output = '';
+foreach ($social_icons as $social)
+{
+	$extra_url = '';
+	if (!empty(core::config($social['config'])))
+	{
+		if ($social['config'] == 'twitter_username')
+		{
+			$extra_url = 'https://www.twitter.com/';
+		}
+		$social_output .= '<li><a href="'.$extra_url.core::config($social['config']).'" target="_blank"><img alt src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/white/'.$social['icon'].'" width="30" height="30" /></a></li>';
+	}
+}
+$templating->set('social_icons', $social_output);
 
 // info for admins to see execution time and mysql queries per page
 $debug = '';

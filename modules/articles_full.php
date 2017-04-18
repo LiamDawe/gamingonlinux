@@ -622,20 +622,14 @@ if (!isset($_GET['go']))
 							$quote_username = $comments['username'];
 						}
 
-						$pc_info = '';
-						if ($comments['pc_info_public'] == 1)
-						{
-							if ($comments['pc_info_filled'] == 1)
-							{
-								$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/call_profile.php?user_id='.$comments['author_id'].'">View PC info</a>';
-							}
-						}
-
 						// sort out the avatar
 						$comment_avatar = user::sort_avatar($comments);
 						
 						$into_username = '';
 						$into_username = plugins::do_hooks('into_post_username', $comments);
+						
+						$user_info_extra = '';
+						$user_info_extra = plugins::do_hooks('into_post_user_info', $comments);
 
 						$templating->block('article_comments', 'articles_full');
 						$permalink = article_class::get_link($article['article_id'], $article['slug'], 'comment_id=' . $comments['comment_id']);
@@ -645,7 +639,7 @@ if (!isset($_GET['go']))
 						$templating->set('comment_avatar', $comment_avatar);
 						$templating->set('date', $comment_date);
 						$templating->set('tzdate', date('c',$comments['time_posted']) );
-						$templating->set('pc_info_link', $pc_info);
+						$templating->set('user_info_extra', $user_info_extra);
 
 						$cake_bit = '';
 						if ($username != 'Guest')

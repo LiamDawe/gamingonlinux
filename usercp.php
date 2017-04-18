@@ -50,7 +50,7 @@ if (isset($_SESSION['message']))
 	{
 		$extra = $_SESSION['message_extra'];
 	}
-	$message_map->display_message(core::$current_module['module_file_name'], $_SESSION['message'], $extra);
+	$message_map->display_message('usercp/'.$module, $_SESSION['message'], $extra);
 }
 
 if (in_array($module, $modules_allowed))

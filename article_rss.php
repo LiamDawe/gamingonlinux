@@ -87,7 +87,7 @@ if (core::config('articles_rss') == 1)
 		{
 			$username = $line['username'];
 		}
-		$xml->writeElement('author', "contact@gamingonlinux.com ($username)");
+		$xml->writeElement('author', core::config('contact_email') . " ($username)");
 		
 		$article_link = article_class::get_link($line['article_id'], $line['title']);
 		$xml->writeElement('link', $article_link);

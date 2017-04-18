@@ -24,9 +24,9 @@ class plugins
 	// this is called by the main php files, which then looks for registers from register_hook
 	public static function do_hooks($name, $value = NULL)
 	{
+		$return_value = '';
 		if (isset(self::$hooks[$name]))
 		{
-			$return_value = '';
 			foreach (self::$hooks[$name] as $hook)
 			{
 				$return_value = call_user_func('hook_'.$hook, $value);

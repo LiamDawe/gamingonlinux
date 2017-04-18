@@ -191,41 +191,47 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('aper-page', $apage_options);
 
-	if (!empty($usercpcp['twitter_username']))
+	$twitter_button = '';
+	if (core::config('twitter_login') == 1)
 	{
-		$twitter_button = "<div class=\"box\"><div class=\"body group\"><form method=\"post\" action=\"/usercp.php?module=home\">
-		Current twitter handle linked: @{$usercpcp['twitter_username']}<br />
-		<button type=\"submit\">Remove linked Twitter account</button>
-		<input type=\"hidden\" name=\"act\" value=\"twitter_remove\" />
-		</form></div></div>";
-	}
+		if (!empty($usercpcp['twitter_username']))
+		{
+			$twitter_button = '<div class="box"><div class="body group"><form method="post" action="'.core::config('website_url').'usercp.php?module=home">
+			Current twitter handle linked: @'.$usercpcp['twitter_username'].'<br />
+			<button type="submit">Remove linked Twitter account</button>
+			<input type="hidden" name="act" value="twitter_remove" />
+			</form></div></div>';
+		}
 
-	else
-	{
-		$twitter_button = '<div class="box"><div class="body group"><form method="post" action="/index.php?module=login&twitter">
-		<button type="submit">Link a Twitter account</button>
-		</form></div></div>';
+		else
+		{
+			$twitter_button = '<div class="box"><div class="body group"><form method="post" action="'.core::config('website_url').'index.php?module=login&twitter">
+			<button type="submit">Link a Twitter account</button>
+			</form></div></div>';
+		}
 	}
-
 	$templating->set('twitter_button', $twitter_button);
 
-	if (!empty($usercpcp['steam_username']))
+	$steam_button = '';
+	if (core::config('steam_login') == 1)
 	{
-		$steam_button = "<div class=\"box\"><div class=\"body group\"><form method=\"post\" action=\"/usercp.php?module=home\">
-		Current Steam user linked: {$usercpcp['steam_username']}<br />
-		If this username is old it doesn't matter!<br />
-		<button type=\"submit\" class=\"btn btn-danger\">Remove a linked Steam account</button>
-		<input type=\"hidden\" name=\"act\" value=\"steam_remove\" />
-		</form></div></div>";
-	}
+		if (!empty($usercpcp['steam_username']))
+		{
+			$steam_button = '<div class="box"><div class="body group"><form method="post" action="'.core::config('website_url').'usercp.php?module=home">
+			Current Steam user linked: '.$usercpcp['steam_username'].'<br />
+			If this username is old it doesn\'t matter!<br />
+			<button type="submit" class="btn btn-danger">Remove a linked Steam account</button>
+			<input type="hidden" name="act" value="steam_remove" />
+			</form></div></div>';
+		}
 
-	else
-	{
-		$steam_button = '<div class="box"><div class="body group"><form method="post" action="/index.php?module=login&steam">
-		<button type="submit" formaction="/index.php?module=login&amp;steam"><img src="'.core::config('website_url').'uploads/steam_login_with_large_border.png" /></button>
-		</form></div></div>';
+		else
+		{
+			$steam_button = '<div class="box"><div class="body group"><form method="post" action="/index.php?module=login&steam">
+			<button type="submit" formaction="/index.php?module=login&amp;steam"><img src="'.core::config('website_url').'uploads/steam_login_with_large_border.png" /></button>
+			</form></div></div>';
+		}
 	}
-
 	$templating->set('steam_button', $steam_button);
 }
 

@@ -867,7 +867,7 @@ class article_class
 
 			foreach ($get_categories as $k => $category_list)
 			{
-				if (in_array($article['article_id'], $category_list))
+				if ($article['article_id'] == $category_list['article_id'])
 				{
 					$category_link = article_class::tag_link($category_list['category_name']);
 

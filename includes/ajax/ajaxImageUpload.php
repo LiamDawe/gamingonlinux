@@ -11,8 +11,9 @@ include($file_dir . '/includes/class_user.php');
 $user = new user();
 $user->check_session();
 
-include_once($file_dir . '/includes/class_image.php');
-$image_func = new SimpleImage();
+include_once($file_dir . '/includes/image_class/SimpleImage.php');
+use claviska\SimpleImage;
+$img = new SimpleImage();
 
 if ($user->check_group([1,2,5]) == false)
 {
@@ -52,9 +53,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 
 				// thumbs
 				$thumb_newname = $thumbs_dir.$image_name;
-				$image_func->load($_FILES['photos']['tmp_name'][$name]);
-				$image_func->scale(300);
-				$image_func->save($thumb_newname);
+				$img->fromFile($_FILES['photos']['tmp_name'][$name])->resize(350, null)->toFile($thumb_newname);
 				
 				if (move_uploaded_file($_FILES['photos']['tmp_name'][$name], $main_newname))
 				{

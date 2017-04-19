@@ -82,7 +82,7 @@ if (!isset($_GET['go']))
 					{
 						$additional_likes = '';
 					}
-					$note_row = $templating->store_replace($note_row, array('additional_likes' => $additional_likes));
+					$note_row = $templating->store_replace($note_row, array('additional_likes' => $additional_likes, 'this_template' => core::config('website_url') . 'templates/' . core::config('template')));
 				}
 
 				if ($note_list['seen'] == 0)
@@ -116,7 +116,7 @@ if (!isset($_GET['go']))
 
 				$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
 
-				$note_row = $templating->store_replace($note_row, array('id' => $note_list['id'], 'icon' => $icon, 'title' => $note_list['title'], 'link' => $link, 'avatar' => $avatar, 'username' => $username, 'profile_link' => $profile_link));
+				$note_row = $templating->store_replace($note_row, array('id' => $note_list['id'], 'icon' => $icon, 'title' => $note_list['title'], 'link' => $link, 'avatar' => $avatar, 'username' => $username, 'profile_link' => $profile_link, 'this_template' => core::config('website_url') . 'templates/' . core::config('template')));
 
 				if ($note_list['seen'] == 0)
 				{

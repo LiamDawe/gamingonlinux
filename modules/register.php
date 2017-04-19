@@ -30,7 +30,7 @@ if (core::config('allow_registrations') == 1)
 		$captcha = '';
 	}
 
-	if (!isset($_POST['register']) && !isset($_GET['twitter_new']) && !isset($_GET['steam_new']))
+	if (!isset($_POST['register']) && !isset($_GET['twitter_new']) && !isset($_GET['steam_new']) && !isset($_GET['google_new']))
 	{
 		$templating->block('main');
 
@@ -59,6 +59,21 @@ if (core::config('allow_registrations') == 1)
 		$templating->block('steam_new');
 
 		$templating->set('username', $_SESSION['steam_username']);
+
+		$templating->set('rules', core::config('rules'));
+		$templating->set('captcha', $captcha);
+		$templating->set('timezone_list', core::timezone_list());
+
+		// set time to check against registration time to prevent really fast bots
+		$_SESSION['register_time'] = time();
+	}
+	
+	else if (!isset($_POST['register']) && isset($_GET['google_new']))
+	{
+		$templating->block('google_new');
+		
+		$templating->set('name', $_SESSION['google_name']);
+		$templating->set('email', $_SESSION['google_data']['google_email']);
 
 		$templating->set('rules', core::config('rules'));
 		$templating->set('captcha', $captcha);
@@ -188,6 +203,11 @@ if (core::config('allow_registrations') == 1)
 					if ($_POST['register'] == 'steam')
 					{
 						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
+					}
+					
+					if ($_POST['register'] == 'google')
+					{
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `user_group` = 3, `secondary_user_group` = 3, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_id` = ?, `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_id'], $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
 					}
 
 					$last_id = $db->grab_id();

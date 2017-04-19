@@ -785,17 +785,37 @@ if (!isset($_GET['go']))
 								
 								$twitter_button = '';
 								if (core::config('twitter_login') == 1)
-								{
-									$twitter_button = '<button type="submit" name="action" value="twitter" class="fright"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -3px;"><image xlink:href="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/twitter.svg" src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/twitter.png" width="18" height="18" /></svg> Twitter</button>';
+								{	
+									$twitter_button = '<a href="'.core::config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
 								}
 								$templating->set('twitter_button', $twitter_button);
-			
+								
 								$steam_button = '';
 								if (core::config('steam_login') == 1)
 								{
-									$steam_button = '<button type="submit" name="action" value="steam" class="fleft"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" style="margin-bottom: -4px;"><image xlink:href="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/steam.svg" src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/steam.png" width="18" height="18" /></svg> Steam</button>';
+									$steam_button = '<a href="'.core::config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
 								}
 								$templating->set('steam_button', $steam_button);
+								
+								$google_button = '';
+								if (core::config('google_login') == 1)
+								{
+									$client_id = core::config('google_login_public'); 
+									$client_secret = core::config('google_login_secret');
+									$redirect_uri = core::config('website_url') . 'includes/google/login.php';
+									require_once (core::config('path') . 'includes/google/libraries/Google/autoload.php');
+									$client = new Google_Client();
+									$client->setClientId($client_id);
+									$client->setClientSecret($client_secret);
+									$client->setRedirectUri($redirect_uri);
+									$client->addScope("email");
+									$client->addScope("profile");
+									$service = new Google_Service_Oauth2($client);
+									$authUrl = $client->createAuthUrl();
+									
+									$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
+								}
+								$templating->set('google_button', $google_button);
 							}
 
 							else

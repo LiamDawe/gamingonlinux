@@ -70,6 +70,8 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/Chart.min.js (http://www.chartjs.org/ MIT)
 
+- /inclides/image_class/ (https://github.com/claviska/SimpleImage MIT)
+
 ## Misc
 
 If you want to know what you can put in a chart.js tooltip:  

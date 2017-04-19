@@ -1,11 +1,10 @@
 <?php
+include($file_dir . '/includes/class_image_uploads.php');
+$image_upload = new image_upload();
+
 $templating->set_previous('title', 'Change your avatar', 1);
 $templating->set_previous('meta_description', 'Here you can change your avatar!', 1);
 
-if (isset($_GET['error']))
-{
-	$core->message($_SESSION['message'], NULL, 1);
-}
 if (isset($_GET['message']))
 {
 	if ($_GET['message'] == 'deleted')
@@ -27,10 +26,6 @@ if (isset($_GET['message']))
 	if ($_GET['message'] == 'gallery')
 	{
 		$core->message("You are now using an avatar picked from the gallery!");
-	}
-	if ($_GET['message'] == 'toobig')
-	{
-		$core->message('The dimensions are too big!', NULL, 1);
 	}
 }
 $templating->merge('usercp_modules/usercp_module_avatar');
@@ -109,15 +104,15 @@ if (isset($_POST['action']))
 
 	else if ($_POST['action'] == 'Upload')
 	{
-		if ($user->avatar() == true)
+		if (image_upload::avatar() == true)
 		{
 			header("Location: /usercp.php?module=avatar&message=uploaded");
 		}
 
 		else
 		{
-			$_SESSION['message'] = $user->message;
-			header("Location: /usercp.php?module=avatar&error");
+			$_SESSION['message'] = image_upload::$return_message;
+			header("Location: /usercp.php?module=avatar");
 		}
 	}
 

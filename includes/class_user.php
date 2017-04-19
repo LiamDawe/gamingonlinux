@@ -1,8 +1,6 @@
 <?php
 class user
 {
-	public $message;
-	
 	public static $user_group_list;
 
 	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
@@ -357,109 +355,6 @@ class user
 		$_SESSION['canary'] = time();
 
 		header("Location: ".core::config('website_url')."index.php");
-	}
-
-	function avatar()
-	{
-		global $db;
-
-		if (is_uploaded_file($_FILES['new_image']['tmp_name']))
-		{
-			// this will make sure it is an image file, if it cant get an image size then its not an image
-			if (!getimagesize($_FILES['new_image']['tmp_name']))
-			{
-				$this->message = 'Not an image!';
-				return false;
-			}
-
-			// check the dimensions
-			list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
-
-			// check if its too big
-			if ($_FILES['new_image']['size'] > 42000)
-			{
-				$this->message = 'File size too big!';
-				return false;
-			}
-
-			if ($width > core::config('avatar_width') || $height > core::config('avatar_height'))
-			{
-				// include the image class to resize it as its too big
-				include('includes/class_image.php');
-				$image = new SimpleImage();
-				$image->load($_FILES['new_image']['tmp_name']);
-				$image->resize(core::config('avatar_width'),core::config('avatar_height'));
-				$image->save($_FILES['new_image']['tmp_name']);
-
-				clearstatcache();
-
-				// just double check it's now the right size (just a failsafe)
-				list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
-				if ($width > core::config('avatar_width') || $height > core::config('avatar_height'))
-				{
-					$this->message = 'Too big!';
-					return false;
-				}
-			}
-
-			// see if they currently have an avatar set
-			$db->sqlquery("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-			$avatar = $db->fetch();
-
-			$image_info = getimagesize($_FILES['new_image']['tmp_name']);
-			$image_type = $image_info[2];
-			$file_ext = '';
-			if( $image_type == IMAGETYPE_JPEG )
-			{
-				$file_ext = 'jpg';
-			}
-
-			else if( $image_type == IMAGETYPE_GIF )
-			{
-				$file_ext = 'gif';
-			}
-
-			else if( $image_type == IMAGETYPE_PNG )
-			{
-				$file_ext = 'png';
-			}
-
-			$rand_name = rand(1,999);
-
-			$imagename = $_SESSION['username'] . $rand_name . '_avatar.' . $file_ext;
-
-			// the actual image
-			$source = $_FILES['new_image']['tmp_name'];
-
-			// where to upload to
-			$target = $_SERVER['DOCUMENT_ROOT'] . "/uploads/avatars/" . $imagename;
-
-			if (move_uploaded_file($source, $target))
-			{
-				// remove old avatar
-				if ($avatar['avatar_uploaded'] == 1)
-				{
-					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $avatar['avatar']);
-				}
-
-				$_SESSION['avatar'] = "/uploads/avatars/" . $imagename;
-
-				$db->sqlquery("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
-				return true;
-			}
-
-			else
-			{
-				$this->message = 'Could not upload file!';
-				return false;
-			}
-		}
-
-		else
-		{
-			$this->message = 'No file selected to upload, dummy!';
-			return false;
-		}
 	}
 
 	// check a users group to perform a certain task, can check two groups

@@ -67,8 +67,8 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 
 			if ($_COOKIE['request_stay'] == 1)
 			{
-				setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', 'gamingonlinux.com');
-				setcookie('gol_session', $generated_session,  time()+31556926, '/', 'gamingonlinux.com');
+				setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', core::config('cookie_domain'));
+				setcookie('gol_session', $generated_session,  time()+31556926, '/', core::config('cookie_domain'));
 			}
 
 			header("Location: /");

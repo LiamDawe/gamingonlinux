@@ -1,4 +1,7 @@
 <?php
+include($file_dir . '/includes/class_image_uploads.php');
+$image_upload = new image_upload();
+
 $templating->merge('admin_modules/admin_module_featured');
 
 if (isset($_GET['message']))
@@ -110,7 +113,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
-		$upload = $core->carousel_image($_POST['article_id'], 1);
+		$upload = image_upload::featured_image($_POST['article_id'], 1);
 		if ($upload === true)
 		{
 			header("Location: /admin.php?module=featured&view=manage&message=added");
@@ -123,7 +126,7 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'edit')
 	{
-		$upload = $core->carousel_image($_POST['article_id'], 0);
+		$upload = image_upload::featured_image($_POST['article_id'], 0);
 		if ($upload === true)
 		{
 			header("Location: /admin.php?module=featured&view=manage&message=edited");

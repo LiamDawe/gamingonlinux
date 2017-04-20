@@ -174,14 +174,14 @@ if (!isset($_GET['go']))
 				// twitter info card
 				$twitter_card = "<!-- twitter card -->\n";
 				$twitter_card .= '<meta name="twitter:card" content="summary_large_image">';
-				$twitter_card .= '<meta name="twitter:site" content="@gamingonlinux">';
-				if (!empty($article['twitter_on_profile']) && $article['twitter_on_profile'] !== 'gamingonlinux' )
+				$twitter_card .= '<meta name="twitter:site" content="@'.core::config('twitter_username').'">';
+				if (!empty($article['twitter_on_profile']))
 				{
 					$twitter_card .= '<meta name="twitter:creator" content="@'.$article['twitter_on_profile'].'">';
 				}
 
 				$twitter_card .= '<meta name="twitter:title" content="'.$article['title'].'">';
-				$twitter_card .= '<meta name="twitter:description" content="'.strip_tags(bbcode($article['tagline'], 0)).'">'; //Piratelv @ 06/06/14 -- Fixed iframes showing up in page header
+				$twitter_card .= '<meta name="twitter:description" content="'.$article['tagline'].'">';
 				$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">';
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
 
@@ -278,7 +278,7 @@ if (!isset($_GET['go']))
 				$article_bottom = '';
 				if ($article['user_group'] != 1 && $article['user_group'] != 2 && $article['user_group'] != 5)
 				{
-					$article_bottom = "\n<br /><br /><p class=\"small muted\">This article was submitted by a guest, we encourage anyone to <a href=\"//www.gamingonlinux.com/submit-article/\">submit their own articles</a>.</p>";
+					$article_bottom = "\n<br /><br /><p class=\"small muted\">This article was submitted by a guest, we encourage anyone to <a href=\"".core::config('website_url')."submit-article/\">submit their own articles</a>.</p>";
 				}
 
 				//piratelv timeago: 12/11/14

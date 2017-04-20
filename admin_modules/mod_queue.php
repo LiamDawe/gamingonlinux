@@ -70,7 +70,7 @@ if (isset($_POST['action']))
 			{
 				$db->sqlquery("UPDATE `forum_topics` SET `approved` = 1, `creation_date` = ? WHERE `topic_id` = ?", array(core::$date, $_POST['topic_id']));
 
-				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
+				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
 
 				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
@@ -99,7 +99,7 @@ if (isset($_POST['action']))
 
 				$db->sqlquery("UPDATE `forum_topics` SET `last_post_date` = ?, `last_post_id` = ?, `replys` = (replys + 1) WHERE `topic_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id']));
 
-				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
+				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
 
 				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_reply'", array(core::$date, $_POST['post_id']));
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_reply_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));

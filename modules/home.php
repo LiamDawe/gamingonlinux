@@ -11,6 +11,10 @@ if (!isset($_GET['view']))
 
 	$templating->block('articles_top', 'home');
 	
+	$top_of_home_hook = '';
+	$top_of_home_hook = plugins::do_hooks('top_of_home_hook');
+	$templating->set('top_of_home_hook', $top_of_home_hook);
+	
 	$quick_nav = '';
 	if (core::config('quick_nav') == 1)
 	{

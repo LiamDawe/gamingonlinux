@@ -213,14 +213,8 @@ if (!isset($_GET['go']))
 				$gplus_share = '<a class="button small fnone" href="https://plusone.google.com/_/+1/confirm?hl=en&url='.$share_url.'" target="_blank"><img src="'.core::config('website_url') . 'templates/' . core::config('template') .'/images/social/google-plus.svg" alt="" /></a>';
 				$templating->set('gplus_share', $gplus_share);
 
-				if (core::config('pretty_urls') == 1)
-				{
-					$article_link = "https://www.gamingonlinux.com/articles/$nice_title.{$_GET['aid']}";
-				}
-				else
-				{
-					$article_link = "/index.php?module=articles_full&$nice_title&aid={$_GET['aid']}";
-				}
+				$article_link = article_class::get_link($_GET['aid'], $nice_title);
+				
 				$templating->set('article_link', $article_link);
 
 				$templating->set('rules', core::config('rules'));

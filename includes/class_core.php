@@ -1,8 +1,7 @@
 <?php
 class core
 {
-	// database config details
-	public static $database;
+	private $dbl = null;
 	
 	// the current date and time for the mysql
 	public static $date;
@@ -36,20 +35,20 @@ class core
 	
 	public static $top_bar_links = [];
 
-	function __construct($file_dir)
+	function __construct($database_connection)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
 		ini_set('session.cookie_httponly', 1);
 		date_default_timezone_set('UTC');
 		
-		$this->_file_dir = $file_dir;
-		
 		session_start();
 		
-		core::$database = include  $this->_file_dir . '/includes/config.php';
+        $this->dbl = $database_connection;
+		
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
+		
 	}
 	
 	// check in_array for a multidimensional array
@@ -63,21 +62,6 @@ class core
 			}
 		}
 		return false;
-	}
-
-	public static function genEmailCode($id)
-	{
-		include_once dirname(__FILE__).'/hashids/HashGenerator.php';
-		include_once dirname(__FILE__).'/hashids/Hashids.php';
-
-		$hashids = new Hashids\Hashids('GoL sends email');
-		return $hashids->encode($id);
-	}
-
-	public static function genReplyAddress($id, $type)
-	{
-		if (!in_array($type, ['comment', 'forum', 'editor', 'admin'])) return false;
-		return static::genEmailCode($id)."-".$type."@mail.gamingonlinux.com";
 	}
 
 	public static function make_safe($text)
@@ -212,13 +196,17 @@ class core
 	// grab a config key
 	public static function config($key)
 	{
-		global $db;
-
+		//global $db;
+		
+		print_r($dbl);
+		die();
 		if (empty(self::$config))
 		{
 			// get config
-			$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-			$fetch_config = $db->fetch_all_rows();
+			$get_config = $dbl->table('config')->select('`data_key`, `data_value`');
+			$fetch_config = $get_config->fetchAll();
+			//$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
+			//$fetch_config = $db->fetch_all_rows();
 
 			foreach ($fetch_config as $config_set)
 			{

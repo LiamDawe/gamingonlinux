@@ -7,14 +7,15 @@ include($file_dir . '/includes/header.php');
 
 if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 {
-	$db->sqlquery("SELECT `article_id`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
-	$featured_grabber = $db->fetch();
+	$select_featured = $dbl->table('articles')->select('`article_id`, `slug`')->where('`article_id` = ?');
+	$select_featured->values = [$_GET['aid']];
+	$featured = $select_featured->fetch();
 
-	if (!empty($featured_grabber['article_id']))
+	if (!empty($featured['article_id']))
 	{
-		$db->sqlquery("UPDATE `editor_picks` SET `hits` = (hits + 1) WHERE `article_id` = ?", array($_GET['aid']));
+		$dbl->table('editor_picks')->update('`hits` = (hits + 1)')->where('`article_id` = ?')->run();
 		
-		header('Location: ' . article_class::get_link($featured_grabber['article_id'], $featured_grabber['slug']));
+		header('Location: ' . article_class::get_link($featured['article_id'], $featured['slug']));
 	}
 }
 

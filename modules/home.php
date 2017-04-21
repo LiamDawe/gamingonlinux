@@ -58,7 +58,7 @@ if (!isset($_GET['view']))
 			$per_page = $_SESSION['articles-per-page'];
 		}
 		
-		$last_page = round($total/$per_page);
+		$last_page = ceil($total/$per_page);
 		
 		if ($page > $last_page)
 		{

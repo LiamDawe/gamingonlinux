@@ -3,16 +3,11 @@ error_reporting(-1);
 
 $timer_start = microtime(true);
 
-$db_conf = include $file_dir . '/includes/config.php';
+include($file_dir . '/includes/class_core.php');
+$core = new core($file_dir);
 
-require_once($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql($db_conf);
-
-require_once($file_dir . '/includes/class_core.php');
-$core = new core($dbl);
-
-require_once($file_dir. '/includes/class_mysql.php');
-$db = new mysql($db_conf['host'], $db_conf['username'], $db_conf['password'], $db_conf['database']);
+include($file_dir. '/includes/class_mysql.php');
+$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
 include($file_dir . '/includes/class_messages.php');
 $message_map = new message_map();

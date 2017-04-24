@@ -35,6 +35,12 @@ class db_mysql extends PDO
 		return $this;
 	}
 	
+	public function order($order)
+	{
+		$this->sql = $this->sql . ' ORDER BY ' . $order;
+		return $this;
+	}
+	
 	public function where($where)
 	{
 		$this->sql = $this->sql . ' WHERE ' . $where;

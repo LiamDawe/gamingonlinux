@@ -1,14 +1,16 @@
 <?php
 class plugins
 {	
+	// the database connection
+	public $database = null;
 	public static $hooks = [];
 	
 	// load all plugin files
-	function __construct($file_dir)
+	function __construct($database, $file_dir)
 	{
-		global $db;
+		$this->database = $database;
 		
-		$get_plugins = $db->sqlquery("SELECT `name` FROM `plugins` ORDER BY `name` ASC");
+		$get_plugins = $this->database->select('plugins', '`name`')->order('`name` ASC');
 		while ($plugin = $get_plugins->fetch())
 		{
 			include($file_dir . '/plugins/' . $plugin['name'] . '/plugin_' . $plugin['name'] . '.php');

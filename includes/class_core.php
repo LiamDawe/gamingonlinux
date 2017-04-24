@@ -1,8 +1,8 @@
 <?php
 class core
-{
-	// database config details
-	public static $database;
+{	
+	// the database connection
+	public $database = null;
 	
 	// the current date and time for the mysql
 	public static $date;
@@ -28,7 +28,7 @@ class core
 	
 	public static $editor_js;
 
-	protected static $config = array();
+	public static $config = [];
 	
 	public static $allowed_modules = [];
 	
@@ -36,20 +36,18 @@ class core
 	
 	public static $top_bar_links = [];
 
-	function __construct($file_dir)
+	function __construct($database, $file_dir)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
 		ini_set('session.cookie_httponly', 1);
 		date_default_timezone_set('UTC');
 		
-		$this->_file_dir = $file_dir;
-		
 		session_start();
 		
-		core::$database = include  $this->_file_dir . '/includes/config.php';
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
+		$this->database = $database;
 	}
 	
 	// check in_array for a multidimensional array
@@ -174,18 +172,17 @@ class core
 		$raw = curl_exec($ch);
 		$result = array();
 
-		if(file_exists($fn)){
+		if(file_exists($fn))
+		{
 			unlink($fn);
 		}
 
 		if ($raw !== false) 
 		{
-
 			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 			if ($status == 200 || $status == 206) 
 			{
-
 				$result["w"] = 0;
 				$result["h"] = 0;
 
@@ -201,24 +198,22 @@ class core
 				//  Return width and height
 					list($result["w"], $result["h"]) = $size;
 				}
-
 			}
 		}
 
 		curl_close ($ch);
 		return $result;
 	}
-
+	
+	// this doesn't work, yet the above does, claims "Uncaught Error: Using $this when not in object context" on line 224 YET IT WORKS IN test() ?!
 	// grab a config key
-	public static function config($key)
+	public function config($key)
 	{
-		global $db;
-
 		if (empty(self::$config))
 		{
 			// get config
-			$db->sqlquery("SELECT `data_key`, `data_value` FROM `config`");
-			$fetch_config = $db->fetch_all_rows();
+			$get_config = $this->database->select("config", '`data_key`, `data_value`');
+			$fetch_config = $get_config->fetch_all();
 
 			foreach ($fetch_config as $config_set)
 			{

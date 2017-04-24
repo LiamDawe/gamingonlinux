@@ -83,4 +83,5 @@ echo $templating->output();
 
 // close the mysql connection
 $db = null;
+$dbl = NULL;
 ?>

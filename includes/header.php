@@ -3,17 +3,22 @@ error_reporting(-1);
 
 $timer_start = microtime(true);
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
 include($file_dir. '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+$db = new mysql($db_conf['host'], $db_conf['username'], $db_conf['password'], $db_conf['database']);
+
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 include($file_dir . '/includes/class_messages.php');
 $message_map = new message_map();
 
 include($file_dir . '/includes/class_plugins.php');
-$plugins = new plugins($file_dir);
+$plugins = new plugins($dbl, $file_dir);
 
 include($file_dir . '/includes/class_article.php');
 $article_class = new article_class();
@@ -23,7 +28,7 @@ $forum_class = new forum_class();
 
 include($file_dir . '/includes/class_mail.php');
 
-define('url', core::config('website_url'));
+define('url', $core->config('website_url'));
 
 include($file_dir . '/includes/class_user.php');
 $user = new user();
@@ -72,7 +77,7 @@ if (!isset($_SESSION['logged_in']))
 		$_SESSION['user_group'] = 4;
 		$_SESSION['secondary_user_group'] = 4;
 		$_SESSION['theme'] = 'default';
-		$_SESSION['per-page'] = core::config('default-comments-per-page');
+		$_SESSION['per-page'] = $core->config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
 		$_SESSION['forum_type'] = 'normal_forum';
 		$_SESSION['single_article_page'] = 0;
@@ -83,7 +88,7 @@ if (!isset($_SESSION['logged_in']))
 // setup the templating, if not logged in default theme, if logged in use selected theme
 include($file_dir . '/includes/class_template.php');
 
-$templating = new template(core::config('template'));
+$templating = new template($core->config('template'));
 
 if ($_SESSION['user_id'] != 0 && $_SESSION['theme'] != 'default')
 {
@@ -110,7 +115,7 @@ if ($_SESSION['user_id'] != 0)
 		$_SESSION['user_id'] = 0;
 		$_SESSION['user_group'] = 4;
 		$_SESSION['secondary_user_group'] = 4;
-		header("Location: ".core::config('website_url')."index.php");
+		header("Location: ".$core->config('website_url')."index.php");
 	}
 }
 
@@ -142,10 +147,10 @@ if ($_SESSION['user_id'] != 0 && $user->check_group(6) == false)
 // get the header template html
 $templating->load('header');
 $templating->block('header', 'header');
-$templating->set('site_title', core::config('site_title'));
-$templating->set('meta_keywords', core::config('meta_keywords'));
-$templating->set('url', core::config('website_url'));
-$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
+$templating->set('site_title', $core->config('site_title'));
+$templating->set('meta_keywords', $core->config('meta_keywords'));
+$templating->set('url', $core->config('website_url'));
+$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
 // add a gol premium class tag to the body html tag, this is used to ignore gol premium and editors from the ad-blocking stats gathering
 $body_class = '';
@@ -165,7 +170,7 @@ else
 
 $templating->set('body_class', $body_class);
 
-$templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for '.core::config('site_title').'" href="'.core::config('website_url').'article_rss.php" />');
+$templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for '.$core->config('site_title').'" href="'.$core->config('website_url').'article_rss.php" />');
 
 // set a blank article image as its set again in articles_full.php
 if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'articles_full' || $_GET['module'] == 'articles_full' && isset($_GET['go']))
@@ -176,8 +181,8 @@ if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'art
 $templating->merge('mainpage');
 
 $templating->block('top');
-$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
-$templating->set('url', core::config('website_url'));
+$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
+$templating->set('url', $core->config('website_url'));
 
 // april fools, because why not
 if (date('dm') == '0104' && date('H') < 14)
@@ -188,12 +193,12 @@ if (date('dm') == '0104' && date('H') < 14)
 else if (date('m') == '12')
 {
 	$icon = 'icon_xmas.png';
-	$site_title = core::config('site_title');
+	$site_title = $core->config('site_title');
 }
 else
 {
-	$icon = core::config('navbar_logo_icon');
-	$site_title = core::config('site_title');
+	$icon = $core->config('navbar_logo_icon');
+	$site_title = $core->config('site_title');
 }
 $templating->set('icon', $icon);
 $templating->set('site_title', $site_title);
@@ -205,7 +210,7 @@ $section_links = implode('', core::$top_bar_links);
 $templating->set('sections_links', $section_links);
 
 // sort the links out
-if (core::config('pretty_urls') == 1)
+if ($core->config('pretty_urls') == 1)
 {
 	$forum_link = '/forum/';
 	$irc_link = '/irc/';
@@ -215,25 +220,25 @@ if (core::config('pretty_urls') == 1)
 	{
 		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
 		{
-			$submit_a = core::config('website_url') . 'admin.php?module=add_article';
+			$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
 		}
 	}
 	$submit_e = '/email-us/';
 }
 else 
 {
-	$forum_link = core::config('website_url') . 'index.php?module=forum';
-	$irc_link = core::config('website_url') . 'index.php?module=irc';
-	$contact_link = core::config('website_url') . 'index.php?module=contact';
-	$submit_a = core::config('website_url') . 'index.php?module=submit_article&view=Submit';
+	$forum_link = $core->config('website_url') . 'index.php?module=forum';
+	$irc_link = $core->config('website_url') . 'index.php?module=irc';
+	$contact_link = $core->config('website_url') . 'index.php?module=contact';
+	$submit_a = $core->config('website_url') . 'index.php?module=submit_article&view=Submit';
 	if (isset($_SESSION['user_group']))
 	{
 		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
 		{
-			$submit_a = core::config('website_url') . 'admin.php?module=add_article';
+			$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
 		}
 	}
-	$submit_e = core::config('website_url') . 'index.php?module=email_us';
+	$submit_e = $core->config('website_url') . 'index.php?module=email_us';
 }
 $templating->set('forum_link', $forum_link);
 $templating->set('irc_link', $irc_link);
@@ -256,7 +261,7 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 	$templating->set('user_link', '<li><a href="/index.php?module=login">Login</a></li><li><a href="/index.php?module=register">Register</a></li>');
 
 	$login_menu = $templating->block_store('login_menu');
-	$login_menu = $templating->store_replace($login_menu, array('url' => core::config('website_url')));
+	$login_menu = $templating->store_replace($login_menu, array('url' => $core->config('website_url')));
 
 	$templating->set('user_menu', $login_menu);
 	$templating->set('notifications_menu', '');
@@ -282,8 +287,8 @@ else if ($_SESSION['user_id'] > 0)
 		{
 			$admin_indicator = 0;
 		}
-		$admin_link = '<li><a href="'.core::config('website_url').'admin.php">Admin CP</a></li>';
-		$admin_line = '<li><a href="'.core::config('website_url').'admin.php">'.$admin_indicator.' new admin notifications</a></li>';
+		$admin_link = '<li><a href="'.$core->config('website_url').'admin.php">Admin CP</a></li>';
+		$admin_line = '<li><a href="'.$core->config('website_url').'admin.php">'.$admin_indicator.' new admin notifications</a></li>';
 	}
 
 	// for the mobile navigation
@@ -292,18 +297,18 @@ else if ($_SESSION['user_id'] > 0)
 	// for the user menu toggle
 	$user_menu = $templating->block_store('user_menu', 'mainpage');
 
-	if (core::config('pretty_urls') == 1)
+	if ($core->config('pretty_urls') == 1)
 	{
 		$profile_link = "/profiles/{$_SESSION['user_id']}";
 		$messages_html_link = '/private-messages/';
 	}
 	else
 	{
-		$profile_link = core::config('website_url') . "index.php?module=profile&user_id={$_SESSION['user_id']}";
-		$messages_html_link = core::config('website_url') . "index.php?module=messages";
+		$profile_link = $core->config('website_url') . "index.php?module=profile&user_id={$_SESSION['user_id']}";
+		$messages_html_link = $core->config('website_url') . "index.php?module=messages";
 	}
 	
-	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link, 'url' => core::config('website_url')));
+	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link, 'url' => $core->config('website_url')));
 	$templating->set('user_menu', $user_menu);
 
 	/* This section is for general user notifications, it covers:
@@ -374,7 +379,7 @@ else if ($_SESSION['user_id'] > 0)
 	'comments_line' => $new_comments_line,
 	'messages_link' => $messages_html_link,
 	'admin_line' => $admin_line,
-	'this_template' => core::config('website_url') . 'templates/' . core::config('template')));
+	'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 
 	$templating->set('notifications_menu', $notifications_menu);
 }

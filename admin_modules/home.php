@@ -179,7 +179,7 @@ if (isset($_POST['act']))
 			<title>A new admin area comment on GamingOnLinux.com!</title>
 			</head>
 			<body>
-			<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+			<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Logo\">
 			<br />
 			<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"http://www.gamingonlinux.com/admin.php\">admin panel</a>:</p>
 			<hr>
@@ -235,7 +235,7 @@ if (isset($_POST['act']))
 			<title>A new editor area comment on GamingOnLinux.com!</title>
 			</head>
 			<body>
-			<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+			<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Logo\">
 			<br />
 			<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"http://www.gamingonlinux.com/admin.php\">editor panel</a>:</p>
 			<hr>

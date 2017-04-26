@@ -220,8 +220,10 @@ if (core::config('allow_registrations') == 1)
 					// get the users info to log them in right away!
 					$db->sqlquery("SELECT ".$user::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($last_id));
 					$new_user_info = $db->fetch();
-
-					user::register_session($new_user_info);
+					
+					$generated_session = md5(mt_rand() . $last_id . $_SERVER['HTTP_USER_AGENT']);
+					
+					user::new_login($new_user_info, $generated_session);
 
 					// subject
 					$subject = 'Welcome to '.core::config('site_title').', activation needed!';
@@ -237,7 +239,9 @@ if (core::config('allow_registrations') == 1)
 					$mail = new mail($_POST['uemail'], $subject, $html_message, $plain_message);
 					$mail->send();
 
-					$core->message("Thank you for registering {$_POST['username']}, <strong>but you need to confirm your email first</strong>! <a href=\"index.php\">Click here to return to the homepage.</a>");
+					$core->message("");
+					$_SESSION['message'] = 'new_account';
+					header("Location: ". $core->config('website_url'));
 				}
 			}
 			// Check the score to determine what to do.

@@ -27,11 +27,6 @@ return [
 		"text" => "Sorry your details didn't match up to unlike!",
 		"error" => 1
 	],
-	"banned" =>
-	[
-		"text" => "You were banned, possibly from spam detection or for breaking our rules!",
-		"error" => 1
-	],
 	"spam" => 
 	[
 		"text" => "You have been sent here to due being flagged as a spammer! Please contact us directly if this is false. You should check <a href=\"http://www.stopforumspam.com/\">StopForumSpam</a> to see if your IP is in their database.",

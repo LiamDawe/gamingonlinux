@@ -10,8 +10,8 @@ class plugins
 	{
 		$this->database = $database;
 		
-		$get_plugins = $this->database->select('plugins', '`name`')->order('`name` ASC');
-		while ($plugin = $get_plugins->fetch())
+		$get_plugins = $this->database->run("SELECT `name` FROM `plugins` ORDER BY `name` ASC")->fetch_all();
+		foreach ($get_plugins as $plugin)
 		{
 			include($file_dir . '/plugins/' . $plugin['name'] . '/plugin_' . $plugin['name'] . '.php');
 		}

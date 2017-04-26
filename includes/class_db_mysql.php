@@ -4,12 +4,8 @@ $file_dir = dirname( dirname( __FILE__ ) );
 require_once $file_dir. "/includes/EPDOStatement.php";
 	
 class db_mysql extends PDO
-{		
-	public $sql = '';
-	
-	public $query;
-	
-	public $values;
+{	
+	public $stmt;
 	
 	// the query counter
 	public $counter = 0;
@@ -29,88 +25,37 @@ class db_mysql extends PDO
         parent::__construct($dsn, $username, $password, $options);
 	}
 	
-	public function select($table, $fields = '*')
-	{
-		$this->sql = ' SELECT ' . $fields . ' FROM `' . $table . '`';
-		return $this;
-	}
-	
-	public function order($order)
-	{
-		$this->sql = $this->sql . ' ORDER BY ' . $order;
-		return $this;
-	}
-	
-	public function where($where)
-	{
-		$this->sql = $this->sql . ' WHERE ' . $where;
-		return $this;
-	}
-	
-	public function update($table, $fields = NULL)
-	{
-		$this->sql = ' UPDATE ' . $table . ' SET ' . $fields;
-		$this->query = $this->prepare($this->sql);
-		$this->debug_queries .= '<pre>' . $this->query->interpolateQuery() . '</pre>';
-		$this->result = $this->query->fetchAll($mode);
-		$this->counter++;
-	}
-
-	// a basic plain query with nothing attached
-	// EITHER THIS OR THIS QUERY STRING NEEDS RENAMING
-	public function query()
-	{
-		$results = $this->query($this->sql);
-
-		return $results;
-	}
+	// the most basic query
+    public function run($sql, $data = NULL)
+    {
+        $this->stmt = $this->prepare($sql);
+        $this->stmt->execute($data);
+        $this->debug_queries .= '<pre>' . $this->stmt->interpolateQuery() . '</pre>';
+        return $this;
+    }
 	
 	// This is used for grabbing a single column, setting the data to it directly, so you don't have to call it again
 	// so $result instead of $result['column']
-	// Also used for counting rows SELECT count(1) FROM t, returning the number of rows
-	public function fetchOne($mode = PDO::FETCH_ASSOC)
-	{
-		$this->query = $this->prepare($this->sql);
-
-		if (!empty($this->values))
-		{
-			$this->query->execute($this->values);
-		}
-		
-		$this->debug_queries .= '<pre>' . $this->query->interpolateQuery() . '</pre>';
-		
-		$this->result = $this->query->fetchColumn($mode);
+	// Also used for counting rows SELECT count(*) FROM t, returning the number of rows
+	public function fetchOne()
+	{		
+		$this->result = $this->stmt->fetchColumn();
 		$this->counter++;
 		
 		return $this->result;
 	}
 	
 	public function fetch($mode = PDO::FETCH_ASSOC)
-	{
-		$this->query = $this->prepare($this->sql);
-
-		if (!empty($this->values))
-		{
-			$this->query->execute($this->values);
-		}
-		
-		$this->debug_queries .= '<pre>' . $this->query->interpolateQuery() . '</pre>';
-		
-		$this->result = $this->query->fetch($mode);
+	{		
+		$this->result = $this->stmt->fetch($mode);
 		$this->counter++;
 		
 		return $this->result;
 	}
 	
 	public function fetch_all($mode = NULL)
-	{
-		$this->query = $this->prepare($this->sql);
-		
-		$this->query->execute($this->values);
-		
-		$this->debug_queries .= '<pre>' . $this->query->interpolateQuery() . '</pre>';
-		
-		$this->result = $this->query->fetchAll($mode);
+	{		
+		$this->result = $this->stmt->fetchAll($mode);
 		$this->counter++;
 		
 		return $this->result;
@@ -119,14 +64,8 @@ class db_mysql extends PDO
 	// get the last auto made ID
 	public function new_id()
 	{
-		$this->result = $this->query->lastInsertId();
+		$this->result = $this->stmt->lastInsertId();
 		
 		return $this->result;
-	}
-	
-	// for testing/showing the final query with all vars replaced
-	public function show_query()
-	{
-		return $this->query->interpolateQuery();
 	}
 }

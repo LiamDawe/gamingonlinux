@@ -1,6 +1,9 @@
 <?php
 class template
 {
+	// the required core class
+	private $core;
+	
 	// the current template folder, simple enough
 	public $template;
 
@@ -26,8 +29,10 @@ class template
 	// the final template to show to the viewer
 	protected $final_output;
 
-	public function __construct($template_folder = NULL)
+	public function __construct($core, $template_folder = NULL)
 	{
+		$this->core = $core;
+		
 		if ($template_folder == NULL)
 		{
 			$template_folder = 'default';
@@ -35,10 +40,10 @@ class template
 
 		if (!is_dir(core::config('path') . "templates/{$template_folder}"))
 		{
-			die("Error loading template folder ($template_folder). " . $_SERVER['DOCUMENT_ROOT'] . core::config('path') . "templates/" . $template_folder);
+			die("Error loading template folder ($template_folder). " . $_SERVER['DOCUMENT_ROOT'] . $this->core->config('path') . "templates/" . $template_folder);
 		}
 
-		$this->template = core::config('path') . "templates/{$template_folder}";
+		$this->template = $this->core->config('path') . "templates/{$template_folder}";
 	}
 
 	public function load($file)
@@ -57,11 +62,9 @@ class template
 	// NOTE: why is this exactly the same as load? what was I drinking?!
 	public function merge($file)
 	{
-		global $core;
-
 		if (!file_exists("{$this->template}/{$file}.html"))
 		{
-			$core->message("Error merging template file, cannot find ({$this->template}/$file).", NULL, 1);
+			$this->core->message("Error merging template file, cannot find ({$this->template}/$file).", NULL, 1);
 		}
 
 		else
@@ -74,16 +77,14 @@ class template
 	// for plugins
 	public function merge_plugin($file)
 	{
-		global $core;
-
 		if (!file_exists(core::config('path') . "plugins/{$file}.html"))
 		{
-			$core->message("Error merging plugin template file, cannot find ({$this->template}/$file).", NULL, 1);
+			$this->core->message("Error merging plugin template file, cannot find ({$this->template}/$file).", NULL, 1);
 		}
 
 		else
 		{
-			$this->files[$file] = file_get_contents(core::config('path') . "plugins/{$file}.html");
+			$this->files[$file] = file_get_contents($this->core->config('path') . "plugins/{$file}.html");
 			$this->last_file = $file;
 		}
 	}
@@ -95,8 +96,6 @@ class template
 	*/
 	public function block($block, $file = NULL)
 	{
-		global $core;
-
 		if ($file == NULL)
 		{
 			$file = $this->last_file;
@@ -117,15 +116,13 @@ class template
 
 		else
 		{
-			$core->message("Error cannot find block named ($block).", NULL, 1);
+			$this->core->message("Error cannot find block named ($block).", NULL, 1);
 		}
 	}
 
 	// for just grabbing the html from the block, if you want to do something with it manually
 	public function block_store($block, $file = NULL)
 	{
-		global $core;
-
 		if ($file == NULL)
 		{
 			$file = $this->last_file;
@@ -142,7 +139,7 @@ class template
 
 		else
 		{
-			$core->message("Error cannot find block named ($block).", NULL, 1);
+			$this->core->message("Error cannot find block named ($block).", NULL, 1);
 		}
 	}
 

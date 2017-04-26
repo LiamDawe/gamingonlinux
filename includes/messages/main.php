@@ -127,6 +127,15 @@ return [
 	[
 		"text" => "You didn't do the captcha, which is necessary to combat spam!",
 		"error" => 1
+	],
+	"banned" =>
+	[
+		"text" => "You were banned, possibly from spam detection or for breaking our rules!",
+		"error" => 1
+	],
+	"new_account" =>
+	[
+		"text" => "Thank you for registering {$_SESSION['username']}, you are now logged in, <strong>but you need to confirm your email before being able to post</strong>!"
 	]
 ];
 ?>

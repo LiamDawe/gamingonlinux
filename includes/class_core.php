@@ -42,8 +42,6 @@ class core
 		ini_set('session.cookie_httponly', 1);
 		date_default_timezone_set('UTC');
 		
-		session_start();
-		
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
@@ -205,17 +203,14 @@ class core
 		return $result;
 	}
 	
-	// this doesn't work, yet the above does, claims "Uncaught Error: Using $this when not in object context" on line 224 YET IT WORKS IN test() ?!
 	// grab a config key
 	public function config($key)
 	{
 		if (empty(self::$config))
 		{
 			// get config
-			$get_config = $this->database->select("config", '`data_key`, `data_value`');
-			$fetch_config = $get_config->fetch_all();
-
-			foreach ($fetch_config as $config_set)
+			$get_config = $this->database->run("SELECT `data_key`, `data_value` FROM config")->fetch_all();
+			foreach ($get_config as $config_set)
 			{
 				self::$config[$config_set['data_key']] = $config_set['data_value'];
 			}
@@ -229,7 +224,7 @@ class core
 	function set_config($value, $key)
 	{
 		global $db;
-		$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", array($value, $key));
+		$this->database->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
 
 		// invalidate the cache
 		self::$config = array();

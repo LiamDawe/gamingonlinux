@@ -55,6 +55,7 @@ if ($user->check_group(1) == true && core::config('show_debug') == 1)
 
 	$debug = "<br />Page generated in {$time} seconds, MySQL queries: {$db->counter}<br />";
 	$debug .= $db->queries;
+	$debug .= $dbl->debug_queries;
 	$debug .= print_r($_SESSION, true);
 }
 $templating->set('debug', $debug);

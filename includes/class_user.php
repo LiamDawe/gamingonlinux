@@ -1,6 +1,11 @@
 <?php
 class user
 {
+	// the required database connection
+	private $database;
+	// the required core class
+	private $core;
+	
 	public static $user_group_list;
 
 	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
@@ -8,44 +13,46 @@ class user
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`,
 	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
+	
+	function __construct($database, $core)
+	{
+		$this->database = $database;
+		$this->core = $core;
+	}
 
+	// check their session is valid and register guest session if needed
 	function check_session()
 	{
-		global $db;
-
 		$logout = 0;
 
-		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			// we know it's numeric, but doubly be sure and don't allow any html
 			$safe_id = (int) $_SESSION['user_id'];
 
 			// check if they actually have any saved sessions, if they don't then logout to cancel everything
 			// this is also if we need to remove everyone being logged in due to any security issues
-			$db->sqlquery("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", array($safe_id));
-			if ($db->num_rows() == 0)
+			$session_exists = $this->database->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [$safe_id])->fetch();
+			if (!$session_exists)
 			{
 				$logout = 1;
 			}
+			
+			$this->check_banned($_SESSION['user_id']);
+		}
+		else
+		{
+			if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']) && $user->stay_logged_in() == true)
+			{
+				header("Location: " . $_SERVER['REQUEST_URI']);
+			}
+			$this->make_guest_session();
 		}
 
 		if ($logout == 1)
 		{
-			self::logout();
-		}
-
-		// help prevent Session Fixation attacks
-		// Make sure we have a canary set
-		if (!isset($_SESSION['canary']))
-		{
-		    session_regenerate_id(true);
-		    $_SESSION['canary'] = time();
-		}
-		// Regenerate session ID every five minutes:
-		if ($_SESSION['canary'] < time() - 300)
-		{
-		    session_regenerate_id(true);
-		    $_SESSION['canary'] = time();
+			$this->logout();
+			return;
 		}
 	}
 
@@ -56,41 +63,36 @@ class user
 		
 		if (!empty($password))
 		{
-			$db->sqlquery("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
-			if ($db->num_rows() > 0)
+			// check username/email exists first
+			$info = $this->database->run("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
+			if ($info)
 			{
-				$info = $db->fetch();
-
+				// now check password matches
 				if (password_verify($password, $info['password']))
 				{
-					$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", array($username, $username));
+					$user_info = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
 
-					if ($db->num_rows() == 1)
+					$this->check_banned($user_info['user_id']);
+
+					$generated_session = md5(mt_rand() . $user_info['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
+					// update IP address and last login
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
+
+					$this->new_login($user_info, $generated_session);
+
+					if ($remember_username == 1)
 					{
-						$user_info = $db->fetch();
-
-						$this->check_banned($user_info);
-
-						$generated_session = md5(mt_rand() . $user_info['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
-						// update IP address and last login
-						$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
-
-						$this->new_login($user_info, $generated_session);
-
-						if ($remember_username == 1)
-						{
-							setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
-						}
-
-						if ($stay == 1)
-						{
-							setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', core::config('cookie_domain'));
-							setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
-						}
-
-						return true;
+						setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
 					}
+
+					if ($stay == 1)
+					{
+						setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', core::config('cookie_domain'));
+						setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
+					}
+
+					return true;
 				}
 
 				else
@@ -112,55 +114,59 @@ class user
 		}
 	}
 
-	public static function check_banned($user_data)
+	public function check_banned($user_id)
 	{
-		global $db;
-
 		$banned = 0;
 
 		// now check IP ban
-		$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-		if ($db->num_rows() == 1)
+		$check_ip = $this->database->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
+		if ($check_ip)
 		{
 			$banned = 1;
 		}
 
-		if ($user_data['banned'] == 1)
+		$banning_check = $this->database->run("SELECT `banned` FROM `users` WHERE `user_id` = ?", [$user_id])->fetchOne();
+			
+		if ($banning_check == 1)
 		{
 			$banned = 1;
 		}
 
 		if ($banned == 1)
 		{
-			setcookie('gol_stay', "",  time()-60, '/');
-			setcookie('gol_session', "",  time()-60, '/');
-			setcookie('gol-device', "",  time()-60, '/');
-
 			// update their ip in the user table
-			$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array(core::$ip, $user_data['user_id']));
+			$this->database->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $user_id]);
 
 			// search the ip list, if it's not on it then add it in
-			$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-			if ($db->num_rows() == 0)
+			$search_ips = $this->database->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
+			if (!$search_ips)
 			{
-				$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array(core::$ip));
+				$this->database->run("INSERT INTO `ipbans` SET `ip` = ?", [core::$ip]);
 			}
-
-			$_SESSION['message'] = 'banned';
-			if (core::config('pretty_urls') == 1)
-			{
-				header("Location: /home/");
-			}
-			else
-			{
-				header("Location: ".core::config('website_url')."index.php?module=home");
-			}
-			die();
+			
+			$this->logout(1);
 		}
+	}
+	
+	// need to implement this and do checks to only use it if not logging out or banned etc
+	function make_guest_session()
+	{
+		$_SESSION['user_id'] = 0;
+		$_SESSION['username'] = 'Guest'; // not even sure why I set this
+		$_SESSION['user_group'] = 4;
+		$_SESSION['secondary_user_group'] = 4;
+		$_SESSION['theme'] = 'default';
+		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
+		$_SESSION['articles-per-page'] = 15;
+		$_SESSION['forum_type'] = 'normal_forum';
+		$_SESSION['single_article_page'] = 0;
+		$_SESSION['timezone'] = 'UTC';
 	}
 
 	public static function register_session($user_data)
 	{
+		session_regenerate_id(true);
+		
 		$_SESSION['user_id'] = $user_data['user_id'];
 		$_SESSION['username'] = $user_data['username'];
 		$_SESSION['user_group'] = $user_data['user_group'];
@@ -169,7 +175,6 @@ class user
 		$_SESSION['new_login'] = 1;
 		$_SESSION['activated'] = $user_data['activated'];
 		$_SESSION['in_mod_queue'] = $user_data['in_mod_queue'];
-		$_SESSION['logged_in'] = 1;
 		$_SESSION['per-page'] = $user_data['per-page'];
 		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
 		$_SESSION['forum_type'] = $user_data['forum_type'];
@@ -187,9 +192,6 @@ class user
 		{
 			$_SESSION['timezone'] = $user_data['timezone'];
 		}
-
-		session_regenerate_id(true);
-		$_SESSION['canary'] = time();
 	}
 
 	// check if it's a new device, then set the session up
@@ -273,45 +275,15 @@ class user
 			// login then
 			$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
 			$user_data = $db->fetch();
+			
+			$this->check_banned($user_data['user_id']);
 
-			if ($user_data['banned'] == 0)
-			{
-				// now check IP ban
-				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-				if ($db->num_rows() == 1)
-				{
-					setcookie('gol_stay', "",  time()-60, '/');
-					$this->message = "banned";
-					return false;
-				}
+			// update IP address and last login
+			$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
 
-				else
-				{
-					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
+			self::register_session($user_data);
 
-					self::register_session($user_data);
-
-					return true;
-				}
-			}
-
-			else
-			{
-				setcookie('gol_stay', "",  time()-60, '/');
-
-				// update their ip in the user table
-				$db->sqlquery("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", array(core::$ip, $user_data['user_id']));
-
-				// search the ip list, if it's not on it then add it in
-				$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-				if ($db->num_rows() == 0)
-				{
-					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array(core::$ip));
-				}
-				$this->message = "banned";
-				return false;
-			}
+			return true;
 		}
 
 		else
@@ -320,13 +292,11 @@ class user
 		}
 	}
 
-	function logout()
+	function logout($banned = 0)
 	{
-		global $db;
-
 		if (isset($_COOKIE['gol-device']))
 		{
-			$db->sqlquery("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($_SESSION['user_id'], $_COOKIE['gol-device']));
+			$this->database->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", [$_SESSION['user_id'], $_COOKIE['gol-device']]);
 		}
 
 		// remove all session information
@@ -341,20 +311,22 @@ class user
 		
 		session_destroy();
 		
-		$_SESSION['timezone'] = 'UTC';
-		$_SESSION['per-page'] = core::config('default-comments-per-page');
-		$_SESSION['articles-per-page'] = 15;
-		$_SESSION['forum_type'] = 'normal_forum';
-		$_SESSION['single_article_page'] = 0;
+		session_start();
+		
+		session_regenerate_id(true);
+
 		setcookie('gol_stay', "",  time()-60, '/');
 		setcookie('gol_session', "",  time()-60, '/');
 		setcookie('gol-device', "",  time()-60, '/');
 		setcookie('steamID', '', -1, '/');
 
-		session_regenerate_id(true);
-		$_SESSION['canary'] = time();
-
-		header("Location: ".core::config('website_url')."index.php");
+		if ($banned == 1)
+		{
+			$_SESSION['message'] = 'banned';
+		}
+		
+		header("Location: ".core::config('website_url'));
+		die();
 	}
 
 	// check a users group to perform a certain task, can check two groups

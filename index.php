@@ -176,8 +176,11 @@ if (isset($_GET['user_id']))
 
 if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
 {
-	$templating->block('activation', 'mainpage');
-	$templating->set('url', core::config('website_url'));
+	if ( (isset($_SESSION['message']) && $_SESSION['message'] != 'new_account') || !isset($_SESSION['message']))
+	{
+		$templating->block('activation', 'mainpage');
+		$templating->set('url', core::config('website_url'));
+	}
 }
 
 $templating->block('left', 'mainpage');

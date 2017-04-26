@@ -59,7 +59,7 @@ class steam_user
 					// update IP address and last login
 					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
-					user::check_banned($userdata);
+					$user->check_banned($userdata['user_id']);
 
 					$generated_session = md5(mt_rand  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 

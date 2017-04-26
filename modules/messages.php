@@ -654,59 +654,30 @@ else
 
 			if ($email_data['email_on_pm'] == 1)
 			{
-				// sort out registration email
-				$to  = $email_data['email'];
-
 				// subject
-				$subject = 'New conversation started on GamingOnLinux.com';
+				$subject = 'New conversation started on ' . core::config('site_title');
 
 				$email_text = email_bbcode($text);
 
 				$message = '';
 
 				// message
-				$html_message = "
-				<html>
-				<head>
-				<title>New conversation started on GamingOnLinux.com</title>
-				</head>
-				<body>
-				<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-				<br />
-				<p>Hello <strong>{$email_data['username']}</strong>,</p>
-				<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
+				$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
+				<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"".core::config('website_url')."private-messages/\" target=\"_blank\">".core::config('site_title')."</a>, titled \"<a href=\"".core::config('website_url')."private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
 				<br style=\"clear:both\">
 				<div>
 				<hr>
-				{$email_text}
-				<hr>
-				<p>If you haven&#39;t registered at <a href=\"http://www.gamingonlinux.com\" target=\"_blank\">gamingonlinux.com</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-				</div>
-				</body>
-				</html>";
+				{$email_text}";
 
-				$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has started a new conversation with you on  http://www.gamingonlinux.com/private-messages, titled \"{$_POST['title']}\",\r\n{$_POST['text']}";
+				$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has started a new conversation with you on ".core::config('website_url')."private-messages/, titled \"{$_POST['title']}\",\r\n{$_POST['text']}";
 				$boundary = uniqid('np');
 
-				// To send HTML mail, the Content-type header must be set
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
-				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-				$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
-				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-				$message .= $plain_message;
-
-				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-				$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
-				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-				$message .= "$html_message";
-				$message .= "\r\n\r\n--" . $boundary . "--";
-
 				// Mail it
-				mail($to, $subject, $message, $headers);
+				if (core::config('send_emails') == 1)
+				{
+					$mail = new mail($email_data['email'], $subject, $html_message, $plain_message);
+					$mail->send();
+				}
 			}
 		}
 
@@ -863,60 +834,28 @@ else
 
 				if ($email_data['email_on_pm'] == 1)
 				{
-					// sort out registration email
-					$to  = $email_data['email'];
-
 					// subject
-					$subject = 'New reply to a conversation on GamingOnLinux.com';
+					$subject = 'New reply to a conversation on ' . core::config('site_title');
 
 					$email_text = email_bbcode($text);
 
-					$message = '';
-
 					// message
-					$html_message = "
-					<html>
-					<head>
-					<title>New reply to a conversation on GamingOnLinux.com</title>
-					</head>
-					<body>
-					<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-					<br />
-					<p>Hello <strong>{$email_data['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"http://www.gamingonlinux.com/private-messages/\" target=\"_blank\">gamingonlinux.com</a>, titled \"<a href=\"http://www.gamingonlinux.com/private-messages/{$_POST['conversation_id']}\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
+					$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"".core::config('website_url')."private-messages/\" target=\"_blank\">".core::config('site_title')."</a>, titled \"<a href=\"".core::config('website_url')."private-messages/{$_POST['conversation_id']}\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
 					<br style=\"clear:both\">
 					<div>
 				 	<hr>
-					{$email_text}
-			 		<hr>
-			  		<p>If you haven&#39;t registered at <a href=\"http://www.gamingonlinux.com\" target=\"_blank\">gamingonlinux.com</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-			  		<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-					</div>
-					</body>
-					</html>
-					";
+					{$email_text}";
 
-					$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has replied to a conversation with you on http://www.gamingonlinux.com/private-messages, titled \"{$last['title']}\",\r\n{$_POST['text']}";
+					$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has replied to a conversation with you on ".core::config('website_url')."private-messages/, titled \"{$last['title']}\",\r\n{$_POST['text']}";
 					$boundary = uniqid('np');
 
-					// To send HTML mail, the Content-type header must be set
-					$headers  = 'MIME-Version: 1.0' . "\r\n";
-					$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
-					$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-					$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-					$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
-					$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-					$message .= $plain_message;
-
-					$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-					$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
-					$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-					$message .= "$html_message";
-					$message .= "\r\n\r\n--" . $boundary . "--";
-
 					// Mail it
-					mail($to, $subject, $message, $headers);
+					if (core::config('send_emails') == 1)
+					{
+						$mail = new mail($email_data['email'], $subject, $html_message, $plain_message);
+						$mail->send();
+					}
 				}
 			}
 

@@ -125,24 +125,25 @@ $templating->block('top');
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 $templating->set('url', $core->config('website_url'));
 
-// april fools, because why not
-if (date('dm') == '0104' && date('H') < 14)
+$branding['icon'] = core::config('navbar_logo_icon');
+$branding['title'] = core::config('site_title');
+
+$icon_plugin = plugins::do_hooks('icon_hook');
+
+if (is_array($icon_plugin))
 {
-	$icon = 'windows_logo.png';
-	$site_title = 'Gaming On Windows 10';
+	if (isset($icon_plugin['icon']) && !empty($icon_plugin['icon']))
+	{
+		$branding['icon'] = $icon_plugin['icon'];
+	}
+	if (isset($icon_plugin['title']) && !empty($icon_plugin['title']))
+	{
+		$branding['title'] = $icon_plugin['title'];
+	}
 }
-else if (date('m') == '12')
-{
-	$icon = 'icon_xmas.png';
-	$site_title = $core->config('site_title');
-}
-else
-{
-	$icon = $core->config('navbar_logo_icon');
-	$site_title = $core->config('site_title');
-}
-$templating->set('icon', $icon);
-$templating->set('site_title', $site_title);
+
+$templating->set('icon', $branding['icon'] );
+$templating->set('site_title', $branding['title']);
 
 // Here we sort out what modules we are allowed to load, this also grabs links needed for the navbar
 core::load_modules(['db_table' => 'modules']);

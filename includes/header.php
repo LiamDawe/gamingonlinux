@@ -63,11 +63,10 @@ include($file_dir . '/includes/bbcode.php');
 // get user group permissions
 if (core::is_number($_SESSION['user_group']))
 {
-	$get_permissions = $db->sqlquery("SELECT `name`,`value` FROM `group_permissions` WHERE `group` = ?", array($_SESSION['user_group']));
-	$fetch_permissions = $db->fetch_all_rows();
+	$get_permissions = $dbl->run("SELECT `name`,`value` FROM `group_permissions` WHERE `group` = ?", [$_SESSION['user_group']])->fetch_all();
 
 	$parray = array();
-	foreach ($fetch_permissions as $permissions_set)
+	foreach ($get_permissions as $permissions_set)
 	{
 		$parray[$permissions_set['name']] = $permissions_set['value'];
 	}
@@ -76,8 +75,7 @@ if (core::is_number($_SESSION['user_group']))
 // check for gol premium
 if ($_SESSION['user_id'] != 0 && $user->check_group(6) == false)
 {
-	$db->sqlquery("SELECT `user_group`, `secondary_user_group` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-	$check_new_prem = $db->fetch();
+	$check_new_prem = $dbl->run("SELECT `user_group`, `secondary_user_group` FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
 
 	if ($check_new_prem['user_group'] == 6 || $check_new_prem['secondary_user_group'] == 6)
 	{
@@ -125,8 +123,8 @@ $templating->block('top');
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 $templating->set('url', $core->config('website_url'));
 
-$branding['icon'] = core::config('navbar_logo_icon');
-$branding['title'] = core::config('site_title');
+$branding['icon'] = $core->config('navbar_logo_icon');
+$branding['title'] = $core->config('site_title');
 
 $icon_plugin = plugins::do_hooks('icon_hook');
 
@@ -263,9 +261,7 @@ else if ($_SESSION['user_id'] > 0)
 	$alerts_counter = 0;
 
 	// sort out private message unread counter
-	$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", array($_SESSION['user_id']), 'header.php');
-	$unread_messages_counter = $db->num_rows();
-
+	$unread_messages_counter = $dbl->run("SELECT COUNT(`conversation_id`) FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", [$_SESSION['user_id']])->fetchOne();
 	if ($unread_messages_counter == 0)
 	{
 		$messages_indicator = 0;
@@ -278,27 +274,26 @@ else if ($_SESSION['user_id'] > 0)
 
 	// set these by default as comment notifications can be turned off
 	$new_comments_line = '';
-	$unread_comments_counter['counter'] = 0;
+	$unread_comments_counter = 0;
 	if (isset($_SESSION['display_comment_alerts']) && $_SESSION['display_comment_alerts'] == 1)
 	{
 		// sort out the number of unread comments
-		$db->sqlquery("SELECT count(`id`) as `counter` FROM `user_notifications` WHERE `seen` = 0 AND owner_id = ?", array($_SESSION['user_id']));
-		$unread_comments_counter = $db->fetch();
+		$unread_comments_counter = $dbl->run("SELECT count(`id`) as `counter` FROM `user_notifications` WHERE `seen` = 0 AND owner_id = ?", [$_SESSION['user_id']])->fetchOne();
 
-		if ($unread_comments_counter['counter'] == 0)
+		if ($unread_comments_counter == 0)
 		{
 			$comments_indicator = 0;
 		}
 
-		else if ($unread_comments_counter['counter'] > 0)
+		else if ($unread_comments_counter > 0)
 		{
-			$comments_indicator = '<span class="badge badge-important">'.$unread_comments_counter['counter'].'</span>';
+			$comments_indicator = '<span class="badge badge-important">'.$unread_comments_counter.'</span>';
 		}
 		$new_comments_line = '<li><a href="/usercp.php?module=notifications">'.$comments_indicator.' new notifications</a></li>';
 	}
 
 	// sort out the main navbar indicator
-	$alerts_counter = $unread_messages_counter + $unread_comments_counter['counter'] + $admin_notes;
+	$alerts_counter = $unread_messages_counter + $unread_comments_counter + $admin_notes;
 
 	// sort out the styling for the alerts indicator
 	$alerts_indicator = '';

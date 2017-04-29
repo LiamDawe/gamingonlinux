@@ -3,7 +3,7 @@ $file_dir = dirname(__FILE__);
 
 include($file_dir . '/includes/header.php');
 
-if (core::config('goty_page_open') == 0)
+if ($core->config('goty_page_open') == 0)
 {
 	if ($user->check_group([1,2,5]) == false)
 	{

@@ -951,9 +951,14 @@ function(data){
     $.post('/includes/ajax/claim_key.php', { 'giveaway_id':giveaway_id },
     function(data)
     {
+		console.log(data.result);
       if (data.result == 1)
       {
         $('#key-area').text("Here's your key: " + data.key);
+      }
+	  if (data.result == 3)
+      {
+        $('#key-area').text("You have to login to redeem a key!");
       }
     });
   });
@@ -1068,7 +1073,6 @@ function(data){
 	var label_inputs = $('.labels').length;
 	var colour_inputs = $('.colours').length;
 	var data_inputs = $('.data').length;
-	console.log('label inputs: ' + label_inputs);
 	// for the grouped charts admin section
 	$(document).on('click', "#add_label", function() 
 	{

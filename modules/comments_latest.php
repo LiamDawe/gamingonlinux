@@ -24,7 +24,7 @@ FROM
 INNER JOIN 
 	`articles` a ON c.article_id = a.article_id 
 LEFT JOIN 
-	users u ON u.user_id = c.author_id 
+	`".$dbl->table_prefix."users` u ON u.user_id = c.author_id 
 WHERE 
 	a.active = 1 ORDER BY `comment_id` DESC limit 20");
 while ($comments = $db->fetch())
@@ -37,7 +37,7 @@ while ($comments = $db->fetch())
 
 	//Warp sentenses at 150 char-ish. So it only get's cut at a whole word
 	//Now don't go and use the keyword "<!WRAP!>" in any comment please. It will break this thing
-	$text = wordwrap(remove_bbcode($text), 150, "<!WRAP!>", true);
+	$text = wordwrap($bbcode->remove_bbcode($text), 150, "<!WRAP!>", true);
 	if (strpos($text, "<!WRAP!>") !== FALSE) // Sometimes it's possible the comment was shorter then 150 char, it doesn't include the keyword then
 	{
 		$text = substr($text, 0, strpos($text, "<!WRAP!>"));

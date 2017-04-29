@@ -22,7 +22,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 				$db_grab_fields .= "{$field['db_field']},";
 			}
 
-			$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip`, `game_developer` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip`, `game_developer` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 			if ($db->num_rows() != 1)
 			{
 				$core->message('That person does not exist here!');
@@ -65,7 +65,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					$registered_date = $core->format_date($profile['register_date']);
 					$templating->set('registered_date', $registered_date);
 
-					$avatar = user::sort_avatar($profile);
+					$avatar = $user->sort_avatar($profile['user_id']);
 
 					$templating->set('avatar', $avatar);
 					$templating->set('article_comments', $profile['comment_count']);
@@ -135,7 +135,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						$templating->set('username', $profile['username']);
 
 						$fields_output = '';
-						$pc_info = user::display_pc_info($profile['user_id'], $profile['distro']);
+						$pc_info = $user->display_pc_info($profile['user_id'], $profile['distro']);
 						if ($pc_info['counter'] > 0)
 						{
 							foreach ($pc_info as $k => $info)
@@ -174,7 +174,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					if (!empty($profile['article_bio']))
 					{
 						$templating->block('bio', 'profile');
-						$templating->set('bio_text', bbcode($profile['article_bio']));
+						$templating->set('bio_text', $bbcode->parse_bbcode($profile['article_bio']));
 					}
 
 					$comment_posts = '';
@@ -200,7 +200,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 
 							$comment_posts .= "<li class=\"list-group-item\">
 						<a href=\"".$article_link."\">{$title}</a>
-						<div>".substr(strip_tags(bbcode($text)), 0, 63)."&hellip;</div>
+						<div>".substr(strip_tags($bbcode->parse_bbcode($text)), 0, 63)."&hellip;</div>
 						<small>{$date}</small>
 					</li>";
 						}
@@ -254,7 +254,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 		{
 			if (isset($_GET['user_id']) && is_numeric($_GET['user_id']))
 			{
-				$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$exists = $db->num_rows();
 				if ($exists == 1)
 				{
@@ -341,7 +341,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						<a href=\"".$view_comment_link."\">{$title}</a><br />
 						<small>{$date}" . $likes ."</small><br />
 						<hr />
-						<div>".bbcode($comments['comment_text'])."</div>
+						<div>".$bbcode->parse_bbcode($comments['comment_text'])."</div>
 						<hr />
 						<div><a href=\"".$view_comment_link."\">View this comment</a> - <a href=\"".$view_article_link."\">View article</a> - <a href=\"".$view_comments_full_link."\">View full comments</a></div>
 						</div></div>";

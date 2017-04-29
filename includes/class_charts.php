@@ -1,6 +1,9 @@
 <?php
 class golchart
 {
+	// the required db connection
+	private $database;
+	
 	private $chart_info;
 	private $labels_raw_data;
 	private $labels = [];
@@ -35,6 +38,11 @@ class golchart
 	private $get_labels_old;
 	private $chart_info_old;
 	private $y_axis_outline_y_start = 0;
+	
+	function __construct($database)
+	{
+		$this->database = $database;
+	}
 	
 	function setup($custom_options = NULL)
 	{
@@ -89,17 +97,15 @@ class golchart
 	
 	function get_chart($chart_id, $type = 'normal')
 	{
-		global $db;
-		
 		if ($type == 'normal')
 		{
-			$db->sqlquery("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped`, `enabled` FROM `charts` WHERE `id` = ?", array($chart_id));
+			$get_chart = $this->database->run("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped`, `enabled` FROM `charts` WHERE `id` = ?", [$chart_id]);
 		}
 		if ($type == 'stat_chart')
 		{
-			$db->sqlquery("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `grouped`, `enabled` FROM `user_stats_charts` WHERE `id` = ?", array($chart_id));
+			$get_chart = $this->database->run("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `grouped`, `enabled` FROM `user_stats_charts` WHERE `id` = ?", [$chart_id]);
 		}
-		$this->chart_info = $db->fetch();
+		$this->chart_info = $get_chart->fetch();
 	}
 	
 	function get_labels($chart_id, $labels_table, $data_table)
@@ -107,8 +113,7 @@ class golchart
 		global $db;
 		
 		// set the right labels to the right data
-		$db->sqlquery("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`data_series` FROM `".$labels_table."` l LEFT JOIN `".$data_table."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_id));
-		$this->labels_raw_data = $db->fetch_all_rows();
+		$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`data_series` FROM `".$labels_table."` l LEFT JOIN `".$data_table."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_id))->fetch_all();
 		
 		// if we are requesting the top 10, cut it down
 		$get_labels = $this->labels_raw_data;

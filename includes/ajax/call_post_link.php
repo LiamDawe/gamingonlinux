@@ -1,14 +1,17 @@
 <?php
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
+$db_conf = include $file_dir . '/includes/config.php';
+
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
 include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$core = new core($dbl, $file_dir);
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
-
+// setup the templating, if not logged in default theme, if logged in use selected theme
 include($file_dir . '/includes/class_template.php');
-$templating = new template('default');
+$templating = new template($core, $core->config('template'));
 
 if(isset($_GET['post_id']))
 {
@@ -20,14 +23,11 @@ if(isset($_GET['post_id']))
 	{
 		if ($_GET['type'] == 'comment')
 		{
-			$db->sqlquery("SELECT c.`comment_id`, a.`article_id`, a.`slug` FROM `articles_comments` c LEFT JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array($post_id));
-			$exists = $db->num_rows();
-			if ($exists == 1)
+			$permalink_info = $dbl->run("SELECT c.`comment_id`, a.`article_id`, a.`slug` FROM `articles_comments` c LEFT JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", [$post_id])->fetch();
+			if ($permalink_info)
 			{
-				$permalink_info = $db->fetch();
-				
 				include($file_dir . '/includes/class_article.php');
-				$article_class = new article_class();
+				$article_class = new article_class($dbl, $bbcode);
 				
 				$permalink = article_class::get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
 				$templating->set('permalink', $permalink);
@@ -40,12 +40,9 @@ if(isset($_GET['post_id']))
 		
 		if ($_GET['type'] == 'forum_topic')
 		{
-			$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `topic_id` = ?", array($post_id));
-			$exists = $db->num_rows();
-			if ($exists == 1)
+			$permalink_info = $dbl->run("SELECT `topic_id` FROM `forum_topics` WHERE `topic_id` = ?", [$post_id])->fetch();
+			if ($permalink_info)
 			{
-				$permalink_info = $db->fetch();
-				
 				include($file_dir . '/includes/class_forum.php');
 				$forum_class = new forum_class();
 				
@@ -60,12 +57,9 @@ if(isset($_GET['post_id']))
 		
 		if ($_GET['type'] == 'forum_reply')
 		{
-			$db->sqlquery("SELECT `topic_id`, `post_id` FROM `forum_replies` WHERE `post_id` = ?", array($post_id));
-			$exists = $db->num_rows();
-			if ($exists == 1)
+			$permalink_info = $db->sqlquery("SELECT `topic_id`, `post_id` FROM `forum_replies` WHERE `post_id` = ?", [$post_id])->fetch();
+			if ($permalink_info)
 			{
-				$permalink_info = $db->fetch();
-				
 				include($file_dir . '/includes/class_forum.php');
 				$forum_class = new forum_class();
 				

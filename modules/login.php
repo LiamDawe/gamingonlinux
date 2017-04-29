@@ -200,7 +200,7 @@ else if (isset($_POST['action']))
 	else if ($_POST['action'] == 'Send')
 	{
 		// check if user exists
-		$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['email']));
+		$db->sqlquery("SELECT `email` FROM `".$dbl->table_prefix."users` WHERE `email` = ?", array($_POST['email']));
 		if ($db->num_rows() == 0)
 		{
 			header("Location: ".core::config('website_url')."index.php?module=login&forgot&bademail");
@@ -278,7 +278,7 @@ else if (isset($_POST['action']))
 					$new_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
 					// new password
-					$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `email` = ?", array($new_password, $email));
+					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `password` = ? WHERE `email` = ?", array($new_password, $email));
 
 					// drop any previous requested
 					$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));

@@ -7,8 +7,6 @@ $core = new core($file_dir);
 include($file_dir . '/includes/class_mysql.php');
 $db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
 
-include($file_dir . '/includes/bbcode.php');
-
 // setup the templating, if not logged in default theme, if logged in use selected theme
 include($file_dir . '/includes/class_template.php');
 

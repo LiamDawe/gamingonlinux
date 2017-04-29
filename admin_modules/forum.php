@@ -243,7 +243,7 @@ if (isset($_GET['view']))
 
 		$templating->block('topic_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
+		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t LEFT JOIN `".$dbl->table_prefix."users` u ON t.author_id = u.user_id LEFT JOIN `".$dbl->table_prefix."users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('topic', 'admin_modules/admin_module_forum');
@@ -271,7 +271,7 @@ if (isset($_GET['view']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			$avatar = user::sort_avatar($topic);
+			$avatar = $user->sort_avatar($topic);
 
 			$templating->set('avatar', $avatar);
 
@@ -279,7 +279,7 @@ if (isset($_GET['view']))
 			$templating->set('topic_id', $topic['topic_id']);
 			$templating->set('forum_id', $topic['forum_id']);
 			$templating->set('author_id', $topic['author_id']);
-			$templating->set('post_text', bbcode($topic['topic_text'], 0));
+			$templating->set('post_text', $bbcode->parse_bbcode($topic['topic_text'], 0));
 			if ($topic['reported_by_id'] == 0)
 			{
 				$reported_by = "Guest";
@@ -312,7 +312,7 @@ if (isset($_GET['view']))
 
 		$templating->block('reply_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, t.forum_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON p.author_id = u.user_id LEFT JOIN `users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
+		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, t.forum_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `".$dbl->table_prefix."users` u ON p.author_id = u.user_id LEFT JOIN `".$dbl->table_prefix."users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('reply', 'admin_modules/admin_module_forum');
@@ -340,14 +340,14 @@ if (isset($_GET['view']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			$avatar = user::sort_avatar($topic);
+			$avatar = $user->sort_avatar($topic);
 
 			$templating->set('avatar', $avatar);
 
 			$templating->set('post_id', $topic['post_id']);
 			$templating->set('topic_id', $topic['topic_id']);
 			$templating->set('forum_id', $topic['forum_id']);
-			$templating->set('post_text', bbcode($topic['reply_text'], 0));
+			$templating->set('post_text', $bbcode->parse_bbcode($topic['reply_text'], 0));
 			if ($topic['reported_by_id'] == 0)
 			{
 				$reported_by = "Guest";

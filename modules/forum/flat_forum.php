@@ -36,7 +36,7 @@ $templating->set('new_topic', $new_topic);
 
 $forum_list = '';
 $forum_address = '';
-if (core::config('pretty_urls') == 1)
+if ($core->config('pretty_urls') == 1)
 {
 	$forum_address = '/forum/';
 }
@@ -86,20 +86,15 @@ SELECT
 	t.`last_post_id`,
 	f.name as forum_name,
 	u.`username`,
-	u2.`username` as username_last,
-	u.`avatar`,
-	u.`avatar_gravatar`,
-	u.`gravatar_email`,
-	u.`avatar_uploaded`,
-	u.`avatar_gallery`
+	u2.`username` as username_last
 FROM
 	`forum_topics` t
 INNER JOIN
 	`forums` f ON t.forum_id = f.forum_id
 INNER JOIN
-	`users` u ON t.author_id = u.user_id
+	".$core->db_tables['users']." u ON t.author_id = u.user_id
 LEFT JOIN
-	`users` u2 ON t.last_post_id = u2.user_id
+	".$core->db_tables['users']." u2 ON t.last_post_id = u2.user_id
 WHERE
 	t.`approved` = 1
 AND
@@ -108,9 +103,9 @@ ORDER BY
 	t.`last_post_date`
 DESC LIMIT ?, $comments_per_page";
 
-$db->sqlquery($sql, array($core->start));
+$get_topics = $dbl->run($sql, [$core->start])->fetch_all();
 
-while ($topics = $db->fetch())
+foreach ($get_topics as $topics)
 {
 	$templating->block('topics', 'flat_forum');
 
@@ -137,8 +132,8 @@ while ($topics = $db->fetch())
 		// the post we are going to
 		$postNumber = (($post_count - 1) % $rows_per_page) + 1;
 	}
-
-	$avatar = user::sort_avatar($topics);
+	
+	$avatar = $user->sort_avatar($topics['author_id']);
 
 	if (core::config('pretty_urls') == 1)
 	{

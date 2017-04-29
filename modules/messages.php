@@ -65,11 +65,11 @@ else
 		FROM
 			`user_conversations_info` i
 		INNER JOIN
-			`users` u ON u.`user_id` = i.`author_id`
+			`".$dbl->table_prefix."users` u ON u.`user_id` = i.`author_id`
 		INNER JOIN
 			user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id`
 		LEFT JOIN
-			`users` u2 ON u2.`user_id` = i.`last_reply_id`
+			`".$dbl->table_prefix."users` u2 ON u2.`user_id` = i.`last_reply_id`
 		WHERE
 			i.`owner_id` = ?
 		ORDER BY
@@ -192,7 +192,7 @@ else
 			include('includes/profile_fields.php');
 
 			// get usernames of everyone in this conversation
-			$db->sqlquery("SELECT u.`username`, u.`user_id` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.`user_id` = p.`participant_id` WHERE p.`conversation_id` = ?", array($_GET['id']));
+			$db->sqlquery("SELECT u.`username`, u.`user_id` FROM `".$dbl->table_prefix."users` u INNER JOIN `user_conversations_participants` p ON u.`user_id` = p.`participant_id` WHERE p.`conversation_id` = ?", array($_GET['id']));
 			$p_list = '';
 
 			$count_participants = $db->num_rows();
@@ -232,7 +232,7 @@ else
 				$db_grab_fields .= "u.`{$field['db_field']}`,";
 			}
 
-			$db->sqlquery("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']));
+			$db->sqlquery("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `".$dbl->table_prefix."users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']));
 			$start = $db->fetch();
 
 			$templating->block('view_row', 'private_messages');
@@ -244,14 +244,14 @@ else
 			$templating->set('text_plain', htmlspecialchars($start['message'], ENT_QUOTES));
 
 			// sort out the avatar
-			$avatar = user::sort_avatar($start);
+			$avatar = $user->sort_avatar($start);
 
 			$templating->set('avatar', $avatar);
 			$templating->set('username', $start['username']);
 			$cake_bit = $user->cake_day($start['register_date'], $start['username']);
 			$templating->set('cake_icon', $cake_bit);
 			$templating->set('user_id', $start['user_id']);
-			$templating->set('message_text', bbcode($start['message']));
+			$templating->set('message_text', $bbcode->parse_bbcode($start['message']));
 
 			$badges = user::user_badges($start, 1);
 			$templating->set('badges', implode(' ', $badges));
@@ -305,7 +305,7 @@ else
 			$templating->set('edit_link', $edit_link);
 
 			// replies
-			$get_replies = $db->sqlquery("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
+			$get_replies = $db->sqlquery("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN `".$dbl->table_prefix."users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
 			while ($replies = $get_replies->fetch())
 			{
 				$templating->block('view_row_reply', 'private_messages');
@@ -316,14 +316,14 @@ else
 				$templating->set('text_plain', htmlspecialchars($replies['message'], ENT_QUOTES));
 
 				// sort out the avatar
-				$avatar = user::sort_avatar($replies);
+				$avatar = $user->sort_avatar($replies);
 
 				$templating->set('avatar', $avatar);
 				$templating->set('username', $replies['username']);
 				$cake_bit = $user->cake_day($replies['register_date'], $replies['username']);
 				$templating->set('cake_icon', $cake_bit);
 				$templating->set('user_id', $replies['user_id']);
-				$templating->set('message_text', bbcode($replies['message']));
+				$templating->set('message_text', $bbcode->parse_bbcode($replies['message']));
 
 				$profile_fields_output = '';
 
@@ -415,7 +415,7 @@ else
 					$sql_ids[] = '?';
 				}
 				
-				$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $_SESSION['mto']);
+				$db->sqlquery("SELECT `user_id`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $_SESSION['mto']);
 				while ($check_to = $db->fetch())
 				{
 					$user_to .= '<option value="'.$check_to['user_id'].'" selected>'.$check_to['username'].'</option>';
@@ -429,7 +429,7 @@ else
 		if (isset($_GET['user']))
 		{
 			// find the username of the person requested
-			$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_id` = ?", array($_GET['user']));
+			$db->sqlquery("SELECT `user_id`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user']));
 			$user_info = $db->fetch();
 
 			$user_to = '<option value="'.$user_info['user_id'].'" selected>'.$user_info['username'].'</option>';
@@ -496,11 +496,11 @@ else
 		FROM
 			`user_conversations_info` i
 		INNER JOIN
-			`users` u ON u.`user_id` = i.`author_id`
+			`".$dbl->table_prefix."users` u ON u.`user_id` = i.`author_id`
 		INNER JOIN
 			user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id`
 		LEFT JOIN
-			`users` u2 ON u2.`user_id` = i.`last_reply_id`
+			`".$dbl->table_prefix."users` u2 ON u2.`user_id` = i.`last_reply_id`
 		WHERE
 			i.`owner_id` = ?
 		AND 
@@ -615,7 +615,7 @@ else
 			$sql_ids[] = '?';
 		}
 			
-		$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids);
+		$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `".$dbl->table_prefix."users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids);
 		$recepients_count = $db->fetch();
 
 		if ($recepients_count['count'] == 0)
@@ -649,7 +649,7 @@ else
 			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
 
 			// also while we are here, email each user to tell them they have a new convo
-			$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']));
+			$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']));
 			$email_data = $db->fetch();
 
 			if ($email_data['email_on_pm'] == 1)
@@ -657,7 +657,7 @@ else
 				// subject
 				$subject = 'New conversation started on ' . core::config('site_title');
 
-				$email_text = email_bbcode($text);
+				$email_text = $bbcode->email_bbcode($text);
 
 				$message = '';
 
@@ -829,7 +829,7 @@ else
 				$db->sqlquery("UPDATE `user_conversations_participants` SET `unread` = 1 WHERE `participant_id` = ? AND `conversation_id` = ?", array($person['participant_id'], $_POST['conversation_id']));
 
 				// also while we are here, email each user to tell them they have a new reply
-				$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($person['participant_id'], $_SESSION['user_id']));
+				$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ? AND `user_id` != ?", array($person['participant_id'], $_SESSION['user_id']));
 				$email_data = $db->fetch();
 
 				if ($email_data['email_on_pm'] == 1)
@@ -837,7 +837,7 @@ else
 					// subject
 					$subject = 'New reply to a conversation on ' . core::config('site_title');
 
-					$email_text = email_bbcode($text);
+					$email_text = $bbcode->email_bbcode($text);
 
 					// message
 					$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>

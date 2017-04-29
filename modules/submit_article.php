@@ -264,7 +264,7 @@ if (isset($_POST['act']))
 
                 $subject = core::config('site_title') . " article submission from {$username}";
 
-                $db->sqlquery("SELECT `email`, `username` FROM `users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5)");
+                $db->sqlquery("SELECT `email`, `username` FROM `".$dbl->table_prefix."users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5)");
                 while ($get_emails = $db->fetch())
                 {
                   // message
@@ -328,7 +328,7 @@ if (isset($_POST['act']))
         $templating->set('submitted_date', 'Submitted ' . $date);
 
         $text = htmlentities($_POST['text']);
-        $templating->set('text_full', bbcode($text));
+        $templating->set('text_full', $bbcode->parse_bbcode($text));
         $templating->set('article_link', '#');
         $templating->set('comment_count', '0');
 

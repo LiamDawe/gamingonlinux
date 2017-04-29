@@ -11,7 +11,7 @@ include($file_dir. '/includes/class_mysql.php');
 $db = new mysql($db_conf['host'], $db_conf['username'], $db_conf['password'], $db_conf['database']);
 
 include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password']);
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
 
 include($file_dir . '/includes/class_core.php');
 $core = new core($dbl, $file_dir);
@@ -22,8 +22,11 @@ $message_map = new message_map();
 include($file_dir . '/includes/class_plugins.php');
 $plugins = new plugins($dbl, $file_dir);
 
+include($file_dir . '/includes/bbcode.php');
+$bbcode = new bbcode($dbl, $core);
+
 include($file_dir . '/includes/class_article.php');
-$article_class = new article_class();
+$article_class = new article_class($dbl, $bbcode);
 
 include($file_dir . '/includes/class_forum.php');
 $forum_class = new forum_class();
@@ -48,17 +51,15 @@ include($file_dir . '/includes/class_template.php');
 
 $templating = new template($core, $core->config('template'));
 
-if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0 && $_SESSION['theme'] != 'default')
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
-	$theme = $_SESSION['theme'];
+	$theme = $user->get('theme', $_SESSION['user_id']);
 }
 
 else
 {
 	$theme = 'default';
 }
-
-include($file_dir . '/includes/bbcode.php');
 
 // get user group permissions
 if (core::is_number($_SESSION['user_group']))
@@ -75,7 +76,7 @@ if (core::is_number($_SESSION['user_group']))
 // check for gol premium
 if ($_SESSION['user_id'] != 0 && $user->check_group(6) == false)
 {
-	$check_new_prem = $dbl->run("SELECT `user_group`, `secondary_user_group` FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
+	$check_new_prem = $dbl->run("SELECT `user_group`, `secondary_user_group` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
 
 	if ($check_new_prem['user_group'] == 6 || $check_new_prem['secondary_user_group'] == 6)
 	{
@@ -247,7 +248,10 @@ else if ($_SESSION['user_id'] > 0)
 		$messages_html_link = $core->config('website_url') . "index.php?module=messages";
 	}
 	
-	$user_menu = $templating->store_replace($user_menu, array('avatar' => $_SESSION['avatar'], 'username' => $_SESSION['username'], 'profile_link' => $profile_link, 'admin_link' => $admin_link, 'url' => $core->config('website_url')));
+	$user_avatar = $user->sort_avatar($_SESSION['user_id']);
+	$username = $user->get('username', $_SESSION['user_id'])['username'];
+	
+	$user_menu = $templating->store_replace($user_menu, array('avatar' => $user_avatar, 'username' => $username, 'profile_link' => $profile_link, 'admin_link' => $admin_link, 'url' => $core->config('website_url')));
 	$templating->set('user_menu', $user_menu);
 
 	/* This section is for general user notifications, it covers:

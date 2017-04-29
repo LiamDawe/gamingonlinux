@@ -69,7 +69,7 @@ else
 			$db_grab_fields
 			f.`name` as `forum_name`
 			FROM `forum_topics` t
-			LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
+			LEFT JOIN `".$dbl->table_prefix."users` u ON t.`author_id` = u.`user_id`
 			INNER JOIN `forums` f ON t.`forum_id` = f.`forum_id`
 			WHERE t.`topic_id` = ? AND t.`approved` = 1", array($_GET['topic_id']));
 		if ($db->num_rows() != 1)
@@ -81,7 +81,7 @@ else
 		{
 			$topic = $db->fetch();
 
-			$remove_bbcode = remove_bbcode($topic['topic_text']);
+			$remove_bbcode = $bbcode->remove_bbcode($topic['topic_text']);
 			$rest = substr($remove_bbcode, 0, 70);
 
 			$templating->set_previous('title', "Viewing topic {$topic['topic_title']}", 1);
@@ -382,7 +382,7 @@ else
 					$templating->set('cake_icon', $cake_bit);
 
 					// sort out the avatar
-					$avatar = user::sort_avatar($topic);
+					$avatar = $user->sort_avatar($topic);
 					$templating->set('avatar', $avatar);
 
 					$badges = user::user_badges($topic, 1);
@@ -414,7 +414,7 @@ else
 					$templating->set('user_options', $user_options);
 
 					// do last to help prevent templating tags in user text getting replaced
-					$templating->set('post_text', bbcode($topic['topic_text'], 0));
+					$templating->set('post_text', $bbcode->parse_bbcode($topic['topic_text'], 0));
 				}
 
 				$reply_count = 0;
@@ -464,7 +464,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
+					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `".$dbl->table_prefix."users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
 					while ($post = $get_replies->fetch())
 					{
 						$templating->block('reply', 'viewtopic');
@@ -511,7 +511,7 @@ else
 
 						$templating->set('username', $into_username . $username);
 
-						$avatar = user::sort_avatar($post);
+						$avatar = $user->sort_avatar($post);
 						$templating->set('avatar', $avatar);
 
 						$badges = user::user_badges($post, 1);
@@ -555,7 +555,7 @@ else
 						$templating->set('post_link', $post_link);
 
 						$reply_count++;
-						$templating->set('post_text', bbcode($post['reply_text'], 0));
+						$templating->set('post_text', $bbcode->parse_bbcode($post['reply_text'], 0));
 					}
 				}
 
@@ -718,7 +718,7 @@ else
 
 								if (!isset($_SESSION['activated']))
 								{
-									$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+									$db->sqlquery("SELECT `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 									$get_active = $db->fetch();
 									$_SESSION['activated'] = $get_active['activated'];
 								}

@@ -57,6 +57,7 @@ if ($user->check_group(1) == true && core::config('show_debug') == 1)
 	$debug .= $db->queries;
 	$debug .= $dbl->debug_queries;
 	$debug .= print_r($_SESSION, true);
+	$debug .= 'Stored user details: ' . print_r($user->user_details, true);
 }
 $templating->set('debug', $debug);
 

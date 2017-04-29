@@ -37,7 +37,7 @@ if (!isset($_GET['go']))
 	$pagination = $core->pagination_link(10, $total_subs, "usercp.php?module=article_subscriptions&", $page);
 
 	// get the articles
-	$db->sqlquery("SELECT a.article_id, a.title, a.date, s.user_id, s.emails, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id LEFT JOIN `users` u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 10", array($_SESSION['user_id'], $core->start));
+	$db->sqlquery("SELECT a.article_id, a.title, a.date, s.user_id, s.emails, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id LEFT JOIN ".$core->db_tables['users']." u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 10", array($_SESSION['user_id'], $core->start));
 
 	while ($post = $db->fetch())
 	{

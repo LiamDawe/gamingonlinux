@@ -94,7 +94,7 @@ foreach ($blocks as $block)
 		}
 
 		$templating->set('block_title', $title);
-		$templating->set('block_content', bbcode($block['block_custom_content']));
+		$templating->set('block_content', $bbcode->parse_bbcode($block['block_custom_content']));
 	}
 }
 

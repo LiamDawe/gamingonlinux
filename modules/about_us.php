@@ -6,7 +6,7 @@ $templating->merge('about_us');
 $templating->block('top');
 $templating->set('about_text', core::config('about_text'));
 
-$db->sqlquery("SELECT `user_id`, `username`, `article_bio` FROM `users` WHERE `user_group` IN (1,2) ORDER BY `user_id`");
+$db->sqlquery("SELECT `user_id`, `username`, `article_bio` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (1,2) ORDER BY `user_id`");
 while ($editors = $db->fetch())
 {
 	if (!empty($editors['article_bio']))
@@ -14,7 +14,7 @@ while ($editors = $db->fetch())
 		$templating->block('row');
 		$templating->set('user_id', $editors['user_id']);
 		$templating->set('username', $editors['username']);
-		$templating->set('bio', bbcode($editors['article_bio']));
+		$templating->set('bio', $bbcode->parse_bbcode($editors['article_bio']));
 	}
 }
 ?>

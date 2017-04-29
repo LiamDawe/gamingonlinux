@@ -4,6 +4,9 @@ class core
 	// the database connection
 	public $database = null;
 	
+	// the user table information
+	public $db_tables = [];
+	
 	// the current date and time for the mysql
 	public static $date;
 	
@@ -46,6 +49,7 @@ class core
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
 		$this->database = $database;
+		$this->users_table();
 	}
 	
 	// check in_array for a multidimensional array
@@ -143,18 +147,24 @@ class core
 
 	function file_get_contents_curl($url) 
 	{
-	    $ch = curl_init();
-
+	    $ch = curl_init($url);
+	    
 	    curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
-	    curl_setopt($ch, CURLOPT_HEADER, 0);
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($ch, CURLOPT_URL, $url);
 	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-
+	    
 	    $data = curl_exec($ch);
-	    curl_close($ch);
-
-	    return $data;
+		
+		if (curl_getinfo ( $ch )['http_code'] != 200)
+		{
+			curl_close ( $ch );
+			return false;
+		} 
+		else 
+		{
+			curl_close ( $ch );
+			return $data;
+		}
 	}
 
 	// secure way of grabbing a remote image, for avatars
@@ -228,6 +238,24 @@ class core
 
 		// invalidate the cache
 		self::$config = array();
+	}
+	
+	function users_table()
+	{
+		if ($this->config('local_users') == 1)
+		{
+			$this->db_tables['users'] = '`'.$this->database->table_prefix.'users`';
+			$this->db_tables['session'] = '`'.$this->database->table_prefix.'saved_sessions`';
+			$this->db_tables['profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
+			$this->db_tables['user_groups'] = '`'.$this->database->table_prefix.'user_groups`';
+		}
+		else if ($this->config('local_users') == 0)
+		{
+			$this->db_tables['users'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'users`';
+			$this->db_tables['session'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'saved_sessions`';
+			$this->db_tables['profile_info'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_profile_info`';
+			$this->db_tables['user_groups'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_groups`';
+		}
 	}
 
 	function get_client_ip()

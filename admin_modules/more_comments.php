@@ -32,16 +32,16 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
 	$templating->set('pagination', $pagination);
 
-	$result = $db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
+	$result = $db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `".$dbl->table_prefix."users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
 	while ($commentsall = $result->fetch())
 	{
 		$templating->block('commentall', 'admin_modules/admin_module_more_comments');
 
 		// sort out the avatar
 		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-		$comment_avatar = user::sort_avatar($commentsall);
+		$comment_avatar = $user->sort_avatar($commentsall);
 
-		$commentall_text = bbcode($commentsall['text'], 0, 1);
+		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0, 1);
 		$dateall = $core->format_date($commentsall['date_posted']);
 		$templating->set('username', '<a href="/profiles/' . $commentsall['user_id'] . '">' . $commentsall['username'] . '</a>');
 		$templating->set('date', $dateall);
@@ -70,13 +70,13 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, core::$date));
 
-		$db->sqlquery("SELECT `username`, `email` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `username`, `email` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
 
 		while ($emailer = $db->fetch())
 		{
 			$subject = "A new editor area comment on GamingOnLinux.com";
 
-			$comment_email = email_bbcode($text);
+			$comment_email = $bbcode->email_bbcode($text);
 
 			// message
 			$html_message = "<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"" . core::config('website_url') . "admin.php\">editor panel</a>:</p>

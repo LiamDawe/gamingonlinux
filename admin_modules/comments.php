@@ -16,7 +16,7 @@ if (!isset($_GET['view']))
 	else
 	{
 		// get the article
-		$db->sqlquery("SELECT a.article_id, a.title, a.draft, a.text, a.tagline, a.date, a.submitted_unapproved, a.admin_review, a.date_submitted, a.author_id, a.active, a.guest_username, a.views, a.tagline_image, a.comments_open, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.avatar_gallery, u.article_bio, u.user_group, u.twitter_on_profile FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.article_id = ?", array($_GET['aid']), 'articles_full.php');
+		$db->sqlquery("SELECT a.article_id, a.title, a.draft, a.text, a.tagline, a.date, a.submitted_unapproved, a.admin_review, a.date_submitted, a.author_id, a.active, a.guest_username, a.views, a.tagline_image, a.comments_open, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.avatar_gallery, u.article_bio, u.user_group, u.twitter_on_profile FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u on a.author_id = u.user_id WHERE a.article_id = ?", array($_GET['aid']), 'articles_full.php');
 		$article = $db->fetch();
 
 		if ($db->num_rows() == 0)
@@ -137,12 +137,12 @@ if (!isset($_GET['view']))
 
 			if ($article_page == 1)
 			{
-				$templating->set('text', bbcode($article['text'], 1, 1, $tagline_bbcode) . $article_bottom);
+				$templating->set('text', $bbcode->parse_bbcode($article['text'], 1, 1, $tagline_bbcode) . $article_bottom);
 			}
 
 			else
 			{
-				$templating->set('text', bbcode($article['page'.$article_page], 1, 1, $tagline_bbcode) . $article_bottom);
+				$templating->set('text', $bbcode->parse_bbcode($article['page'.$article_page], 1, 1, $tagline_bbcode) . $article_bottom);
 			}
 
 			$pages = 1;
@@ -180,7 +180,7 @@ if (!isset($_GET['view']))
 			$templating->merge('admin_modules/admin_module_comments');
 			$templating->block('comments_top', 'admin_modules/admin_module_comments');
 
-			$db->sqlquery("SELECT a.*, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.avatar_gallery, u.steam, u.twitter_on_profile, u.website FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC", array($_GET['aid']));
+			$db->sqlquery("SELECT a.*, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.avatar_gallery, u.steam, u.twitter_on_profile, u.website FROM `articles_comments` a LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC", array($_GET['aid']));
 			while ($comments = $db->fetch())
 			{
 				// make date human readable
@@ -189,7 +189,7 @@ if (!isset($_GET['view']))
 				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
 				$quote_username = $comments['username'];
 
-				$comment_avatar = user::sort_avatar($comments);
+				$comment_avatar = $user->sort_avatar($comments);
 
 				$templating->block('review_comments', 'admin_modules/admin_module_comments');
 				$templating->set('user_id', $comments['author_id']);
@@ -197,7 +197,7 @@ if (!isset($_GET['view']))
 				$templating->set('plain_username', $quote_username);
 				$templating->set('comment_avatar', $comment_avatar);
 				$templating->set('date', $date);
-				$templating->set('text', bbcode($comments['comment_text'], 0));
+				$templating->set('text', $bbcode->parse_bbcode($comments['comment_text'], 0));
 				$templating->set('text_plain', $comments['comment_text']);
 				$templating->set('article_id', $_GET['aid']);
 				$templating->set('comment_id', $comments['comment_id']);
@@ -352,7 +352,7 @@ if (isset($_POST['act']))
 				}
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
+				$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `".$dbl->table_prefix."users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
 				$users_array = array();
 				while ($users = $db->fetch())
 				{
@@ -370,7 +370,7 @@ if (isset($_POST['act']))
 					// subject
 					$subject = 'New reply to editor review article "' . $title['title'] . '" on GamingOnLinux.com';
 
-					$comment_email = email_bbcode($comment);
+					$comment_email = $bbcode->email_bbcode($comment);
 
 					// message
 					$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>

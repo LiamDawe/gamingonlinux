@@ -25,7 +25,7 @@ if (core::$current_module['module_file_name'] == 'home')
 
 	if ($count_total == 1)
 	{
-		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> ''");
+		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> ''");
 		$featured = $db->fetch();
 	}
 	if ($count_total > 1)
@@ -41,7 +41,7 @@ if (core::$current_module['module_file_name'] == 'home')
 			$last_featured_sql = 'AND a.article_id != ?';
 		}
 
-		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
+		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
 		$featured = $db->fetch();
 
 		$_SESSION['last_featured_id'] = $featured['article_id'];
@@ -156,7 +156,7 @@ if ($count_announcements['count'] > 0)
 		if ($show == 1 || ($module_show == 1 && $group_show == 1))
 		{
 			$templating->block('announcement', 'announcements');
-			$templating->set('text', bbcode($announcement['text']));
+			$templating->set('text', $bbcode->parse_bbcode($announcement['text']));
 		}
 	}
 
@@ -168,7 +168,7 @@ if (isset($_GET['user_id']))
 {
 	if (!isset($_SESSION['activated']) && $_SESSION['user_id'] != 0)
 	{
-		$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 		$get_active = $db->fetch();
 		$_SESSION['activated'] = $get_active['activated'];
 	}
@@ -273,7 +273,7 @@ foreach ($blocks as $block)
 			}
 
 			$templating->set('block_title', $title);
-			$templating->set('block_content', bbcode($block['block_custom_content']));
+			$templating->set('block_content', $bbcode->parse_bbcode($block['block_custom_content']));
 		}
 	}
 }

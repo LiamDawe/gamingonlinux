@@ -26,7 +26,7 @@ if ($count_servers > 0)
 		}
 		$templating->set('badge', $badge);
 		
-		$templating->set('connection_info', bbcode($servers['connection_info']));
+		$templating->set('connection_info', $bbcode->parse_bbcode($servers['connection_info']));
 	}
 }
 else

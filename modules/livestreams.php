@@ -12,10 +12,12 @@ if ($user->check_group([1,2]))
 }
 $templating->set('edit_link', $edit_link);
 
+$user_timezone = $user->user_timezone($_SESSION['user_id']);
+
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'])
 {
 	$templating->block('submit', 'livestreams');
-	$timezones = core::timezone_list($_SESSION['timezone']);
+	$timezones = core::timezone_list($user_timezone);
 	$templating->set('timezones_list', $timezones);
 }
 
@@ -47,14 +49,14 @@ if ($db->num_rows() > 0)
 
 		$templating->set('title', $streams['title']);
 		
-		$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $_SESSION['timezone']));
-		$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $_SESSION['timezone']));
+		$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $user_timezone));
+		$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $user_timezone));
 
 		$countdown = '<span id="timer'.$streams['row_id'].'"></span><script type="text/javascript">var timer' . $streams['row_id'] . ' = moment.tz("'.$streams['date'].'", "UTC"); $("#timer'.$streams['row_id'].'").countdown(timer'.$streams['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
 		$templating->set('countdown', $countdown);
 
 		$streamer_list = '';
-		$db->sqlquery("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN users u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']));
+		$db->sqlquery("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `".$dbl->table_prefix."users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']));
 		$total_streamers = $db->num_rows();
 		$streamer_counter = 0;
 		while ($grab_streamers = $db->fetch())

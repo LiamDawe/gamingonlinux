@@ -37,7 +37,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	unset($_SESSION['gallery_tagline_filename']);
 
 	// email all editors apart from yourself
-	$db->sqlquery("SELECT `user_id`, `email`, `username` FROM `users` WHERE `user_group` IN (1,2) AND `user_id` != ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `user_id`, `email`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (1,2) AND `user_id` != ?", array($_SESSION['user_id']));
 	$users_array = array();
 	while ($email_users = $db->fetch())
 	{

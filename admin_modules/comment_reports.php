@@ -30,7 +30,7 @@ if (!isset($_GET['ip_id']))
 	/* get any spam reported comments in a paginated list here */
 	$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=comment_reports", $page);
 
-	$db->sqlquery("SELECT a.*, t.title, u.username, u.user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.register_date, u2.username as reported_by_username FROM `articles_comments` a INNER JOIN `articles` t ON a.article_id = t.article_id LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` u2 on a.spam_report_by = u2.user_id WHERE a.spam = 1 ORDER BY a.`comment_id` ASC LIMIT ?, 9", array($core->start));
+	$db->sqlquery("SELECT a.*, t.title, u.username, u.user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.register_date, u2.username as reported_by_username FROM `articles_comments` a INNER JOIN `articles` t ON a.article_id = t.article_id LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id LEFT JOIN `".$dbl->table_prefix."users` u2 on a.spam_report_by = u2.user_id WHERE a.spam = 1 ORDER BY a.`comment_id` ASC LIMIT ?, 9", array($core->start));
 	if ($db->num_rows() > 0)
 	{
 		while ($comments = $db->fetch())
@@ -54,7 +54,7 @@ if (!isset($_GET['ip_id']))
 			$templating->set('user_id', $comments['author_id']);
 			$templating->set('username', $username);
 			$templating->set('date', $date);
-			$templating->set('text', bbcode($comments['comment_text']));
+			$templating->set('text', $bbcode->parse_bbcode($comments['comment_text']));
 			$templating->set('reported_by', "<a href=\"/profiles/{$comments['spam_report_by']}\">{$comments['reported_by_username']}</a>");
 			$templating->set('comment_id', $comments['comment_id']);
 			$templating->set('article_title', $comments['title']);

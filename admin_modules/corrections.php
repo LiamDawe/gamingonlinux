@@ -23,7 +23,7 @@ $total_pages = $db->num_rows();
 /* get any spam reported comments in a paginated list here */
 $pagination = $core->pagination_link(9, $total_pages, "admin.php?module=corrections", $page);
 
-  $db->sqlquery("SELECT c.row_id, c.`article_id`, c.`user_id`, c.`correction_comment`, u.username, a.title FROM `article_corrections` c LEFT JOIN `users` u ON u.user_id = c.user_id LEFT JOIN `articles` a ON a.article_id = c.article_id ORDER BY c.`row_id` ASC LIMIT ?, 9", array($core->start));
+  $db->sqlquery("SELECT c.row_id, c.`article_id`, c.`user_id`, c.`correction_comment`, u.username, a.title FROM `article_corrections` c LEFT JOIN `".$dbl->table_prefix."users` u ON u.user_id = c.user_id LEFT JOIN `articles` a ON a.article_id = c.article_id ORDER BY c.`row_id` ASC LIMIT ?, 9", array($core->start));
   if ($db->num_rows() > 0)
   {
     while ($corrections = $db->fetch())

@@ -1,16 +1,18 @@
 <?php
 $file_dir = dirname(__FILE__);
 
+$db_conf = include $file_dir . '/includes/config.php';
+
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
 include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$core = new core($dbl, $file_dir);
 
-include($file_dir. '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir . '/includes/class_user.php');
+$user = new user($dbl, $core);
 
-include($file_dir . '/includes/class_template.php');
-$templating = new template(core::config('template'));
-
-if (core::config('forum_rss') == 1)
+if ($core->config('forum_rss') == 1)
 {
 	header('Content-Type: text/xml; charset=utf-8', true);
 	header("Cache-Control: max-age=3600");
@@ -26,22 +28,22 @@ if (core::config('forum_rss') == 1)
 	$xml->writeAttribute( 'xmlns:atom', 'http://www.w3.org/2005/Atom' );
 
 	$xml->startElement('channel');
-	$xml->writeElement('title', core::config('site_title') . ' Latest forum posts');
-	$xml->writeElement('link', core::config('website_url'));
-	$xml->writeElement('description', 'The latest forum posts from ' . core::config('site_title'));
+	$xml->writeElement('title', $core->config('site_title') . ' Latest forum posts');
+	$xml->writeElement('link', $core->config('website_url'));
+	$xml->writeElement('description', 'The latest forum posts from ' . $core->config('site_title'));
 	$xml->writeElement('pubDate', $now);
 	$xml->writeElement('language', 'en-us');
 	$xml->writeElement('lastBuildDate', $now);
 
 	$xml->startElement('atom:link');
-	$xml->writeAttribute('href', core::config('website_url') . 'forum_rss.php');
+	$xml->writeAttribute('href', $core->config('website_url') . 'forum_rss.php');
 	$xml->writeAttribute('rel', 'self');
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();
 
-	$db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC LIMIT 15");
+	$fetch_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC LIMIT 15")->fetch_all();
 
-	while ($line = $db->fetch())
+	foreach ($fetch_topics as $line)
 	{
 		$xml->startElement('item');
 		

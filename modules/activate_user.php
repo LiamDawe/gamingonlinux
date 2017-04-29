@@ -8,11 +8,11 @@ if (!isset($_GET['redo']))
 	}
 	else
 	{
-		$db->sqlquery("SELECT `user_id` FROM `users` WHERE `user_id` = ? AND `activation_code` = ?", array($_GET['user_id'], $_GET['code']));
+		$db->sqlquery("SELECT `user_id` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ? AND `activation_code` = ?", array($_GET['user_id'], $_GET['code']));
 		$count_rows = $db->num_rows();
 		if ($count_rows == 1)
 		{
-			$db->sqlquery("UPDATE `users` SET `activated` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `activated` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['activated'] = 1;
 			$_SESSION['message'] = 'activated';
@@ -28,7 +28,7 @@ if (!isset($_GET['redo']))
 
 else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 {
-	$db->sqlquery("SELECT `email`, `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `email`, `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$get_active = $db->fetch();
 
 	if ($get_active['activated'] == 0)
@@ -36,7 +36,7 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 		// make random registration code
 		$code = sha1(mt_rand(10000,99999).time().$_SESSION['user_id']);
 
-		$db->sqlquery("UPDATE `users` SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
 
 		// subject
 		$subject = 'Welcome to '.core::config('site_title').', activation needed!';

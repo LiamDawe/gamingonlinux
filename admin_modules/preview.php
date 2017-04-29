@@ -24,9 +24,9 @@ if (isset($_POST['check']))
 		u2.`username` as username_lock
 		FROM `articles` a
 		LEFT JOIN
-		users u1 ON u1.`user_id` = a.`author_id`
+		`".$dbl->table_prefix."users` u1 ON u1.`user_id` = a.`author_id`
 		LEFT JOIN
-		`users` u2 ON a.`locked_by` = u2.`user_id`
+		`".$dbl->table_prefix."users` u2 ON a.`locked_by` = u2.`user_id`
 		LEFT JOIN
 		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 		WHERE `article_id` = ?";
@@ -168,13 +168,13 @@ else if ((!isset($_SESSION['uploads_tagline']) || $_SESSION['uploads_tagline']['
 }
 $templating->set('top_image_nobbcode', $top_image_nobbcode);
 $templating->set('tagline', $_POST['tagline']);
-$templating->set('text_full', bbcode($_POST['text'], 1, 1, $tagline_bbcode, $bbcode_tagline_gallery));
+$templating->set('text_full', $bbcode->parse_bbcode($_POST['text'], 1, 1, $tagline_bbcode, $bbcode_tagline_gallery));
 $templating->set('article_link', '#');
 $templating->set('comment_count', '0');
 
 // sort out the avatar
 // either no avatar (gets no avatar from gravatars redirect) or gravatar set
-$db->sqlquery("SELECT `avatar`, `avatar_gravatar`, `gravatar_email`, `article_bio`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+$db->sqlquery("SELECT `avatar`, `avatar_gravatar`, `gravatar_email`, `article_bio`, `avatar_uploaded` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 $article_avatar = $db->fetch();
 
 if (empty($article_avatar['avatar']) || $article_avatar['avatar_gravatar'] == 1)
@@ -200,7 +200,7 @@ if (empty($article['article_bio']))
 }
 else
 {
-	$bio = bbcode($article['article_bio']);
+	$bio = $bbcode->parse_bbcode($article['article_bio']);
 }
 
 $templating->set('article_bio', $bio);

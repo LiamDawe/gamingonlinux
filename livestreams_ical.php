@@ -4,11 +4,13 @@ header('Content-Disposition: attachment; filename=calendar.ical');
 
 $file_dir = dirname(__FILE__);
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir. '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 // the iCal date format. Note the Z on the end indicates a UTC timestamp.
 define('DATE_ICAL', 'Ymd\THis\Z');
@@ -20,10 +22,10 @@ function escapeString($string) {
 
 $output = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nVERSION:2.0\r\nPRODID:-//Gaming On Linux//Livestream Calendar//EN\r\n";
 
-$db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `date_created`, `community_stream` FROM `livestreams` ORDER BY `date` ASC");
+$items = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `date_created`, `community_stream` FROM `livestreams` ORDER BY `date` ASC")->fetch_all();
 
 // loop over events
-while ($item = $db->fetch())
+foreach ($items as $item)
 {
 	$url = '';
 	if (!empty($item['link']))

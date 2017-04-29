@@ -10,12 +10,12 @@ if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION
 
 	else if (isset($_POST['no']))
 	{
-		header("Location: https://www.gamingonlinux.com");
+		header("Location: " . core::config('website_url'));
 	}
 
 	else if (isset($_POST['yes']))
 	{
-		$db->sqlquery("SELECT `user_id` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `user_id` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 		if ($db->num_rows() == 1)
 		{
 				$db->sqlquery("DELETE FROM `likes` WHERE `user_id` = ?", array($_SESSION['user_id']));

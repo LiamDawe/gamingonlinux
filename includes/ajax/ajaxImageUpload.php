@@ -1,14 +1,18 @@
 <?php
+session_start();
+
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 include($file_dir . '/includes/class_user.php');
-$user = new user();
+$user = new user($dbl, $core);
 $user->check_session();
 
 include_once($file_dir . '/includes/image_class/SimpleImage.php');
@@ -62,8 +66,8 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					{
 						$article_id = $_POST['article_id'];
 					}
-					$db->sqlquery("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?", array($image_name, $_SESSION['user_id'], core::$date, $article_id));
-					$image_id = $db->grab_id();
+					$new_image = $dbl->run("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?", [$image_name, $_SESSION['user_id'], core::$date, $article_id]);
+					$image_id = $new_image->new_id();
 
 					// if they aren't adding the image to an existing article, store it in the session
 					if (!isset($_POST['article_id']) || $_POST['article_id'] == 0)
@@ -73,12 +77,12 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						$_SESSION['uploads'][$image_id]['image_rand'] = $_SESSION['image_rand'];
 					}
 
-					$bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$image_name}[/img]";
+					$bbcode = "[img]" . $core->config('website_url') . "uploads/articles/article_images/{$image_name}[/img]";
 					$bbcode_thumb = "[img-thumb]{$image_name}[/img-thumb]";
 
 					echo "<div class=\"box\">
 					<div class=\"body group\">
-					<div id=\"{$image_id}\"><img src=\"" . core::config('website_url') . "uploads/articles/article_images/thumbs/$image_name\" class='imgList'><br />
+					<div id=\"{$image_id}\"><img src=\"" . $core->config('website_url') . "uploads/articles/article_images/thumbs/$image_name\" class='imgList'><br />
 					BBCode: <input id=\"img{$image_id}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /> <button class=\"btn\" data-clipboard-target=\"#img{$image_id}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button>
 					BBCode (thumbnail): <input id=\"img{$image_id}_thumb\" type=\"text\" class=\"form-control\" value=\"{$bbcode_thumb}\" /> <button class=\"btn\" data-clipboard-target=\"#img{$image_id}_thumb\">Copy</button> <button data-bbcode=\"{$bbcode_thumb}\" class=\"add_button\">Add to editor</button> <button id=\"{$image_id}\" class=\"trash\">Delete image</button>
 					</div>

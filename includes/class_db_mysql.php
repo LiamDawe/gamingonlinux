@@ -13,7 +13,9 @@ class db_mysql extends PDO
 	// store all the queries for debugging
 	public $debug_queries = '';
 	
-	public function __construct($dsn, $username, $password)
+	public $table_prefix = '';
+	
+	public function __construct($dsn, $username, $password, $table_prefix)
 	{
 		$options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -23,15 +25,24 @@ class db_mysql extends PDO
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
         ];
         parent::__construct($dsn, $username, $password, $options);
+        $this->table_prefix = $table_prefix;
 	}
 	
 	// the most basic query
     public function run($sql, $data = NULL)
     {
-        $this->stmt = $this->prepare($sql);
-        $this->stmt->execute($data);
-        $this->debug_queries .= '<pre>' . $this->stmt->interpolateQuery() . '</pre>';
-        return $this;
+		try
+		{
+			$this->stmt = $this->prepare($sql);
+			$this->stmt->execute($data);
+			$this->debug_queries .= '<pre>' . $this->stmt->interpolateQuery() . '</pre>';
+			return $this;
+        }
+        catch (PDOException $error)
+        {
+			echo  $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $this->stmt->interpolateQuery();
+			die();
+        }
     }
 	
 	// This is used for grabbing a single column, setting the data to it directly, so you don't have to call it again
@@ -64,7 +75,7 @@ class db_mysql extends PDO
 	// get the last auto made ID
 	public function new_id()
 	{
-		$this->result = $this->stmt->lastInsertId();
+		$this->result = $this->lastInsertId();
 		
 		return $this->result;
 	}

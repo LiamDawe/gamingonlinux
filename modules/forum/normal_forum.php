@@ -28,7 +28,7 @@ FROM
 LEFT JOIN
 	`forums` forum ON forum.parent_id = category.forum_id
 LEFT JOIN
-	`users` users ON forum.last_post_user_id = users.user_id
+	`".$dbl->table_prefix."users` users ON forum.last_post_user_id = users.user_id
 LEFT JOIN
 	`forum_topics` topic ON topic.topic_id = forum.last_post_topic_id
 WHERE

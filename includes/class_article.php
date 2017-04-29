@@ -1,6 +1,17 @@
 <?php
 class article_class
 {
+	// the required bbcode class
+	private $bbcode;
+	// the required db connection
+	private $database;
+	
+	function __construct($database, $bbcode)
+	{
+		$this->database = $database;
+		$this->bbcode = $bbcode;
+	}
+	
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
 	function reset_sessions()
 	{
@@ -236,23 +247,12 @@ class article_class
   }
 
 	// this function will check over everything necessary for an article to be correctly done
-	public static function check_article_inputs($return_page)
+	public function check_article_inputs($return_page)
 	{
-		global $db, $core;
+		global $core;
 
 		// if this is set to 1, we've come across an issue, so redirect
 		$redirect = 0;
-
-		// count how many editors picks we have
-		$editor_picks = array();
-
-		$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1");
-		while($editor_get = $db->fetch())
-		{
-			$editor_picks[] = $editor_get['article_id'];
-		}
-
-		$editor_pick_count = $db->num_rows();
 
 		$temp_tagline = 0;
 		if ( (!empty($_SESSION['uploads_tagline']['image_name']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand']) || (!empty($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand']))
@@ -262,8 +262,7 @@ class article_class
 
 		if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
 		{
-			$db->sqlquery("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-			$check_article = $db->fetch();
+			$check_article = $this->database->run("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 		}
 
 		$title = strip_tags($_POST['title']);
@@ -297,12 +296,12 @@ class article_class
 			$_SESSION['message'] = 'shorttagline';
 		}
 
-		else if (strlen($tagline) > core::config('tagline-max-length'))
+		else if (strlen($tagline) > $core->config('tagline-max-length'))
 		{
 			$redirect = 1;
 
 			$_SESSION['message'] = 'taglinetoolong';
-			$_SESSION['message_extra'] = core::config('tagline-max-length');
+			$_SESSION['message_extra'] = $core->config('tagline-max-length');
 		}
 
 		else if (strlen($title) < 10)
@@ -312,12 +311,12 @@ class article_class
 			$_SESSION['message'] = 'shorttitle';
 		}
 
-		else if (isset($_POST['show_block']) && $editor_pick_count == core::config('editor_picks_limit'))
+		else if (isset($_POST['show_block']) && $core->config('total_featured') == $core->config('editor_picks_limit'))
 		{
 			$redirect = 1;
 			
 			$_SESSION['message'] = 'editor_picks_full';
-			$_SESSION['message_extra'] = core::config('editor_picks_limit');
+			$_SESSION['message_extra'] = $core->config('editor_picks_limit');
 		}
 
 		// if it's an existing article, check tagline image
@@ -440,7 +439,7 @@ class article_class
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$db->sqlquery("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+					$db->sqlquery("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 					
 					$get_email_type = $db->fetch();
 					
@@ -473,7 +472,7 @@ class article_class
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$db->sqlquery("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+					$db->sqlquery("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefer."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 					
 					$get_email_type = $db->fetch();
 					
@@ -506,7 +505,7 @@ class article_class
 	function article_history($article_id)
 	{
 		global $db, $templating, $core;
-		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
+		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `".$this->database->table_prefix."users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
 		$history = '';
 		while ($grab_history = $db->fetch())
 		{
@@ -571,7 +570,7 @@ class article_class
 		if (isset($_POST['article_id']))
 		{
 			// check it hasn't been accepted already
-			$db->sqlquery("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `".$this->database->table_prefix."users` u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']));
 			$check_article = $db->fetch();
 			if ($check_article['active'] == 1)
 			{
@@ -581,7 +580,7 @@ class article_class
 		}
 			
 		// check everything is set correctly
-		$checked = self::check_article_inputs($options['return_page']);
+		$checked = $this->check_article_inputs($options['return_page']);
 			
 		// check if it's an editors pick
 		$editors_pick = 0;
@@ -705,7 +704,7 @@ class article_class
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("SELECT `email` FROM `".$this->database->table_prefix."users` WHERE `user_id` = ?", array($_POST['author_id']));
 				$author_email = $db->fetch();
 
 				// subject
@@ -794,7 +793,7 @@ class article_class
 		}
 	}
 	
-	public static function display_article_list($article_list, $get_categories)
+	public function display_article_list($article_list, $get_categories)
 	{
 		global $db, $templating, $core, $user;
 
@@ -889,7 +888,7 @@ class article_class
 			$templating->set('top_image', $tagline_image);
 
 			// set last bit to 0 so we don't parse links in the tagline
-			$templating->set('text', bbcode($article['tagline'], 1, 0));
+			$templating->set('text', $this->bbcode->parse_bbcode($article['tagline'], 1, 0));
 				
 			$templating->set('article_link', article_class::get_link($article['article_id'], $article['slug']));
 			$templating->set('comment_count', $article['comment_count']);

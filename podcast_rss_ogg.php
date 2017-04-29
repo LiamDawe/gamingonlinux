@@ -1,13 +1,13 @@
 <?php
 $file_dir = dirname(__FILE__);
 
+$db_conf = include $file_dir . '/includes/config.php';
+
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
 include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
-
-include($file_dir. '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
-
-include($file_dir . '/includes/bbcode.php');
+$core = new core($dbl, $file_dir);
 
 header("Content-Type: application/rss+xml");
 header("Cache-Control: max-age=3600");
@@ -31,9 +31,7 @@ $output = '<?xml version="1.0" encoding="UTF-8"?>
 <itunes:category text="Technology">
 </itunes:category>';
 
-$db->sqlquery("SELECT a.* FROM `articles` a LEFT JOIN `article_category_reference` c ON c.article_id = a.article_id WHERE a.`active` = 1 AND c.`category_id` = 97 ORDER BY a.`date` DESC LIMIT 15");
-
-$articles = $db->fetch_all_rows();
+$articles = $db->sqlquery("SELECT a.* FROM `articles` a LEFT JOIN `article_category_reference` c ON c.article_id = a.article_id WHERE a.`active` = 1 AND c.`category_id` = 97 ORDER BY a.`date` DESC LIMIT 15")->fetch_all();
 
 foreach ($articles as $line)
 {

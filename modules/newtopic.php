@@ -133,7 +133,7 @@ else
 					$options = '';
 				}
 				// see if we will allow them to make polls
-				$db->sqlquery("SELECT `in_mod_queue` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+				$db->sqlquery("SELECT `in_mod_queue` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 				$check_queue = $db->fetch();
 
 				if ($check_queue['in_mod_queue'] == 0)
@@ -227,7 +227,7 @@ else
 					else
 					{
 						// see if we need to add it into the mod queue
-						$db->sqlquery("SELECT `in_mod_queue` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+						$db->sqlquery("SELECT `in_mod_queue` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 						$check_queue = $db->fetch();
 
 						$approved = 1;
@@ -239,7 +239,7 @@ else
 						// update user post counter
 						if ($approved == 1)
 						{
-							$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
+							$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
 						}
 
 						// add the topic

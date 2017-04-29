@@ -31,11 +31,11 @@ else
 				{
 					if (isset($username) && !empty($username))
 					{
-						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `username` LIKE ?", array('%'.$username.'%'));
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `".$dbl->table_prefix."users` WHERE `username` LIKE ?", array('%'.$username.'%'));
 					}
 					if (isset($email) && !empty($email))
 					{
-						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `email` LIKE ?", array('%'.$email.'%'));
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `".$dbl->table_prefix."users` WHERE `email` LIKE ?", array('%'.$email.'%'));
 					}
 					$templating->block('search_row_top', 'admin_modules/users');
 					while ($search = $db->fetch())
@@ -51,7 +51,7 @@ else
 
 		if ($_GET['view'] == 'premium')
 		{
-			$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2) ORDER BY `premium-ends-date` ASC");
+			$db->sqlquery("SELECT `user_id`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2) ORDER BY `premium-ends-date` ASC");
 			$templating->block('premium_row_top');
 			while ($search = $db->fetch())
 			{
@@ -74,7 +74,7 @@ else
 			{
 				$templating->block('search','admin_modules/users');
 
-				$db->sqlquery("SELECT * FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT * FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$user_info = $db->fetch();
 
 				$templating->block('edituser', 'admin_modules/users');
@@ -248,11 +248,11 @@ else
 					$dev_check = 1;
 				}
 
-				$db->sqlquery("UPDATE `users` SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $_GET['user_id']));
+				$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $_GET['user_id']));
 
 				if ($user->check_group(1) == true)
 				{
-					$db->sqlquery("UPDATE `users` SET `user_group` = ?, `secondary_user_group` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['user_group'], $_POST['secondary_user_group'], $dev_check, $_GET['user_id']));
+					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `user_group` = ?, `secondary_user_group` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['user_group'], $_POST['secondary_user_group'], $dev_check, $_GET['user_id']));
 				}
 
 				// make sure they have a row for notes, if not add a new row otherwise edit
@@ -280,7 +280,7 @@ else
 
 		if ($_POST['act'] == 'ban')
 		{
-			$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 			$ban_info = $db->fetch();
 
 			if (!isset($_POST['yes']))
@@ -297,7 +297,7 @@ else
 
 				else
 				{
-					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'banned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
@@ -309,7 +309,7 @@ else
 
 		if ($_POST['act'] == 'unban')
 		{
-			$db->sqlquery("UPDATE `users` SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unbanned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
@@ -337,7 +337,7 @@ else
 
 		if ($_POST['act'] == 'totalban')
 		{
-			$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 			$ban_info = $db->fetch();
 
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
@@ -360,7 +360,7 @@ else
 
 				else
 				{
-					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_SESSION['ban_ip'], core::$sql_date_now));
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'total_ban', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
@@ -425,7 +425,7 @@ else
 		if ($_POST['act'] == 'deleteavatar')
 		{
 			// remove any old avatar if one was uploaded
-			$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 			$avatar = $db->fetch();
 
 			if ($avatar['avatar_uploaded'] == 1)
@@ -433,7 +433,7 @@ else
 				unlink('uploads/avatars/' . $avatar['avatar']);
 			}
 
-			$db->sqlquery("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'avatar';
@@ -455,7 +455,7 @@ else
 			else
 			{
 				// remove any old avatar if one was uploaded
-				$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$deleted_info = $db->fetch();
 
 				if ($deleted_info['avatar_uploaded'] == 1)
@@ -463,7 +463,7 @@ else
 					unlink('uploads/avatars/' . $deleted_info['avatar']);
 				}
 
-				$db->sqlquery("DELETE FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("DELETE FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['user_id']));
@@ -489,7 +489,7 @@ else
 			}
 			else
 			{
-				$db->sqlquery("SELECT `username`, `banned` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `username`, `banned` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$check_ban = $db->fetch();
 
 				if ($check_ban['banned'] !== "1")

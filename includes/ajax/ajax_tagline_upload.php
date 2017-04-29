@@ -1,11 +1,15 @@
 <?php
+session_start();
+
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 include_once($file_dir . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
@@ -66,7 +70,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			/* CHECK FILE SIZE
 			So we now know for sure it has the correct minimum dimensions, but is the filesize okay?
 			*/
-			if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
+			if (filesize($_FILES['photos2']['tmp_name']) > $core->config('max_tagline_image_filesize'))
 			{
 				// okay, so it's a rather big image you're trying to put up as a tagline image, let's make it no bigger than GOL's content area, as that would be utterly pointless
 				if ($img->getWidth() > 950)
@@ -86,7 +90,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					clearstatcache();
 
 					// if it's still too big, we should try compressing it
-					if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
+					if (filesize($_FILES['photos2']['tmp_name']) > $core->config('max_tagline_image_filesize'))
 					{
 						if( $img->getMimeType() == 'image/jpeg' || $img->getMimeType() == 'image/png' )
 						{
@@ -96,7 +100,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						clearstatcache();
 						
 						// if it's still too big, we should try compressing it
-						if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
+						if (filesize($_FILES['photos2']['tmp_name']) > $core->config('max_tagline_image_filesize'))
 						{
 							echo '<span class="imgList">File size too big, tried compressing it, but still too big!</span>';
 							return;
@@ -122,7 +126,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					clearstatcache();
 
 					// if it's still too big, we don't want to compress any further or it will look bad
-					if (filesize($_FILES['photos2']['tmp_name']) > core::config('max_tagline_image_filesize'))
+					if (filesize($_FILES['photos2']['tmp_name']) > $core->config('max_tagline_image_filesize'))
 					{
 						echo '<span class="imgList">File size too big, tried compressing it, but still too big!</span>';
 						return;
@@ -154,7 +158,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		$source = $_FILES['photos2']['tmp_name'];
 
 		// where to upload to
-		$target = core::config('path') . "uploads/articles/tagline_images/temp/" . $imagename;
+		$target = $core->config('path') . "uploads/articles/tagline_images/temp/" . $imagename;
 
 		// make the thumbnail, nice and small
 		$img->fromFile($_FILES['photos2']['tmp_name'])->resize(350, null)->toFile(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename);
@@ -164,8 +168,8 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			// replace any existing just-uploaded image
 			if (isset($_SESSION['uploads_tagline']))
 			{
-				unlink(core::config('path') . "uploads/articles/tagline_images/temp/" . $_SESSION['uploads_tagline']['image_name']);
-				unlink(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $_SESSION['uploads_tagline']['image_name']);
+				unlink($core->config('path') . "uploads/articles/tagline_images/temp/" . $_SESSION['uploads_tagline']['image_name']);
+				unlink($core->config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $_SESSION['uploads_tagline']['image_name']);
 			}
 
 			$_SESSION['uploads_tagline']['image_name'] = $imagename;
@@ -176,7 +180,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			unset($_SESSION['gallery_tagline_rand']);
 			unset($_SESSION['gallery_tagline_filename']);
 
-			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\" class='imgList'><br />";
+			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".$core->config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\" class='imgList'><br />";
 			echo "BBCode: <input type=\"text\" value=\"[img]tagline-image[/img]\" /><br />";
 			echo "<input type=\"hidden\" name=\"image_name\" value=\"{$imagename}\" />";
 			echo "<a href=\"#\" id=\"{$imagename}\" class=\"trash_tagline\">Delete Image</a></div>";

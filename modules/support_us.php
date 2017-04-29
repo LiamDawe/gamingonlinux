@@ -9,7 +9,7 @@ $templating->set('config_support_us_text', core::config('support_us_text'));
 $templating->block('list_top');
 
 // get supporter list Sorted by last login
-$res = $db->sqlquery("SELECT `username`, `user_id`, `avatar`, `gravatar_email`, `avatar_uploaded`,`avatar_gravatar`, `avatar_gallery`, `supporter_link` FROM `users` WHERE `secondary_user_group` IN (6,7) AND `user_group` != 1 AND `user_group` != 2 ORDER BY RAND() DESC LIMIT 9");
+$res = $db->sqlquery("SELECT `username`, `user_id`, `avatar`, `gravatar_email`, `avatar_uploaded`,`avatar_gravatar`, `avatar_gallery`, `supporter_link` FROM `".$dbl->table_prefix."users` WHERE `secondary_user_group` IN (6,7) AND `user_group` != 1 AND `user_group` != 2 ORDER BY RAND() DESC LIMIT 9");
 $templating->block('list_row_start');
 while ($rowuser = $res->fetch())
 {
@@ -18,7 +18,7 @@ while ($rowuser = $res->fetch())
 	$templating->set('user_id', $rowuser['user_id']);
 	$templating->set('username', $rowuser['username']);
 
-	$avatar = user::sort_avatar($rowuser);
+	$avatar = $user->sort_avatar($rowuser);
 	$templating->set('avatarurl', $avatar);
 
 	$supporter_link = '';

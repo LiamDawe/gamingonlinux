@@ -42,7 +42,7 @@ if(isset($_GET['user_id']))
       $templating->set('profile_link', $profile_link);
 
       $fields_output = '';
-      $pc_info = user::display_pc_info($_GET['user_id'], $grab_fields['distro']);
+      $pc_info = $user->display_pc_info($_GET['user_id'], $grab_fields['distro']);
       if ($pc_info['counter'] > 0)
       {
         foreach ($pc_info as $k => $info)

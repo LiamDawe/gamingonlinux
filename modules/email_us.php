@@ -86,7 +86,7 @@ if (isset($_POST['act']))
 			
 			$message = core::make_safe($_POST['message']);
 			
-			$html_message = '<p>' . $name . ' writes,</p>' . email_bbcode($_POST['message']);
+			$html_message = '<p>' . $name . ' writes,</p>' . $bbcode->email_bbcode($_POST['message']);
 			
 			// Mail it
             if (core::config('send_emails') == 1)
@@ -111,7 +111,7 @@ if (($_SESSION['user_id'] != 0) && (!isset($_GET['message']) || isset($_GET['mes
 {
 	$name = $_SESSION['username'];
 
-	$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `email` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$get_email = $db->fetch();
 
 	$email = $get_email['email'];

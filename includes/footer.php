@@ -48,7 +48,7 @@ $templating->set('social_icons', $social_output);
 
 // info for admins to see execution time and mysql queries per page
 $debug = '';
-if ($user->check_group(1) == true && core::config('show_debug') == 1)
+if ($user->check_group(1) && core::config('show_debug') == 1)
 {
 	$timer_end = microtime(true);
 	$time = number_format($timer_end - $timer_start, 3);

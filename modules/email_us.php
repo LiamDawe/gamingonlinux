@@ -30,7 +30,7 @@ if (isset($_POST['act']))
 
 	else
 	{
-		if ($parray['contact_captcha'] == 1)
+		if ($user->can('skip_contact_captcha') == 1)
 		{
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";

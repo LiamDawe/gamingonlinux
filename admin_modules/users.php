@@ -1,5 +1,5 @@
 <?php
-if ($user->check_group([1,2]) == false)
+if (!$user->check_group([1,2]))
 {
 	$core->message("You need to be an editor or an admin to access this section!", NULL, 1);
 }
@@ -51,11 +51,10 @@ else
 
 		if ($_GET['view'] == 'premium')
 		{
-			$db->sqlquery("SELECT `user_id`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2) ORDER BY `premium-ends-date` ASC");
+			$db->sqlquery("SELECT `user_id`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2)");
 			$templating->block('premium_row_top');
 			while ($search = $db->fetch())
 			{
-				$end_date = $core->normal_date($search['premium-ends-date']);
 				$templating->block('premium_row','admin_modules/users');
 				$templating->set('username', $search['username']);
 				$templating->set('user_id', $search['user_id']);
@@ -95,11 +94,10 @@ else
 				$templating->set('bio', $user_info['article_bio']);
 
 				$groups_list = '';
-				$users_groups = unserialize($user_info['user_groups']);
+				
+				$users_groups = $dbl->run("SELECT m.`group_id`, g.`group_name` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['user_groups']." g ON m.group_id = g.group_id WHERE m.`user_id` = ?", [$user_info['user_id']])->fetch_all();
 
-				$in = str_repeat('?,', count($users_groups) - 1) . '?';
-				$groups = $dbl->run("SELECT `group_name`, `group_id` FROM ".$core->db_tables['user_groups']." WHERE `group_id` IN ($in)", $users_groups)->fetch_all();
-				foreach($groups as $group)
+				foreach($users_groups as $group)
 				{
 					$groups_list .= "<option value=\"{$group['group_id']}\" selected>{$group['group_name']}</option>";
 				}
@@ -215,7 +213,7 @@ else
 			}
 			$templating->set('remote_check', $remote_group);
 			
-			$perms_access = unserialize($group['perms_access']);
+			$perms_access = explode(',',$group['perms_access']);
 			
 			$permission_rows = '';
 			foreach ($permissions as $perm)
@@ -263,11 +261,30 @@ else
 				{
 					$dev_check = 1;
 				}
+
+				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $dev_check, $_GET['user_id']));
 				
-				$user_groups = serialize($_POST['user_groups']);
+				// user group updating
+				$current_groups = $dbl->run("SELECT `group_id` FROM ".$core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_GET['user_id']])->fetch_all(PDO::FETCH_COLUMN);
 
-				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ?, `game_developer` = ?, `user_groups` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $dev_check, $user_groups, $_GET['user_id']));
-
+				// remove any groups no longer wanted
+				foreach ($current_groups as $key => $group)
+				{
+					if (!in_array($group, $_POST['user_groups']))
+					{
+						$dbl->run("DELETE FROM ".$core->db_tables['user_group_membership']." WHERE `user_id` = ? AND `group_id` = ?", [$_GET['user_id'], $group]);
+					}
+				}
+				
+				// add in any missing groups
+				foreach ($_POST['user_groups'] as $key => $group)
+				{
+					if (!in_array($group, $current_groups))
+					{
+						$dbl->run("INSERT INTO ".$core->db_tables['user_group_membership']." SET `user_id` = ?, `group_id` = ?", [$_GET['user_id'], $group]);
+					}
+				}
+					
 				// make sure they have a row for notes, if not add a new row otherwise edit
 				$db->sqlquery("SELECT `user_id` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']));
 				$user_count = $db->num_rows();
@@ -584,8 +601,8 @@ else
 			{
 				$remote = 1;
 			}
-
-			$perms_access = serialize($_POST['permissions']);
+			
+			$perms_access = implode(',',$_POST['permissions']);
 			
 			$dbl->run("UPDATE ".$core->db_tables['user_groups']." SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ?, `perms_access` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $perms_access, $_POST['group_id']]);
 			

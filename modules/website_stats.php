@@ -11,7 +11,7 @@ $templating->block('users');
 $templating->set('site_title', core::config('site_title'));
 $templating->set('total_users', number_format(core::config('total_users')));
 
-$count_new_users = $db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM `".$dbl->table_prefix."users` WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
+$count_new_users = $db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM ".$core->db_tables['users']." WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
 $count_monthly_users = $count_new_users->fetch();
 
 $templating->set('users_month', number_format($count_monthly_users['counter']));
@@ -40,7 +40,7 @@ if ($prev_month == 12)
 $last_month_start = mktime(0, 0, 0, $prev_month, 1, $year_selector);
 $now = time();
 
-$article_list = $db->sqlquery("SELECT COUNT( DISTINCT a.article_id ) AS `counter`, u.username, u.user_id, (SELECT `date` FROM `articles` WHERE author_id = a.author_id ORDER BY `article_id` DESC LIMIT 1) as last_date FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u ON u.user_id = a.author_id LEFT JOIN `article_category_reference` c ON a.`article_id` = c.`article_id`
+$article_list = $db->sqlquery("SELECT COUNT( DISTINCT a.article_id ) AS `counter`, u.username, u.user_id, (SELECT `date` FROM `articles` WHERE author_id = a.author_id ORDER BY `article_id` DESC LIMIT 1) as last_date FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u ON u.user_id = a.author_id LEFT JOIN `article_category_reference` c ON a.`article_id` = c.`article_id`
 WHERE a.`date` >= $last_month_start AND a.`date` <= $now AND a.`active` = 1 AND c.`category_id` NOT IN (63) AND a.author_id != 1844 GROUP BY u.`username` ORDER BY `counter` DESC, a.date DESC");
 
 $templating->block('articles', 'website_stats');

@@ -69,7 +69,7 @@ else
 			$db_grab_fields
 			f.`name` as `forum_name`
 			FROM `forum_topics` t
-			LEFT JOIN `".$dbl->table_prefix."users` u ON t.`author_id` = u.`user_id`
+			LEFT JOIN ".$core->db_tables['users']." u ON t.`author_id` = u.`user_id`
 			INNER JOIN `forums` f ON t.`forum_id` = f.`forum_id`
 			WHERE t.`topic_id` = ? AND t.`approved` = 1", array($_GET['topic_id']));
 		if ($db->num_rows() != 1)
@@ -464,7 +464,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `".$dbl->table_prefix."users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
+					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN ".$core->db_tables['users']." u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
 					while ($post = $get_replies->fetch())
 					{
 						$templating->block('reply', 'viewtopic');
@@ -718,7 +718,7 @@ else
 
 								if (!isset($_SESSION['activated']))
 								{
-									$db->sqlquery("SELECT `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+									$db->sqlquery("SELECT `activated` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
 									$get_active = $db->fetch();
 									$_SESSION['activated'] = $get_active['activated'];
 								}

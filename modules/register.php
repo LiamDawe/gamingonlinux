@@ -188,32 +188,31 @@ if (core::config('allow_registrations') == 1)
 					$code = sha1(mt_rand(10000,99999).time().$_POST['uemail']);
 					
 					$email = trim($_POST['uemail']);
-					
-					// gives them "Member" group
-					$new_user_group = 'a:1:{i:0;s:1:"3";}';
 
 					// register away
 					if ($_POST['register'] == 'Register')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_groups` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, $new_user_group, core::$ip, core::$date, core::$date, $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code, $_POST['timezone']));
 					}
 
 					if ($_POST['register'] == 'twitter')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `user_groups` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $new_user_group, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $_POST['timezone']));
 					}
 
 					if ($_POST['register'] == 'steam')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `user_groups` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, $new_user_group, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
 					}
 					
 					if ($_POST['register'] == 'google')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `user_groups` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_id` = ?, `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], $new_user_group, core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_id'], $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_id` = ?, `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_id'], $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
 					}
 
 					$last_id = $db->grab_id();
+					
+					$dbl->run("INSERT INTO ".$core->db_tables['user_group_membership']." SET `user_id` = ?, `group_id` = ?", [$last_id, 3]);
 
 					$db->sqlquery("INSERT INTO ".$core->db_tables['user_profile_info']." SET `user_id` = ?", array($last_id));
 

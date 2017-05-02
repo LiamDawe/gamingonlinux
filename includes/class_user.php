@@ -222,16 +222,22 @@ class user
 		// find the requested permission
 		$get_permission = $this->database->run("SELECT `id`, `name` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetch();
 
-		// first get the groups this user is in
-		$get_groups = $this->database->run("SELECT `user_groups` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", [$_SESSION['user_id']])->fetchOne();
-		$their_group_ids = unserialize($get_groups);
-		
-		$in = str_repeat('?,', count($their_group_ids) - 1) . '?';
+		if ($_SESSION['user_id'] > 0)
+		{
+			// first get the groups this user is in
+			$their_group_ids = $this->database->run("SELECT `group_id` FROM ".$this->core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
+
+			$in = str_repeat('?,', count($their_group_ids) - 1) . '?';
+		}
+		else
+		{
+			$their_group_ids = [0 => 4];
+			$in = '?';
+		}
 		
 		// get the group names for those IDS (we don't store them in case the group names change)
 		$users_groups = $this->database->run("SELECT `group_id`, `group_name`, `remote_group`, `perms_access` FROM ".$this->core->db_tables['user_groups']." WHERE `group_id` IN ($in)", $their_group_ids)->fetch_all();
 		
-		$user_group_ids = [];
 		// if we are using local users, remove any remote groups to check permissions on
 		if ($this->core->config('local_users') == 1)
 		{
@@ -248,7 +254,7 @@ class user
 		{
 			foreach ($users_groups as $key => $value)
 			{
-				if ($value['remote_group'])
+				if ($value['remote_group'] == 0)
 				{
 					unset($users_groups[$key]);
 				}
@@ -259,10 +265,10 @@ class user
 				}
 			}			
 		}
-		
+
 		foreach ($users_groups as $group)
 		{
-			$groups_permissions = unserialize($group['perms_access']);
+			$groups_permissions = explode(',',$group['perms_access']);
 			// at least one group they are in allows it, so let them in
 			if (is_array($groups_permissions) && in_array($get_permission['id'], $groups_permissions))
 			{
@@ -441,16 +447,21 @@ class user
 	// useful for seeing if they are an admin or editor to perform editing, deleting, publishing etc
 	function check_group($check_groups = NULL)
 	{
-		$their_groups = unserialize($this->get('user_groups', $_SESSION['user_id'])['user_groups']);
-		print_r($their_groups);
+		if ($_SESSION['user_id'] > 0)
+		{
+			$their_groups = $this->database->run("SELECT `group_id` FROM ".$this->core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
+		}
+		else
+		{
+			$their_groups = [0 => 4];
+		}
+		
 		if ( is_array($check_groups) )
 		{
 			foreach ($check_groups as $group)
 			{
-				echo $group;
 				if ( in_array($group, $their_groups) )
 				{
-					die('test');
 					return true;
 				}
 			}

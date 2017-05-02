@@ -5,7 +5,7 @@ if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION
 {
 	if (!isset($_POST['yes']) && !isset($_POST['no']))
 	{
-		$core->yes_no('Are you sure you want to unlike all comments and articles? CANNOT BE UNDONE', 'index.php?module=unlike_all');
+		$core->yes_no('Are you sure you want to unlike all comments and articles? THIS CANNOT BE UNDONE', 'index.php?module=unlike_all');
 	}
 
 	else if (isset($_POST['no']))
@@ -15,7 +15,7 @@ if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION
 
 	else if (isset($_POST['yes']))
 	{
-		$db->sqlquery("SELECT `user_id` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `user_id` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
 		if ($db->num_rows() == 1)
 		{
 				$db->sqlquery("DELETE FROM `likes` WHERE `user_id` = ?", array($_SESSION['user_id']));

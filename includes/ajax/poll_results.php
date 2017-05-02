@@ -1,29 +1,26 @@
 <?php
+session_start();
+
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 if($_POST)
 {
-    $db->sqlquery("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `poll_id` = ?", array($_POST['poll_id']));
-    $grab_poll = $db->fetch();
+	$grab_poll = $dbl->run("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `poll_id` = ?", array($_POST['poll_id']))->fetch();
 
-    $db->sqlquery("SELECT `option_id`, `option_title`, `votes` FROM `poll_options` WHERE `poll_id` = ? ORDER BY `votes` DESC", array($grab_poll['poll_id']));
-    $options = $db->fetch_all_rows();
+	$options =  $dbl->run("SELECT `option_id`, `option_title`, `votes` FROM `poll_options` WHERE `poll_id` = ? ORDER BY `votes` DESC", array($grab_poll['poll_id']))->fetch_all();
 
     // see if they voted to make their option have a star * by the name
-    if (isset($_SESSION['user_id']))
+    if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
     {
-        if ($_SESSION['user_id'] != 0)
-        {
-            $db->sqlquery("SELECT `user_id`, `option_id` FROM `poll_votes` WHERE `user_id` = ? AND `poll_id` = ?", array($_SESSION['user_id'], $_POST['poll_id']));
-            $check_voted = $db->num_rows();
-            $get_user = $db->fetch();
-        }
+		$get_user = $dbl->run("SELECT `user_id`, `option_id` FROM `poll_votes` WHERE `user_id` = ? AND `poll_id` = ?", array($_SESSION['user_id'], $_POST['poll_id']))->fetch();
     }
 
     $total_votes = 0;
@@ -56,25 +53,25 @@ if($_POST)
         $star = '';
     }
 
-    if ($check_voted == 0 && $grab_poll['poll_open'] == 1)
+    if (empty($get_user) && $grab_poll['poll_open'] == 1)
     {
         $results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="pollresults" class="back_vote_button poll_button" data-poll-id="'.$grab_poll['poll_id'].'">Back to voting</button></li></ul>';
     }
 
-    if ($grab_poll['poll_open'] == 1)
+	if ($grab_poll['poll_open'] == 1)
     {
-      if ($_SESSION['user_id'] == $grab_poll['author_id'])
-      {
-        $results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="closepoll" class="close_poll poll_button" data-poll-id="'.$grab_poll['poll_id'].'">Close Poll</button></li></ul>';
-      }
-    }
+		if ($_SESSION['user_id'] == $grab_poll['author_id'])
+		{
+			$results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="closepoll" class="close_poll poll_button" data-poll-id="'.$grab_poll['poll_id'].'">Close Poll</button></li></ul>';
+		}
+	}
 
     if ($grab_poll['poll_open'] == 0)
     {
-      if ($_SESSION['user_id'] == $grab_poll['author_id'])
-      {
-        $results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="openpoll" class="open_poll poll_button" data-poll-id="'.$grab_poll['poll_id'].'">Open Poll</button></li></ul>';
-      }
+		if ($_SESSION['user_id'] == $grab_poll['author_id'])
+		{
+			$results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="openpoll" class="open_poll poll_button" data-poll-id="'.$grab_poll['poll_id'].'">Open Poll</button></li></ul>';
+		}
     }
 
     echo $results;

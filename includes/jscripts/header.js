@@ -886,24 +886,25 @@ jQuery(document).ready(function()
 
 $(".poll_content").on("click", ".open_poll", function()
 {
-  var poll_id = $(this).data('poll-id');
-$.post('/includes/ajax/open_poll.php', {'poll_id':poll_id},
-function(data){
-   if (data.result == 1)
- {
-   $('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
-    window.alert("Poll opened!");
-   }
-   else if (data.result == 2)
-   {
-     $('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
-      window.alert("Poll opened!");
-   }
- else if (data.result == 3)
- {
-   window.alert("Sorry, I am unable to do that.");
- }
-});
+	var poll_id = $(this).data('poll-id');
+	$.post('/includes/ajax/open_poll.php', {'poll_id':poll_id},
+	function(data)
+	{
+		if (data.result == 1)
+		{
+			$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
+			window.alert("Poll opened!");
+		}
+		else if (data.result == 2)
+		{
+			$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
+			window.alert("Poll opened!");
+		}
+		else if (data.result == 3)
+		{
+			window.alert("Sorry, I am unable to do that.");
+		}
+	});
 });
 
   $(".poll_content").on("click", ".results_button", function(){
@@ -937,10 +938,11 @@ function(data){
 
   });
 
-  $(".poll_content").on("click", ".back_vote_button", function(){
-  	var poll_id = $(this).data('poll-id');
-  	$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
-  });
+	$(".poll_content").on("click", ".back_vote_button", function()
+	{
+		var poll_id = $(this).data('poll-id');
+		$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
+	});
 
   // claim a key from bbcode key giveaway
   $(document).on('click', '#claim_key', function(e)

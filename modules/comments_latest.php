@@ -24,7 +24,7 @@ FROM
 INNER JOIN 
 	`articles` a ON c.article_id = a.article_id 
 LEFT JOIN 
-	`".$dbl->table_prefix."users` u ON u.user_id = c.author_id 
+	".$core->db_tables['users']." u ON u.user_id = c.author_id 
 WHERE 
 	a.active = 1 ORDER BY `comment_id` DESC limit 20");
 while ($comments = $db->fetch())

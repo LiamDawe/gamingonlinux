@@ -50,7 +50,7 @@ if (!isset($_GET['go']))
 				u.`twitter_on_profile`
 				FROM `articles` a
 				LEFT JOIN
-				`".$dbl->table_prefix."users` u on a.`author_id` = u.`user_id`
+				".$core->db_tables['users']." u on a.`author_id` = u.`user_id`
 				LEFT JOIN
 				`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 				WHERE
@@ -302,8 +302,9 @@ if (!isset($_GET['go']))
 					$article_page = $_GET['article_page'];
 				}
 
+				$user_single_page_article = $user->get('single_article_page', $_SESSION['user_id'])['single_article_page'];
 				// sort out the pages and pagination and only return the page requested
-				if ($_SESSION['single_article_page'] == 0)
+				if ($user_single_page_article == 0)
 				{
 					$pages_array = explode('<*PAGE*>', $article['text']);
 					$article_page_count = count($pages_array);
@@ -566,7 +567,7 @@ if (!isset($_GET['go']))
 						$per_page = $_SESSION['per-page'];
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id LEFT JOIN `".$dbl->table_prefix."users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $_GET['aid'], $core->start, $per_page));
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id LEFT JOIN ".$core->db_tables['users']." ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $_GET['aid'], $core->start, $per_page));
 					$comments_get = $db->fetch_all_rows();
 					
 					// make an array of all comment ids to search for likes (instead of one query per comment for likes)
@@ -816,7 +817,7 @@ if (!isset($_GET['go']))
 							{
 								if (!isset($_SESSION['activated']))
 								{
-									$db->sqlquery("SELECT `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
+									$db->sqlquery("SELECT `activated` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
 									$get_active = $db->fetch();
 									$_SESSION['activated'] = $get_active['activated'];
 								}
@@ -1081,7 +1082,7 @@ else if (isset($_GET['go']))
 							$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
 
 							// update the posting users comment count
-							$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
+							$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
 
 							// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 							$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article_id));
@@ -1118,7 +1119,7 @@ else if (isset($_GET['go']))
 								{
 									if ($match != $_SESSION['username'])
 									{
-										$db->sqlquery("SELECT `user_id` FROM `".$dbl->table_prefix."users` WHERE `username` = ?", array($match));
+										$db->sqlquery("SELECT `user_id` FROM ".$core->db_tables['users']." WHERE `username` = ?", array($match));
 										if ($db->num_rows() == 1)
 										{
 											$quoted_user = $db->fetch();
@@ -1133,7 +1134,7 @@ else if (isset($_GET['go']))
 							- Make an array of anyone who needs an email now
 							- Additionally, send a notification to anyone subscribed
 							*/
-							$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `".$dbl->table_prefix."users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']));
+							$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']));
 							$users_array = array();
 							$users_to_email = $db->fetch_all_rows();
 							foreach ($users_to_email as $email_user)
@@ -1410,7 +1411,7 @@ else if (isset($_GET['go']))
 			$templating->set_previous('title', 'Reporting a comment', 1);
 
 			// show the comment they are reporting
-			$db->sqlquery("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN `".$dbl->table_prefix."users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
+			$db->sqlquery("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN ".$core->db_tables['users']." u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
 			$comment = $db->fetch();
 			$templating->block('report', 'articles_full');
 			$templating->set('text', $bbcode->parse_bbcode($comment['comment_text']));

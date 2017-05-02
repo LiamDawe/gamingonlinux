@@ -1,0 +1,36 @@
+[block: start_top]
+<div class="box"><div class="head">Manage User Groups &amp; Permissions</div></div>
+[/block: start_top]
+
+[block: group_row]
+<div class="box"><div class="body group"><a href="admin.php?module=users&view=edit_group&id={:id}">{:name}</a></div></div>
+[/block: group_row]
+
+[block: group_edit]
+<ul class="breadcrumb">
+	<li><a href="admin.php?module=users&view=groups">User Groups</a></li>
+	<li class="active">{:name}</li>
+</ul>
+<div class="box">
+	<div class="head">Main info</div>
+	<div class="body group">
+	<form method="post" action="admin.php?module=users">
+	Name: <input type="text" name="name" value="{:name}" /><br />
+	<label><input type="checkbox" name="show_badge" {:badge_check} /> Show badge?</label>
+	Badge Colour: <input type="text" name="badge_colour" value="{:colour}" /><br />
+	Badge Text: <input type="text" name="badge_text" value="{:badge_text}" /><br />
+	<label><input type="checkbox" name="remote_group" {:remote_check} /> Remote group?</label><br />
+	</div>
+	<div class="head">Permissions</div>
+	{:permissions_list}
+</div>
+[/block: group_edit]
+
+[block: permission_row]
+<div class="body group"><label><input type="checkbox" name="permissions[]" value="{:permission_id}" {:checked} /> {:permission_name}</label></div>
+[/block: permission_row]
+
+[block: group_bottom]
+<div class="box"><div class="body group"><input type="hidden" name="group_id" value="{:group_id}" /> <button type="submit" name="act" value="edit_group">Update Group</button></div></div>
+</form>
+[/block: group_bottom]

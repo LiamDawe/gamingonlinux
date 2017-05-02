@@ -5,8 +5,7 @@ $file_dir = dirname(__FILE__);
 
 include($file_dir . '/includes/header.php');
 
-// stop anyone not allowed in
-if ($parray['access_admin'] == 0)
+if (!$user->can('access_admin'))
 {
 	$templating->set_previous('title', 'No Access', 1);
 	$core->message('You do not have permissions to view this page! <a href="index.php" class="white-link">Please click here to return to the home page</a>.', NULL, 1);

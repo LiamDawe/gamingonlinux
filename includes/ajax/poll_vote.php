@@ -1,29 +1,33 @@
 <?php
+session_start();
+
 header('Content-Type: application/json');
 
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 if($_POST)
 {
 	// make sure the poll is open
-	$db->sqlquery("SELECT `poll_open` FROM `polls` WHERE `poll_id` = ?", array($_POST['poll_id']));
-	if ($db->num_rows() == 1)
+	$open = $dbl->run("SELECT `poll_open` FROM `polls` WHERE `poll_id` = ?", array($_POST['poll_id']))->fetchOne();
+	if ($open == 1)
 	{
 		// make sure they haven't voted already
-		$db->sqlquery("SELECT `user_id` FROM `poll_votes` WHERE `poll_id` = ? AND `user_id` = ?", array($_POST['poll_id'], $_SESSION['user_id']));
-		if ($db->num_rows() == 0)
+		$voted = $dbl->run("SELECT `user_id` FROM `poll_votes` WHERE `poll_id` = ? AND `user_id` = ?", array($_POST['poll_id'], $_SESSION['user_id']))->fetchOne();
+		if (!$voted)
 		{
 			// add their vote in
-			$db->sqlquery("INSERT INTO `poll_votes` SET `poll_id` = ?, `option_id` = ?, `user_id` = ?", array($_POST['poll_id'], $_POST['option_id'], $_SESSION['user_id']));
+			$dbl->run("INSERT INTO `poll_votes` SET `poll_id` = ?, `option_id` = ?, `user_id` = ?", array($_POST['poll_id'], $_POST['option_id'], $_SESSION['user_id']));
 
 			// add to the total of this option
-			$db->sqlquery("UPDATE `poll_options` SET `votes` = (votes + 1) WHERE `option_id` = ?", array($_POST['option_id']));
+			$dbl->run("UPDATE `poll_options` SET `votes` = (votes + 1) WHERE `option_id` = ?", array($_POST['option_id']));
 
 			echo json_encode(array("result" => 1));
 			return;

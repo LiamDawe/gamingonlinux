@@ -191,7 +191,7 @@ if (isset($view))
 			u.`username`
 			FROM `article_category_reference` r
 			JOIN `articles` a ON a.`article_id` = r.`article_id`
-			LEFT JOIN `".$dbl->table_prefix."users` u on a.`author_id` = u.`user_id`
+			LEFT JOIN ".$core->db_tables['users']." u on a.`author_id` = u.`user_id`
 			LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 			WHERE $cat_sql AND a.`active` = 1
 			GROUP BY r.`article_id` $all_sql

@@ -308,7 +308,6 @@ else if (isset($_POST['act']))
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;
-		$_SESSION['single_article_page'] = $single_article_page;
 		
 		$db_grab_fields = '';
 		foreach ($profile_fields as $field)

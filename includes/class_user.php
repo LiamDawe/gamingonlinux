@@ -159,7 +159,6 @@ class user
 		$_SESSION['secondary_user_group'] = 4;
 		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
-		$_SESSION['single_article_page'] = 0;
 	}
 	
 	// helper func to get a user field(s)
@@ -216,6 +215,64 @@ class user
 		}
 	}
 	
+	// check if a user is able to do something
+	// possibly update this, to check for needing to add in a usergroup name prefix?
+	function can($do)
+	{
+		// find the requested permission
+		$get_permission = $this->database->run("SELECT `id`, `name` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetch();
+
+		// first get the groups this user is in
+		$get_groups = $this->database->run("SELECT `user_groups` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", [$_SESSION['user_id']])->fetchOne();
+		$their_group_ids = unserialize($get_groups);
+		
+		$in = str_repeat('?,', count($their_group_ids) - 1) . '?';
+		
+		// get the group names for those IDS (we don't store them in case the group names change)
+		$users_groups = $this->database->run("SELECT `group_id`, `group_name`, `remote_group`, `perms_access` FROM ".$this->core->db_tables['user_groups']." WHERE `group_id` IN ($in)", $their_group_ids)->fetch_all();
+		
+		$user_group_ids = [];
+		// if we are using local users, remove any remote groups to check permissions on
+		if ($this->core->config('local_users') == 1)
+		{
+			foreach ($users_groups as $key => $value)
+			{
+				if ($value['remote_group'] == 1)
+				{
+					unset($users_groups[$key]);
+				}
+			}
+		}
+		// else we are on an install that's using a remote users database, remove their local groups
+		else
+		{
+			foreach ($users_groups as $key => $value)
+			{
+				if ($value['remote_group'])
+				{
+					unset($users_groups[$key]);
+				}
+				// also remove any groups that don't contain our wanted prefix
+				if (strpos($value['group_name'], $this->core->config('user_group_prefix')) === false) 
+				{
+					unset($users_groups[$key]);
+				}
+			}			
+		}
+		
+		foreach ($users_groups as $group)
+		{
+			$groups_permissions = unserialize($group['perms_access']);
+			// at least one group they are in allows it, so let them in
+			if (is_array($groups_permissions) && in_array($get_permission['id'], $groups_permissions))
+			{
+				return true;
+			}
+		}
+		// if we didn't find any time the group value = 1, then none of their user groups is allowed
+		return false;
+	}
+	
 	function user_timezone($user_id)
 	{
 		if (!isset($user_id) || $user_id == 0)
@@ -240,8 +297,6 @@ class user
 		$_SESSION['activated'] = $user_data['activated'];
 		$_SESSION['per-page'] = $user_data['per-page'];
 		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
-		$_SESSION['single_article_page'] = $user_data['single_article_page'];
-		$_SESSION['display_comment_alerts'] = $user_data['display_comment_alerts'];
 		$_SESSION['email_options'] = $user_data['email_options'];
 		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
 		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
@@ -386,38 +441,29 @@ class user
 	// useful for seeing if they are an admin or editor to perform editing, deleting, publishing etc
 	function check_group($check_groups = NULL)
 	{
-		if ( isset($_SESSION['user_group']) || isset($_SESSION['secondary_user_group']) )
+		$their_groups = unserialize($this->get('user_groups', $_SESSION['user_id'])['user_groups']);
+		print_r($their_groups);
+		if ( is_array($check_groups) )
 		{
-			$user_group = (int) $_SESSION['user_group'];
-			$second_group = (int) $_SESSION['secondary_user_group'];
-			
-			if ( is_array($check_groups) )
+			foreach ($check_groups as $group)
 			{
-				if ( in_array($user_group, $check_groups) || in_array($second_group, $check_groups) )
+				echo $group;
+				if ( in_array($group, $their_groups) )
 				{
+					die('test');
 					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			else
-			{
-				if ($user_group == $check_groups || $second_group == $check_groups)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
 				}
 			}
 		}
 		else
 		{
-			return false;
+			if (in_array($check_groups, $their_groups))
+			{
+				return true;
+			}
 		}
+
+		return false;
 	}
 
 	public function sort_avatar($user_id)

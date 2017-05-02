@@ -110,11 +110,8 @@ $message = '';
 if (($_SESSION['user_id'] != 0) && (!isset($_GET['message']) || isset($_GET['message']) && $_GET['message'] != 'empty'))
 {
 	$name = $_SESSION['username'];
-
-	$db->sqlquery("SELECT `email` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-	$get_email = $db->fetch();
-
-	$email = $get_email['email'];
+	
+	$email = $user->get('email', $_SESSION['user_id'])['email'];
 }
 
 if (isset($_SESSION['message']) && $_SESSION['message'] == 'empty')

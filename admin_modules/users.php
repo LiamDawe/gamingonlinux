@@ -74,12 +74,11 @@ else
 			{
 				$templating->block('search','admin_modules/users');
 
-				$db->sqlquery("SELECT * FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
-				$user_info = $db->fetch();
+				$user_info = $dbl->run("SELECT * FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
 
 				$templating->block('edituser', 'admin_modules/users');
 
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					$profile_link = '/profiles/' . $user_info['user_id'];
 				}
@@ -94,65 +93,25 @@ else
 				$templating->set('email', $user_info['email']);
 				$templating->set('website', $user_info['website']);
 				$templating->set('bio', $user_info['article_bio']);
-				$admin_only = '';
-				if ($user->check_group(1) == true)
+
+				$groups_list = '';
+				$users_groups = unserialize($user_info['user_groups']);
+
+				$in = str_repeat('?,', count($users_groups) - 1) . '?';
+				$groups = $dbl->run("SELECT `group_name`, `group_id` FROM ".$core->db_tables['user_groups']." WHERE `group_id` IN ($in)", $users_groups)->fetch_all();
+				foreach($groups as $group)
 				{
-					$groups = '';
-					$none_selected = '';
-					$db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_id` ASC");
-					while ($group_sql = $db->fetch())
-					{
-						if ($user_info['secondary_user_group'] == 0)
-						{
-							$none_selected = 'selected';
-						}
-
-						if ($group_sql['group_id'] == $user_info['user_group'])
-						{
-							$groups .= "<option value=\"{$group_sql['group_id']}\" selected>{$group_sql['group_name']}</option>";
-						}
-
-						else
-						{
-							$groups .= "<option value=\"{$group_sql['group_id']}\">{$group_sql['group_name']}</option>";
-						}
-					}
-					$groups .= '<option value="0" '.$none_selected.'>None</option>';
-
-					$sgroups = '';
-					$snone_selected = '';
-					$db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_id` ASC");
-					while ($sgroup_sql = $db->fetch())
-					{
-						if ($user_info['secondary_user_group'] == 0)
-						{
-							$snone_selected = 'selected';
-						}
-
-						if ($sgroup_sql['group_id'] == $user_info['secondary_user_group'])
-						{
-							$sgroups .= "<option value=\"{$sgroup_sql['group_id']}\" selected>{$sgroup_sql['group_name']}</option>";
-						}
-
-						else
-						{
-							$sgroups .= "<option value=\"{$sgroup_sql['group_id']}\">{$sgroup_sql['group_name']}</option>";
-						}
-					}
-					$sgroups .= '<option value="0" '.$snone_selected.'>None</option>';
-
-					$admin_only = "User Group: <select name=\"user_group\">{$groups}</select><br />Secondary User Group: <select name=\"secondary_user_group\">{$sgroups}</select><br />";
-
-					$developer_check = '';
-					if ($user_info['game_developer'] == 1)
-					{
-						$developer_check = 'checked';
-					}
-
-					$admin_only .= '<label><input type="checkbox" name="game_developer" '.$developer_check.'/>Game developer?</label>';
-
+					$groups_list .= "<option value=\"{$group['group_id']}\" selected>{$group['group_name']}</option>";
 				}
-				$templating->set('admin_only', $admin_only);
+				$templating->set('groups_list', $groups_list);
+				
+				$developer_check = '';
+				if ($user_info['game_developer'] == 1)
+				{
+					$developer_check = 'checked';
+				}
+				$templating->set('developer_check', $developer_check);
+
 				// sort out the avatar
 				// either no avatar (gets no avatar from gravatars redirect) or gravatar set
 				if (empty($user_info['avatar']) || $user_info['avatar_gravatar'] == 1)
@@ -217,6 +176,63 @@ else
 				$core->message('No IP bans are currently in place!');
 			}
 		}
+		
+		if ($_GET['view'] == 'groups')
+		{
+			$templating->merge('admin_modules/user_groups');
+			$templating->block('start_top');
+			
+			$groups = $dbl->run("SELECT `group_id`, `group_name` FROM ".$core->db_tables['user_groups']." ORDER BY `group_name` ASC")->fetch_all();
+			foreach ($groups as $group)
+			{
+				$templating->block('group_row');
+				$templating->set('name', $group['group_name']);
+				$templating->set('id', $group['group_id']);
+			}
+		}
+		
+		if ($_GET['view'] == 'edit_group')
+		{
+			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour`, `remote_group`, `perms_access` FROM ".$core->db_tables['user_groups']." WHERE `group_id` = ?", [$_GET['id']])->fetch();
+			
+			$permissions = $dbl->run("SELECT `id`, `name`, `groups_access` FROM ".$core->db_tables['user_permissions']." ORDER BY `id` ASC")->fetch_all();
+			
+			$templating->merge('admin_modules/user_groups');
+			$templating->block('group_edit');
+			$templating->set('name', $group['group_name']);
+			$show_badge = '';
+			if ($group['show_badge'] == 1)
+			{
+				$show_badge = 'checked';
+			}
+			$templating->set('badge_check', $show_badge);
+			$templating->set('colour', $group['badge_colour']);
+			$templating->set('badge_text', $group['badge_text']);
+			$remote_group = '';
+			if ($group['remote_group'] == 1)
+			{
+				$remote_group = 'checked';
+			}
+			$templating->set('remote_check', $remote_group);
+			
+			$perms_access = unserialize($group['perms_access']);
+			
+			$permission_rows = '';
+			foreach ($permissions as $perm)
+			{
+				$checked = '';
+				if (is_array($perms_access) && in_array($perm['id'], $perms_access))
+				{
+					$checked = 'checked';
+				}
+				
+				$this_permission = $templating->block_store('permission_row');
+				$permission_rows .= $templating->store_replace($this_permission, ['checked' => $checked, 'permission_name' => $perm['name'], 'permission_id' => $perm['id']]);
+			}
+			$templating->set('permissions_list', $permission_rows);
+			$templating->block('group_bottom');
+			$templating->set('group_id', $group['group_id']);
+		}
 	}
 
 	else if (isset($_POST['act']))
@@ -247,13 +263,10 @@ else
 				{
 					$dev_check = 1;
 				}
+				
+				$user_groups = serialize($_POST['user_groups']);
 
-				$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $_GET['user_id']));
-
-				if ($user->check_group(1) == true)
-				{
-					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `user_group` = ?, `secondary_user_group` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['user_group'], $_POST['secondary_user_group'], $dev_check, $_GET['user_id']));
-				}
+				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ?, `game_developer` = ?, `user_groups` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $dev_check, $user_groups, $_GET['user_id']));
 
 				// make sure they have a row for notes, if not add a new row otherwise edit
 				$db->sqlquery("SELECT `user_id` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']));
@@ -557,6 +570,26 @@ else
 					}
 				}
 			}
+		}
+		
+		if ($_POST['act'] == 'edit_group')
+		{
+			$show_badge = 0;
+			if (isset($_POST['show_badge']))
+			{
+				$show_badge = 1;
+			}
+			$remote = 0;
+			if (isset($_POST['remote_group']))
+			{
+				$remote = 1;
+			}
+
+			$perms_access = serialize($_POST['permissions']);
+			
+			$dbl->run("UPDATE ".$core->db_tables['user_groups']." SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ?, `perms_access` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $perms_access, $_POST['group_id']]);
+			
+			header('Location: admin.php?module=users&view=edit_group&id=' . $_POST['group_id']);
 		}
 	}
 }

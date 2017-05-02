@@ -15,7 +15,8 @@ if (!isset($_GET['go']))
 	$templating->block('main', 'usercp_modules/notification_preferences');
 
 	$comments_check = '';
-	if ($_SESSION['display_comment_alerts'] == 1)
+	$user_comment_alerts = $user->get('display_comment_alerts')['display_comment_alerts'];
+	if ($user_comment_alerts == 1)
 	{
 		$comments_check = 'checked';
 	}
@@ -145,7 +146,6 @@ else if (isset($_GET['go']))
 			$email_on_login,
 			$_SESSION['user_id']));
 
-		$_SESSION['display_comment_alerts'] = $comment_alerts;
 		$_SESSION['email_options'] = $_POST['email_options'];
 		$_SESSION['auto_subscribe'] = $auto_subscribe;
 		$_SESSION['auto_subscribe_email'] = $subscribe_emails;

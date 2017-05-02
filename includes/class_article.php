@@ -6,7 +6,7 @@ class article_class
 	// the required db connection
 	private $database;
 	
-	function __construct($database, $bbcode)
+	function __construct($database, $bbcode = NULL)
 	{
 		$this->database = $database;
 		$this->bbcode = $bbcode;
@@ -22,51 +22,51 @@ class article_class
 		unset($_SESSION['gallery_tagline_filename']);
 	}
 
-  public static function tagline_image($data)
-  {
-    $tagline_image = '';
-    if (!empty($data['tagline_image']))
-    {
-      $tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
-    }
-    if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
-    {
-      $tagline_image = "<img alt src=\"".core::config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
-    }
-    if (empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
-    {
-      $tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
-    }
+	public static function tagline_image($data)
+	{
+		$tagline_image = '';
+		if (!empty($data['tagline_image']))
+		{
+			$tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+		}
+		if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
+		{
+			$tagline_image = "<img alt src=\"".core::config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
+		}
+		if (empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
+		{
+			$tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
+		}
 
-    return $tagline_image;
-  }
+		return $tagline_image;
+	}
 
-  // if they have set a tagline image from the gallery, remove any existing images
-  public static function gallery_tagline($data = NULL)
-  {
-    global $db;
+	// if they have set a tagline image from the gallery, remove any existing images
+	public static function gallery_tagline($data = NULL)
+	{
+		global $db;
 
-    $gallery_tagline_sql = '';
+		$gallery_tagline_sql = '';
 
-    if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
-    {
-      if ($data != NULL && $data['article_id'] != NULL)
-      {
-        if (!empty($data['tagline_image']))
-        {
-          unlink(core::config('path') . 'uploads/articles/tagline_images/' . $data['tagline_image']);
-          unlink(core::config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
-        }
+		if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+		{
+			if ($data != NULL && $data['article_id'] != NULL)
+			{
+				if (!empty($data['tagline_image']))
+				{
+					unlink(core::config('path') . 'uploads/articles/tagline_images/' . $data['tagline_image']);
+					unlink(core::config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
+				}
 
-        $db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
-      }
-      else if ($data == NULL || $data['article_id'] == NULL)
-      {
-        $gallery_tagline_sql = ", `gallery_tagline` = {$_SESSION['gallery_tagline_id']}";
-        return $gallery_tagline_sql;
-      }
-    }
-  }
+				$db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
+			}
+			else if ($data == NULL || $data['article_id'] == NULL)
+			{
+				$gallery_tagline_sql = ", `gallery_tagline` = {$_SESSION['gallery_tagline_id']}";
+				return $gallery_tagline_sql;
+			}
+		}
+	}
 
   function display_previous_uploads($article_id = NULL)
   {
@@ -424,24 +424,20 @@ class article_class
 		return $content_array;
 	}
 
-	// this will subscribe them to an article and generate any possible missing secret key for emails
+	// subscribe to an article, or update subscription and generate any missing secret keys
 	function subscribe($article_id, $emails = NULL)
 	{
-		global $db;
-
 		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		{
-			$db->sqlquery("SELECT `user_id`, `article_id`, `secret_key` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
-			$count_subs = $db->num_rows();
-			if ($count_subs == 0)
+			$sub_info = $this->database->run("SELECT `user_id`, `article_id`, `secret_key` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id))->fetch();
+			// there's no sub, so make one now
+			if (!$sub_info)
 			{
 				// have we been given an email option, if so use it
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$db->sqlquery("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-					
-					$get_email_type = $db->fetch();
+					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 					
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
@@ -453,28 +449,25 @@ class article_class
 				// for unsubscribe link in emails
 				$secret_key = core::random_id(15);
 
-				$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $sql_emails, $sql_emails, $secret_key));
+				$this->database->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $sql_emails, $sql_emails, $secret_key));
 			}
-			else if ($count_subs == 1)
+			else
 			{
-				$get_key = $db->fetch();
 				// for unsubscribe link in emails
-				if (empty($get_key['secret_key']))
+				if (empty($sub_info['secret_key']))
 				{
 					$secret_key = core::random_id(15);
 				}
 				else
 				{
-					$secret_key = $get_key['secret_key'];
+					$secret_key = $sub_info['secret_key'];
 				}
 				
 				// check over their email options on this new subscription
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$db->sqlquery("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefer."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-					
-					$get_email_type = $db->fetch();
+					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefer."users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 					
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
@@ -482,22 +475,19 @@ class article_class
 				{
 					$sql_emails = (int) $emails;
 				}
-				$db->sqlquery("UPDATE `articles_subscriptions` SET `secret_key` = ?, `emails` = ?, `send_email` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $sql_emails, $sql_emails, $_SESSION['user_id'], $article_id));
+				$this->database->run("UPDATE `articles_subscriptions` SET `secret_key` = ?, `emails` = ?, `send_email` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $sql_emails, $sql_emails, $_SESSION['user_id'], $article_id));
 			}
 		}
 	}
 
 	function unsubscribe($article_id)
 	{
-		global $db;
-
 		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		{
-			$db->sqlquery("SELECT `user_id`, `article_id` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
-			$count_subs = $db->num_rows();
-			if ($count_subs == 1)
+			$check_exists = $this->database->run("SELECT `article_id` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id))->fetchOne();
+			if ($check_exists)
 			{
-				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+				$this->database->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
 			}
 		}
 	}

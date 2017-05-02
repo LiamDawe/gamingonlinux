@@ -351,7 +351,7 @@ else
 					$permalink = forum_class::get_link($topic['topic_id']);
 					$templating->set('permalink', $permalink);
 					$user_info_extra = '';
-					$user_info_extra = plugins::do_hooks('into_post_user_info', $comments);
+					$user_info_extra = plugins::do_hooks('into_post_user_info', $topic);
 					$templating->set('user_info_extra', $user_info_extra);
 					$templating->set('topic_title', $topic['topic_title']);
 
@@ -382,7 +382,7 @@ else
 					$templating->set('cake_icon', $cake_bit);
 
 					// sort out the avatar
-					$avatar = $user->sort_avatar($topic);
+					$avatar = $user->sort_avatar($topic['author_id']);
 					$templating->set('avatar', $avatar);
 
 					$badges = user::user_badges($topic, 1);

@@ -56,7 +56,9 @@
 			Website: <input type="text" name="website" value="{:website}" /><br />
 			<label for="bio">Biography, for Editors this will show on articles you create, for normal users it will just show it on your profile, keep it short.</label>
 			<textarea name="article_bio" class="bbcode-editor" cols="100" rows="10">{:bio}</textarea><br />
-			{:admin_only}
+			<strong>User Groups</strong><br />
+			<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen">{:groups_list}</select><br />
+			<label><input type="checkbox" name="game_developer" {:developer_check} />Game developer?</label>
 			Avatar: <br /><img src="{:avatar}" alt="avatar" /><br />
 			<em>These notes are never shown to a user, if you feel the need to note something down other editors to know enter it here</em><br />
 			<textarea name="notes" rows="20">{:admin_notes}</textarea>

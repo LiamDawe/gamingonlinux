@@ -248,6 +248,8 @@ class core
 			$this->db_tables['session'] = '`'.$this->database->table_prefix.'saved_sessions`';
 			$this->db_tables['profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
 			$this->db_tables['user_groups'] = '`'.$this->database->table_prefix.'user_groups`';
+ 			$this->db_tables['user_permissions'] = '`'.$this->database->table_prefix.'user_group_permissions`';
+ 			$this->db_tables['user_profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
 		}
 		else if ($this->config('local_users') == 0)
 		{
@@ -255,6 +257,8 @@ class core
 			$this->db_tables['session'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'saved_sessions`';
 			$this->db_tables['profile_info'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_profile_info`';
 			$this->db_tables['user_groups'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_groups`';
+			$this->db_tables['user_permissions'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_group_permissions`';
+			$this->db_tables['user_profile_info'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_profile_info`';
 		}
 	}
 

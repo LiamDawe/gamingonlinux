@@ -34,8 +34,8 @@ if (!isset($_GET['go']))
 	$templating->block('top', 'usercp_modules/notifications');
 
 	$pagination = '';
-
-	if ($_SESSION['display_comment_alerts'] == 1)
+	$user_comment_alerts = $user->get('display_comment_alerts')['display_comment_alerts'];
+	if ($user_comment_alerts == 1)
 	{
 		// count how many there is in total
 		$db->sqlquery("SELECT `id` FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `date`", array($_SESSION['user_id']));

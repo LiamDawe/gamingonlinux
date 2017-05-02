@@ -44,6 +44,8 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 $user->check_session();
 $user->grab_user_groups();
 
+$user->can('access_admin');
+
 include($file_dir . '/includes/class_charts.php');
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
@@ -59,29 +61,6 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 else
 {
 	$theme = 'default';
-}
-
-// get user group permissions
-if (core::is_number($_SESSION['user_group']))
-{
-	$get_permissions = $dbl->run("SELECT `name`,`value` FROM `group_permissions` WHERE `group` = ?", [$_SESSION['user_group']])->fetch_all();
-
-	$parray = array();
-	foreach ($get_permissions as $permissions_set)
-	{
-		$parray[$permissions_set['name']] = $permissions_set['value'];
-	}
-}
-
-// check for gol premium
-if ($_SESSION['user_id'] != 0 && $user->check_group(6) == false)
-{
-	$check_new_prem = $dbl->run("SELECT `user_group`, `secondary_user_group` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
-
-	if ($check_new_prem['user_group'] == 6 || $check_new_prem['secondary_user_group'] == 6)
-	{
-		$_SESSION['secondary_user_group'] = 6;
-	}
 }
 
 // get the header template html
@@ -216,7 +195,7 @@ else if ($_SESSION['user_id'] > 0)
 	$admin_link = '';
 	$admin_indicator = '';
 	$admin_notes = 0;
-	if ($user->check_group([1,2,5]))
+	if ($user->can('access_admin'))
 	{
 		$admin_notes = $dbl->run("SELECT count(*) FROM `admin_notifications` WHERE `completed` = 0")->fetchOne();
 		if ($admin_notes > 0)
@@ -279,7 +258,8 @@ else if ($_SESSION['user_id'] > 0)
 	// set these by default as comment notifications can be turned off
 	$new_comments_line = '';
 	$unread_comments_counter = 0;
-	if (isset($_SESSION['display_comment_alerts']) && $_SESSION['display_comment_alerts'] == 1)
+	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id'])['display_comment_alerts'];
+	if ($user_comment_alerts == 1)
 	{
 		// sort out the number of unread comments
 		$unread_comments_counter = $dbl->run("SELECT count(`id`) as `counter` FROM `user_notifications` WHERE `seen` = 0 AND owner_id = ?", [$_SESSION['user_id']])->fetchOne();

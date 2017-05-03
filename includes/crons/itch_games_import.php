@@ -1,11 +1,13 @@
 <?php
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 include($file_dir . '/includes/class_mail.php');
 
@@ -17,13 +19,12 @@ if ($core->file_get_contents_curl($url) == true)
 }
 else
 {
-	$to = 'liamdawe@gmail.com';
 	$subject = 'GOL ERROR - Cannot reach Itch.io new games importer';
 	// To send HTML mail, the Content-type header must be set
 	$headers  = 'MIME-Version: 1.0' . "\r\n";
 	$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 	$headers .= "From: GOL Contact Us <noreply@gamingonlinux.com>\r\n";
-	mail($to, $subject, "Could not reach the new itch games importer!", $headers);
+	mail($core->config('contact_email'), $subject, "Could not reach the new itch games importer!", $headers);
 	die('Itch XML not available!');
 }
 
@@ -44,15 +45,12 @@ foreach ($xml->channel->item as $game)
 		$parsed_release_date = strtotime($game->pubDate);
 		$released_date = date('Y-m-d', $parsed_release_date);
 
-		$get_info = $db->sqlquery("SELECT `name`, `itch_link` FROM `calendar` WHERE `name` = ?", array($name));
-		$grab_info = $get_info->fetch();
-
-		$count_rows = $db->num_rows();
+		$grab_info = $dbl->run("SELECT `name`, `itch_link` FROM `calendar` WHERE `name` = ?", array($name))->fetch();
 
 		// if it does exist, make sure it's not from itch already
-		if ($count_rows == 1 && $grab_info['itch_link'] == NULL)
+		if (!empty($grab_info) && $grab_info['itch_link'] == NULL)
 		{
-			$db->sqlquery("UPDATE `calendar` SET `itch_link` = ? WHERE `name` = ?", array($game->link, $name));
+			$dbl->run("UPDATE `calendar` SET `itch_link` = ? WHERE `name` = ?", array($game->link, $name));
 
 			echo "Updated {$name} with the latest information<br />";
 		}
@@ -62,9 +60,9 @@ foreach ($xml->channel->item as $game)
 
 if (!empty($games_added))
 {
-  if (core::config('send_emails') == 1)
-  {
-    $mail = new mail(core::config('contact_email'), 'The itch new games importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from itch.io!<br />' . $games_added, '');
-    $mail->send();
-  }
+	if ($core->config('send_emails') == 1)
+	{
+		$mail = new mail($core->config('contact_email'), 'The itch new games importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from itch.io!<br />' . $games_added, '');
+		$mail->send();
+	}
 }

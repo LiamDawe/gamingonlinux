@@ -1,11 +1,13 @@
 <?php
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 // don't count people who haven't logged in for six months, need to test this more before putting it in
 // last time i ran it, it already cut off a ton of people even though the system has only been around a few weeks, which wasn't right at all
@@ -14,14 +16,13 @@ $cutoff = 182*24*3600;
 $last_login = core::$date - $cutoff;
 
 // get the last grouping_id, this is how we group together each new generation for easy edits and deletions
-$db->sqlquery("SELECT `grouping_id` FROM `user_stats_charts` ORDER BY `id` DESC LIMIT 1");
-if ($db->num_rows() == 0)
+$get_grouping_id = $dbl->run("SELECT `grouping_id` FROM `user_stats_charts` ORDER BY `id` DESC LIMIT 1")->fetch();
+if (!$get_grouping_id)
 {
 	$grouping_id = 1;
 }
 else
 {
-    $get_grouping_id = $db->fetch();
     $grouping_id = $get_grouping_id['grouping_id'] + 1;
 }
 
@@ -29,11 +30,10 @@ else
 $labels = array();
 $data = array();
 
-$grab_users = $db->sqlquery("SELECT u.`distro`, count(*) as 'total', d.`arch-based`, d.`ubuntu-based` FROM `users` u INNER JOIN `distributions` d ON u.distro = d.name WHERE u.`distro` != '' AND u.`distro` != 'Not Listed' AND u.`distro` IS NOT NULL GROUP BY u.`distro`, d.`arch-based`, d.`ubuntu-based` ORDER BY `total` DESC");
-$users = $db->fetch_all_rows();
+$users = $dbl->run("SELECT u.`distro`, count(*) as 'total', d.`arch-based`, d.`ubuntu-based` FROM `users` u INNER JOIN `distributions` d ON u.distro = d.name WHERE u.`distro` != '' AND u.`distro` != 'Not Listed' AND u.`distro` IS NOT NULL GROUP BY u.`distro`, d.`arch-based`, d.`ubuntu-based` ORDER BY `total` DESC")->fetch_all();
 
-$db->sqlquery("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', 'Linux Distributions (Combined)'));
-$new_chart_id = $db->grab_id();
+$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', 'Linux Distributions (Combined)'));
+$new_chart_id = $dbl->new_id();
 
 $arch_total = 0;
 $ubuntu_total = 0;
@@ -57,18 +57,18 @@ foreach ($users as $user)
 $total_dat = 0;
 foreach ($labels as $key => $label)
 {
-	$db->sqlquery("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $key));
-	$new_label_id = $db->grab_id();
+	$dbl->run("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $key));
+	$new_label_id = $dbl->new_id();
 
 	echo 'Label ' . $key . ' added!<br />';
 
-	$db->sqlquery("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $new_label_id, $label));
+	$dbl->run("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $new_label_id, $label));
 
 	$total_dat = $total_dat + $label;
 	echo "Data $label added!<br />";
 }
 
-$db->sqlquery("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
+$dbl->run("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
 
 unset($data);
 unset($labels);
@@ -109,14 +109,13 @@ foreach ($charts as $chart)
 		$sql_vendor = "`gpu_vendor` = '{$chart['gpu_vendor']}' AND";
 	}
 
-	$grab_users = $db->sqlquery("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor `{$chart['db_field']}` != '' AND `{$chart['db_field']}` != 'Not Listed' AND `{$chart['db_field']}` IS NOT NULL GROUP BY {$chart['db_field']} ORDER BY `total` DESC");
-	$users = $db->fetch_all_rows();
+	$users = $dbl->run("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor `{$chart['db_field']}` != '' AND `{$chart['db_field']}` != 'Not Listed' AND `{$chart['db_field']}` IS NOT NULL GROUP BY {$chart['db_field']} ORDER BY `total` DESC")->fetch_all();
 	$labels = array();
 	$data = array();
 
-	$db->sqlquery("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', $chart['name']));
-
-	$new_chart_id = $db->grab_id();
+	$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', $chart['name']));
+	$new_chart_id = $dbl->new_id();
+	
 	foreach ($users as $user)
 	{
 			$labels[] = $user[$chart['db_field']];
@@ -126,14 +125,14 @@ foreach ($charts as $chart)
 	$label_counter = 0;
 	foreach ($labels as $label)
 	{
-		$db->sqlquery("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $label));
+		$dbl->run("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $label));
 
 		// get the first id
 		if ($label_counter == 0)
 		{
 			$label_counter++;
 
-			$new_label_id = $db->grab_id();
+			$new_label_id = $dbl->new_id();
 		}
 
 		echo "Label $label added!<br />";
@@ -144,13 +143,13 @@ foreach ($charts as $chart)
 	// put in the data
 	foreach ($data as $dat)
 	{
-		$db->sqlquery("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $set_label_id, $dat));
+		$dbl->run("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $set_label_id, $dat));
 		$set_label_id++;
 		$total_dat = $total_dat + $dat;
 		echo "Data $dat added!<br />";
 	}
 
-	$db->sqlquery("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
+	$dbl->run("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
 
 	unset($data);
 	unset($labels);
@@ -160,4 +159,4 @@ foreach ($charts as $chart)
 	unset($dat);
 }
 
-$db->sqlquery("INSERT INTO `user_stats_grouping` SET `grouping_id` = ?", array($grouping_id));
+$dbl->run("INSERT INTO `user_stats_grouping` SET `grouping_id` = ?", array($grouping_id));

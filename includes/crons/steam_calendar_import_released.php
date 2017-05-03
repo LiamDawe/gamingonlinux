@@ -4,14 +4,13 @@ include('simple_html_dom.php');
 
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
 
 include($file_dir . '/includes/class_core.php');
-$core = new core();
+$core = new core($dbl, $file_dir);
 
 include($file_dir . '/includes/class_mail.php');
 
@@ -77,18 +76,14 @@ do
               $link = $element->parent()->href;
               echo  'Link: ' . $link . '<br /><br />';
 
-              $db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title));
-
-              $grab_info = $db->fetch();
-
-              $check_rows = $db->num_rows();
+              $grab_info = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 
               // if it does exist, make sure it's not from Steam already
-              if ($check_rows == 0)
+              if (!$grab_info)
               {
-                $db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `steam_link` = ?, `date` = ?, `approved` = 1", array($title, $link, $parsed_release_date));
+                $dbl->run("INSERT INTO `calendar` SET `name` = ?, `steam_link` = ?, `date` = ?, `approved` = 1", array($title, $link, $parsed_release_date));
 
-                $game_id = $db->grab_id();
+                $game_id = $dbl->new_id();
 
                 echo "\tAdded this game to the calendar DB with id: " . $game_id . "<br />\n";
 
@@ -96,9 +91,9 @@ do
               }
 
               // if we already have it, just update it
-              else if ($check_rows == 1 && $grab_info['steam_link'] == NULL)
+              else if (!empty($grab_info) && $grab_info['steam_link'] == NULL)
               {
-                $db->sqlquery("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $grab_info['id']));
+                $dbl->run("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $grab_info['id']));
 
                 echo "Updated {$title} with the latest information<br />";
               }
@@ -114,9 +109,9 @@ echo '<br />Last page hit: ' . $page . '<br /><br />';
 
 if (!empty($games_added_list))
 {
-  if (core::config('send_emails') == 1)
+  if ($core->config('send_emails') == 1)
   {
-    $mail = new mail(core::config('contact_email'), 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar!</a><br />' . $games_added_list, '');
+    $mail = new mail($core->config('contact_email'), 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar!</a><br />' . $games_added_list, '');
     $mail->send();
   }
 }

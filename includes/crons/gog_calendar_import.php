@@ -1,11 +1,13 @@
 <?php
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
-include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
+$db_conf = include $file_dir . '/includes/config.php';
 
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
+include($file_dir . '/includes/class_core.php');
+$core = new core($dbl, $file_dir);
 
 include($file_dir . '/includes/class_mail.php');
 
@@ -91,17 +93,14 @@ do {
 				echo $games['title'] . "<br />\n";
 				echo "* Original release date: ". $games['original_release_date'] ."<br />\n";
 
-				$db->sqlquery("SELECT `name`, `gog_link` FROM `calendar` WHERE `name` = ?", array($games['title']));
-				$grab_info = $db->fetch();
-
-				$check_rows = $db->num_rows();
+				$grab_info = $dbl->run("SELECT `name`, `gog_link` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
 
 				// if it does exist, make sure it's not from GOG already
-				if ($check_rows == 0)
+				if (!$grab_info)
 				{
-					$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `gog_link` = ?, `date` = ?, `approved` = 1, `is_dlc` = ?", array($games['title'], $games['short_link'], $games['original_release_date'], $dlc));
+					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `gog_link` = ?, `date` = ?, `approved` = 1, `is_dlc` = ?", array($games['title'], $games['short_link'], $games['original_release_date'], $dlc));
 
-					$calendar_id = $db->grab_id();
+					$calendar_id = $dbl->new_id();
 
 					echo "\tAdded this game to the calendar DB with id: " . $calendar_id . ".\n";
 
@@ -109,9 +108,9 @@ do {
 				}
 
 				// if we already have it, just update it
-				else if ($check_rows == 1 && $grab_info['gog_link'] == NULL)
+				else if (!empty($grab_info) && $grab_info['gog_link'] == NULL)
 				{
-					$db->sqlquery("UPDATE `calendar` SET `gog_link` = ?, `is_dlc` = ? WHERE `name` = ?", array($games['short_link'], $dlc, $games['title']));
+					$dbl->run("UPDATE `calendar` SET `gog_link` = ?, `is_dlc` = ? WHERE `name` = ?", array($games['short_link'], $dlc, $games['title']));
 
 					echo "Updated {$games['title']} with the latest information<br />";
 				}
@@ -125,9 +124,9 @@ echo "\n\n";//More whitespace, just to make the output look a bit more pretty
 
 if (!empty($games_added))
 {
-  if (core::config('send_emails') == 1)
-  {
-    $mail = new mail(core::config('contact_email'), 'The GOG calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from GOG!<br />' . $games_added, '');
-    $mail->send();
-  }
+	if ($core->config('send_emails') == 1)
+	{
+		$mail = new mail($core->config('contact_email'), 'The GOG calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from GOG!<br />' . $games_added, '');
+		$mail->send();
+	}
 }

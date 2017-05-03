@@ -1,16 +1,13 @@
 <?php
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
+$db_conf = include $file_dir . '/includes/config.php';
+
+include($file_dir. '/includes/class_db_mysql.php');
+$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
+
 include($file_dir . '/includes/class_core.php');
-$core = new core($file_dir);
-
-include($file_dir . '/includes/class_mysql.php');
-$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
-
-// setup the templating, if not logged in default theme, if logged in use selected theme
-include($file_dir . '/includes/class_template.php');
-
-$templating = new template();
+$core = new core($dbl, $file_dir);
 
 $title = "Reminder: Update your PC info for the next round of statistics updates";
 
@@ -23,13 +20,13 @@ While we don't currently have a drop-off implemented for old/stale data, it will
 
 $slug = core::nice_title($title);
 
-$db->sqlquery("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'defaulttagline.png'", array(core::$date, $title, $slug, $tagline, $text));
+$dbl->run("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'defaulttagline.png'", array(core::$date, $title, $slug, $tagline, $text));
 
-$article_id = $db->grab_id();
+$article_id = $dbl->new_id();
 
-$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 22", array($article_id));
-$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 83", array($article_id));
+$dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 22", array($article_id));
+$dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 83", array($article_id));
 
-include(core::config('path') . 'includes/telegram_poster.php');
-telegram($title . ' ' . core::config('website_url') . "articles/" . $slug . '.' . $article_id);
+include($core->config('path') . 'includes/telegram_poster.php');
+telegram($title . ' ' . $core->config('website_url') . "articles/" . $slug . '.' . $article_id);
 ?>

@@ -5,7 +5,7 @@ $core->check_ip_from_stopforumspam(core::$ip);
 $templating->set_previous('title', 'Register', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com register page', 1);
 
-if (core::config('pretty_urls') == 1)
+if ($core->config('pretty_urls') == 1)
 {
 	$redirect = '/register/';
 }
@@ -18,11 +18,11 @@ require_once("includes/curl_data.php");
 
 $templating->merge('register');
 
-if (core::config('allow_registrations') == 1)
+if ($core->config('allow_registrations') == 1)
 {
-	if (core::config('captcha_disabled') == 0 && core::config('register_captcha') == 1)
+	if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1)
 	{
-		$captcha = '<strong>You must do a captcha to register</strong><br />If you don\'t see a captcha below, then <strong>please allow google reCAPTCHA in your privacy plugins</strong>. <div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';
+		$captcha = '<strong>You must do a captcha to register</strong><br />If you don\'t see a captcha below, then <strong>please allow google reCAPTCHA in your privacy plugins</strong>. <div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
 	}
 
 	else
@@ -34,7 +34,7 @@ if (core::config('allow_registrations') == 1)
 	{
 		$templating->block('main');
 
-		$templating->set('rules', core::config('rules'));
+		$templating->set('rules', $core->config('rules'));
 		$templating->set('captcha', $captcha);
 		$templating->set('timezone_list', core::timezone_list());
 
@@ -46,7 +46,7 @@ if (core::config('allow_registrations') == 1)
 	{
 		$templating->block('twitter_new');
 
-		$templating->set('rules', core::config('rules'));
+		$templating->set('rules', $core->config('rules'));
 		$templating->set('captcha', $captcha);
 		$templating->set('timezone_list', core::timezone_list());
 
@@ -60,7 +60,7 @@ if (core::config('allow_registrations') == 1)
 
 		$templating->set('username', $_SESSION['steam_username']);
 
-		$templating->set('rules', core::config('rules'));
+		$templating->set('rules', $core->config('rules'));
 		$templating->set('captcha', $captcha);
 		$templating->set('timezone_list', core::timezone_list());
 
@@ -75,7 +75,7 @@ if (core::config('allow_registrations') == 1)
 		$templating->set('name', $_SESSION['google_name']);
 		$templating->set('email', $_SESSION['google_data']['google_email']);
 
-		$templating->set('rules', core::config('rules'));
+		$templating->set('rules', $core->config('rules'));
 		$templating->set('captcha', $captcha);
 		$templating->set('timezone_list', core::timezone_list());
 
@@ -139,17 +139,17 @@ if (core::config('allow_registrations') == 1)
 
 		else
 		{
-			if (core::config('captcha_disabled') == 0 && core::config('register_captcha') == 1)
+			if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1)
 			{
 				$recaptcha=$_POST['g-recaptcha-response'];
 				$google_url="https://www.google.com/recaptcha/api/siteverify";
 				$ip=core::$ip;
-				$url=$google_url."?secret=".core::config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
+				$url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
 				$res=getCurlData($url);
 				$res= json_decode($res, true);
 			}
 
-			if (core::config('captcha_disabled') == 1 || (core::config('captcha_disabled') == 0 && (core::config('register_captcha') == 1 && $res['success']) || core::config('register_captcha') == 0))
+			if ($core->config('captcha_disabled') == 1 || ($core->config('captcha_disabled') == 0 && ($core->config('register_captcha') == 1 && $res['success']) || $core->config('register_captcha') == 0))
 			{
 				// check username isnt taken
 				$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `username` = ?", array($_POST['username']));
@@ -166,7 +166,7 @@ if (core::config('allow_registrations') == 1)
 				{
 					$_SESSION['message'] = 'email_taken';
 					
-					if (core::config('pretty_urls') == 1)
+					if ($core->config('pretty_urls') == 1)
 					{
 						
 						header("Location: ".$redirect);
@@ -218,10 +218,10 @@ if (core::config('allow_registrations') == 1)
 
 					// add one to members count, this is a special case
 					// it's one of only a few times we would update a remote config table, rather than local if we are using their user database
-					$config_table = '`'.$this->database->table_prefix.'config`';
-					if ($this->config('local_users') == 0)
+					$config_table = '`'.$dbl->table_prefix.'config`';
+					if ($core->config('local_users') == 0)
 					{
-						$config_table = $this->config('remote_users_database') . '.' . '`config`';
+						$config_table = $core->config('remote_users_database') . '.' . '`config`';
 					}
 					$db->sqlquery("UPDATE $config_table SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
 
@@ -231,28 +231,29 @@ if (core::config('allow_registrations') == 1)
 					
 					$generated_session = md5(mt_rand() . $last_id . $_SERVER['HTTP_USER_AGENT']);
 					
-					user::new_login($new_user_info, $generated_session);
+					$user->new_login($new_user_info, $generated_session);
 
 					// subject
-					$subject = 'Welcome to '.core::config('site_title').', activation needed!';
+					$subject = 'Welcome to '.$core->config('site_title').', activation needed!';
 
 					// message
 					$html_message = '<p>Hello '.$_POST['username'].',</p>
-					<p>Thanks for registering on <a href="'.core::config('website_url').'" target="_blank">'.core::config('site_title').'</a>!</p>
-					<p><strong><a href="'.core::config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code.'">You need to activate your account before you can post! Click here to activate!</a></strong></p>
-					<p>If you&#39;re new, consider saying hello in the <a href="'.core::config('website_url').'forum/" target="_blank">forum</a>.</p>';
+					<p>Thanks for registering on <a href="'.$core->config('website_url').'" target="_blank">'.$core->config('site_title').'</a>!</p>
+					<p><strong><a href="'.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code.'">You need to activate your account before you can post! Click here to activate!</a></strong></p>
+					<p>If you&#39;re new, consider saying hello in the <a href="'.$core->config('website_url').'forum/" target="_blank">forum</a>.</p>';
 
-					$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on '.core::config('site_title').'. You need to activate your account before you can post! Go here to activate: '.core::config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
+					$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on '.$core->config('site_title').'. You need to activate your account before you can post! Go here to activate: '.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
 
 					$mail = new mail($_POST['uemail'], $subject, $html_message, $plain_message);
 					$mail->send();
 
 					$_SESSION['message'] = 'new_account';
+					$_SESSION['message_extra'] = $_POST['username'];
 					header("Location: ". $core->config('website_url'));
 				}
 			}
 			// Check the score to determine what to do.
-			else if (core::config('captcha_disabled') == 0 && core::config('register_captcha') == 1 && !$res['success'])
+			else if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1 && !$res['success'])
 			{
 				// Add code to process the form.
 				$core->message("You need to complete the captcha to prove you are human and not a bot! <a href=\"index.php?module=register\">Click here to try again</a>.", NULL, 1);
@@ -263,5 +264,5 @@ if (core::config('allow_registrations') == 1)
 
 else
 {
-	$core->message(core::config('register_off_message'));
+	$core->message($core->config('register_off_message'));
 }

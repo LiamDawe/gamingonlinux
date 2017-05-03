@@ -322,9 +322,8 @@ if (isset($_POST['act']))
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$db->sqlquery("SELECT `email` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("SELECT `email` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_POST['author_id']));
 				$author_email = $db->fetch();
-
 
 				// subject
 				$subject = 'Your article was reviewed and edited on ' . core::config('site_title');

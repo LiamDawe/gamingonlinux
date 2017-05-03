@@ -135,7 +135,8 @@ return [
 	],
 	"new_account" =>
 	[
-		"text" => "Thank you for registering {$_SESSION['username']}, you are now logged in, <strong>but you need to confirm your email before being able to post</strong>!"
+		"text" => "Thank you for registering %s, you are now logged in, <strong>but you need to confirm your email before being able to post</strong>!",
+		"additions" => 1
 	]
 ];
 ?>

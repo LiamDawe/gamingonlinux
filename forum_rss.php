@@ -55,7 +55,7 @@ if ($core->config('forum_rss') == 1)
 		$date = date("D, d M Y H:i:s O", $line['last_post_date']);
 		$xml->writeElement('pubDate', $date);
 		
-		$link = core::config('website_url') . "forum/topic/{$line['topic_id']}/";
+		$link = $core->config('website_url') . "forum/topic/{$line['topic_id']}/";
 		$xml->writeElement('link', $link);
 		$xml->writeElement('guid', $link);
 		

@@ -108,7 +108,7 @@ if (!isset($_GET['view']))
 				$categories_list .= " <li><a href=\"/articles/category/{$get_categories['category_id']}\">{$get_categories['category_name']}</a></li> ";
 			}
 			
-			$categories_list .= plugins::do_hooks('display_article_tags_list', $article['article_id']);
+			$categories_list .= $plugins->do_hooks('display_article_tags_list', $article['article_id']);
 
 			$templating->set('categories_list', $categories_list);
 
@@ -189,7 +189,7 @@ if (!isset($_GET['view']))
 				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
 				$quote_username = $comments['username'];
 
-				$comment_avatar = $user->sort_avatar($comments);
+				$comment_avatar = $user->sort_avatar($comments['author_id']);
 
 				$templating->block('review_comments', 'admin_modules/admin_module_comments');
 				$templating->set('user_id', $comments['author_id']);

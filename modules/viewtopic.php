@@ -348,10 +348,10 @@ else
 				if ($page == 1)
 				{
 					$templating->block('topic', 'viewtopic');
-					$permalink = forum_class::get_link($topic['topic_id']);
+					$permalink = $forum_class->get_link($topic['topic_id']);
 					$templating->set('permalink', $permalink);
 					$user_info_extra = '';
-					$user_info_extra = plugins::do_hooks('into_post_user_info', $topic);
+					$user_info_extra = $plugins->do_hooks('into_post_user_info', $topic);
 					$templating->set('user_info_extra', $user_info_extra);
 					$templating->set('topic_title', $topic['topic_title']);
 
@@ -374,7 +374,7 @@ else
 					}
 
 					$into_username = '';
-					$into_username = plugins::do_hooks('into_post_username', $topic);
+					$into_username = $plugins->do_hooks('into_post_username', $topic);
 
 					$templating->set('username', $into_username . $username);
 
@@ -437,13 +437,13 @@ else
 
 						$last_page = ceil($number['counter']/$_SESSION['per-page']);
 						
-						$redirect = forum_class::get_link($_GET['topic_id'], 'page=' . $last_page . '#r' . $_GET['post_id']);
+						$redirect = $forum_class->get_link($_GET['topic_id'], 'page=' . $last_page . '#r' . $_GET['post_id']);
 
 						header("Location: " . $redirect);
 					}
 					else
 					{
-						$redirect = forum_class::get_link($_GET['topic_id'], '#r' . $_GET['post_id']);
+						$redirect = $forum_class->get_link($_GET['topic_id'], '#r' . $_GET['post_id']);
 
 						header("Location: " . $redirect);
 					}
@@ -469,7 +469,7 @@ else
 					{
 						$templating->block('reply', 'viewtopic');
 						
-						$permalink = forum_class::get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
+						$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
 						$templating->set('permalink', $permalink);
 
 						$reply_date = $core->format_date($post['creation_date']);
@@ -500,13 +500,13 @@ else
 						}
 
 						$into_username = '';
-						$into_username = plugins::do_hooks('into_post_username', $post);
+						$into_username = $plugins->do_hooks('into_post_username', $post);
 
 						$cake_bit = $user->cake_day($post['register_date'], $post['username']);
 						$templating->set('cake_icon', $cake_bit);
 
 						$user_info_extra = '';
-						$user_info_extra = plugins::do_hooks('into_post_user_info', $post);
+						$user_info_extra = $plugins->do_hooks('into_post_user_info', $post);
 						$templating->set('user_info_extra', $user_info_extra);
 
 						$templating->set('username', $into_username . $username);

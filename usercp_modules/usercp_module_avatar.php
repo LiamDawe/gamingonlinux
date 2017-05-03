@@ -31,16 +31,12 @@ if (isset($_GET['message']))
 $templating->merge('usercp_modules/usercp_module_avatar');
 $templating->block('main');
 
-// get current avatar
-$db->sqlquery("SELECT `avatar`, `avatar_uploaded`,`avatar_gravatar`, `gravatar_email`, `avatar_gallery` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
-$user_avatar = $db->fetch();
-
 // sort out the avatar
-$avatar = $user->sort_avatar($user_avatar);
+$avatar = $user->sort_avatar($_SESSION['user_id']);
 $templating->set('current_avatar', $avatar);
 
-$templating->set('width', core::config('avatar_width'));
-$templating->set('height', core::config('avatar_height'));
+$templating->set('width', $core->config('avatar_width'));
+$templating->set('height', $core->config('avatar_height'));
 
 // AVATAR GALLERY
 $db->sqlquery("SELECT `id`, `filename` FROM `avatars_gallery` ORDER BY `id` ASC");
@@ -51,7 +47,7 @@ while ($gallery = $db->fetch())
 }
 $templating->set('avatar_gallery', $avatar_gallery);
 
-$templating->set('gravatar_email', $user_avatar['gravatar_email']);
+$templating->set('gravatar_email', $user->get('gravatar_email', $_SESSION['user_id']));
 
 if (isset($_POST['action']))
 {
@@ -77,7 +73,7 @@ if (isset($_POST['action']))
 				$core->message('Error!');
 			}
 
-			if ($avatar_file_check['w'] > core::config('avatar_width') || $avatar_file_check['h'] > core::config('avatar_height'))
+			if ($avatar_file_check['w'] > $core->config('avatar_width') || $avatar_file_check['h'] > $core->config('avatar_height'))
 			{
 				header("Location: /usercp.php?module=avatar&message=toobig");
 				die();

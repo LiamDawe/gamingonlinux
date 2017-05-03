@@ -1,7 +1,7 @@
 <?php
 plugins::register_hook('footer_code', 'piwik_footer');
 
-function hook_piwik_footer()
+function hook_piwik_footer($database, $core)
 {
 	global $templating;
 	

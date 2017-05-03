@@ -48,7 +48,7 @@ if (!isset($_GET['ip_id']))
 			}
 
 			// sort out the avatar
-			$comment_avatar = $user->sort_avatar($comments);
+			$comment_avatar = $user->sort_avatar($comments['author_id']);
 
 			$templating->block('article_comments', 'admin_modules/comment_reports');
 			$templating->set('user_id', $comments['author_id']);

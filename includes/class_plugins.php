@@ -3,12 +3,17 @@ class plugins
 {	
 	// the database connection
 	public $database = null;
+	// the main core class with all the helpers
+	public $core = null;
 	public static $hooks = [];
 	
 	// load all plugin files
-	function __construct($database, $file_dir)
+	function __construct($database, $core)
 	{
 		$this->database = $database;
+		$this->core = $core;
+		
+		$file_dir = dirname( dirname(__FILE__) );
 		
 		$get_plugins = $this->database->run("SELECT `name` FROM `plugins` WHERE `enabled` = 1 ORDER BY `name` ASC")->fetch_all();
 		foreach ($get_plugins as $plugin)
@@ -24,14 +29,14 @@ class plugins
 	}
 	
 	// this is called by the main php files, which then looks for registers from register_hook
-	public static function do_hooks($name, $value = NULL)
+	public function do_hooks($name, $value = NULL)
 	{
 		$return_value = '';
 		if (isset(self::$hooks[$name]))
 		{
 			foreach (self::$hooks[$name] as $hook)
 			{
-				$return_value = call_user_func('hook_'.$hook, $value);
+				$return_value = call_user_func('hook_'.$hook, $this->database, $this->core, $value);
 			}
 		}
 		return $return_value;

@@ -1,7 +1,7 @@
 <?php
 plugins::register_hook('icon_hook', 'icon_changer');
 
-function hook_icon_changer()
+function hook_icon_changer($database, $core)
 {
 	$branding = NULL;
 	// april fools, because why not

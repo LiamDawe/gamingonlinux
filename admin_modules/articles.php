@@ -176,7 +176,7 @@ if (isset($_GET['view']))
 
 			$templating->set('categories_list', $categorys_list);
 
-			$article_form_top = plugins::do_hooks('article_form_top', $article['article_id']);
+			$article_form_top = $plugins->do_hooks('article_form_top', $article['article_id']);
 			$templating->set('article_form_top', $article_form_top);
 
 			$text = $article['text'];
@@ -630,7 +630,7 @@ else if (isset($_POST['act']))
 
 			article_class::process_categories($_POST['article_id']);
 
-			plugins::do_hooks('article_database_entry', $_POST['article_id']);
+			$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{

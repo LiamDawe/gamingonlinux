@@ -69,7 +69,7 @@ if (isset($_GET['category_id']) && isset($_GET['view']) && $_GET['view'] == 'top
 		die();
 	}
 
-	if (core::config('goty_finished') == 1)
+	if ($core->config('goty_finished') == 1)
 	{
 		$db->sqlquery("SELECT `category_name` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']));
 		$cat = $db->fetch();
@@ -90,7 +90,7 @@ if (!isset($_POST['act']))
 {
 	if (isset($_GET['view']) && $_GET['view'] == 'top10')
 	{
-		if (core::config('goty_voting_open') == 0 && core::config('goty_finished') == 1)
+		if ($core->config('goty_voting_open') == 0 && $core->config('goty_finished') == 1)
 		{
 			$templating->block('top10', 'goty');
 			$templating->set('category_name', $cat['category_name']);
@@ -176,7 +176,7 @@ if (!isset($_POST['act']))
 		$templating->set('game_name', $game['game']);
 		$templating->set('category_name', $game['category_name']);
 
-		if (core::config('goty_voting_open') == 0)
+		if ($core->config('goty_voting_open') == 0)
 		{
 			$templating->block('direct_closed', 'goty');
 		}
@@ -187,24 +187,24 @@ if (!isset($_POST['act']))
 		$votes = '';
 
 		// show leaderboard if voting is open, or voting is closed because it's finished
-		if (core::config('goty_voting_open') == 0 && core::config('goty_finished') == 1)
+		if ($core->config('goty_voting_open') == 0 && $core->config('goty_finished') == 1)
 		{
 			$votes = 'Votes: ' . $game['votes'] . '<br />';
 		}
 
 		$templating->set('votes', $votes);
 		$templating->set('game_id', $game['id']);
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			$db->sqlquery("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['category_id']));
 			$count_votes = $db->num_rows();
-			if ($count_votes == 0 && core::config('goty_voting_open') == 1)
+			if ($count_votes == 0 && $core->config('goty_voting_open') == 1)
 			{
 				$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
 			}
-			else if (core::config('goty_voting_open') == 1 && $count_votes == 1)
+			else if ($core->config('goty_voting_open') == 1 && $count_votes == 1)
 			{
 				$templating->set('vote_button', '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Remove Vote</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>');
 			}
@@ -223,7 +223,7 @@ if (!isset($_POST['act']))
 		$total = $db->fetch_all_rows();
 
 		$leaderboard = '';
-		if (core::config('goty_voting_open') == 0 && core::config('goty_finished') == 1)
+		if ($core->config('goty_voting_open') == 0 && $core->config('goty_finished') == 1)
 		{
 			$total_votes = 0;
 			foreach ($total as $votes)
@@ -254,26 +254,26 @@ if (!isset($_POST['act']))
 		if (!isset($_GET['category_id']))
 		{
 			$templating->block('top', 'goty');
-			$templating->set('total_votes', core::config('goty_total_votes'));
+			$templating->set('total_votes', $core->config('goty_total_votes'));
 
 			$voting_text = '';
-			if (core::config('goty_voting_open') == 1 && core::config('goty_finished') == 0)
+			if ($core->config('goty_voting_open') == 1 && $core->config('goty_finished') == 0)
 			{
 				$voting_text = '<br /><br />Voting is now open!';
 			}
 
-			else if (core::config('goty_voting_open') == 0 && core::config('goty_games_open') == 1 && core::config('goty_finished') == 0)
+			else if ($core->config('goty_voting_open') == 0 && $core->config('goty_games_open') == 1 && $core->config('goty_finished') == 0)
 			{
 				$voting_text = '<br /><br />Voting opens once we have allowed enough time for people to add game nominations.';
 			}
 
-			else if (core::config('goty_finished') == 1)
+			else if ($core->config('goty_finished') == 1)
 			{
 				$voting_text = '<br /><br />Voting is currently closed!';
 			}
 			$templating->set('voting_text', $voting_text);
 
-			if (core::config('goty_games_open') == 1)
+			if ($core->config('goty_games_open') == 1)
 			{
 				$category_list = '';
 				$cats = $db->sqlquery("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
@@ -313,7 +313,7 @@ if (!isset($_POST['act']))
 
 		else
 		{
-			if (core::config('goty_finished') == 1)
+			if ($core->config('goty_finished') == 1)
 			{
 				$templating->block('top_games', 'goty');
 				$templating->set('category_id', $_GET['category_id']);
@@ -329,7 +329,7 @@ if (!isset($_POST['act']))
 					$templating->set('game_name', $game['game']);
 					$templating->set('game_counter', $game['votes']);
 					$templating->set('game_id', $game['id']);
-					$templating->set('url', core::config('website_url'));
+					$templating->set('url', $core->config('website_url'));
 					$templating->set('vote_button', '');
 
 					// work out the games total %
@@ -355,7 +355,7 @@ if (!isset($_POST['act']))
 			$templating->block('games_list', 'goty');
 
 			$reset_button = '';
-			if (core::config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			if ($core->config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 			{
 				$db->sqlquery("SELECT `user_id`, `id`, `game_id` FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_GET['category_id'], $_SESSION['user_id']));
 				$check_vote = $db->num_rows();
@@ -369,7 +369,7 @@ if (!isset($_POST['act']))
 			$templating->set('reset_button', $reset_button);
 
 			$templating->set('category_id', $_GET['category_id']);
-			$templating->set('url', core::config('website_url'));
+			$templating->set('url', $core->config('website_url'));
 
 			// get the list
 			$filter_sql = '';
@@ -422,24 +422,24 @@ if (!isset($_POST['act']))
 
 					$votes = '';
 					// show leaderboard if voting is open, or voting is closed because it's finished
-					if (core::config('goty_voting_open') == 0 && core::config('goty_finished') == 1)
+					if ($core->config('goty_voting_open') == 0 && $core->config('goty_finished') == 1)
 					{
 						$votes = 'Votes: ' . $game['votes'] . '<br />';
 					}
 
 					$templating->set('votes', $votes);
 					$templating->set('game_id', $game['id']);
-					$templating->set('url', core::config('website_url'));
+					$templating->set('url', $core->config('website_url'));
 
 					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 					{
 						$db->sqlquery("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['category_id']));
 						$count_votes = $db->num_rows();
-						if ($count_votes == 0 && core::config('goty_voting_open') == 1)
+						if ($count_votes == 0 && $core->config('goty_voting_open') == 1)
 						{
 							$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
 						}
-						else if (core::config('goty_voting_open') == 1 && $count_votes == 1 && $game['id'] == $grab_vote['game_id'])
+						else if ($core->config('goty_voting_open') == 1 && $count_votes == 1 && $game['id'] == $grab_vote['game_id'])
 						{
 							$templating->set('vote_button', '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Remove Vote</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>');
 						}
@@ -455,7 +455,7 @@ if (!isset($_POST['act']))
 
 					$leaderboard = '';
 					// show leaderboard if voting is open, or voting is closed because it's finished
-					if (core::config('goty_voting_open') == 0 && core::config('goty_finished') == 1)
+					if ($core->config('goty_voting_open') == 0 && $core->config('goty_finished') == 1)
 					{
 						// work out the games total %
 						$db->sqlquery("SELECT `votes` FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']));
@@ -489,7 +489,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
-		if (core::config('goty_games_open') == 1)
+		if ($core->config('goty_games_open') == 1)
 		{
 			if (!empty($_POST['name']))
 			{
@@ -505,7 +505,7 @@ if (isset($_POST['act']))
 						$game_id = $db->grab_id();
 
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'goty_game_submission', core::$date, $game_id));
-						header("Location: " . core::config('website_url') . "goty.php?message=added");
+						header("Location: " . $core->config('website_url') . "goty.php?message=added");
 					}
 					else if ($user->check_group([1,2,5]) == true)
 					{
@@ -513,30 +513,30 @@ if (isset($_POST['act']))
 						$game_id = $db->grab_id();
 
 						$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'goty_game_added', core::$date, core::$date, $game_id));
-						header("Location: " . core::config('website_url') . "goty.php?message=added_editor");
+						header("Location: " . $core->config('website_url') . "goty.php?message=added_editor");
 					}
 				}
 
 				else
 				{
-					header("Location: " . core::config('website_url') . "goty.php?message=exists");
+					header("Location: " . $core->config('website_url') . "goty.php?message=exists");
 				}
 			}
 			else
 			{
-				header("Location: " . core::config('website_url') . "goty.php?message=empty&extra=game-name");
+				header("Location: " . $core->config('website_url') . "goty.php?message=empty&extra=game-name");
 			}
 		}
 
 		else
 		{
-			header("Location: " . core::config('website_url') . "goty.php");
+			header("Location: " . $core->config('website_url') . "goty.php");
 		}
 	}
 
 	if ($_POST['act'] == 'reset_category_vote')
 	{
-		if (core::config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		if ($core->config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			if (!empty($_POST['category_id']))
 			{

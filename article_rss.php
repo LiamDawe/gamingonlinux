@@ -12,15 +12,18 @@ $core = new core($dbl, $file_dir);
 include($file_dir . '/includes/class_user.php');
 $user = new user($dbl, $core);
 
+include($file_dir . '/includes/class_plugins.php');
+$plugins = new plugins($dbl, $core, $file_dir);
+
 if ($core->config('articles_rss') == 1)
 {
 	include($file_dir . '/includes/bbcode.php');
-	$bbcode = new bbcode($dbl, $core);
+	$bbcode = new bbcode($dbl, $core, $plugins);
 	
 	include($file_dir . '/includes/class_charts.php');
 
 	include($file_dir . '/includes/class_article.php');
-	$article_class = new article_class($dbl, $core, $bbcode);
+	$article_class = new article_class($dbl, $core, $plugins);
 
 	$sql_join = '';
 	$sql_addition = '';

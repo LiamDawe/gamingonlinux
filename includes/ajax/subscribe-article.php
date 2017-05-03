@@ -15,7 +15,7 @@ include($file_dir . '/includes/class_user.php');
 $user = new user($dbl, $core);
 
 include($file_dir . '/includes/class_article.php');
-$article_class = new article_class($dbl);
+$article_class = new article_class($dbl, $core);
 
 if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {

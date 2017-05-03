@@ -8,11 +8,13 @@ class bbcode
 	private $database;
 	// the requred core class
 	private $core;
+	private $plugins;
 	
-	function __construct($database, $core)
+	function __construct($database, $core, $plugins)
 	{
 		$this->database = $database;
 		$this->core = $core;
+		$this->plugin = $plugins;
 	}
 	
 	function do_charts($body)
@@ -56,7 +58,7 @@ class bbcode
 				else if ($your_key['counter'] == 0)
 				{
 					// check their registration date is older than one day
-					$reg_fetch = $this->database->run("SELECT `register_date` FROM `".$this->database->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$reg_fetch = $this->database->run("SELECT `register_date` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 							
 					$day_ago = time() - 24 * 3600;
 						
@@ -152,7 +154,7 @@ class bbcode
 	// replace specific-user quotes, called by quotes()
 	function replace_quotes($matches)
 	{
-		$find_quoted = $this->database->run("SELECT `username`, `user_id` FROM `".$this->database->table_prefix."users` WHERE `username` = ?", [$matches[1]])->fetch();
+		$find_quoted = $this->database->run("SELECT `username`, `user_id` FROM ".$this->core->db_tables['users']." WHERE `username` = ?", [$matches[1]])->fetch();
 		if ($find_quoted)
 		{
 			if ($this->core->config('pretty_urls') == 1)
@@ -237,7 +239,7 @@ class bbcode
 				a.`article_id` = ?", [$article_id]);
 			$article_info = $get_article->fetch();
 			
-			$article_class = new article_class($this->database, $this->core);
+			$article_class = new article_class($this->database, $this->core, $this->plugins);
 				
 			$tagline_image = $article_class->tagline_image($article_info);
 			

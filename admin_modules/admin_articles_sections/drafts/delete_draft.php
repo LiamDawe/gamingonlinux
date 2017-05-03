@@ -15,11 +15,11 @@ if (!isset($_POST['yes']) && !isset($_POST['no']))
 }
 else if (isset($_POST['no']))
 {
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts");
+	header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=drafts");
 }
 else if (isset($_POST['yes']))
 {
 	$article_class->delete_article($check);
 
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&message=deleted&extra=draft");
+	header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=drafts&message=deleted&extra=draft");
 }

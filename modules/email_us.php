@@ -41,7 +41,7 @@ if (isset($_POST['act']))
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";
 			$ip=core::$ip;
-			$url=$google_url."?secret=".core::config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
+			$url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
 			$res=getCurlData($url);
 			$res= json_decode($res, true);
 		}
@@ -88,14 +88,14 @@ if (isset($_POST['act']))
 				}
 			}
 			
-			$subject = core::config('site_title') . ' Contact Us - ' . $name;
+			$subject = $core->config('site_title') . ' Contact Us - ' . $name;
 			
 			$message = core::make_safe($_POST['message']);
 			
 			$html_message = '<p>' . $name . ' writes,</p>' . $bbcode->email_bbcode($_POST['message']);
 			
 			// Mail it
-            if (core::config('send_emails') == 1)
+            if ($core->config('send_emails') == 1)
             {
 				$mail = new mail($core->config('contact_email'), $subject, $html_message, '', $additional_header);
 				$mail->send();
@@ -144,14 +144,14 @@ $social_output = '';
 foreach ($social_icons as $social)
 {
 	$extra_url = '';
-	if (!empty(core::config($social['config'])))
+	if (!empty($core->config($social['config'])))
 	{
 		if ($social['config'] == 'twitter_username')
 		{
 			$extra_url = 'https://www.twitter.com/';
 		}
 		
-		$social_output .= '<a class="button small fnone" href="'.$extra_url.core::config($social['config']).'" target="_blank"><img src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/'.$social['icon'].'"></a>';
+		$social_output .= '<a class="button small fnone" href="'.$extra_url.$core->config($social['config']).'" target="_blank"><img src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/'.$social['icon'].'"></a>';
 	}
 }
 $templating->set('social_icons', $social_output);

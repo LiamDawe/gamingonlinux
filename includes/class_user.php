@@ -194,6 +194,7 @@ class user
 
 				$sql = "SELECT ".$get_fields." FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?";
 				$grabber = $this->database->run($sql, [$user_id])->fetch();
+
 				foreach ($grabber as $field => $put)
 				{
 					$to_return[$field] = $put;
@@ -533,8 +534,6 @@ class user
 
 	public function sort_avatar($user_id)
 	{
-		$user_data = $this->get(['avatar', 'avatar_gravatar', 'gravatar_email', 'avatar_gallery', 'avatar_uploaded', 'theme'], $user_id);
-		
 		$your_theme = $this->get('theme', $_SESSION['user_id']);
 		
 		if ($your_theme == 'dark')
@@ -545,35 +544,44 @@ class user
 		{
 			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar.png";
 		}
-			
-		$avatar = '';
-		if ($user_data['avatar_gravatar'] == 1)
-		{
-			$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
-		}
-
-		else if ($user_data['avatar_gallery'] != NULL)
-		{
-			$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
-		}
-
-		// either uploaded or linked an avatar
-		else if (!empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0)
-		{
-			$avatar = $user_data['avatar'];
-			if ($user_data['avatar_uploaded'] == 1)
-			{
-				$avatar = $this->core->config('website_url') . "uploads/avatars/{$user_data['avatar']}";
-			}
-		}
-
-		// else no avatar, then as a fallback use gravatar if they have an email left-over
-		else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
-		{
-			$avatar = $default_avatar;
-		}
 		
-		return $avatar;
+		if ($user_id == 0)
+		{
+			return $default_avatar;
+		}
+		else
+		{
+			$user_data = $this->get(['avatar', 'avatar_gravatar', 'gravatar_email', 'avatar_gallery', 'avatar_uploaded', 'theme'], $user_id);
+			
+			$avatar = '';
+			if ($user_data['avatar_gravatar'] == 1)
+			{
+				$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
+			}
+
+			else if ($user_data['avatar_gallery'] != NULL)
+			{
+				$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
+			}
+
+			// either uploaded or linked an avatar
+			else if (!empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0)
+			{
+				$avatar = $user_data['avatar'];
+				if ($user_data['avatar_uploaded'] == 1)
+				{
+					$avatar = $this->core->config('website_url') . "uploads/avatars/{$user_data['avatar']}";
+				}
+			}
+
+			// else no avatar, then as a fallback use gravatar if they have an email left-over
+			else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
+			{
+				$avatar = $default_avatar;
+			}
+			
+			return $avatar;
+		}
 	}
 
 	// give them a cake icon if they have been here for x years

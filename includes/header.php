@@ -20,13 +20,13 @@ include($file_dir . '/includes/class_messages.php');
 $message_map = new message_map();
 
 include($file_dir . '/includes/class_plugins.php');
-$plugins = new plugins($dbl, $file_dir);
+$plugins = new plugins($dbl, $core, $file_dir);
 
 include($file_dir . '/includes/class_article.php');
-$article_class = new article_class($dbl, $core);
+$article_class = new article_class($dbl, $core, $plugins);
 
 include($file_dir . '/includes/bbcode.php');
-$bbcode = new bbcode($dbl, $core);
+$bbcode = new bbcode($dbl, $core, $plugins);
 
 include($file_dir . '/includes/class_mail.php');
 
@@ -104,7 +104,7 @@ $templating->set('url', $core->config('website_url'));
 $branding['icon'] = $core->config('navbar_logo_icon');
 $branding['title'] = $core->config('site_title');
 
-$icon_plugin = plugins::do_hooks('icon_hook');
+$icon_plugin = $plugins->do_hooks('icon_hook');
 
 if (is_array($icon_plugin))
 {

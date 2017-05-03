@@ -46,8 +46,8 @@ else
 	{
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{
-			$new_topic = "<a href=\"" . core::config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a>";
-			$new_topic_bottom = "<span class=\"block3\"><a href=\"" . core::config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a></span><br /><br />";
+			$new_topic = "<a href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a>";
+			$new_topic_bottom = "<span class=\"block3\"><a href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a></span><br /><br />";
 		}
 	}
 	$templating->set('new_topic_link', $new_topic);
@@ -56,7 +56,7 @@ else
 	$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_GET['forum_id']));
 	$total_pages = $db->num_rows();
 	
-	$per_page = core::config('default-comments-per-page');
+	$per_page = $core->config('default-comments-per-page');
 	if (isset($_SESSION['per-page']) && core::is_number($_SESSION['per-page']))
 	{
 		$per_page = $_SESSION['per-page'];
@@ -99,7 +99,7 @@ else
 			{
 				for ($i = 1; $i <= $lastpage; $i++)
 				{
-					if (core::config('pretty_urls') == 1)
+					if ($core->config('pretty_urls') == 1)
 					{
 						$pages[] = " <li><a href=\"/forum/topic/{$post['topic_id']}/page={$i}\">$i</a></li>";
 					}
@@ -128,7 +128,7 @@ else
 		$templating->block('post_row', 'viewforum');
 
 		// sort out topic icon
-		$topic_pip = core::config('website_url') . 'templates/' . core::config('template') . '/images/topic_icon.png';
+		$topic_pip = $core->config('website_url') . 'templates/' . $core->config('template') . '/images/topic_icon.png';
 
 		// Let them know if it's a sticky post or not
 		$sticky = '';
@@ -148,7 +148,7 @@ else
 
 		$templating->set('topic_pip', $topic_pip);
 
-		if (core::config('pretty_urls') == 1)
+		if ($core->config('pretty_urls') == 1)
 		{
 			$topic_link = "/forum/topic/{$post['topic_id']}";
 		}

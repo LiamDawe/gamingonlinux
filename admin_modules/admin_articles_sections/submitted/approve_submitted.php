@@ -72,7 +72,7 @@ else
 
 		article_class::process_categories($_POST['article_id']);
 
-		plugins::do_hooks('article_database_entry', $_POST['article_id']);
+		$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{

@@ -13,6 +13,9 @@ $core = new core($dbl, $file_dir);
 include($file_dir . '/includes/class_template.php');
 $templating = new template($core, $core->config('template'));
 
+include($file_dir . '/includes/class_plugins.php');
+$plugins = new plugins($dbl, $core, $file_dir);
+
 include($file_dir . '/includes/class_forum.php');
 $forum_class = new forum_class($dbl, $core);
 
@@ -30,7 +33,7 @@ if(isset($_GET['post_id']))
 			if ($permalink_info)
 			{
 				include($file_dir . '/includes/class_article.php');
-				$article_class = new article_class($dbl, $core);
+				$article_class = new article_class($dbl, $core, $plugins);
 				
 				$permalink = $article_class->get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
 				$templating->set('permalink', $permalink);
@@ -46,7 +49,7 @@ if(isset($_GET['post_id']))
 			$permalink_info = $dbl->run("SELECT `topic_id` FROM `forum_topics` WHERE `topic_id` = ?", [$post_id])->fetch();
 			if ($permalink_info)
 			{
-				$permalink = forum_class::get_link($permalink_info['topic_id']);
+				$permalink = $forum_class->get_link($permalink_info['topic_id']);
 				$templating->set('permalink', $permalink);
 			}
 			else
@@ -57,10 +60,10 @@ if(isset($_GET['post_id']))
 		
 		if ($_GET['type'] == 'forum_reply')
 		{
-			$permalink_info = $db->sqlquery("SELECT `topic_id`, `post_id` FROM `forum_replies` WHERE `post_id` = ?", [$post_id])->fetch();
+			$permalink_info = $dbl->run("SELECT `topic_id`, `post_id` FROM `forum_replies` WHERE `post_id` = ?", [$post_id])->fetch();
 			if ($permalink_info)
 			{
-				$permalink = forum_class::get_link($permalink_info['topic_id'], 'post_id=' . $permalink_info['post_id']);
+				$permalink = $forum_class->get_link($permalink_info['topic_id'], 'post_id=' . $permalink_info['post_id']);
 				$templating->set('permalink', $permalink);
 			}
 			else

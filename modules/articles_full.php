@@ -348,7 +348,7 @@ if (!isset($_GET['go']))
 					}
 				}
 				
-				$categories_list .= plugins::do_hooks('display_article_tags_list', $article['article_id']);
+				$categories_list .= $plugins->do_hooks('display_article_tags_list', $article['article_id']);
 
 				if (!empty($categories_list))
 				{
@@ -634,10 +634,10 @@ if (!isset($_GET['go']))
 						$comment_avatar = $user->sort_avatar($comments['author_id']);
 						
 						$into_username = '';
-						$into_username = plugins::do_hooks('into_post_username', $comments);
+						$into_username = $plugins->do_hooks('into_post_username', $comments);
 						
 						$user_info_extra = '';
-						$user_info_extra = plugins::do_hooks('into_post_user_info', $comments);
+						$user_info_extra = $plugins->do_hooks('into_post_user_info', $comments);
 
 						$templating->block('article_comments', 'articles_full');
 						$permalink = $article_class->get_link($article['article_id'], $article['slug'], 'comment_id=' . $comments['comment_id']);

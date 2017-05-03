@@ -38,7 +38,7 @@ if (!isset($_POST['act']))
 	if ($user->check_group([1,2,5,6]) == true)
 	{
 		$templating->block('premium', 'usercp_modules/usercp_module_home');
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 		$state = 'disabled';
 		if ($user->check_group([1,2,5,6]) == true)
 		{
@@ -72,7 +72,7 @@ if (!isset($_POST['act']))
 	}
 
 	$templating->block('main', 'usercp_modules/usercp_module_home');
-	$templating->set('url', core::config('website_url'));
+	$templating->set('url', $core->config('website_url'));
 	
 	$templating->set('timezone_list', core::timezone_list($usercpcp['timezone']));
 
@@ -192,11 +192,11 @@ if (!isset($_POST['act']))
 	$templating->set('aper-page', $apage_options);
 
 	$twitter_button = '';
-	if (core::config('twitter_login') == 1)
+	if ($core->config('twitter_login') == 1)
 	{
 		if (!empty($usercpcp['twitter_username']))
 		{
-			$twitter_button = '<div class="box"><div class="body group"><form method="post" action="'.core::config('website_url').'usercp.php?module=home">
+			$twitter_button = '<div class="box"><div class="body group"><form method="post" action="'.$core->config('website_url').'usercp.php?module=home">
 			Current twitter handle linked: @'.$usercpcp['twitter_username'].'<br />
 			<button type="submit">Remove linked Twitter account</button>
 			<input type="hidden" name="act" value="twitter_remove" />
@@ -205,17 +205,17 @@ if (!isset($_POST['act']))
 
 		else
 		{
-			$twitter_button = '<div class="box"><div class="body group"><a href="'.core::config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a></div></div>';
+			$twitter_button = '<div class="box"><div class="body group"><a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a></div></div>';
 		}
 	}
 	$templating->set('twitter_button', $twitter_button);
 
 	$steam_button = '';
-	if (core::config('steam_login') == 1)
+	if ($core->config('steam_login') == 1)
 	{
 		if (!empty($usercpcp['steam_username']))
 		{
-			$steam_button = '<div class="box"><div class="body group"><form method="post" action="'.core::config('website_url').'usercp.php?module=home">
+			$steam_button = '<div class="box"><div class="body group"><form method="post" action="'.$core->config('website_url').'usercp.php?module=home">
 			Current Steam user linked: '.$usercpcp['steam_username'].'<br />
 			If this username is old it doesn\'t matter!<br />
 			<button type="submit" class="btn btn-danger">Remove a linked Steam account</button>
@@ -225,17 +225,17 @@ if (!isset($_POST['act']))
 
 		else
 		{
-			$steam_button = '<div class="box"><div class="body group"><a href="'.core::config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a></div></div>';
+			$steam_button = '<div class="box"><div class="body group"><a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a></div></div>';
 		}
 	}
 	$templating->set('steam_button', $steam_button);
 	
 	$google_button = '';
-	if (core::config('google_login') == 1)
+	if ($core->config('google_login') == 1)
 	{
 		if (!empty($usercpcp['google_id']))
 		{
-			$google_button = '<div class="box"><div class="body group"><form method="post" action="'.core::config('website_url').'usercp.php?module=home">
+			$google_button = '<div class="box"><div class="body group"><form method="post" action="'.$core->config('website_url').'usercp.php?module=home">
 			Current Google Email linked: '.$usercpcp['google_email'].'<br />
 			<button type="submit" class="btn btn-danger">Remove a linked Google account</button>
 			<input type="hidden" name="act" value="google_remove" />
@@ -244,10 +244,10 @@ if (!isset($_POST['act']))
 
 		else
 		{
-			$client_id = core::config('google_login_public'); 
-			$client_secret = core::config('google_login_secret');
-			$redirect_uri = core::config('website_url') . 'includes/google/login.php';
-			require_once (core::config('path') . 'includes/google/libraries/Google/autoload.php');
+			$client_id = $core->config('google_login_public'); 
+			$client_secret = $core->config('google_login_secret');
+			$redirect_uri = $core->config('website_url') . 'includes/google/login.php';
+			require_once ($core->config('path') . 'includes/google/libraries/Google/autoload.php');
 			$client = new Google_Client();
 			$client->setClientId($client_id);
 			$client->setClientSecret($client_secret);
@@ -257,7 +257,7 @@ if (!isset($_POST['act']))
 			$service = new Google_Service_Oauth2($client);
 			$authUrl = $client->createAuthUrl();
 				
-			$google_button = '<div class="box"><div class="body group"><a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/google-plus.png" /> </span>Link your <b>Google</b> account</a></div></div>';
+			$google_button = '<div class="box"><div class="body group"><a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/google-plus.png" /> </span>Link your <b>Google</b> account</a></div></div>';
 				
 		}
 	}
@@ -315,14 +315,14 @@ else if (isset($_POST['act']))
 			// tell them to do it properly
 			if ($field['db_field'] == 'youtube' && (!empty($_POST['youtube']) && strpos($_POST['youtube'], "youtube.com") === false))
 			{
-				header("Location: " . core::config('website_url') . "usercp.php?module=home&message=youtube-missing");
+				header("Location: " . $core->config('website_url') . "usercp.php?module=home&message=youtube-missing");
 				die();
 			}
 
 			// tell them to do it properly
 			if ($field['db_field'] == 'twitch' && (!empty($_POST['twitch']) && strpos($_POST['twitch'], "twitch.tv") === false))
 			{
-				header("Location: " . core::config('website_url') . "usercp.php?module=home&message=twitch-missing");
+				header("Location: " . $core->config('website_url') . "usercp.php?module=home&message=twitch-missing");
 				die();
 			}
 
@@ -358,28 +358,28 @@ else if (isset($_POST['act']))
 		// need to add theme updating back into here
 		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `supporter_link` = ?, `theme` = ? WHERE `user_id` = ?", array($supporter_link, $_POST['theme'], $_SESSION['user_id']), 'usercp_module_home.php');
 
-		header("Location: " . core::config('website_url') . "usercp.php?module=home&updated");
+		header("Location: " . $core->config('website_url') . "usercp.php?module=home&updated");
 	}
 
 	if ($_POST['act'] == 'twitter_remove')
 	{
 		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `twitter_username` = ?, `oauth_uid` = ?, `oauth_provider` = ? WHERE `user_id` = ?", array('', '', '', $_SESSION['user_id']));
 
-		header("Location: " . core::config('website_url') . "usercp.php");
+		header("Location: " . $core->config('website_url') . "usercp.php");
 	}
 
 	if ($_POST['act'] == 'steam_remove')
 	{
 		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `steam_username` = ?, `steam_id` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
 
-		header("Location: " . core::config('website_url') . "usercp.php");
+		header("Location: " . $core->config('website_url') . "usercp.php");
 	}
 	
 	if ($_POST['act'] == 'google_remove')
 	{
 		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `google_id` = ?, `google_email` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
 
-		header("Location: " . core::config('website_url') . "usercp.php");
+		header("Location: " . $core->config('website_url') . "usercp.php");
 	}
 }
 ?>

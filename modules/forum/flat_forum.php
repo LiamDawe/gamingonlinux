@@ -59,7 +59,7 @@ $sql_forum_ids = implode(', ', $forum_id_list);
 $db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1 AND `forum_id` IN ($sql_forum_ids)");
 $total_topics = $db->num_rows();
 
-$comments_per_page = core::config('default-comments-per-page');
+$comments_per_page = $core->config('default-comments-per-page');
 if (isset($_SESSION['per-page']))
 {
 	$comments_per_page = $_SESSION['per-page'];
@@ -137,7 +137,7 @@ foreach ($get_topics as $topics)
 	
 	$avatar = $user->sort_avatar($topics['author_id']);
 
-	if (core::config('pretty_urls') == 1)
+	if ($core->config('pretty_urls') == 1)
 	{
 		$link = "/forum/topic/{$topics['topic_id']}";
 		$last_link = "/forum/topic/{$topics['topic_id']}?page={$postPage}";

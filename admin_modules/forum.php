@@ -271,7 +271,7 @@ if (isset($_GET['view']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			$avatar = $user->sort_avatar($topic);
+			$avatar = $user->sort_avatar($topic['author_id']);
 
 			$templating->set('avatar', $avatar);
 
@@ -340,7 +340,7 @@ if (isset($_GET['view']))
 			$templating->set('username', $username);
 
 			// sort out the avatar
-			$avatar = $user->sort_avatar($topic);
+			$avatar = $user->sort_avatar($topic['author_id']);
 
 			$templating->set('avatar', $avatar);
 

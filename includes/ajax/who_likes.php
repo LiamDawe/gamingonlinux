@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
 $db_conf = include $file_dir . '/includes/config.php';
@@ -42,7 +44,7 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']))
 
 		foreach($grab_users as $user_who)
 		{
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				$profile_link = '/profiles/' . $user_who['user_id'];
 			}

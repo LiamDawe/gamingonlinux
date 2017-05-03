@@ -20,9 +20,9 @@ if (!isset($_GET['view']))
 	$templating->set('articles_css', "adminHome");
 	$templating->block('main', 'admin_modules/admin_home');
 	$templating->set('username', $_SESSION['username']);
-	$templating->set('featured_max', core::config('editor_picks_limit'));
+	$templating->set('featured_max', $core->config('editor_picks_limit'));
 
-	$templating->set('featured_ctotal', core::config('total_featured'));
+	$templating->set('featured_ctotal', $core->config('total_featured'));
 
 	// only show admin/editor comments to admins and editors
 	if ($user->check_group([1,2]) == true)
@@ -83,7 +83,7 @@ if (!isset($_GET['view']))
 		}
 		else
 		{
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				$username = '<a href="/profiles/'.$tracking['user_id'].'">'.$tracking['username'].'</a>';
 			}
@@ -197,7 +197,7 @@ if (isset($_POST['act']))
 			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress(66,'admin')."\r\n";
 
 			// Mail it
-			if (core::config('send_emails') == 1)
+			if ($core->config('send_emails') == 1)
 			{
 				mail($to, $subject, $message, $headers);
 			}
@@ -253,7 +253,7 @@ if (isset($_POST['act']))
 			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress(365,'editor')."\r\n";
 
 			// Mail it
-			if (core::config('send_emails') == 1)
+			if ($core->config('send_emails') == 1)
 			{
 				mail($to, $subject, $message, $headers);
 			}

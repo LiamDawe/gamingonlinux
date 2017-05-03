@@ -11,8 +11,11 @@ $dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database
 include($file_dir . '/includes/class_core.php');
 $core = new core($dbl, $file_dir);
 
+include($file_dir . '/includes/class_plugins.php');
+$plugins = new plugins($dbl, $core, $file_dir);
+
 include($file_dir . '/includes/bbcode.php');
-$bbcode = new bbcode($dbl, $core);
+$bbcode = new bbcode($dbl, $core, $plugins);
 
 include($file_dir . '/includes/class_article.php');
 $article_class = new article_class($dbl, $bbcode);

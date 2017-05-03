@@ -280,11 +280,11 @@ class forum_class
 		}
 	}
 	
-	public static function get_link($id, $additional = NULL)
+	public function get_link($id, $additional = NULL)
 	{
 		$link = '';
 		
-		if (core::config('pretty_urls') == 1)
+		if ($this->core->config('pretty_urls') == 1)
 		{
 			$link = 'forum/topic/'.$id;
 			
@@ -302,7 +302,7 @@ class forum_class
 				$link = $link . '&' . $additional;
 			}
 		}
-		return core::config('website_url') . $link;
+		return $this->core->config('website_url') . $link;
 	}
 	// check permissions, done from primary user group as thats where your main permissions come from, secondary user group should only be used for site extras anyway
 	function forum_permissions($forum_id)

@@ -4,7 +4,7 @@ $templating->set_previous('meta_description', 'A list of channels to watch for L
 
 $templating->load('videos');
 $templating->block('top');
-$templating->set('twitch_key', core::config('twitch_dev_key'));
+$templating->set('twitch_key', $core->config('twitch_dev_key'));
 
 // paging for pagination
 $page = core::give_page();

@@ -4,7 +4,7 @@ plugins::register_hook('article_database_entry', 'games_list_updating');
 plugins::register_hook('display_article_tags_list', 'game_tag_list');
 plugins::register_hook('article_deletion', 'remove_game_rows');
 
-function hook_games_tagging_list($article_id)
+function hook_games_tagging_list($database, $core, $article_id)
 {
 	global $db, $templating, $edit_state;
     
@@ -56,7 +56,7 @@ function hook_games_tagging_list($article_id)
     return $tagging_block;
 }
 
-function hook_games_list_updating($article_id)
+function hook_games_list_updating($database, $core, $article_id)
 {
     global $db;
 
@@ -96,7 +96,7 @@ function hook_games_list_updating($article_id)
 	unset($_SESSION['agames']);
 }
 
-function hook_game_tag_list($article_id)
+function hook_game_tag_list($database, $core, $article_id)
 {
 	global $db;
 	
@@ -105,15 +105,13 @@ function hook_game_tag_list($article_id)
 	$db->sqlquery("SELECT c.`name`, c.`id` FROM `calendar` c INNER JOIN `article_game_assoc` r ON c.id = r.game_id WHERE r.article_id = ? ORDER BY c.`name` ASC", array($article_id));
 	while ($get_games = $db->fetch())
 	{
-		$games_list .= ' <li><a href="'.core::config('website_url').'index.php?module=game&game-id=' . $get_games['id'] . '">' . $get_games['name'] . '</a></li> ';
+		$games_list .= ' <li><a href="'.$core->config('website_url').'index.php?module=game&game-id=' . $get_games['id'] . '">' . $get_games['name'] . '</a></li> ';
 	}
 	
 	return $games_list;
 }
 
-function hook_remove_game_rows($article_id)
-{
-	global $db;
-	
-	$db->sqlquery("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
+function hook_remove_game_rows($database, $core, $article_id)
+{	
+	$database->run("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
 }

@@ -3,11 +3,13 @@ class article_class
 {
 	private $database;
 	private $core;
+	private $plugins;
 	
-	function __construct($database, $core)
+	function __construct($database, $core, $plugins)
 	{
 		$this->database = $database;
 		$this->core = $core;
+		$this->plugins = $plugins;
 	}
 	
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
@@ -168,8 +170,8 @@ class article_class
 		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
 		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
 		$db->sqlquery("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
-    
-		plugins::do_hooks('article_deletion', $article['article_id']);
+		
+		$this->plugins->do_hooks('article_deletion', $article['article_id']);
     
 		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article_id, 'deleted_article', core::$date, core::$date));
@@ -435,7 +437,7 @@ class article_class
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 					
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
@@ -558,7 +560,7 @@ class article_class
 		if (isset($_POST['article_id']))
 		{
 			// check it hasn't been accepted already
-			$db->sqlquery("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `".$this->database->table_prefix."users` u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN ".$this->core->db_tables['users']." u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']));
 			$check_article = $db->fetch();
 			if ($check_article['active'] == 1)
 			{
@@ -660,7 +662,7 @@ class article_class
 		
 		self::process_categories($article_id);
 
-		plugins::do_hooks('article_database_entry', $article_id);
+		$this->plugins->do_hooks('article_database_entry', $article_id);
 		
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
@@ -692,7 +694,7 @@ class article_class
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$db->sqlquery("SELECT `email` FROM `".$this->database->table_prefix."users` WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("SELECT `email` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_POST['author_id']));
 				$author_email = $db->fetch();
 
 				// subject

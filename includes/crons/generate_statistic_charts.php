@@ -40,32 +40,32 @@ $ubuntu_total = 0;
 
 foreach ($users as $user)
 {
-  if ($user['arch-based'] == 1)
-  {
-    $labels['Arch-based'] = $labels['Arch-based'] + $user['total'];
-  }
-  else if ($user['ubuntu-based'] == 1)
-  {
-    $labels['Ubuntu-based'] = $labels['Ubuntu-based'] + $user['total'];
-  }
-  else
-  {
-    $labels[$user['distro']] = $labels[$user['distro']] + $user['total'];
-  }
+	if ($user['arch-based'] == 1)
+	{
+		$labels['Arch-based'] = $labels['Arch-based'] + $user['total'];
+	}
+	else if ($user['ubuntu-based'] == 1)
+	{
+		$labels['Ubuntu-based'] = $labels['Ubuntu-based'] + $user['total'];
+	}
+	else
+	{
+		$labels[$user['distro']] = $labels[$user['distro']] + $user['total'];
+	}
 }
 
 $total_dat = 0;
 foreach ($labels as $key => $label)
 {
-  $db->sqlquery("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $key));
-  $new_label_id = $db->grab_id();
+	$db->sqlquery("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $key));
+	$new_label_id = $db->grab_id();
 
-  echo 'Label ' . $key . ' added!<br />';
+	echo 'Label ' . $key . ' added!<br />';
 
-  $db->sqlquery("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $new_label_id, $label));
+	$db->sqlquery("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $new_label_id, $label));
 
-  $total_dat = $total_dat + $label;
-  echo "Data $label added!<br />";
+	$total_dat = $total_dat + $label;
+	echo "Data $label added!<br />";
 }
 
 $db->sqlquery("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
@@ -79,20 +79,20 @@ unset($dat);
 
 // this is for all the others that can be generated automatically
 $charts = array (
-  array ("name" => "Linux Distributions (Split)", "db_field" => "distro", "table" => 'users'),
-  array ("name" => "Desktop Environment", "db_field" => "desktop_environment"),
-  array ("name" => "Distro Architecture", "db_field" => "what_bits"),
-  array ("name" => "Dual Booting", "db_field" => "dual_boot"),
-  array ("name" => "CPU Vendor", "db_field" => "cpu_vendor"),
-	array ("name" => "GPU Vendor", "db_field" => "gpu_vendor"),
-	array ("name" => "GPU Driver", "db_field" => "gpu_driver"),
-	array ("name" => "GPU Driver (Nvidia)", "db_field" => "gpu_driver", "gpu_vendor" => "Nvidia"),
-	array ("name" => "GPU Driver (AMD)", "db_field" => "gpu_driver", "gpu_vendor" => "AMD"),
-	array ("name" => "RAM", "db_field" => "ram_count"),
-	array ("name" => "Monitors", "db_field" => "monitor_count"),
-	array ("name" => "Resolution", "db_field" => "resolution"),
-	array ("name" => "Main Gaming Machine", "db_field" => "gaming_machine_type"),
-  array ("name" => "Main Gamepad", "db_field" => "gamepad")
+array ("name" => "Linux Distributions (Split)", "db_field" => "distro", "table" => 'users'),
+array ("name" => "Desktop Environment", "db_field" => "desktop_environment"),
+array ("name" => "Distro Architecture", "db_field" => "what_bits"),
+array ("name" => "Dual Booting", "db_field" => "dual_boot"),
+array ("name" => "CPU Vendor", "db_field" => "cpu_vendor"),
+array ("name" => "GPU Vendor", "db_field" => "gpu_vendor"),
+array ("name" => "GPU Driver", "db_field" => "gpu_driver"),
+array ("name" => "GPU Driver (Nvidia)", "db_field" => "gpu_driver", "gpu_vendor" => "Nvidia"),
+array ("name" => "GPU Driver (AMD)", "db_field" => "gpu_driver", "gpu_vendor" => "AMD"),
+array ("name" => "RAM", "db_field" => "ram_count"),
+array ("name" => "Monitors", "db_field" => "monitor_count"),
+array ("name" => "Resolution", "db_field" => "resolution"),
+array ("name" => "Main Gaming Machine", "db_field" => "gaming_machine_type"),
+array ("name" => "Main Gamepad", "db_field" => "gamepad")
 );
 
 foreach ($charts as $chart)
@@ -140,24 +140,24 @@ foreach ($charts as $chart)
 	}
 
 	$set_label_id = $new_label_id;
-  $total_dat = 0;
+	$total_dat = 0;
 	// put in the data
 	foreach ($data as $dat)
 	{
 		$db->sqlquery("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $set_label_id, $dat));
 		$set_label_id++;
-    $total_dat = $total_dat + $dat;
+		$total_dat = $total_dat + $dat;
 		echo "Data $dat added!<br />";
 	}
 
-  $db->sqlquery("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
+	$db->sqlquery("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
 
 	unset($data);
 	unset($labels);
 	unset($label);
 	unset($users);
 	unset($user);
-  unset($dat);
+	unset($dat);
 }
 
 $db->sqlquery("INSERT INTO `user_stats_grouping` SET `grouping_id` = ?", array($grouping_id));

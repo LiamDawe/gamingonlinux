@@ -83,14 +83,14 @@ foreach ($category_array as $category)
 		if ($forum['parent'] == $category['id'])
 		{
 			$templating->block('forum_row', 'normal_forum');
-			$templating->set('this_template', core::config('website_url') . '/templates/' . core::config('template'));
+			$templating->set('this_template', $core->config('website_url') . '/templates/' . $core->config('template'));
 
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				$forum_link = "/forum/" . $forum['id'] . '/';
 			}
 			else {
-				$forum_link = core::config('website_url') . 'index.php?module=viewforum&amp;forum_id=' . $forum['id'];
+				$forum_link = $core->config('website_url') . 'index.php?module=viewforum&amp;forum_id=' . $forum['id'];
 			}
 			$templating->set('forum_link', $forum_link);
 
@@ -124,7 +124,7 @@ foreach ($category_array as $category)
 					$postNumber = (($post_count - 1) % $rows_per_page) + 1;
 				}
 
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					$last_title = "<a href=\"/forum/topic/{$forum['last_post_topic_id']}?page={$postPage}\">{$forum['topic_title']}</a>";
 				}
@@ -145,7 +145,7 @@ foreach ($category_array as $category)
 }
 
 $templating->block('latest', 'normal_forum');
-$templating->set('this_template', core::config('website_url') . '/templates/' . core::config('template'));
+$templating->set('this_template', $core->config('website_url') . '/templates/' . $core->config('template'));
 
 // lastest posts block below forums
 $forum_posts = '';

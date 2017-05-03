@@ -159,40 +159,40 @@ class article_class
     }
   }
 
-  function delete_article($article)
-  {
-    global $db;
+	function delete_article($article)
+	{
+		global $db;
 
-    $db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
-    $db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
-    $db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
-    $db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
-    $db->sqlquery("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
+		$db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
+		$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
+		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
+		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
+		$db->sqlquery("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
     
-    plugins::do_hooks('article_deletion', $article['article_id']);
+		plugins::do_hooks('article_deletion', $article['article_id']);
     
-    $db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
-    $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article_id, 'deleted_article', core::$date, core::$date));
+		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
+		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article_id, 'deleted_article', core::$date, core::$date));
 
-    // if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
-    if ($article['author_id'] != 1844)
-    {
-      if (!empty($article['tagline_image']))
-      {
-        unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
-        unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
-      }
-    }
+		// if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
+		if ($article['author_id'] != 1844)
+		{
+			if (!empty($article['tagline_image']))
+			{
+				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
+				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
+			}
+		}
 
-    // find any uploaded images, and remove them
-    $db->sqlquery("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
-    while ($image_search = $db->fetch())
-    {
-      unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $image_search['filename']);
-    }
+		// find any uploaded images, and remove them
+		$db->sqlquery("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
+		while ($image_search = $db->fetch())
+		{
+			unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $image_search['filename']);
+		}
 
-    $db->sqlquery("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
-  }
+		$db->sqlquery("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
+	}
 
   function display_tagline_image($article = NULL)
   {
@@ -493,7 +493,7 @@ class article_class
 	function article_history($article_id)
 	{
 		global $db, $templating, $core;
-		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `".$this->database->table_prefix."users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
+		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM ".$this->core->db_tables['users']." u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
 		$history = '';
 		while ($grab_history = $db->fetch())
 		{

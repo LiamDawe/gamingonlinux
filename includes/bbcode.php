@@ -236,8 +236,10 @@ class bbcode
 			WHERE 
 				a.`article_id` = ?", [$article_id]);
 			$article_info = $get_article->fetch();
+			
+			$article_class = new article_class($this->database, $this->core);
 				
-			$tagline_image = article_class::tagline_image($article_info);
+			$tagline_image = $article_class->tagline_image($article_info);
 			
 			$nice_link =  $this->core::nice_title($article_info['title']) . '.' . $article_info['article_id'];
 			

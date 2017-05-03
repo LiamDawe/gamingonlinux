@@ -50,7 +50,14 @@ class user
 			{
 				header("Location: " . $_SERVER['REQUEST_URI']);
 			}
-			$this->make_guest_session();
+			else
+			{
+				setcookie('gol_stay', "",  time()-60, '/');
+				setcookie('gol_session', "",  time()-60, '/');
+				setcookie('gol-device', "",  time()-60, '/');
+				setcookie('steamID', '', -1, '/');
+				$this->make_guest_session();
+			}
 		}
 		
 		$this->user_groups = $this->get_user_groups();
@@ -89,13 +96,13 @@ class user
 
 					if ($remember_username == 1)
 					{
-						setcookie('remember_username', $username,  time()+60*60*24*30, '/', core::config('cookie_domain'));
+						setcookie('remember_username', $username,  time()+60*60*24*30, '/', $this->core->config('cookie_domain'));
 					}
 
 					if ($stay == 1)
 					{
-						setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', core::config('cookie_domain'));
-						setcookie('gol_session', $generated_session, time()+31556926, '/', core::config('cookie_domain'));
+						setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', $this->core->config('cookie_domain'));
+						setcookie('gol_session', $generated_session, time()+31556926, '/', $this->core->config('cookie_domain'));
 					}
 
 					return true;
@@ -334,7 +341,7 @@ class user
 		}
 		else
 		{
-			return $this->get('timezone', $user_id)['timezone'];
+			return $this->get('timezone', $user_id);
 		}
 	}
 
@@ -356,8 +363,6 @@ class user
 	// check if it's a new device, then set the session up
 	public function new_login($user_data, $generated_session)
 	{
-		global $db;
-
 		// check if it's a new device straight away
 		$new_device = 0;
 		if (!isset($_COOKIE['gol-device']))
@@ -368,9 +373,9 @@ class user
 		// they have a device cookie, let's check it bitches
 		if (isset($_COOKIE['gol-device']))
 		{
-			$db->sqlquery("SELECT `device-id` FROM ".$this->core->db_tables['session']." WHERE `user_id` = ? AND `device-id` = ?", array($user_data['user_id'], $_COOKIE['gol-device']));
+			$device_test = $this->database->run("SELECT `device-id` FROM ".$this->core->db_tables['session']." WHERE `user_id` = ? AND `device-id` = ?", array($user_data['user_id'], $_COOKIE['gol-device']))->fetch();
 			// cookie didn't match, don't let them in, hacking attempt probable
-			if ($db->num_rows() == 0)
+			if (!$device_test)
 			{
 				setcookie('gol-device', "",  time()-60, '/');
 				$new_device = 1;
@@ -383,20 +388,20 @@ class user
 		{
 			$device_id = md5(mt_rand() . $user_data['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
-			setcookie('gol-device', $device_id, time()+31556926, '/', core::config('cookie_domain'));
+			setcookie('gol-device', $device_id, time()+31556926, '/', $this->core->config('cookie_domain'));
 
-			if ($user_data['login_emails'] == 1 && core::config('send_emails'))
+			if ($user_data['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
 				// send email about new device
 				$message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
-				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the ".core::config('site_title')." ".core::config('website_url')." website you may want to let the admin know and change your password immediately.</p>
+				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.</p>
 				<div>
 				<hr>
 				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>";
 
-				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".core::config('site_title')." ".core::config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
+				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".core::config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
 
-				$mail = new mail($user_data['email'], core::config('site_title') . ": New Login Notification", $message, $plain_message);
+				$mail = new mail($user_data['email'], $this->core->config('site_title') . ": New Login Notification", $message, $plain_message);
 				$mail->send();
 			}
 		}
@@ -416,7 +421,7 @@ class user
 
 		// keeping a log of logins, to review at anytime
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-		$db->sqlquery("INSERT INTO ".$this->core->db_tables['session']." SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
+		$this->database->run("INSERT INTO ".$this->core->db_tables['session']." SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
 
 		$this->register_session($user_data);
 	}
@@ -484,7 +489,7 @@ class user
 			$_SESSION['message'] = 'banned';
 		}
 		
-		header("Location: ".core::config('website_url'));
+		header("Location: ".$this->core->config('website_url'));
 		die();
 	}
 	

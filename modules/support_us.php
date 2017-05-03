@@ -18,7 +18,7 @@ while ($rowuser = $res->fetch())
 	$templating->set('user_id', $rowuser['user_id']);
 	$templating->set('username', $rowuser['username']);
 
-	$avatar = $user->sort_avatar($rowuser);
+	$avatar = $user->sort_avatar($rowuser['user_id']);
 	$templating->set('avatarurl', $avatar);
 
 	$supporter_link = '';

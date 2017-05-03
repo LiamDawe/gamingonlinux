@@ -8,13 +8,12 @@ class twitter_user
 
 	function checkUser($uid, $oauth_provider, $username)
 	{
-		global $db, $core;
+		global $dbl, $core;
 
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
-			$get_user = $db->sqlquery("SELECT ".user::$user_sql_fields." FROM `users` WHERE oauth_uid = ? and oauth_provider = ? AND `twitter_username` = ?", array($uid, $oauth_provider, $username));
-			$result = $get_user->fetch();
+			$result = $dbl->run("SELECT ".user::$user_sql_fields." FROM `users` WHERE oauth_uid = ? and oauth_provider = ? AND `twitter_username` = ?", array($uid, $oauth_provider, $username))->fetch();
 			if (!empty($result))
 			{
 				$this->new = 1;
@@ -40,7 +39,7 @@ class twitter_user
 		// if they are linking via usercp to a logged in account
 		else
 		{
-			$db->sqlquery("UPDATE `users` SET oauth_provider = ?, oauth_uid = ?, `twitter_username` = ? WHERE `user_id` = ?", array($oauth_provider, $uid, $username, $_SESSION['user_id']));
+			$dbl->run("UPDATE `users` SET oauth_provider = ?, oauth_uid = ?, `twitter_username` = ? WHERE `user_id` = ?", array($oauth_provider, $uid, $username, $_SESSION['user_id']));
 			$this->new = 0;
 			return;
 		}

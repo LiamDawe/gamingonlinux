@@ -327,7 +327,7 @@ if (!isset($_GET['go']))
 					$article_link = "/index.php?module=articles_full&amp;aid={$_GET['aid']}&amp;preview&amp;";
 				}
 
-				$article_pagination = $core->article_pagination($article_page, $article_page_count, $article_link);
+				$article_pagination = $article_class->article_pagination($article_page, $article_page_count, $article_link);
 
 				$templating->set('paging', $article_pagination);
 

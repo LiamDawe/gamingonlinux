@@ -22,11 +22,11 @@ $message_map = new message_map();
 include($file_dir . '/includes/class_plugins.php');
 $plugins = new plugins($dbl, $file_dir);
 
+include($file_dir . '/includes/class_article.php');
+$article_class = new article_class($dbl, $core);
+
 include($file_dir . '/includes/bbcode.php');
 $bbcode = new bbcode($dbl, $core);
-
-include($file_dir . '/includes/class_article.php');
-$article_class = new article_class($dbl, $core, $bbcode);
 
 include($file_dir . '/includes/class_mail.php');
 

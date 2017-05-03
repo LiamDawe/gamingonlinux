@@ -8,7 +8,7 @@ $templating->load('statistics');
 
 // TOTAL USERS
 $templating->block('top', 'statistics');
-$templating->set('total_users', core::config('total_users'));
+$templating->set('total_users', $core->config('total_users'));
 
 $charts_list = array(
   array("name" => "Linux Distributions (Combined)"),
@@ -67,7 +67,7 @@ foreach($charts_list as $chart)
   $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $previous_group['grouping_id']));
   $get_last_chart_id = $db->fetch();
   
-  $charts = new golchart();
+  $charts = new golchart($dbl);
   
   $options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC'];
 

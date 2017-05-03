@@ -1,15 +1,13 @@
 <?php
 class article_class
 {
-	private $bbcode;
 	private $database;
 	private $core;
 	
-	function __construct($database, $core, $bbcode = NULL)
+	function __construct($database, $core)
 	{
 		$this->database = $database;
 		$this->core = $core;
-		$this->bbcode = $bbcode;
 	}
 	
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
@@ -878,7 +876,7 @@ class article_class
 			$templating->set('top_image', $tagline_image);
 
 			// set last bit to 0 so we don't parse links in the tagline
-			$templating->set('text', $this->bbcode->parse_bbcode($article['tagline'], 1, 0));
+			$templating->set('text', $article['tagline']);
 				
 			$templating->set('article_link', $this->get_link($article['article_id'], $article['slug']));
 			$templating->set('comment_count', $article['comment_count']);
@@ -925,6 +923,83 @@ class article_class
 		}
 		$templating->set('any_check', $any_check);
 		$templating->set('all_check', $all_check);
+	}
+
+	// per page = how many rows to show per page
+	// total = total number of rows
+	// targetpage = the page to append the pagination target page onto
+	// extra = anything extra to add like "#comments" to go to the comments
+	function article_pagination($page, $lastpage, $targetpage)
+	{
+		//previous page is page - 1
+		$prev = $page - 1;
+
+		//next page is page + 1
+		$next = $page + 1;
+
+		// sort out the pagination links
+		$article_pagination = "";
+		if($lastpage > 1)
+		{
+			$article_pagination .= "<div class=\"pagination group\"><ul class=\"pagination fleft\">";
+
+			//previous button
+			if ($page > 1)
+			{
+				$article_pagination.= "<li class=\"previouspage\"><a href=\"{$targetpage}article_page=$prev\">&laquo;</a></li>";
+			}
+
+			else
+			{
+				$article_pagination.= "<li><span>&laquo;</span></li>";
+			}
+
+			$article_pagination .= "<li><a href=\"#\">$page</a></li>";
+
+			$article_pagination .= "<li><span>/</span></li>";
+
+			// sort out last page link, no link if on last page
+			if ($page == $lastpage)
+			{
+				$article_pagination .= "<li><span>{$lastpage}</span></li>";
+			}
+
+			else
+			{
+				$article_pagination.= "<li><a href=\"{$targetpage}article_page={$lastpage}\">{$lastpage}</a></li>";
+			}
+
+			// next button
+			if ($page < $lastpage)
+			{
+				$article_pagination .= "<li><a href=\"{$targetpage}article_page=$next\">&raquo;</a></li>";
+			}
+
+			else
+			{
+				$article_pagination .= "<li><span>&raquo;</span></li>";
+			}
+
+			$article_pagination .= "</ul>";
+
+
+			$article_pagination .= "<form name=\"form2\" class=\"form-inline\">
+			&nbsp; Go to: <select class=\"dropdown\" style=\"width: auto;\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
+
+			for ($i = 1; $i <= $lastpage; $i++)
+			{
+				$selected = '';
+				if ($i == $page)
+				{
+					$selected = 'selected';
+				}
+				$article_pagination .= "<option value=\"{$targetpage}article_page={$i}\" $selected>$i</option>";
+			}
+
+			$article_pagination .= '</select></form></div>';
+		}
+
+		return $article_pagination;
 	}
 }
 ?>

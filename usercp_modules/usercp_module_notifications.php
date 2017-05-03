@@ -34,7 +34,7 @@ if (!isset($_GET['go']))
 	$templating->block('top', 'usercp_modules/notifications');
 
 	$pagination = '';
-	$user_comment_alerts = $user->get('display_comment_alerts');
+	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id']);
 	if ($user_comment_alerts == 1)
 	{
 		// count how many there is in total
@@ -82,7 +82,7 @@ if (!isset($_GET['go']))
 					{
 						$additional_likes = '';
 					}
-					$note_row = $templating->store_replace($note_row, array('additional_likes' => $additional_likes, 'this_template' => core::config('website_url') . 'templates/' . core::config('template')));
+					$note_row = $templating->store_replace($note_row, array('additional_likes' => $additional_likes, 'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 				}
 
 				if ($note_list['seen'] == 0)
@@ -94,7 +94,7 @@ if (!isset($_GET['go']))
 					$icon = 'envelope-open';
 				}
 
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					$profile_link = '/profiles/' . $note_list['user_id'];
 				}
@@ -112,11 +112,11 @@ if (!isset($_GET['go']))
 					$username = 'Guest';
 				}
 
-				$avatar = $user->sort_avatar($note_list);
+				$avatar = $user->sort_avatar($note_list['user_id']);
 
 				$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
 
-				$note_row = $templating->store_replace($note_row, array('id' => $note_list['id'], 'icon' => $icon, 'title' => $note_list['title'], 'link' => $link, 'avatar' => $avatar, 'username' => $username, 'profile_link' => $profile_link, 'this_template' => core::config('website_url') . 'templates/' . core::config('template')));
+				$note_row = $templating->store_replace($note_row, array('id' => $note_list['id'], 'icon' => $icon, 'title' => $note_list['title'], 'link' => $link, 'avatar' => $avatar, 'username' => $username, 'profile_link' => $profile_link, 'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 
 				if ($note_list['seen'] == 0)
 				{

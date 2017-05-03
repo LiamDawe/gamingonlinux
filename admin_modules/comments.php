@@ -157,7 +157,7 @@ if (!isset($_GET['view']))
 
 			$article_link = "/admin.php?module=comments&amp;aid={$_GET['aid']}&";
 
-			$article_pagination = $core->article_pagination($article_page, $pages, $article_link);
+			$article_pagination = $article_class->article_pagination($article_page, $pages, $article_link);
 
 			$templating->set('paging', $article_pagination);
 

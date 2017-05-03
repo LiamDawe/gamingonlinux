@@ -5,11 +5,11 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 $templating->merge('website_stats');
 
 $templating->block('top');
-$templating->set('site_title', core::config('site_title'));
+$templating->set('site_title', $core->config('site_title'));
 
 $templating->block('users');
-$templating->set('site_title', core::config('site_title'));
-$templating->set('total_users', number_format(core::config('total_users')));
+$templating->set('site_title', $core->config('site_title'));
+$templating->set('total_users', number_format($core->config('total_users')));
 
 $count_new_users = $db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM ".$core->db_tables['users']." WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
 $count_monthly_users = $count_new_users->fetch();
@@ -44,7 +44,7 @@ $article_list = $db->sqlquery("SELECT COUNT( DISTINCT a.article_id ) AS `counter
 WHERE a.`date` >= $last_month_start AND a.`date` <= $now AND a.`active` = 1 AND c.`category_id` NOT IN (63) AND a.author_id != 1844 GROUP BY u.`username` ORDER BY `counter` DESC, a.date DESC");
 
 $templating->block('articles', 'website_stats');
-$templating->set('site_title', core::config('site_title'));
+$templating->set('site_title', $core->config('site_title'));
 $author_list = '';
 
 $last_month = date("j M Y", strtotime("first day of previous month"));
@@ -53,7 +53,7 @@ $now_date = date("j M Y");
 $templating->set('last_month', $last_month);
 $templating->set('now_date', $now_date);
 
-if (core::config('pretty_urls') == 1)
+if ($core->config('pretty_urls') == 1)
 {
 	$profile_url = '/profiles/';
 }
@@ -98,7 +98,7 @@ $hot_articles = '';
 $db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 AND `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp));
 while ($get_hot = $db->fetch())
 {
-	$hot_articles .= '<li><a href="'.article_class::get_link($get_hot['article_id'], $get_hot['title']).'">'.$get_hot['title'].'</a> ('.number_format($get_hot['views']).')</li>';
+	$hot_articles .= '<li><a href="'.$article_class->get_link($get_hot['article_id'], $get_hot['title']).'">'.$get_hot['title'].'</a> ('.number_format($get_hot['views']).')</li>';
 }
 
 $templating->set('hot_articles', $hot_articles);
@@ -111,7 +111,7 @@ $article_list = '';
 $db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 ORDER BY `views` DESC LIMIT 5");
 while ($top_articles = $db->fetch())
 {
-	$article_list .= '<li><a href="'.article_class::get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
+	$article_list .= '<li><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
 }
 $templating->set('article_list', $article_list);
 ?>

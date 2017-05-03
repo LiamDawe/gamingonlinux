@@ -3,10 +3,10 @@ $templating->merge('search');
 if (!isset($_GET['author_id']))
 {
 	$templating->set_previous('title', 'Article Search', 1);
-	$templating->set_previous('meta_description', 'Search for articles on ' . core::config('site_title'), 1);
+	$templating->set_previous('meta_description', 'Search for articles on ' . $core->config('site_title'), 1);
 
 	$templating->block('top');
-	$templating->set('url', core::config('website_url'));
+	$templating->set('url', $core->config('website_url'));
 }
 
 $search_text = '';
@@ -95,7 +95,7 @@ if (isset($search_text) && !empty($search_text))
 
 			$templating->set('date', $date);
 			$templating->set('title', $found['title']);
-			$templating->set('article_link', article_class::get_link($found['article_id'], $found['slug']));
+			$templating->set('article_link', $article_class->get_link($found['article_id'], $found['slug']));
 
 			if ($found['author_id'] == 0)
 			{
@@ -164,13 +164,13 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		$templating->block('author_top');
 		$templating->set('username', $found_search[0]['username']);
 
-		if (core::config('pretty_urls') == 1)
+		if ($core->config('pretty_urls') == 1)
 		{
-			$profile_link = core::config('website_url') . 'profiles/' . $found_search[0]['author_id'];
+			$profile_link = $core->config('website_url') . 'profiles/' . $found_search[0]['author_id'];
 		}
 		else
 		{
-			$profile_link = core::config('website_url') . 'index.php?module=profile&user_id=' . $found_search[0]['author_id'];
+			$profile_link = $core->config('website_url') . 'index.php?module=profile&user_id=' . $found_search[0]['author_id'];
 		}
 		$templating->set('profile_link', $profile_link);
 
@@ -183,7 +183,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 			$templating->set('date', $date);
 			$templating->set('title', $found['title']);
-			$templating->set('article_link', article_class::get_link($found['article_id'], $found['slug']));
+			$templating->set('article_link', $article_class->get_link($found['article_id'], $found['slug']));
 
 			if ($found['author_id'] == 0)
 			{
@@ -201,7 +201,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 			$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']));
 			while ($get_categories = $db->fetch())
 			{
-				$tag_link = article_class::tag_link($get_categories['category_name']);
+				$tag_link = $article_class->tag_link($get_categories['category_name']);
 				
 				if ($get_categories['category_id'] == 60)
 				{

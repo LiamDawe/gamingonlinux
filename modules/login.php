@@ -111,18 +111,10 @@ if (!isset($_POST['action']))
 	}
 	
 	else if (isset($_GET['steam']))
-	{
-		// see if they need to stay logged in
-		$stay = 0;
-		if (isset($_POST['stay']))
-		{
-			$stay = 1;
-		}
-		setcookie('request_stay', $stay, time()+(60*60*24*7), '/', $core->config('cookie_domain')); // 1 week
-		
+	{		
 		require("includes/steam/steam_login.php");
 	
-		$steam_user = new steam_user;
+		$steam_user = new steam_user($user, $core);
 		$steam_user->apikey = $core->config('steam_openid_key'); // put your API key here
 		$steam_user->domain = $core->config('website_url'); // put your domain
 		$steam_user->return_url = $core->config('website_url');
@@ -131,12 +123,6 @@ if (!isset($_POST['action']))
 	
 	else if (isset($_GET['twitter']))
 	{
-		// see if they need to stay logged in
-		$stay = 0;
-		if (isset($_POST['stay']))
-		{
-			$stay = 1;
-		}
 		setcookie('request_stay', $stay, time()+(60*60*24*7), '/', $core->config('cookie_domain')); // 1 week
 		
 		require("includes/twitter/twitteroauth.php");

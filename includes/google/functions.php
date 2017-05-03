@@ -5,16 +5,22 @@ class google_check
 	// 1 = logging in using google that has already been setup
 	// 2 = making a new user
 	public $new = 0;
+	
+	private $database;
+	
+	function __construct($database)
+	{
+		$this->database = $database;
+	}
 
 	function checkUser($google_id, $google_email)
 	{
-		global $db, $core;
+		global $core;
 
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
-			$get_user = $db->sqlquery("SELECT ".user::$user_sql_fields." FROM `users` WHERE `google_id` = ? AND `google_email` = ?", array($google_id, $google_email));
-			$result = $get_user->fetch();
+			$result = $this->database->run("SELECT ".user::$user_sql_fields." FROM `users` WHERE `google_id` = ? AND `google_email` = ?", array($google_id, $google_email))->fetch();
 			if (!empty($result))
 			{
 				$this->new = 1;
@@ -39,7 +45,7 @@ class google_check
 		// if they are linking via usercp to a logged in account
 		else
 		{
-			$db->sqlquery("UPDATE `users` SET `google_id` = ?, `google_email` = ? WHERE `user_id` = ?", array($google_id, $google_email, $_SESSION['user_id']));
+			$this->database->run("UPDATE `users` SET `google_id` = ?, `google_email` = ? WHERE `user_id` = ?", array($google_id, $google_email, $_SESSION['user_id']));
 			$this->new = 0;
 			return;
 		}

@@ -9,6 +9,14 @@ class steam_user
 	public static $domain;
 	public static $return_url;
 	public $data_array;
+	private $user;
+	private $core;
+	
+	function __construct($user, $core)
+	{
+		$this->user = $user;
+		$this->core = $core;
+	}
 
 	public function GetPlayerSummaries ($steamid)
 	{
@@ -21,14 +29,14 @@ class steam_user
 
 	public function signIn ()
 	{
-		global $db, $core;
+		global $db;
 
 		require_once 'openid.php';
 		$openid = new LightOpenID($this->domain);// put your domain
 		if(!$openid->mode)
 		{
 			$openid->identity = 'http://steamcommunity.com/openid';
-			$openid->returnUrl = core::config('website_url') . 'index.php?module=login&steam&real_return=' . $this->return_url;
+			$openid->returnUrl = $this->core->config('website_url') . 'index.php?module=login&steam&real_return=' . $this->return_url;
 			header('Location: ' . $openid->authUrl());
 		}
 		elseif($openid->mode == 'cancel')
@@ -59,18 +67,15 @@ class steam_user
 					// update IP address and last login
 					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
-					$user->check_banned($userdata['user_id']);
+					$this->user->check_banned($userdata['user_id']);
 
 					$generated_session = md5(mt_rand  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
-					user::new_login($userdata, $generated_session);
+					$this->user->new_login($userdata, $generated_session);
 
-					if ($_COOKIE['request_stay'] == 1)
-					{
-						setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', core::config('cookie_domain'));
-						setcookie('gol_session', $generated_session,  time()+31556926, '/', core::config('cookie_domain'));
-					}
-
+					setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', $this->core->config('cookie_domain'));
+					setcookie('gol_session', $generated_session,  time()+31556926, '/', $this->core->config('cookie_domain'));
+					
 					header("Location: {$_GET['real_return']}");
 				}
 

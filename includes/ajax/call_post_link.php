@@ -30,9 +30,9 @@ if(isset($_GET['post_id']))
 			if ($permalink_info)
 			{
 				include($file_dir . '/includes/class_article.php');
-				$article_class = new article_class($dbl);
+				$article_class = new article_class($dbl, $core);
 				
-				$permalink = article_class::get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
+				$permalink = $article_class->get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
 				$templating->set('permalink', $permalink);
 			}
 			else

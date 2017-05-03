@@ -551,7 +551,7 @@ class article_class
 		return $this->core->config('website_url') . $link;
 	}
 	
-	public static function publish_article($options)
+	public function publish_article($options)
 	{
 		global $db, $core;
 

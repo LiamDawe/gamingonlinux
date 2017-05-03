@@ -480,7 +480,7 @@ else if (isset($_POST['act']))
 	if ($_POST['act'] == 'add_draft')
 	{
 		$return_page = '/admin.php?module=articles&view=drafts&aid=' . $_POST['article_id'];
-		article_class::publish_article(['return_page' => $return_page, 'type' => 'draft', 'new_notification_type' => 'new_article_published', 'clear_notification_type' => 'draft']);
+		$article_class->publish_article(['return_page' => $return_page, 'type' => 'draft', 'new_notification_type' => 'new_article_published', 'clear_notification_type' => 'draft']);
 	}
 
 	if ($_POST['act'] == 'Add_Review_Comment')
@@ -762,7 +762,7 @@ else if (isset($_POST['act']))
 	if ($_POST['act'] == 'Approve')
 	{
 		$return_page = '/admin.php?module=articles&view=Submitted&aid=' . $_POST['article_id'];
-		article_class::publish_article(['return_page' => $return_page, 'type' => 'submitted_article', 'new_notification_type' => 'approve_submitted_article', 'clear_notification_type' => 'submitted_article']);
+		$article_class->publish_article(['return_page' => $return_page, 'type' => 'submitted_article', 'new_notification_type' => 'approve_submitted_article', 'clear_notification_type' => 'submitted_article']);
 	}
 
 	// For editing a post from another admin in the review pool

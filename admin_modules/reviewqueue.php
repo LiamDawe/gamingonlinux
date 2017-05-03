@@ -266,7 +266,7 @@ if (isset($_POST['act']))
 	if ($_POST['act'] == 'Approve_Admin')
 	{
 		$return_page = "/admin.php?module=reviewqueue&aid={$_POST['article_id']}";
-		article_class::publish_article(['return_page' => $return_page, 'type' => 'admin_review', 'new_notification_type' => 'article_admin_queue_approved', 'clear_notification_type' => 'article_admin_queue']);
+		$article_class->publish_article(['return_page' => $return_page, 'type' => 'admin_review', 'new_notification_type' => 'article_admin_queue_approved', 'clear_notification_type' => 'article_admin_queue']);
 	}
 	
 	// For editing a post from another admin in the review pool

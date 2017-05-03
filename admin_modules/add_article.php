@@ -86,6 +86,6 @@ $templating->set('subscribe_check', $auto_subscribe);
 if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 {
 	$return_page = "/admin.php?module=add_article";
-	article_class::publish_article(['return_page' => $return_page, 'type' => 'new_article', 'new_notification_type' => 'new_article_published']);
+	$article_class->publish_article(['return_page' => $return_page, 'type' => 'new_article', 'new_notification_type' => 'new_article_published']);
 }
 ?>

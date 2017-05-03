@@ -38,7 +38,7 @@ class template
 			$template_folder = 'default';
 		}
 
-		if (!is_dir(core::config('path') . "templates/{$template_folder}"))
+		if (!is_dir($this->core->config('path') . "templates/{$template_folder}"))
 		{
 			die("Error loading template folder ($template_folder). " . $_SERVER['DOCUMENT_ROOT'] . $this->core->config('path') . "templates/" . $template_folder);
 		}
@@ -77,7 +77,7 @@ class template
 	// for plugins
 	public function merge_plugin($file)
 	{
-		if (!file_exists(core::config('path') . "plugins/{$file}.html"))
+		if (!file_exists($this->core->config('path') . "plugins/{$file}.html"))
 		{
 			$this->core->message("Error merging plugin template file, cannot find ({$this->template}/$file).", NULL, 1);
 		}

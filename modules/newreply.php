@@ -1,10 +1,12 @@
 <?php
 if (core::config('forum_posting_open') == 1)
 {
+	$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
+	
 	$forum_id = (int) $_GET['forum_id'];
 	$topic_id = (int) $_GET['topic_id'];
 
-	$core->forum_permissions($forum_id);
+	$forum_class->forum_permissions($forum_id);
 
 	$db->sqlquery("SELECT t.`topic_title`, t.`replys`, t.`is_locked`, t.`is_sticky`, f.`name`, f.`forum_id` FROM `forum_topics` t JOIN `forums` f ON t.`forum_id` = f.`forum_id` WHERE topic_id = ?", array($topic_id));
 
@@ -111,12 +113,8 @@ if (core::config('forum_posting_open') == 1)
 					}
 				}
 
-				// see if we need to add it into the mod queue
-				$db->sqlquery("SELECT `in_mod_queue` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-				$check_queue = $db->fetch();
-
 				$approved = 1;
-				if ($check_queue['in_mod_queue'] == 1)
+				if ($mod_queue == 1)
 				{
 					$approved = 0;
 				}
@@ -128,7 +126,7 @@ if (core::config('forum_posting_open') == 1)
 				// update user post counter
 				if ($approved == 1)
 				{
-					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
+					$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
 
 					// update forums post counter and last post info
 					$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $forum_id));
@@ -164,7 +162,7 @@ if (core::config('forum_posting_open') == 1)
 
 					// email anyone subscribed which isn't you
 					$users_array = array();
-					$fetch_subs = $db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `".$dbl->table_prefix."users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id));
+					$fetch_subs = $db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id));
 					$check_rows = $db->num_rows();
 					if ($check_rows > 0)
 					{
@@ -216,7 +214,7 @@ if (core::config('forum_posting_open') == 1)
 							}
 
 							// remove anyones send_emails subscription setting if they have it set to email once
-							$db->sqlquery("SELECT `email_options` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($email_user['user_id']));
+							$db->sqlquery("SELECT `email_options` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($email_user['user_id']));
 							$update_sub = $db->fetch();
 
 							if ($update_sub['email_options'] == 2)
@@ -234,7 +232,7 @@ if (core::config('forum_posting_open') == 1)
 					}
 					else
 					{
-						header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&post_id={$post_id}");
+						header("Location: " . $core->config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&post_id={$post_id}");
 					}
 				}
 

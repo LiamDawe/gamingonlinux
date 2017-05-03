@@ -51,7 +51,7 @@ if (isset($search_text) && !empty($search_text))
 		// do the search query
 		$db->sqlquery("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
 		FROM `forum_topics` t
-		LEFT JOIN `".$dbl->table_prefix."users` u ON t.author_id = u.user_id
+		LEFT JOIN ".$core->db_tables['users']." u ON t.author_id = u.user_id
 		WHERE MATCH (
 		t.`topic_title`
 		)
@@ -69,7 +69,7 @@ if (isset($search_text) && !empty($search_text))
 		// do the search query
 		$db->sqlquery("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
 		FROM `forum_topics` t
-		LEFT JOIN `".$dbl->table_prefix."users` u ON t.author_id = u.user_id
+		LEFT JOIN ".$core->db_tables['users']." u ON t.author_id = u.user_id
 		WHERE MATCH (
 		t.`topic_title`
 		)

@@ -11,7 +11,7 @@ else
 	if (isset($_GET['view']) && $_GET['view'] == 'deletetopic')
 	{
 		$return = "/index.php?module=viewforum&forum_id=" . $_GET['forum_id'];
-		if (core::config('pretty_urls') == 1)
+		if ($core->config('pretty_urls') == 1)
 		{
 			$return_no = '/forum/topic/' . $_GET['topic_id'];
 		}
@@ -26,7 +26,7 @@ else
 	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
 	{
 		$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
-		if (core::config('pretty_urls') == 1)
+		if ($core->config('pretty_urls') == 1)
 		{
 			$return_no = '/forum/topic/' . $_GET['topic_id'];
 		}
@@ -35,7 +35,7 @@ else
 			$return_no = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
 		}
 			
-		forum_class::delete_reply($return, $return_no, "/index.php?module=viewtopic&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
+		$forum_class->delete_reply($return, $return_no, "/index.php?module=viewtopic&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
 	}
 
 	else if (!isset($_POST['act']) && !isset($_GET['go']) && !isset($_GET['view']))
@@ -87,7 +87,7 @@ else
 			$templating->set_previous('title', "Viewing topic {$topic['topic_title']}", 1);
 			$templating->set_previous('meta_description', $rest . ' - Forum post on GamingOnLinux.com', 1);
 
-			$core->forum_permissions($topic['forum_id']);
+			$forum_class->forum_permissions($topic['forum_id']);
 
 			// are we even allow to view this forum?
 			if($parray['view'] == 0)
@@ -193,7 +193,7 @@ else
 				$templating->set('forum_name', $topic['forum_name']);
 				$templating->set('subscribe_link', $subscribe_link);
 
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					$forum_index = '/forum/';
 				}
@@ -364,7 +364,7 @@ else
 					$delete_link = '';
 					if ($user->check_group([1,2]) == true)
 					{
-						$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletetopic&topic_id=' . $topic['topic_id'] . '&forum_id='. $topic['forum_id'] . '&author_id=' . $topic['author_id'] . '"><span class="icon delete"></span></a>';
+						$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletetopic&topic_id=' . $topic['topic_id'] . '&forum_id='. $topic['forum_id'] . '&author_id=' . $topic['author_id'] . '"><span class="icon delete"></span></a>';
 					}
 					$templating->set('delete_link', $delete_link);
 
@@ -408,7 +408,7 @@ else
 						{
 							$bookmark = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="forum_topic" data-id="'.$_GET['topic_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
 						}
-						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$topic['username']."\" data-comment=\"".htmlspecialchars($topic['topic_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
+						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$topic['username']."\" data-comment=\"".htmlspecialchars($topic['topic_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
 					}
 					$templating->set('bookmark', $bookmark);
 					$templating->set('user_options', $user_options);
@@ -482,7 +482,7 @@ else
 						$edit_link = '';
 						if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 						{
-							$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . core::config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
+							$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . $core->config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
 						}
 						$templating->set('edit_link', $edit_link);
 
@@ -490,7 +490,7 @@ else
 						$delete_link = '';
 						if ($user->check_group([1,2]) == true)
 						{
-							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . core::config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
+							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
 						}
 						$templating->set('delete_link', $delete_link);
 
@@ -511,7 +511,7 @@ else
 
 						$templating->set('username', $into_username . $username);
 
-						$avatar = $user->sort_avatar($post);
+						$avatar = $user->sort_avatar($post['author_id']);
 						$templating->set('avatar', $avatar);
 
 						$badges = user::user_badges($post, 1);
@@ -529,7 +529,7 @@ else
 						$bookmark_reply = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . core::config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$post['username']."\" data-comment=\"".htmlspecialchars($post['reply_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
+							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$post['username']."\" data-comment=\"".htmlspecialchars($post['reply_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
 							// sort bookmark icon out
 							if (in_array($post['post_id'], $bookmarks_array))
 							{
@@ -543,7 +543,7 @@ else
 						$templating->set('user_options', $user_options);
 						$templating->set('bookmark', $bookmark_reply);
 
-						if (core::config('pretty_urls') == 1)
+						if ($core->config('pretty_urls') == 1)
 						{
 							$post_link = '/forum/topic/' . $_GET['topic_id'] . '/post_id=' . $post['post_id'];
 						}
@@ -662,36 +662,36 @@ else
 					}
 				}
 
-				if (core::config('forum_posting_open') == 1)
+				if ($core->config('forum_posting_open') == 1)
 				{
-					if ((isset($_SESSION['user_group']) && $_SESSION['user_group'] == 4) || !isset($_SESSION['user_group']))
+					if ($_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 					{
 						$templating->merge('login');
 						$templating->block('small');
 						
-						$templating->set('url', core::config('website_url'));
+						$templating->set('url', $core->config('website_url'));
 								
 						$twitter_button = '';
-						if (core::config('twitter_login') == 1)
+						if ($core->config('twitter_login') == 1)
 						{	
-							$twitter_button = '<a href="'.core::config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
+							$twitter_button = '<a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
 						}
 						$templating->set('twitter_button', $twitter_button);
 								
 						$steam_button = '';
-						if (core::config('steam_login') == 1)
+						if ($core->config('steam_login') == 1)
 						{
-							$steam_button = '<a href="'.core::config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
+							$steam_button = '<a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
 						}
 						$templating->set('steam_button', $steam_button);
 								
 						$google_button = '';
-						if (core::config('google_login') == 1)
+						if ($core->config('google_login') == 1)
 						{
-							$client_id = core::config('google_login_public'); 
-							$client_secret = core::config('google_login_secret');
-							$redirect_uri = core::config('website_url') . 'includes/google/login.php';
-							require_once (core::config('path') . 'includes/google/libraries/Google/autoload.php');
+							$client_id = $core->config('google_login_public'); 
+							$client_secret = $core->config('google_login_secret');
+							$redirect_uri = $core->config('website_url') . 'includes/google/login.php';
+							require_once ($core->config('path') . 'includes/google/libraries/Google/autoload.php');
 							$client = new Google_Client();
 							$client->setClientId($client_id);
 							$client->setClientSecret($client_secret);
@@ -701,7 +701,7 @@ else
 							$service = new Google_Service_Oauth2($client);
 							$authUrl = $client->createAuthUrl();
 									
-							$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
+							$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
 						}
 						$templating->set('google_button', $google_button);
 					}
@@ -819,7 +819,7 @@ else
 						}
 					}
 				}
-				else if (core::config('forum_posting_open') == 0)
+				else if ($core->config('forum_posting_open') == 0)
 				{
 					$core->message('Posting is currently down for maintenance.');
 				}

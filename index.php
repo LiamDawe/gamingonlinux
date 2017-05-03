@@ -14,7 +14,7 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 	{
 		$db->sqlquery("UPDATE `editor_picks` SET `hits` = (hits + 1) WHERE `article_id` = ?", array($_GET['aid']));
 		
-		header('Location: ' . article_class::get_link($featured_grabber['article_id'], $featured_grabber['slug']));
+		header('Location: ' . $article_class->get_link($featured_grabber['article_id'], $featured_grabber['slug']));
 	}
 }
 

@@ -6,7 +6,7 @@ if (!core::is_number($_GET['forum_id']))
 	die();
 }
 
-$core->forum_permissions($_GET['forum_id']);
+$forum_class->forum_permissions($_GET['forum_id']);
 
 // permissions for viewforum page
 if($parray['view'] == 0)

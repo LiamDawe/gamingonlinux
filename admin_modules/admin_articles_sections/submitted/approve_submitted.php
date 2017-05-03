@@ -1,6 +1,6 @@
 <?php
 // check it hasn't been accepted already
-$db->sqlquery("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
 $check_article = $db->fetch();
 if ($check_article['active'] == 1)
 {
@@ -108,7 +108,7 @@ else
 		$article_link = article_class::get_link($_POST['article_id'], $checked['slug']);
 
 		// subject
-		$subject = 'Your article was approved and published on ' . core::config('site_title');
+		$subject = 'Your article was approved and published on ' . $core->config('site_title');
 		
 		$html_message = '<p>We have accepted your article titled "<a href="'.$article_link.'">'.$checked['title'].'</a>" on <a href="'.core::config('website_url').'" target="_blank">'.core::config('site_title').'</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome!</p>';
 

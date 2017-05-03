@@ -3,7 +3,7 @@
 $templating->merge('blocks/block_forum_latest');
 $templating->block('list');
 
-$comments_per_page = core::config('default-comments-per-page');
+$comments_per_page = $core->config('default-comments-per-page');
 if (isset($_SESSION['per-page']))
 {
 	$comments_per_page = $_SESSION['per-page'];
@@ -45,7 +45,7 @@ while ($topics = $db->fetch())
 		$title = $topics['topic_title'];
 	}
 
-	if (core::config('pretty_urls') == 1)
+	if ($core->config('pretty_urls') == 1)
 	{
 		$forum_posts .= "<li class=\"list-group-item\"><a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\">{$title}</a><br /><small>{$date}</small></li>";
 	}

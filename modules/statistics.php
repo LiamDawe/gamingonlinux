@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'User stats', 1);
 $templating->set_previous('meta_description', 'Statistics generated from the users of the GamingOnLinux website', 1);
 
-include(core::config('path') . '/includes/profile_fields.php');
+include($core->config('path') . '/includes/profile_fields.php');
 
 $templating->load('statistics');
 

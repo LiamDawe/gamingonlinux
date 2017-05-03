@@ -9,7 +9,7 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
 	{
-		$topics = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username` FROM `forum_topics` t INNER JOIN `".$dbl->table_prefix."users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0");
+		$topics = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username` FROM `forum_topics` t INNER JOIN ".$core->db_tables['users']." u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0");
 		$topic_counter = $db->num_rows();
 		if ($topic_counter > 0)
 		{
@@ -28,7 +28,7 @@ if (isset($_GET['view']))
 			}
 		}
 
-		$replies = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `".$dbl->table_prefix."users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0");
+		$replies = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN ".$core->db_tables['users']." u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0");
 		$reply_counter = $db->num_rows();
 
 		if ($reply_counter > 0)
@@ -109,7 +109,7 @@ if (isset($_POST['action']))
 				$topic_info = $db->fetch();
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `".$dbl->table_prefix."users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']));
+				$db->sqlquery("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']));
 				$users_array = array();
 				while ($users = $db->fetch())
 				{
@@ -121,7 +121,7 @@ if (isset($_POST['action']))
 					}
 				}
 
-				$db->sqlquery("SELECT `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_POST['author_id']));
 				$author_username = $db->fetch();
 
 				// send the emails
@@ -152,7 +152,7 @@ if (isset($_POST['action']))
 					}
 
 					// remove anyones send_emails subscription setting if they have it set to email once
-					$db->sqlquery("SELECT `email_options` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($email_user['user_id']));
+					$db->sqlquery("SELECT `email_options` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($email_user['user_id']));
 					$update_sub = $db->fetch();
 
 					if ($update_sub['email_options'] == 2)
@@ -162,18 +162,18 @@ if (isset($_POST['action']))
 				}
 
 				// update their post counter
-				$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
 
 				// add 1 to their approval rating
-				$db->sqlquery("SELECT `mod_approved` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("SELECT `mod_approved` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_POST['author_id']));
 				$user_get = $db->fetch();
 
 				// remove them from the mod queue if we need to
 				if ($user_get['mod_approved'] >= 2)
 				{
-					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `in_mod_queue` = 0 WHERE `user_id` = ?", array($_POST['author_id']));
+					$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `in_mod_queue` = 0 WHERE `user_id` = ?", array($_POST['author_id']));
 				}
-				$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `mod_approved` = (mod_approved + 1), `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `mod_approved` = (mod_approved + 1), `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
 
 				$_SESSION['message'] = 'accepted';
 				$_SESSION['message_extra'] = 'post';
@@ -231,10 +231,10 @@ if (isset($_POST['action']))
 		}
 
 		// do the ban as well
-		$db->sqlquery("SELECT `ip` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_POST['author_id']));
+		$db->sqlquery("SELECT `ip` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_POST['author_id']));
 		$get_ip = $db->fetch();
 
-		$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `banned` = 1 WHERE `user_id` = ?", array($_POST['author_id']));
+		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `banned` = 1 WHERE `user_id` = ?", array($_POST['author_id']));
 
 		$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($get_ip['ip']));
 

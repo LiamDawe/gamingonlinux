@@ -1,14 +1,14 @@
 <?php
 class article_class
 {
-	// the required bbcode class
 	private $bbcode;
-	// the required db connection
 	private $database;
+	private $core;
 	
-	function __construct($database, $bbcode = NULL)
+	function __construct($database, $core, $bbcode = NULL)
 	{
 		$this->database = $database;
+		$this->core = $core;
 		$this->bbcode = $bbcode;
 	}
 	
@@ -22,20 +22,20 @@ class article_class
 		unset($_SESSION['gallery_tagline_filename']);
 	}
 
-	public static function tagline_image($data)
+	public function tagline_image($data)
 	{
 		$tagline_image = '';
 		if (!empty($data['tagline_image']))
 		{
-			$tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+			$tagline_image = "<img alt src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
 		}
 		if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
 		{
-			$tagline_image = "<img alt src=\"".core::config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
+			$tagline_image = "<img alt src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
 		}
 		if (empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
 		{
-			$tagline_image = "<img alt src=\"".core::config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
+			$tagline_image = "<img alt src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
 		}
 
 		return $tagline_image;
@@ -54,8 +54,8 @@ class article_class
 			{
 				if (!empty($data['tagline_image']))
 				{
-					unlink(core::config('path') . 'uploads/articles/tagline_images/' . $data['tagline_image']);
-					unlink(core::config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
+					unlink($this->core->config('path') . 'uploads/articles/tagline_images/' . $data['tagline_image']);
+					unlink($this->core->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
 				}
 
 				$db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
@@ -81,15 +81,15 @@ class article_class
 
       foreach($article_images as $value)
       {
-        $bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$value['filename']}[/img]";
+        $bbcode = "[img]" . $this->core->config('website_url') . "uploads/articles/article_images/{$value['filename']}[/img]";
         $bbcode_thumb = "[img-thumb]{$value['filename']}[/img-thumb]";
         
         // for old uploads where no thumbnail was made
         $show_thumb = '';
-        $main_image = core::config('website_url') . 'uploads/articles/article_images/'.$value['filename'];
-        if (file_exists(core::config('path') . 'uploads/articles/article_images/thumbs/'.$value['filename']))
+        $main_image = $this->core->config('website_url') . 'uploads/articles/article_images/'.$value['filename'];
+        if (file_exists($this->core->config('path') . 'uploads/articles/article_images/thumbs/'.$value['filename']))
         {
-			$main_image = core::config('website_url') . 'uploads/articles/article_images/thumbs/'.$value['filename'];
+			$main_image = $this->core->config('website_url') . 'uploads/articles/article_images/thumbs/'.$value['filename'];
 			$show_thumb = 'BBCode (thumbnail): <input id="img'.$value['id'].'_thumb" type="text" class="form-control" value="'.$bbcode_thumb.'" /> <button class="btn" data-clipboard-target="#img'.$value['id'].'_thumb">Copy</button> <button data-bbcode="'.$bbcode_thumb.'" class="add_button">Add to editor</button>';
         }
         
@@ -111,7 +111,7 @@ class article_class
         {
           if ($key['image_rand'] == $_SESSION['image_rand'])
           {
-            $bbcode = "[img]" . core::config('website_url') . "uploads/articles/article_images/{$key['image_name']}[/img]";
+            $bbcode = "[img]" . $this->core->config('website_url') . "uploads/articles/article_images/{$key['image_name']}[/img]";
             $previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$key['image_id']}\"><img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
             BBCode: <input id=\"img{$key['image_id']}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
             <button class=\"btn\" data-clipboard-target=\"#img{$key['image_id']}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$key['image_id']}\" class=\"trash\">Delete image</button>
@@ -205,15 +205,15 @@ class article_class
     {
       if (!empty($article['tagline_image']))
       {
-        $tagline_image = "<div class=\"test\" id=\"{$article['tagline_image']}\"><img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+        $tagline_image = "<div class=\"test\" id=\"{$article['tagline_image']}\"><img src=\"" . $this->core->config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
         BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-        Full Image Url: <a href=\"" . core::config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a></div>";
+        Full Image Url: <a href=\"" . $this->core->config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a></div>";
       }
       if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
       {
-        $tagline_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+        $tagline_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . $this->core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
         BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-        Full Image Url: <a href=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
+        Full Image Url: <a href=\"" . $this->core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
       }
     }
 
@@ -223,11 +223,11 @@ class article_class
       {
         if (isset($_SESSION['uploads_tagline']))
         {
-          $file = core::config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
+          $file = $this->core->config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
 
           if (file_exists($file))
           {
-            $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".core::config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
+            $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
             BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
             <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
             <a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
@@ -236,7 +236,7 @@ class article_class
 
         if (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] = $_SESSION['image_rand'])
         {
-          $tagline_image = "<div class=\"test\" id=\"{$_SESSION['gallery_tagline_filename']}\"><img src=\"".core::config('website_url')."uploads/tagline_gallery/{$_SESSION['gallery_tagline_filename']}\" class='imgList'><br />
+          $tagline_image = "<div class=\"test\" id=\"{$_SESSION['gallery_tagline_filename']}\"><img src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$_SESSION['gallery_tagline_filename']}\" class='imgList'><br />
           BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
           <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['gallery_tagline_filename']}\" /></div>";
         }
@@ -513,12 +513,12 @@ class article_class
 		$templating->set('history', $history);
 	}
   
-	public static function get_link($id, $title, $additional = NULL)
+	public function get_link($id, $title, $additional = NULL)
 	{
 		$link = '';
 		$nice_title = core::nice_title($title);
 		
-		if (core::config('pretty_urls') == 1)
+		if ($this->core->config('pretty_urls') == 1)
 		{
 			$link = 'articles/'.$nice_title.'.'.$id;
 			
@@ -536,13 +536,13 @@ class article_class
 				$link = $link . '&' . $additional;
 			}
 		}
-		return core::config('website_url') . $link;
+		return $this->core->config('website_url') . $link;
 	}
 	
-	public static function tag_link($name)
+	public function tag_link($name)
 	{
 		$name = str_replace(' ', '-', $name);
-		if (core::config('pretty_urls') == 1)
+		if ($this->core->config('pretty_urls') == 1)
 		{
 			$link = 'articles/category/'.$name;
 		}
@@ -550,7 +550,7 @@ class article_class
 		{
 			$link = 'index.php?module=articles&amp;view=cat&amp;catid='.$name;
 		}
-		return core::config('website_url') . $link;
+		return $this->core->config('website_url') . $link;
 	}
 	
 	public static function publish_article($options)
@@ -719,7 +719,7 @@ class article_class
 				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 				// Mail it
-				if (core::config('send_emails') == 1)
+				if ($this->core->config('send_emails') == 1)
 				{
 					mail($author_email['email'], $subject, $message, $headers);
 				}
@@ -761,13 +761,13 @@ class article_class
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
-			if (core::config('send_emails') == 1)
+			if ($this->core->config('send_emails') == 1)
 			{
 				mail($email, $subject, $message, $headers);
 			}
 		}
 		
-		include(core::config('path') . 'includes/telegram_poster.php');
+		include($this->core->config('path') . 'includes/telegram_poster.php');
 
 		$article_link = self::get_link($article_id, $checked['slug']);
 
@@ -779,18 +779,18 @@ class article_class
 		else
 		{
 			telegram($checked['title'] . ' ' . $article_link);
-			header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
+			header("Location: " . $this->core->config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
 		}
 	}
 	
 	public function display_article_list($article_list, $get_categories)
 	{
-		global $db, $templating, $core, $user;
+		global $db, $templating, $user;
 
 		foreach ($article_list as $article)
 		{
 			// make date human readable
-			$date = $core->format_date($article['date']);
+			$date = $this->core->format_date($article['date']);
 
 			// get the article row template
 			$templating->block('article_row', 'articles');
@@ -800,12 +800,12 @@ class article_class
 				$templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
 				if ($article['show_in_menu'] == 0)
 				{
-					if (core::config('total_featured') < 5)
+					if ($this->core->config('total_featured') < 5)
 					{
-						$editor_pick_expiry = $core->format_date($article['date'] + 1209600, 'd/m/y');
+						$editor_pick_expiry = $this->core->format_date($article['date'] + 1209600, 'd/m/y');
 						$templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
 					}
-					else if (core::config('total_featured') == 5)
+					else if ($this->core->config('total_featured') == 5)
 					{
 						$templating->set('editors_pick_link', "");
 					}
@@ -858,7 +858,7 @@ class article_class
 			{
 				if ($article['article_id'] == $category_list['article_id'])
 				{
-					$category_link = article_class::tag_link($category_list['category_name']);
+					$category_link = $this->tag_link($category_list['category_name']);
 
 					if ($category_list['category_id'] == 60)
 					{
@@ -873,14 +873,14 @@ class article_class
 
 			$templating->set('categories_list', $categories_list);
 
-			$tagline_image = self::tagline_image($article);
+			$tagline_image = $this->tagline_image($article);
 
 			$templating->set('top_image', $tagline_image);
 
 			// set last bit to 0 so we don't parse links in the tagline
 			$templating->set('text', $this->bbcode->parse_bbcode($article['tagline'], 1, 0));
 				
-			$templating->set('article_link', article_class::get_link($article['article_id'], $article['slug']));
+			$templating->set('article_link', $this->get_link($article['article_id'], $article['slug']));
 			$templating->set('comment_count', $article['comment_count']);
 		}
 	}

@@ -63,7 +63,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('timezones_list', '');
 
 			$streamer_list = '';
-			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `".$dbl->table_prefix."users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
+			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN ".$core->db_tables['users']." u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
 			while ($grab_streamers = $db->fetch())
 			{
 				$streamer_list .= '<option value="'.$grab_streamers['user_id'].'" selected>'.$grab_streamers['username'].'</option>';
@@ -142,7 +142,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
 
 			$streamer_list = '';
-			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `".$dbl->table_prefix."users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
+			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN ".$core->db_tables['users']." u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
 			while ($grab_streamers = $db->fetch())
 			{
 				$streamer_list .= '<option value="'.$grab_streamers['user_id'].'" selected>'.$grab_streamers['username'].'</option>';
@@ -287,7 +287,7 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'deny_submission')
 	{
-		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `".$dbl->table_prefix."users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
+		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN ".$core->db_tables['users']." u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
 		$livestream = $db->fetch();
 
 		if (!isset($_POST['go']))
@@ -315,12 +315,7 @@ if (isset($_POST['act']))
 			<p><strong>{$_SESSION['username']}</strong> has denied your livestream even submission, sorry!</p>
 			<div>
 			<hr>
-			{$comment_email}
-			<hr>
-				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-				<p>-----------------------------------------------------------------------------------------------------------</p>
-			</div>";
+			{$comment_email}";
 
 			$plain_message = PHP_EOL."Hello {$livestream['username']}, {$_SESSION['username']} has denied your livestream even submission, sorry!";
 
@@ -362,7 +357,7 @@ if (isset($_POST['act']))
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);
 
-		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `".$dbl->table_prefix."users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
+		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN ".$core->db_tables['users']." u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
 		$livestream = $db->fetch();
 
 		$comment_email = $bbcode->email_bbcode($_POST['message']);
@@ -372,13 +367,7 @@ if (isset($_POST['act']))
 
 		// message
 		$html_message = "<p>Hello <strong>{$livestream['username']}</strong>,</p>
-		<p><strong>{$_SESSION['username']}</strong> has approved your livestream even submission, thanks for sending it in!</p>
-		<div>
-		<hr>
-			<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-			<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-			<p>-----------------------------------------------------------------------------------------------------------</p>
-		</div>";
+		<p><strong>{$_SESSION['username']}</strong> has approved your livestream even submission, thanks for sending it in!</p>";
 
 		$plain_message = PHP_EOL."Hello {$livestream['username']}, {$_SESSION['username']} has approved your livestream even submission, thanks for sending it in!";
 

@@ -8,6 +8,12 @@ $templating->merge('email_us');
 
 $templating->block('top');
 
+$captcha = 0;
+if (!$user->can('skip_contact_captcha'))
+{
+	$captcha = 1;
+}
+
 if (isset($_POST['act']))
 {
 	if (empty($_POST['message']))
@@ -18,7 +24,7 @@ if (isset($_POST['act']))
 		$_SESSION['message'] = 'empty';
 		$_SESSION['message_extra'] = 'email text';
 
-		if (core::config('pretty_urls') == 1)
+		if ($core->config('pretty_urls') == 1)
 		{
 			header('Location: /email-us/');
 		}
@@ -30,7 +36,7 @@ if (isset($_POST['act']))
 
 	else
 	{
-		if ($user->can('skip_contact_captcha') == 1)
+		if ($captcha == 1)
 		{
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";
@@ -40,14 +46,14 @@ if (isset($_POST['act']))
 			$res= json_decode($res, true);
 		}
 
-		if ($parray['contact_captcha'] == 1 && !$res['success'])
+		if ($captcha == 1 && !$res['success'])
 		{
 			$_SESSION['aname'] = $_POST['name'];
 			$_SESSION['aemail'] = $_POST['email'];
 			$_SESSION['atext'] = $_POST['message'];
 			$_SESSION['message'] = 'captcha';
 			
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				header('Location: /email-us/');
 			}
@@ -57,7 +63,7 @@ if (isset($_POST['act']))
 			}
 		}
 
-		else if (($parray['contact_captcha'] == 1 && $res['success']) || $parray['contact_captcha'] == 0)
+		else if (($captcha == 1 && $res['success']) || $captcha == 0)
 		{
 			// send the email
 			$additional_header = '';
@@ -91,7 +97,7 @@ if (isset($_POST['act']))
 			// Mail it
             if (core::config('send_emails') == 1)
             {
-				$mail = new mail(core::config('contact_email'), $subject, $html_message, '', $additional_header);
+				$mail = new mail($core->config('contact_email'), $subject, $html_message, '', $additional_header);
 				$mail->send();
 				
 				unset($_SESSION['aname']);
@@ -111,7 +117,7 @@ if (($_SESSION['user_id'] != 0) && (!isset($_GET['message']) || isset($_GET['mes
 {
 	$name = $_SESSION['username'];
 	
-	$email = $user->get('email', $_SESSION['user_id'])['email'];
+	$email = $user->get('email', $_SESSION['user_id']);
 }
 
 if (isset($_SESSION['message']) && $_SESSION['message'] == 'empty')
@@ -145,20 +151,20 @@ foreach ($social_icons as $social)
 			$extra_url = 'https://www.twitter.com/';
 		}
 		
-		$social_output .= '<a class="button small fnone" href="'.$extra_url.core::config($social['config']).'" target="_blank"><img src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/'.$social['icon'].'"></a>';
+		$social_output .= '<a class="button small fnone" href="'.$extra_url.core::config($social['config']).'" target="_blank"><img src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/'.$social['icon'].'"></a>';
 	}
 }
 $templating->set('social_icons', $social_output);
 
-if ($parray['contact_captcha'] == 1)
+if ($captcha == 1)
 {
-	$captcha = '<noscript><strong>You need Javascript turned on to see the captcha, otherwise you won\'t be able to email us!</strong></noscript><div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';
+	$captcha_output = '<noscript><strong>You need Javascript turned on to see the captcha, otherwise you won\'t be able to email us!</strong></noscript><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
 }
 
 else
 {
-	$captcha = '';
+	$captcha_output = '';
 }
 
-$templating->set('captcha', $captcha);
+$templating->set('captcha', $captcha_output);
 ?>

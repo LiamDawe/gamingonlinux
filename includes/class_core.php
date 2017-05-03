@@ -65,21 +65,6 @@ class core
 		return false;
 	}
 
-	public static function genEmailCode($id)
-	{
-		include_once dirname(__FILE__).'/hashids/HashGenerator.php';
-		include_once dirname(__FILE__).'/hashids/Hashids.php';
-
-		$hashids = new Hashids\Hashids('GoL sends email');
-		return $hashids->encode($id);
-	}
-
-	public static function genReplyAddress($id, $type)
-	{
-		if (!in_array($type, ['comment', 'forum', 'editor', 'admin'])) return false;
-		return static::genEmailCode($id)."-".$type."@mail.gamingonlinux.com";
-	}
-
 	public static function make_safe($text)
 	{
 		if (is_array($text))
@@ -251,6 +236,7 @@ class core
  			$this->db_tables['user_permissions'] = '`'.$this->database->table_prefix.'user_group_permissions`';
  			$this->db_tables['user_profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
  			$this->db_tables['user_group_membership'] = '`'.$this->database->table_prefix.'user_group_membership`';
+ 			$this->db_tables['user_group_permissions_membership'] = '`'.$this->database->table_prefix.'user_group_permissions_membership`';
 		}
 		else if ($this->config('local_users') == 0)
 		{
@@ -261,6 +247,7 @@ class core
 			$this->db_tables['user_permissions'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_group_permissions`';
 			$this->db_tables['user_profile_info'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_profile_info`';
 			$this->db_tables['user_group_membership'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_group_membership`';
+			$this->db_tables['user_group_permissions_membership'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_group_permissions_membership`';
 		}
 	}
 
@@ -645,93 +632,6 @@ class core
 			$act2_text = "<input type=\"hidden\" name=\"$act2_custom_name\" value=\"$act2\" />";
 		}
 		$templating->set('act2', $act2_text);
-	}
-
-	// check permissions, done from primary user group as thats where your main permissions come from, secondary user group should only be used for site extras anyway
-	function forum_permissions($id)
-	{
-		global $db, $parray;
-
-		$forum_id = $id;
-		$group_id = $_SESSION['user_group'];
-
-		$sql_permissions = "
-		SELECT
-			`can_view`,
-			`can_topic`,
-			`can_reply`,
-			`can_lock`,
-			`can_sticky`,
-			`can_delete`,
-			`can_delete_own`,
-			`can_avoid_floods`,
-			`can_move`
-		FROM
-			`forum_permissions`
-		WHERE
-			`forum_id` = ? AND `group_id` = ?
-		";
-
-		$db->sqlquery($sql_permissions, array($forum_id, $group_id));
-
-		$permission = $db->fetch();
-
-		$parray = array();
-
-		// set the permissions
-		$parray['view'] = 0;
-		if ($permission['can_view'] == 1)
-		{
-			$parray['view'] = 1;
-		}
-
-		$parray['topic'] = 0;
-		if ($permission['can_topic'] == 1)
-		{
-			$parray['topic'] = 1;
-		}
-		$modules_allowed = [];
-		$parray['reply'] = 0;
-		if ($permission['can_reply'] == 1)
-		{
-			$parray['reply'] = 1;
-		}
-
-		$parray['lock'] = 0;
-		if ($permission['can_lock'] == 1)
-		{
-			$parray['lock'] = 1;
-		}
-
-		$parray['sticky'] = 0;
-		if ($permission['can_sticky'] == 1)
-		{
-			$parray['sticky'] = 1;
-		}
-
-		$parray['delete'] = 0;
-		if ($permission['can_delete'] == 1)
-		{
-			$parray['delete'] = 1;
-		}
-
-		$parray['delete_own'] = 0;
-		if ($permission['can_delete_own'] == 1)
-		{
-			$parray['delete_own'] = 1;
-		}
-
-		$parray['avoid_floods'] = 0;
-		if ($permission['can_avoid_floods'] == 1)
-		{
-			$parray['avoid_floods'] = 1;
-		}
-
-		$parray['can_move'] = 0;
-		if ($permission['can_move'] == 1)
-		{
-			$parray['can_move'] = 1;
-		}
 	}
 
 	public static function nice_title($title)
@@ -1303,7 +1203,7 @@ class core
 		return $output;
 	}
 	
-	public static function load_modules($options)
+	public function load_modules($options)
 	{
 		global $db;
 		
@@ -1317,10 +1217,10 @@ class core
 			if ($modules['sections_link'] == 1)
 			{
 				// sort out links to be placed in the navbar
-				$section_link = core::config('website_url') . 'index.php?module=' . $modules['module_file_name'];
-				if (core::config('pretty_urls') == 1 && !empty($modules['nice_link']) && $modules['nice_link'] != NULL)
+				$section_link = self::config('website_url') . 'index.php?module=' . $modules['module_file_name'];
+				if ($this->config('pretty_urls') == 1 && !empty($modules['nice_link']) && $modules['nice_link'] != NULL)
 				{
-					$section_link = core::config('website_url') . $modules['nice_link'];
+					$section_link = self::config('website_url') . $modules['nice_link'];
 				}
 				self::$top_bar_links[] = '<li><a href="'.$section_link.'">'.$modules['nice_title'].'</a></li>';
 			}
@@ -1341,7 +1241,7 @@ class core
 
 		else
 		{
-			self::$current_module = self::$allowed_modules[core::config('default_module')];
+			self::$current_module = self::$allowed_modules[$this->config('default_module')];
 		}
 	}
 	

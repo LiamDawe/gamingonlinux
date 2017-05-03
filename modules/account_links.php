@@ -25,17 +25,13 @@ else if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	// sort out admin red numbered notification for article submissions
 	$admin_link = '';
 	$notifications_link = '';
-	if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
+	if ($user->check_group([1,2,5]))
 	{
-		// now we set if we need to show notifications or not
-		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2)
+		$db->sqlquery("SELECT `id` FROM `admin_notifications` WHERE `completed` = 0");
+		$admin_notes = $db->num_rows();
+		if ($admin_notes > 0)
 		{
-			$db->sqlquery("SELECT `id` FROM `admin_notifications` WHERE `completed` = 0");
-			$admin_notes = $db->num_rows();
-			if ($admin_notes > 0)
-			{
-				$notifications_link = "<span class=\"badge badge-important\">$admin_notes</span>";
-			}
+			$notifications_link = "<span class=\"badge badge-important\">$admin_notes</span>";
 		}
 		
 		$admin_link = "<li><a href=\"/admin.php\">Admin CP $notifications_link</a></li>";

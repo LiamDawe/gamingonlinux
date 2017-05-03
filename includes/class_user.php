@@ -16,6 +16,8 @@ class user
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`,
 	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
 	
+	public $user_groups;
+	
 	function __construct($database, $core)
 	{
 		$this->database = $database;
@@ -44,12 +46,14 @@ class user
 		}
 		else
 		{
-			if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']) && $user->stay_logged_in() == true)
+			if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']) && $this->stay_logged_in() == true)
 			{
 				header("Location: " . $_SERVER['REQUEST_URI']);
 			}
 			$this->make_guest_session();
 		}
+		
+		$this->user_groups = $this->get_user_groups();
 
 		if ($logout == 1)
 		{
@@ -155,10 +159,9 @@ class user
 	{
 		$_SESSION['user_id'] = 0;
 		$_SESSION['username'] = 'Guest'; // not even sure why I set this
-		$_SESSION['user_group'] = 4;
-		$_SESSION['secondary_user_group'] = 4;
 		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
+		$this->user_details[0] = ['theme' => 'default'];
 	}
 	
 	// helper func to get a user field(s)
@@ -201,18 +204,66 @@ class user
 			}
 			else
 			{
-				$get_fields = "`" . $fields . "`";
-
-				$sql = "SELECT ".$get_fields." FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?";
-				$picked_fields = $this->database->run($sql, [$user_id])->fetch();
+				$sql = "SELECT `".$fields."` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?";
+				$picked_field = $this->database->run($sql, [$user_id])->fetchOne();
 				
 				// set the cache
-				$this->user_details[$user_id][$fields] = $picked_fields[$fields];
+				$this->user_details[$user_id][$fields] = $picked_field;
 				
 				// return the details
-				return $picked_fields;
+				return $picked_field;
 			}
 		}
+	}
+	
+	// return a list of group ids that have a particular permission
+	function get_group_ids($permission)
+	{
+		// find the requested permission
+		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$permission])->fetchOne();
+		
+		// find all groups that have that permission
+		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN ".$this->core->db_tables['user_groups']." g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+
+		$return_ids = [];
+		
+		// if we are using local users, remove any remote groups to check permissions on
+		if ($this->core->config('local_users') == 1)
+		{
+			foreach ($allowed_groups as $key => $value)
+			{
+				if ($value['remote_group'] == 1)
+				{
+					unset($allowed_groups[$key]);
+				}
+				else
+				{
+					$return_ids[] = $value['group_id'];
+				}
+			}
+		}
+		// else we are on an install that's using a remote users database, remove their local groups
+		else
+		{
+			foreach ($allowed_groups as $key => $value)
+			{
+				if ($value['remote_group'] == 0 && $value['universal'] == 1)
+				{
+					unset($allowed_groups[$key]);
+				}
+				// also remove any groups that don't contain our wanted prefix
+				else if (strpos($value['group_name'], $this->core->config('user_group_prefix')) === false && $value['universal'] == 1) 
+				{
+					unset($allowed_groups[$key]);
+				}
+				else
+				{
+					$return_ids[] = $value['group_id'];
+				}
+			}			
+		}
+		
+		return $return_ids;
 	}
 	
 	// check if a user is able to do something
@@ -220,57 +271,53 @@ class user
 	function can($do)
 	{
 		// find the requested permission
-		$get_permission = $this->database->run("SELECT `id`, `name` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetch();
-
-		if ($_SESSION['user_id'] > 0)
-		{
-			// first get the groups this user is in
-			$their_group_ids = $this->database->run("SELECT `group_id` FROM ".$this->core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
-
-			$in = str_repeat('?,', count($their_group_ids) - 1) . '?';
-		}
-		else
-		{
-			$their_group_ids = [0 => 4];
-			$in = '?';
-		}
+		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetchOne();
 		
-		// get the group names for those IDS (we don't store them in case the group names change)
-		$users_groups = $this->database->run("SELECT `group_id`, `group_name`, `remote_group`, `perms_access` FROM ".$this->core->db_tables['user_groups']." WHERE `group_id` IN ($in)", $their_group_ids)->fetch_all();
+		// find all groups that have that permission
+		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN ".$this->core->db_tables['user_groups']." g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		
+		$check_against = [];
 		
 		// if we are using local users, remove any remote groups to check permissions on
 		if ($this->core->config('local_users') == 1)
 		{
-			foreach ($users_groups as $key => $value)
+			foreach ($allowed_groups as $key => $value)
 			{
 				if ($value['remote_group'] == 1)
 				{
-					unset($users_groups[$key]);
+					unset($allowed_groups[$key]);
+				}
+				else
+				{
+					$check_against[] = $value['group_id'];
 				}
 			}
 		}
 		// else we are on an install that's using a remote users database, remove their local groups
 		else
 		{
-			foreach ($users_groups as $key => $value)
+			foreach ($allowed_groups as $key => $value)
 			{
-				if ($value['remote_group'] == 0)
+				if ($value['remote_group'] == 0 && $value['universal'] == 1)
 				{
-					unset($users_groups[$key]);
+					unset($allowed_groups[$key]);
 				}
 				// also remove any groups that don't contain our wanted prefix
-				if (strpos($value['group_name'], $this->core->config('user_group_prefix')) === false) 
+				else if (strpos($value['group_name'], $this->core->config('user_group_prefix')) === false && $value['universal'] == 1) 
 				{
-					unset($users_groups[$key]);
+					unset($allowed_groups[$key]);
+				}
+				else
+				{
+					$check_against[] = $value['group_id'];
 				}
 			}			
 		}
 
-		foreach ($users_groups as $group)
+		foreach ($this->user_groups as $group)
 		{
-			$groups_permissions = explode(',',$group['perms_access']);
 			// at least one group they are in allows it, so let them in
-			if (is_array($groups_permissions) && in_array($get_permission['id'], $groups_permissions))
+			if (in_array($group, $check_against))
 			{
 				return true;
 			}
@@ -297,8 +344,6 @@ class user
 		
 		$_SESSION['user_id'] = $user_data['user_id'];
 		$_SESSION['username'] = $user_data['username'];
-		$_SESSION['user_group'] = $user_data['user_group'];
-		$_SESSION['secondary_user_group'] = $user_data['secondary_user_group'];
 		$_SESSION['new_login'] = 1;
 		$_SESSION['activated'] = $user_data['activated'];
 		$_SESSION['per-page'] = $user_data['per-page'];
@@ -442,10 +487,8 @@ class user
 		header("Location: ".core::config('website_url'));
 		die();
 	}
-
-	// check a users group to perform a certain task, can check two groups
-	// useful for seeing if they are an admin or editor to perform editing, deleting, publishing etc
-	function check_group($check_groups = NULL)
+	
+	function get_user_groups()
 	{
 		if ($_SESSION['user_id'] > 0)
 		{
@@ -455,12 +498,18 @@ class user
 		{
 			$their_groups = [0 => 4];
 		}
-		
+		return $their_groups;
+	}
+
+	// check a users group to perform a certain task, can check two groups
+	// useful for seeing if they are an admin or editor to perform editing, deleting, publishing etc
+	function check_group($check_groups = NULL)
+	{		
 		if ( is_array($check_groups) )
 		{
 			foreach ($check_groups as $group)
 			{
-				if ( in_array($group, $their_groups) )
+				if ( in_array($group, $this->user_groups) )
 				{
 					return true;
 				}
@@ -468,7 +517,7 @@ class user
 		}
 		else
 		{
-			if (in_array($check_groups, $their_groups))
+			if (in_array($check_groups, $this->user_groups))
 			{
 				return true;
 			}
@@ -481,11 +530,13 @@ class user
 	{
 		$user_data = $this->get(['avatar', 'avatar_gravatar', 'gravatar_email', 'avatar_gallery', 'avatar_uploaded', 'theme'], $user_id);
 		
-		if ($user_data['theme'] == 'dark')
+		$your_theme = $this->get('theme', $_SESSION['user_id']);
+		
+		if ($your_theme == 'dark')
 		{
 			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar_dark.png";
 		}
-		else if ($user_data['theme'] == 'default')
+		else if ($your_theme == 'default')
 		{
 			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar.png";
 		}
@@ -561,13 +612,11 @@ class user
 
 	public function display_pc_info($user_id)
 	{
-		global $db;
-
 		$pc_info = [];
 
 		$counter = 0;
 
-		$additionaldb = $db->sqlquery("SELECT
+		$additionaldb = $this->database->run("SELECT
 			p.`desktop_environment`,
 			p.`what_bits`,
 			p.`cpu_vendor`,

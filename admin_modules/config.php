@@ -1,7 +1,7 @@
 <?php
 define("POPULAR_COUNTER_DEFAULT", 1000);
 
-if ($_SESSION['user_group'] != 1)
+if (!$user->check_group(1))
 {
 	$core->message("You do not have permission to access this page!");
 }

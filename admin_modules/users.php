@@ -31,11 +31,11 @@ else
 				{
 					if (isset($username) && !empty($username))
 					{
-						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `".$dbl->table_prefix."users` WHERE `username` LIKE ?", array('%'.$username.'%'));
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM ".$core->db_tables['users']." WHERE `username` LIKE ?", array('%'.$username.'%'));
 					}
 					if (isset($email) && !empty($email))
 					{
-						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `".$dbl->table_prefix."users` WHERE `email` LIKE ?", array('%'.$email.'%'));
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM ".$core->db_tables['users']." WHERE `email` LIKE ?", array('%'.$email.'%'));
 					}
 					$templating->block('search_row_top', 'admin_modules/users');
 					while ($search = $db->fetch())
@@ -51,7 +51,7 @@ else
 
 		if ($_GET['view'] == 'premium')
 		{
-			$db->sqlquery("SELECT `user_id`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2)");
+			$db->sqlquery("SELECT `user_id`, `username` FROM ".$core->db_tables['users']." WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2)");
 			$templating->block('premium_row_top');
 			while ($search = $db->fetch())
 			{
@@ -162,7 +162,7 @@ else
 					$templating->set('ip', $ip['ip']);
 					
 					$banned_until = new DateTime($ip['ban_date']);
-					$banned_until->add(new DateInterval('P'.core::config('ip_ban_length').'D'));
+					$banned_until->add(new DateInterval('P'.$core->config('ip_ban_length').'D'));
 					
 					$templating->set('removal_date', $banned_until->format('Y-m-d H:i:s'));
 					
@@ -191,9 +191,11 @@ else
 		
 		if ($_GET['view'] == 'edit_group')
 		{
-			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour`, `remote_group`, `perms_access` FROM ".$core->db_tables['user_groups']." WHERE `group_id` = ?", [$_GET['id']])->fetch();
+			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour`, `remote_group` FROM ".$core->db_tables['user_groups']." WHERE `group_id` = ?", [$_GET['id']])->fetch();
 			
-			$permissions = $dbl->run("SELECT `id`, `name`, `groups_access` FROM ".$core->db_tables['user_permissions']." ORDER BY `id` ASC")->fetch_all();
+			$permissions_list = $dbl->run("SELECT `id`, `name` FROM ".$core->db_tables['user_permissions']." ORDER BY `id` ASC")->fetch_all();
+			
+			$current_permissions = $dbl->run("SELECT `permission_id` FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `group_id` = ?", [$_GET['id']])->fetch_all(PDO::FETCH_COLUMN);
 			
 			$templating->merge('admin_modules/user_groups');
 			$templating->block('group_edit');
@@ -213,13 +215,11 @@ else
 			}
 			$templating->set('remote_check', $remote_group);
 			
-			$perms_access = explode(',',$group['perms_access']);
-			
 			$permission_rows = '';
-			foreach ($permissions as $perm)
+			foreach ($permissions_list as $perm)
 			{
 				$checked = '';
-				if (is_array($perms_access) && in_array($perm['id'], $perms_access))
+				if (is_array($current_permissions) && in_array($perm['id'], $current_permissions))
 				{
 					$checked = 'checked';
 				}
@@ -310,7 +310,7 @@ else
 
 		if ($_POST['act'] == 'ban')
 		{
-			$db->sqlquery("SELECT `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 			$ban_info = $db->fetch();
 
 			if (!isset($_POST['yes']))
@@ -327,7 +327,7 @@ else
 
 				else
 				{
-					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+					$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'banned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
@@ -339,7 +339,7 @@ else
 
 		if ($_POST['act'] == 'unban')
 		{
-			$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unbanned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
@@ -367,7 +367,7 @@ else
 
 		if ($_POST['act'] == 'totalban')
 		{
-			$db->sqlquery("SELECT `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 			$ban_info = $db->fetch();
 
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
@@ -390,7 +390,7 @@ else
 
 				else
 				{
-					$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+					$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_SESSION['ban_ip'], core::$sql_date_now));
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'total_ban', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
@@ -455,7 +455,7 @@ else
 		if ($_POST['act'] == 'deleteavatar')
 		{
 			// remove any old avatar if one was uploaded
-			$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 			$avatar = $db->fetch();
 
 			if ($avatar['avatar_uploaded'] == 1)
@@ -463,7 +463,7 @@ else
 				unlink('uploads/avatars/' . $avatar['avatar']);
 			}
 
-			$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'avatar';
@@ -485,7 +485,7 @@ else
 			else
 			{
 				// remove any old avatar if one was uploaded
-				$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 				$deleted_info = $db->fetch();
 
 				if ($deleted_info['avatar_uploaded'] == 1)
@@ -493,13 +493,20 @@ else
 					unlink('uploads/avatars/' . $deleted_info['avatar']);
 				}
 
-				$db->sqlquery("DELETE FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("DELETE FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($_GET['user_id']));
 
-				$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
+				// remove one from members count, this is a special case
+				// it's one of only a few times we would update a remote config table, rather than local if we are using their user database
+				$config_table = '`'.$this->database->table_prefix.'config`';
+				if ($this->config('local_users') == 0)
+				{
+					$config_table = $this->config('remote_users_database') . '.' . '`config`';
+				}
+				$db->sqlquery("UPDATE ".$config_table." SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
 
@@ -519,7 +526,7 @@ else
 			}
 			else
 			{
-				$db->sqlquery("SELECT `username`, `banned` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `username`, `banned` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 				$check_ban = $db->fetch();
 
 				if ($check_ban['banned'] !== "1")
@@ -602,9 +609,28 @@ else
 				$remote = 1;
 			}
 			
-			$perms_access = implode(',',$_POST['permissions']);
+			$dbl->run("UPDATE ".$core->db_tables['user_groups']." SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $_POST['group_id']]);
 			
-			$dbl->run("UPDATE ".$core->db_tables['user_groups']." SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ?, `perms_access` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $perms_access, $_POST['group_id']]);
+			// user group updating
+			$current_permissions = $dbl->run("SELECT `permission_id` FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `group_id` = ?", [$_POST['group_id']])->fetch_all(PDO::FETCH_COLUMN);
+
+			// remove any permissions no longer wanted
+			foreach ($current_permissions as $key => $permission)
+			{
+				if (!in_array($permission, $_POST['permissions']))
+				{
+					$dbl->run("DELETE FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `permission_id` = ? AND `group_id` = ?", [$permission, $_POST['group_id']]);
+				}
+			}
+			
+			// add in any missing groups
+			foreach ($_POST['permissions'] as $key => $permission)
+			{
+				if (!in_array($permission, $current_permissions))
+				{
+					$dbl->run("INSERT INTO ".$core->db_tables['user_group_permissions_membership']." SET `permission_id` = ?, `group_id` = ?", [$permission, $_POST['group_id']]);
+				}
+			}
 			
 			header('Location: admin.php?module=users&view=edit_group&id=' . $_POST['group_id']);
 		}

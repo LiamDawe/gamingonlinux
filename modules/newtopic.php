@@ -1,15 +1,19 @@
 <?php
 $templating->set_previous('title', 'Create new topic', 1);
-if (!isset($_SESSION['activated']))
+if ($_SESSION['user_id'] > 0 && !isset($_SESSION['activated']))
 {
 	$core->message('You do not have permission to post in this forum! Your account isn\'t activated!');
 }
 else
 {
-	if (core::config('forum_posting_open') == 1)
+	$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
+				
+	if ($core->config('forum_posting_open') == 1)
 	{
+		$in = str_repeat('?,', count($user->user_groups) - 1) . '?';
+		
 		// get forum permissions
-		$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE p.`can_topic` = 1 AND p.`group_id` IN ( ?, ? ) GROUP BY p.forum_id ORDER BY f.`name` ASC ", array($_SESSION['user_group'], $_SESSION['secondary_user_group']));
+		$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE p.`can_topic` = 1 AND p.`group_id` IN ($in) GROUP BY p.forum_id ORDER BY f.`name` ASC ", $user->user_groups);
 		if ($db->num_rows() == 0)
 		{
 			$core->message('You do not have permission to post in any forums!');
@@ -21,7 +25,7 @@ else
 			$show_forum_breadcrumb = 0;
 			if (isset($_GET['forum_id']))
 			{
-				$core->forum_permissions($_GET['forum_id']);
+				$forum_class->forum_permissions($_GET['forum_id']);
 				if ($parray['topic'] == 0)
 				{
 					$core->message('You do not have permission to post in that selected forum (you shouldn\'t even be able to get here with that forum id set), but you can post in others!', NULL, 1);
@@ -132,11 +136,9 @@ else
 				{
 					$options = '';
 				}
-				// see if we will allow them to make polls
-				$db->sqlquery("SELECT `in_mod_queue` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-				$check_queue = $db->fetch();
 
-				if ($check_queue['in_mod_queue'] == 0)
+
+				if ($mod_queue == 0)
 				{
 					$templating->block('poll', 'newtopic');
 				}
@@ -227,11 +229,11 @@ else
 					else
 					{
 						// see if we need to add it into the mod queue
-						$db->sqlquery("SELECT `in_mod_queue` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+						$db->sqlquery("SELECT `in_mod_queue` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
 						$check_queue = $db->fetch();
 
 						$approved = 1;
-						if ($check_queue['in_mod_queue'] == 1)
+						if ($mod_queue == 1)
 						{
 							$approved = 0;
 						}
@@ -239,7 +241,7 @@ else
 						// update user post counter
 						if ($approved == 1)
 						{
-							$db->sqlquery("UPDATE `".$dbl->table_prefix."users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
+							$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
 						}
 
 						// add the topic
@@ -304,7 +306,7 @@ else
 							}
 							else
 							{
-								header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
+								header("Location: " . $core->config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
 							}
 						}
 
@@ -314,14 +316,14 @@ else
 
 							$_SESSION['message'] = 'mod_queue';
 							
-							header("Location: " . core::config('website_url') . "index.php?module=viewforum&forum_id={$_POST['category']}");
+							header("Location: " . $core->config('website_url') . "index.php?module=viewforum&forum_id={$_POST['category']}");
 						}
 					}
 				}
 			}
 		}
 	}
-	else if (core::config('forum_posting_open') == 0)
+	else if ($core->config('forum_posting_open') == 0)
 	{
 		$core->message('Posting is currently down for maintenance.');
 	}

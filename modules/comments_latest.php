@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Latest Comments', 1);
-$templating->set_previous('meta_description', 'The latest article comments on GamingOnLinux.com', 1);
+$templating->set_previous('meta_description', 'The latest article comments on ' . $core->config('site_title'), 1);
 
 // main menu block
 $templating->merge('comments_latest');
@@ -60,7 +60,7 @@ while ($comments = $db->fetch())
 		$username = "<a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a>";
 	}
 	
-	$article_link = article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#r' . $comments['comment_id']);
+	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#r' . $comments['comment_id']);
 
 	$comment_posts .= "<li class=\"list-group-item\">
 	<a href=\"".$article_link."\">{$title}</a><br />

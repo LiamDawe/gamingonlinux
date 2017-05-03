@@ -1,7 +1,5 @@
 <?php
 $file_dir = dirname( dirname( __FILE__ ) );
-
-require_once $file_dir. "/includes/EPDOStatement.php";
 	
 class db_mysql extends PDO
 {	
@@ -20,7 +18,6 @@ class db_mysql extends PDO
 		$options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_STATEMENT_CLASS => array("EPDOStatement\EPDOStatement", array($this)),
             PDO::ATTR_EMULATE_PREPARES   => false, // allows LIMIT placeholders
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
         ];
@@ -35,12 +32,14 @@ class db_mysql extends PDO
 		{
 			$this->stmt = $this->prepare($sql);
 			$this->stmt->execute($data);
-			$this->debug_queries .= '<pre>' . $this->stmt->interpolateQuery() . '</pre>';
+			$this->debug_queries .= '<pre>' . $this->replaced_query($sql, $data) . '</pre>';
 			return $this;
         }
         catch (PDOException $error)
         {
-			echo  $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $this->stmt->interpolateQuery();
+			$trace = $error->getTrace();
+			$this->pdo_error($error->getMessage(), $trace[2]['file'], $this->replaced_query($sql, $data), core::current_page_url());
+			echo  $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $this->replaced_query($sql, $data);
 			die();
         }
     }
@@ -78,5 +77,67 @@ class db_mysql extends PDO
 		$this->result = $this->lastInsertId();
 		
 		return $this->result;
+	}
+
+	function replaced_query($query, $params)
+	{
+		if (isset($params))
+		{
+			$keys = array();
+
+			# build a regular expression for each parameter
+			foreach ($params as $key => $value) 
+			{
+				if (is_string($key)) 
+				{
+					$keys[] = '/:'.$key.'/';
+				} 
+				else 
+				{
+					$keys[] = '/[?]/';
+				}
+			}
+
+			$query = preg_replace($keys, $params, $query, 1, $count);
+		}
+		return $query;
+	}
+	
+	function pdo_error($exception, $page, $sql, $url)
+	{
+		$to = core::config('contact_email');
+
+		// subject
+		$subject = "GOL PDO Error: " . core::config('site_name');
+
+		$make_sql_safe = core::make_safe($sql);
+		$make_url_safe = core::make_safe($url);
+
+		// message
+		$message = "
+		<html>
+		<head>
+		<title>A PDO Error Report For ".core::config('site_name')."</title>
+		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
+		</head>
+		<body>
+		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_name')."\">
+		<br />
+		$exception on page <br />
+		<strong>URL:</strong> $make_url_safe<br />
+		SQL QUERY<br />
+		$make_sql_safe<br />
+		Referring Page<br />
+		$referrer
+		</body>
+		</html>";
+
+		// To send HTML mail, the Content-type header must be set
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
+		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+
+		// Mail it
+		mail($to, $subject, $message, $headers);
 	}
 }

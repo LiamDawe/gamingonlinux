@@ -67,7 +67,7 @@ $templating->set('categories_list', $categorys_list);
 $templating->set('max_height', core::config('article_image_max_height'));
 $templating->set('max_width', core::config('article_image_max_width'));
 
-$db->sqlquery("SELECT `auto_subscribe_new_article` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+$db->sqlquery("SELECT `auto_subscribe_new_article` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
 $grab_subscribe = $db->fetch();
 
 $auto_subscribe = '';

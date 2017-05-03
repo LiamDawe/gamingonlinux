@@ -226,7 +226,7 @@ if (isset($view))
 			$db->sqlquery($category_tag_sql, $safe_ids);
 			$get_categories = $db->fetch_all_rows();
 
-			article_class::display_article_list($articles_get, $get_categories);
+			$article_class->display_article_list($articles_get, $get_categories);
 				
 			$templating->block('bottom');
 			$templating->set('pagination', $pagination);

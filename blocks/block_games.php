@@ -3,7 +3,7 @@
 $templating->merge('blocks/block_games');
 $templating->block('list');
 
-$templating->set('url', core::config('website_url'));
+$templating->set('url', $core->config('website_url'));
 
 // count how many there is due this month and today
 $count_query = "SELECT (select COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1) as this_month,

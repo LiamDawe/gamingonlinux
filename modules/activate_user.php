@@ -39,15 +39,15 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
 
 		// subject
-		$subject = 'Welcome to '.core::config('site_title').', activation needed!';
+		$subject = 'Welcome to '.$core->config('site_title').', activation needed!';
 
 		// message
 		$html_message = "<p>Hello {$_SESSION['username']},</p>
-		<p>Thanks for registering on <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>!</p>
-		<p><strong><a href=\"" . core::config('website_url') . "index.php?module=activate_user&user_id={$_SESSION['user_id']}&code=$code\">You need to activate your account before you can post! Click here to activate!</a></strong></p>
-		<p>If you're new, consider saying hello in the <a href=\"" . core::config('website_url') . "forum/\" target=\"_blank\">forum</a>.</p>";
+		<p>Thanks for registering on <a href=\"" . $core->config('website_url') . "\" target=\"_blank\">" . $core->config('website_url') . "</a>!</p>
+		<p><strong><a href=\"" . $core->config('website_url') . "index.php?module=activate_user&user_id={$_SESSION['user_id']}&code=$code\">You need to activate your account before you can post! Click here to activate!</a></strong></p>
+		<p>If you're new, consider saying hello in the <a href=\"" . $core->config('website_url') . "forum/\" target=\"_blank\">forum</a>.</p>";
 		
-		$plain_message = 'Hello ' . $_SESSION['username'] . ', thanks for registering on ' . core::config('website_url') . '! You need to activate your account before you can post, do so here: ' . core::config('website_url') . 'index.php?module=activate_user&user_id=' . $_SESSION['user_id'] . '&code=' . $code;
+		$plain_message = 'Hello ' . $_SESSION['username'] . ', thanks for registering on ' . $core->config('website_url') . '! You need to activate your account before you can post, do so here: ' . $core->config('website_url') . 'index.php?module=activate_user&user_id=' . $_SESSION['user_id'] . '&code=' . $code;
 
 		$mail = new mail($get_active['email'], $subject, $html_message, $plain_message);
 		$mail->send();

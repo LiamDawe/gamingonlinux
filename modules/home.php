@@ -1,11 +1,11 @@
 <?php
-$templating->set_previous('meta_description', core::config('meta_description'), 1);
+$templating->set_previous('meta_description', $core->config('meta_description'), 1);
 
 $templating->merge('home');
 
 if (!isset($_GET['view']))
 {
-	$templating->set_previous('title', core::config('meta_homepage_title'), 1);
+	$templating->set_previous('title', $core->config('meta_homepage_title'), 1);
 
 	$core->check_old_pc_info($_SESSION['user_id']);
 
@@ -16,7 +16,7 @@ if (!isset($_GET['view']))
 	$templating->set('top_of_home_hook', $top_of_home_hook);
 	
 	$quick_nav = '';
-	if (core::config('quick_nav') == 1)
+	if ($core->config('quick_nav') == 1)
 	{
 		$quick_nav = $templating->block_store('quick_nav', 'home');
 		
@@ -25,8 +25,8 @@ if (!isset($_GET['view']))
 		$db->sqlquery("SELECT `category_name` FROM `articles_categorys` WHERE `quick_nav` = 1");
 		while ($get_quick = $db->fetch())
 		{
-			$quick_tag_hidden[] = '<li><a href="'.article_class::tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a></li>';
-			$quick_tag_normal[] = ' <a class="link_button" href="'.article_class::tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a> ';
+			$quick_tag_hidden[] = '<li><a href="'.$article_class->tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a></li>';
+			$quick_tag_normal[] = ' <a class="link_button" href="'.$article_class->tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a> ';
 		}
 		
 		$quick_nav = $templating->store_replace($quick_nav, ['quick_tag_hidden' => implode($quick_tag_hidden), 'quick_tag_normal' => implode($quick_tag_normal)]);
@@ -43,7 +43,7 @@ if (!isset($_GET['view']))
 
 	if ($total > 0)
 	{
-		if (core::config('pretty_urls') == 1)
+		if ($core->config('pretty_urls') == 1)
 		{
 			$pagination_linky = "/home/";
 		}
@@ -69,7 +69,7 @@ if (!isset($_GET['view']))
 		$pagination = $core->pagination_link($per_page, $total, $pagination_linky, $page);
 
 		// latest news
-		$db->sqlquery("SELECT a.`article_id`, a.`author_id`, a.`guest_username`, a.`title`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`tagline_image`, a.`show_in_menu`, a.`slug`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`active` = 1 ORDER BY a.`date` DESC LIMIT ?, ?", array($core->start, $per_page));
+		$db->sqlquery("SELECT a.`article_id`, a.`author_id`, a.`guest_username`, a.`title`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`tagline_image`, a.`show_in_menu`, a.`slug`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`active` = 1 ORDER BY a.`date` DESC LIMIT ?, ?", array($core->start, $per_page));
 		$articles_get = $db->fetch_all_rows();
 
 		$count_rows = $db->num_rows();
@@ -109,15 +109,15 @@ if (!isset($_GET['view']))
 
 if (isset($_GET['view']) && $_GET['view'] == 'editors')
 {
-	if (core::config('total_featured') == core::config('editor_picks_limit'))
+	if ($core->config('total_featured') == $core->config('editor_picks_limit'))
 	{
 		$_SESSION['message'] = 'toomanypicks';
-		header("Location: ".core::config('website_url')."index.php?module=home");
+		header("Location: ".$core->config('website_url')."index.php?module=home");
 	}
 
 	else
 	{
-		header("Location: ".core::config('website_url')."admin.php?module=featured&view=add&article_id={$_GET['article_id']}");
+		header("Location: ".$core->config('website_url')."admin.php?module=featured&view=add&article_id={$_GET['article_id']}");
 	}
 }
 
@@ -131,14 +131,14 @@ if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 			$featured = $db->fetch();
 
 			$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
-			unlink(core::config('path') . 'uploads/carousel/' . $featured['featured_image']);
+			unlink($core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
 
 			$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
 
 			$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 
 			$_SESSION['message'] = 'unpicked';
-			header("Location: ".core::config('website_url')."index.php?module=home");
+			header("Location: ".$core->config('website_url')."index.php?module=home");
 		}
 	}
 }

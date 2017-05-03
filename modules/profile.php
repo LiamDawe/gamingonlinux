@@ -22,7 +22,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 				$db_grab_fields .= "{$field['db_field']},";
 			}
 
-			$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip`, `game_developer` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip`, `game_developer` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 			if ($db->num_rows() != 1)
 			{
 				$core->message('That person does not exist here!');
@@ -49,7 +49,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					if ($_SESSION['user_id'] == $_GET['user_id'])
 					{
 						$templating->block('top');
-						$templating->set('url', core::config('website_url'));
+						$templating->set('url', $core->config('website_url'));
 					}
 
 					$templating->block('main', 'profile');
@@ -163,7 +163,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						{
 							$templating->block('articles');
 
-							$templating->set('latest_article_link', '<a href="' . article_class::get_link($article_link['article_id'], $article_link['slug']).'">'.$article_link['title'].'</a>');
+							$templating->set('latest_article_link', '<a href="' . $article_class->get_link($article_link['article_id'], $article_link['slug']).'">'.$article_link['title'].'</a>');
 						}
 						$templating->block('articles_bottom');
 						$templating->set('user_id', $profile['user_id']);
@@ -196,7 +196,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 							$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
 							$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
 							
-							$article_link = article_class::get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+							$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
 
 							$comment_posts .= "<li class=\"list-group-item\">
 						<a href=\"".$article_link."\">{$title}</a>
@@ -207,7 +207,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 
 						if ($count_comments >= 5)
 						{
-							if (core::config('pretty_urls') == 1)
+							if ($core->config('pretty_urls') == 1)
 							{
 								$more_comments_href = "/profiles/".$_GET['user_id']."/comments/";
 							}
@@ -254,7 +254,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 		{
 			if (isset($_GET['user_id']) && is_numeric($_GET['user_id']))
 			{
-				$db->sqlquery("SELECT `username` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 				$exists = $db->num_rows();
 				if ($exists == 1)
 				{
@@ -275,7 +275,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 						$page = $_GET['page'];
 					}
 
-					if (core::config('pretty_urls') == 1)
+					if ($core->config('pretty_urls') == 1)
 					{
 						$pagination_linky = "profiles/".$_GET['user_id']."/comments/";
 					}
@@ -286,17 +286,18 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 
 
 					// sort out the pagination link
-					$pagination = $core->pagination_link(10, $total, core::config('website_url')  . $pagination_linky, $page);
+					$pagination = $core->pagination_link(10, $total, $core->config('website_url')  . $pagination_linky, $page);
 
 					// get top of comments section
 					$templating->block('more_comments');
 					$templating->set('username', $get_username['username']);
 
-					if (core::config('pretty_urls') == 1)
+					if ($core->config('pretty_urls') == 1)
 					{
 						$profile_link = "/profiles/" . $_GET['user_id'];
 					}
-					else {
+					else 
+					{
 						$profile_link = url . "index.php?module=profile&amp;user_id=" . $_GET['user_id'];
 					}
 
@@ -333,9 +334,9 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 							$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
 						}
 						
-						$view_comment_link = article_class::get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
-						$view_article_link = article_class::get_link($comments['article_id'], $comments['slug']);
-						$view_comments_full_link = article_class::get_link($comments['article_id'], $comments['slug'], '#comments');
+						$view_comment_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+						$view_article_link = $article_class->get_link($comments['article_id'], $comments['slug']);
+						$view_comments_full_link = $article_class->get_link($comments['article_id'], $comments['slug'], '#comments');
 
 						$comment_posts .= "<div class=\"box\"><div class=\"body group\">
 						<a href=\"".$view_comment_link."\">{$title}</a><br />

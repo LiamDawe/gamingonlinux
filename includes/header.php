@@ -26,10 +26,7 @@ include($file_dir . '/includes/bbcode.php');
 $bbcode = new bbcode($dbl, $core);
 
 include($file_dir . '/includes/class_article.php');
-$article_class = new article_class($dbl, $bbcode);
-
-include($file_dir . '/includes/class_forum.php');
-$forum_class = new forum_class();
+$article_class = new article_class($dbl, $core, $bbcode);
 
 include($file_dir . '/includes/class_mail.php');
 
@@ -44,7 +41,8 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 $user->check_session();
 $user->grab_user_groups();
 
-$user->can('access_admin');
+include($file_dir . '/includes/class_forum.php');
+$forum_class = new forum_class($dbl, $core, $user);
 
 include($file_dir . '/includes/class_charts.php');
 
@@ -124,7 +122,7 @@ $templating->set('icon', $branding['icon'] );
 $templating->set('site_title', $branding['title']);
 
 // Here we sort out what modules we are allowed to load, this also grabs links needed for the navbar
-core::load_modules(['db_table' => 'modules']);
+$core->load_modules(['db_table' => 'modules']);
 
 $section_links = implode('', core::$top_bar_links);
 $templating->set('sections_links', $section_links);
@@ -136,12 +134,9 @@ if ($core->config('pretty_urls') == 1)
 	$irc_link = '/irc/';
 	$contact_link = '/contact-us/';
 	$submit_a = '/submit-article/';
-	if (isset($_SESSION['user_group']))
+	if ($user->check_group([1,2,5]))
 	{
-		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
-		{
-			$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
-		}
+		$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
 	}
 	$submit_e = '/email-us/';
 }
@@ -151,12 +146,9 @@ else
 	$irc_link = $core->config('website_url') . 'index.php?module=irc';
 	$contact_link = $core->config('website_url') . 'index.php?module=contact';
 	$submit_a = $core->config('website_url') . 'index.php?module=submit_article&view=Submit';
-	if (isset($_SESSION['user_group']))
+	if ($user->check_group([1,2,5]))
 	{
-		if ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2 || $_SESSION['user_group'] == 5)
-		{
-			$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
-		}
+		$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
 	}
 	$submit_e = $core->config('website_url') . 'index.php?module=email_us';
 }
@@ -228,7 +220,7 @@ else if ($_SESSION['user_id'] > 0)
 	}
 	
 	$user_avatar = $user->sort_avatar($_SESSION['user_id']);
-	$username = $user->get('username', $_SESSION['user_id'])['username'];
+	$username = $user->get('username', $_SESSION['user_id']);
 	
 	$user_menu = $templating->store_replace($user_menu, array('avatar' => $user_avatar, 'username' => $username, 'profile_link' => $profile_link, 'admin_link' => $admin_link, 'url' => $core->config('website_url')));
 	$templating->set('user_menu', $user_menu);
@@ -258,7 +250,7 @@ else if ($_SESSION['user_id'] > 0)
 	// set these by default as comment notifications can be turned off
 	$new_comments_line = '';
 	$unread_comments_counter = 0;
-	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id'])['display_comment_alerts'];
+	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id']);
 	if ($user_comment_alerts == 1)
 	{
 		// sort out the number of unread comments

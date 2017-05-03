@@ -2,7 +2,7 @@
 $templating->merge('admin_modules/admin_articles_sections/submitted_articles');
 
 // first check if there is a guest email or a users email
-$db->sqlquery("SELECT a.`article_id`, a.`tagline_image`, a.`title`, a.`text`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
+$db->sqlquery("SELECT a.`article_id`, a.`tagline_image`, a.`title`, a.`text`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
 $check = $db->fetch();
 
 if ($db->num_rows() == 0)
@@ -48,18 +48,18 @@ else
 				}
 
 				// subject
-				$subject = 'Your article was denied on ' . core::config('site_title');
+				$subject = 'Your article was denied on ' . $core->config('site_title');
 				
-				$html_message = '<p>Your article submission on ' . core::config('site_title') . ' was denied and the editor left a message for you below:</p>
+				$html_message = '<p>Your article submission on ' . $core->config('site_title') . ' was denied and the editor left a message for you below:</p>
 				<p>'.$_POST['message'].'</p>
 				<p>Here is a copy below are your article:<br />
 				Title: '.$check['title'].'<br />
 				' . $check['text']. '</p>';
 
 				// message
-				$plain_message = 'Your article submission on ' . core::config('site_title') . ' was denied and the editor said this' . "\n\n" . $_POST['message'] . "\n\n" . 'Here\'s a copy of your article below' . "\n\n" . $check['text'];
+				$plain_message = 'Your article submission on ' . $core->config('site_title') . ' was denied and the editor said this' . "\n\n" . $_POST['message'] . "\n\n" . 'Here\'s a copy of your article below' . "\n\n" . $check['text'];
 				
-				if (core::config('send_emails') == 1)
+				if ($core->config('send_emails') == 1)
 				{
 					$mail = new mail($email, $subject, $html_message, $plain_message);
 					$mail->send();

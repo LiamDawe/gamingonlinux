@@ -20,7 +20,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	article_class::process_categories($_POST['article_id']);
 
-	article_class::process_game_assoc($_POST['article_id']);
+	plugins::do_hooks('article_database_entry', $_POST['article_id']);
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 	unset($_SESSION['atitle']);
@@ -37,20 +37,17 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	unset($_SESSION['gallery_tagline_filename']);
 
 	// email all editors apart from yourself
-	$db->sqlquery("SELECT `user_id`, `email`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (1,2) AND `user_id` != ?", array($_SESSION['user_id']));
-	$users_array = array();
-	while ($email_users = $db->fetch())
-	{
-		if ($email_users['user_id'] != $_SESSION['user_id'] && $email_users['email'] == 1)
-		{
-			$users_array[$email_users['user_id']]['user_id'] = $email_users['user_id'];
-			$users_array[$email_users['user_id']]['email'] = $email_users['email'];
-			$users_array[$email_users['user_id']]['username'] = $email_users['username'];
-		}
-	}
+	$sql_replace = $user->get_group_ids('article_submission_emails');
+                
+	$in = str_repeat('?,', count($sql_replace) - 1) . '?';
+	
+	$sql_replace[] = $_SESSION['user_id'];
+	
+	// email all editors apart from yourself
+	$users_array = $dbl->run("SELECT m.user_id, u.email, u.username from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.user_id = u.user_id WHERE m.group_id IN ($in) AND u.`submission_emails` = 1 AND u.`user_id` != ?", $sql_replace)->fetch_all();
 
 	// subject
-	$subject = core::config('site_title') . ": article submitted for review by {$_SESSION['username']}";
+	$subject = $core->config('site_title') . ": article submitted for review by {$_SESSION['username']}";
 
 	foreach ($users_array as $email_user)
 	{

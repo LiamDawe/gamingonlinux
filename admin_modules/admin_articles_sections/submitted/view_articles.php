@@ -24,7 +24,7 @@ if (!isset($_GET['aid']))
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');
 
-	$db->sqlquery("SELECT a.article_id, a.date_submitted, a.title, a.tagline, a.guest_username, u.username, u.user_id FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u on a.author_id = u.user_id WHERE `submitted_article` = 1 AND `submitted_unapproved` = 1");
+	$db->sqlquery("SELECT a.article_id, a.date_submitted, a.title, a.tagline, a.guest_username, u.username, u.user_id FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u on a.author_id = u.user_id WHERE `submitted_article` = 1 AND `submitted_unapproved` = 1");
 	while ($article = $db->fetch())
 	{
 		$templating->block('submitted_row', 'admin_modules/admin_articles_sections/submitted_articles');
@@ -92,8 +92,8 @@ else if (isset($_GET['aid']))
 	u.`username`, u2.`username` as `username_lock`
 	FROM
 	`articles` a
-	LEFT JOIN `".$dbl->table_prefix."users` u on a.`author_id` = u.`user_id`
-	LEFT JOIN `".$dbl->table_prefix."users` u2 ON a.`locked_by` = u2.`user_id`
+	LEFT JOIN ".$core->db_tables['users']." u on a.`author_id` = u.`user_id`
+	LEFT JOIN ".$core->db_tables['users']." u2 ON a.`locked_by` = u2.`user_id`
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 	WHERE `submitted_article` = 1 AND `active` = 0 AND `article_id` = ?";
 	$db->sqlquery($article_sql, array($_GET['aid']));
@@ -388,7 +388,7 @@ if (isset($_POST['act']))
 				}
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `".$dbl->table_prefix."users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
+				$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
 				$users_array = array();
 				while ($users = $db->fetch())
 				{
@@ -429,12 +429,12 @@ if (isset($_POST['act']))
 				<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 				<br />
 				<p>Hello <strong>{$email_user['username']}</strong>,</p>
-				<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "articles/$title_nice.$article_id#comments\">{$title_upper}</a></strong>\".</p>
+				<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "articles/$title_nice.$article_id#comments\">{$title_upper}</a></strong>\".</p>
 				<div>
 				<hr>
 				{$comment_email}
 				<hr>
-				You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
+				You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
 				<hr>
 				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
@@ -464,7 +464,7 @@ if (isset($_POST['act']))
 				$message .= "\r\n\r\n--" . $boundary . "--";
 
 				// Mail it
-				if (core::config('send_emails') == 1)
+				if ($core->config('send_emails') == 1)
 				{
 					mail($to, $subject, $message, $headers);
 				}
@@ -476,7 +476,7 @@ if (isset($_POST['act']))
 			// clear any comment or name left from errors
 			unset($_SESSION['acomment']);
 
-			header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid=$article_id#comments");
+			header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=Submitted&aid=$article_id#comments");
 
 		}
 	}

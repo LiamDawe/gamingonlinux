@@ -45,33 +45,29 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	unset($_SESSION['gallery_tagline_id']);
 	unset($_SESSION['gallery_tagline_rand']);
 	unset($_SESSION['gallery_tagline_filename']);
-
+	
+	$sql_replace = $user->get_group_ids('article_submission_emails');
+                
+	$in = str_repeat('?,', count($sql_replace) - 1) . '?';
+	
+	$sql_replace[] = $_SESSION['user_id'];
+	
 	// email all editors apart from yourself
-	$db->sqlquery("SELECT `user_id`, `email`, `username` FROM `".$dbl->table_prefix."users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
-	$users_array = array();
-	while ($users = $db->fetch())
-	{
-		if ($users['user_id'] != $_SESSION['user_id'] && $users['email'] == 1)
-		{
-			$users_array[$users['user_id']]['user_id'] = $users['user_id'];
-			$users_array[$users['user_id']]['email'] = $users['email'];
-			$users_array[$users['user_id']]['username'] = $users['username'];
-		}
-	}
+	$users_array = $dbl->run("SELECT m.user_id, u.email, u.username from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.user_id = u.user_id WHERE m.group_id IN ($in) AND u.`submission_emails` = 1 AND u.`user_id` != ?", $sql_replace)->fetch_all();
 
 	// subject
-	$subject = core::config('site_title') . ": article submitted for review by {$_SESSION['username']}";
+	$subject = $core->config('site_title') . ": article submitted for review by {$_SESSION['username']}";
 
 	foreach ($users_array as $email_user)
 	{
 		$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-		<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . core::config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}\">{$checked['title']}</a></strong>\".</p>
+		<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}\">{$checked['title']}</a></strong>\".</p>
 		</body>
 		</html>";
 		
-		$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has sent an article to be reviewed before publishing on: " . core::config('website_url') . " You can review it here: " . core::config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}";
+		$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has sent an article to be reviewed before publishing on: " . $core->config('website_url') . " You can review it here: " . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}";
 
-		if (core::config('send_emails') == 1)
+		if ($core->config('send_emails') == 1)
 		{
 			$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
 			$mail->send();

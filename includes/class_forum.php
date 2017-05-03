@@ -1,6 +1,17 @@
 <?php
 class forum_class
 {
+	private $database;
+	private $core;
+	private $user;
+	
+	function __construct($database, $core, $user = NULL)
+	{
+		$this->database = $database;
+		$this->core = $core;
+		$this->user = $user;
+	}
+	
 	// this will subscribe them to an article and generate any possible missing secret key for emails
 	function subscribe($topic_id, $emails = NULL)
 	{
@@ -81,7 +92,7 @@ class forum_class
 			die();
 		}
 
-		$core->forum_permissions($_GET['forum_id']);
+		$this->forum_permissions($_GET['forum_id']);
 		if ($parray['delete'] == 0 || !isset($parray['delete']))
 		{
 			header('Location: ' . $return_page_no);
@@ -183,7 +194,7 @@ class forum_class
 		}
 	}
 	
-	public static function delete_reply($return_page_done = NULL, $return_page_no = NULL, $post_page = NULL)
+	public function delete_reply($return_page_done = NULL, $return_page_no = NULL, $post_page = NULL)
 	{
 		global $core, $db, $parray, $templating;
 		
@@ -199,7 +210,7 @@ class forum_class
 			die();
 		}
 
-		$core->forum_permissions($_GET['forum_id']);
+		$this->forum_permissions($_GET['forum_id']);
 		if ($parray['delete'] == 0 || !isset($parray['delete']))
 		{
 			header('Location: ' . $return_page_no);
@@ -292,6 +303,93 @@ class forum_class
 			}
 		}
 		return core::config('website_url') . $link;
+	}
+	// check permissions, done from primary user group as thats where your main permissions come from, secondary user group should only be used for site extras anyway
+	function forum_permissions($forum_id)
+	{
+		global $parray;
+
+		$group_ids = $this->user->get_user_groups();
+		
+		// placeholder for forum id, then for user groups
+		$end_replace = [$forum_id];
+		foreach ($group_ids as $group)
+		{
+			$end_replace[] = $group;
+		}
+		
+		$in = str_repeat('?,', count($group_ids) - 1) . '?';
+		
+		$sql_permissions = "
+		SELECT
+			`can_view`,
+			`can_topic`,
+			`can_reply`,
+			`can_lock`,
+			`can_sticky`,
+			`can_delete`,
+			`can_delete_own`,
+			`can_avoid_floods`,
+			`can_move`
+		FROM
+			`forum_permissions`
+		WHERE
+			`forum_id` = ? AND `group_id` IN ($in)
+		";
+
+		$permissions = $this->database->run($sql_permissions, $end_replace)->fetch_all();
+		
+		// first set them all to 0 (not allowed), and if any of their groups allow them, change it
+		$parray = [
+		'view' => 0,
+		'topic' => 0,
+		'reply' => 0,
+		'lock' => 0,
+		'sticky' => 0,
+		'delete' => 0,
+		'delete_own' => 0,
+		'avoid_floods' => 0,
+		'can_move' => 0
+		];
+		foreach ($permissions as $perm)
+		{
+			if ($perm['can_view'] == 1)
+			{
+				$parray['view'] = 1;
+			}
+			if ($perm['can_topic'] == 1)
+			{
+				$parray['topic'] = 1;
+			}
+			if ($perm['can_reply'] == 1)
+			{
+				$parray['reply'] = 1;
+			}
+			if ($perm['can_lock'] == 1)
+			{
+				$parray['lock'] = 1;
+			}
+			if ($perm['can_sticky'] == 1)
+			{
+				$parray['sticky'] = 1;
+			}
+			if ($perm['can_delete'] == 1)
+			{
+				$parray['delete'] = 1;
+			}
+			if ($perm['can_delete_own'] == 1)
+			{
+				$parray['delete_own'] = 1;
+			}
+			if ($perm['can_avoid_floods'] == 1)
+			{
+				$parray['avoid_floods'] = 1;
+			}
+			if ($perm['can_move'] == 1)
+			{
+				$parray['can_move'] = 1;
+			}
+		}
 	}
 }
 ?>

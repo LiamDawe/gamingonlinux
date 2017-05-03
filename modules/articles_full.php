@@ -90,14 +90,14 @@ if (!isset($_GET['go']))
 
 						$last_page = ceil($current_number['counter']/$_SESSION['per-page']);
 						
-						$article_link = article_class::get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
+						$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
 
 						header("Location: " . $article_link);
 
 					}
 					else
 					{
-						$article_link = article_class::get_link($article['article_id'], $article['slug'], '#r' . $_GET['comment_id']);
+						$article_link = $article_class->get_link($article['article_id'], $article['slug'], '#r' . $_GET['comment_id']);
 
 						header("Location: " . $article_link);
 					}
@@ -105,7 +105,7 @@ if (!isset($_GET['go']))
 				else
 				{
 					$_SESSION['message'] = 'nocomment';
-					$article_link = article_class::get_link($article['article_id'], $article['slug']);
+					$article_link = $article_class->get_link($article['article_id'], $article['slug']);
 
 					header("Location: " . $article_link);
 				}
@@ -120,7 +120,7 @@ if (!isset($_GET['go']))
 
 				$templating->merge('search');
 				$templating->block('top');
-				$templating->set('url', core::config('website_url'));
+				$templating->set('url', $core->config('website_url'));
 				$templating->set('search_text', '');
 			}
 
@@ -162,11 +162,11 @@ if (!isset($_GET['go']))
 				$article_meta_image = '';
 				if (!empty($article['tagline_image']))
 				{
-					$article_meta_image = core::config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}";
+					$article_meta_image = $core->config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}";
 				}
 				if (!empty($article['gallery_tagline_filename']))
 				{
-					$article_meta_image = core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}";
+					$article_meta_image = $core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}";
 				}
 
 				$nice_title = core::nice_title($article['title']);
@@ -174,7 +174,7 @@ if (!isset($_GET['go']))
 				// twitter info card
 				$twitter_card = "<!-- twitter card -->\n";
 				$twitter_card .= '<meta name="twitter:card" content="summary_large_image">';
-				$twitter_card .= '<meta name="twitter:site" content="@'.core::config('twitter_username').'">';
+				$twitter_card .= '<meta name="twitter:site" content="@'.$core->config('twitter_username').'">';
 				if (!empty($article['twitter_on_profile']))
 				{
 					$twitter_card .= '<meta name="twitter:creator" content="@'.$article['twitter_on_profile'].'">';
@@ -186,42 +186,42 @@ if (!isset($_GET['go']))
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
 
 				// meta tags for g+, facebook and twitter images
-				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . core::config('website_url') . "/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n$twitter_card", 1);
+				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . $core->config('website_url') . "/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n$twitter_card", 1);
 
 				// make date human readable
 				$date = $core->format_date($article['date']);
 
 				$templating->block('article', 'articles_full');
-				$templating->set('url', core::config('website_url'));
+				$templating->set('url', $core->config('website_url'));
 				
-				$share_url = article_class::get_link($_GET['aid'], $nice_title);
+				$share_url = $article_class->get_link($_GET['aid'], $nice_title);
 				
 				$twitter_share = '';
-				if (!empty(core::config('twitter_username')))
+				if (!empty($core->config('twitter_username')))
 				{
-					$twitter_share = '<a class="button small fnone" href="https://twitter.com/intent/tweet?text='.$article['title'].'%20%23Linux&amp;url='.$share_url.'&amp;via='.core::config('twitter_username').'" target="_blank"><img src="'.core::config('website_url') . 'templates/' . core::config('template') .'/images/social/twitter.svg" alt="" /></a>';
+					$twitter_share = '<a class="button small fnone" href="https://twitter.com/intent/tweet?text='.$article['title'].'%20%23Linux&amp;url='.$share_url.'&amp;via='.$core->config('twitter_username').'" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/social/twitter.svg" alt="" /></a>';
 				}
 				$templating->set('twitter_share', $twitter_share);
 
 				$fb_onclick = "window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('$share_url'), 'height=279, width=575'); return false;";
 				
-				$facebook_share = '<a class="button small fnone" href="#" onclick="'.$fb_onclick.'" target="_blank"><img src="'.core::config('website_url') . 'templates/' . core::config('template') .'/images/social/facebook.svg" alt="" /></a>';
+				$facebook_share = '<a class="button small fnone" href="#" onclick="'.$fb_onclick.'" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/social/facebook.svg" alt="" /></a>';
 				$templating->set('facebook_share', $facebook_share);
 				
 				
 				
-				$gplus_share = '<a class="button small fnone" href="https://plusone.google.com/_/+1/confirm?hl=en&url='.$share_url.'" target="_blank"><img src="'.core::config('website_url') . 'templates/' . core::config('template') .'/images/social/google-plus.svg" alt="" /></a>';
+				$gplus_share = '<a class="button small fnone" href="https://plusone.google.com/_/+1/confirm?hl=en&url='.$share_url.'" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/social/google-plus.svg" alt="" /></a>';
 				$templating->set('gplus_share', $gplus_share);
 
-				$article_link = article_class::get_link($_GET['aid'], $nice_title);
+				$article_link = $article_class->get_link($_GET['aid'], $nice_title);
 				
 				$templating->set('article_link', $article_link);
 
-				$templating->set('rules', core::config('rules'));
+				$templating->set('rules', $core->config('rules'));
 
 				if (($user->check_group([1,2,5]) == true) && !isset($_GET['preview']))
 				{
-					$templating->set('edit_link', " <a href=\"" . core::config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\">Edit</a>");
+					$templating->set('edit_link', " <a href=\"" . $core->config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\">Edit</a>");
 					$templating->set('admin_button', '');
 				}
 
@@ -237,7 +237,7 @@ if (!isset($_GET['go']))
 						$page_action ='admin.php?module=articles&view=drafts';
 					}
 					$templating->set('edit_link', '');
-					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . core::config('website_url') . "{$page_action}\">Back</button> <button type=\"submit\" formaction=\"" . core::config('url') . "{$page_action}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
+					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . $core->config('website_url') . "{$page_action}\">Back</button> <button type=\"submit\" formaction=\"" . $core->config('url') . "{$page_action}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
 				}
 
 				if ($user->check_group([1,2,5]) == false)
@@ -278,7 +278,7 @@ if (!isset($_GET['go']))
 				$article_bottom = '';
 				if ($article['user_group'] != 1 && $article['user_group'] != 2 && $article['user_group'] != 5)
 				{
-					$article_bottom = "\n<br /><br /><p class=\"small muted\">This article was submitted by a guest, we encourage anyone to <a href=\"".core::config('website_url')."submit-article/\">submit their own articles</a>.</p>";
+					$article_bottom = "\n<br /><br /><p class=\"small muted\">This article was submitted by a guest, we encourage anyone to <a href=\"".$core->config('website_url')."submit-article/\">submit their own articles</a>.</p>";
 				}
 
 				//piratelv timeago: 12/11/14
@@ -302,7 +302,7 @@ if (!isset($_GET['go']))
 					$article_page = $_GET['article_page'];
 				}
 
-				$user_single_page_article = $user->get('single_article_page', $_SESSION['user_id'])['single_article_page'];
+				$user_single_page_article = $user->get('single_article_page', $_SESSION['user_id']);
 				// sort out the pages and pagination and only return the page requested
 				if ($user_single_page_article == 0)
 				{
@@ -317,7 +317,7 @@ if (!isset($_GET['go']))
 					$article_page_count = 1;
 				}
 				
-				$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
+				$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
 				$templating->set('text', $bbcode->parse_bbcode($article_body, 1, 1, $tagline_bbcode, $bbcode_tagline_gallery) . $article_bottom);
 
@@ -389,7 +389,7 @@ if (!isset($_GET['go']))
 				$templating->set('who_likes_alink', $who_likes_alink);
 
 				$like_button = '';
-				if ($_SESSION['user_group'] != 4)
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
 					$like_text = "Like";
 					$like_class = "like";
@@ -488,7 +488,7 @@ if (!isset($_GET['go']))
 
 					$subscribe_link = '';
 					$close_comments_link = '';
-					if ($_SESSION['user_group'] != 4)
+					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 					{
 						// find out if this user has subscribed to the comments
 						if ($_SESSION['user_id'] != 0)
@@ -523,13 +523,13 @@ if (!isset($_GET['go']))
 						$templating->block('comments_closed', 'articles_full');
 					}
 
-					if (core::config('pretty_urls') == 1)
+					if ($core->config('pretty_urls') == 1)
 					{
 						$pagination_linking = "/articles/$nice_title.{$_GET['aid']}/";
 					}
 					else
 					{
-						$pagination_linking = core::config('website_url') . 'index.php?module=articles_full&amp;aid=' . $_GET['aid'] . '&amp;';
+						$pagination_linking = $core->config('website_url') . 'index.php?module=articles_full&amp;aid=' . $_GET['aid'] . '&amp;';
 					}
 
 					// sort out the pagination link
@@ -640,7 +640,7 @@ if (!isset($_GET['go']))
 						$user_info_extra = plugins::do_hooks('into_post_user_info', $comments);
 
 						$templating->block('article_comments', 'articles_full');
-						$permalink = article_class::get_link($article['article_id'], $article['slug'], 'comment_id=' . $comments['comment_id']);
+						$permalink = $article_class->get_link($article['article_id'], $article['slug'], 'comment_id=' . $comments['comment_id']);
 						$templating->set('comment_permalink', $permalink);
 						$templating->set('user_id', $comments['author_id']);
 						$templating->set('username', $into_username . $username);
@@ -688,7 +688,7 @@ if (!isset($_GET['go']))
 
 						$logged_in_options = '';
 						$bookmark_comment = '';
-						if ($_SESSION['user_group'] != 4)
+						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 						{
 							// sort bookmark icon out
 							if (in_array($comments['comment_id'], $bookmarks_array))
@@ -742,21 +742,21 @@ if (!isset($_GET['go']))
 						$comment_edit_link = '';
 						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 						{
-							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
+							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $core->config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
 						}
 						$templating->set('edit', $comment_edit_link);
 
 						$comment_delete_link = '';
 						if ($user->check_group([1,2]) == true)
 						{
-							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
+							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . $core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 						}
 						$templating->set('delete', $comment_delete_link);
 
 						$report_link = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$report_link = "<li><a class=\"tooltip-top\" href=\"" . core::config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$_GET['aid']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
+							$report_link = "<li><a class=\"tooltip-top\" href=\"" . $core->config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$_GET['aid']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
 						}
 						$templating->set('report_link', $report_link);
 
@@ -768,37 +768,37 @@ if (!isset($_GET['go']))
 					$templating->set('pagination', $pagination);
 
 					// only show comments box if the comments are turned on for this article
-					if (core::config('comments_open') == 1)
+					if ($core->config('comments_open') == 1)
 					{
 						if (($article['comments_open'] == 1) || ($article['comments_open'] == 0 && $user->check_group([1,2]) == true))
 						{
-							if ($_SESSION['user_group'] == 4)
+							if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 							{
 								$templating->merge('login');
 								$templating->block('small');
-								$templating->set('url', core::config('website_url'));
+								$templating->set('url', $core->config('website_url'));
 								
 								$twitter_button = '';
-								if (core::config('twitter_login') == 1)
+								if ($core->config('twitter_login') == 1)
 								{	
-									$twitter_button = '<a href="'.core::config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
+									$twitter_button = '<a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
 								}
 								$templating->set('twitter_button', $twitter_button);
 								
 								$steam_button = '';
-								if (core::config('steam_login') == 1)
+								if ($core->config('steam_login') == 1)
 								{
-									$steam_button = '<a href="'.core::config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
+									$steam_button = '<a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
 								}
 								$templating->set('steam_button', $steam_button);
 								
 								$google_button = '';
-								if (core::config('google_login') == 1)
+								if ($core->config('google_login') == 1)
 								{
-									$client_id = core::config('google_login_public'); 
-									$client_secret = core::config('google_login_secret');
-									$redirect_uri = core::config('website_url') . 'includes/google/login.php';
-									require_once (core::config('path') . 'includes/google/libraries/Google/autoload.php');
+									$client_id = $core->config('google_login_public'); 
+									$client_secret = $core->config('google_login_secret');
+									$redirect_uri = $core->config('website_url') . 'includes/google/login.php';
+									require_once ($core->config('path') . 'includes/google/libraries/Google/autoload.php');
 									$client = new Google_Client();
 									$client->setClientId($client_id);
 									$client->setClientSecret($client_secret);
@@ -808,7 +808,7 @@ if (!isset($_GET['go']))
 									$service = new Google_Service_Oauth2($client);
 									$authUrl = $client->createAuthUrl();
 									
-									$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.core::config('website_url'). 'templates/' . core::config('template') .'/images/social/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
+									$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
 								}
 								$templating->set('google_button', $google_button);
 							}
@@ -832,13 +832,13 @@ if (!isset($_GET['go']))
 										$comment = $_SESSION['acomment'];
 									}
 									$templating->block('comments_box_top', 'articles_full');
-									$templating->set('url', core::config('website_url'));
+									$templating->set('url', $core->config('website_url'));
 									$templating->set('article_id', $_GET['aid']);
 
 									$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment_text']);
 
 									$templating->block('comment_buttons', 'articles_full');
-									$templating->set('url', core::config('website_url'));
+									$templating->set('url', $core->config('website_url'));
 									$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
 									$templating->set('subscribe_email_check', $subscribe_check['emails']);
 									$templating->set('aid', $_GET['aid']);
@@ -853,7 +853,7 @@ if (!isset($_GET['go']))
 							}
 						}
 					}
-					else if (core::config('comments_open') == 0)
+					else if ($core->config('comments_open') == 0)
 					{
 						$core->message('Commenting is currently down for maintenance.');
 					}
@@ -900,10 +900,10 @@ if (!isset($_GET['go']))
 
 		$templating->block('edit_comment_buttons', 'articles_full');
 		$templating->set('comment_id', $comment['comment_id']);
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 		$templating->set('page', $page);
 		
-		$cancel_action = article_class::get_link($comment['article_id'], $nice_title);
+		$cancel_action = $article_class->get_link($comment['article_id'], $nice_title);
 
 		$templating->set('cancel_action', $cancel_action);
 		$templating->block('preview', 'articles_full');
@@ -919,7 +919,7 @@ else if (isset($_GET['go']))
 		{
 			$_SESSION['message'] = 'no_id';
 			$_SESSION['message_extra'] = 'Article ID';
-			header("Location: " . core::config('website_url'));
+			header("Location: " . $core->config('website_url'));
 
 			die();
 		}
@@ -952,7 +952,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = article_class::get_link($_POST['article_id'], $title['slug']);
+			$article_link = $article_class->get_link($_POST['article_id'], $title['slug']);
 
 			if (empty($correction))
 			{
@@ -981,7 +981,7 @@ else if (isset($_GET['go']))
 		// make sure news id is a number
 		if (!isset($_POST['aid']) || !is_numeric($_POST['aid']))
 		{
-			header("Location: " . core::config('website_url'));
+			header("Location: " . $core->config('website_url'));
 			die();
 		}
 
@@ -990,14 +990,14 @@ else if (isset($_GET['go']))
 			$core->message('You do not have permisions to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
 		}
 
-		else if ($parray['comment_on_articles'] == 0)
+		else if (!$user->can('comment_on_articles'))
 		{
 			$core->message('You do not have permisions to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
 		}
 
 		else
 		{
-			if (core::config('comments_open') == 0)
+			if ($core->config('comments_open') == 0)
 			{
 				$core->message('Commenting is currently down for maintenance.');
 			}
@@ -1021,7 +1021,7 @@ else if (isset($_GET['go']))
 					{
 						$_SESSION['message'] = 'locked';
 						$_SESSION['message_extra'] = 'article comments';
-						$article_link = article_class::get_link($_POST['aid'], $title['slug']);
+						$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
 
 						header("Location: " . $article_link);
 
@@ -1048,7 +1048,7 @@ else if (isset($_GET['go']))
 						if ($check_comment['comment_text'] == $comment)
 						{
 							$_SESSION['message'] = 'double_comment';
-							$article_link = article_class::get_link($_POST['aid'], $title['slug']);
+							$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
 							
 							header("Location: " . $article_link);
 
@@ -1060,7 +1060,7 @@ else if (isset($_GET['go']))
 						{
 							$_SESSION['message'] = 'empty';
 							$_SESSION['message_extra'] = 'text';
-							$article_link = article_class::get_link($_POST['aid'], $title['slug']);
+							$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
 
 							header("Location: " . $article_link);
 
@@ -1199,17 +1199,17 @@ else if (isset($_GET['go']))
 
 								// message
 								$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 								<div>
 							 	<hr>
 							 	{$comment_email}
 							 	<hr>
-							 	<p>You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
+							 	<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
 
-								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . core::config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
+								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
 
 								// Mail it
-								if (core::config('send_emails') == 1)
+								if ($core->config('send_emails') == 1)
 								{
 									$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
 									$mail->send();
@@ -1228,7 +1228,7 @@ else if (isset($_GET['go']))
 							// clear any comment or name left from errors
 							unset($_SESSION['acomment']);
 							
-							$article_link = article_class::get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
+							$article_link = $article_class->get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
 
 							header("Location: " . $article_link);
 						}
@@ -1259,7 +1259,7 @@ else if (isset($_GET['go']))
 			{
 				$_SESSION['message'] = 'empty';
 				$_SESSION['message_extra'] = 'text';
-				$article_link = article_class::get_link($comment['article_id'], $comment['slug']);
+				$article_link = $article_class->get_link($comment['article_id'], $comment['slug']);
 
 				header("Location: " . $article_link);
 
@@ -1273,7 +1273,7 @@ else if (isset($_GET['go']))
 
 				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ?, `edit_counter` = (edit_counter + 1) WHERE `comment_id` = ?", array($comment_text, (int) $_SESSION['user_id'], core::$date, (int) $_POST['comment_id']));
 				
-				$edit_redirect = article_class::get_link($comment['article_id'], $comment['slug'], 'comment_id=' . $_POST['comment_id']);
+				$edit_redirect = $article_class->get_link($comment['article_id'], $comment['slug'], 'comment_id=' . $_POST['comment_id']);
 
 				header("Location: ".$edit_redirect);
 			}
@@ -1292,7 +1292,7 @@ else if (isset($_GET['go']))
 		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
 		$comment = $db->fetch();
 
-		$article_link = article_class::get_link($comment['article_id'], $comment['slug'], '#comments');
+		$article_link = $article_class->get_link($comment['article_id'], $comment['slug'], '#comments');
 
 		if ($user->check_group([1,2]) == false)
 		{
@@ -1429,14 +1429,14 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = article_class::get_link($_GET['article_id'], $title['slug'], '#comments');
+			$article_link = $article_class->get_link($_GET['article_id'], $title['slug'], '#comments');
 
 			header("Location: ".$article_link);
 		}
 
 		else
 		{
-			if ($_SESSION['user_group'] != 4)
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
 				// update admin notifications
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], 'reported_comment', core::$date, (int) $_GET['comment_id']));
@@ -1448,7 +1448,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = article_class::get_link($_GET['article_id'], $title['slug']);
+			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
 
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'comment';
@@ -1465,7 +1465,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = article_class::get_link($_GET['article_id'], $title['slug']);
+			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
 
 			header("Location: ".$article_link);
 
@@ -1500,7 +1500,7 @@ else if (isset($_GET['go']))
 			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
 			$title = $db->fetch();
 			
-			$article_link = article_class::get_link($_GET['article_id'], $title['slug']);
+			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
 
 			header("Location: ".$article_link);
 

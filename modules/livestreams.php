@@ -56,7 +56,7 @@ if ($db->num_rows() > 0)
 		$templating->set('countdown', $countdown);
 
 		$streamer_list = '';
-		$db->sqlquery("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `".$dbl->table_prefix."users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']));
+		$db->sqlquery("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN ".$core->db_tables['users']." u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']));
 		$total_streamers = $db->num_rows();
 		$streamer_counter = 0;
 		while ($grab_streamers = $db->fetch())

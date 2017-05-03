@@ -19,8 +19,10 @@ $templating->block('small');
 // paging for pagination
 $page = core::give_page();
 
+$in = str_repeat('?,', count($user->user_groups) - 1) . '?';
+
 // get the forum ids this user is actually allowed to view
-$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ( ?, ? ) GROUP BY forum_id ORDER BY f.name ASC", array($_SESSION['user_group'], $_SESSION['secondary_user_group']));
+$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups);
 $forum_ids = $db->fetch_all_rows();
 
 $templating->block('options', 'flat_forum');

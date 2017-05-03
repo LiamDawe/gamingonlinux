@@ -52,7 +52,7 @@ if (isset($search_text) && !empty($search_text))
 	// do the search query
 	$db->sqlquery("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
 	FROM `articles` a
-	LEFT JOIN `".$dbl->table_prefix."users` u ON a.`author_id` = u.`user_id`
+	LEFT JOIN ".$core->db_tables['users']." u ON a.`author_id` = u.`user_id`
 	WHERE a.`active` = 1
 	AND a.`title` LIKE ?
 	ORDER BY a.`date` DESC
@@ -118,7 +118,7 @@ if (isset($search_text) && !empty($search_text))
 			{
 				if (in_array($found['article_id'], $category_list))
 				{
-					$tag_link = article_class::tag_link($category_list['category_name']);
+					$tag_link = $article_class->tag_link($category_list['category_name']);
 
 					if ($category_list['category_id'] == 60)
 					{
@@ -153,7 +153,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 	$pagination = $core->pagination_link(15, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
 	// do the search query
-	$db->sqlquery("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start), 'search.php');
+	$db->sqlquery("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start));
 	$found_search = $db->fetch_all_rows();
 
 	if ($total > 0)

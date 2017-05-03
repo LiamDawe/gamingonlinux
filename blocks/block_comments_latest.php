@@ -4,7 +4,7 @@ define("TITLE_MAX_LENGTH", 55);
 $templating->merge('blocks/block_comments_latest');
 $templating->block('list');
 
-if (core::config('pretty_urls') == 1)
+if ($core->config('pretty_urls') == 1)
 {
 	$latest_link = '/latest-comments/';
 }
@@ -13,7 +13,7 @@ else {
 }
 $templating->set('latest_link', $latest_link);
 
-$comments_per_page = core::config('default-comments-per-page');
+$comments_per_page = $core->config('default-comments-per-page');
 if (isset($_SESSION['per-page']))
 {
 	$comments_per_page = $_SESSION['per-page'];
@@ -42,7 +42,7 @@ while ($comments = $db->fetch())
 		$page = ceil($comments['comment_count'] / $comments_per_page);
 	}
 	
-	$article_link = article_class::get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#' . $comments['comment_id']);
+	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#' . $comments['comment_id']);
 
 	$comment_posts .= "<li class=\"list-group-item\">
 	<a href=\"{$article_link}\">{$title}</a><br />

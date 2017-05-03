@@ -243,7 +243,7 @@ if (isset($_GET['view']))
 
 		$templating->block('topic_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t LEFT JOIN `".$dbl->table_prefix."users` u ON t.author_id = u.user_id LEFT JOIN `".$dbl->table_prefix."users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
+		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t LEFT JOIN ".$core->db_tables['users']." u ON t.author_id = u.user_id LEFT JOIN ".$core->db_tables['users']." u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('topic', 'admin_modules/admin_module_forum');
@@ -312,7 +312,7 @@ if (isset($_GET['view']))
 
 		$templating->block('reply_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, t.forum_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `".$dbl->table_prefix."users` u ON p.author_id = u.user_id LEFT JOIN `".$dbl->table_prefix."users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
+		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, t.forum_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN ".$core->db_tables['users']." u ON p.author_id = u.user_id LEFT JOIN ".$core->db_tables['users']." u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
 		while ($topic = $db->fetch())
 		{
 			$templating->block('reply', 'admin_modules/admin_module_forum');
@@ -363,7 +363,7 @@ if (isset($_GET['view']))
 	if ($_GET['view'] == 'deletepost')
 	{
 		$return_page = "/admin.php?module=forum&view=reportedreplies";
-		forum_class::delete_reply($return_page, $return_page, "admin.php?module=forum&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
+		$forum_class->delete_reply($return_page, $return_page, "admin.php?module=forum&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
 	}
 
 	if ($_GET['view'] == 'removetopicreport')

@@ -48,9 +48,9 @@ if (isset($_GET['view']))
 			FROM
 			`articles` a
 			LEFT JOIN
-			`".$dbl->table_prefix."users` u on a.author_id = u.user_id
+			".$core->db_tables['users']." u on a.author_id = u.user_id
 			LEFT JOIN
-			`".$dbl->table_prefix."users` u2 ON a.locked_by = u2.user_id
+			".$core->db_tables['users']." u2 ON a.locked_by = u2.user_id
 			LEFT JOIN
 			`articles_tagline_gallery` t ON t.id = a.gallery_tagline
 			WHERE `article_id` = ?";
@@ -319,7 +319,7 @@ if (isset($_GET['view']))
 			{
 				$active = 0;
 				$paginate_link = "admin.php?module=articles&view=manage&category=inactive&";
-				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a LEFT JOIN `".$dbl->table_prefix."users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT `article_id` FROM `articles` WHERE `active` = 0 AND `admin_review` = 0 AND `draft` = 0 AND `submitted_unapproved` = 0";
 			}
 
@@ -327,7 +327,7 @@ if (isset($_GET['view']))
 			{
 				$active = 1;
 				$paginate_link = "admin.php?module=articles&view=manage&category=all&";
-				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a JOIN `".$dbl->table_prefix."users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a JOIN ".$core->db_tables['users']." u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT `article_id` FROM `articles`";
 			}
 
@@ -406,7 +406,7 @@ if (isset($_GET['view']))
 			// sort out the pagination link
 			$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=articles&view=manage&category_id={$_GET['category_id']}&", $page);
 
-			$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `".$dbl->table_prefix."users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start));
+			$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN ".$core->db_tables['users']." u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start));
 			$article_get = $db->fetch_all_rows();
 
 			foreach ($article_get as $article)
@@ -540,7 +540,7 @@ else if (isset($_POST['act']))
 				}
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.emails, s.secret_key, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `".$dbl->table_prefix."users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
+				$db->sqlquery("SELECT s.`user_id`, s.emails, s.secret_key, u.email, u.username FROM `articles_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
 				$users_array = array();
 				while ($users = $db->fetch())
 				{

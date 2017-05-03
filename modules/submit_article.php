@@ -3,6 +3,12 @@ $templating->merge('submit_article');
 
 require_once("includes/curl_data.php");
 
+$captcha = 0;
+if (!$user->can('skip_submit_article_captcha'))
+{
+	$captcha = 1;
+}
+
 if (isset($_GET['view']))
 {
     if ($_GET['view'] == 'Submit')
@@ -95,16 +101,16 @@ if (isset($_GET['view']))
 
         }
 
-        $captcha = '';
-        if (core::config('captcha_disabled') == 0 && $parray['article_comments_captcha'] == 1)
+        $captcha_output = '';
+        if ($core->config('captcha_disabled') == 0 && $captcha == 1)
         {
-            $captcha = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';
+            $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';
         }
 
         $core->editor(['name' => 'text', 'editor_id' => 'article_text']);
 
         $templating->block('submit_bottom', 'submit_article');
-        $templating->set('captcha', $captcha);
+        $templating->set('captcha', $captcha_output);
         $templating->set('subscribe_box', $subscribe_box);
     }
 }
@@ -181,7 +187,7 @@ if (isset($_POST['act']))
             die();
         }
 
-		if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1)
+		if ($core->config('captcha_disabled') == 0 && $captcha == 1)
 		{
 			if (isset($_POST['g-recaptcha-response']))
 			{
@@ -200,7 +206,7 @@ if (isset($_POST['act']))
 			}
 		}
 
-		if (core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && !$res['success'])
+		if ($core->config('captcha_disabled') == 0 && $captcha == 1 && !$res['success'])
 		{
 			$_SESSION['atitle'] = $title;
 			$_SESSION['atext'] = $text;
@@ -262,20 +268,25 @@ if (isset($_POST['act']))
                 // get all the editor and admin emails apart from sinead
                 $editor_emails = array();
 
-                $subject = core::config('site_title') . " article submission from {$username}";
-
-                $db->sqlquery("SELECT `email`, `username` FROM `".$dbl->table_prefix."users` WHERE `submission_emails` = 1 AND `user_group` IN (1,2,5)");
+                $subject = $core->config('site_title') . " article submission from {$username}";
+                
+                $email_groups = $user->get_group_ids('article_submission_emails');
+                
+                $in = str_repeat('?,', count($email_groups) - 1) . '?';
+                
+                $db->sqlquery("SELECT m.`user_id`, u.`email`, u.`username` from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups);
                 while ($get_emails = $db->fetch())
                 {
+					$submitted_link = $core->config('website_url') . "admin.php?module=articles&view=Submitted";
                   // message
                   $html_message = "<p>Hello {$get_emails['username']},</p>
-                  <p>A new article has been submitted that needs reviewing titled <a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\"><strong>{$title}</strong></a> from {$username}</p>
-                  <p><a href=\"" . core::config('website_url') . "admin.php?module=articles&view=Submitted\">Click here to review it</a>";
+                  <p>A new article has been submitted that needs reviewing titled <a href=\"$submitted_link\"><strong>{$title}</strong></a> from {$username}</p>
+                  <p><a href=\"$submitted_link\">Click here to review it</a>";
 
-                  $plain_message = PHP_EOL."Hello {$get_emails['username']}, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review: " . core::config('website_url') . "admin.php?module=articles&view=Submitted";
+                  $plain_message = PHP_EOL."Hello {$get_emails['username']}, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review:  $submitted_link";
 
                   // Mail it
-                  if (core::config('send_emails') == 1)
+                  if ($core->config('send_emails') == 1)
                   {
                     $mail = new mail($get_emails['email'], $subject, $html_message, $plain_message);
                     $mail->send();
@@ -336,13 +347,13 @@ if (isset($_POST['act']))
         $guest_username = '';
         if (isset($_POST['name']))
         {
-            $guest_username = core::make_safe($_POST['name']);
+            $guest_username = $core->make_safe($_POST['name']);
         }
 
         $guest_email = '';
         if (isset($_POST['email']))
         {
-            $guest_email = core::make_safe($_POST['email']);
+            $guest_email = $core->make_safe($_POST['email']);
         }
 
         $guest_fields = '';
@@ -355,14 +366,14 @@ if (isset($_POST['act']))
         }
 
         $templating->block('submit', 'submit_article');
-        $templating->set('url', core::config('website_url'));
+        $templating->set('url', $core->config('website_url'));
         $templating->set('guest_fields', $guest_fields);
-        $templating->set('title', core::make_safe($_POST['title']));
+        $templating->set('title', $core->make_safe($_POST['title']));
 
         $top_image = '';
         if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
         {
-            $top_image = '<img src="'.core::config('website_url').'uploads/articles/tagline_images/temp/thumbnails/'.$_SESSION['uploads_tagline']['image_name'].'" alt="[articleimage]" class="imgList"><br />
+            $top_image = '<img src="'.$core->config('website_url').'uploads/articles/tagline_images/temp/thumbnails/'.$_SESSION['uploads_tagline']['image_name'].'" alt="[articleimage]" class="imgList"><br />
             BBCode: <input type="text" class="form-control input-sm" value="[img]tagline-image[/img]" /><br />';
         }
 
@@ -373,8 +384,8 @@ if (isset($_POST['act']))
         }
         $templating->set('tagline_image', $top_image);
 
-        $templating->set('max_height', core::config('article_image_max_height'));
-        $templating->set('max_width', core::config('article_image_max_width'));
+        $templating->set('max_height', $core->config('article_image_max_height'));
+        $templating->set('max_width', $core->config('article_image_max_width'));
 
         $subscribe_box = '';
         if ($_SESSION['user_id'] != 0)
@@ -383,16 +394,16 @@ if (isset($_POST['act']))
 
         }
 
-        $captcha = '';
-        if ($parray['article_comments_captcha'] == 1)
+        $captcha_output = '';
+        if ($captcha == 1)
         {
-            $captcha = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="6LcT0gATAAAAAOAGes2jwsVjkan3TZe5qZooyA-z"></div>';
+            $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
         }
 
         $core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text']);
 
         $templating->block('submit_bottom', 'submit_article');
-        $templating->set('captcha', $captcha);
+        $templating->set('captcha', $captcha_output);
         $templating->set('subscribe_box', $subscribe_box);
     }
 }

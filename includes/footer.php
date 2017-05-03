@@ -1,21 +1,21 @@
 <?php
 $templating->merge('footer');
 $templating->block('footer');
-$templating->set('site_title', core::config('site_title'));
+$templating->set('site_title', $core->config('site_title'));
 $templating->set('url', url);
 $templating->set('year', date('Y'));
 
 $article_rss = '';
-if (core::config('articles_rss') == 1)
+if ($core->config('articles_rss') == 1)
 {
-	$article_rss = '<li><a href="'.core::config('website_url').'article_rss.php" target="_blank"><img alt src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/white/rss-website.svg" width="30" height="30" /></a></li>';
+	$article_rss = '<li><a href="'.$core->config('website_url').'article_rss.php" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/rss-website.svg" width="30" height="30" /></a></li>';
 }
 $templating->set('article_rss', $article_rss);
 
 $forum_rss = '';
-if (core::config('forum_rss') == 1)
+if ($core->config('forum_rss') == 1)
 {
-	$forum_rss = '<li><a href="'.core::config('website_url').'forum_rss.php" target="_blank"><img alt src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/white/rss-forum.svg" width="30" height="30" /></a></li>';
+	$forum_rss = '<li><a href="'.$core->config('website_url').'forum_rss.php" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/rss-forum.svg" width="30" height="30" /></a></li>';
 }
 $templating->set('forum_rss', $forum_rss);
 
@@ -35,25 +35,27 @@ $social_output = '';
 foreach ($social_icons as $social)
 {
 	$extra_url = '';
-	if (!empty(core::config($social['config'])))
+	if (!empty($core->config($social['config'])))
 	{
 		if ($social['config'] == 'twitter_username')
 		{
 			$extra_url = 'https://www.twitter.com/';
 		}
-		$social_output .= '<li><a href="'.$extra_url.core::config($social['config']).'" target="_blank"><img alt src="'.core::config('website_url').'templates/'.core::config('template').'/images/social/white/'.$social['icon'].'" width="30" height="30" /></a></li>';
+		$social_output .= '<li><a href="'.$extra_url.$core->config($social['config']).'" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/'.$social['icon'].'" width="30" height="30" /></a></li>';
 	}
 }
 $templating->set('social_icons', $social_output);
 
 // info for admins to see execution time and mysql queries per page
 $debug = '';
-if ($user->check_group(1) && core::config('show_debug') == 1)
+if ($user->check_group(1) && $core->config('show_debug') == 1)
 {
 	$timer_end = microtime(true);
 	$time = number_format($timer_end - $timer_start, 3);
+	
+	$total_queries = $db->counter + $dbl->counter;
 
-	$debug = "<br />Page generated in {$time} seconds, MySQL queries: {$db->counter}<br />";
+	$debug = "<br />Page generated in {$time} seconds, MySQL queries: {$total_queries}<br />";
 	$debug .= $db->queries;
 	$debug .= $dbl->debug_queries;
 	$debug .= print_r($_SESSION, true);

@@ -26,11 +26,11 @@ else
 			if (isset($_GET['forum_id']))
 			{
 				$forum_class->forum_permissions($_GET['forum_id']);
-				if ($parray['topic'] == 0)
+				if ($parray['can_topic'] == 0)
 				{
 					$core->message('You do not have permission to post in that selected forum (you shouldn\'t even be able to get here with that forum id set), but you can post in others!', NULL, 1);
 				}
-				if ($parray['view'] == 1)
+				if ($parray['can_view'] == 1)
 				{
 					$show_forum_breadcrumb = 1;
 				}
@@ -103,19 +103,19 @@ else
 					<select name="moderator_options"><option value=""></option>';
 					$options_count = 0;
 
-					if ($parray['sticky'] == 1)
+					if ($parray['can_sticky'] == 1)
 					{
 						$options .= '<option value="sticky">Sticky Topic</option>';
 						$options_count++;
 					}
 
-					if ($parray['lock'] == 1)
+					if ($parray['can_lock'] == 1)
 					{
 						$options .= '<option value="lock">Lock Topic</option>';
 						$options_count++;
 					}
 
-					if ($parray['sticky'] == 1 && $parray['lock'] == 1)
+					if ($parray['can_sticky'] == 1 && $parray['can_lock'] == 1)
 					{
 						$options .= '<option value="both">Lock & Sticky Topic</option>';
 						$options_count++;

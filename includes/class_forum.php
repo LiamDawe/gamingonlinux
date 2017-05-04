@@ -341,53 +341,24 @@ class forum_class
 		
 		// first set them all to 0 (not allowed), and if any of their groups allow them, change it
 		$parray = [
-		'view' => 0,
-		'topic' => 0,
-		'reply' => 0,
-		'lock' => 0,
-		'sticky' => 0,
-		'delete' => 0,
-		'delete_own' => 0,
-		'avoid_floods' => 0,
+		'can_view' => 0,
+		'can_topic' => 0,
+		'can_reply' => 0,
+		'can_lock' => 0,
+		'can_sticky' => 0,
+		'can_delete' => 0,
+		'can_delete_own' => 0,
+		'can_avoid_floods' => 0,
 		'can_move' => 0
 		];
-		foreach ($permissions as $perm)
+		foreach ($permissions as $group_level)
 		{
-			if ($perm['can_view'] == 1)
+			foreach ($group_level as $permission => $value)
 			{
-				$parray['view'] = 1;
-			}
-			if ($perm['can_topic'] == 1)
-			{
-				$parray['topic'] = 1;
-			}
-			if ($perm['can_reply'] == 1)
-			{
-				$parray['reply'] = 1;
-			}
-			if ($perm['can_lock'] == 1)
-			{
-				$parray['lock'] = 1;
-			}
-			if ($perm['can_sticky'] == 1)
-			{
-				$parray['sticky'] = 1;
-			}
-			if ($perm['can_delete'] == 1)
-			{
-				$parray['delete'] = 1;
-			}
-			if ($perm['can_delete_own'] == 1)
-			{
-				$parray['delete_own'] = 1;
-			}
-			if ($perm['can_avoid_floods'] == 1)
-			{
-				$parray['avoid_floods'] = 1;
-			}
-			if ($perm['can_move'] == 1)
-			{
-				$parray['can_move'] = 1;
+				if ($value == 1)
+				{
+					$parray[$permission] = 1;
+				}
 			}
 		}
 	}

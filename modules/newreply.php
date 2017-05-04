@@ -19,7 +19,7 @@ if ($core->config('forum_posting_open') == 1)
 	}
 
 	// permissions for forum
-	else if($parray['reply'] == 0)
+	else if($parray['can_reply'] == 0)
 	{
 		$core->message('You do not have permission to post in this forum!');
 	}

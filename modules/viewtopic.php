@@ -90,7 +90,7 @@ else
 			$forum_class->forum_permissions($topic['forum_id']);
 
 			// are we even allow to view this forum?
-			if($parray['view'] == 0)
+			if($parray['can_view'] == 0)
 			{
 				$core->message('You do not have permission to view this forum!');
 			}
@@ -566,7 +566,7 @@ else
 				$options_count = 0;
 				$options = '';
 				$options_form = '';
-				if ($parray['sticky'] == 1)
+				if ($parray['can_sticky'] == 1)
 				{
 					if ($topic['is_sticky'] == 1)
 					{
@@ -581,7 +581,7 @@ else
 					$options_count++;
 				}
 
-				if ($parray['lock'] == 1)
+				if ($parray['can_lock'] == 1)
 				{
 					if ($topic['is_locked'] == 1)
 					{
@@ -596,7 +596,7 @@ else
 					$options_count++;
 				}
 
-				if ($parray['sticky'] == 1 && $parray['lock'] == 1)
+				if ($parray['can_sticky'] == 1 && $parray['can_lock'] == 1)
 				{
 					if ($topic['is_locked'] == 1 && $topic['is_sticky'] == 0)
 					{
@@ -621,7 +621,7 @@ else
 					$options_count++;
 				}
 
-				if ($parray['delete'] == 1)
+				if ($parray['can_delete'] == 1)
 				{
 					$options .= '<option value="Delete">Delete</option>';
 					$options_count++;
@@ -644,12 +644,12 @@ else
 				$reply_access = 0;
 
 				// sort out the reply area (if it's allowed)
-				if ($parray['reply'] == 1 && $topic['is_locked'] == 0)
+				if ($parray['can_reply'] == 1 && $topic['is_locked'] == 0)
 				{
 					$reply_access = 1;
 				}
 
-				else if ($parray['reply'] == 1 && $topic['is_locked'] == 1)
+				else if ($parray['can_reply'] == 1 && $topic['is_locked'] == 1)
 				{
 					if ($user->check_group([1,2]) == false)
 					{
@@ -739,7 +739,7 @@ else
 									$reply_options = 'Moderator options after posting: <select name="moderator_options"><option value=""></option>';
 									$options_count = 0;
 
-									if ($parray['sticky'] == 1)
+									if ($parray['can_sticky'] == 1)
 									{
 										if ($topic['is_sticky'] == 1)
 										{
@@ -753,7 +753,7 @@ else
 										$options_count++;
 									}
 
-									if ($parray['lock'] == 1)
+									if ($parray['can_lock'] == 1)
 									{
 										if ($topic['is_locked'] == 1)
 										{
@@ -767,7 +767,7 @@ else
 										$options_count++;
 									}
 
-									if ($parray['sticky'] == 1 && $parray['lock'] == 1)
+									if ($parray['can_sticky'] == 1 && $parray['can_lock'] == 1)
 									{
 										if ($topic['is_locked'] == 1 && $topic['is_sticky'] == 0)
 										{

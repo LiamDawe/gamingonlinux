@@ -9,7 +9,7 @@ if (!core::is_number($_GET['forum_id']))
 $forum_class->forum_permissions($_GET['forum_id']);
 
 // permissions for viewforum page
-if($parray['view'] == 0)
+if($parray['can_view'] == 0)
 {
 	$core->message('You do not have permission to view this forum!', NULL, 1);
 }
@@ -42,7 +42,7 @@ else
 		$_SESSION['activated'] = $get_active['activated'];
 	}
 
-	if ($parray['topic'] == 1)
+	if ($parray['can_topic'] == 1)
 	{
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{

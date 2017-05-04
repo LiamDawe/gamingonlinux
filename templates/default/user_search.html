@@ -1,0 +1,23 @@
+[block: user_search]
+<div class="box">
+	<div class="head">User Search</div>
+	<div class="body group">
+		Need to get in touch with someone? Search by username below:<br />
+		<form method="get" action="{:url}index.php?module=user_search">
+		<input type="hidden" name="module" value="user_search" />
+		Username: <input type="text" name="username" value="{:search_text}" />
+		<button type="submit">Search</button>
+		</form>
+	</div>
+</div>
+[/block: user_search]
+
+[block: user_row]
+<div class="box">
+	<div class="body group"><a href="{:url}profiles/{:user_id}"><img src="{:avatar}" alt="avatar" width="20" height="20" /> {:username}</a> - <a href="{:url}private-messages/compose/user={:user_id}">Send PM</a></div>
+</div>
+[/block: user_row]
+
+[block: bottom]
+{:pagination}
+[/block: bottom]

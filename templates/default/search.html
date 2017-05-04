@@ -23,25 +23,6 @@
 			</div>
 [/block: row]
 
-[block: user_search]
-<div class="box">
-	<div class="head">User Search</div>
-	<div class="body group">
-		Need to get in touch with someone? Search by username below:<br />
-		<form method="get" action="{:url}index.php?module=user_search">
-		Username: <input type="text" name="username" value="{:search_text}" />
-		<button type="submit">Search</button>
-		</form>
-	</div>
-</div>
-[/block: user_search]
-
-[block: user_row]
-<div class="box">
-	<div class="body group">{:avatar} <a href="{:user_id}">{:username}</a></div>
-</div>
-[/block: user_row]
-
 [block: bottom]
 {:pagination}
 [/block: bottom]

@@ -216,14 +216,7 @@ if ($core->config('allow_registrations') == 1)
 
 					$db->sqlquery("INSERT INTO ".$core->db_tables['user_profile_info']." SET `user_id` = ?", array($last_id));
 
-					// add one to members count, this is a special case
-					// it's one of only a few times we would update a remote config table, rather than local if we are using their user database
-					$config_table = '`'.$dbl->table_prefix.'config`';
-					if ($core->config('local_users') == 0)
-					{
-						$config_table = $core->config('remote_users_database') . '.' . '`config`';
-					}
-					$db->sqlquery("UPDATE $config_table SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
+					$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
 
 					// get the users info to log them in right away!
 					$db->sqlquery("SELECT ".$user::$user_sql_fields." FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($last_id));

@@ -31,7 +31,7 @@ $output = '<?xml version="1.0" encoding="UTF-8"?>
 <itunes:category text="Technology">
 </itunes:category>';
 
-$articles = $db->sqlquery("SELECT a.* FROM `articles` a LEFT JOIN `article_category_reference` c ON c.article_id = a.article_id WHERE a.`active` = 1 AND c.`category_id` = 97 ORDER BY a.`date` DESC LIMIT 15")->fetch_all();
+$articles = $dbl->run("SELECT a.* FROM `articles` a LEFT JOIN `article_category_reference` c ON c.article_id = a.article_id WHERE a.`active` = 1 AND c.`category_id` = 97 ORDER BY a.`date` DESC LIMIT 15")->fetch_all();
 
 foreach ($articles as $line)
 {

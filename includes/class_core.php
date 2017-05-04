@@ -227,28 +227,14 @@ class core
 	
 	function users_table()
 	{
-		if ($this->config('local_users') == 1)
-		{
-			$this->db_tables['users'] = '`'.$this->database->table_prefix.'users`';
-			$this->db_tables['session'] = '`'.$this->database->table_prefix.'saved_sessions`';
-			$this->db_tables['profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
-			$this->db_tables['user_groups'] = '`'.$this->database->table_prefix.'user_groups`';
- 			$this->db_tables['user_permissions'] = '`'.$this->database->table_prefix.'user_group_permissions`';
- 			$this->db_tables['user_profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
- 			$this->db_tables['user_group_membership'] = '`'.$this->database->table_prefix.'user_group_membership`';
- 			$this->db_tables['user_group_permissions_membership'] = '`'.$this->database->table_prefix.'user_group_permissions_membership`';
-		}
-		else if ($this->config('local_users') == 0)
-		{
-			$this->db_tables['users'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'users`';
-			$this->db_tables['session'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'saved_sessions`';
-			$this->db_tables['profile_info'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_profile_info`';
-			$this->db_tables['user_groups'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_groups`';
-			$this->db_tables['user_permissions'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_group_permissions`';
-			$this->db_tables['user_profile_info'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_profile_info`';
-			$this->db_tables['user_group_membership'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_group_membership`';
-			$this->db_tables['user_group_permissions_membership'] = $this->config('remote_users_database') . '.`' . $this->config('remote_sql_prefix') . 'user_group_permissions_membership`';
-		}
+		$this->db_tables['users'] = '`'.$this->database->table_prefix.'users`';
+		$this->db_tables['session'] = '`'.$this->database->table_prefix.'saved_sessions`';
+		$this->db_tables['profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
+		$this->db_tables['user_groups'] = '`'.$this->database->table_prefix.'user_groups`';
+ 		$this->db_tables['user_permissions'] = '`'.$this->database->table_prefix.'user_group_permissions`';
+ 		$this->db_tables['user_profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
+ 		$this->db_tables['user_group_membership'] = '`'.$this->database->table_prefix.'user_group_membership`';
+ 		$this->db_tables['user_group_permissions_membership'] = '`'.$this->database->table_prefix.'user_group_permissions_membership`';
 	}
 
 	function get_client_ip()

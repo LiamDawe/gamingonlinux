@@ -1,8 +1,8 @@
 # Gamingonlinux.com code
 
-The [Gamingonlinux](https://gamingonlinux.com) news site source code.
+The [Gamingonlinux](https://gamingonlinux.com) news site source code. This code is meant for GOL and isn't really suitable for use on other sites, nor was it designed with other sites in mind.
 
-Please read first: The entire codebase is probably a mess, as it was started years ago and tons needs updating for standards, newer PHP versions etc. It was started as a learning experience for Liam and still is to this day. Remember this before making any smart-arsed comments ;) (helpful pointers appreciated!)
+Please read first: The entire codebase is probably a mess, as it was started years ago and tons needs updating for standards, newer PHP versions etc. It was started as a learning experience for Liam and still is to this day. Remember this before making any smart-arsed comments ;) (helpful pointers, patches and so on highly appreciated!)
 
 If you like what I do please consider [supporting me on Patreon](https://www.patreon.com/liamdawe).
 

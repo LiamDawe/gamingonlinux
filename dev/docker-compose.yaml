@@ -1,0 +1,75 @@
+# PHP
+
+version: '2'
+
+services:
+
+  # phpfpm:
+  #   image: php:7-fpm-alpine
+  #   volumes:
+  #     - ../:/var/www/html
+  #   environment:
+  #     - DOCKER: "yes"
+  #   depends_on:
+  #     - db
+  #   links:
+  #     - db:db
+
+  # nginx-app:
+  #   image: nginx:alpine
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  #     - ../:/var/www/html
+  #   ports:
+  #    - "80:80"
+  #   environment:
+  #    - NGINX_HOST=gol.dev
+  #    - NGINX_PORT=80
+  #   depends_on:
+  #     - db
+  #     - phpfpm
+  #   links:
+  #     - phpfpm
+
+  apache:
+    image: php:7-apache
+    command: bash /start.sh
+    ports:
+      - "8866:80"
+    volumes:
+      - ../:/var/www/html
+      - ./files/start-apache.sh:/start.sh
+      # - ./files/apache.conf:/etc/apache2/sites-enabled/000-default.conf
+    environment:
+      DOCKER: "yes"
+    depends_on:
+      - db
+      - setup
+    links:
+      - db:db
+
+  # MYSQL
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: toor666
+      MYSQL_USER: goldev
+      MYSQL_PASSWORD: golpass
+      MYSQL_DATABASE: gol
+    volumes:
+      - golmysql_data:/var/lib/mysql
+
+  # INIT
+  setup:
+    image: php:7-apache
+    command: bash /start.sh
+    environment:
+      DOCKER: "yes"
+    volumes:
+      - ../:/var/www/html
+      - ./files/start-setup.sh:/start.sh
+    links:
+      - db:db
+
+volumes:
+  golmysql_data:

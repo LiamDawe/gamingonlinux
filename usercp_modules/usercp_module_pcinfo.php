@@ -17,8 +17,8 @@ if (!isset($_POST['act']))
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_pcinfo');
 	$templating->set('user_id', $_SESSION['user_id']);
-	$templating->set('url', core::config('website_url'));
-	$templating->set('this_template', core::config('website_url') . 'templates/' . core::config('template'));
+	$templating->set('url', $core->config('website_url'));
+	$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
 	if (!isset($additional['date_updated']))
 	{
@@ -326,6 +326,6 @@ else if (isset($_POST['act']))
 		$user_update_sql = "UPDATE ".$core->db_tables['users']." SET `distro` = ?, `pc_info_public` = ?, `pc_info_filled` = ? WHERE `user_id` = ?";
 		$user_update_query = $db->sqlquery($user_update_sql, array($_POST['distribution'], $public, $pc_info_filled, $_SESSION['user_id']));
 
-		header("Location: " . core::config('website_url') . "usercp.php?module=pcinfo&updated");
+		header("Location: " . $core->config('website_url') . "usercp.php?module=pcinfo&updated");
 	}
 }

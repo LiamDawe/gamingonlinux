@@ -43,7 +43,7 @@ else
 			if ($amountOfPosts['c'] > 5)
 			{
 				$_SESSION['message'] = 'toomany';
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					header("Location: /forum/");
 				}
@@ -72,7 +72,7 @@ else
 				$templating->block('main', 'newtopic');
 
 				$forum_index = '';
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					$forum_index = '/forum/';
 				}
@@ -85,7 +85,7 @@ else
 				$crumbs = '';
 				if ($show_forum_breadcrumb == 1)
 				{
-					if (core::config('pretty_urls') == 1)
+					if ($core->config('pretty_urls') == 1)
 					{
 						$forum_url = '/forum/' . $_GET['forum_id'] . '/';
 					}
@@ -300,7 +300,7 @@ else
 							unset($_SESSION['atitle']);
 							unset($_SESSION['atext']);
 
-							if (core::config('pretty_urls') == 1)
+							if ($core->config('pretty_urls') == 1)
 							{
 								header("Location: /forum/topic/{$topic_id}");
 							}

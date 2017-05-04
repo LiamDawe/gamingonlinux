@@ -207,7 +207,7 @@ if ($core->config('allow_registrations') == 1)
 					
 					if ($_POST['register'] == 'google')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_id` = ?, `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_id'], $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
 					}
 
 					$last_id = $db->grab_id();

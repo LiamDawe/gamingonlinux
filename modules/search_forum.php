@@ -1,10 +1,10 @@
 <?php
 $templating->set_previous('title', 'Forum Search', 1);
-$templating->set_previous('meta_description', 'Search the forum on ' . core::config('site_title'), 1);
+$templating->set_previous('meta_description', 'Search the forum on ' . $core->config('site_title'), 1);
 
 $templating->merge('forum_search');
 $templating->block('top');
-$templating->set('url', core::config('website_url'));
+$templating->set('url', $core->config('website_url'));
 
 $search_sql = '';
 if (isset($_GET['forums']) && $_GET['forums'] != 'all')

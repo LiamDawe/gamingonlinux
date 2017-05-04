@@ -38,7 +38,7 @@ if (isset($_GET['view']))
             header_remove("Last-Modified");
         }
 
-        $templating->set_previous('meta_description', 'Submit an article to ' . core::config('site_title'), 1);
+        $templating->set_previous('meta_description', 'Submit an article to ' . $core->config('site_title'), 1);
         $templating->set_previous('title', 'Submit An Article', 1);
 
         if (!isset($_GET['error']))
@@ -80,7 +80,7 @@ if (isset($_GET['view']))
         }
 
         $templating->block('submit', 'submit_article');
-        $templating->set('url', core::config('website_url'));
+        $templating->set('url', $core->config('website_url'));
         $templating->set('guest_fields', $guest_fields);
         $templating->set('title', $title);
 
@@ -91,8 +91,8 @@ if (isset($_GET['view']))
         }
         $templating->set('tagline_image', $tagline_pic);
 
-        $templating->set('max_height', core::config('article_image_max_height'));
-        $templating->set('max_width', core::config('article_image_max_width'));
+        $templating->set('max_height', $core->config('article_image_max_height'));
+        $templating->set('max_width', $core->config('article_image_max_width'));
 
         $subscribe_box = '';
         if ($_SESSION['user_id'] != 0)
@@ -104,7 +104,7 @@ if (isset($_GET['view']))
         $captcha_output = '';
         if ($core->config('captcha_disabled') == 0 && $captcha == 1)
         {
-            $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.core::config('recaptcha_public').'"></div>';
+            $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
         }
 
         $core->editor(['name' => 'text', 'editor_id' => 'article_text']);
@@ -148,7 +148,7 @@ if (isset($_POST['act']))
 			$guest_email = core::make_safe($_POST['email']);
         }
         
-		if (core::config('pretty_urls') == 1)
+		if ($core->config('pretty_urls') == 1)
 		{
 			$redirect = '/submit-article/';
 		}
@@ -194,7 +194,7 @@ if (isset($_POST['act']))
                 $recaptcha=$_POST['g-recaptcha-response'];
                 $google_url="https://www.google.com/recaptcha/api/siteverify";
                 $ip=core::$ip;
-                $url=$google_url."?secret=".core::config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
+                $url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
                 $res=getCurlData($url);
                 $res= json_decode($res, true);
 			}
@@ -219,7 +219,7 @@ if (isset($_POST['act']))
 		}
 
             // carry on and submit the article
-            if ((core::config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0 || core::config('captcha_disabled') == 1)
+            if (($core->config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0 || $core->config('captcha_disabled') == 1)
             {
                 // setup category if empty
                 if (empty($_POST['category']) || !is_numeric($_POST['category']))
@@ -306,7 +306,7 @@ if (isset($_POST['act']))
 
     if ($_POST['act'] == 'Preview')
     {
-        $templating->set_previous('meta_description', 'Previewing a submitted article to ' . core::config('site_title'), 1);
+        $templating->set_previous('meta_description', 'Previewing a submitted article to ' . $core->config('site_title'), 1);
         $templating->set_previous('title', 'Submit An Article Preview', 1);
 
         // make date human readable
@@ -314,7 +314,7 @@ if (isset($_POST['act']))
 
         // get the article row template
         $templating->block('preview_row');
-        $templating->set('url',core::config('website_url'));
+        $templating->set('url',$core->config('website_url'));
 
         $templating->set('title', strip_tags($_POST['title']));
         $templating->set('user_id', $_SESSION['user_id']);

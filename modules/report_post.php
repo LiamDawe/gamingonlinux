@@ -20,7 +20,7 @@ if (isset($_GET['view']))
 		{
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'topic';
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				header("Location: /forum/topic/{$_GET['topic_id']}/");
 			}
@@ -58,7 +58,7 @@ if (isset($_GET['view']))
 		{
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'post';
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				header("Location: /forum/topic/{$_GET['topic_id']}/");
 			}
@@ -94,7 +94,7 @@ if (isset($_POST['act']))
 		{
 			if (isset($_POST['no']))
 			{
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					header("Location: /forum/topic/{$_GET['topic_id']}/");
 				}
@@ -114,7 +114,7 @@ if (isset($_POST['act']))
 
 				$_SESSION['message'] = 'reported';
 				$_SESSION['message_extra'] = 'topic';
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					header("Location: /forum/topic/{$_GET['topic_id']}/");
 				}
@@ -137,7 +137,7 @@ if (isset($_POST['act']))
 		{
 			if (isset($_POST['no']))
 			{
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					header("Location: /forum/topic/{$_GET['topic_id']}/");
 				}
@@ -158,7 +158,7 @@ if (isset($_POST['act']))
 				$_SESSION['message'] = 'reported';
 				$_SESSION['message_extra'] = 'post';
 				
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					header("Location: /forum/topic/{$_GET['topic_id']}/");
 				}

@@ -16,12 +16,12 @@ if (!isset($_GET['redo']))
 
 			$_SESSION['activated'] = 1;
 			$_SESSION['message'] = 'activated';
-			header("Location: ".core::config('website_url')."index.php?module=home");
+			header("Location: ".$core->config('website_url')."index.php?module=home");
 		}
 		else
 		{
 			$_SESSION['message'] = 'cannot_activate';
-			header("Location: ".core::config('website_url')."index.php?module=home");
+			header("Location: ".$core->config('website_url')."index.php?module=home");
 		}
 	}
 }
@@ -57,7 +57,7 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 
 	else if ($get_active['activated'] == 1)
 	{
-		header("Location: ".core::config('website_url'));
+		header("Location: ".$core->config('website_url'));
 	}
 }
 ?>

@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
 $db_conf = include $file_dir . '/includes/config.php';
@@ -56,10 +58,10 @@ if (isset($_GET['code']))
 	$client->authenticate($_GET['code']);
 	$_SESSION['google_access_token'] = $client->getAccessToken();
   
-  	$google_user = $service->userinfo->get(); //get user info 
-	
+  	$google_user = $service->userinfo->get(); //get user info
+
 	$google_check = new google_check($dbl);
-	$userdata = $google_check->checkUser($google_user->id, $google_user->email);
+	$userdata = $google_check->checkUser($google_user->email);
 
 	// linking account via usercp
 	if ($google_check->new == 0)

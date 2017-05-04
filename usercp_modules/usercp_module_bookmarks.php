@@ -40,7 +40,7 @@ if ($total > 0)
       $data_type = 'article';
       $type = 'Article: ';
       $title = $data['article_title'];
-      if (core::config('pretty_urls') == 1)
+      if ($core->config('pretty_urls') == 1)
       {
         $link = '/articles/' . $data['slug'] . '.' . $data['data_id'];
       }
@@ -65,7 +65,7 @@ if ($total > 0)
       $data_type = 'forum_topic';
       $type = 'Forum Topic: ';
       $title = $data['topic_title'];
-      if (core::config('pretty_urls') == 1)
+      if ($core->config('pretty_urls') == 1)
       {
         $link = '/forum/topic/' . $data['data_id'];
       }

@@ -62,7 +62,7 @@ if ($db->num_rows() > 0)
 		while ($grab_streamers = $db->fetch())
 		{
 			$streamer_counter++;
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				$streamer_list .= '<a href="/profiles/' . $grab_streamers['user_id'] . '">'.$grab_streamers['username'].'</a>';
 			}

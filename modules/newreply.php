@@ -1,5 +1,5 @@
 <?php
-if (core::config('forum_posting_open') == 1)
+if ($core->config('forum_posting_open') == 1)
 {
 	$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
 	
@@ -33,7 +33,7 @@ if (core::config('forum_posting_open') == 1)
 			{
 				$_SESSION['message'] = 'locked';
 				$_SESSION['message_extra'] = 'forum post';
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					$redirect = '/forum/topic/'.$topic_id.'/';
 				}
@@ -55,7 +55,7 @@ if (core::config('forum_posting_open') == 1)
 			{
 				$_SESSION['message'] = 'empty';
 				$_SESSION['message_extra'] = 'text';
-				if (core::config('pretty_urls') == 1)
+				if ($core->config('pretty_urls') == 1)
 				{
 					$redirect = '/forum/topic/'.$topic_id;
 				}
@@ -197,17 +197,17 @@ if (core::config('forum_posting_open') == 1)
 
 							// message
 							$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-							<p><strong>{$_SESSION['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . core::config('website_url') . "forum/topic/{$topic_id}/post_id={$post_id}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+							<p><strong>{$_SESSION['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "forum/topic/{$topic_id}/post_id={$post_id}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 							<div>
 							<hr>
 							{$email_message}
 							<hr>
-							You can unsubscribe from this topic by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$topic_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.";
+							You can unsubscribe from this topic by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$topic_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.";
 							
-							$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has replied to a forum topic you follow on titled {$title['topic_title']} find it here: " . core::config('website_url') . 'forum/topic/' . $topic_id . '/post_id=' . $post_id;
+							$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has replied to a forum topic you follow on titled {$title['topic_title']} find it here: " . $core->config('website_url') . 'forum/topic/' . $topic_id . '/post_id=' . $post_id;
 
 							// Mail it
-							if (core::config('send_emails') == 1)
+							if ($core->config('send_emails') == 1)
 							{
 								$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
 								$mail->send();
@@ -226,7 +226,7 @@ if (core::config('forum_posting_open') == 1)
 					// help stop double postings
 					unset($message);
 
-					if (core::config('pretty_urls') == 1)
+					if ($core->config('pretty_urls') == 1)
 					{
 						header("Location: /forum/topic/{$topic_id}/post_id={$post_id}");
 					}
@@ -245,13 +245,13 @@ if (core::config('forum_posting_open') == 1)
 					
 					$_SESSION['message'] = 'mod_queue';
 
-					header("Location: " . core::config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
+					header("Location: " . $core->config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
 				}
 			}
 		}
 	}
 }
-else if (core::config('forum_posting_open') == 0)
+else if ($core->config('forum_posting_open') == 0)
 {
 	$core->message('Posting is currently down for maintenance.');
 }

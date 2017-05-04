@@ -13,14 +13,14 @@ class google_check
 		$this->database = $database;
 	}
 
-	function checkUser($google_id, $google_email)
+	function checkUser($google_email)
 	{
 		global $core;
 
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
-			$result = $this->database->run("SELECT ".user::$user_sql_fields." FROM `users` WHERE `google_id` = ? AND `google_email` = ?", array($google_id, $google_email))->fetch();
+			$result = $this->database->run("SELECT ".user::$user_sql_fields." FROM `users` WHERE `google_email` = ?", array($google_email))->fetch();
 			if (!empty($result))
 			{
 				$this->new = 1;
@@ -33,7 +33,6 @@ class google_check
 
 				$result = array();
 
-				$result['google_id'] = $google_id;
 				$result['google_email'] = $google_email;
 
 				return $result;
@@ -45,9 +44,16 @@ class google_check
 		// if they are linking via usercp to a logged in account
 		else
 		{
-			$this->database->run("UPDATE `users` SET `google_id` = ?, `google_email` = ? WHERE `user_id` = ?", array($google_id, $google_email, $_SESSION['user_id']));
-			$this->new = 0;
-			return;
+			if (isset($_SESSION['user_id']))
+			{
+				$this->database->run("UPDATE `users` SET `google_email` = ? WHERE `user_id` = ?", array($google_email, $_SESSION['user_id']));
+				$this->new = 0;
+				return;
+			}
+			else
+			{
+				die('Session error');
+			}
 		}
 	}
 }

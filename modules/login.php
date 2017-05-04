@@ -122,9 +122,7 @@ if (!isset($_POST['action']))
 	}
 	
 	else if (isset($_GET['twitter']))
-	{
-		setcookie('request_stay', $stay, time()+(60*60*24*7), '/', $core->config('cookie_domain')); // 1 week
-		
+	{		
 		require("includes/twitter/twitteroauth.php");
 
 		$twitteroauth = new TwitterOAuth($core->config('tw_consumer_key'), $core->config('tw_consumer_skey'));

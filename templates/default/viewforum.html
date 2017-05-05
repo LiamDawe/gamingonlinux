@@ -6,27 +6,28 @@
 					</ul>
 				</div>
 				<div class="box">
-					<div class="box">
-						<div class="head">{:forum_name}</div>
-						<div class="subhead">{:new_topic_link}</div>
-					</div>
-					<table class="table table-bordered">
+					<div class="head">{:forum_name}</div>
+					<div class="subhead">{:new_topic_link}</div>
+				</div>
 [/block: main_top]
 
 [block: post_row]
-	<tr>
-		<td width="30px" id="forum-post" class="forum_cell"><img src="{:topic_pip}" width="30px" height="30px" alt="pip" /></td>
-		<td width="455px" id="forum-post" class="forum_cell"><div>{:is_locked} {:is_sticky} <a href="{:topic_link}">{:post_title}</a></div> {:pagination_post}
-		by <a href="/profiles/{:author_id}"><span class="glyphicon glyphicon-user"></span> {:post_author}</a> on {:post_date}<br />
-		Replies: {:post_replys} Views: {:post_views}</td>
-		<td width="25px" id="forum-post" class="forum_cell"><img src="/templates/default/images/last_post.png" alt="" /></td>
-		<td width="200px" id="forum-post" class="forum_cell" valign="top">Last Post {:last_post_name}</td>
-	</tr>
+	<div class="post_row">
+		<div class="forum_avatar_holder">
+				<img src="{:avatar}" class="index_avatar" alt="avatar" height="50" width="50" />
+		</div>
+		<div class="post_info_container">
+			<div class="forum_post_info">
+					<span style="padding-left: 2px; vertical-align: middle; display: table-cell;">{:is_locked}<a href="{:topic_link}">{:title}</a> {:replies} {:pagination_post}<br />
+					<em>By <a href="{:profile_link}">{:post_author}</a> {:post_date}</em> </span>
+			</div>
+			<div class="forum_last_post last_post"><img width="15" height="15" src="/templates/default/images/last_post.png" alt="" />{:last_post}</div>
+		</div>
+	</div>
 [/block: post_row]
 
 [block: main_bottom]
-					</table>
 					{:new_topic_link}
 					{:pagination}
-				</div>
+
 [/block: main_bottom]

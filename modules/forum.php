@@ -87,6 +87,7 @@ SELECT
 	t.`replys`,
 	t.`last_post_date`,
 	t.`last_post_id`,
+	t.`is_locked`,
 	f.name as forum_name,
 	u.`username`,
 	u2.`username` as username_last
@@ -152,13 +153,20 @@ foreach ($get_topics as $topics)
 		$profile_link = "/index.php?module=profile&user_id={$topics['author_id']}";
 		$forum_link = '/index.php?module=viewforum&forum_id=' . $topics['forum_id'];
 	}
+	
+	$locked = '';
+	if ($topics['is_locked'] == 1)
+	{
+		$locked = ' <img width="15" height="15" src="'.$this_template.'/images/forum/lock.svg" onerror="'.$this_template.'/images/forum/lock.png" alt=""> ';
+	}
+	$templating->set('is_locked', $locked);
 
 	$templating->set('title', $topics['topic_title']);
 	$templating->set('link', $link);
 	$replies = '';
 	if ($topics['replys'] > 0)
 	{
-		$replies = '<img wdith="15" height="12" src="'.$this_template.'/images/comments/replies.svg" onerror="'.$this_template.'/images/comments/replies.png" alt=""> ' . $topics['replys'];
+		$replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" onerror="'.$this_template.'/images/comments/replies.png" alt=""> ' . $topics['replys'];
 	}
 	$templating->set('replies', $replies);
 	$templating->set('avatar', $avatar);

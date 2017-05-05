@@ -113,7 +113,7 @@ else
 					$pages[] = " <li><a class=\"pagination_small\" href=\"$page_link\">$i</a></li>";
 				}
 
-				$pagination_post = "<ul class=\"pagination_small pagination\">" . implode(' ', $pages) . "</ul>";
+				$pagination_post = " <ul class=\"pagination_small pagination\">" . implode(' ', $pages) . "</ul>";
 			}
 
 			// if more than 7 pages then put ... in the middle to save space
@@ -128,7 +128,7 @@ else
 				$end_page = $forum_class->get_link($post['topic_id'], 'page=' . $lastpage);
 				$lastlink = "<li><a class=\"pagination_small\" href=\"$end_page\">$lastpage</a></li>";
 
-				$pagination_post = "<ul class=\"pagination_small pagination\">" . implode(' ', $pages) . "<li class=\"pagination-disabled\"><a href=\"#\">....</a></li>{$lastlink}</ul>";
+				$pagination_post = " <ul class=\"pagination_small pagination\">" . implode(' ', $pages) . "<li class=\"pagination-disabled\"><a href=\"#\">....</a></li>{$lastlink}</ul>";
 			}
 		}
 		$templating->block('post_row', 'viewforum');

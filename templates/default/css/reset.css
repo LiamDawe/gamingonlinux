@@ -411,8 +411,10 @@ ul.pagination {
 	padding: 0;
 }
 ul.pagination_small {
-	display: inline-block;
-	float: none;
+    display: inline-block;
+    float: none;
+    position: absolute;
+	padding-left: 3px;
 }
 ul.pagination li {
 	float: left;

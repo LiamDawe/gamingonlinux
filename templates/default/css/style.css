@@ -869,6 +869,7 @@ ul.social-networks li > a {
 .database-updated{float: right; width: 49%;}
 
 /* Forum */
+.dark .post_row {background: #333333; border-bottom: 1px solid #868686;}
 .post_row {
 	float:left;
 	width:100%;

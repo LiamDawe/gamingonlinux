@@ -158,7 +158,7 @@ foreach ($get_topics as $topics)
 	$replies = '';
 	if ($topics['replys'] > 0)
 	{
-		$replies = '<img src="'.$this_template.'/images/comments/replies.png" alt=""> ' . $topics['replys'];
+		$replies = '<img wdith="15" height="12" src="'.$this_template.'/images/comments/replies.svg" onerror="'.$this_template.'/images/comments/replies.png" alt=""> ' . $topics['replys'];
 	}
 	$templating->set('replies', $replies);
 	$templating->set('avatar', $avatar);

@@ -1325,7 +1325,9 @@ body.dark {
 
 /* TABLET/NETBOOK */
 @media only screen and (max-width: 768px) {
+	.forum_post_info{width: 100%;}
 	.last_post{display: none;visibility: hidden;}
+	ul.pagination_small{display: none;visibility: hidden;}
 	.forum_avatar_holder{display: none;visibility: hidden;}
 	.container {
 		width: 100%;

@@ -279,11 +279,6 @@
 		padding: 7px;
 	}
 
-/* Abbr */
-	abbr[title] {
-		border-bottom: 1px dotted;
-	}
-
 /* Clearer */
 	.group:after {
 		content: ".";

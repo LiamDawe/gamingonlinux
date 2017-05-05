@@ -2,7 +2,7 @@
 $templating->merge('blocks/block_article_categorys');
 $templating->block('menu');
 
-if (!$user->check_group(1,2,5))
+if (!$user->check_group([1,2,5]))
 {
 	if ($core->config('pretty_urls') == 1)
 	{
@@ -14,7 +14,7 @@ if (!$user->check_group(1,2,5))
 	}
 }
 
-else if ($user->check_group(1,2,5))
+else if ($user->check_group([1,2,5]))
 {
 	$submit_link = $core->config('website_url') . 'admin.php?module=add_article';
 }

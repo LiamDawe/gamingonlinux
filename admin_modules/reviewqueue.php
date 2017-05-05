@@ -11,7 +11,7 @@ if (!isset($_GET['aid']))
 	while ($article = $db->fetch())
 	{
 		$templating->block('review_row', 'admin_modules/reviewqueue');
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 		$templating->set('article_id', $article['article_id']);
 		$templating->set('article_title', $article['title']);
 		$templating->set('username', $article['username']);
@@ -144,12 +144,12 @@ else
 	$templating->merge('admin_modules/article_form');
 
 	$templating->block('preview_code', 'admin_modules/article_form');
-	$templating->set('preview_url', core::config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
+	$templating->set('preview_url', $core->config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
 	$templating->set('edit_state', $edit_state);
 	$templating->set('article_id', $article['article_id']);
 
 	$templating->block('full_editor', 'admin_modules/article_form');
-	$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
+	$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 	$templating->set('edit_state', $edit_state);
 	$templating->set('edit_state_textarea', $edit_state_textarea);
 	$templating->set('main_formaction', '<form method="post" action="'.url.'admin.php?module=reviewqueue" enctype="multipart/form-data">');
@@ -220,8 +220,8 @@ else
 
 	$templating->set('tagline_image', $tagline_image);
 
-	$templating->set('max_height', core::config('article_image_max_height'));
-	$templating->set('max_width', core::config('article_image_max_width'));
+	$templating->set('max_height', $core->config('article_image_max_height'));
+	$templating->set('max_width', $core->config('article_image_max_width'));
 
 	$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text', 'article_editor' => 1, 'disabled' => $editor_disabled]);
 
@@ -326,7 +326,7 @@ if (isset($_POST['act']))
 				$author_email = $db->fetch();
 
 				// subject
-				$subject = 'Your article was reviewed and edited on ' . core::config('site_title');
+				$subject = 'Your article was reviewed and edited on ' . $core->config('site_title');
 
 				$nice_title = core::nice_title($_POST['title']);
 
@@ -349,14 +349,14 @@ if (isset($_POST['act']))
 				$headers .= "From: GamingOnLinux.com Editor Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 				// Mail it
-				if (core::config('send_emails') == 1)
+				if ($core->config('send_emails') == 1)
 				{
 					mail($author_email['email'], $subject, $message, $headers);
 				}
 			}
 
 			$_SESSION['message'] = 'admin_edited';
-			header("Location: ".core::config('website_url')."admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
+			header("Location: ".$core->config('website_url')."admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
 		}
 	}
 }

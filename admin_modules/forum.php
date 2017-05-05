@@ -250,7 +250,7 @@ if (isset($_GET['view']))
 			$templating->set('topic_title', $topic['topic_title']);
 
 			$topic_link = '';
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				$topic_link = '/forum/topic/' . $topic['topic_id'];
 			}
@@ -286,7 +286,7 @@ if (isset($_GET['view']))
 			}
 			else
 			{
-				$reported_by = "<a href=\"" . core::config('website_url') . "profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
+				$reported_by = "<a href=\"" . $core->config('website_url') . "profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
 			}
 			$templating->set('reporter', $reported_by);
 		}
@@ -319,7 +319,7 @@ if (isset($_GET['view']))
 			$templating->set('topic_title', $topic['topic_title']);
 
 			$topic_link = '';
-			if (core::config('pretty_urls') == 1)
+			if ($core->config('pretty_urls') == 1)
 			{
 				$topic_link = '/forum/topic/' . $topic['topic_id'];
 			}
@@ -354,7 +354,7 @@ if (isset($_GET['view']))
 			}
 			else
 			{
-				$reported_by = "<a href=\"" . core::config('website_url') . "profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
+				$reported_by = "<a href=\"" . $core->config('website_url') . "profiles/{$topic['reporter_id']}\">{$topic['reporter_user']}</a>";
 			}
 			$templating->set('reporter', $reported_by);
 		}

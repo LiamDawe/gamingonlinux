@@ -110,28 +110,28 @@ else
 		// subject
 		$subject = 'Your article was approved and published on ' . $core->config('site_title');
 		
-		$html_message = '<p>We have accepted your article titled "<a href="'.$article_link.'">'.$checked['title'].'</a>" on <a href="'.core::config('website_url').'" target="_blank">'.core::config('site_title').'</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome!</p>';
+		$html_message = '<p>We have accepted your article titled "<a href="'.$article_link.'">'.$checked['title'].'</a>" on <a href="'.$core->config('website_url').'" target="_blank">'.$core->config('site_title').'</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome!</p>';
 
 		// message
-		$plain_message = 'We have accepted your article titled "'.$checked['title'].'" on '.core::config('site_title').', you can see it here: '.$article_link;
+		$plain_message = 'We have accepted your article titled "'.$checked['title'].'" on '.$core->config('site_title').', you can see it here: '.$article_link;
 		
-		if (core::config('send_emails') == 1)
+		if ($core->config('send_emails') == 1)
 		{
 			$mail = new mail($email, $subject, $html_message, $plain_message);
 			$mail->send();
 		}
 
-		include(core::config('path') . 'includes/telegram_poster.php');
+		include($core->config('path') . 'includes/telegram_poster.php');
 
 		telegram($checked['title'] . ' ' . $article_link);
 
 		if (!isset($_POST['show_block']))
 		{
-			header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&accepted");
+			header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=Submitted&accepted");
 		}
 		else
 		{
-			header("Location: ". core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
+			header("Location: ". $core->config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 		}
 	}
 }

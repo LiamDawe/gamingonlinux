@@ -41,5 +41,5 @@ if ($checked = $article_class->check_article_inputs($return_page))
 
 	$_SESSION['message'] = 'edited';
 	$_SESSION['message_extra'] = 'submitted';
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}");
+	header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}");
 }

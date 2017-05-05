@@ -13,73 +13,73 @@ else
 		$templating->merge('admin_modules/config');
 
 		$templating->block('main');
-		$templating->set('form_url', core::config('website_url'));
+		$templating->set('form_url', $core->config('website_url'));
 		
-		$templating->set('title', core::config('site_title'));
+		$templating->set('title', $core->config('site_title'));
 
-		$templating->set('contact_email', core::config('contact_email'));
-		$templating->set('mailer_email', core::config('mailer_email'));
+		$templating->set('contact_email', $core->config('contact_email'));
+		$templating->set('mailer_email', $core->config('mailer_email'));
 
 		// set the default module
-		$templating->set('default_module', core::config('default_module'));
+		$templating->set('default_module', $core->config('default_module'));
 
 		// are users allowed to register?
 		$allow_registrations_check = '';
-		if (core::config('allow_registrations') == 1)
+		if ($core->config('allow_registrations') == 1)
 		{
 			$allow_registrations_check = 'checked';
 		}
 		$templating->set('register_check', $allow_registrations_check);
 
-		$templating->set('reg_message', core::config('register_off_message'));
+		$templating->set('reg_message', $core->config('register_off_message'));
 
 		// is there a captcha on register?
 		$register_captcha_check = '';
-		if (core::config('register_captcha') == 1)
+		if ($core->config('register_captcha') == 1)
 		{
 			$register_captcha_check = 'checked';
 		}
 		$templating->set('register_captcha_check', $register_captcha_check);
 		
 		$rss_check = '';
-		if (core::config('articles_rss') == 1)
+		if ($core->config('articles_rss') == 1)
 		{
 			$rss_check = 'checked';
 		}
 		$templating->set('article_rss_check', $rss_check);
 		
 		$forum_rss_check = '';
-		if (core::config('forum_rss') == 1)
+		if ($core->config('forum_rss') == 1)
 		{
 			$forum_rss_check = 'checked';
 		}
 		$templating->set('forum_rss_check', $forum_rss_check);
 
-		$templating->set('popular_counter', core::config('hot-article-viewcount'));
+		$templating->set('popular_counter', $core->config('hot-article-viewcount'));
 
 		// debug mode on?
 		$debug_check = '';
-		if (core::config('show_debug') == 1)
+		if ($core->config('show_debug') == 1)
 		{
 			$debug_check = 'checked';
 		}
 		$templating->set('debug_check', $debug_check);
 
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 		
 		// SOCIAL
-		$templating->set('twitter', core::config('twitter_username'));
-		$templating->set('telegram_group', core::config('telegram_group'));
-		$templating->set('telegram_bot_key', core::config('telegram_bot_key'));
-		$templating->set('discord', core::config('discord'));
-		$templating->set('steam_group', core::config('steam_group'));
-		$templating->set('facebook_page', core::config('facebook_page'));
-		$templating->set('gplus_page', core::config('gplus_page'));
-		$templating->set('youtube_channel', core::config('youtube_channel'));
+		$templating->set('twitter', $core->config('twitter_username'));
+		$templating->set('telegram_group', $core->config('telegram_group'));
+		$templating->set('telegram_bot_key', $core->config('telegram_bot_key'));
+		$templating->set('discord', $core->config('discord'));
+		$templating->set('steam_group', $core->config('steam_group'));
+		$templating->set('facebook_page', $core->config('facebook_page'));
+		$templating->set('gplus_page', $core->config('gplus_page'));
+		$templating->set('youtube_channel', $core->config('youtube_channel'));
 		
 		// THEMING
-		$templating->set('navbar_logo_icon', core::config('navbar_logo_icon'));
-		$templating->set('template', core::config('template'));
+		$templating->set('navbar_logo_icon', $core->config('navbar_logo_icon'));
+		$templating->set('template', $core->config('template'));
 	}
 
 	// We have been asked to edit the config
@@ -170,7 +170,7 @@ else
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';
-			header('Location: '.core::config('website_url').'admin.php?module=config');
+			header('Location: '.$core->config('website_url').'admin.php?module=config');
 		}
 	}
 }

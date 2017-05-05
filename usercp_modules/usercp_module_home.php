@@ -151,20 +151,6 @@ if (!isset($_POST['act']))
 
 	$templating->set('bio', $usercpcp['article_bio']);
 
-	$normal_set = '';
-	$flat_set = '';
-	if ($usercpcp['forum_type'] == 'normal_forum')
-	{
-		$normal_set = 'selected';
-	}
-	if ($usercpcp['forum_type'] == 'flat_forum')
-	{
-		$flat_set = 'selected';
-	}
-
-	$forum_types = '<option value="normal_forum" '.$normal_set.'>Category view with forums</option><option value="flat_forum" '.$flat_set.'>A list of all topics</option>';
-	$templating->set('forum_types', $forum_types);
-
 	$page_options = '';
 	$per_page_selected = '';
 	for ($i = 10; $i <= 50; $i += 5)
@@ -233,7 +219,7 @@ if (!isset($_POST['act']))
 	$google_button = '';
 	if ($core->config('google_login') == 1)
 	{
-		if (!empty($usercpcp['google_id']))
+		if (!empty($usercpcp['google_email']))
 		{
 			$google_button = '<div class="box"><div class="body group"><form method="post" action="'.$core->config('website_url').'usercp.php?module=home">
 			Current Google Email linked: '.$usercpcp['google_email'].'<br />
@@ -280,12 +266,6 @@ else if (isset($_POST['act']))
 			$aper_page = $_POST['articles-per-page'];
 		}
 
-		$forum_type_sql = $_POST['forum_type'];
-		if ($_POST['forum_type'] != 'normal_forum' && $_POST['forum_type'] != 'flat_forum')
-		{
-			$forum_type_sql = 'normal_forum';
-		}
-
 		$single_article_page = 0;
 		if ($_POST['single_article_page'] == 1 || $_POST['single_article_page'] == 0)
 		{
@@ -303,8 +283,8 @@ else if (isset($_POST['act']))
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
-		$user_update_sql = "UPDATE ".$core->db_tables['users']." SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `forum_type` = ?, `timezone` = ? WHERE `user_id` = ?";
-		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $forum_type_sql, $_POST['timezone'], $_SESSION['user_id']));
+		$user_update_sql = "UPDATE ".$core->db_tables['users']." SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ? WHERE `user_id` = ?";
+		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;
@@ -377,7 +357,7 @@ else if (isset($_POST['act']))
 	
 	if ($_POST['act'] == 'google_remove')
 	{
-		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `google_id` = ?, `google_email` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
+		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `google_email` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}

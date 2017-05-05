@@ -60,7 +60,7 @@ $date = $core->format_date(core::$date);
 
 // get the article row template
 $templating->block('preview_row', 'admin_modules/admin_module_articles');
-$templating->set('url', core::config('website_url'));
+$templating->set('url', $core->config('website_url'));
 
 $templating->set('categories_list_preview', '<span class="label label-info">Categories Here</span>');
 
@@ -93,16 +93,16 @@ if (isset($article))
 	
 	if (!empty($article['tagline_image']))
 	{
-		$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
-		$top_image = "<img src=\"" . core::config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+		$top_image_nobbcode = "<img src=\"" . $core->config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\">";
+		$top_image = "<img src=\"" . $core->config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 		BBCode: <input type=\"text\" class=\"form-control input-sm\" value=\"[img]tagline-image[/img]\" /><br />";
 	}
 	if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
 	{
-		$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
-		$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+		$top_image_nobbcode = "<img src=\"" . $core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
+		$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . $core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 		BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /><br />
-		Full Image Url: <a href=\"" . core::config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
+		Full Image Url: <a href=\"" . $core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a></div>";
 	}
 }
 
@@ -121,14 +121,14 @@ if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] 
 {
 	$db->sqlquery("SELECT `filename` FROM `articles_tagline_gallery` WHERE `id` = ?", array($_SESSION['gallery_tagline_id']));
 	$gallery_image = $db->fetch();
-	$top_image_nobbcode = "<img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$gallery_image['filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
-	$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . core::config('website_url') . "uploads/tagline_gallery/{$gallery_image['filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
+	$top_image_nobbcode = "<img src=\"" . $core->config('website_url') . "uploads/tagline_gallery/{$gallery_image['filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
+	$top_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . $core->config('website_url') . "uploads/tagline_gallery/{$gallery_image['filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
 	BBCode: <input type=\"text\" class=\"form-control\" value=\"[img]tagline-image[/img]\" /></div>";
 }
 if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 {
-	$top_image_nobbcode = '<img src="' . core::config('website_url') . 'uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name'] . '" alt="[articleimage]">';
-	$top_image = '<img src="' . core::config('website_url') . 'uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name'] . '" alt="[articleimage]" class="imgList"><br />
+	$top_image_nobbcode = '<img src="' . $core->config('website_url') . 'uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name'] . '" alt="[articleimage]">';
+	$top_image = '<img src="' . $core->config('website_url') . 'uploads/articles/tagline_images/temp/thumbnails/' . $_SESSION['uploads_tagline']['image_name'] . '" alt="[articleimage]" class="imgList"><br />
 	BBCode: <input type="text" class="form-control input-sm" value="[img]tagline-image[/img]" /><br />';
 }
 
@@ -208,8 +208,8 @@ $templating->set('article_bio', $bio);
 // this bit is for the final form
 $templating->merge('admin_modules/article_form');
 $templating->block('full_editor', 'admin_modules/article_form');
-$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
-$templating->set('main_formaction', '<form id="form" method="post" action="'.core::config('website_url').'admin.php?module=preview" enctype="multipart/form-data">');
+$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
+$templating->set('main_formaction', '<form id="form" method="post" action="'.$core->config('website_url').'admin.php?module=preview" enctype="multipart/form-data">');
 $templating->set('tagline', $_POST['tagline']);
 $templating->set('tagline_image', $top_image);
 
@@ -248,8 +248,8 @@ $templating->set('categories_list', $categories_list);
 $templating->set('title', htmlentities($_POST['title'], ENT_QUOTES));
 $templating->set('slug', $_POST['slug']);
 
-$templating->set('max_height', core::config('article_image_max_height'));
-$templating->set('max_width', core::config('article_image_max_width'));
+$templating->set('max_height', $core->config('article_image_max_height'));
+$templating->set('max_width', $core->config('article_image_max_width'));
 
 $core->editor(['name' => 'text', 'content' => $_POST['text'], 'editor_id' => 'comment_text', 'article_editor' => 1]);
 

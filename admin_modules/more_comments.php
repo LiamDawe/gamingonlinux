@@ -19,7 +19,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	$db->sqlquery($sql_count);
 	$total_comments = $db->num_rows();
 
-	$comments_per_page = core::config('default-comments-per-page');
+	$comments_per_page = $core->config('default-comments-per-page');
 	if (isset($_SESSION['per-page']))
 	{
 		$comments_per_page = $_SESSION['per-page'];
@@ -79,14 +79,14 @@ if (isset($_POST['act']))
 			$comment_email = $bbcode->email_bbcode($text);
 
 			// message
-			$html_message = "<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"" . core::config('website_url') . "admin.php\">editor panel</a>:</p>
+			$html_message = "<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"" . $core->config('website_url') . "admin.php\">editor panel</a>:</p>
 			<hr>
 			<p>{$text}</p>";
 
-			$plain_message = PHP_EOL."Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux editor panel: " . core::config('website_url') . "admin.php\r\n\r\n{$_POST['text']}\r\n\r\n";
+			$plain_message = PHP_EOL."Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux editor panel: " . $core->config('website_url') . "admin.php\r\n\r\n{$_POST['text']}\r\n\r\n";
 
 			// Mail it
-			if (core::config('send_emails') == 1)
+			if ($core->config('send_emails') == 1)
 			{
 				$mail = new mail($emailer['email'], $subject, $html_message, $plain_message);
 				$mail->send();

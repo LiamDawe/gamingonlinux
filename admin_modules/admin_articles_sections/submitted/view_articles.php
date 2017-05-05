@@ -28,7 +28,7 @@ if (!isset($_GET['aid']))
 	while ($article = $db->fetch())
 	{
 		$templating->block('submitted_row', 'admin_modules/admin_articles_sections/submitted_articles');
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 		$templating->set('article_id', strip_tags($article['article_id']));
 		$templating->set('article_title', $article['title']);
 		if (empty($article['username']))
@@ -169,11 +169,11 @@ else if (isset($_GET['aid']))
 	$lock_button = '';
 	if ($article['locked'] == 0)
 	{
-		$lock_button = '<a class="button_link" href="'.core::config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a><hr />';
+		$lock_button = '<a class="button_link" href="'.$core->config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a><hr />';
 	}
 	else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$lock_button = '<a class="button_link" href="'.core::config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a><hr />';
+		$lock_button = '<a class="button_link" href="'.$core->config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a><hr />';
 	}
 	$templating->set('lock_button', $lock_button);
 
@@ -181,13 +181,13 @@ else if (isset($_GET['aid']))
 	$templating->merge('admin_modules/article_form');
 
 	$templating->block('preview_code', 'admin_modules/article_form');
-	$templating->set('preview_url', core::config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
+	$templating->set('preview_url', $core->config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
 	$templating->set('edit_state', $edit_state);
 	$templating->set('article_id', $article['article_id']);
 
 	$templating->block('full_editor', 'admin_modules/article_form');
-	$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
-	$templating->set('main_formaction', '<form method="post" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+	$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
+	$templating->set('main_formaction', '<form method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 	$templating->set('edit_state', $edit_state);
 	$templating->set('edit_state_textarea', $edit_state_textarea);
 
@@ -282,8 +282,8 @@ else if (isset($_GET['aid']))
 	$tagline_image = $article_class->display_tagline_image($article);
 	$templating->set('tagline_image', $tagline_image);
 
-	$templating->set('max_height', core::config('article_image_max_height'));
-	$templating->set('max_width', core::config('article_image_max_width'));
+	$templating->set('max_height', $core->config('article_image_max_height'));
+	$templating->set('max_width', $core->config('article_image_max_width'));
 
 	// if they have done it before set the text
 	$text = $article['text'];
@@ -350,14 +350,14 @@ if (isset($_POST['act']))
 
 			if ($check_comment['comment_text'] == $comment)
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=doublecomment#editor_comments");
+				header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=doublecomment#editor_comments");
 
 				die();
 			}
 
 			if (empty($comment))
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=emptycomment#editor_comments");
+				header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=Submitted&aid={$_GET['aid']}&error=emptycomment#editor_comments");
 
 				die();
 			}
@@ -426,7 +426,7 @@ if (isset($_POST['act']))
 				<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 				</head>
 				<body>
-				<img src=\"" . core::config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
+				<img src=\"" . $core->config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
 				<br />
 				<p>Hello <strong>{$email_user['username']}</strong>,</p>
 				<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "articles/$title_nice.$article_id#comments\">{$title_upper}</a></strong>\".</p>
@@ -434,15 +434,15 @@ if (isset($_POST['act']))
 				<hr>
 				{$comment_email}
 				<hr>
-				You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.
+				You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.
 				<hr>
-				<p>If you haven&#39;t registered at <a href=\"" . core::config('website_url') . "\" target=\"_blank\">" . core::config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
+				<p>If you haven&#39;t registered at <a href=\"" . $core->config('website_url') . "\" target=\"_blank\">" . $core->config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
 				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
 				</div>
 				</body>
 				</html>";
 
-				$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on " . core::config('website_url') . "articles/$title_nice.$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+				$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on " . $core->config('website_url') . "articles/$title_nice.$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 				$boundary = uniqid('np');
 

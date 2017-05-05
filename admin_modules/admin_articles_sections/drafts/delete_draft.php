@@ -11,7 +11,7 @@ if ($check['active'] == 1)
 if (!isset($_POST['yes']) && !isset($_POST['no']))
 {
 	$templating->set_previous('title', 'Deleting a draft article', 1);
-	$core->yes_no('Are you sure you want to delete that draft?', core::config('website_url') . "admin.php?module=articles", 'delete_draft', $_POST['article_id'], 'article_id');
+	$core->yes_no('Are you sure you want to delete that draft?', $core->config('website_url') . "admin.php?module=articles", 'delete_draft', $_POST['article_id'], 'article_id');
 }
 else if (isset($_POST['no']))
 {

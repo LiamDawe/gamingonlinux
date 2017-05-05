@@ -67,8 +67,8 @@ if (isset($_GET['view']))
 				$title = $db->fetch();
 
 				$templating->block('add', 'admin_modules/admin_module_featured');
-				$templating->set('max_width', core::config('carousel_image_width'));
-				$templating->set('max_height', core::config('carousel_image_height'));
+				$templating->set('max_width', $core->config('carousel_image_width'));
+				$templating->set('max_height', $core->config('carousel_image_height'));
 
 				$templating->set('article_title', $title['title']);
 				$templating->set('article_id', $_GET['article_id']);
@@ -98,12 +98,12 @@ if (isset($_GET['view']))
 			$image = '<strong>This Editors Pick currently has no featured image set!</strong><br />';
 			if (!empty($items['featured_image']))
 			{
-				$image = '<img src="' . core::config('website_url') . 'uploads/carousel/' . $items['featured_image'] . '" width="100%" class="img-responsive"/>';
+				$image = '<img src="' . $core->config('website_url') . 'uploads/carousel/' . $items['featured_image'] . '" width="100%" class="img-responsive"/>';
 			}
 
 			$templating->set('current_image', $image);
-			$templating->set('max_width', core::config('carousel_image_width'));
-			$templating->set('max_height', core::config('carousel_image_height'));
+			$templating->set('max_width', $core->config('carousel_image_width'));
+			$templating->set('max_height', $core->config('carousel_image_height'));
 			$templating->set('hits', $items['hits']);
 		}
 	}
@@ -143,7 +143,7 @@ if (isset($_POST['act']))
 		$featured = $db->fetch();
 
 		$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']));
-		unlink(core::config('path') . 'uploads/carousel/' . $featured['featured_image']);
+		unlink($core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
 
 		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 

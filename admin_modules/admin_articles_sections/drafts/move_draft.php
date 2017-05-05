@@ -52,13 +52,13 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 	foreach ($users_array as $email_user)
 	{
 		$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-		<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . core::config('website_url') . "admin.php?module=articles&view=adminreview&aid={$_POST['article_id']}\">{$title}</a></strong>\".</p>
+		<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$_POST['article_id']}\">{$title}</a></strong>\".</p>
 		</body>
 		</html>";
 		
-		$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has sent an article to be reviewed before publishing on: " . core::config('website_url') . " You can review it here: " . core::config('website_url') . "admin.php?module=articles&view=adminreview&aid={$_POST['article_id']}";
+		$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has sent an article to be reviewed before publishing on: " . $core->config('website_url') . " You can review it here: " . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$_POST['article_id']}";
 
-		if (core::config('send_emails') == 1)
+		if ($core->config('send_emails') == 1)
 		{
 			$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
 			$mail->send();
@@ -69,5 +69,5 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 }
 else
 {
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts");
+	header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=drafts");
 }

@@ -29,7 +29,7 @@ if (isset($_GET['view']))
 		}
 
 		$templating->block('add', 'admin_modules/admin_module_goty');
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 		$templating->set('options', $category_list);
 	}
 
@@ -87,7 +87,7 @@ if (isset($_GET['view']))
 				}
 				$templating->block('manage_row', 'admin_modules/admin_module_goty');
 				$templating->set('game_name', $games['game']);
-				$templating->set('url', core::config('website_url'));
+				$templating->set('url', $core->config('website_url'));
 				$templating->set('id', $games['id']);
 				$templating->set('options', $category_list);
 			}
@@ -99,18 +99,18 @@ if (isset($_GET['view']))
 		$games = '';
 		$voting = '';
 
-		if (core::config('goty_games_open') == 1)
+		if ($core->config('goty_games_open') == 1)
 		{
 			$games = 'checked';
 		}
 
-		if (core::config('goty_voting_open') == 1)
+		if ($core->config('goty_voting_open') == 1)
 		{
 			$voting = 'checked';
 		}
 
 		$end_awards = '';
-		if (core::config('goty_finished') == 0)
+		if ($core->config('goty_finished') == 0)
 		{
 			$end_awards = '<button class="fnone" name="act" value="end">End Awards</button>';
 		}
@@ -202,7 +202,7 @@ if (isset($_GET['view']))
 			$templating->set('game_name', $games['game']);
 			$templating->set('category_name', $games['category_name']);
 			$templating->set('category_id', $games['category_id']);
-			$templating->set('url', core::config('website_url'));
+			$templating->set('url', $core->config('website_url'));
 			$templating->set('id', $games['id']);
 		}
 	}
@@ -221,17 +221,17 @@ if (isset($_POST['act']))
 			if ($db->num_rows() != 1)
 			{
 				$db->sqlquery("INSERT INTO `goty_games` SET `game` = ?, `accepted` = 1, `category_id` = ?", array($_POST['name'], $_POST['category']));
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=add&message=added");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=add&message=added");
 			}
 
 			else
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=add&message=exists");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=add&message=exists");
 			}
 		}
 		else
 		{
-			header("Location: " . core::config('website_url') . "admin.php?module=goty&view=add&message=empty");
+			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=add&message=empty");
 		}
 	}
 
@@ -246,17 +246,17 @@ if (isset($_POST['act']))
 			if ($db->num_rows() == 1)
 			{
 				$db->sqlquery("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=manage&message=deleted");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=deleted");
 			}
 
 			else
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=manage&message=nope");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=nope");
 			}
 		}
 		else
 		{
-			header("Location: " . core::config('website_url') . "admin.php?module=goty&view=manage&message=empty");
+			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=empty");
 		}
 	}
 
@@ -271,17 +271,17 @@ if (isset($_POST['act']))
 			if ($db->num_rows() == 1)
 			{
 				$db->sqlquery("UPDATE `goty_games` SET `game` = ?, `category_id` = ? WHERE `id` = ?", array($_POST['game'], $_POST['category'], $_POST['id']));
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=manage&message=edited");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=edited");
 			}
 
 			else
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=manage&message=exists");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=exists");
 			}
 		}
 		else
 		{
-			header("Location: " . core::config('website_url') . "admin.php?module=goty&view=manage&message=empty");
+			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=empty");
 		}
 	}
 
@@ -298,17 +298,17 @@ if (isset($_POST['act']))
 				$db->sqlquery("UPDATE `goty_games` SET `game` = ?, `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_POST['name'], $_SESSION['user_id'], $_POST['id']));
 				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=submitted&message=added");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=added");
 			}
 
 			else
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=submitted&message=exists");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=exists");
 			}
 		}
 		else
 		{
-			header("Location: " . core::config('website_url') . "admin.php?module=goty&view=submitted");
+			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
 		}
 	}
 
@@ -325,17 +325,17 @@ if (isset($_POST['act']))
 				$db->sqlquery("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_denied_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=submitted&message=deleted");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=deleted");
 			}
 
 			else
 			{
-				header("Location: " . core::config('website_url') . "admin.php?module=goty&view=submitted&message=nope");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=nope");
 			}
 		}
 		else
 		{
-			header("Location: " . core::config('website_url') . "admin.php?module=goty&view=submitted");
+			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
 		}
 	}
 
@@ -355,12 +355,12 @@ if (isset($_POST['act']))
 		$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_games_open'", array($games));
 		$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_voting_open'", array($voting));
 
-		header("Location: " . core::config('website_url') . "admin.php?module=goty&view=config");
+		header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=config");
 	}
 
 	if ($_POST['act'] == 'end')
 	{
-		if (core::config('goty_finished') == 0)
+		if ($core->config('goty_finished') == 0)
 		{
 			$db->sqlquery("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_games_open'");
 			$db->sqlquery("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_voting_open'");
@@ -385,7 +385,7 @@ if (isset($_POST['act']))
 				}
 			}
 
-			header("Location: " . core::config('website_url') . "admin.php?module=goty&view=config");
+			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=config");
 		}
 	}
 }

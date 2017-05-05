@@ -427,7 +427,7 @@ else
 				$templating->set('ip', $ip['ip']);
 				
 				$banned_until = new DateTime($ip['ban_date']);
-				$banned_until->add(new DateInterval('P'.core::config('ip_ban_length').'D'));
+				$banned_until->add(new DateInterval('P'.$core->config('ip_ban_length').'D'));
 					
 				$templating->set('removal_date', $banned_until->format('Y-m-d H:i:s'));
 				

@@ -133,7 +133,7 @@ if (isset($_GET['view']))
 			// get the edit row
 			$templating->merge('admin_modules/article_form');
 			$templating->block('full_editor', 'admin_modules/article_form');
-			$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
+			$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 			$templating->set('edit_state', $edit_state);
 			$templating->set('edit_state_textarea', $edit_state_textarea);
 
@@ -202,7 +202,7 @@ if (isset($_GET['view']))
 				$templating->set('slug', $article['slug']);
 			}
 
-			$templating->set('main_formaction', '<form method="post" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+			$templating->set('main_formaction', '<form method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 
 			if (empty($article['username']))
 			{
@@ -229,8 +229,8 @@ if (isset($_GET['view']))
 
 			$templating->set('temp_tagline_image', $temp_tagline_image);
 
-			$templating->set('max_height', core::config('article_image_max_height'));
-			$templating->set('max_width', core::config('article_image_max_width'));
+			$templating->set('max_height', $core->config('article_image_max_height'));
+			$templating->set('max_width', $core->config('article_image_max_width'));
 
 			$core->editor(['name' => 'text', 'content' => $text, 'disabled' => $editor_disabled, 'editor_id' => 'article_text']);
 
@@ -557,23 +557,23 @@ else if (isset($_POST['act']))
 				foreach ($users_array as $email_user)
 				{
 					// subject
-					$subject = "New comment on your unpublished article {$title['title']} on " . core::config('site_title');
+					$subject = "New comment on your unpublished article {$title['title']} on " . $core->config('site_title');
 
 					$comment_email = $bbcode->email_bbcode($comment);
 
 					// message
 					$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"" . core::config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title['title']}</a></strong>\".</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to an article you sent for review on titled \"<strong><a href=\"" . $core->config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\">{$title['title']}</a></strong>\".</p>
 					<div>
 					<hr>
 					{$comment_email}
 					<hr>
-					<p>You can unsubscribe from this article by <a href=\"" . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . core::config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
+					<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
 
-					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} has replied to an article you sent for review on titled \"{$title['title']}\" " . core::config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\r\n\r\nIf you wish to unsubscribe you can go here: " . core::config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
+					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} has replied to an article you sent for review on titled \"{$title['title']}\" " . $core->config('website_url') . "/admin.php?module=reviewqueue&aid={$_POST['aid']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
 
 					// Mail it
-					if (core::config('send_emails') == 1)
+					if ($core->config('send_emails') == 1)
 					{
 						$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
 						$mail->send();
@@ -672,11 +672,11 @@ else if (isset($_POST['act']))
 			{
 				if (!isset($_POST['show_block']))
 				{
-					header("Location: " . core::config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}");
+					header("Location: " . $core->config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}");
 				}
 				else
 				{
-					header("Location: " . core::config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
+					header("Location: " . $core->config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 				}
 			}
 		}

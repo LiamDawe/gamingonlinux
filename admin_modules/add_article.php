@@ -15,8 +15,8 @@ $templating->block('add', 'admin_modules/admin_module_articles');
 
 $templating->merge('admin_modules/article_form');
 $templating->block('full_editor', 'admin_modules/article_form');
-$templating->set('main_formaction', '<form method="post" name="article-form" action="'.core::config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
-$templating->set('max_filesize', core::readable_bytes(core::config('max_tagline_image_filesize')));
+$templating->set('main_formaction', '<form method="post" name="article-form" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 
 // get categorys
 $categorys_list = '';
@@ -64,8 +64,8 @@ $templating->set('tagline', $tagline);
 $templating->set('text', $text);
 
 $templating->set('categories_list', $categorys_list);
-$templating->set('max_height', core::config('article_image_max_height'));
-$templating->set('max_width', core::config('article_image_max_width'));
+$templating->set('max_height', $core->config('article_image_max_height'));
+$templating->set('max_width', $core->config('article_image_max_width'));
 
 $db->sqlquery("SELECT `auto_subscribe_new_article` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
 $grab_subscribe = $db->fetch();
@@ -79,7 +79,7 @@ if ($grab_subscribe['auto_subscribe_new_article'] == 1)
 $core->editor(['name'=> 'text', 'content' => $text, 'article_editor' => 1, 'editor_id' => 'article_text']);
 
 $templating->block('add_bottom', 'admin_modules/admin_module_articles');
-$templating->set('website_url', core::config('website_url'));
+$templating->set('website_url', $core->config('website_url'));
 $templating->set('previously_uploaded', $previously_uploaded);
 $templating->set('subscribe_check', $auto_subscribe);
 

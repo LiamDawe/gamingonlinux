@@ -40,9 +40,9 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	$_SESSION['message'] = 'edited';
 	$_SESSION['message_extra'] = 'draft';
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}");
+	header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=drafts&aid={$_POST['article_id']}");
 }
 else
 {
-	header("Location: " . core::config('website_url') . "admin.php?module=articles&view=drafts");
+	header("Location: " . $core->config('website_url') . "admin.php?module=articles&view=drafts");
 }

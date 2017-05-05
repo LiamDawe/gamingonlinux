@@ -39,7 +39,7 @@ $pagination = $core->pagination_link(9, $total_pages, "admin.php?module=correcti
 
       $nice_title = core::nice_title($corrections['title']);
 
-      if (core::config('pretty_urls') == 1)
+      if ($core->config('pretty_urls') == 1)
       {
         $article_link = '/articles/' . $nice_title . '.' . $corrections['article_id'];
       }

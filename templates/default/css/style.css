@@ -869,7 +869,38 @@ ul.social-networks li > a {
 .database-updated{float: right; width: 49%;}
 
 /* Forum */
-.index_avatar{vertical-align:middle; max-width: 50px;}
+.post_row {
+	float:left;
+	width:100%;
+	position:relative;
+	background:#efefef; /* column 1 background colour */
+	margin-bottom: 5px;
+	border-bottom: 1px solid #d3d3d3;
+}
+.forum_avatar_holder {
+	float:left;
+	width:50px;
+	position:relative;
+	overflow:hidden;
+}
+.post_info_container
+{
+	width: 100%;
+	position:relative;
+}
+.forum_post_info {
+	float:left;
+	width:70%;
+	position:relative;
+	left:5px;
+	overflow:hidden;
+}
+.forum_last_post {
+	float:left;
+	width:20%;
+	position:relative;
+	overflow:hidden;
+}
 .forum-badge a {color: #fff;}
 #create-poll{display: none;}
 .poll_button{float: none ;}
@@ -1294,7 +1325,7 @@ body.dark {
 /* TABLET/NETBOOK */
 @media only screen and (max-width: 768px) {
 	.last_post{display: none;visibility: hidden;}
-	.index_avatar{display: none;visibility: hidden;}
+	.forum_avatar_holder{display: none;visibility: hidden;}
 	.container {
 		width: 100%;
 	}

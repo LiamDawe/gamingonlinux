@@ -320,7 +320,7 @@ if (isset($_POST['act']))
 			$plain_message = PHP_EOL."Hello {$livestream['username']}, {$_SESSION['username']} has denied your livestream even submission, sorry!";
 
 			// Mail it
-			if (core::config('send_emails') == 1)
+			if ($core->config('send_emails') == 1)
 			{
 				$mail = new mail($livestream['email'], $subject, $html_message, $plain_message);
 				$mail->send();
@@ -372,7 +372,7 @@ if (isset($_POST['act']))
 		$plain_message = PHP_EOL."Hello {$livestream['username']}, {$_SESSION['username']} has approved your livestream even submission, thanks for sending it in!";
 
 		// Mail it
-		if (core::config('send_emails') == 1)
+		if ($core->config('send_emails') == 1)
 		{
 			$mail = new mail($livestream['email'], $subject, $html_message, $plain_message);
 			$mail->send();

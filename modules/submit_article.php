@@ -117,9 +117,9 @@ if (isset($_GET['view']))
 
 if (isset($_POST['act']))
 {
-    if ($_POST['act'] == 'Submit')
-    {
-        // check for ipban (spammers) and don't let them submit
+	if ($_POST['act'] == 'Submit')
+	{
+		// check for ipban (spammers) and don't let them submit
         $db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
         $get_ip = $db->fetch();
         if ($db->num_rows() > 0)
@@ -218,91 +218,90 @@ if (isset($_POST['act']))
 			die();
 		}
 
-            // carry on and submit the article
-            if (($core->config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0 || $core->config('captcha_disabled') == 1)
+        // carry on and submit the article
+        if (($core->config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0 || $core->config('captcha_disabled') == 1)
+        {
+            // setup category if empty
+            if (empty($_POST['category']) || !is_numeric($_POST['category']))
             {
-                // setup category if empty
-                if (empty($_POST['category']) || !is_numeric($_POST['category']))
-                {
-                    $category_sql = 0;
-                }
+                $category_sql = 0;
+            }
 
-                else
-                {
-                    $category_sql = $_POST['category'];
-                }
+            else
+            {
+                $category_sql = $_POST['category'];
+            }
 
-                $guest_username = '';
-                if (!empty($_POST['name']))
-                {
-                    $guest_username = core::make_safe($_POST['name']);
-                    $username = core::make_safe($_POST['name']);
-                }
+            $guest_username = '';
+            if (!empty($_POST['name']))
+            {
+                $guest_username = core::make_safe($_POST['name']);
+                $username = core::make_safe($_POST['name']);
+            }
 
-                else
-                {
-                    $username = $_SESSION['username'];
-                }
+            else
+            {
+                $username = $_SESSION['username'];
+            }
 
-                // make the slug
-                $title_slug = core::nice_title($_POST['title']);
+			// make the slug
+			$title_slug = core::nice_title($_POST['title']);
 
-                // insert the article itself
-                $db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
+			// insert the article itself
+			$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
 
-                $article_id = $db->grab_id();
+			$article_id = $db->grab_id();
 
-                $db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_article', core::$date, $article_id));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_article', core::$date, $article_id));
 
-                // check if they are subscribing
-                if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
-                {
-                    $db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $article_id));
-                }
+			// check if they are subscribing
+			if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
+			{
+				$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $article_id));
+			}
 
-                if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-                {
-                    $core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
-                }
+			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+			{
+				$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
+			}
 
-                // get all the editor and admin emails apart from sinead
-                $editor_emails = array();
+			// get all the editor and admin emails apart from sinead
+			$editor_emails = array();
 
-                $subject = $core->config('site_title') . " article submission from {$username}";
+			$subject = $core->config('site_title') . " article submission from {$username}";
                 
-                $email_groups = $user->get_group_ids('article_submission_emails');
+			$email_groups = $user->get_group_ids('article_submission_emails');
                 
-                $in = str_repeat('?,', count($email_groups) - 1) . '?';
+			$in = str_repeat('?,', count($email_groups) - 1) . '?';
                 
-                $db->sqlquery("SELECT m.`user_id`, u.`email`, u.`username` from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups);
-                while ($get_emails = $db->fetch())
+			$db->sqlquery("SELECT m.`user_id`, u.`email`, u.`username` from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups);
+			while ($get_emails = $db->fetch())
+			{
+				$submitted_link = $core->config('website_url') . "admin.php?module=articles&view=Submitted";
+                // message
+                $html_message = "<p>Hello {$get_emails['username']},</p>
+                <p>A new article has been submitted that needs reviewing titled <a href=\"$submitted_link\"><strong>{$title}</strong></a> from {$username}</p>
+                <p><a href=\"$submitted_link\">Click here to review it</a>";
+
+                $plain_message = PHP_EOL."Hello {$get_emails['username']}, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review:  $submitted_link";
+
+				// Mail it
+                if ($core->config('send_emails') == 1)
                 {
-					$submitted_link = $core->config('website_url') . "admin.php?module=articles&view=Submitted";
-                  // message
-                  $html_message = "<p>Hello {$get_emails['username']},</p>
-                  <p>A new article has been submitted that needs reviewing titled <a href=\"$submitted_link\"><strong>{$title}</strong></a> from {$username}</p>
-                  <p><a href=\"$submitted_link\">Click here to review it</a>";
-
-                  $plain_message = PHP_EOL."Hello {$get_emails['username']}, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review:  $submitted_link";
-
-                  // Mail it
-                  if ($core->config('send_emails') == 1)
-                  {
-                    $mail = new mail($get_emails['email'], $subject, $html_message, $plain_message);
-                    $mail->send();
-                  }
-                }
+					$mail = new mailer($core, $mail_class);
+					$mail->sendMail($get_emails['email'], $subject, $html_message, $plain_message);
+				}
+			}
                 
-                $core->message('Thank you for submitting an article to us! The article has been sent to the admins for review before it is posted, please allow time for us to go over it properly. Keep an eye on your email in case we send it back to you with feedback. <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
+			$core->message('Thank you for submitting an article to us! The article has been sent to the admins for review before it is posted, please allow time for us to go over it properly. Keep an eye on your email in case we send it back to you with feedback. <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
 
                 unset($_SESSION['atitle']);
                 unset($_SESSION['atext']);
                 unset($_SESSION['aname']);
                 unset($_SESSION['aemail']);
                 unset($_SESSION['image_rand']);
-            }
-        
-    }
+		}
+	}
 
     if ($_POST['act'] == 'Preview')
     {

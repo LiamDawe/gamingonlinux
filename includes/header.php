@@ -28,6 +28,8 @@ $article_class = new article_class($dbl, $core, $plugins);
 include($file_dir . '/includes/bbcode.php');
 $bbcode = new bbcode($dbl, $core, $plugins);
 
+include($file_dir . '/includes/PHPMailer/PHPMailerAutoload.php');
+$mail_class = new PHPMailer();
 include($file_dir . '/includes/class_mail.php');
 
 define('url', $core->config('website_url'));

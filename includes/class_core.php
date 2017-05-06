@@ -712,7 +712,7 @@ class core
 		}
 		$templating->set('ays_ignore', $ays_check);
 		
-		$templating->set('limit_youtube', core::config('limit_youtube'));
+		$templating->set('limit_youtube', $this->config('limit_youtube'));
 		
 		$templating->set('editor_id', $editor['editor_id']);
 		

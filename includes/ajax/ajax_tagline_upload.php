@@ -161,7 +161,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		$target = $core->config('path') . "uploads/articles/tagline_images/temp/" . $imagename;
 
 		// make the thumbnail, nice and small
-		$img->fromFile($_FILES['photos2']['tmp_name'])->resize(350, null)->toFile(core::config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename);
+		$img->fromFile($_FILES['photos2']['tmp_name'])->resize(350, null)->toFile($core->config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename);
 
 		if (move_uploaded_file($source, $target))
 		{

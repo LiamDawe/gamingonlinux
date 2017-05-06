@@ -76,29 +76,19 @@ if (isset($_POST['act']))
 				$name = 'Anonymous';
 			}
 			
-			if (isset($_POST['email']) && !empty($_POST['email']))
-			{
-				if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
-				{
-					$additional_header = '';
-				}
-				else
-				{
-					$additional_header = "Reply-To: $name <{$_POST['email']}>";
-				}
-			}
-			
 			$subject = $core->config('site_title') . ' Contact Us - ' . $name;
 			
 			$message = core::make_safe($_POST['message']);
 			
-			$html_message = '<p>' . $name . ' writes,</p>' . $bbcode->email_bbcode($_POST['message']);
+			$html_message = '<p>' . $name . ' writes,</p><p>' . $bbcode->email_bbcode($_POST['message']) . '</p>';
+
+			$plain_message = "$name writes:" . PHP_EOL . $message;
 			
 			// Mail it
             if ($core->config('send_emails') == 1)
             {
-				$mail = new mail($core->config('contact_email'), $subject, $html_message, '', $additional_header);
-				$mail->send();
+				$mail = new mailer($core, $mail_class);
+				$mail->sendMail($core->config('contact_email'), $subject, $html_message, $plain_message, ['name' => $name, 'email' => $_POST['email']]);
 				
 				unset($_SESSION['aname']);
 				unset($_SESSION['aemail']);

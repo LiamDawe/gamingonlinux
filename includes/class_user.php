@@ -168,7 +168,7 @@ class user
 		$_SESSION['username'] = 'Guest'; // not even sure why I set this
 		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
-		$this->user_details[0] = ['theme' => 'default'];
+		$this->user_details[0] = ['theme' => 'default', 'timezone' => 'UTC'];
 	}
 	
 	// helper func to get a user field(s)
@@ -194,11 +194,17 @@ class user
 
 				$sql = "SELECT ".$get_fields." FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?";
 				$grabber = $this->database->run($sql, [$user_id])->fetch();
-
-				foreach ($grabber as $field => $put)
+				if ($grabber)
 				{
-					$to_return[$field] = $put;
-					$this->user_details[$user_id][$field] = $put;
+					foreach ($grabber as $field => $put)
+					{
+						$to_return[$field] = $put;
+						$this->user_details[$user_id][$field] = $put;
+					}
+				}
+				else
+				{
+					error_log($sql . ' ' . $user_id);
 				}
 			}
 			return $to_return;
@@ -400,7 +406,7 @@ class user
 				<hr>
 				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>";
 
-				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".core::config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
+				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
 
 				$mail = new mail($user_data['email'], $this->core->config('site_title') . ": New Login Notification", $message, $plain_message);
 				$mail->send();
@@ -496,7 +502,7 @@ class user
 	
 	function get_user_groups()
 	{
-		if ($_SESSION['user_id'] > 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			$their_groups = $this->database->run("SELECT `group_id` FROM ".$this->core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
 		}

@@ -31,22 +31,45 @@ services:
   #   links:
   #     - phpfpm
 
+  proxy:
+    image: zzrot/alpine-caddy
+    ports: 
+      - 80:80
+      - 443:443
+    volumes: 
+      -  ./files/CaddyFile:/etc/Caddyfile
+    links:
+      - apache
+      - phpmyadmin
+
   apache:
     image: php:7-apache
     command: bash /start.sh
-    ports:
-      - "8866:80"
     volumes:
       - ../:/var/www/html
       - ./files/start-apache.sh:/start.sh
       # - ./files/apache.conf:/etc/apache2/sites-enabled/000-default.conf
     environment:
       DOCKER: "yes"
+      MYSQL_ROOT_PASSWORD: toor666
+      MYSQL_USER: pmauser
+      MYSQL_PASSWORD: pma66user888password
     depends_on:
       - db
       - setup
     links:
       - db:db
+
+
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      container_name: phpmyadmin
+      environment:
+        DOCKER: "yes"
+      depends_on:
+        - db
+      links:
+        - db:db
 
   # MYSQL
   db:

@@ -1,0 +1,17 @@
+:80, :443 {
+
+	proxy / apache:80 {
+		transparent
+		websocket
+	}
+
+	proxy /phpmyadmin phpmyadmin:80 {
+		without /phpmyadmin
+		transparent
+		websocket
+	}
+
+	gzip
+
+	tls self_signed
+}

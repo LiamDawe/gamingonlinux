@@ -164,12 +164,9 @@ if (isset($_POST['act']))
 		$date = core::$date;
 		$db->sqlquery("INSERT INTO `admin_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$db->sqlquery("SELECT `username`, `email` FROM ".$core->db_tables['users']." WHERE `user_group` IN (1,2) AND `user_id` != ?", array($_SESSION['user_id']));
-
-		while ($emailer = $db->fetch())
+		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
+		foreach ($grab_admins as $emailer)
 		{
-			$to = $emailer['email'];
-
 			$subject = "A new admin area comment on GamingOnLinux.com";
 
 			// message
@@ -184,9 +181,6 @@ if (isset($_POST['act']))
 			<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"http://www.gamingonlinux.com/admin.php\">admin panel</a>:</p>
 			<hr>
 			<p>{$text}</p>
-			<br>
-			<p>You can reply to this mail to make a new comment, replace all contents or comment below this line.</p>
-			<p>".str_repeat('-', 98)."</p>
 			</body>
 			</html>
 			";
@@ -194,12 +188,12 @@ if (isset($_POST['act']))
 			// To send HTML mail, the Content-type header must be set
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress(66,'admin')."\r\n";
+			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n";
 
 			// Mail it
 			if ($core->config('send_emails') == 1)
 			{
-				mail($to, $subject, $message, $headers);
+				mail($emailer['email'], $subject, $message, $headers);
 			}
 		}
 
@@ -218,14 +212,12 @@ if (isset($_POST['act']))
 		}
 
 		$date = core::$date;
-		$db->sqlquery("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
+		$dbl->run("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$db->sqlquery("SELECT `username`, `email` FROM ".$core->db_tables['users']." WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
+		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 
-		while ($emailer = $db->fetch())
+		foreach ($grab_editors as $emailer)
 		{
-			$to = $emailer['email'];
-
 			$subject = "A new editor area comment on GamingOnLinux.com";
 
 			// message
@@ -240,9 +232,6 @@ if (isset($_POST['act']))
 			<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"http://www.gamingonlinux.com/admin.php\">editor panel</a>:</p>
 			<hr>
 			<p>{$text}</p>
-			<br>
-			<p>You can reply to this mail to make a new comment, replace all contents or comment below this line.</p>
-			<p>".str_repeat('-', 98)."</p>
 			</body>
 			</html>
 			";
@@ -250,12 +239,12 @@ if (isset($_POST['act']))
 			// To send HTML mail, the Content-type header must be set
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: ".core::genReplyAddress(365,'editor')."\r\n";
+			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n";
 
 			// Mail it
 			if ($core->config('send_emails') == 1)
 			{
-				mail($to, $subject, $message, $headers);
+				mail($emailer['email'], $subject, $message, $headers);
 			}
 		}
 

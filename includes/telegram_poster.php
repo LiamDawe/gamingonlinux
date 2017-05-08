@@ -1,5 +1,5 @@
 <?php
-define('BOT_TOKEN', core::config('telegram_bot_key'));
+define('BOT_TOKEN', $core->config('telegram_bot_key'));
 define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
 function exec_curl_request($handle) 

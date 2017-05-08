@@ -590,6 +590,29 @@ INSERT INTO `user_group_permissions` (`id`, `name`) VALUES
 (6, 'skip_submit_article_captcha'),
 (7, 'article_submission_emails');
 
+INSERT INTO `user_group_permissions_membership` (`group_id`, `permission_id`) VALUES
+(1, 1),
+(1, 2),
+(1, 5),
+(1, 6),
+(1, 7),
+(5, 1),
+(5, 2),
+(5, 5),
+(5, 6),
+(5, 7),
+(2, 1),
+(2, 2),
+(2, 5),
+(2, 6),
+(2, 7),
+(3, 2),
+(3, 5),
+(3, 6),
+(6, 2),
+(6, 5),
+(6, 6);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

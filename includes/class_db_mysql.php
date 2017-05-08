@@ -39,7 +39,7 @@ class db_mysql extends PDO
         {
 			$trace = $error->getTrace();
 			$this->pdo_error($error->getMessage(), $trace[2]['file'], $this->replaced_query($sql, $data), core::current_page_url());
-			//echo  $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $this->replaced_query($sql, $data);
+			echo  $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $this->replaced_query($sql, $data);
 			die('SQL Error');
         }
     }
@@ -108,7 +108,7 @@ class db_mysql extends PDO
 		$to = core::config('contact_email');
 
 		// subject
-		$subject = "GOL PDO Error: " . core::config('site_name');
+		$subject = "GOL PDO Error: " . core::config('site_title');
 
 		$make_sql_safe = core::make_safe($sql);
 		$make_url_safe = core::make_safe($url);
@@ -117,18 +117,16 @@ class db_mysql extends PDO
 		$message = "
 		<html>
 		<head>
-		<title>A PDO Error Report For ".core::config('site_name')."</title>
+		<title>A PDO Error Report For ".core::config('site_title')."</title>
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>
-		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_name')."\">
+		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_title')."\">
 		<br />
 		$exception on page <br />
 		<strong>URL:</strong> $make_url_safe<br />
 		SQL QUERY<br />
 		$make_sql_safe<br />
-		Referring Page<br />
-		$referrer
 		</body>
 		</html>";
 

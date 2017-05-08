@@ -634,10 +634,19 @@ if (!isset($_GET['go']))
 						$comment_avatar = $user->sort_avatar($comments['author_id']);
 						
 						$into_username = '';
-						$into_username = $plugins->do_hooks('into_post_username', $comments);
+						if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
+						{
+							$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . $core->config('website_url') . 'templates/'.$core->config('template').'/images/distros/' . $comments['distro'] . '.svg" />';
+						}
 						
-						$user_info_extra = '';
-						$user_info_extra = $plugins->do_hooks('into_post_user_info', $comments);
+						$pc_info = '';
+						if (isset($comments['pc_info_public']) && $comments['pc_info_public'] == 1)
+						{
+							if ($comments['pc_info_filled'] == 1)
+							{
+								$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$comments['author_id'].'">View PC info</a>';
+							}
+						}
 
 						$templating->block('article_comments', 'articles_full');
 						$permalink = $article_class->get_link($article['article_id'], $article['slug'], 'comment_id=' . $comments['comment_id']);
@@ -647,7 +656,7 @@ if (!isset($_GET['go']))
 						$templating->set('comment_avatar', $comment_avatar);
 						$templating->set('date', $comment_date);
 						$templating->set('tzdate', date('c',$comments['time_posted']) );
-						$templating->set('user_info_extra', $user_info_extra);
+						$templating->set('user_info_extra', $pc_info);
 
 						$cake_bit = '';
 						if ($username != 'Guest')

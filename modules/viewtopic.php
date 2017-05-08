@@ -350,9 +350,15 @@ else
 					$templating->block('topic', 'viewtopic');
 					$permalink = $forum_class->get_link($topic['topic_id']);
 					$templating->set('permalink', $permalink);
-					$user_info_extra = '';
-					$user_info_extra = $plugins->do_hooks('into_post_user_info', $topic);
-					$templating->set('user_info_extra', $user_info_extra);
+					$pc_info = '';
+					if (isset($topic['pc_info_public']) && $topic['pc_info_public'] == 1)
+					{
+						if ($topic['pc_info_filled'] == 1)
+						{
+							$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$topic['author_id'].'">View PC info</a>';
+						}
+					}
+					$templating->set('user_info_extra', $pc_info);
 					$templating->set('topic_title', $topic['topic_title']);
 
 					$topic_date = $core->format_date($topic['creation_date']);
@@ -500,14 +506,23 @@ else
 						}
 
 						$into_username = '';
-						$into_username = $plugins->do_hooks('into_post_username', $post);
+						if (!empty($post['distro']) && $post['distro'] != 'Not Listed')
+						{
+							$into_username .= '<img title="' . $post['distro'] . '" class="distro tooltip-top"  alt="" src="' . $core->config('website_url') . 'templates/'.$core->config('template').'/images/distros/' . $post['distro'] . '.svg" />';
+						}
 
 						$cake_bit = $user->cake_day($post['register_date'], $post['username']);
 						$templating->set('cake_icon', $cake_bit);
 
-						$user_info_extra = '';
-						$user_info_extra = $plugins->do_hooks('into_post_user_info', $post);
-						$templating->set('user_info_extra', $user_info_extra);
+						$pc_info;
+						if (isset($post['pc_info_public']) && $post['pc_info_public'] == 1)
+						{
+							if ($post['pc_info_filled'] == 1)
+							{
+								$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$post['author_id'].'">View PC info</a>';
+							}
+						}
+						$templating->set('user_info_extra', $pc_info);
 
 						$templating->set('username', $into_username . $username);
 

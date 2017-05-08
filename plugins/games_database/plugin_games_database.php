@@ -110,8 +110,3 @@ function hook_game_tag_list($database, $core, $article_id)
 	
 	return $games_list;
 }
-
-function hook_remove_game_rows($database, $core, $article_id)
-{	
-	$database->run("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($article_id));
-}

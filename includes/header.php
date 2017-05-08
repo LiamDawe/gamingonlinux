@@ -25,7 +25,7 @@ $plugins = new plugins($dbl, $core, $file_dir);
 include($file_dir . '/includes/class_article.php');
 $article_class = new article_class($dbl, $core, $plugins);
 
-include($file_dir . '/includes/bbcode.php');
+include($file_dir . '/includes/class_bbcode.php');
 $bbcode = new bbcode($dbl, $core, $plugins);
 
 include($file_dir . '/includes/PHPMailer/PHPMailerAutoload.php');
@@ -106,18 +106,16 @@ $templating->set('url', $core->config('website_url'));
 $branding['icon'] = $core->config('navbar_logo_icon');
 $branding['title'] = $core->config('site_title');
 
-$icon_plugin = $plugins->do_hooks('icon_hook');
-
-if (is_array($icon_plugin))
+// april fools, because why not
+if (date('dm') == '0104' && date('H') < 14)
 {
-	if (isset($icon_plugin['icon']) && !empty($icon_plugin['icon']))
-	{
-		$branding['icon'] = $icon_plugin['icon'];
-	}
-	if (isset($icon_plugin['title']) && !empty($icon_plugin['title']))
-	{
-		$branding['title'] = $icon_plugin['title'];
-	}
+	$branding['icon'] = 'windows_logo.png';
+	$branding['title'] = 'Gaming On Windows 10';
+}
+// christmas
+if (date('m') == '12')
+{
+	$branding['icon'] = 'icon_xmas.png';
 }
 
 $templating->set('icon', $branding['icon'] );

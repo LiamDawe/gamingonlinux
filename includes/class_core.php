@@ -1105,9 +1105,17 @@ class core
 	
 	public static function adjust_time($date, $from = 'UTC', $to = 'UTC')
 	{
+		if (empty($from) || $from == NULL)
+		{
+			$from = 'UTC';
+		}
+		if (empty($to) || $to == NULL)
+		{
+			$to = 'UTC';
+		}
 		$given = new DateTime($date, new DateTimeZone($from));
 		$given->setTimezone(new DateTimeZone($to));
-		$output = $given->format("Y-m-d H:i:s"); 
+		$output = $given->format("Y-m-d H:i:s") . ' (' . $to . ')'; 
 		
 		return $output;
 	}

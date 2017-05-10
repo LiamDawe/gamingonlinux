@@ -202,10 +202,6 @@ class user
 						$this->user_details[$user_id][$field] = $put;
 					}
 				}
-				else
-				{
-					error_log($sql . ' ' . $user_id);
-				}
 			}
 			return $to_return;
 		}
@@ -558,30 +554,36 @@ class user
 		else
 		{
 			$user_data = $this->get(['avatar', 'avatar_gravatar', 'gravatar_email', 'avatar_gallery', 'avatar_uploaded', 'theme'], $user_id);
-			
-			$avatar = '';
-			if ($user_data['avatar_gravatar'] == 1)
+			if (!empty($user_data))
 			{
-				$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
-			}
-
-			else if ($user_data['avatar_gallery'] != NULL)
-			{
-				$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
-			}
-
-			// either uploaded or linked an avatar
-			else if (!empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0)
-			{
-				$avatar = $user_data['avatar'];
-				if ($user_data['avatar_uploaded'] == 1)
+				$avatar = '';
+				if ($user_data['avatar_gravatar'] == 1)
 				{
-					$avatar = $this->core->config('website_url') . "uploads/avatars/{$user_data['avatar']}";
+					$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
+				}
+
+				else if ($user_data['avatar_gallery'] != NULL)
+				{
+					$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
+				}
+
+				// either uploaded or linked an avatar
+				else if (!empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0)
+				{
+					$avatar = $user_data['avatar'];
+					if ($user_data['avatar_uploaded'] == 1)
+					{
+						$avatar = $this->core->config('website_url') . "uploads/avatars/{$user_data['avatar']}";
+					}
+				}
+
+				// else no avatar, then as a fallback use gravatar if they have an email left-over
+				else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
+				{
+					$avatar = $default_avatar;
 				}
 			}
-
-			// else no avatar, then as a fallback use gravatar if they have an email left-over
-			else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
+			else
 			{
 				$avatar = $default_avatar;
 			}

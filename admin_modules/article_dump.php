@@ -5,7 +5,7 @@ $templating->block('main');
 
 if (isset($_GET['dump']))
 {
-	$sections = article_dump($_POST['text']);
+	$sections = $bbcode->article_dump($_POST['text']);
 
 	$_SESSION['atitle'] = $sections['title'];
 	$_SESSION['atagline'] = $sections['tagline'];

@@ -134,7 +134,7 @@ if (isset($_GET['view']))
 			$templating->merge('admin_modules/article_form');
 			$templating->block('full_editor', 'admin_modules/article_form');
 			$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
-			$templating->set('edit_state', $edit_state);
+			$templating->set('!_state', $edit_state);
 			$templating->set('edit_state_textarea', $edit_state_textarea);
 
 			$brandnew = '';
@@ -184,7 +184,6 @@ if (isset($_GET['view']))
 			// if they have done it before set title, text and tagline
 			if (isset($message_map::$error) && $message_map::$error == 1)
 			{
-				die();
 				$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 				$templating->set('tagline', $_SESSION['atagline']);
 				$templating->set('slug', $_SESSION['aslug']);
@@ -612,7 +611,11 @@ else if (isset($_POST['act']))
 				$show = 1;
 			}
 
+			
+
 			$article_class->gallery_tagline($checked);
+
+			
 
 			// first check if it was disabled
 			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
@@ -627,6 +630,8 @@ else if (isset($_POST['act']))
 					$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
 				}
 			}
+
+			
 
 			article_class::process_categories($_POST['article_id']);
 
@@ -663,6 +668,8 @@ else if (isset($_POST['act']))
 			unset($_SESSION['original_text']);
 			unset($_SESSION['gallery_tagline_id']);
 			unset($_SESSION['gallery_tagline_rand']);
+
+			
 			
 			if ($core->config('pretty_urls') == 1)
 			{

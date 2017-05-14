@@ -257,7 +257,7 @@ if (isset($_POST['act']))
 			// check if they are subscribing
 			if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 			{
-				$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?", array($_SESSION['user_id'], $article_id));
+				$article_class->subscribe($article_id, 1);
 			}
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
@@ -273,10 +273,12 @@ if (isset($_POST['act']))
 			$email_groups = $user->get_group_ids('article_submission_emails');
                 
 			$in = str_repeat('?,', count($email_groups) - 1) . '?';
-                
-			$db->sqlquery("SELECT m.`user_id`, u.`email`, u.`username` from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups);
-			while ($get_emails = $db->fetch())
+			
+			$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups)->fetch_all();
+
+			foreach ($grab_editors as $get_emails)
 			{
+				print_r($get_emails);
 				$submitted_link = $core->config('website_url') . "admin.php?module=articles&view=Submitted";
                 // message
                 $html_message = "<p>Hello {$get_emails['username']},</p>
@@ -295,11 +297,11 @@ if (isset($_POST['act']))
                 
 			$core->message('Thank you for submitting an article to us! The article has been sent to the admins for review before it is posted, please allow time for us to go over it properly. Keep an eye on your email in case we send it back to you with feedback. <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
 
-                unset($_SESSION['atitle']);
-                unset($_SESSION['atext']);
-                unset($_SESSION['aname']);
-                unset($_SESSION['aemail']);
-                unset($_SESSION['image_rand']);
+            unset($_SESSION['atitle']);
+            unset($_SESSION['atext']);
+            unset($_SESSION['aname']);
+            unset($_SESSION['aemail']);
+            unset($_SESSION['image_rand']);
 		}
 	}
 

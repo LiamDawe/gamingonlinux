@@ -86,7 +86,7 @@ class mysql
 		catch (Exception $error)
 		{
 			$trace = $error->getTrace();
-			if (isset($_SESSION['user_group']) && ($_SESSION['user_group'] == 1 || $_SESSION['user_group'] == 2))
+			if ($_SESSION['user_id'] == 1)
 			{
 				$core->message( $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $STH->interpolateQuery(), NULL, 1);
 				echo $templating->output();
@@ -128,7 +128,7 @@ class mysql
 		$to = core::config('contact_email');
 
 		// subject
-		$subject = "GOL PDO Error: " . core::config('site_name');
+		$subject = "GOL PDO Error: " . core::config('site_title');
 
 		$make_sql_safe = core::make_safe($sql);
 		$make_url_safe = core::make_safe($url);
@@ -137,11 +137,11 @@ class mysql
 		$message = "
 		<html>
 		<head>
-		<title>A PDO Error Report For ".core::config('site_name')."</title>
+		<title>A PDO Error Report For ".core::config('site_title')."</title>
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>
-		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_name')."\">
+		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_title')."\">
 		<br />
 		$exception on page <br />
 		<strong>URL:</strong> $make_url_safe<br />

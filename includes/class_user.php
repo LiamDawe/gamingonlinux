@@ -288,40 +288,16 @@ class user
 		
 		$check_against = [];
 		
-		// if we are using local users, remove any remote groups to check permissions on
-		if ($this->core->config('local_users') == 1)
+		foreach ($allowed_groups as $key => $value)
 		{
-			foreach ($allowed_groups as $key => $value)
+			if ($value['remote_group'] == 1)
 			{
-				if ($value['remote_group'] == 1)
-				{
-					unset($allowed_groups[$key]);
-				}
-				else
-				{
-					$check_against[] = $value['group_id'];
-				}
+				unset($allowed_groups[$key]);
 			}
-		}
-		// else we are on an install that's using a remote users database, remove their local groups
-		else
-		{
-			foreach ($allowed_groups as $key => $value)
+			else
 			{
-				if ($value['remote_group'] == 0 && $value['universal'] == 1)
-				{
-					unset($allowed_groups[$key]);
-				}
-				// also remove any groups that don't contain our wanted prefix
-				else if (strpos($value['group_name'], $this->core->config('user_group_prefix')) === false && $value['universal'] == 1) 
-				{
-					unset($allowed_groups[$key]);
-				}
-				else
-				{
-					$check_against[] = $value['group_id'];
-				}
-			}			
+				$check_against[] = $value['group_id'];
+			}
 		}
 
 		foreach ($this->user_groups as $group)

@@ -268,6 +268,7 @@ class article_class
 		$title = strip_tags($_POST['title']);
 		$tagline = trim($_POST['tagline']);
 		$text = trim($_POST['text']);
+		$categories = $_POST['categories'];
 
 		// check its set, if not hard-set it based on the article title
 		if (isset($_POST['slug']) && !empty($_POST['slug']))
@@ -280,7 +281,7 @@ class article_class
 		}
 
 		// make sure its not empty
-		$empty_check = core::mempty(compact('title', 'tagline', 'text'));
+		$empty_check = core::mempty(compact('title', 'tagline', 'text', 'categories'));
 		if ($empty_check !== true)
 		{
 			$redirect = 1;

@@ -87,7 +87,7 @@ if (isset($_POST['act']))
 			// Mail it
             if ($core->config('send_emails') == 1)
             {
-				$mail = new mailer($core, $mail_class);
+				$mail = new mailer($core);
 				$mail->sendMail($core->config('contact_email'), $subject, $html_message, $plain_message, ['name' => $name, 'email' => $_POST['email']]);
 				
 				unset($_SESSION['aname']);

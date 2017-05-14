@@ -278,7 +278,7 @@ if (isset($_POST['act']))
 
 			foreach ($grab_editors as $get_emails)
 			{
-				print_r($get_emails);
+				//print_r($get_emails);
 				$submitted_link = $core->config('website_url') . "admin.php?module=articles&view=Submitted";
                 // message
                 $html_message = "<p>Hello {$get_emails['username']},</p>
@@ -290,7 +290,7 @@ if (isset($_POST['act']))
 				// Mail it
                 if ($core->config('send_emails') == 1)
                 {
-					$mail = new mailer($core, $mail_class);
+					$mail = new mailer($core);
 					$mail->sendMail($get_emails['email'], $subject, $html_message, $plain_message);
 				}
 			}

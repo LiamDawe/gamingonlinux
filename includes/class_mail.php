@@ -141,16 +141,9 @@ class mailer
     private $mail;
 	private $core;
 
-    public function __construct($core, $instance = null) 
+    public function __construct($core) 
 	{
-		if ($instance !== null) 
-		{
-            $this->mail = $instance;
-        }
-		else
-		{
-			$this->mail = new PHPMailer();
-		}
+		$this->mail = new PHPMailer();
 		$this->core = $core;
 
 		$this->mail->isHTML(true);

@@ -1,8 +1,10 @@
 <?php
+// steam game importer, DLC only ordered by release date (for already released stuff)
+
 // http://simplehtmldom.sourceforge.net/
 include('simple_html_dom.php');
 
-$file_dir = dirname( dirname( dirname(__FILE__) ) );
+$file_dir = dirname ( dirname( dirname( dirname(__FILE__) ) ) );
 
 $db_conf = include $file_dir . '/includes/config.php';
 
@@ -18,7 +20,7 @@ $stop = 0;
 $games_added_list = '';
 
 $page = 1;
-$url = "http://store.steampowered.com/search/?sort_by=Released_DESC&os=linux&category1=998%2C21&page=";
+$url = "http://store.steampowered.com/search/?sort_by=Released_DESC&category1=21&os=linux&page=";
 
 do
 {
@@ -93,7 +95,7 @@ do
               // if we already have it, just update it
               else if (!empty($grab_info) && $grab_info['steam_link'] == NULL)
               {
-                $dbl->run("UPDATE `calendar` SET `steam_link` = ? WHERE id = ?", array($link, $grab_info['id']));
+                $dbl->run("UPDATE `calendar` SET `steam_link` = ?, `is_dlc` = 1 WHERE id = ?", array($link, $grab_info['id']));
 
                 echo "Updated {$title} with the latest information<br />";
               }

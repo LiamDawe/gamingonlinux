@@ -4,7 +4,7 @@ error_reporting(-1);
 // http://simplehtmldom.sourceforge.net/
 include('simple_html_dom.php');
 
-$file_dir = dirname( dirname( dirname(__FILE__) ) );
+$file_dir = dirname ( dirname( dirname( dirname(__FILE__) ) ) );
 
 $db_conf = include $file_dir . '/includes/config.php';
 

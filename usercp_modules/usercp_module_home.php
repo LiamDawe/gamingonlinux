@@ -122,6 +122,21 @@ if (!isset($_POST['act']))
 	}
 
 	$templating->set('profile_fields', $profile_fields_output);
+	
+	$normal_set = '';
+	$flat_set = '';
+	if ($usercpcp['forum_type'] == 'normal_forum')
+	{
+		$normal_set = 'selected';
+	}
+	if ($usercpcp['forum_type'] == 'flat_forum')
+	{
+		$flat_set = 'selected';
+	}
+
+	$forum_types = '<option value="normal_forum" '.$normal_set.'>Category view with forums</option><option value="flat_forum" '.$flat_set.'>A list of all topics, a "flat forum"</option>';
+	$templating->set('forum_types', $forum_types);
+
 
 	$submission_emails = '';
 	if ($user->check_group([1,2,5]) == true)
@@ -280,11 +295,17 @@ else if (isset($_POST['act']))
 				$submission_emails = 1;
 			}
 		}
+		
+		$forum_type_sql = $_POST['forum_type'];
+		if ($_POST['forum_type'] != 'normal_forum' && $_POST['forum_type'] != 'flat_forum')
+		{
+			$forum_type_sql = 'normal_forum';
+		}
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
-		$user_update_sql = "UPDATE ".$core->db_tables['users']." SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ? WHERE `user_id` = ?";
-		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $_SESSION['user_id']));
+		$user_update_sql = "UPDATE ".$core->db_tables['users']." SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ? WHERE `user_id` = ?";
+		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;

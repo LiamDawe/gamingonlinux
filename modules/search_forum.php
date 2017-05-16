@@ -57,7 +57,7 @@ if (isset($search_text) && !empty($search_text))
 		)
 		AGAINST (
 		? IN BOOLEAN MODE
-		) $search_sql
+		) $search_sql AND t.approved = 1
 		ORDER BY t.creation_date DESC
 		LIMIT 0 , 30", array($search_text));
 	}
@@ -75,7 +75,7 @@ if (isset($search_text) && !empty($search_text))
 		)
 		AGAINST (
 		? IN BOOLEAN MODE
-		) $search_sql
+		) $search_sql AND t.approved = 1
 		ORDER BY t.creation_date DESC
 		LIMIT 0 , 30", array($search_text));
 	}

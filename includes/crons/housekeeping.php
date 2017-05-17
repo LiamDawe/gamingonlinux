@@ -96,29 +96,3 @@ if ($total_to_remove > 0)
 {
 	$dbl->run("UPDATE `config` SET `data_value` = (data_value - $total_to_remove) WHERE `data_key` = 'total_featured'");
 }
-
-// count how many there are
-$editor_pick_count = $dbl->run("SELECT COUNT(`article_id`) FROM `editor_picks`")->fetchOne();
-
-if ($editor_pick_count < $core->config('editor_picks_limit'))
-{
-	// subject
-	$subject = "You need to set more editor picks on " . $core->config('site_title');
-	
-	// message
-	$html_message = "<p>Hello <strong>admin</strong>,</p>
-	<p>You need to <a href=\"https://www.gamingonlinux.com\">set more articles as an editors pick</a> there are ".$editor_pick_count."/" . $core->config('editor_picks_limit') . "!</p>";
-	
-	if (!empty($games))
-	{
-		$html_message .= "<p>Games removed:</p>
-		<p>$games</p>";
-	}
-	
-	// Mail it
-	if ($core->config('send_emails') == 1)
-	{
-		$mail = new mail($core->config('contact_email'), $subject, $html_message, $plain_message);
-		$mail->send();
-	}
-}

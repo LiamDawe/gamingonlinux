@@ -9,6 +9,8 @@ $dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database
 include($file_dir . '/includes/class_core.php');
 $core = new core($dbl, $file_dir);
 
+$dbl->run("TRUNCATE TABLE `article_totals`");
+
 $start = 2010 . '-01-01 00:00:00'; // when the current GOL began
 // articles total for each month
 $monthly_list = $dbl->run("SELECT Year(FROM_UNIXTIME(date)) as year, Month(FROM_UNIXTIME(date)) as month, Count(*) as `total` FROM `articles` WHERE `date` BETWEEN UNIX_TIMESTAMP( ? ) AND UNIX_TIMESTAMP( ? ) GROUP BY Year(FROM_UNIXTIME(date)), Month(FROM_UNIXTIME(date))", array($start, core::$sql_date_now))->fetch_all();

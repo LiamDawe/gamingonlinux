@@ -1572,6 +1572,8 @@ hr.content_split {
 .table-stripes {border-collapse: collapse;}
 .table-stripes tr:nth-child(even) {background: #e5e5e5}
 .table-stripes tr:nth-child(odd) {background: #FFF}
+.dark .table-stripes tr:nth-child(even) {background: #333}
+.dark .table-stripes tr:nth-child(odd) {background: #3f3f3f}
 
 /* social login buttons */
 .btn-auth{

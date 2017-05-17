@@ -107,7 +107,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$chart_info = $db->fetch();
 			
-			$charts = new golchart();
+			$charts = new golchart($dbl);
 			
 			$templating->block('chart', 'admin_modules/admin_module_charts');
 			$templating->set('chart', $charts->render($chart_id, NULL, 'charts_labels', 'charts_data'));

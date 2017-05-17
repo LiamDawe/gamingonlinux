@@ -40,8 +40,31 @@ if ($prev_month == 12)
 $last_month_start = mktime(0, 0, 0, $prev_month, 1, $year_selector);
 $now = time();
 
-$article_list = $db->sqlquery("SELECT COUNT( DISTINCT a.article_id ) AS `counter`, u.username, u.user_id, (SELECT `date` FROM `articles` WHERE author_id = a.author_id ORDER BY `article_id` DESC LIMIT 1) as last_date FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u ON u.user_id = a.author_id LEFT JOIN `article_category_reference` c ON a.`article_id` = c.`article_id`
-WHERE a.`date` >= $last_month_start AND a.`date` <= $now AND a.`active` = 1 AND c.`category_id` NOT IN (63) AND a.author_id != 1844 GROUP BY u.`username` ORDER BY `counter` DESC, a.date DESC");
+$article_list = $db->sqlquery("SELECT
+    COUNT(DISTINCT a.article_id) AS `counter`,
+    u.`username`,
+    u.`user_id`,
+    MAX(a.date) AS `last_date`
+FROM
+    `articles` a
+LEFT JOIN
+    ".$core->db_tables['users']." u
+ON
+    u.`user_id` = a.`author_id`
+LEFT JOIN
+    `article_category_reference` c
+ON
+    a.`article_id` = c.`article_id`
+WHERE
+    a.`date` >= $last_month_start AND a.`date` <= $now AND a.`active` = 1 AND c.`category_id` NOT IN(63) AND a.author_id != 1844
+GROUP BY
+    u.`username`,
+    u.`user_id`
+ORDER BY
+    `counter`
+DESC,
+    `last_date`
+DESC");
 
 $templating->block('articles', 'website_stats');
 $templating->set('site_title', $core->config('site_title'));
@@ -114,4 +137,18 @@ while ($top_articles = $db->fetch())
 	$article_list .= '<li><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
 }
 $templating->set('article_list', $article_list);
+
+// articles total for each month
+$templating->block('articles_monthly');
+$this_year = date('Y');
+
+$monthly_list = $dbl->run("SELECT `year`, `month`, `total` FROM `article_totals` WHERE `year` = ?", [$this_year])->fetch_all();
+$monthly_output = '';
+foreach ($monthly_list as $monthly)
+{
+	$dateObj   = DateTime::createFromFormat('!m', $monthly['month']);
+	$monthName = $dateObj->format('F'); // March
+	$monthly_output .= '<li><strong>' . $monthName . ' ' . $monthly['year'] . '</strong>: ' . $monthly['total'] . '</li>';
+}
+$templating->set('monthly_list', $monthly_output);
 ?>

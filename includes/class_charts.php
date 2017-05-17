@@ -131,12 +131,12 @@ class golchart
 				$this->labels[]['name'] = $label_loop['name'];
 				end($this->labels);
 				$last_id=key($this->labels);
-				$this->labels[$last_id]['total'] = $label_loop['data'];
+				$this->labels[$last_id]['total'] = $label_loop['data'] + 0; // + 0 to remove extra needless zeros
 				$this->labels[$last_id]['colour'] = $label_loop['colour'];
 			}
 			else
 			{
-				$this->labels[$label_loop['name']][$label_loop['data_series']] = $label_loop['data'];
+				$this->labels[$label_loop['name']][$label_loop['data_series']] = $label_loop['data'] + 0; // + 0 to remove extra needless zeros
 				if (!array_key_exists($label_loop['data_series'], $this->data_series))
 				{
 					$this->data_series[$label_loop['data_series']]['name'] = $label_loop['data_series'];
@@ -247,7 +247,7 @@ class golchart
 		{
 			self::biggest_series_label($this->data_series);
 			// make space for the series labels in the legend AND the coloured squares
-			$this->actual_chart_space = $this->actual_chart_space - $this->biggest_series - 13;
+			$this->actual_chart_space = $this->actual_chart_space - $this->biggest_series - 20; // extra space added in case of decimals, otherwise they would overlap the legend
 		}
 		
 		// the actual bars and everything else start after the label

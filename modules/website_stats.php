@@ -137,18 +137,4 @@ while ($top_articles = $db->fetch())
 	$article_list .= '<li><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
 }
 $templating->set('article_list', $article_list);
-
-// articles total for each month
-$templating->block('articles_monthly');
-$this_year = date('Y');
-
-$monthly_list = $dbl->run("SELECT `year`, `month`, `total` FROM `article_totals` WHERE `year` = ?", [$this_year])->fetch_all();
-$monthly_output = '';
-foreach ($monthly_list as $monthly)
-{
-	$dateObj   = DateTime::createFromFormat('!m', $monthly['month']);
-	$monthName = $dateObj->format('F'); // March
-	$monthly_output .= '<li><strong>' . $monthName . ' ' . $monthly['year'] . '</strong>: ' . $monthly['total'] . '</li>';
-}
-$templating->set('monthly_list', $monthly_output);
 ?>

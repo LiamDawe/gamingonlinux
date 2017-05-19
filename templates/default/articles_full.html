@@ -1,10 +1,11 @@
 [block: article]
 		{:admin_button}<!-- article page -->
 		{:article_meta}
+		<article>
 				<div class="article individual no-image group">
 					<div class="info group">
 						<div class="bubble">
-							<div class="title"><a href="{:article_link}">{:title}</a></div>
+							<h1 class="title"><a href="{:article_link}">{:title}</a></h1>
 							<div class="meta">Posted by <strong>{:username}</strong>, {:date} / {:article_views} views {:edit_link}</div>
 						</div>
 					</div>
@@ -113,6 +114,7 @@
 					</div>
 				</div>
 {:pagination}
+</article>
 [/block: bottom]
 
 [block: comments_closed]

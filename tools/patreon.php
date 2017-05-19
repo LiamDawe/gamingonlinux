@@ -2,14 +2,19 @@
 if (isset($_POST['go']))
 {
 	$file_dir = dirname( dirname(__FILE__) );
+	
+	$db_conf = include $file_dir . '/includes/config.php';
+
+	include($file_dir. '/includes/class_db_mysql.php');
+	$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
 
 	include($file_dir . '/includes/class_core.php');
-	$core = new core($file_dir);
-
-	include($file_dir. '/includes/class_mysql.php');
-	$db = new mysql(core::$database['host'], core::$database['username'], core::$database['password'], core::$database['database']);
+	$core = new core($dbl, $file_dir);
 
 	include($file_dir . '/includes/class_mail.php');
+	
+	include($file_dir . '/includes/class_user.php');
+	$user = new user($dbl, $core);
 
 	$csv = array_map('str_getcsv', file('patreon.csv'));
 
@@ -22,12 +27,11 @@ if (isset($_POST['go']))
 		// if they pledge at least 5 dollars a month
 		if ($pledge >= 5)
 		{
-			$db->sqlquery("SELECT `username`, `secondary_user_group` FROM `users` WHERE `email` = ?", array($line[2]));
-			$count = $db->num_rows();
+			$user_info = $dbl->run("SELECT `username`, `user_id` FROM `users` WHERE `email` = ?", array($line[2]))->fetch();
 			// it didn't find an account, email them
-			if ($count != 1)
+			if (!$user_info)
 			{
-				if (core::config('send_emails') == 1 && isset($_POST['emails']))
+				if ($core->config('send_emails') == 1 && isset($_POST['emails']))
 				{
 					$html_message = "Hello from Liam at <a href=\"https://www.gamingonlinux.com\">GamingOnLinux.com</a>! Thank you for supporting me on Patreon.<br />
 					<br />
@@ -46,13 +50,18 @@ if (isset($_POST['go']))
 				}
 			}
 			// it found an account, give them their badge
-			else if ($count == 1)
+			else
 			{
-				$result = $db->fetch();
-				if ($result['secondary_user_group'] != 6)
+				$their_groups = $user->post_group_list([$user_info['user_id']]);
+				if (!in_array(6, $their_groups[$user_info['user_id']]))
 				{
-					$db->sqlquery("UPDATE `users` SET `secondary_user_group` = 6 WHERE `email` = ?", array($line[2]));
-					echo 'User ' . $result['username'] . ' ' . $line[2] . ' given GOL Supporter status.<br />';
+					echo $user_info['username'] . ' ' . $line[2] . '<pre>';
+					print_r($their_groups);
+					echo '</pre>';
+					
+					$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 6", [$user_info['user_id']]);
+					
+					echo "\nGiven Supporter status\n\n";
 				}
 			}
 		}

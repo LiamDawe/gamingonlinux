@@ -184,9 +184,11 @@ if (!isset($_GET['go']))
 				$twitter_card .= '<meta name="twitter:description" content="'.$article['tagline'].'">';
 				$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">';
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
+				
+				$published_date_meta = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
 
 				// meta tags for g+, facebook and twitter images
-				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . $core->config('website_url') . "/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n$twitter_card", 1);
+				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . $core->config('website_url') . "/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n$twitter_card", 1);
 
 				// make date human readable
 				$date = $core->format_date($article['date']);

@@ -276,33 +276,25 @@ class user
 		return $return_ids;
 	}
 	
-	// check if a user is able to do something
-	// possibly update this, to check for needing to add in a usergroup name prefix?
+	// check if a user is able to do or not do something
 	function can($do)
 	{
 		// find the requested permission
 		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetchOne();
 		
 		// find all groups that have that permission
-		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN ".$this->core->db_tables['user_groups']." g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN ".$this->core->db_tables['user_groups']." g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
 		
 		$check_against = [];
 		
 		foreach ($allowed_groups as $key => $value)
 		{
-			if ($value['remote_group'] == 1)
-			{
-				unset($allowed_groups[$key]);
-			}
-			else
-			{
-				$check_against[] = $value['group_id'];
-			}
+			$check_against[] = $value['group_id'];
 		}
 
 		foreach ($this->user_groups as $group)
 		{
-			// at least one group they are in allows it, so let them in
+			// at least one group they are has it checked, return true
 			if (in_array($group, $check_against))
 			{
 				return true;

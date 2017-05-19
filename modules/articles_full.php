@@ -563,7 +563,7 @@ if (!isset($_GET['go']))
 						$per_page = $_SESSION['per-page'];
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id LEFT JOIN ".$core->db_tables['users']." ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $_GET['aid'], $core->start, $per_page));
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id LEFT JOIN ".$core->db_tables['users']." ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $_GET['aid'], $core->start, $per_page));
 					$comments_get = $db->fetch_all_rows();
 					
 					// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
@@ -1079,21 +1079,24 @@ else if (isset($_GET['go']))
 
 						else
 						{
+							$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
+							$forced_mod_queue = $user->can('forced_mod_queue');
+							
+							$approved = 1;
+							if ($mod_queue == 1 || $forced_mod_queue == true)
+							{
+								$approved = 0;
+							}
+				
 							$comment = core::make_safe($comment);
 
 							$article_id = (int) $_POST['aid'];
 
 							// add the comment
-							$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($article_id, (int) $_SESSION['user_id'], core::$date, $comment));
-
+							$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?, `approved` = ?", array($article_id, (int) $_SESSION['user_id'], core::$date, $comment, $approved));
+							
 							$new_comment_id = $db->grab_id();
-
-							// update the news items comment count
-							$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
-
-							// update the posting users comment count
-							$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
-
+							
 							// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 							$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article_id));
 							if ($db->num_rows() == 1)
@@ -1104,143 +1107,145 @@ else if (isset($_GET['go']))
 								}
 							}
 
-							// check if they are subscribing
-							if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
+							if ($approved == 1)
 							{
-								$emails = 0;
-								if ($_POST['subscribe-type'] == 'sub-emails')
+								// update the news items comment count
+								$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
+
+								// update the posting users comment count
+								$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
+
+								// check if they are subscribing
+								if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 								{
-									$emails = 1;
-								}
-								$article_class->subscribe($article_id, $emails);
-							}
-
-							/* gather a list of people quoted and let them know
-							 do this first, so we can check if they have been notified already and not send another */
-							$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
-							preg_match_all($pattern, $comment, $matches);
-
-							// we only want to notify them once on being quoted, so make sure each quote has a unique name
-							$quoted_usernames = array_values(array_unique($matches[1]));
-
-							if (!empty($quoted_usernames))
-							{
-								foreach($quoted_usernames as $match)
-								{
-									if ($match != $_SESSION['username'])
+									$emails = 0;
+									if ($_POST['subscribe-type'] == 'sub-emails')
 									{
-										$db->sqlquery("SELECT `user_id` FROM ".$core->db_tables['users']." WHERE `username` = ?", array($match));
-										if ($db->num_rows() == 1)
+										$emails = 1;
+									}
+									$article_class->subscribe($article_id, $emails);
+								}
+								
+								$new_notification_id = $article_class->quote_notification($comment, $_SESSION['username'], $_SESSION['user_id'], $article_id, $new_comment_id);
+
+								/* gather a list of subscriptions for this article (not including yourself!)
+								- Make an array of anyone who needs an email now
+								- Additionally, send a notification to anyone subscribed
+								*/
+								$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']));
+								$users_array = array();
+								$users_to_email = $db->fetch_all_rows();
+								foreach ($users_to_email as $email_user)
+								{
+									// gather list
+									if ($email_user['emails'] == 1 && $email_user['send_email'] == 1)
+									{
+										// use existing key, or generate any missing keys
+										if (empty($email_user['secret_key']))
 										{
-											$quoted_user = $db->fetch();
-											$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
-											$new_notification_id = $db->grab_id();
+											$secret_key = core::random_id(15);
+											$db->sqlquery("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $email_user['user_id'], $article_id));
+
+										}
+										else
+										{
+											$secret_key = $email_user['secret_key'];
+										}
+										
+										$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
+										$users_array[$email_user['user_id']]['email'] = $email_user['email'];
+										$users_array[$email_user['user_id']]['username'] = $email_user['username'];
+										$users_array[$email_user['user_id']]['email_options'] = $email_user['email_options'];
+										$users_array[$email_user['user_id']]['secret_key'] = $secret_key;
+									}
+
+									// notify them, if they haven't been quoted and already given one
+									if (!in_array($email_user['username'], $new_notification_id['quoted_usernames']))
+									{
+										$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($article_id, $email_user['user_id']));
+										$check_exists = $db->num_rows();
+										$get_note_info = $db->fetch();
+										if ($check_exists == 0)
+										{
+											$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
+											$new_notification_id[$email_user['user_id']] = $db->grab_id();
+										}
+										else if ($check_exists == 1)
+										{
+											// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
+											if ($get_note_info['seen'] == 1)
+											{
+												$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
+											}
+											// they haven't seen this note before, so add one to the counter and update the date
+											else if ($get_note_info['seen'] == 0)
+											{
+												$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
+											}
+											$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
 										}
 									}
 								}
-							}
 
-							/* gather a list of subscriptions for this article (not including yourself!)
-							- Make an array of anyone who needs an email now
-							- Additionally, send a notification to anyone subscribed
-							*/
-							$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']));
-							$users_array = array();
-							$users_to_email = $db->fetch_all_rows();
-							foreach ($users_to_email as $email_user)
+								// send the emails
+								foreach ($users_array as $email_user)
+								{
+									// subject
+									$subject = "New reply to article {$title['title']} on GamingOnLinux.com";
+
+									$comment_email = $bbcode->email_bbcode($comment);
+
+									// message
+									$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
+									<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+									<div>
+									<hr>
+									{$comment_email}
+									<hr>
+									<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
+
+									$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
+
+									// Mail it
+									if ($core->config('send_emails') == 1)
+									{
+										$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
+										$mail->send();
+									}
+
+									// remove anyones send_emails subscription setting if they have it set to email once
+									if ($email_user['email_options'] == 2)
+									{
+										$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($article_id, $email_user['user_id']));
+									}
+								}
+
+								// try to stop double postings, clear text
+								unset($_POST['text']);
+
+								// clear any comment or name left from errors
+								unset($_SESSION['acomment']);
+								
+								$article_link = $article_class->get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
+
+								header("Location: " . $article_link);
+							}
+							else if ($approved == 0)
 							{
-								// gather list
-								if ($email_user['emails'] == 1 && $email_user['send_email'] == 1)
-								{
-									// use existing key, or generate any missing keys
-									if (empty($email_user['secret_key']))
-									{
-										$secret_key = core::random_id(15);
-										$db->sqlquery("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $email_user['user_id'], $article_id));
+								$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue_comment'", array($_SESSION['user_id'], core::$date, $new_comment_id));
 
-									}
-									else
-									{
-										$secret_key = $email_user['secret_key'];
-									}
-									
-									$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
-									$users_array[$email_user['user_id']]['email'] = $email_user['email'];
-									$users_array[$email_user['user_id']]['username'] = $email_user['username'];
-									$users_array[$email_user['user_id']]['email_options'] = $email_user['email_options'];
-									$users_array[$email_user['user_id']]['secret_key'] = $secret_key;
-								}
+								// try to stop double postings, clear text
+								unset($_POST['text']);
 
-								// notify them, if they haven't been quoted and already given one
-								if (!in_array($email_user['username'], $quoted_usernames))
-								{
-									$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($article_id, $email_user['user_id']));
-									$check_exists = $db->num_rows();
-									$get_note_info = $db->fetch();
-									if ($check_exists == 0)
-									{
-										$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
-										$new_notification_id = $db->grab_id();
-									}
-									else if ($check_exists == 1)
-									{
-										// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
-										if ($get_note_info['seen'] == 1)
-										{
-											$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
-										}
-										// they haven't seen this note before, so add one to the counter and update the date
-										else if ($get_note_info['seen'] == 0)
-										{
-											$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
-										}
-										$new_notification_id = $get_note_info['id'];
-									}
-								}
+								// clear any comment or name left from errors
+								unset($_SESSION['acomment']);
+								
+								$_SESSION['message'] = 'mod_queue';
+								
+								$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
+					
+								header("Location: " . $article_link);
 							}
-
-							// send the emails
-							foreach ($users_array as $email_user)
-							{
-								// subject
-								$subject = "New reply to article {$title['title']} on GamingOnLinux.com";
-
-								$comment_email = $bbcode->email_bbcode($comment);
-
-								// message
-								$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-								<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
-								<div>
-							 	<hr>
-							 	{$comment_email}
-							 	<hr>
-							 	<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
-
-								$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note=$new_notification_id\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
-
-								// Mail it
-								if ($core->config('send_emails') == 1)
-								{
-									$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
-									$mail->send();
-								}
-
-								// remove anyones send_emails subscription setting if they have it set to email once
-								if ($email_user['email_options'] == 2)
-								{
-									$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($article_id, $email_user['user_id']));
-								}
-							}
-
-							// try to stop double postings, clear text
-							unset($_POST['text']);
-
-							// clear any comment or name left from errors
-							unset($_SESSION['acomment']);
-							
-							$article_link = $article_class->get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
-
-							header("Location: " . $article_link);
 						}
 					}
 				}

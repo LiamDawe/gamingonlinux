@@ -468,7 +468,7 @@ class article_class
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `".$this->database->table_prefer."users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 					
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
@@ -1003,6 +1003,41 @@ class article_class
 		}
 
 		return $article_pagination;
+	}
+	
+	// give a user a notification if their name was quoted in a comment
+	function quote_notification($text, $username, $author_id, $article_id, $comment_id)
+	{
+		/* gather a list of people quoted and let them know
+		do this first, so we can check if they have been notified already and not send another */
+		$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
+		preg_match_all($pattern, $text, $matches);
+
+		// we only want to notify them once on being quoted, so make sure each quote has a unique name
+		$quoted_usernames = array_values(array_unique($matches[1]));
+		
+		$new_notification_id = [];
+
+		if (!empty($quoted_usernames))
+		{
+			foreach($quoted_usernames as $match)
+			{
+				// don't notify the person making this post, if a quote has their own name in it
+				if ($match != $username)
+				{
+					$quoted_user = $this->database->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match))->fetchOne();
+					if ($quoted_user)
+					{
+						$this->database->run("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user, $author_id, $article_id, $comment_id));
+						$new_notification_id[$quoted_user] = $this->database->new_id();
+					}
+				}
+			}
+		}
+		
+		$new_notification_id['quoted_usernames'] = $quoted_usernames;
+		
+		return $new_notification_id;
 	}
 }
 ?>

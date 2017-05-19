@@ -7,6 +7,7 @@ if ($_SESSION['user_id'] > 0 && !isset($_SESSION['activated']))
 else
 {
 	$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
+	$forced_mod_queue = $user->can('forced_mod_queue');
 				
 	if ($core->config('forum_posting_open') == 1)
 	{
@@ -233,7 +234,7 @@ else
 						$check_queue = $db->fetch();
 
 						$approved = 1;
-						if ($mod_queue == 1)
+						if ($mod_queue == 1 || $forced_mod_queue == true)
 						{
 							$approved = 0;
 						}
@@ -257,7 +258,8 @@ else
 						// if they are subscribing
 						if (isset($_POST['subscribe']))
 						{
-							$db->sqlquery("INSERT INTO `forum_topics_subscriptions` SET `user_id` = ?, `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
+							$secret_key = core::random_id(15);
+							$db->sqlquery("INSERT INTO `forum_topics_subscriptions` SET `user_id` = ?, `topic_id` = ?, `secret_key` = ?", array($_SESSION['user_id'], $topic_id, $secret_key));
 						}
 
 						if ($approved == 1)

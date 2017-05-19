@@ -106,7 +106,7 @@ return [
 	],
 	"mod_queue" => 
 	[
-		"text" => "Your submission is now in the mod queue to be manually approved to prevent spam attacks, please be patient while our editors work. This only happens a few times to start with!",
+		"text" => "Your submission is now in the mod queue to be manually approved, please be patient while our editors work. You're either a new user who we need to make sure isn't a spammer, or you're on the naughty list.",
 		"error" => 0
 	],
 	"one_link_needed" => [

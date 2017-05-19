@@ -2,6 +2,7 @@
 if ($core->config('forum_posting_open') == 1)
 {
 	$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
+	$forced_mod_queue = $user->can('forced_mod_queue');
 	
 	$forum_id = (int) $_GET['forum_id'];
 	$topic_id = (int) $_GET['topic_id'];
@@ -114,7 +115,7 @@ if ($core->config('forum_posting_open') == 1)
 				}
 
 				$approved = 1;
-				if ($mod_queue == 1)
+				if ($mod_queue == 1 || $forced_mod_queue == true)
 				{
 					$approved = 0;
 				}

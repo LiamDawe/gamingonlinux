@@ -1,7 +1,7 @@
 <?php
 $templating->merge('admin_blocks/admin_block_mod_queue');
 
-$db->sqlquery("SELECT COUNT(`id`) as count FROM `admin_notifications` WHERE `type` IN('mod_queue','mod_queue_reply') AND `completed` = 0");
+$db->sqlquery("SELECT COUNT(`id`) as count FROM `admin_notifications` WHERE `type` IN('mod_queue','mod_queue_reply', 'mod_queue_comment') AND `completed` = 0");
 $post_counter = $db->fetch();
 
 $templating->block('main');

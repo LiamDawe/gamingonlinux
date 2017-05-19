@@ -564,12 +564,13 @@ if (!isset($_GET['go']))
 					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id LEFT JOIN ".$core->db_tables['users']." ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $_GET['aid'], $core->start, $per_page));
 					$comments_get = $db->fetch_all_rows();
 					
-					// make an array of all comment ids to search for likes (instead of one query per comment for likes)
+					// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 					$like_array = [];
 					$sql_replacers = [];
 					foreach ($comments_get as $id_loop)
 					{
 						$like_array[] = (int) $id_loop['comment_id'];
+						$user_ids[] = (int) $id_loop['author_id'];
 						$sql_replacers[] = '?';
 					}
 					
@@ -593,6 +594,9 @@ if (!isset($_GET['go']))
 							$grab_user_likes = $db->sqlquery("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'comment'", $replace);
 							$get_user_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN);
 						}
+						
+						// get a list of each users user groups, so we can display their badges
+						$comment_user_groups = $user->post_group_list($user_ids);
 					}
 
 					foreach ($comments_get as $comments)
@@ -735,6 +739,7 @@ if (!isset($_GET['go']))
 						$templating->set('logged_in_options', $logged_in_options);
 						$templating->set('bookmark', $bookmark_comment);
 
+						$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
 						$badges = user::user_badges($comments, 1);
 						$templating->set('badges', implode(' ', $badges));
 						

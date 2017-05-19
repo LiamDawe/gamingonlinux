@@ -22,7 +22,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 				$db_grab_fields .= "{$field['db_field']},";
 			}
 
-			$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `user_group`, `secondary_user_group`, `ip`, `game_developer` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `ip`, `game_developer` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
 			if ($db->num_rows() != 1)
 			{
 				$core->message('That person does not exist here!');
@@ -39,6 +39,8 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 
 				else if (($profile['banned'] == 1 && $user->check_group([1,2]) == true) || $profile['banned'] == 0)
 				{
+					
+					
 					if ($profile['banned'] == 1)
 					{
 						$core->message("You are viewing a banned users profile!", NULL, 2);
@@ -59,6 +61,8 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					$cake_bit = $user->cake_day($profile['register_date'], $profile['username']);
 					$templating->set('cake_icon', $cake_bit);
 					
+					$their_groups = $user->post_group_list([$profile['user_id']]);
+					$profile['user_groups'] = $their_groups[$profile['user_id']];
 					$badges = user::user_badges($profile);
 					$templating->set('badges', implode(' ', $badges));
 

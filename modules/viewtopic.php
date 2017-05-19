@@ -391,6 +391,8 @@ else
 					$avatar = $user->sort_avatar($topic['author_id']);
 					$templating->set('avatar', $avatar);
 
+					$their_groups = $user->post_group_list([$topic['author_id']]);
+					$topic['user_groups'] = $their_groups[$topic['author_id']];
 					$badges = user::user_badges($topic, 1);
 					$templating->set('badges', implode(' ', $badges));
 
@@ -470,8 +472,17 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN ".$core->db_tables['users']." u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start));
-					while ($post = $get_replies->fetch())
+					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN ".$core->db_tables['users']." u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start))->fetch_all();
+					
+					// make an array of all user ids to grab user groups for badge displaying
+					$user_ids = [];
+					foreach ($get_replies as $id_loop)
+					{
+						$user_ids[] = (int) $id_loop['author_id'];
+					}
+					$reply_user_groups = $user->post_group_list($user_ids);
+					
+					foreach ($get_replies as $post)
 					{
 						$templating->block('reply', 'viewtopic');
 						
@@ -529,6 +540,7 @@ else
 						$avatar = $user->sort_avatar($post['author_id']);
 						$templating->set('avatar', $avatar);
 
+						$post['user_groups'] = $reply_user_groups[$post['author_id']];
 						$badges = user::user_badges($post, 1);
 						$templating->set('badges', implode(' ', $badges));
 

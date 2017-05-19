@@ -827,6 +827,24 @@ class user
 		self::$user_group_list = $db->fetch_all_rows(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
 	}
 	
+	// this function gets a list of [user_id => [group id, group id], another_user_id => [group_id, group_id]]
+	// helper function for grabbing user badges for comments, forum posts etc
+	public function post_group_list($user_ids)
+	{
+		$in  = str_repeat('?,', count($user_ids) - 1) . '?';
+		$group_list = $this->database->run("SELECT u.`user_id`, m.`group_id` FROM `users` u LEFT JOIN `user_group_membership` m ON u.user_id = m.user_id WHERE u.`user_id` IN ( $in ) ORDER BY u.`user_id` ASC", $user_ids)->fetch_all();
+		
+		$formatted_list = [];
+		
+		foreach ($group_list as $group)
+		{
+			$formatted_list[$group['user_id']][] = $group['group_id'];
+		}
+		
+		return $formatted_list;
+	}
+	
+	// the actual user badge sorting, which gives the expected output of user badges for comments, forum posts etc
 	public static function user_badges($data, $list = 0)
 	{
 		$badges = [];
@@ -852,21 +870,11 @@ class user
 			
 			$badges[] = $text;
 		}
-		if (array_key_exists($data['user_group'], self::$user_group_list) && self::$user_group_list[$data['user_group']]['show_badge'] == 1)
+		foreach ($data['user_groups'] as $group)
 		{
-			$text = '<span class="badge '.self::$user_group_list[$data['user_group']]['badge_colour'].'">'.self::$user_group_list[$data['user_group']]['badge_text'].'</span>';
-			if ($list == 1)
+			if (array_key_exists($group, self::$user_group_list) && self::$user_group_list[$group]['show_badge'] == 1)
 			{
-				$text = '<li>'.$text.'</li>';
-			}
-			$badges[] = $text;
-		}
-		if (array_key_exists($data['secondary_user_group'], self::$user_group_list) && self::$user_group_list[$data['secondary_user_group']]['show_badge'] == 1)
-		{
-			// admins and main editors should not get the supporter badge
-			if ($data['secondary_user_group'] == 6 && $data['user_group'] != 1 && $data['user_group'] != 2)
-			{
-				$text = '<span class="badge '.self::$user_group_list[$data['secondary_user_group']]['badge_colour'].'">'.self::$user_group_list[$data['secondary_user_group']]['badge_text'].'</span>';
+				$text = '<span class="badge '.self::$user_group_list[$group]['badge_colour'].'">'.self::$user_group_list[$group]['badge_text'].'</span>';
 				if ($list == 1)
 				{
 					$text = '<li>'.$text.'</li>';

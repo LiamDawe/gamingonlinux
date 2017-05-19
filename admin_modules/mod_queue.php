@@ -279,7 +279,7 @@ if (isset($_POST['action']))
 							// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
 							if ($get_note_info['seen'] == 1)
 							{
-								$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $_POST['post_id'], $get_note_info['id']));
+								$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_POST['author_id'], core::$date, $_POST['post_id'], $get_note_info['id']));
 							}
 							// they haven't seen this note before, so add one to the counter and update the date
 							else if ($get_note_info['seen'] == 0)

@@ -16,6 +16,7 @@ if (isset($_GET['view']))
 			while ($results = $topics->fetch())
 			{
 				$templating->block('approve_forum', 'admin_modules/mod_queue');
+				$templating->set('mod_type', 'Forum Topic');
 				$templating->set('username', $results['username']);
 				$templating->set('topic_id', $results['topic_id']);
 				$templating->set('post_id', '');
@@ -36,6 +37,7 @@ if (isset($_GET['view']))
 			while ($results = $replies->fetch())
 			{
 				$templating->block('approve_forum', 'admin_modules/mod_queue');
+				$templating->set('mod_type', 'Forum Reply');
 				$templating->set('username', $results['username']);
 				$templating->set('topic_id', $results['topic_id']);
 				$templating->set('post_id', $results['post_id']);
@@ -57,6 +59,7 @@ if (isset($_GET['view']))
 				$article_link = $article_class->get_link($comment['article_id'], $comment['slug']);
 				
 				$templating->block('approve_forum', 'admin_modules/mod_queue');
+				$templating->set('mod_type', 'Article Comment');
 				$templating->set('username', $comment['username']);
 				$templating->set('topic_id', '');
 				$templating->set('post_id', $comment['comment_id']);
@@ -271,7 +274,7 @@ if (isset($_POST['action']))
 						$get_note_info = $db->fetch();
 						if ($check_exists == 0)
 						{
-							$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $approved['article_id'], $_POST['post_id']));
+							$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'],  $_POST['author_id'], $approved['article_id'], $_POST['post_id']));
 							$new_notification_id[$email_user['user_id']] = $db->grab_id();
 						}
 						else if ($check_exists == 1)

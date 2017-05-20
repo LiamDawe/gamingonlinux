@@ -834,26 +834,42 @@ if (!isset($_GET['go']))
 
 								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 								{
-									$subscribe_check = $user->check_subscription($_GET['aid'], 'article');
-
-									$comment = '';
-									if (isset($_SESSION['acomment']))
+									// check they don't already have a reply in the mod queue for this forum topic
+									$check_queue = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `approved` = 0 AND `author_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']))->fetchOne();
+									if ($check_queue == 0)
 									{
-										$comment = $_SESSION['acomment'];
+										$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
+										$forced_mod_queue = $user->can('forced_mod_queue');
+							
+										if ($forced_mod_queue == true || $mod_queue == 1)
+										{
+											$core->message('You are currently being moderated, so your comment will go through editor approval first. You\'re either a new user (anti-spam measure), or you\'ve landed yourself on the naughty list.', NULL, 2);
+										}
+										$subscribe_check = $user->check_subscription($_GET['aid'], 'article');
+
+										$comment = '';
+										if (isset($_SESSION['acomment']))
+										{
+											$comment = $_SESSION['acomment'];
+										}
+										$templating->block('comments_box_top', 'articles_full');
+										$templating->set('url', $core->config('website_url'));
+										$templating->set('article_id', $_GET['aid']);
+
+										$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment_text']);
+
+										$templating->block('comment_buttons', 'articles_full');
+										$templating->set('url', $core->config('website_url'));
+										$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
+										$templating->set('subscribe_email_check', $subscribe_check['emails']);
+										$templating->set('aid', $_GET['aid']);
+
+										$templating->block('preview', 'articles_full');
 									}
-									$templating->block('comments_box_top', 'articles_full');
-									$templating->set('url', $core->config('website_url'));
-									$templating->set('article_id', $_GET['aid']);
-
-									$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment_text']);
-
-									$templating->block('comment_buttons', 'articles_full');
-									$templating->set('url', $core->config('website_url'));
-									$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
-									$templating->set('subscribe_email_check', $subscribe_check['emails']);
-									$templating->set('aid', $_GET['aid']);
-
-									$templating->block('preview', 'articles_full');
+									else
+									{
+										$core->message('You currently have a comment in the moderation queue for this article, you must wait for that to be approved/denied before you can post another reply here.', NULL, 2);
+									}
 								}
 
 								else

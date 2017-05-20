@@ -839,7 +839,7 @@ else
 							}
 							else if ($check['count'] > 0)
 							{
-								$core->message('You currently have a post in the moderation queue for this forum topic, you must wait for that to be approved before you can post another reply here.');
+								$core->message('You currently have a post in the moderation queue for this forum topic, you must wait for that to be approved before you can post another reply here.', NULL, 2);
 							}
 						}
 					}

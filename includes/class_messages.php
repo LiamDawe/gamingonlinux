@@ -54,15 +54,22 @@ class message_map
 		}
 
 		$templating->merge('messages');
+		
+		$templating->block('message');
 
 		if ($error == 0)
 		{
-			$templating->block('message');
+			$templating->set('type', '');
 		}
 
 		else if ($error == 1)
 		{
-			$templating->block('errormessage');
+			$templating->set('type', 'error');
+		}
+
+		else if ($error == 2)
+		{
+			$templating->set('type', 'warning');
 		}
 
 		$templating->set('message', $stored_message);

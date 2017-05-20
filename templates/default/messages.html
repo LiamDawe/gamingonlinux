@@ -1,20 +1,8 @@
 [block: message]
-				<div class="box">
-					<div class="head">System Message</div>
-					<div class="body group">{:message}</div>
+				<div class="box {:type} message">
+					<div class="head ">{:message}</div>
 				</div>
 [/block: message]
-
-[block: errormessage]
-				<div class="box">
-					<div class="head" style="background-color: #f74444; padding: 5px; color: #fff;">System Message</div>
-					<div class="body group">{:message}</div>
-				</div>
-[/block: errormessage]
-
-[block: warningmessage]
-<div class="col-md-12" style="background-color: #FFFF00; padding: 5px;">{:message}</div>
-[/block: warningmessage]
 
 [block: yes_no]
 				<div class="box">

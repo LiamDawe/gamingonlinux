@@ -474,20 +474,21 @@ class core
 		if (!is_object($templating)) return; //your globals are fucked, bail
 
 		$templating->merge('messages');
+		$templating->block('message');
 
 		if ($urgent == 0)
 		{
-			$templating->block('message');
+			$templating->set('type', '');
 		}
 
 		else if ($urgent == 1)
 		{
-			$templating->block('errormessage');
+			$templating->set('type', 'error');
 		}
 
 		else if ($urgent == 2)
 		{
-			$templating->block('warningmessage');
+			$templating->set('type', 'warning');
 		}
 
 		$templating->set('message', $message);

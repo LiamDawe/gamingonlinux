@@ -177,7 +177,7 @@ class bbcode
 	function quotes($body)
 	{
 		// Quote on its own, do these first so they don't get in the way
-		$pattern = '/\[quote\](.+?)\[\/quote\]/is';
+		$pattern = '/\[quote\](?:\s)*(.+?)\[\/quote\]/is';
 		$replace = "<blockquote><cite>Quote</cite>$1</blockquote>";
 
 		while(preg_match($pattern, $body))
@@ -186,7 +186,7 @@ class bbcode
 		}
 
 		// Quoting an actual person, book or whatever
-		$pattern = '~\[quote=([^]]+)]([^[]*(?:\[(?!/?quote\b)[^[]*)*)\[/quote]~i';
+		$pattern = '~\[quote=([^]]+)](?:\s)*([^[]*(?:\[(?!/?quote\b)[^[]*)*)\[/quote]~i';
 		do
 		{
 			$body = preg_replace_callback($pattern, function ($matches){return $this->replace_quotes($matches);}, $body, -1, $count);

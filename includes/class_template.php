@@ -59,7 +59,7 @@ class template
 	}
 	
 	// for plugins
-	public function merge_plugin($file)
+	public function load_plugin($file)
 	{
 		if (!file_exists($this->core->config('path') . "plugins/{$file}.html"))
 		{

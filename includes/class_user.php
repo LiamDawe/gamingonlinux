@@ -265,19 +265,7 @@ class user
 		{
 			foreach ($allowed_groups as $key => $value)
 			{
-				if ($value['remote_group'] == 0 && $value['universal'] == 1)
-				{
-					unset($allowed_groups[$key]);
-				}
-				// also remove any groups that don't contain our wanted prefix
-				else if (strpos($value['group_name'], $this->core->config('user_group_prefix')) === false && $value['universal'] == 1) 
-				{
-					unset($allowed_groups[$key]);
-				}
-				else
-				{
-					$return_ids[] = $value['group_id'];
-				}
+				$return_ids[] = $value['group_id'];
 			}			
 		}
 		

@@ -219,7 +219,7 @@ if (isset($_POST['act']))
 		}
 
         // carry on and submit the article
-        if (($core->config('captcha_disabled') == 0 && $parray['submit_article_captcha'] == 1 && $res['success']) || $parray['submit_article_captcha'] == 0 || $core->config('captcha_disabled') == 1)
+        if (($core->config('captcha_disabled') == 0 && $captcha == 1 && $res['success']) || $captcha == 0 || $core->config('captcha_disabled') == 1)
         {
             // setup category if empty
             if (empty($_POST['category']) || !is_numeric($_POST['category']))

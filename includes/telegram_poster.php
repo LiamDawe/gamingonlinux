@@ -1,4 +1,5 @@
 <?php
+define('CHAT_ID', $core->config('telegram_news_channel'));
 define('BOT_TOKEN', $core->config('telegram_bot_key'));
 define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
@@ -86,7 +87,7 @@ function apiRequest($method, $parameters)
 function processMessage($message)
 {
 	// process incoming message
-	$chat_id = "@" . core::config('telegram_news_channel');
+	$chat_id = "@" . CHAT_ID;
 	if (isset($message))
 	{
 		apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $message));
@@ -95,7 +96,7 @@ function processMessage($message)
 
 function telegram($link)
 {
-	if (!empty(core::config('telegram_bot_key')))
+	if (!empty(BOT_TOKEN))
 	{
 		processMessage($link);
 	}

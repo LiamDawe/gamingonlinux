@@ -215,8 +215,8 @@ else if (isset($_POST['action']))
 			// Mail it
 			if ($core->config('send_emails') == 1)
 			{
-				$mail = new mail($_POST['email'], $core->config('site_title') . ' password reset request', $html_message, $plain_message);
-				$mail->send();
+				$mail = new mailer($core);
+				$mail->sendMail($_POST['email'], $core->config('site_title') . ' password reset request', $html_message, $plain_message);
 
 				$core->message("An email has been sent to {$_POST['email']} with instructions on how to change your password.");
 			}

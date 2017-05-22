@@ -357,7 +357,7 @@ class user
 			if ($user_data['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
 				// send email about new device
-				$message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
+				$html_message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
 				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.</p>
 				<div>
 				<hr>
@@ -365,8 +365,8 @@ class user
 
 				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
 
-				$mail = new mail($user_data['email'], $this->core->config('site_title') . ": New Login Notification", $message, $plain_message);
-				$mail->send();
+				$mail = new mailer($this->core);
+				$mail->sendMail($user_data['email'], $this->core->config('site_title') . ": New Login Notification", $html_message, $plain_message);
 			}
 		}
 		else

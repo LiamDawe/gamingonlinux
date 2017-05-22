@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'Contact Us', 1);
 $templating->set_previous('meta_description', 'Contact Us form for ' . $core->config('site_title'), 1);
 
-$templating->merge('contact');
+$templating->load('contact');
 $templating->block('top');
 
 if ($core->config('pretty_urls') == 1)

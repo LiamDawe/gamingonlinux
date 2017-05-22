@@ -4,7 +4,7 @@ $templating->set_previous('meta_description', 'Email form to contact GamingOnLin
 
 require_once("includes/curl_data.php");
 
-$templating->merge('email_us');
+$templating->load('email_us');
 
 $templating->block('top');
 

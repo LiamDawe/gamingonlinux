@@ -1,5 +1,5 @@
 <?php
-$templating->merge('articles_full');
+$templating->load('articles_full');
 
 if (isset($_GET['view']))
 {
@@ -118,7 +118,7 @@ if (!isset($_GET['go']))
 				$templating->set_previous('title', 'Couldn\'t find article', 1);
 				$core->message('That is not a correct article id! We have loaded a search box for you if you\'re lost!');
 
-				$templating->merge('search');
+				$templating->load('search');
 				$templating->block('top');
 				$templating->set('url', $core->config('website_url'));
 				$templating->set('search_text', '');
@@ -784,7 +784,7 @@ if (!isset($_GET['go']))
 						{
 							if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 							{
-								$templating->merge('login');
+								$templating->load('login');
 								$templating->block('small');
 								$templating->set('url', $core->config('website_url'));
 								

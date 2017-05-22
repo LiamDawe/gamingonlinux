@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_charts');
+$templating->load('admin_modules/admin_module_charts');
 
 
 if (isset($_GET['view']) && !isset($_POST['act']))

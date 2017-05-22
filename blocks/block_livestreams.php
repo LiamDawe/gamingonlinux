@@ -1,6 +1,6 @@
 <?php
 // Article categorys block
-$templating->merge('blocks/block_livestreams');
+$templating->load('blocks/block_livestreams');
 $templating->block('list');
 
 // count how many there is due this month and today

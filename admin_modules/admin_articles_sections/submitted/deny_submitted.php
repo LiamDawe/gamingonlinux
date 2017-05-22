@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_articles_sections/submitted_articles');
+$templating->load('admin_modules/admin_articles_sections/submitted_articles');
 
 // first check if there is a guest email or a users email
 $db->sqlquery("SELECT a.`article_id`, a.`tagline_image`, a.`title`, a.`text`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));

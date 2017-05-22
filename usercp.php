@@ -81,7 +81,7 @@ foreach ($blocks as $block)
 
 	else if ($block['left'] == 1 && $block['block_link'] == NULL)
 	{
-		$templating->merge('usercp_blocks/block_custom');
+		$templating->load('usercp_blocks/block_custom');
 		$templating->block('block');
 		// any title link?
 		if (!empty($block['block_title_link']))

@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Home' . $templating->get('title', 1)  , 1);
-$templating->merge('admin_modules/admin_home');
+$templating->load('admin_modules/admin_home');
 
 if (!isset($_GET['view']))
 {

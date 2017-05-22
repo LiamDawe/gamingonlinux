@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Notification Preferences' . $templating->get('title', 1)  , 1);
-$templating->merge('usercp_modules/notification_preferences');
+$templating->load('usercp_modules/notification_preferences');
 
 if (!isset($_GET['go']))
 {

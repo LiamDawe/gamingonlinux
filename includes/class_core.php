@@ -473,7 +473,7 @@ class core
 
 		if (!is_object($templating)) return; //your globals are fucked, bail
 
-		$templating->merge('messages');
+		$templating->load('messages');
 		$templating->block('message');
 
 		if ($urgent == 0)
@@ -526,7 +526,7 @@ class core
 	{
 		global $templating;
 
-		$templating->merge('messages');
+		$templating->load('messages');
 		$templating->block('yes_no');
 		$templating->set('message', $message);
 		$templating->set('action_url', $action_url);
@@ -680,7 +680,7 @@ class core
 			$editor[$option] = $value;
 		}
 		
-		$templating->merge('editor');
+		$templating->load('editor');
 		$templating->block('editor');
 		$templating->set('this_template', $this->config('website_url') . 'templates/' . $this->config('template'));
 		$templating->set('url', $this->config('website_url'));
@@ -1044,7 +1044,7 @@ class core
 
 				if (strtotime($checker['date_updated']) < $minus_4months)
 				{
-					$templating->merge('announcements');
+					$templating->load('announcements');
 					$templating->block('announcement_top', 'announcements');
 					$templating->block('announcement', 'announcements');
 					$templating->set('text', 'You haven\'t updated your PC information in over 4 months! <a href="/usercp.php?module=pcinfo">Click here to go and check</a>. You can simply update if nothing has changed to be included in our statistics!');

@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'Login', 1);
 $templating->set_previous('meta_description', 'Login page for ' . $core->config('site_title'), 1);
 
-$templating->merge('login');
+$templating->load('login');
 
 if (!isset($_POST['action']))
 {

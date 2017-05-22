@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_articles');
+$templating->load('admin_modules/admin_module_articles');
 $templating->set('article_css', 'articleadmin');
 
 $templating->set_previous('title', 'New article ' . $templating->get('title', 1)  , 1);
@@ -13,7 +13,7 @@ if ((isset($message_map::$error) && $message_map::$error == 0) && !isset($_POST[
 
 $templating->block('add', 'admin_modules/admin_module_articles');
 
-$templating->merge('admin_modules/article_form');
+$templating->load('admin_modules/article_form');
 $templating->block('full_editor', 'admin_modules/article_form');
 $templating->set('main_formaction', '<form method="post" name="article-form" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 $templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));

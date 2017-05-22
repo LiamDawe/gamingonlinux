@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/comment_reports');
+$templating->load('admin_modules/comment_reports');
 
 $templating->set_previous('title', 'Article comments' . $templating->get('title', 1)  , 1);
 if (!isset($_GET['ip_id']))

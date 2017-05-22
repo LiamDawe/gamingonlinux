@@ -1,7 +1,7 @@
 <?php
 define("TITLE_MAX_LENGTH", 55);
 
-$templating->merge('blocks/block_comments_latest');
+$templating->load('blocks/block_comments_latest');
 $templating->block('list');
 
 if ($core->config('pretty_urls') == 1)

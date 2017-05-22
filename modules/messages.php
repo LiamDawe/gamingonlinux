@@ -19,7 +19,7 @@ else
 		$page = $_GET['page'];
 	}
 
-	$templating->merge('private_messages');
+	$templating->load('private_messages');
 
 	// if nothing list messages
 	if (!isset($_GET['view']) && !isset($_POST['act']))

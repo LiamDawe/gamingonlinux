@@ -509,7 +509,7 @@ class article_class
 			$history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> '.$view_link.' - ' . $date . '</li>';
 		}
 
-		$templating->merge('admin_modules/admin_module_articles');
+		$templating->load('admin_modules/admin_module_articles');
 		$templating->block('history', 'admin_modules/admin_module_articles');
 		$templating->set('history', $history);
 	}

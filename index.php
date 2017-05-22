@@ -96,7 +96,7 @@ $get_announcements = $db->sqlquery("SELECT count(id) as count FROM `announcement
 $count_announcements = $get_announcements->fetch();
 if ($count_announcements['count'] > 0)
 {
-	$templating->merge('announcements');
+	$templating->load('announcements');
 	$templating->block('announcement_top', 'announcements');
 	
 	$get_announcements = $db->sqlquery("SELECT `text`, `user_groups`, `type`, `modules` FROM `announcements` ORDER BY `id` DESC");
@@ -251,7 +251,7 @@ foreach ($blocks as $block)
 
 		if ($show == 1)
 		{
-			$templating->merge('blocks/block_custom');
+			$templating->load('blocks/block_custom');
 
 			if ($block['style'] == 'block')
 			{

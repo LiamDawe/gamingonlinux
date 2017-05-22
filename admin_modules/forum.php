@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_forum');
+$templating->load('admin_modules/admin_module_forum');
 
 if (isset ($_GET['message']))
 {

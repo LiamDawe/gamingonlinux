@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'Website stats', 1);
 $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux website', 1);
 
-$templating->merge('website_stats');
+$templating->load('website_stats');
 
 $templating->block('top');
 $templating->set('site_title', $core->config('site_title'));

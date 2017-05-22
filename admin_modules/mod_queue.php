@@ -1,7 +1,7 @@
 <?php
 $templating->set_previous('title', 'Comments & Forum moderation queue', 1);
 
-$templating->merge('admin_modules/mod_queue');
+$templating->load('admin_modules/mod_queue');
 
 $templating->block('top', 'admin_modules/mod_queue');
 

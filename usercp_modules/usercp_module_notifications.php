@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Notifications manager' . $templating->get('title', 1)  , 1);
-$templating->merge('usercp_modules/notifications');
+$templating->load('usercp_modules/notifications');
 
 if (!isset($_GET['go']))
 {

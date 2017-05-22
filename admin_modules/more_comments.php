@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_more_comments');
+$templating->load('admin_modules/admin_module_more_comments');
 
 if (isset($_GET['view']) && $_GET['view'] == 'editors')
 {

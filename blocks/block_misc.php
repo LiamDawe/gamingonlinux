@@ -1,6 +1,6 @@
 <?php
 // Article categorys block
-$templating->merge('blocks/block_bottom_info');
+$templating->load('blocks/block_bottom_info');
 $templating->block('list');
 
 if ($core->config('pretty_urls') == 1)

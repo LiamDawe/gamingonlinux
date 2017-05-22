@@ -2,7 +2,7 @@
 $templating->set_previous('meta_description', 'There are ways you can help ' . $core->config('site_title'), 1);
 $templating->set_previous('title', 'Support ' . $core->config('site_title'), 1);
 
-$templating->merge('support_us');
+$templating->load('support_us');
 $templating->block('main');
 $templating->set('config_support_us_text', $core->config('support_us_text'));
 

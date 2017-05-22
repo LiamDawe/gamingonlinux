@@ -40,7 +40,7 @@ else if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	$templating->set_previous('meta_description', 'Your account links', 1);
 	$templating->set_previous('title', 'Your account links!', 1);
 
-	$templating->merge('account');
+	$templating->load('account');
 	$templating->block('main');
 	$templating->set('admin_link', $admin_link);
 	$templating->set('messages_link', $messages_link);

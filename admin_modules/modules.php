@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_modules');
+$templating->load('admin_modules/admin_module_modules');
 
 if (isset($_GET['page']) && !isset($_POST['action']))
 {

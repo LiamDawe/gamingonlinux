@@ -2,7 +2,7 @@
 $db->sqlquery("SELECT `email`, `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
 $grab_email = $db->fetch();
 
-$templating->merge('usercp_modules/usercp_module_email');
+$templating->load('usercp_modules/usercp_module_email');
 $templating->block('main');
 $templating->set('current_email', $grab_email['email']);
 

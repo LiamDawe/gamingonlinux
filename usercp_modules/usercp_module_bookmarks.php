@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'Your bookmarked content', 1);
 $templating->set_previous('meta_description', 'Your personal bookmarked content', 1);
 
-$templating->merge('usercp_modules/bookmarks');
+$templating->load('usercp_modules/bookmarks');
 
 $templating->block('top');
 

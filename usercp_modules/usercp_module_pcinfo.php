@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'PC Info' . $templating->get('title', 1)  , 1);
-$templating->merge('usercp_modules/usercp_module_pcinfo');
+$templating->load('usercp_modules/usercp_module_pcinfo');
 
 if (isset($_GET['updated']))
 {

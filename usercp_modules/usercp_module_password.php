@@ -5,7 +5,7 @@ $templating->set_previous('title', 'Change Password' . $templating->get('title',
 $db->sqlquery("SELECT `username`, `password`, `email` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
 $grab_current_password = $db->fetch();
 
-$templating->merge('usercp_modules/usercp_module_password');
+$templating->load('usercp_modules/usercp_module_password');
 
 if (empty($grab_current_password['password']))
 {

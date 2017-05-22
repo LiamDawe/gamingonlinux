@@ -18,7 +18,7 @@ if ($core->config('goty_page_open') == 0)
 
 $templating->set_previous('title', 'Linux Game Of The Year Awards', 1);
 $templating->set_previous('meta_description', 'Vote for your favourite Linux game of the past year', 1);
-$templating->merge('goty');
+$templating->load('goty');
 
 $templating->block('vote_popover', 'goty');
 

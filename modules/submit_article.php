@@ -1,5 +1,5 @@
 <?php
-$templating->merge('submit_article');
+$templating->load('submit_article');
 
 require_once("includes/curl_data.php");
 

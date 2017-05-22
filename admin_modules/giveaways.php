@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/giveaways');
+$templating->load('admin_modules/giveaways');
 
 if (isset($_GET['message']))
 {

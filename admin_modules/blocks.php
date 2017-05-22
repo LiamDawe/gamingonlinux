@@ -6,7 +6,7 @@ if (!$user->check_group(1))
 
 else
 {
-	$templating->merge('admin_modules/admin_module_blocks');
+	$templating->load('admin_modules/admin_module_blocks');
 
 	if (!isset($_POST['act']) && isset($_GET['view']))
 	{

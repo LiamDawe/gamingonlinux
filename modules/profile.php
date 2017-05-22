@@ -10,7 +10,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 	}
 	else
 	{
-		$templating->merge('profile');
+		$templating->load('profile');
 
 		if (!isset($_GET['view']))
 		{

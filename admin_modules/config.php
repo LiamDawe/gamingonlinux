@@ -10,7 +10,7 @@ else
 {
 	if (!isset($_POST['Submit']))
 	{
-		$templating->merge('admin_modules/config');
+		$templating->load('admin_modules/config');
 
 		$templating->block('main');
 		$templating->set('form_url', $core->config('website_url'));

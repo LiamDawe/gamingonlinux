@@ -1,5 +1,5 @@
 <?php
-$templating->merge('blocks/block_article_categorys');
+$templating->load('blocks/block_article_categorys');
 $templating->block('menu');
 
 if (!$user->check_group([1,2,5]))

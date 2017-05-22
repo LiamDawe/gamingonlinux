@@ -2,7 +2,7 @@
 $templating->set_previous('meta_description', 'Linux games database search', 1);
 $templating->set_previous('title', 'GamingOnLinux Linux games database search', 1);
 
-$templating->merge('game-search');
+$templating->load('game-search');
 $templating->block('search_bread', 'game-search');
 
 $search = '';

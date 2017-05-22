@@ -1,5 +1,5 @@
 <?php
-$templating->merge('footer');
+$templating->load('footer');
 $templating->block('footer');
 $templating->set('site_title', $core->config('site_title'));
 $templating->set('url', url);

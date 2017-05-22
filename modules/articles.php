@@ -1,5 +1,5 @@
 <?php
-$templating->merge('articles');
+$templating->load('articles');
 
 if (!isset($_GET['view']))
 {

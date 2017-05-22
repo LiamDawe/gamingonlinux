@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/games');
+$templating->load('admin_modules/games');
 
 $licenses = array('', 'Closed Source', 'GPL', 'BSD', 'MIT');
 

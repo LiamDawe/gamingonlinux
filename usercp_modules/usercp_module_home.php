@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Home' . $templating->get('title', 1)  , 1);
-$templating->merge('usercp_modules/usercp_module_home');
+$templating->load('usercp_modules/usercp_module_home');
 
 include('includes/profile_fields.php');
 

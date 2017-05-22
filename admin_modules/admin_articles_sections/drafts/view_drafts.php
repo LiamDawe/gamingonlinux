@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_articles_sections/drafts');
+$templating->load('admin_modules/admin_articles_sections/drafts');
 if (!isset($_GET['aid']))
 {
 	$templating->block('drafts_top', 'admin_modules/admin_articles_sections/drafts');
@@ -67,7 +67,7 @@ else
 
 	$_SESSION['original_text'] = $article['text'];
 
-	$templating->merge('admin_modules/article_form');
+	$templating->load('admin_modules/article_form');
 
 	$templating->block('preview_code', 'admin_modules/article_form');
 	$templating->set('preview_url', $core->config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);

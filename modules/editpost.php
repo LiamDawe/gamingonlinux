@@ -1,7 +1,7 @@
 <?php
 $templating->set_previous('title', 'Editing a post', 1);
 
-$templating->merge('editpost');
+$templating->load('editpost');
 
 // if its the topic
 if (!isset($_POST['act']))

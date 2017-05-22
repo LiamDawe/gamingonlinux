@@ -1,5 +1,5 @@
 <?php
-$templating->merge('blocks/block_twitter');
+$templating->load('blocks/block_twitter');
 $templating->block('menu');
 $theme = $user->get('theme', $_SESSION['user_id']);
 if (isset($theme) && $theme == 'default' || !isset($theme))

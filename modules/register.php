@@ -16,7 +16,7 @@ else
 
 require_once("includes/curl_data.php");
 
-$templating->merge('register');
+$templating->load('register');
 
 if ($core->config('allow_registrations') == 1)
 {

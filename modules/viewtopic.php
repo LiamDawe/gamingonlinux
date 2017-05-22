@@ -6,7 +6,7 @@ if (!core::is_number($_GET['topic_id']))
 
 else
 {
-	$templating->merge('viewtopic');
+	$templating->load('viewtopic');
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletetopic')
 	{
@@ -691,7 +691,7 @@ else
 				{
 					if ($_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 					{
-						$templating->merge('login');
+						$templating->load('login');
 						$templating->block('small');
 						
 						$templating->set('url', $core->config('website_url'));

@@ -53,7 +53,7 @@ class message_map
 			$stored_message = 'We tried to give a message with the key "'.$key.'" but we couldn\'t find that message.';
 		}
 
-		$templating->merge('messages');
+		$templating->load('messages');
 		
 		$templating->block('message');
 

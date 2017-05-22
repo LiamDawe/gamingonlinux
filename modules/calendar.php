@@ -33,7 +33,7 @@ else if (isset($_GET['month']) && !is_numeric($_GET['month']))
 $templating->set_previous('title', 'Linux Game Release Calendar', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com maintained list of Linux game releases', 1);
 
-$templating->merge('calendar');
+$templating->load('calendar');
 
 // count how many there is due this month
 $db->sqlquery("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1 AND `also_known_as` IS NULL");
@@ -49,7 +49,7 @@ if ($user->check_group([1,2,5]))
 }
 $templating->set('editor_links', $editor_links);
 
-$templating->merge('game-search');
+$templating->load('game-search');
 $templating->block('search', 'game-search');
 $templating->set('search_text', '');
 

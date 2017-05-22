@@ -1,5 +1,5 @@
 <?php
-$templating->merge('search');
+$templating->load('search');
 if (!isset($_GET['author_id']))
 {
 	$templating->set_previous('title', 'Article Search', 1);
@@ -19,7 +19,7 @@ $templating->set('search_text', $search_text);
 
 if (!isset($_GET['q']) && !isset($_GET['author_id']))
 {
-	$templating->merge('articles');
+	$templating->load('articles');
 	$templating->block('multi', 'articles');
 
 	$templating->block('articles_top', 'articles');

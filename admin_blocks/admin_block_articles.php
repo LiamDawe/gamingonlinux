@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_blocks/articles');
+$templating->load('admin_blocks/articles');
 $templating->block('main');
 
 // count any submitted admin articles for review

@@ -1,6 +1,6 @@
 <?php
 // main menu block
-$templating->merge('blocks/block_forum_latest');
+$templating->load('blocks/block_forum_latest');
 $templating->block('list');
 
 $comments_per_page = $core->config('default-comments-per-page');

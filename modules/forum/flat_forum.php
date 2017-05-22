@@ -10,10 +10,10 @@ if (isset($_GET['message']))
 	}
 }
 
-$templating->merge('flat_forum');
+$templating->load('flat_forum');
 $templating->block('top');
 
-$templating->merge('forum_search');
+$templating->load('forum_search');
 $templating->block('small');
 
 // paging for pagination

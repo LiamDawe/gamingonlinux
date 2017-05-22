@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'Forum Search', 1);
 $templating->set_previous('meta_description', 'Search the forum on ' . $core->config('site_title'), 1);
 
-$templating->merge('forum_search');
+$templating->load('forum_search');
 $templating->block('top');
 $templating->set('url', $core->config('website_url'));
 

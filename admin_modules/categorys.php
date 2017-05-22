@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_categorys');
+$templating->load('admin_modules/admin_module_categorys');
 
 if (!isset($_POST['act']))
 {

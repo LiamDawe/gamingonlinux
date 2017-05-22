@@ -3,7 +3,7 @@ $templating->set_previous('title', 'Latest Comments', 1);
 $templating->set_previous('meta_description', 'The latest article comments on ' . $core->config('site_title'), 1);
 
 // main menu block
-$templating->merge('comments_latest');
+$templating->load('comments_latest');
 $templating->block('list');
 
 $comment_posts = '';

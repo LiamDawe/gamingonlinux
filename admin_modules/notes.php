@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_notes');
+$templating->load('admin_modules/admin_module_notes');
 
 $templating->block('notes', 'admin_modules/admin_module_notes');
 

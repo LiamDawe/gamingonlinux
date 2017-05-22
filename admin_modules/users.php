@@ -5,7 +5,7 @@ if (!$user->check_group([1,2]))
 }
 else
 {
-	$templating->merge('admin_modules/users');
+	$templating->load('admin_modules/users');
 
 	if (isset($_GET['view']) && !isset($_POST['act']))
 	{
@@ -177,7 +177,7 @@ else
 		
 		if ($_GET['view'] == 'groups')
 		{
-			$templating->merge('admin_modules/user_groups');
+			$templating->load('admin_modules/user_groups');
 			$templating->block('start_top');
 			
 			$groups = $dbl->run("SELECT `group_id`, `group_name` FROM ".$core->db_tables['user_groups']." ORDER BY `group_name` ASC")->fetch_all();
@@ -197,7 +197,7 @@ else
 			
 			$current_permissions = $dbl->run("SELECT `permission_id` FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `group_id` = ?", [$_GET['id']])->fetch_all(PDO::FETCH_COLUMN);
 			
-			$templating->merge('admin_modules/user_groups');
+			$templating->load('admin_modules/user_groups');
 			$templating->block('group_edit');
 			$templating->set('name', $group['group_name']);
 			$show_badge = '';

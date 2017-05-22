@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_articles_sections/submitted_articles');
+$templating->load('admin_modules/admin_articles_sections/submitted_articles');
 if (!isset($_GET['aid']))
 {
 	if (isset($_GET['denied']))
@@ -178,7 +178,7 @@ else if (isset($_GET['aid']))
 	$templating->set('lock_button', $lock_button);
 
 	// get the edit row
-	$templating->merge('admin_modules/article_form');
+	$templating->load('admin_modules/article_form');
 
 	$templating->block('preview_code', 'admin_modules/article_form');
 	$templating->set('preview_url', $core->config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);

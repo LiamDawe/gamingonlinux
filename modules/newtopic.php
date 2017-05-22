@@ -56,7 +56,7 @@ else
 
 			else if (!isset($_POST['act']))
 			{
-				$templating->merge('newtopic');
+				$templating->load('newtopic');
 
 				$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
 				$name = $db->fetch();

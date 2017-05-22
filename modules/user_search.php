@@ -1,5 +1,5 @@
 <?php
-$templating->merge('user_search');
+$templating->load('user_search');
 
 if (!isset($_GET['author_id']))
 {

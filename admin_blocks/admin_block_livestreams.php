@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_blocks/admin_block_livestreams');
+$templating->load('admin_blocks/admin_block_livestreams');
 $templating->block('main');
 
 $db->sqlquery("SELECT COUNT(`row_id`) as counter FROM `livestreams` WHERE `accepted` = 0");

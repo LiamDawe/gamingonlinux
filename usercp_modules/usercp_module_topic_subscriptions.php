@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Forum Subscription Manager' . $templating->get('title', 1)  , 1);
-$templating->merge('usercp_modules/usercp_module_topic_subscriptions');
+$templating->load('usercp_modules/usercp_module_topic_subscriptions');
 
 if (!isset($_GET['go']))
 {

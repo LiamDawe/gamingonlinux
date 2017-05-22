@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_announcements');
+$templating->load('admin_modules/admin_module_announcements');
 
 $group_types = ['' => '', 'in_groups' => 'Only those groups', 'not_in_groups' => 'Not in those groups'];
 

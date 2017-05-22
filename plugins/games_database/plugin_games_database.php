@@ -8,7 +8,7 @@ function hook_games_tagging_list($database, $core, $article_id)
 {
 	global $db, $templating, $edit_state;
     
-    $templating->merge_plugin('games_database/template');
+    $templating->load_plugin('games_database/template');
     $tagging_block = $templating->block_store('game_tagging', 'games_database/template');
 
     if ($article_id != NULL)

@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/livestreams');
+$templating->load('admin_modules/livestreams');
 
 if (isset($_GET['view']) && !isset($_POST['act']))
 {

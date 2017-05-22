@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'About Us', 1);
 $templating->set_previous('meta_description', 'About Us information for ' . $core->config('site_title'), 1);
 
-$templating->merge('about_us');
+$templating->load('about_us');
 $templating->block('top');
 $templating->set('about_text', $core->config('about_text'));
 

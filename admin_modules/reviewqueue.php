@@ -1,7 +1,7 @@
 <?php
 $templating->set_previous('title', 'Review articles' . $templating->get('title', 1)  , 1);
 
-$templating->merge('admin_modules/reviewqueue');
+$templating->load('admin_modules/reviewqueue');
 
 if (!isset($_GET['aid']))
 {
@@ -141,7 +141,7 @@ else
 	$templating->set('lock_button', $lock_button);
 
 	// get the edit row
-	$templating->merge('admin_modules/article_form');
+	$templating->load('admin_modules/article_form');
 
 	$templating->block('preview_code', 'admin_modules/article_form');
 	$templating->set('preview_url', $core->config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);

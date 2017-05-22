@@ -51,27 +51,11 @@ class template
 		$full_path = $this->template . '/' . $file . '.html';
 		if (!file_exists($full_path))
 		{
-			die("Error loading template file $full_path.");
+			$this->core->message("Error merging template file, cannot find $full_path.", NULL, 1);
 		}
 
 		$this->files[$file] = file_get_contents("{$this->template}/{$file}.html");
 		$this->last_file = $file;
-	}
-
-	// merge another template with the first loaded one
-	// NOTE: why is this exactly the same as load? what was I drinking?!
-	public function merge($file)
-	{
-		if (!file_exists("{$this->template}/{$file}.html"))
-		{
-			$this->core->message("Error merging template file, cannot find ({$this->template}/$file).", NULL, 1);
-		}
-
-		else
-		{
-			$this->files[$file] = file_get_contents("{$this->template}/{$file}.html");
-			$this->last_file = $file;
-		}
 	}
 	
 	// for plugins

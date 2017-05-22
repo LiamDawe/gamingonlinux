@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/article_dump');
+$templating->load('admin_modules/article_dump');
 $templating->block('top');
 $templating->block('main');
 

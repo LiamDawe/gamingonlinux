@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_goty');
+$templating->load('admin_modules/admin_module_goty');
 
 if (isset($_GET['view']))
 {

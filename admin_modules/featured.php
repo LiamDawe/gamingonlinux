@@ -2,7 +2,7 @@
 include($file_dir . '/includes/class_image_uploads.php');
 $image_upload = new image_upload($core);
 
-$templating->merge('admin_modules/admin_module_featured');
+$templating->load('admin_modules/admin_module_featured');
 
 if (isset($_GET['message']))
 {

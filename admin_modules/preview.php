@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_articles');
+$templating->load('admin_modules/admin_module_articles');
 $templating->set('article_css', 'articleadmin');
 
 $author_id = '';
@@ -206,7 +206,7 @@ else
 $templating->set('article_bio', $bio);
 
 // this bit is for the final form
-$templating->merge('admin_modules/article_form');
+$templating->load('admin_modules/article_form');
 $templating->block('full_editor', 'admin_modules/article_form');
 $templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 $templating->set('main_formaction', '<form id="form" method="post" action="'.$core->config('website_url').'admin.php?module=preview" enctype="multipart/form-data">');

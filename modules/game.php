@@ -1,5 +1,5 @@
 <?php
-$templating->merge('game_database');
+$templating->load('game_database');
 
 if (isset($_GET['view']))
 {
@@ -91,7 +91,7 @@ if (!isset($_GET['game-id']) && !isset($_GET['view']))
 	$total_games = $db->fetch();
 	$templating->set('total_games', $total_games['total']);
 
-	$templating->merge('game-search');
+	$templating->load('game-search');
 	$templating->block('search', 'game-search');
 	$templating->set('search_text', '');
 

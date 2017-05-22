@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/calendar');
+$templating->load('admin_modules/calendar');
 
 $years_array = range(2014, 2020);
 

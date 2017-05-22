@@ -1,7 +1,7 @@
 <?php
 $templating->set_previous('title', 'Viewing the history of an article', 1);
 
-$templating->merge('admin_modules/article_history');
+$templating->load('admin_modules/article_history');
 
 if (isset($_GET['id']) && is_numeric($_GET['id']))
 {

@@ -28,7 +28,7 @@ if (isset($_GET['message']))
 		$core->message("You are now using an avatar picked from the gallery!");
 	}
 }
-$templating->merge('usercp_modules/usercp_module_avatar');
+$templating->load('usercp_modules/usercp_module_avatar');
 $templating->block('main');
 
 // sort out the avatar

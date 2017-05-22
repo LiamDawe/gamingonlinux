@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/corrections');
+$templating->load('admin_modules/corrections');
 
 $templating->set_previous('title', 'Article correction suggestions' . $templating->get('title', 1)  , 1);
 

@@ -2,10 +2,10 @@
 $templating->set_previous('title', 'Forum', 1);
 $templating->set_previous('meta_description', 'Forum', 1);
 
-$templating->merge('normal_forum');
+$templating->load('normal_forum');
 $templating->block('top');
 
-$templating->merge('forum_search');
+$templating->load('forum_search');
 $templating->block('small');
 
 $sql = "

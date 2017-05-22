@@ -1,5 +1,5 @@
 <?php
-$templating->merge('admin_modules/admin_module_articles');
+$templating->load('admin_modules/admin_module_articles');
 $templating->set('article_css', 'articleadmin');
 
 if (!isset($_GET['view']) && !isset($_POST['act']))
@@ -131,7 +131,7 @@ if (isset($_GET['view']))
 			$templating->set('lock_button', $lock_button);
 
 			// get the edit row
-			$templating->merge('admin_modules/article_form');
+			$templating->load('admin_modules/article_form');
 			$templating->block('full_editor', 'admin_modules/article_form');
 			$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 			$templating->set('!_state', $edit_state);

@@ -96,7 +96,7 @@ foreach ($blocks as $block)
 
 	else if ($block['block_link'] == NULL)
 	{
-		$templating->merge('blocks/block_custom');
+		$templating->load('blocks/block_custom');
 		$templating->set('block_title', $block['block_title']);
 		$templating->set('block_content', $block['block_custom_content']);
 	}

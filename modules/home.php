@@ -1,7 +1,7 @@
 <?php
 $templating->set_previous('meta_description', $core->config('meta_description'), 1);
 
-$templating->merge('home');
+$templating->load('home');
 
 if (!isset($_GET['view']))
 {
@@ -98,7 +98,7 @@ if (!isset($_GET['view']))
 		$db->sqlquery($category_tag_sql);
 		$get_categories = $db->fetch_all_rows();
 		
-		$templating->merge('articles');
+		$templating->load('articles');
 
 		$article_class->display_article_list($articles_get, $get_categories);
 

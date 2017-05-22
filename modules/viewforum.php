@@ -21,10 +21,10 @@ else
 	// paging for pagination
 	$page = core::give_page();
 
-	$templating->merge('forum_search');
+	$templating->load('forum_search');
 	$templating->block('small');
 
-	$templating->merge('viewforum');
+	$templating->load('viewforum');
 
 	$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
 	$name = $db->fetch();

@@ -100,7 +100,7 @@ if (isset($_POST['action']))
 
 	else if ($_POST['action'] == 'Upload')
 	{
-		if (image_upload::avatar() == true)
+		if ($image_upload->avatar() == true)
 		{
 			header("Location: /usercp.php?module=avatar&message=uploaded");
 		}

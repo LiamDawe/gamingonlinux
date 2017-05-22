@@ -14,7 +14,7 @@ class image_upload
 		$this->core = $core;
 	}
 	
-	public static function avatar()
+	public function avatar()
 	{
 		global $db;
 

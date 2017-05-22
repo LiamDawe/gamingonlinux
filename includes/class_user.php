@@ -48,10 +48,6 @@ class user
 		{
 			if ($this->stay_logged_in() == false)
 			{
-				setcookie('gol_stay', "",  time()-60, '/');
-				setcookie('gol_session', "",  time()-60, '/');
-				setcookie('gol-device', "",  time()-60, '/');
-				setcookie('steamID', '', -1, '/');
 				$this->make_guest_session();
 			}
 		}
@@ -421,6 +417,11 @@ class user
 			}
 			else
 			{
+				setcookie('gol_stay', "",  time()-60, '/');
+				setcookie('gol_session', "",  time()-60, '/');
+				setcookie('gol-device', "",  time()-60, '/');
+				setcookie('steamID', '', -1, '/');
+				
 				return false;
 			}
 		}

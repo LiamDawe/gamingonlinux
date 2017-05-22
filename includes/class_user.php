@@ -167,6 +167,22 @@ class user
 		$this->user_details[0] = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0];
 	}
 	
+	public function register_session($user_data)
+	{
+		session_regenerate_id(true);
+		
+		$_SESSION['user_id'] = $user_data['user_id'];
+		$_SESSION['username'] = $user_data['username'];
+		$_SESSION['new_login'] = 1;
+		$_SESSION['activated'] = $user_data['activated'];
+		$_SESSION['per-page'] = $user_data['per-page'];
+		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
+		$_SESSION['email_options'] = $user_data['email_options'];
+		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
+		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
+	}
+
+	
 	// helper func to get a user field(s)
 	function get($fields, $user_id)
 	{
@@ -311,22 +327,7 @@ class user
 			return $this->get('timezone', $user_id);
 		}
 	}
-
-	public function register_session($user_data)
-	{
-		session_regenerate_id(true);
-		
-		$_SESSION['user_id'] = $user_data['user_id'];
-		$_SESSION['username'] = $user_data['username'];
-		$_SESSION['new_login'] = 1;
-		$_SESSION['activated'] = $user_data['activated'];
-		$_SESSION['per-page'] = $user_data['per-page'];
-		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
-		$_SESSION['email_options'] = $user_data['email_options'];
-		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
-		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
-	}
-
+	
 	// check if it's a new device, then set the session up
 	public function new_login($user_data, $generated_session)
 	{
@@ -393,7 +394,7 @@ class user
 		$this->register_session($user_data);
 	}
 
-	// if they have a stay logged in cookie log them in!
+	// if they have a stay logged in cookie log them in
 	function stay_logged_in()
 	{
  		global $db, $core;

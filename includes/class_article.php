@@ -771,17 +771,18 @@ class article_class
 		include($this->core->config('path') . 'includes/telegram_poster.php');
 
 		$article_link = self::get_link($article_id, $checked['slug']);
+		
+		telegram($checked['title'] . ' ' . $article_link);
 
 		if (!isset($_POST['show_block']))
 		{
-			telegram($checked['title'] . ' ' . $article_link);
-			header("Location: ".$article_link);	
+			$redirect = $article_link;
 		}
 		else
 		{
-			telegram($checked['title'] . ' ' . $article_link);
-			header("Location: " . $this->core->config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id);
+			$redirect = $this->core->config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id;
 		}
+		header("Location: " . $redirect);	
 	}
 	
 	public function display_article_list($article_list, $get_categories)

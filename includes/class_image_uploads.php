@@ -7,6 +7,13 @@ class image_upload
 {
 	public static $return_message;
 	
+	private $core;
+	
+	function __construct($core)
+	{
+		$this->core = $core;
+	}
+	
 	public static function avatar()
 	{
 		global $db;
@@ -23,11 +30,11 @@ class image_upload
 			// check the dimensions
 			list($width, $height, $type, $attr) = getimagesize($_FILES['new_image']['tmp_name']);
 			
-			if ($width > core::config('avatar_width') || $height > core::config('avatar_height'))
+			if ($width > $this->core->config('avatar_width') || $height > $this->core->config('avatar_height'))
 			{
 				$img = new SimpleImage();
 
-				$img->fromFile($_FILES['new_image']['tmp_name'])->resize(core::config('avatar_width'), core::config('avatar_height'))->toFile($_FILES['new_image']['tmp_name']);
+				$img->fromFile($_FILES['new_image']['tmp_name'])->resize($this->core->config('avatar_width'), $this->core->config('avatar_height'))->toFile($_FILES['new_image']['tmp_name']);
 			}
 
 			// check if its too big
@@ -135,11 +142,11 @@ class image_upload
 
 				list($width, $height, $type, $attr) = $image_info;
 
-				if (core::config('carousel_image_width') > $width || core::config('carousel_image_height') > $height)
+				if ($this->core->config('carousel_image_width') > $width || $this->core->config('carousel_image_height') > $height)
 				{					
 					$img = new SimpleImage();
 
-					$img->fromFile($_FILES['new_image']['tmp_name'])->resize(core::config('carousel_image_width'), core::config('carousel_image_height'))->toFile($_FILES['new_image']['tmp_name']);
+					$img->fromFile($_FILES['new_image']['tmp_name'])->resize($this->core->config('carousel_image_width'), $this->core->config('carousel_image_height'))->toFile($_FILES['new_image']['tmp_name']);
 				}
 
 				// check if its too big
@@ -219,7 +226,7 @@ class image_upload
 			$source = $_FILES['new_image']['tmp_name'];
 
 			// where to upload to
-			$target = core::config('path') . "uploads/carousel/" . $imagename;
+			$target = $this->core->config('path') . "uploads/carousel/" . $imagename;
 
 			if (move_uploaded_file($source, $target))
 			{
@@ -233,7 +240,7 @@ class image_upload
 					// remove old image
 					if (!empty($image['featured_image']))
 					{
-						unlink(core::config('path') . 'uploads/carousel/' . $image['featured_image']);
+						unlink($this->core->config('path') . 'uploads/carousel/' . $image['featured_image']);
 						$db->sqlquery("UPDATE `editor_picks` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
 					}
 				}

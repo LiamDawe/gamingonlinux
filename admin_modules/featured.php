@@ -1,6 +1,6 @@
 <?php
 include($file_dir . '/includes/class_image_uploads.php');
-$image_upload = new image_upload();
+$image_upload = new image_upload($core);
 
 $templating->merge('admin_modules/admin_module_featured');
 

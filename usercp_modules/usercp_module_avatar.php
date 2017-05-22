@@ -1,6 +1,6 @@
 <?php
 include($file_dir . '/includes/class_image_uploads.php');
-$image_upload = new image_upload();
+$image_upload = new image_upload($core);
 
 $templating->set_previous('title', 'Change your avatar', 1);
 $templating->set_previous('meta_description', 'Here you can change your avatar!', 1);

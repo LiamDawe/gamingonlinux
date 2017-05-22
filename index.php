@@ -36,7 +36,7 @@ if (core::$current_module['module_file_name'] == 'home')
 		}
 
 		$last_featured_sql = '';
-		if (core::config('total_featured') > 1)
+		if ($core->config('total_featured') > 1)
 		{
 			$last_featured_sql = 'AND a.article_id != ?';
 		}
@@ -179,7 +179,7 @@ if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
 	if ( (isset($_SESSION['message']) && $_SESSION['message'] != 'new_account') || !isset($_SESSION['message']))
 	{
 		$templating->block('activation', 'mainpage');
-		$templating->set('url', core::config('website_url'));
+		$templating->set('url', $core->config('website_url'));
 	}
 }
 

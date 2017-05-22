@@ -826,7 +826,7 @@ class user
 		$in  = str_repeat('?,', count($user_ids) - 1) . '?';
 		$group_list = $this->database->run("SELECT u.`user_id`, m.`group_id` FROM `users` u LEFT JOIN `user_group_membership` m ON u.user_id = m.user_id WHERE u.`user_id` IN ( $in ) ORDER BY u.`user_id` ASC", $user_ids)->fetch_all();
 		
-		$formatted_list = [];
+		$formatted_list = [0 => [0]]; // guest user/group
 		
 		foreach ($group_list as $group)
 		{

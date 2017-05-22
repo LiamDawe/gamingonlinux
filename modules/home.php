@@ -112,6 +112,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	if ($core->config('total_featured') == $core->config('editor_picks_limit'))
 	{
 		$_SESSION['message'] = 'toomanypicks';
+		$_SESSION['message_extra'] = $core->config('editor_picks_limit');
 		header("Location: ".$core->config('website_url')."index.php?module=home");
 	}
 

@@ -42,7 +42,8 @@ return [
 	],
 	"toomanypicks" =>
 	[
-		"text" => "Sorry there are already " . core::config('editor_picks_limit') . " articles set as editor picks!"
+		"text" => "Sorry there are already %s articles set as editor picks!"
+		"additions" => 1,
 	]
 ];
 ?>

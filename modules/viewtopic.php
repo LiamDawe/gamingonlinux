@@ -523,7 +523,7 @@ else
 						$cake_bit = $user->cake_day($post['register_date'], $post['username']);
 						$templating->set('cake_icon', $cake_bit);
 
-						$pc_info;
+						$pc_info = '';
 						if (isset($post['pc_info_public']) && $post['pc_info_public'] == 1)
 						{
 							if ($post['pc_info_filled'] == 1)

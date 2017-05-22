@@ -498,15 +498,9 @@ else
 				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($_GET['user_id']));
+				$dbl->run("UPDATE `article_comments` SET `author_id` = 0 WHERE `author_id` = ?", [$_GET['user_id']]);
 
-				// remove one from members count, this is a special case
-				// it's one of only a few times we would update a remote config table, rather than local if we are using their user database
-				$config_table = '`'.$this->database->table_prefix.'config`';
-				if ($this->config('local_users') == 0)
-				{
-					$config_table = $this->config('remote_users_database') . '.' . '`config`';
-				}
-				$db->sqlquery("UPDATE ".$config_table." SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
+				$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
 
 				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
 

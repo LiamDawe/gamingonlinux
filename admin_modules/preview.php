@@ -239,7 +239,7 @@ if (isset($article))
 }
 else
 {
-	$article_form_top = $plugins->do_hooks('article_form_top', $article['article_id']);
+	$article_form_top = $plugins->do_hooks('article_form_top');
 }
 $templating->set('article_form_top', $article_form_top);
 

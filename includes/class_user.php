@@ -46,11 +46,7 @@ class user
 		}
 		else
 		{
-			if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']) && $this->stay_logged_in() == true)
-			{
-				header("Location: " . $_SERVER['REQUEST_URI']);
-			}
-			else
+			if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']) && $this->stay_logged_in() == false)
 			{
 				setcookie('gol_stay', "",  time()-60, '/');
 				setcookie('gol_session', "",  time()-60, '/');

@@ -85,7 +85,6 @@ class bbcode
 
 	function replace_timer($matches)
 	{
-		print_r($matches);
 		if (preg_match("/\*time-only/is", $matches[0]))
 		{
 			$rest = substr($matches[1], 0, -10);

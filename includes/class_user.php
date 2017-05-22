@@ -46,7 +46,7 @@ class user
 		}
 		else
 		{
-			if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']) && $this->stay_logged_in() == false)
+			if ($this->stay_logged_in() == false)
 			{
 				setcookie('gol_stay', "",  time()-60, '/');
 				setcookie('gol_session', "",  time()-60, '/');
@@ -164,7 +164,7 @@ class user
 		$_SESSION['username'] = 'Guest'; // not even sure why I set this
 		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
-		$this->user_details[0] = ['theme' => 'default', 'timezone' => 'UTC'];
+		$this->user_details[0] = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0];
 	}
 	
 	// helper func to get a user field(s)
@@ -396,25 +396,32 @@ class user
 	// if they have a stay logged in cookie log them in!
 	function stay_logged_in()
 	{
-		global $db, $core;
-
-		$db->sqlquery("SELECT `session_id` FROM ".$this->core->db_tables['session']." WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']));
-		$session = $db->fetch();
-
-		if ($db->num_rows() == 1)
+ 		global $db, $core;
+		
+		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']))
 		{
-			// login then
-			$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
-			$user_data = $db->fetch();
-			
-			$this->check_banned($user_data['user_id']);
+			$db->sqlquery("SELECT `session_id` FROM ".$this->core->db_tables['session']." WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']));
+			$session = $db->fetch();
 
-			// update IP address and last login
-			$db->sqlquery("UPDATE `".$this->database->table_prefix."users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
+			if ($db->num_rows() == 1)
+			{
+				// login then
+				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
+				$user_data = $db->fetch();
+				
+				$this->check_banned($user_data['user_id']);
 
-			$this->register_session($user_data);
+				// update IP address and last login
+				$db->sqlquery("UPDATE `".$this->database->table_prefix."users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
 
-			return true;
+				$this->register_session($user_data);
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		else

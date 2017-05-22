@@ -42,8 +42,8 @@ return [
 	],
 	"toomanypicks" =>
 	[
-		"text" => "Sorry there are already %s articles set as editor picks!"
-		"additions" => 1,
+		"text" => "Sorry there are already %s articles set as editor picks!",
+		"additions" => 1
 	]
 ];
 ?>

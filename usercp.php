@@ -19,8 +19,8 @@ $templating->block('left');
 // Here we sort out what modules we are allowed to load
 $modules_allowed = [];
 $module_links = '';
-$db->sqlquery('SELECT `module_file_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `usercp_modules` WHERE `activated` = 1');
-while ($modules = $db->fetch())
+$get_modules = $dbl->run('SELECT `module_file_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `usercp_modules` WHERE `activated` = 1')->fetch_all();
+foreach ($get_modules as $modules)
 {
 	// modules allowed for loading
 	$modules_allowed[] = $modules['module_file_name'];
@@ -69,9 +69,7 @@ $templating->block('left_end', 'mainpage');
 $templating->block('right', 'mainpage');
 
 // get the blocks
-$db->sqlquery('SELECT `block_link`, `left`, `block_title_link`, `block_title`, `block_custom_content` FROM `usercp_blocks` WHERE `activated` = 1');
-$blocks = $db->fetch_all_rows();
-
+$blocks = $dbl->run('SELECT `block_link`, `left`, `block_title_link`, `block_title`, `block_custom_content` FROM `usercp_blocks` WHERE `activated` = 1')->fetch_all();
 foreach ($blocks as $block)
 {
 	if ($block['left'] == 1 && $block['block_link'] != NULL)

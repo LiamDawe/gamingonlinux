@@ -380,19 +380,15 @@ if (isset($_POST['act']))
 					{$comment_email}
 					<hr>
 					You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.
-					<hr>
-						<p>If you haven&#39;t registered at <a href=\"" . $core->config('website_url') . "\" target=\"_blank\">" . $core->config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-						<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-						<p>-----------------------------------------------------------------------------------------------------------</p>
-					</div>";
+					<hr>";
 
 					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an editor review article on " . $core->config('website_url') . "admin.php?module=comments&aid=$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 					// Mail it
 					if ($core->config('send_emails') == 1)
 					{
-						$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
-						$mail->send();
+						$mail = new mailer($core);
+						$mail->sendMail($emailer['email'], $subject, $html_message, $plain_message);
 					}
 				}
 			}

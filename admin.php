@@ -24,8 +24,8 @@ if ($user->check_group(1) == false)
 // Here we sort out what modules we are allowed to load
 $modules_allowed = [];
 $module_links = '';
-$get_modules_info = $db->sqlquery("SELECT `module_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `admin_modules` WHERE `activated` = 1 $sql_editor");
-while ($modules = $db->fetch())
+$get_modules_info = $dbl->run("SELECT `module_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `admin_modules` WHERE `activated` = 1 $sql_editor")->fetch_all();
+foreach ($get_modules_info as $modules)
 {
 	// modules allowed for loading
 	$modules_allowed[] = $modules['module_name'];
@@ -82,11 +82,9 @@ if ($user->check_group(1) == false)
 }
 
 // blocks left
-$db->sqlquery("SELECT * FROM `admin_blocks` WHERE `activated` = 1 $sql_editor ORDER BY `block_id` ASC");
+$blocks = $dbl->run("SELECT * FROM `admin_blocks` WHERE `activated` = 1 $sql_editor ORDER BY `block_id` ASC")->fetch_all();
 $rights = array();
 $right_number = 0;
-$blocks = $db->fetch_all_rows();
-
 foreach ($blocks as $block)
 {
 	if ($block['block_link'] != NULL)

@@ -7,12 +7,11 @@ include($file_dir . '/includes/header.php');
 
 if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 {
-	$db->sqlquery("SELECT `article_id`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
-	$featured_grabber = $db->fetch();
+	$featured_grabber = $dbl->run("SELECT `article_id`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']))->fetch();
 
 	if (!empty($featured_grabber['article_id']))
 	{
-		$db->sqlquery("UPDATE `editor_picks` SET `hits` = (hits + 1) WHERE `article_id` = ?", array($_GET['aid']));
+		$dbl->run("UPDATE `editor_picks` SET `hits` = (hits + 1) WHERE `article_id` = ?", array($_GET['aid']));
 		
 		header('Location: ' . $article_class->get_link($featured_grabber['article_id'], $featured_grabber['slug']));
 	}
@@ -20,13 +19,11 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 
 if (core::$current_module['module_file_name'] == 'home')
 {
-	$db->sqlquery("SELECT a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> ''");
-	$count_total = $db->num_rows();
+	$count_total = $dbl->run("SELECT COUNT(a.active) FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> ''")->fetchOne();
 
 	if ($count_total == 1)
 	{
-		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> ''");
-		$featured = $db->fetch();
+		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> ''")->fetch();
 	}
 	if ($count_total > 1)
 	{
@@ -41,8 +38,7 @@ if (core::$current_module['module_file_name'] == 'home')
 			$last_featured_sql = 'AND a.article_id != ?';
 		}
 
-		$db->sqlquery("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `".$dbl->table_prefix."users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']));
-		$featured = $db->fetch();
+		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
 
 		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
@@ -92,15 +88,14 @@ if (core::$current_module['module_file_name'] == 'home')
 	}
 }
 
-$get_announcements = $db->sqlquery("SELECT count(id) as count FROM `announcements`");
-$count_announcements = $get_announcements->fetch();
-if ($count_announcements['count'] > 0)
+$count_announcements = $dbl->run("SELECT count(id) as count FROM `announcements`")->fetchOne();
+if ($count_announcements > 0)
 {
 	$templating->load('announcements');
 	$templating->block('announcement_top', 'announcements');
 	
-	$get_announcements = $db->sqlquery("SELECT `text`, `user_groups`, `type`, `modules` FROM `announcements` ORDER BY `id` DESC");
-	while ($announcement = $get_announcements->fetch())
+	$get_announcements = $dbl->run("SELECT `text`, `user_groups`, `type`, `modules` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+	foreach ($get_announcements as $announcement)
 	{
 		$show = 0;
 		

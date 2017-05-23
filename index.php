@@ -163,8 +163,7 @@ if (isset($_GET['user_id']))
 {
 	if (!isset($_SESSION['activated']) && $_SESSION['user_id'] != 0)
 	{
-		$db->sqlquery("SELECT `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		$get_active = $db->fetch();
+		$get_active = $dbl->run("SELECT `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 		$_SESSION['activated'] = $get_active['activated'];
 	}
 }
@@ -209,9 +208,7 @@ $templating->block('left_end', 'mainpage');
 $templating->block('right', 'mainpage');
 
 // get the blocks
-$db->sqlquery('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`');
-$blocks = $db->fetch_all_rows();
-
+$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
 foreach ($blocks as $block)
 {
 	// PHP BLOCKS

@@ -14,8 +14,8 @@ if (!isset($_POST['act']))
 	$templating->block('add_category', 'admin_modules/admin_module_categorys');
 
 	// get the current categorys
-	$category_get = $db->sqlquery("SELECT `category_name`, `category_id` FROM `articles_categorys` ORDER BY `category_name` ASC");
-	while ($category = $db->fetch($category_get))
+	$category_get = $dbl->run("SELECT `category_name`, `category_id` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+	foreach ($category_get as $category)
 	{
 		$templating->block('category_row', 'admin_modules/admin_module_categorys');
 		$templating->set('category_name', $category['category_name']);
@@ -37,7 +37,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$checker = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_name` = ?", [$_POST['category_name']])->fetch();
 			if (!$checker)
 			{
-				$db->sqlquery("INSERT INTO `articles_categorys` SET `category_name` = ?", [$_POST['category_name']]);
+				$dbl->run("INSERT INTO `articles_categorys` SET `category_name` = ?", [$_POST['category_name']]);
 
 				header("Location: admin.php?module=categorys&message=added");
 			}
@@ -60,7 +60,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 		else
 		{
-			$db->sqlquery("UPDATE `articles_categorys` SET `category_name` = ? WHERE `category_id` = ?", array($_POST['category_name'], $_POST['category_id']));
+			$dbl->run("UPDATE `articles_categorys` SET `category_name` = ? WHERE `category_id` = ?", array($_POST['category_name'], $_POST['category_id']));
 
 			$core->message("Category {$_POST['category_name']} has been updated! <a href=\"admin.php?module=categorys\">Click here to edit more</a> or <a href=\"index.php\">click here to go to the site home</a>.");
 		}
@@ -88,8 +88,8 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			else
 			{
 				// check category exists
-				$db->sqlquery("SELECT `category_id` FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']));
-				if ($db->num_rows() != 1)
+				$cat_id = $dbl->run("SELECT `category_id` FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']))->fetchOne();
+				if (!$cat_id)
 				{
 					$core->message('That is not a correct id!');
 				}
@@ -97,7 +97,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				// Delete now
 				else
 				{
-					$db->sqlquery("DELETE FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']));
+					$dbl->run("DELETE FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']));
 
 					$core->message('That category has now been deleted');
 				}

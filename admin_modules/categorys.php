@@ -34,9 +34,18 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 		else
 		{
-			$db->sqlquery("INSERT INTO `articles_categorys` SET `category_name` = ?", array($_POST['category_name']));
+			$checker = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_name` = ?", [$_POST['category_name']])->fetch();
+			if (!$checker)
+			{
+				$db->sqlquery("INSERT INTO `articles_categorys` SET `category_name` = ?", [$_POST['category_name']]);
 
-			header("Location: admin.php?module=categorys&message=added");
+				header("Location: admin.php?module=categorys&message=added");
+			}
+			else
+			{
+				$_SESSION['message'] = 'category_exists';
+				header("Location: admin.php?module=categorys");
+			}
 		}
 	}
 	

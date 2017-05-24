@@ -29,8 +29,8 @@ if (!isset($_GET['view']))
 	{
 		$templating->block('comments_top', 'admin_modules/admin_home');
 
-		$grab_comments = $db->sqlquery("SELECT a.`text`, a.`date_posted`, u.`user_id`, u.`username` FROM `admin_discussion` a INNER JOIN ".$core->db_tables['users']." u ON a.`user_id` = u.`user_id` ORDER BY a.`id` DESC LIMIT 10");
-		while ($comments = $grab_comments->fetch())
+		$grab_comments = $dbl->run("SELECT a.`text`, a.`date_posted`, u.`user_id`, u.`username` FROM `admin_discussion` a INNER JOIN ".$core->db_tables['users']." u ON a.`user_id` = u.`user_id` ORDER BY a.`id` DESC LIMIT 10")->fetch_all();
+		foreach ($grab_comments as $comments)
 		{
 			$templating->block('comment', 'admin_modules/admin_home');
 
@@ -46,8 +46,8 @@ if (!isset($_GET['view']))
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_home');
 
-	$editor_chat = $db->sqlquery("SELECT a.*, u.`user_id`, u.`username` FROM `editor_discussion` a INNER JOIN ".$core->db_tables['users']." u ON a.`user_id` = u.`user_id` ORDER BY `id` DESC LIMIT 10");
-	while ($commentsall = $editor_chat->fetch())
+	$editor_chat = $dbl->run("SELECT a.*, u.`user_id`, u.`username` FROM `editor_discussion` a INNER JOIN ".$core->db_tables['users']." u ON a.`user_id` = u.`user_id` ORDER BY `id` DESC LIMIT 10")->fetch_all();
+	foreach ($editor_chat as $commentsall)
 	{
 		$templating->block('commentall', 'admin_modules/admin_home');
 
@@ -63,16 +63,15 @@ if (!isset($_GET['view']))
 	$templating->block('editor_tracking', 'admin_modules/admin_home');
 
 	// get the different types of notifications
-	$db->sqlquery("SELECT `name`, `text`, `link` FROM `admin_notification_types`");
-	$fetch_types = $db->fetch_all_rows();
+	$fetch_types = $dbl->run("SELECT `name`, `text`, `link` FROM `admin_notification_types`")->fetch_all();
 	// make their key their name, so we can easily call them
 	foreach ($fetch_types as $types_set)
 	{
 		$types[$types_set['name']] = $types_set;
 	}
 
-	$get_notifications = $db->sqlquery("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN ".$core->db_tables['users']." u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 50");
-	while ($tracking = $get_notifications->fetch())
+	$get_notifications = $dbl->run("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN ".$core->db_tables['users']." u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 50")->fetch_all();
+	foreach ($get_notifications as $tracking)
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
 
@@ -110,8 +109,7 @@ if (!isset($_GET['view']))
 			// still need a better way so we don't need a query for each one, but it works for now
 			if (preg_match('/{:title}/', $link))
 			{
-				$get_title = $db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($tracking['data']));
-				$title = $get_title->fetch();
+				$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($tracking['data']))->fetch();
 				$link = str_replace('{:title}', core::nice_title($title['title']), $link);
 			}
 
@@ -131,8 +129,7 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'comment')
 	{
-		$db->sqlquery("SELECT * FROM `admin_notifications` WHERE `comment_id` = ?", array($_GET['comment_id']));
-		$content = $db->fetch();
+		$content = $dbl->run("SELECT * FROM `admin_notifications` WHERE `comment_id` = ?", array($_GET['comment_id']))->fetch();
 
 		$templating->block('view_content');
 		$templating->set('action', $content['action']);
@@ -145,7 +142,7 @@ if (isset($_POST['act']))
 	if ($_POST['act'] == 'edit')
 	{
 		$notes_text = trim($_POST['text']);
-		$db->sqlquery("UPDATE `admin_notes` SET `text` = ? WHERE `user_id` = ?", array($notes_text, $_SESSION['user_id']));
+		$dbl->run("UPDATE `admin_notes` SET `text` = ? WHERE `user_id` = ?", array($notes_text, $_SESSION['user_id']));
 
 		header('Location: /admin.php?message=updated');
 	}
@@ -162,7 +159,7 @@ if (isset($_POST['act']))
 		}
 
 		$date = core::$date;
-		$db->sqlquery("INSERT INTO `admin_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
+		$dbl->run("INSERT INTO `admin_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
 		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 		foreach ($grab_admins as $emailer)

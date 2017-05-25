@@ -107,11 +107,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$chart_info = $db->fetch();
 			
-<<<<<<< HEAD
-			$charts = new golchart($dbl);
-=======
 			$charts = new chart();
->>>>>>> First Part of Leviv DI injection
 			
 			$templating->block('chart', 'admin_modules/admin_module_charts');
 			$templating->set('chart', $charts->render($chart_id, NULL, 'charts_labels', 'charts_data'));

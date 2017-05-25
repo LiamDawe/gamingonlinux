@@ -619,10 +619,10 @@ class user
 			p.`user_id` = ?", array($user_id))->fetch();
 
 
-		if (!empty($get_info['distro']) && $get_info['distro'] != 'Not Listed')
+		if (!empty($additionaldb['distro']) && $additionaldb['distro'] != 'Not Listed')
 		{
 			$counter++;
-			$pc_info['distro'] = "<strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$distribution}.svg\" alt=\"{$distribution}\" /> {$distribution}";
+			$pc_info['distro'] = "<strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$additionaldb['distro']}.svg\" alt=\"{$additionaldb['distro']}\" /> {$additionaldb['distro']}";
 		}
 		if (!empty($additionaldb['desktop_environment']))
 		{

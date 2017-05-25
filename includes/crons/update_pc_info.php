@@ -20,13 +20,13 @@ While we don't currently have a drop-off implemented for old/stale data, it will
 
 $slug = core::nice_title($title);
 
-$dbl->run("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `tagline_image` = 'defaulttagline.png'", array(core::$date, $title, $slug, $tagline, $text));
+$dbl->run("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `gallery_tagline` = 26, `active` = 0, `admin_review` = 1", array(core::$date, $title, $slug, $tagline, $text));
 
 $article_id = $dbl->new_id();
 
 $dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 22", array($article_id));
 $dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 83", array($article_id));
 
-include($core->config('path') . 'includes/telegram_poster.php');
-telegram($title . ' ' . $core->config('website_url') . "articles/" . $slug . '.' . $article_id);
+// update admin notifications
+$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = 1844, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array('article_admin_queue', core::$date, $article_id));
 ?>

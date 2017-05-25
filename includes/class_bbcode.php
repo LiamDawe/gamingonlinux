@@ -715,7 +715,119 @@ class bbcode
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0 && is_numeric($_SESSION['user_id']))
 			{
 				$fields_output = '';
-				$pc_info = user::display_pc_info($_SESSION['user_id'], $_SESSION['distro']);
+				
+				$pc_info = [];
+
+				$counter = 0;
+
+				$additionaldb = $this->database->run("SELECT
+					p.`desktop_environment`,
+					p.`what_bits`,
+					p.`cpu_vendor`,
+					p.`cpu_model`,
+					p.`gpu_vendor`,
+					p.`gpu_model`,
+					p.`gpu_driver`,
+					p.`ram_count`,
+					p.`monitor_count`,
+					p.`gaming_machine_type`,
+					p.`resolution`,
+					p.`dual_boot`,
+					p.`gamepad`,
+					p.`date_updated`,
+					u.`distro`
+					FROM
+					".$this->core->db_tables['profile_info']." p
+					INNER JOIN
+					".$this->core->db_tables['users']." u ON u.user_id = p.user_id
+					WHERE
+					p.`user_id` = ?", array($_SESSION['user_id']))->fetch();
+
+
+				if (!empty($additionaldb['distro']) && $additionaldb['distro'] != 'Not Listed')
+				{
+					$counter++;
+					$pc_info['distro'] = "<strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$additionaldb['distro']}.svg\" alt=\"{$additionaldb['distro']}\" /> {$additionaldb['distro']}";
+				}
+				if (!empty($additionaldb['desktop_environment']))
+				{
+					$counter++;
+					$pc_info['desktop'] = '<strong>Desktop Environment:</strong> ' . $additionaldb['desktop_environment'];
+				}
+
+				if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))
+				{
+					$counter++;
+					$pc_info['what_bits'] = '<strong>Distribution Architecture:</strong> '.$additionaldb['what_bits'];
+				}
+
+				if ($additionaldb['dual_boot'] != NULL && !empty($additionaldb['dual_boot']))
+				{
+					$counter++;
+					$pc_info['dual_boot'] = '<strong>Do you dual-boot with a different operating system?</strong> '.$additionaldb['dual_boot'];
+				}
+
+				if ($additionaldb['cpu_vendor'] != NULL && !empty($additionaldb['cpu_vendor']))
+				{
+					$counter++;
+					$pc_info['cpu_vendor'] = '<strong>CPU Vendor:</strong> '.$additionaldb['cpu_vendor'];
+				}
+
+				if ($additionaldb['cpu_model'] != NULL && !empty($additionaldb['cpu_model']))
+				{
+					$counter++;
+					$pc_info['cpu_model'] = '<strong>CPU Model:</strong> ' . $additionaldb['cpu_model'];
+				}
+
+				if ($additionaldb['gpu_vendor'] != NULL && !empty($additionaldb['gpu_vendor']))
+				{
+					$counter++;
+					$pc_info['gpu_vendor'] = '<strong>GPU Vendor:</strong> ' . $additionaldb['gpu_vendor'];
+				}
+
+				if ($additionaldb['gpu_model'] != NULL && !empty($additionaldb['gpu_model']))
+				{
+					$counter++;
+					$pc_info['gpu_model'] = '<strong>GPU Model:</strong> ' . $additionaldb['gpu_model'];
+				}
+
+				if ($additionaldb['gpu_driver'] != NULL && !empty($additionaldb['gpu_driver']))
+				{
+					$counter++;
+					$pc_info['gpu_driver'] = '<strong>GPU Driver:</strong> ' . $additionaldb['gpu_driver'];
+				}
+
+				if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
+				{
+					$counter++;
+					$pc_info['ram_count'] = '<strong>RAM:</strong> '.$additionaldb['ram_count'].'GB';
+				}
+
+				if ($additionaldb['monitor_count'] != NULL && !empty($additionaldb['monitor_count']))
+				{
+					$counter++;
+					$pc_info['monitor_count'] = '<strong>Monitors:</strong> '.$additionaldb['monitor_count'];
+				}
+
+				if ($additionaldb['resolution'] != NULL && !empty($additionaldb['resolution']))
+				{
+					$counter++;
+					$pc_info['resolution'] = '<strong>Resolution:</strong> '.$additionaldb['resolution'];
+				}
+
+				if ($additionaldb['gaming_machine_type'] != NULL && !empty($additionaldb['gaming_machine_type']))
+				{
+					$counter++;
+					$pc_info['gaming_machine_type'] = '<strong>Main gaming machine:</strong> '.$additionaldb['gaming_machine_type'];
+				}
+
+				if ($additionaldb['gamepad'] != NULL && !empty($additionaldb['gamepad']))
+				{
+					$counter++;
+					$pc_info['gamepad'] = '<strong>Gamepad:</strong> '.$additionaldb['gamepad'];
+				}
+				
+				$pc_info['counter'] = $counter;
 				if ($pc_info['counter'] > 0)
 				{
 					$fields_output = '<ul style="list-style-type: none; margin: 0; padding: 0;">';

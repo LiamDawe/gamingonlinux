@@ -36,7 +36,8 @@ class mysql
 	// the main sql query function
 	public function sqlquery($sql, $objects = NULL, $page = NULL, $referrer = NULL)
 	{
-		global $core, $templating;
+		$core = DI::get(core::class);
+		$templating = DI::get(template::class);
 
 		try
 		{
@@ -95,7 +96,7 @@ class mysql
 			else
 			{
 				$core->message("Something went wrong. The admin will be notified", NULL, 1);
-				$this->pdo_error($error->getMessage(), $trace[2]['file'], $STH->interpolateQuery(), core::current_page_url());
+				$this->pdo_error($error->getMessage(), $trace[2]['file'], $STH->interpolateQuery(), $core->current_page_url());
 				echo $templating->output();
 				die();
 			}
@@ -125,30 +126,32 @@ class mysql
 
 	function pdo_error($exception, $page, $sql, $url)
 	{
-		$to = core::config('contact_email');
+		$c = DI::get("core");
+		$to = $c->config('contact_email');
 
 		// subject
-		$subject = "GOL PDO Error: " . core::config('site_title');
+		$subject = "GOL PDO Error: " . $c->config('site_title');
 
-		$make_sql_safe = core::make_safe($sql);
-		$make_url_safe = core::make_safe($url);
+
+		$make_sql_safe = $c->make_safe($sql);
+		$make_url_safe = $c->make_safe($url);
 
 		// message
 		$message = "
 		<html>
 		<head>
-		<title>A PDO Error Report For ".core::config('site_title')."</title>
+		<title>A PDO Error Report For ".$c->config('site_title')."</title>
 		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 		</head>
 		<body>
-		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_title')."\">
+		<img src=\"" . $c->config('website_url') . $c->config('template') . "/default/images/logo.png\" alt=\"".$c->config('site_title')."\">
 		<br />
 		$exception on page <br />
 		<strong>URL:</strong> $make_url_safe<br />
 		SQL QUERY<br />
 		$make_sql_safe<br />
 		Referring Page<br />
-		$referrer
+		$page
 		</body>
 		</html>";
 
@@ -158,7 +161,9 @@ class mysql
 		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 		// Mail it
-		mail($to, $subject, $message, $headers);
+		// mail($to, $subject, $message, $headers);
+
+		var_dump($exception, $sql, $url, debug_backtrace(false)); die();
 	}
 }
 

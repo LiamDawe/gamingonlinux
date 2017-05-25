@@ -20,7 +20,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 		}
 	}
 
-	article_class::process_categories($article_id);
+	article::process_categories($article_id);
 
 	$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 

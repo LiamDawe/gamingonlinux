@@ -631,9 +631,7 @@ else if (isset($_POST['act']))
 				}
 			}
 
-			
-
-			article_class::process_categories($_POST['article_id']);
+			article::process_categories($_POST['article_id']);
 
 			$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 

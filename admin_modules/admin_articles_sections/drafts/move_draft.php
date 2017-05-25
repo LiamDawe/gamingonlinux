@@ -18,7 +18,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
 	}
 
-	article_class::process_categories($_POST['article_id']);
+	article::process_categories($_POST['article_id']);
 
 	$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 

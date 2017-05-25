@@ -3,6 +3,8 @@ error_reporting(E_ALL);
 
 $file_dir = dirname(__FILE__);
 
+define("APP_ROOT", dirname(__FILE__));
+
 include($file_dir . '/includes/header.php');
 
 if (!$user->can('access_admin'))

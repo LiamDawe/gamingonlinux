@@ -8,7 +8,7 @@ class plugins
 	public static $hooks = [];
 	
 	// load all plugin files
-	function __construct($database, $core)
+	function __construct(db_mysql $database, core $core)
 	{
 		$this->database = $database;
 		$this->core = $core;

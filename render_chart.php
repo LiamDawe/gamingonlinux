@@ -14,7 +14,7 @@ $user = new user($dbl, $core);
 
 include($file_dir . '/includes/class_charts.php');
 
-$charts = new golchart($dbl);
+$charts = new chart($dbl);
 
 if (!core::is_number($_GET['id']))
 {

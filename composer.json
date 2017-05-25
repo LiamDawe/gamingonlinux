@@ -1,0 +1,11 @@
+{
+    "name": "liamdawe/gamingonlinux",
+    "description": "The GamingOnLinux Website",
+    "type": "Project",
+    "license": "MIT",
+    "require": {
+        "php-di/php-di": "^5.4",
+        "phpmailer/phpmailer": "^5.2",
+        "doctrine/cache": "^1.6"
+    }
+}

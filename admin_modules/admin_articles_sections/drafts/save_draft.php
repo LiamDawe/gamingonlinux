@@ -19,7 +19,7 @@ $db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` =
 
 $article_id = $db->grab_id();
 
-article_class::process_categories($article_id);
+article::process_categories($article_id);
 
 $plugins->do_hooks('article_database_entry', $article_id);
 

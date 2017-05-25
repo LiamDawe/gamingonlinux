@@ -286,6 +286,116 @@ CREATE TABLE `article_history` (
 
 -- --------------------------------------------------------
 
+
+--
+-- Table structure for table `articles_categorys`
+--
+
+CREATE TABLE `articles_categorys` (
+  `category_id` int(11) NOT NULL,
+  `category_name` varchar(32) CHARACTER SET utf8 NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `articles_comments`
+--
+
+CREATE TABLE `articles_comments` (
+  `comment_id` int(11) UNSIGNED NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `author_id` int(11) NOT NULL,
+  `guest_username` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `time_posted` int(11) NOT NULL,
+  `comment_text` text COLLATE utf8_bin NOT NULL,
+  `spam` tinyint(1) NOT NULL DEFAULT '0',
+  `spam_report_by` int(11) DEFAULT NULL,
+  `guest_ip` varchar(100) COLLATE utf8_bin NOT NULL,
+  `last_edited` int(11) NOT NULL DEFAULT '0',
+  `last_edited_time` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `articles_subscriptions`
+--
+
+CREATE TABLE `articles_subscriptions` (
+  `user_id` int(11) NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `emails` tinyint(1) NOT NULL DEFAULT '1',
+  `send_email` int(1) NOT NULL DEFAULT '1'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `articles_tagline_gallery`
+--
+
+CREATE TABLE `articles_tagline_gallery` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `filename` text NOT NULL,
+  `name` text NOT NULL,
+  `uploader_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `article_category_reference`
+--
+
+CREATE TABLE `article_category_reference` (
+  `ref_id` int(11) NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `article_corrections`
+--
+
+CREATE TABLE `article_corrections` (
+  `row_id` int(11) NOT NULL,
+  `article_id` int(11) DEFAULT NULL,
+  `date` int(11) DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `correction_comment` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `article_game_assoc`
+--
+
+CREATE TABLE `article_game_assoc` (
+  `id` int(11) NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `game_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `article_history`
+--
+
+CREATE TABLE `article_history` (
+  `id` int(11) NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `date` int(11) NOT NULL,
+  `text` text
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `article_images`
 --
@@ -434,6 +544,26 @@ CREATE TABLE `desktop_environments` (
   `name` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `desktop_environments`
+--
+
+INSERT INTO `desktop_environments` (`id`, `name`) VALUES
+(1, 'Cinnamon'),
+(2, 'Unity'),
+(3, 'KDE Plasma'),
+(4, 'GNOME'),
+(5, 'MATE'),
+(6, 'XFCE'),
+(7, 'LXDE'),
+(9, 'Budgie'),
+(10, 'Enlightenment'),
+(11, 'LXQt'),
+(12, 'Not Listed'),
+(13, 'Window Manager Only'),
+(14, 'Pantheon Shell'),
+(15, 'Deepin Desktop Environment');
+
 -- --------------------------------------------------------
 
 --
@@ -448,6 +578,42 @@ CREATE TABLE `distributions` (
   `fedora-based` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `distributions`
+--
+
+
+INSERT INTO `distributions` (`id`, `name`, `arch-based`, `ubuntu-based`, `fedora-based`) VALUES
+(1, 'Antergos', 1, 0, 0),
+(2, 'Arch', 1, 0, 0),
+(3, 'Chakra', 0, 0, 0),
+(4, 'Debian', 0, 0, 0),
+(5, 'Elementary', 0, 1, 0),
+(6, 'Fedora', 0, 0, 0),
+(7, 'Gentoo', 0, 0, 0),
+(8, 'Kubuntu', 0, 1, 0),
+(9, 'Lubuntu', 0, 1, 0),
+(10, 'Mageia', 0, 0, 0),
+(11, 'Manjaro', 1, 0, 0),
+(12, 'Mint', 0, 1, 0),
+(13, 'openSUSE', 0, 0, 0),
+(14, 'Sabayon', 0, 0, 0),
+(15, 'Slackware', 0, 0, 0),
+(16, 'SteamOS', 0, 0, 0),
+(17, 'Solus', 0, 0, 0),
+(18, 'Ubuntu', 0, 1, 0),
+(19, 'Ubuntu-GNOME', 0, 1, 0),
+(20, 'Ubuntu-MATE', 0, 1, 0),
+(21, 'Xubuntu', 0, 1, 0),
+(22, 'Not Listed', 0, 0, 0),
+(23, 'ZorinOS', 0, 1, 0),
+(24, 'Netrunner', 0, 0, 0),
+(25, 'PCLinuxOS', 0, 0, 0),
+(26, 'KDE neon', 0, 1, 0),
+(27, 'Exherbo', 0, 0, 0),
+(28, 'Peppermint', 0, 1, 0),
+(29, 'Korora', 0, 0, 1),
+(30, 'Void', 0, 0, 0);
 -- --------------------------------------------------------
 
 --

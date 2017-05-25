@@ -15,8 +15,6 @@ class core
 
 	// the users ip address
 	public static $ip;
-	
-	protected $_file_dir;
 
 	// how many pages their are in the pagination being done
 	public $pages;
@@ -39,7 +37,7 @@ class core
 	
 	public static $top_bar_links = [];
 
-	function __construct($database, $file_dir)
+	function __construct(db_mysql $database)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
 		ini_set('session.cookie_httponly', 1);
@@ -199,7 +197,7 @@ class core
 	}
 	
 	// grab a config key
-	public function config($key)
+	public function config($key, $default=null)
 	{
 		if (empty(self::$config))
 		{
@@ -210,15 +208,18 @@ class core
 				self::$config[$config_set['data_key']] = $config_set['data_value'];
 			}
 		}
+		// Return default if key not set
+		if (!isset(self::$config[$key]) && !empty($default)){
+			return $default;
+		}
 
 		// return the requested key with the value in place
-		return self::$config[$key];
+		return (isset(self::$config[$key])?self::$config[$key]:false);
 	}
 
 	// update a single config var
-	function set_config($value, $key)
+	public function set_config($value, $key)
 	{
-		global $db;
 		$this->database->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
 
 		// invalidate the cache
@@ -1121,12 +1122,11 @@ class core
 		return $output;
 	}
 	
-	public function load_modules($options)
+	public function load_modules($module=false, $options=[])
 	{
-		global $db;
-		
+		$options = array_merge( ['db_table' => 'modules'], $options );
 		$module_links = '';
-		$fetch_modules = $db->sqlquery('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC');
+		$fetch_modules = $this->database->run('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC');
 		while ($modules = $fetch_modules->fetch())
 		{
 			// modules allowed for loading
@@ -1135,19 +1135,19 @@ class core
 			if ($modules['sections_link'] == 1)
 			{
 				// sort out links to be placed in the navbar
-				$section_link = self::config('website_url') . 'index.php?module=' . $modules['module_file_name'];
+				$section_link = $this->config('website_url') . 'index.php?module=' . $modules['module_file_name'];
 				if ($this->config('pretty_urls') == 1 && !empty($modules['nice_link']) && $modules['nice_link'] != NULL)
 				{
-					$section_link = self::config('website_url') . $modules['nice_link'];
+					$section_link = $this->config('website_url') . $modules['nice_link'];
 				}
 				self::$top_bar_links[] = '<li><a href="'.$section_link.'">'.$modules['nice_title'].'</a></li>';
 			}
 		}
 
 		// modules loading, first are we asked to load a module, if not use the default
-		if (isset($_GET['module']))
+		if ($module)
 		{
-			if (array_key_exists($_GET['module'], self::$allowed_modules))
+			if (array_key_exists($module, self::$allowed_modules))
 			{
 				self::$current_module = self::$allowed_modules[$_GET['module']];
 			}
@@ -1156,7 +1156,6 @@ class core
 				self::$current_module = self::$allowed_modules['404'];
 			}
 		}
-
 		else
 		{
 			self::$current_module = self::$allowed_modules[$this->config('default_module')];

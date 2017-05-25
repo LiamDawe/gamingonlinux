@@ -5,36 +5,8 @@ error_reporting(-1);
 
 $timer_start = microtime(true);
 
-$db_conf = include $file_dir . '/includes/config.php';
+require APP_ROOT . "/includes/bootstrap.php";
 
-include($file_dir. '/includes/class_mysql.php');
-$db = new mysql($db_conf['host'], $db_conf['username'], $db_conf['password'], $db_conf['database']);
-
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_messages.php');
-$message_map = new message_map();
-
-include($file_dir . '/includes/class_plugins.php');
-$plugins = new plugins($dbl, $core, $file_dir);
-
-include($file_dir . '/includes/class_article.php');
-$article_class = new article_class($dbl, $core, $plugins);
-
-include($file_dir . '/includes/class_bbcode.php');
-$bbcode = new bbcode($dbl, $core, $plugins);
-
-include($file_dir . '/includes/PHPMailer/PHPMailerAutoload.php');
-$mail_class = new PHPMailer();
-include($file_dir . '/includes/class_mail.php');
-
-define('url', $core->config('website_url'));
-
-include($file_dir . '/includes/class_user.php');
 $user = new user($dbl, $core);
 if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {
@@ -43,24 +15,15 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 $user->check_session();
 $user->grab_user_groups();
 
-include($file_dir . '/includes/class_forum.php');
-$forum_class = new forum_class($dbl, $core, $user);
+$forum_class = new forum(DI::get(db_mysql::class), DI::get(core::class), $user);
 
-include($file_dir . '/includes/class_charts.php');
+$templating = DI::get(template::class);
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
-include($file_dir . '/includes/class_template.php');
-
-$templating = new template($core, $core->config('template'));
-
+$theme = 'default';
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
 	$theme = $user->get('theme', $_SESSION['user_id']);
-}
-
-else
-{
-	$theme = 'default';
 }
 
 // get the header template html
@@ -71,23 +34,10 @@ $templating->set('meta_keywords', $core->config('meta_keywords'));
 $templating->set('url', $core->config('website_url'));
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
-// add a gol premium class tag to the body html tag, this is used to ignore gol premium and editors from the ad-blocking stats gathering
-$body_class = '';
-if ($theme == 'default')
+if ($theme != 'default' && $user->check_group(6) == true)
 {
-	$body_class = '';
+	$templating->set('body_class', 'class="dark"');
 }
-else if ($theme != 'default' && $user->check_group(6) == true)
-{
-	$body_class = 'class="dark"';
-}
-
-else
-{
-	$body_class = '';
-}
-
-$templating->set('body_class', $body_class);
 
 $templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for '.$core->config('site_title').'" href="'.$core->config('website_url').'article_rss.php" />');
 
@@ -122,7 +72,7 @@ $templating->set('icon', $branding['icon'] );
 $templating->set('site_title', $branding['title']);
 
 // Here we sort out what modules we are allowed to load, this also grabs links needed for the navbar
-$core->load_modules(['db_table' => 'modules']);
+$core->load_modules( isset($_GET['module'])?$_GET['module']:false );
 
 $section_links = implode('', core::$top_bar_links);
 $templating->set('sections_links', $section_links);
@@ -178,8 +128,7 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 	$templating->set('user_menu', $login_menu);
 	$templating->set('notifications_menu', '');
 
-	}
-
+}
 else if ($_SESSION['user_id'] > 0)
 {
 	// give admin link to who is allowed it, and sort out admin notifications
@@ -284,14 +233,17 @@ else if ($_SESSION['user_id'] > 0)
 
 	// replace everything in the notifications menu block
 	$notifications_menu = $templating->store_replace($notifications_menu,
-	array('alerts_icon' => $alerts_icon,
-	'notifications_total' => $alerts_indicator,
-	'alert_box_type' => $alert_box_type,
-	'message_count' => $messages_indicator,
-	'comments_line' => $new_comments_line,
-	'messages_link' => $messages_html_link,
-	'admin_line' => $admin_line,
-	'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
+		array(
+			'alerts_icon' => $alerts_icon,
+			'notifications_total' => $alerts_indicator,
+			'alert_box_type' => $alert_box_type,
+			'message_count' => $messages_indicator,
+			'comments_line' => $new_comments_line,
+			'messages_link' => $messages_html_link,
+			'admin_line' => $admin_line,
+			'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')
+		)
+	);
 
 	$templating->set('notifications_menu', $notifications_menu);
 }

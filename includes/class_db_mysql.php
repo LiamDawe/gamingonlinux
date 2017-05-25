@@ -105,6 +105,7 @@ class db_mysql extends PDO
 	
 	function pdo_error($exception, $page, $sql, $url)
 	{
+		var_dump($exception, $sql); die();
 		$to = core::config('contact_email');
 
 		// subject
@@ -136,6 +137,6 @@ class db_mysql extends PDO
 		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
 
 		// Mail it
-		mail($to, $subject, $message, $headers);
+		// mail($to, $subject, $message, $headers);
 	}
 }

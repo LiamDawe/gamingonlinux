@@ -1,11 +1,11 @@
 <?php
-class article_class
+class article
 {
 	private $database;
 	private $core;
 	private $plugins;
 	
-	function __construct($database, $core, $plugins)
+	function __construct(db_mysql $database, core $core, $plugins)
 	{
 		$this->database = $database;
 		$this->core = $core;

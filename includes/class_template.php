@@ -29,7 +29,7 @@ class template
 	// the final template to show to the viewer
 	protected $final_output;
 
-	public function __construct($core, $template_folder = NULL)
+	public function __construct(core $core, $template_folder = NULL)
 	{
 		$this->core = $core;
 		
@@ -38,12 +38,12 @@ class template
 			$template_folder = 'default';
 		}
 
-		if (!is_dir($this->core->config('path') . "templates/{$template_folder}"))
+		if (!is_dir($_SERVER['DOCUMENT_ROOT'] .  $this->core->config('path') . "templates/{$template_folder}"))
 		{
 			die("Error loading template folder ($template_folder). " . $_SERVER['DOCUMENT_ROOT'] . $this->core->config('path') . "templates/" . $template_folder);
 		}
 
-		$this->template = $this->core->config('path') . "templates/{$template_folder}";
+		$this->template = $_SERVER['DOCUMENT_ROOT'] . $this->core->config('path') . "templates/{$template_folder}";
 	}
 
 	public function load($file)

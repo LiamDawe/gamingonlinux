@@ -23,7 +23,7 @@ class bbcode
 
 		foreach ($matches[1] as $id)
 		{
-			$charts = new golchart($this->database);
+			$charts = new chart($this->database);
 
 			$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", '<div style="text-align:center; width: 100%;">' . $charts->render($id, NULL, 'charts_labels', 'charts_data') . '</div>', $body);
 		}
@@ -219,7 +219,7 @@ class bbcode
 	// for showing a nicely formatted article info box inside anything called by [article]ID[/article]
 	function replace_article($text, $article_id)
 	{
-		if ($this->core::is_number($article_id))
+		if ($this->core->is_number($article_id))
 		{
 			$get_article = $this->database->run("SELECT 
 				a.`title`, 
@@ -242,7 +242,7 @@ class bbcode
 				
 			$tagline_image = $article_class->tagline_image($article_info);
 			
-			$nice_link =  $this->core::nice_title($article_info['title']) . '.' . $article_info['article_id'];
+			$nice_link =  $this->core->nice_title($article_info['title']) . '.' . $article_info['article_id'];
 			
 			$date = $this->core->format_date($article_info['date']);
 			

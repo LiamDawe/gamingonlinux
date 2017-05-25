@@ -12,7 +12,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $_POST['article_id']));
 
-	article_class::process_categories($_POST['article_id']);
+	article::process_categories($_POST['article_id']);
 
 	$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 

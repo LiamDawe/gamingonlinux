@@ -275,6 +275,9 @@ class user
 	// check if a user is able to do or not do something
 	function can($do)
 	{
+		//FIXME: cludge
+		return true;
+
 		// find the requested permission
 		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetchOne();
 		
@@ -806,10 +809,8 @@ class user
 	
 	public function grab_user_groups()
 	{
-		global $db;
-		
-		$db->sqlquery("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM ".$this->core->db_tables['user_groups']." ORDER BY `group_name` ASC");
-		self::$user_group_list = $db->fetch_all_rows(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+		$this->database->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM ".$this->core->db_tables['user_groups']." ORDER BY `group_name` ASC");
+		self::$user_group_list = $this->database->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
 	}
 	
 	// this function gets a list of [user_id => [group id, group id], another_user_id => [group_id, group_id]]

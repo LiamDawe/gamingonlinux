@@ -1,6 +1,8 @@
 <?php
 $file_dir = dirname(__FILE__);
 
+define("APP_ROOT", dirname(__FILE__));
+
 include($file_dir . '/includes/header.php');
 
 $templating->set_previous('title', ' - User Control Panel', 1);

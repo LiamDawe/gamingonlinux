@@ -1,5 +1,5 @@
 <?php
-class forum_class
+class forum
 {
 	private $database;
 	private $core;

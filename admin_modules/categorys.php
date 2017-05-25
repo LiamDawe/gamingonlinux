@@ -31,7 +31,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		{
 			$core->message('You have to fill in a category name!');
 		}
-
 		else
 		{
 			$checker = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_name` = ?", [$_POST['category_name']])->fetch();
@@ -57,7 +56,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		{
 			$core->message('You have to fill in a category name it cannot be empty!');
 		}
-
 		else
 		{
 			$dbl->run("UPDATE `articles_categorys` SET `category_name` = ? WHERE `category_id` = ?", array($_POST['category_name'], $_POST['category_id']));
@@ -72,7 +70,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		{
 			$core->yes_no('Are you sure you want to delete that category?', "admin.php?module=categorys&amp;category_id={$_POST['category_id']}", "Delete");
 		}
-
 		else if (isset($_POST['no']))
 		{
 			header("Location: admin.php?module=categorys");
@@ -84,7 +81,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			{
 				$core->message('That is not a correct id!');
 			}
-			
 			else
 			{
 				// check category exists
@@ -93,7 +89,6 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				{
 					$core->message('That is not a correct id!');
 				}
-
 				// Delete now
 				else
 				{

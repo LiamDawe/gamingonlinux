@@ -42,12 +42,12 @@ if (!isset($_POST['act']))
 	$db->sqlquery("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC");
 	while ($distros = $db->fetch())
 	{
-			$selected = '';
-			if ($usercpcp['distro'] == $distros['name'])
-			{
-				$selected = 'selected';
-			}
-			$distro_list .= "<option value=\"{$distros['name']}\" $selected>{$distros['name']}</option>";
+		$selected = '';
+		if ($usercpcp['distro'] == $distros['name'])
+		{
+			$selected = 'selected';
+		}
+		$distro_list .= "<option value=\"{$distros['name']}\" $selected>{$distros['name']}</option>";
 	}
 	$templating->set('distro_list', $distro_list);
 
@@ -56,12 +56,12 @@ if (!isset($_POST['act']))
 	$db->sqlquery("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC");
 	while ($desktops = $db->fetch())
 	{
-			$selected = '';
-			if ($additional['desktop_environment'] == $desktops['name'])
-			{
-				$selected = 'selected';
-			}
-			$desktop_list .= "<option value=\"{$desktops['name']}\" $selected>{$desktops['name']}</option>";
+		$selected = '';
+		if ($additional['desktop_environment'] == $desktops['name'])
+		{
+			$selected = 'selected';
+		}
+		$desktop_list .= "<option value=\"{$desktops['name']}\" $selected>{$desktops['name']}</option>";
 	}
 	$templating->set('desktop_list', $desktop_list);
 

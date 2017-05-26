@@ -1,23 +1,10 @@
 <?php
-$file_dir = dirname( dirname( dirname(__FILE__) ) );
+define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
-$db_conf = include $file_dir . '/includes/config.php';
+require APP_ROOT . "/includes/bootstrap.php";
 
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-// setup the templating, if not logged in default theme, if logged in use selected theme
-include($file_dir . '/includes/class_template.php');
+$forum_class = new forum($dbl, $core);
 $templating = new template($core, $core->config('template'));
-
-include($file_dir . '/includes/class_plugins.php');
-$plugins = new plugins($dbl, $core, $file_dir);
-
-include($file_dir . '/includes/class_forum.php');
-$forum_class = new forum_class($dbl, $core);
 
 if(isset($_GET['post_id']))
 {
@@ -33,7 +20,7 @@ if(isset($_GET['post_id']))
 			if ($permalink_info)
 			{
 				include($file_dir . '/includes/class_article.php');
-				$article_class = new article_class($dbl, $core, $plugins);
+				$article_class = new article($dbl, $core, $plugins);
 				
 				$permalink = $article_class->get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
 				$templating->set('permalink', $permalink);

@@ -238,7 +238,7 @@ class bbcode
 				a.`article_id` = ?", [$article_id]);
 			$article_info = $get_article->fetch();
 			
-			$article_class = new article_class($this->database, $this->core, $this->plugins);
+			$article_class = new article($this->database, $this->core, $this->plugins);
 				
 			$tagline_image = $article_class->tagline_image($article_info);
 			

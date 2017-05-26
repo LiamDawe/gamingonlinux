@@ -2,15 +2,10 @@
 header('Content-type: text/calendar; charset=utf-8');
 header('Content-Disposition: attachment; filename=calendar.ical');
 
-$file_dir = dirname(__FILE__);
+define("APP_ROOT", dirname(__FILE__));
 
-$db_conf = include $file_dir . '/includes/config.php';
+require APP_ROOT . "/includes/bootstrap.php";
 
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
 // the iCal date format. Note the Z on the end indicates a UTC timestamp.
 define('DATE_ICAL', 'Ymd\THis\Z');
 

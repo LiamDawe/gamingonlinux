@@ -1,7 +1,7 @@
 <?php
-$file_dir = dirname(__FILE__);
+define("APP_ROOT", dirname(__FILE__));
 
-include($file_dir . '/includes/header.php');
+include(APP_ROOT . '/includes/header.php');
 
 if ($core->config('goty_page_open') == 0)
 {
@@ -79,7 +79,7 @@ if (isset($_GET['category_id']) && isset($_GET['view']) && $_GET['view'] == 'top
 	else
 	{
 		$core->message('Voting is currently open! You can only see the top 10 when it is finished to help prevent a voting bias.');
-		include($file_dir . '/includes/footer.php');
+		include(APP_ROOT . '/includes/footer.php');
 		die();
 	}
 }
@@ -93,7 +93,7 @@ if (!isset($_POST['act']))
 			$templating->block('top10', 'goty');
 			$templating->set('category_name', $cat['category_name']);
 
-			require_once($file_dir . '/includes/SVGGraph/SVGGraph.php');
+			require_once(APP_ROOT . '/includes/SVGGraph/SVGGraph.php');
 			$labels = array();
 
 			$settings = array('graph_title' => $cat['category_name'], 'auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside', 'show_grid_h' => false, 'label_h' => 'Total Votes');
@@ -542,4 +542,4 @@ if (isset($_POST['act']))
 
 $templating->block('bottom', 'goty');
 
-include($file_dir . '/includes/footer.php');
+include(APP_ROOT . '/includes/footer.php');

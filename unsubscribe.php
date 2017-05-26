@@ -1,7 +1,7 @@
 <?php
-$file_dir = dirname(__FILE__);
+define("APP_ROOT", dirname(__FILE__));
 
-include($file_dir . '/includes/header.php');
+include(APP_ROOT . '/includes/header.php');
 
 $user_id = '';
 if (isset($_GET['user_id']))

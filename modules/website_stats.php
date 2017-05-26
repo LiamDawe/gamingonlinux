@@ -11,23 +11,20 @@ $templating->block('users');
 $templating->set('site_title', $core->config('site_title'));
 $templating->set('total_users', number_format($core->config('total_users')));
 
-$count_new_users = $db->sqlquery("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM ".$core->db_tables['users']." WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)");
-$count_monthly_users = $count_new_users->fetch();
+$count_monthly_users = $dbl->run("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM ".$core->db_tables['users']." WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)")->fetchOne();
 
-$templating->set('users_month', number_format($count_monthly_users['counter']));
+$templating->set('users_month', number_format($count_monthly_users));
 
-$db->sqlquery("SELECT COUNT(article_id) as `total` FROM `articles` WHERE `active` = 1");
-$total_articles = $db->fetch();
+$total_articles = $dbl->run("SELECT COUNT(article_id) as `total` FROM `articles` WHERE `active` = 1")->fetchOne();
 
-$templating->set('total_articles', number_format($total_articles['total']));
+$templating->set('total_articles', number_format($total_articles));
 
 // count comments posted in the last 24 hours
 $last_24_hours = time() - 86400;
 
-$db->sqlquery("SELECT COUNT(comment_id) as total FROM `articles_comments` WHERE `time_posted` > ?", array($last_24_hours));
-$comments_24 = $db->fetch();
+$comments_24 = $dbl->run("SELECT COUNT(comment_id) as total FROM `articles_comments` WHERE `time_posted` > ?", array($last_24_hours))->fetchOne();
 
-$templating->set('total_comments', number_format($comments_24['total']));
+$templating->set('total_comments', number_format($comments_24));
 
 // list who wrote articles for GOL since the start of last month
 $prev_month = date('n', strtotime('-1 months'));
@@ -40,7 +37,7 @@ if ($prev_month == 12)
 $last_month_start = mktime(0, 0, 0, $prev_month, 1, $year_selector);
 $now = time();
 
-$article_list = $db->sqlquery("SELECT
+$article_list = $dbl->run("SELECT
     COUNT(DISTINCT a.article_id) AS `counter`,
     u.`username`,
     u.`user_id`,
@@ -64,7 +61,7 @@ ORDER BY
     `counter`
 DESC,
     `last_date`
-DESC");
+DESC")->fetch_all();
 
 $templating->block('articles', 'website_stats');
 $templating->set('site_title', $core->config('site_title'));
@@ -87,7 +84,7 @@ else
 
 $counter = 0;
 
-while ($fetch_authors = $article_list->fetch())
+foreach ($article_list as $fetch_authors)
 {
 	if ($counter == 0)
 	{
@@ -118,8 +115,8 @@ $templating->block('hot_articles');
 $timestamp = strtotime("-3 months");
 
 $hot_articles = '';
-$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 AND `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp));
-while ($get_hot = $db->fetch())
+$query_hot = $dbl->run("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 AND `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp))->fetch_all();
+foreach ($query_hot as $get_hot)
 {
 	$hot_articles .= '<li><a href="'.$article_class->get_link($get_hot['article_id'], $get_hot['title']).'">'.$get_hot['title'].'</a> ('.number_format($get_hot['views']).')</li>';
 }
@@ -131,8 +128,8 @@ $templating->block('top_articles');
 
 $article_list = '';
 // top 10 articles of all time by views
-$db->sqlquery("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 ORDER BY `views` DESC LIMIT 5");
-while ($top_articles = $db->fetch())
+$query_top = $dbl->run("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 ORDER BY `views` DESC LIMIT 5")->fetch_all();
+foreach ($query_top as $top_articles)
 {
 	$article_list .= '<li><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
 }

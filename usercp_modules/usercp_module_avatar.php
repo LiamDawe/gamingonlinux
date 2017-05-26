@@ -1,5 +1,4 @@
 <?php
-include($file_dir . '/includes/class_image_uploads.php');
 $image_upload = new image_upload($core);
 
 $templating->set_previous('title', 'Change your avatar', 1);

@@ -19,7 +19,6 @@ if(isset($_GET['post_id']))
 			$permalink_info = $dbl->run("SELECT c.`comment_id`, a.`article_id`, a.`slug` FROM `articles_comments` c LEFT JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", [$post_id])->fetch();
 			if ($permalink_info)
 			{
-				include($file_dir . '/includes/class_article.php');
 				$article_class = new article($dbl, $core, $plugins);
 				
 				$permalink = $article_class->get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);

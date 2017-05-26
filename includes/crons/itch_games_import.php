@@ -1,15 +1,7 @@
 <?php
-$file_dir = dirname( dirname( dirname(__FILE__) ) );
+define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) );
 
-$db_conf = include $file_dir . '/includes/config.php';
-
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_mail.php');
+require APP_ROOT . "/includes/bootstrap.php";
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 $url = 'https://itch.io/feed/new.xml';
@@ -62,7 +54,7 @@ if (!empty($games_added))
 {
 	if ($core->config('send_emails') == 1)
 	{
-		$mail = new mail($core->config('contact_email'), 'The itch new games importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from itch.io!<br />' . $games_added, '');
-		$mail->send();
+		$mail = new mailer($core);
+		$mail->sendMail($core->config('contact_email'), 'The itch new games importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from itch.io!<br />' . $games_added, "New games added to the https://www.gamingonlinux.com/index.php?module=calendar calendar from itch.io!\r\n" . $games_added);
 	}
 }

@@ -4,17 +4,9 @@
 // http://simplehtmldom.sourceforge.net/
 include('simple_html_dom.php');
 
-$file_dir = dirname ( dirname( dirname( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname ( dirname( dirname( dirname(__FILE__) ) ) ) );
 
-$db_conf = include $file_dir . '/includes/config.php';
-
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_mail.php');
+require APP_ROOT . "/includes/bootstrap.php";
 
 $stop = 0;
 $games_added_list = '';
@@ -113,7 +105,7 @@ if (!empty($games_added_list))
 {
   if ($core->config('send_emails') == 1)
   {
-    $mail = new mail($core->config('contact_email'), 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar!</a><br />' . $games_added_list, '');
-    $mail->send();
+		$mail = new mailer($core);
+		$mail->sendMail($core->config('contact_email'), 'The Steam calendar importer has added new games', 'New games added to the <a href="https://www.gamingonlinux.com/index.php?module=calendar">calendar</a> from Steam!<br />' . $games_added_list, "New games added to the https://www.gamingonlinux.com/index.php?module=calendar calendar from Steam!\r\n" . $games_added_list);
   }
 }

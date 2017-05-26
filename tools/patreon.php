@@ -42,9 +42,11 @@ if (isset($_POST['go']))
 					If you haven't, please reply with your username or email attached to a GOL account. You're likely using a different email address on Patreon to what you use on GOL.<br />
 					<br />
 					Thank you.";
-
-					$mail = new mail($line[2], 'Thank you for supporting GamingOnLinux, more info may be needed', $html_message, '', 'Reply-To: ' . core::config('contact_email'));
-					$mail->send();
+					
+					$plain_message = "Hello from Liam at GamingOnLinux.com! Thank you for supporting me on Patreon. I have tried to match your Patreon registered email up to a username on the website, but I didn't find anything.  Don't worry, if you already have your GOL Supporter badge you can ignore this email! If you haven't, please reply with your username or email attached to a GOL account. You're likely using a different email address on Patreon to what you use on GOL. Thank you.";
+					
+					$mail = new mailer($core);
+					$mail->sendMail($line[2], 'Thank you for supporting GamingOnLinux, more info may be needed', $html_message, $plain_message, ['name' => 'Liam Dawe', 'email' => 'contact@gamingonlinux.com']);
 
 					echo "Email sent to " . $line[2] . '<br />';
 				}

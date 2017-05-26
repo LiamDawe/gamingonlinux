@@ -1,16 +1,7 @@
 <?php
-$file_dir = dirname(__FILE__);
+define("APP_ROOT", dirname(__FILE__));
 
-$db_conf = include $file_dir . '/includes/config.php';
-
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_user.php');
-$user = new user($dbl, $core);
+require APP_ROOT . "/includes/bootstrap.php";
 
 if ($core->config('forum_rss') == 1)
 {

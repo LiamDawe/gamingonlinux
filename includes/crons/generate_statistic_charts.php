@@ -1,13 +1,7 @@
 <?php
-$file_dir = dirname( dirname( dirname(__FILE__) ) );
+define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) );
 
-$db_conf = include $file_dir . '/includes/config.php';
-
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
+require APP_ROOT . "/includes/bootstrap.php";
 
 // don't count people who haven't logged in for six months, need to test this more before putting it in
 // last time i ran it, it already cut off a ton of people even though the system has only been around a few weeks, which wasn't right at all

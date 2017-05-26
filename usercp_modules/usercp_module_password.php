@@ -45,8 +45,8 @@ if (isset($_POST['act']))
 		// Mail it
 		if ($core->config('send_emails') == 1)
 		{
-			$mail = new mail($grab_current_password['email'], $subject, $html_message, $plain_message);
-			$mail->send();
+			$mail = new mailer($core);
+			$mail->sendMail($grab_current_password['email'], $subject, $html_message, $plain_message);
 		}
 		
 		$_SESSION['message'] = 'password-sent';
@@ -116,8 +116,8 @@ if (isset($_POST['act']))
 		// Mail it
 		if ($core->config('send_emails') == 1)
 		{
-			$mail = new mail($grab_current_password['email'], $subject, $html_message, $plain_message);
-			$mail->send();
+			$mail = new mailer($core);
+			$mail->sendMail($grab_current_password['email'], $subject, $html_message, $plain_message);
 		}
 
 		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `password` = ? WHERE `user_id` = ?", array($new_password_safe, $_SESSION['user_id']));

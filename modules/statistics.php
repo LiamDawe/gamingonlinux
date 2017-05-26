@@ -67,7 +67,7 @@ foreach($charts_list as $chart)
   $db->sqlquery("SELECT `id` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $previous_group['grouping_id']));
   $get_last_chart_id = $db->fetch();
   
-  $charts = new golchart($dbl);
+  $charts = new charts($dbl);
   
   $options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC'];
 

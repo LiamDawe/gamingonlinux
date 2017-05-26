@@ -15,8 +15,6 @@ class core
 
 	// the users ip address
 	public static $ip;
-	
-	protected $_file_dir;
 
 	// how many pages their are in the pagination being done
 	public $pages;
@@ -39,7 +37,7 @@ class core
 	
 	public static $top_bar_links = [];
 
-	function __construct($database, $file_dir)
+	function __construct($database)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
 		ini_set('session.cookie_httponly', 1);
@@ -218,7 +216,6 @@ class core
 	// update a single config var
 	function set_config($value, $key)
 	{
-		global $db;
 		$this->database->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
 
 		// invalidate the cache

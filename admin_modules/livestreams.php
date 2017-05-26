@@ -322,8 +322,8 @@ if (isset($_POST['act']))
 			// Mail it
 			if ($core->config('send_emails') == 1)
 			{
-				$mail = new mail($livestream['email'], $subject, $html_message, $plain_message);
-				$mail->send();
+				$mail = new mailer($core);
+				$mail->sendMail($livestream['email'], $subject, $html_message, $plain_message);
 			}
 
 			$db->sqlquery("DELETE FROM `livestreams` WHERE `row_id` = ?", array($_POST['id']));
@@ -374,8 +374,8 @@ if (isset($_POST['act']))
 		// Mail it
 		if ($core->config('send_emails') == 1)
 		{
-			$mail = new mail($livestream['email'], $subject, $html_message, $plain_message);
-			$mail->send();
+			$mail = new mailer($core);
+			$mail->sendMail($livestream['email'], $subject, $html_message, $plain_message);
 		}
 
 		$db->sqlquery("UPDATE `livestreams` SET `accepted` = 1, `title` = ?, `date` = ?, `end_date` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community_name, $stream_url, $_POST['id']));

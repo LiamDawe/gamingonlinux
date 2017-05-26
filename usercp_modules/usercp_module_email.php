@@ -75,8 +75,8 @@ if (isset($_POST['Update']))
 	// Mail it
 	if ($core->config('send_emails') == 1)
 	{
-		$mail = new mail($grab_email['email'], $subject, $html_message, $plain_message);
-		$mail->send();
+		$mail = new mailer($core);
+		$mail->sendMail($grab_email['email'], $subject, $html_message, $plain_message);
 	}
 
 	$_SESSION['message'] = 'saved';

@@ -1,7 +1,7 @@
 <?php
-$file_dir = dirname(__FILE__);
+define("APP_ROOT", dirname(__FILE__));
 
-include($file_dir . '/includes/header.php');
+include(APP_ROOT . '/includes/header.php');
 
 $templating->set_previous('title', ' - User Control Panel', 1);
 
@@ -55,7 +55,7 @@ if (isset($_SESSION['message']))
 
 if (in_array($module, $modules_allowed))
 {
-	include($file_dir . "/usercp_modules/usercp_module_$module.php");
+	include(APP_ROOT . "/usercp_modules/usercp_module_$module.php");
 }
 
 else
@@ -74,7 +74,7 @@ foreach ($blocks as $block)
 {
 	if ($block['left'] == 1 && $block['block_link'] != NULL)
 	{
-		include("usercp_blocks/{$block['block_link']}.php");
+		include(APP_ROOT . "/usercp_blocks/{$block['block_link']}.php");
 	}
 
 	else if ($block['left'] == 1 && $block['block_link'] == NULL)
@@ -98,5 +98,5 @@ foreach ($blocks as $block)
 
 $templating->block('right_end', 'mainpage');
 
-include($file_dir . '/includes/footer.php');
+include(APP_ROOT . '/includes/footer.php');
 ?>

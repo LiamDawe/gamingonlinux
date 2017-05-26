@@ -6,7 +6,7 @@ class message_map
 
 	function __construct($file='main')
 	{
-		$main_file = 'includes/messages/' . $file . '.php';
+		$main_file = APP_ROOT . '/includes/messages/' . $file . '.php';
 		if (!file_exists($main_file))
 		{
 			throw new InvalidArgumentException("Missing main message file, cannot continue!");
@@ -23,7 +23,7 @@ class message_map
 		
 		if ($file != NULL)
 		{
-			$module_file = 'includes/messages/' . $file . '_messages.php';
+			$module_file = APP_ROOT . '/includes/messages/' . $file . '_messages.php';
 			if (file_exists($module_file))
 			{
 				$module_messages = include $module_file;

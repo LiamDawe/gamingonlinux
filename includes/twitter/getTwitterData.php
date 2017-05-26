@@ -1,23 +1,14 @@
 <?php
 session_start();
 
-$file_dir = dirname( dirname( dirname(__FILE__) ) );
+define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
-$db_conf = include $file_dir . '/includes/config.php';
+require APP_ROOT . "/includes/bootstrap.php";
 
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_user.php');
 $user = new user($dbl, $core);
 
-include($file_dir . '/includes/class_mail.php');
-
-include ($file_dir . "/includes/twitter/twitteroauth.php");
-include ($file_dir . "/includes/twitter/functions.php");
+include (APP_ROOT . "/includes/twitter/twitteroauth.php");
+include (APP_ROOT . "/includes/twitter/functions.php");
 
 define('YOUR_CONSUMER_KEY', $core->config('tw_consumer_key'));
 define('YOUR_CONSUMER_SECRET', $core->config('tw_consumer_skey'));

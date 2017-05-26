@@ -48,9 +48,9 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 		<p>If you're new, consider saying hello in the <a href=\"" . $core->config('website_url') . "forum/\" target=\"_blank\">forum</a>.</p>";
 		
 		$plain_message = 'Hello ' . $_SESSION['username'] . ', thanks for registering on ' . $core->config('website_url') . '! You need to activate your account before you can post, do so here: ' . $core->config('website_url') . 'index.php?module=activate_user&user_id=' . $_SESSION['user_id'] . '&code=' . $code;
-
-		$mail = new mail($get_active['email'], $subject, $html_message, $plain_message);
-		$mail->send();
+		
+		$mail = new mailer($core);
+		$mail->sendMail($get_active['email'], $subject, $html_message, $plain_message);
 
 		$core->message("We have re-sent a new activation code {$_SESSION['username']}, <strong>please check your emails for the activation link</strong>! <a href=\"index.php\">Click here to return</a>");
 	}

@@ -1,9 +1,7 @@
 <?php
-error_reporting(E_ALL);
+define("APP_ROOT", dirname(__FILE__));
 
-$file_dir = dirname(__FILE__);
-
-include($file_dir . '/includes/header.php');
+include(APP_ROOT . '/includes/header.php');
 
 if (!$user->can('access_admin'))
 {
@@ -62,7 +60,7 @@ if (in_array($module, $modules_allowed))
 		$message_map->display_message('admin/'.$module, $_SESSION['message'], $extra);
 	}
 	
-	include($file_dir . "/admin_modules/$module.php");
+	include(APP_ROOT . "/admin_modules/$module.php");
 }
 
 else
@@ -89,7 +87,7 @@ foreach ($blocks as $block)
 {
 	if ($block['block_link'] != NULL)
 	{
-			include($file_dir . "/admin_blocks/admin_block_{$block['block_link']}.php");
+			include(APP_ROOT . "/admin_blocks/admin_block_{$block['block_link']}.php");
 	}
 
 	else if ($block['block_link'] == NULL)
@@ -102,5 +100,5 @@ foreach ($blocks as $block)
 
 $templating->block('right_end', 'mainpage');
 
-include($file_dir . '/includes/footer.php');
+include(APP_ROOT . '/includes/footer.php');
 ?>

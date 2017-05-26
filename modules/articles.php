@@ -75,7 +75,7 @@ if (isset($view))
 		$templating->block('category');
 		$templating->set('category', $get_category['category_name']);
 		
-		article_class::display_category_picker();
+		article::display_category_picker();
 		
 		$safe_ids[] = $get_category['category_id'];
 		
@@ -119,7 +119,7 @@ if (isset($view))
 			$categorys_ids = $_GET['catid'];
 		}
 		
-		article_class::display_category_picker($categorys_ids);
+		article::display_category_picker($categorys_ids);
 		
 		// sanitize, force to int as that's what we require
 		foreach ($categorys_ids as $k => $make_safe)

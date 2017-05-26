@@ -1,9 +1,7 @@
 <?php
-error_reporting(E_ALL);
+define("APP_ROOT", dirname(__FILE__));
 
-$file_dir = dirname(__FILE__);
-
-include($file_dir . '/includes/header.php');
+include(APP_ROOT . '/includes/header.php');
 
 if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 {
@@ -214,7 +212,7 @@ foreach ($blocks as $block)
 	// PHP BLOCKS
 	if ($block['block_link'] != NULL)
 	{
-		include($file_dir . "/blocks/{$block['block_link']}.php");
+		include(APP_ROOT . "/blocks/{$block['block_link']}.php");
 	}
 
 	// CUSTOM BLOCKS
@@ -273,5 +271,5 @@ foreach ($blocks as $block)
 
 $templating->block('right_end', 'mainpage');
 
-include($file_dir . '/includes/footer.php');
+include(APP_ROOT . '/includes/footer.php');
 ?>

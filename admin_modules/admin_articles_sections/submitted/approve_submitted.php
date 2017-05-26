@@ -70,7 +70,7 @@ else
 			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 		}
 
-		article_class::process_categories($_POST['article_id']);
+		article::process_categories($_POST['article_id']);
 
 		$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 
@@ -105,7 +105,7 @@ else
 			$email = $check_article['email'];
 		}
 		
-		$article_link = article_class::get_link($_POST['article_id'], $checked['slug']);
+		$article_link = article::get_link($_POST['article_id'], $checked['slug']);
 
 		// subject
 		$subject = 'Your article was approved and published on ' . $core->config('site_title');
@@ -116,9 +116,9 @@ else
 		$plain_message = 'We have accepted your article titled "'.$checked['title'].'" on '.$core->config('site_title').', you can see it here: '.$article_link;
 		
 		if ($core->config('send_emails') == 1)
-		{
-			$mail = new mail($email, $subject, $html_message, $plain_message);
-			$mail->send();
+		{			
+			$mail = new mailer($core);
+			$mail->sendMail($email, $subject, $html_message, $plain_message);
 		}
 
 		include($core->config('path') . 'includes/telegram_poster.php');

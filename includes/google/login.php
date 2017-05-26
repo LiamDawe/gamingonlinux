@@ -1,24 +1,15 @@
 <?php
 session_start();
 
-$file_dir = dirname( dirname( dirname(__FILE__) ) );
+define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
-$db_conf = include $file_dir . '/includes/config.php';
+require APP_ROOT . "/includes/bootstrap.php";
 
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_user.php');
 $user = new user($dbl, $core);
 
-include($file_dir . '/includes/class_mail.php');
+include (APP_ROOT . "/includes/google/functions.php");
 
-include ($file_dir . "/includes/google/functions.php");
-
-require_once ($file_dir . '/includes/google/libraries/Google/autoload.php');
+require_once (APP_ROOT . '/includes/google/libraries/Google/autoload.php');
 
 //Insert your cient ID and secret 
 //You can get it from : https://console.developers.google.com/
@@ -87,8 +78,8 @@ if (isset($_GET['code']))
 
 		$user->new_login($userdata, $generated_session);
 
-		setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', core::config('cookie_domain'));
-		setcookie('gol_session', $generated_session,  time()+31556926, '/', core::config('cookie_domain'));
+		setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', $core->config('cookie_domain'));
+		setcookie('gol_session', $generated_session,  time()+31556926, '/', $core->config('cookie_domain'));
 
 		header("Location: /");
 		die();

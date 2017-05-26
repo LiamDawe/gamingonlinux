@@ -1,5 +1,5 @@
 <?php
-class article_class
+class article
 {
 	private $database;
 	private $core;

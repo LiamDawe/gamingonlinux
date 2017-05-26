@@ -88,8 +88,8 @@ if (isset($_POST['act']))
 			// Mail it
 			if ($core->config('send_emails') == 1)
 			{
-				$mail = new mail($emailer['email'], $subject, $html_message, $plain_message);
-				$mail->send();
+				$mail = new mailer($core);
+				$mail->sendMail($emailer['email'], $subject, $html_message, $plain_message);
 			}
 		}
 

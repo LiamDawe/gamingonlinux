@@ -5,36 +5,8 @@ error_reporting(-1);
 
 $timer_start = microtime(true);
 
-$db_conf = include $file_dir . '/includes/config.php';
+require APP_ROOT . "/includes/bootstrap.php";
 
-include($file_dir. '/includes/class_mysql.php');
-$db = new mysql($db_conf['host'], $db_conf['username'], $db_conf['password'], $db_conf['database']);
-
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_messages.php');
-$message_map = new message_map();
-
-include($file_dir . '/includes/class_plugins.php');
-$plugins = new plugins($dbl, $core, $file_dir);
-
-include($file_dir . '/includes/class_article.php');
-$article_class = new article_class($dbl, $core, $plugins);
-
-include($file_dir . '/includes/class_bbcode.php');
-$bbcode = new bbcode($dbl, $core, $plugins);
-
-include($file_dir . '/includes/PHPMailer/PHPMailerAutoload.php');
-$mail_class = new PHPMailer();
-include($file_dir . '/includes/class_mail.php');
-
-define('url', $core->config('website_url'));
-
-include($file_dir . '/includes/class_user.php');
 $user = new user($dbl, $core);
 if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {
@@ -43,14 +15,9 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 $user->check_session();
 $user->grab_user_groups();
 
-include($file_dir . '/includes/class_forum.php');
-$forum_class = new forum_class($dbl, $core, $user);
-
-include($file_dir . '/includes/class_charts.php');
+$forum_class = new forum($dbl, $core, $user);
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
-include($file_dir . '/includes/class_template.php');
-
 $templating = new template($core, $core->config('template'));
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)

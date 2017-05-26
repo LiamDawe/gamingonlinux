@@ -237,8 +237,8 @@ if ($core->config('allow_registrations') == 1)
 
 					$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on '.$core->config('site_title').'. You need to activate your account before you can post! Go here to activate: '.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
 
-					$mail = new mail($_POST['uemail'], $subject, $html_message, $plain_message);
-					$mail->send();
+					$mail = new mailer($core);
+					$mail->sendMail($_POST['uemail'], $subject, $html_message, $plain_message);
 
 					$_SESSION['message'] = 'new_account';
 					$_SESSION['message_extra'] = $_POST['username'];

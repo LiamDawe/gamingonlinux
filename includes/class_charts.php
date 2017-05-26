@@ -1,5 +1,5 @@
 <?php
-class golchart
+class charts
 {
 	// the required db connection
 	private $database;

@@ -23,7 +23,7 @@ class bbcode
 
 		foreach ($matches[1] as $id)
 		{
-			$charts = new golchart($this->database);
+			$charts = new chart($this->database);
 
 			$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", '<div style="text-align:center; width: 100%;">' . $charts->render($id, NULL, 'charts_labels', 'charts_data') . '</div>', $body);
 		}

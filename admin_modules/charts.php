@@ -107,7 +107,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$chart_info = $db->fetch();
 			
-			$charts = new golchart($dbl);
+			$charts = new chart($dbl);
 			
 			$templating->block('chart', 'admin_modules/admin_module_charts');
 			$templating->set('chart', $charts->render($chart_id, NULL, 'charts_labels', 'charts_data'));
@@ -177,7 +177,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				}
 			}
 			
-			$db->sqlquery("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?, `grouped` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title, $grouped));
+			$dbl->run("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?, `grouped` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title, $grouped));
 
 			$new_chart_id = $db->grab_id();
 
@@ -191,7 +191,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				}
 
 				$label = core::make_safe($label);
-				$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?, `colour` = ?", array($new_chart_id, $label, $this_label_colour));
+				$dbk->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?, `colour` = ?", array($new_chart_id, $label, $this_label_colour));
 				$new_label_id = $db->grab_id();
 
 				// sort the data out for grouped charts
@@ -203,7 +203,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 					{
 						$data_series = explode(',',$dat);
 						
-						$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?", array($new_chart_id, $new_label_id, $data_series[0], trim($data_series[1])));
+						$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?", array($new_chart_id, $new_label_id, $data_series[0], trim($data_series[1])));
 
 						$core->message("Data $dat added!");
 					}
@@ -214,7 +214,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				{
 					$data_key = $key+1;
 					$data = $_POST['data-'.$data_key];
-					$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $data));
+					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $data));
 					
 					$core->message("Data $data added!");
 				}
@@ -251,16 +251,16 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		{
 			if (isset($_POST['stat_chart']) && $_POST['stat_chart'] == 1)
 			{
-				$db->sqlquery("DELETE FROM `user_stats_charts` WHERE `id` = ?", array($_GET['id']));
-				$db->sqlquery("DELETE FROM `user_stats_charts_data` WHERE `chart_id` = ?", array($_GET['id']));
-				$db->sqlquery("DELETE FROM `user_stats_charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
+				$dbl->run("DELETE FROM `user_stats_charts` WHERE `id` = ?", array($_GET['id']));
+				$dbl->run("DELETE FROM `user_stats_charts_data` WHERE `chart_id` = ?", array($_GET['id']));
+				$dbl->run("DELETE FROM `user_stats_charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
 				header("Location: /admin.php?module=charts&view=manage_stats&message=deleted");
 			}
 			else
 			{
-				$db->sqlquery("DELETE FROM `charts` WHERE `id` = ?", array($_GET['id']));
-				$db->sqlquery("DELETE FROM `charts_data` WHERE `chart_id` = ?", array($_GET['id']));
-				$db->sqlquery("DELETE FROM `charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
+				$dbl->run("DELETE FROM `charts` WHERE `id` = ?", array($_GET['id']));
+				$dbl->run("DELETE FROM `charts_data` WHERE `chart_id` = ?", array($_GET['id']));
+				$dbl->run("DELETE FROM `charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
 				header("Location: /admin.php?module=charts&view=manage&message=deleted");
 			}
 		}
@@ -278,9 +278,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		}
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("DELETE FROM `user_stats_charts` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
-			$db->sqlquery("DELETE FROM `user_stats_charts_data` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
-			$db->sqlquery("DELETE FROM `user_stats_charts_labels` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
+			$dbl->run("DELETE FROM `user_stats_charts` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
+			$dbl->run("DELETE FROM `user_stats_charts_data` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
+			$dbl->run("DELETE FROM `user_stats_charts_labels` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
 
 			header("Location: /admin.php?module=charts&view=manage_stats&message=deleted");
 		}
@@ -316,7 +316,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			die();
 		}
 		
-		$db->sqlquery("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $chart_id));
+		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $chart_id));
 		
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'chart';

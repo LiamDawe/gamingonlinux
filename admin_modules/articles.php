@@ -574,8 +574,8 @@ else if (isset($_POST['act']))
 					// Mail it
 					if ($core->config('send_emails') == 1)
 					{
-						$mail = new mail($email_user['email'], $subject, $html_message, $plain_message);
-						$mail->send();
+						$mail = new mailer($core);
+						$mail->sendMail($email_user['email'], $subject, $html_message, $plain_message);
 					}
 				}
 
@@ -633,7 +633,7 @@ else if (isset($_POST['act']))
 
 			
 
-			article_class::process_categories($_POST['article_id']);
+			article::process_categories($_POST['article_id']);
 
 			$plugins->do_hooks('article_database_entry', $_POST['article_id']);
 

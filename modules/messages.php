@@ -675,8 +675,8 @@ else
 				// Mail it
 				if ($core->config('send_emails') == 1)
 				{
-					$mail = new mail($email_data['email'], $subject, $html_message, $plain_message);
-					$mail->send();
+					$mail = new mailer($core);
+					$mail->sendMail($email_data['email'], $subject, $html_message, $plain_message);
 				}
 			}
 		}
@@ -853,8 +853,8 @@ else
 					// Mail it
 					if ($core->config('send_emails') == 1)
 					{
-						$mail = new mail($email_data['email'], $subject, $html_message, $plain_message);
-						$mail->send();
+						$mail = new mailer($core);
+						$mail->sendMail($email_data['email'], $subject, $html_message, $plain_message);
 					}
 				}
 			}

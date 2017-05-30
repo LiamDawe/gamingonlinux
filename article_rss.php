@@ -19,8 +19,8 @@ if ($core->config('articles_rss') == 1)
 	ORDER BY a.`date` DESC
 	LIMIT 1")->fetchOne();
 
-	header('Content-Type: text/xml; charset=utf-8', true);
-	header("Cache-Control: max-age=3600");
+	header('Content-Type: application/rss+xml; charset=utf-8');
+	header("Cache-Control: max-age=600");
 
 	$last_date = gmdate("D, d M Y H:i:s O", $last_time);
 

@@ -10,7 +10,7 @@ if ($_SESSION['user_id'] == 0)
 {
 	$templating->set_previous('title', 'No Access', 1);
 	$core->message('You do not have permissions to view this page! You need to be logged in. <a href="index.php">Please click here to return to the home page</a>.');
-	include($file_dir . '/includes/footer.php');
+	include(APP_ROOT . '/includes/footer.php');
 	die();
 }
 

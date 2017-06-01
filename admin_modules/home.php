@@ -23,6 +23,25 @@ if (!isset($_GET['view']))
 	$templating->set('featured_max', $core->config('editor_picks_limit'));
 
 	$templating->set('featured_ctotal', $core->config('total_featured'));
+	
+	if ($user->check_group(1))
+	{
+		$cron_list = '';
+		$templating->block('crons');
+		$crons = $dbl->run("SELECT `name`, `last_ran` FROM `crons` ORDER BY `last_ran` ASC")->fetch_all();
+		$total_crons = count($crons);
+		$counter = 0;
+		foreach ($crons as $cron)
+		{
+			$cron_list .= '<strong>Name:</strong> ' . $cron['name'] . ' - <strong>Last Ran:</strong> ' . $cron['last_ran'];
+			if ($counter < $total_crons)
+			{
+				$cron_list .= '<br />';
+			}
+			$counter++;
+		}
+		$templating->set('cron_list', $cron_list);
+	}
 
 	// only show admin/editor comments to admins and editors
 	if ($user->check_group([1,2]) == true)

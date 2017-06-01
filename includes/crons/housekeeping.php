@@ -87,3 +87,6 @@ if ($total_to_remove > 0)
 {
 	$dbl->run("UPDATE `config` SET `data_value` = (data_value - $total_to_remove) WHERE `data_key` = 'total_featured'");
 }
+
+// update last ran datetime
+$dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);

@@ -111,7 +111,7 @@ if ($core->config('articles_rss') == 1)
 		{
 			$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
 
-			$text = $bbcode->parse_bbcode($text, 1, 1);
+			$text = $bbcode->parse_bbcode($text, 1);
 		}
 		
 		$xml->startElement('description');

@@ -219,7 +219,7 @@ class bbcode
 	// for showing a nicely formatted article info box inside anything called by [article]ID[/article]
 	function replace_article($text, $article_id)
 	{
-		if ($this->core::is_number($article_id))
+		if ($this->core->is_number($article_id))
 		{
 			$get_article = $this->database->run("SELECT 
 				a.`title`, 
@@ -259,7 +259,7 @@ class bbcode
 		return $text;
 	}
 
-	function parse_bbcode($body, $article = 1, $parse_links = 1, $tagline_image = NULL, $gallery_tagline = NULL)
+	function parse_bbcode($body, $article = 1, $tagline_image = NULL, $gallery_tagline = NULL)
 	{
 		//  get rid of empty BBCode, is there a point in having excess markup?
 		$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
@@ -325,50 +325,32 @@ class bbcode
 			$body = preg_replace($find_resize, $replace_resize, $body);
 		}
 
-		if ($parse_links == 1)
-		{
-			$URLRegex = '/(?:(?<!(\[\/url\]|\[\/url=))(\s|^))'; // No [url]-tag in front and is start of string, or has whitespace in front
-			$URLRegex.= '(';                                    // Start capturing URL
-			$URLRegex.= '(https?|ftps?|ircs?):\/\/';            // Protocol
-			$URLRegex.= '[\w\d\.\/#\_\-\?:=]+';                        // Any non-space character
-			$URLRegex.= ')';                                    // Stop capturing URL
-			$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
+		$URLRegex = '/(?:(?<!(\[\/url\]|\[\/url=))(\s|^))'; // No [url]-tag in front and is start of string, or has whitespace in front
+		$URLRegex.= '(';                                    // Start capturing URL
+		$URLRegex.= '(https?|ftps?|ircs?):\/\/';            // Protocol
+		$URLRegex.= '[\w\d\.\/#\_\-\?:=]+';                        // Any non-space character
+		$URLRegex.= ')';                                    // Stop capturing URL
+		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
 
-			$body = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $body);
+		$body = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $body);
 
-			$find = '~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i';
+		$find = '~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i';
 
-			$replace = '<a href="$1" target="_blank"><img src="$2" alt="image" /></a>';
+		$replace = '<a href="$1" target="_blank"><img src="$2" alt="image" /></a>';
 
-			$body = preg_replace($find, $replace, $body);
+		$body = preg_replace($find, $replace, $body);
 
-			$find = array(
-			"/\[url\=(.+?)\](.+?)\[\/url\]/is",
-			"/\[url\](.+?)\[\/url\]/is"
-			);
+		$find = array(
+		"/\[url\=(.+?)\](.+?)\[\/url\]/is",
+		"/\[url\](.+?)\[\/url\]/is"
+		);
 
-			$replace = array(
-			"<a href=\"$1\" target=\"_blank\">$2</a>",
-			"<a href=\"$1\" target=\"_blank\">$1</a>"
-			);
+		$replace = array(
+		"<a href=\"$1\" target=\"_blank\">$2</a>",
+		"<a href=\"$1\" target=\"_blank\">$1</a>"
+		);
 
-			$body = preg_replace($find, $replace, $body);
-		}
-
-		else if ($parse_links == 0)
-		{
-			$find = array(
-			"/\[url\=(.+?)\](.+?)\[\/url\]/is",
-			"/\[url\](.+?)\[\/url\]/is"
-			);
-
-			$replace = array(
-			"$2",
-			"$1"
-			);
-
-			$body = preg_replace($find, $replace, $body);
-		}
+		$body = preg_replace($find, $replace, $body);
 
 		// remove extra new lines, caused by editors adding a new line after bbcode elements for easier reading when editing
 		$find_lines = array(
@@ -459,7 +441,15 @@ class bbcode
 		"/\[ogg](.+?)\[\/ogg\]/is" 
 			=> '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>',
 		"/(\[split\])(\s)*/is"
-			=> '<hr class="content_split">'
+			=> '<hr class="content_split">',
+		"/\[h1](.+?)\[\/h1]/is"
+			=> '<h1>$1</h1>',
+		"/\[h2](.+?)\[\/h2]/is"
+			=> '<h2>$1</h2>',
+		"/\[h3](.+?)\[\/h3]/is"
+			=> '<h3>$1</h3>',
+		"/\[h4](.+?)\[\/h4]/is"
+			=> '<h4>$1</h4>',
 		);
 
 		$body = $this->emoticons($body);

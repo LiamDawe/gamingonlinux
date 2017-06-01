@@ -34,7 +34,7 @@ if (!isset($_GET['view']))
 		{
 			$templating->block('comment', 'admin_modules/admin_home');
 
-			$comment_text = $bbcode->parse_bbcode($comments['text'], 0, 1);
+			$comment_text = $bbcode->parse_bbcode($comments['text'], 0);
 			$date = $core->format_date($comments['date_posted']);
 
 			$templating->set('admin_comments', "<li><a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a> - {$date}<br /> {$comment_text}</li>");
@@ -51,7 +51,7 @@ if (!isset($_GET['view']))
 	{
 		$templating->block('commentall', 'admin_modules/admin_home');
 
-		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0, 1);
+		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0);
 		$dateall = $core->format_date($commentsall['date_posted']);
 
 		$templating->set('editor_comments', "<li><a href=\"/profiles/{$commentsall['user_id']}\">{$commentsall['username']}</a> - {$dateall}<br /> {$commentall_text}</li>");

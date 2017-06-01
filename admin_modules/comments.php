@@ -137,12 +137,12 @@ if (!isset($_GET['view']))
 
 			if ($article_page == 1)
 			{
-				$templating->set('text', $bbcode->parse_bbcode($article['text'], 1, 1, $tagline_bbcode) . $article_bottom);
+				$templating->set('text', $bbcode->parse_bbcode($article['text'], 1, $tagline_bbcode) . $article_bottom);
 			}
 
 			else
 			{
-				$templating->set('text', $bbcode->parse_bbcode($article['page'.$article_page], 1, 1, $tagline_bbcode) . $article_bottom);
+				$templating->set('text', $bbcode->parse_bbcode($article['page'.$article_page], 1, $tagline_bbcode) . $article_bottom);
 			}
 
 			$pages = 1;

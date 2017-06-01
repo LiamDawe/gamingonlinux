@@ -41,7 +41,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
 		$comment_avatar = $user->sort_avatar($commentsall['user_id']);
 
-		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0, 1);
+		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0);
 		$dateall = $core->format_date($commentsall['date_posted']);
 		$templating->set('username', '<a href="/profiles/' . $commentsall['user_id'] . '">' . $commentsall['username'] . '</a>');
 		$templating->set('date', $dateall);

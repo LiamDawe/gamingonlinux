@@ -315,7 +315,7 @@ if (!isset($_GET['go']))
 				
 				$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
-				$templating->set('text', $bbcode->parse_bbcode($article_body, 1, 1, $tagline_bbcode, $bbcode_tagline_gallery) . $article_bottom);
+				$templating->set('text', $bbcode->parse_bbcode($article_body, 1, $tagline_bbcode, $bbcode_tagline_gallery) . $article_bottom);
 
 				$article_link = "/articles/$nice_title.{$_GET['aid']}/";
 				if (isset($_GET['preview']))

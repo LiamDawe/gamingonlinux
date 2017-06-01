@@ -168,7 +168,7 @@ else if ((!isset($_SESSION['uploads_tagline']) || $_SESSION['uploads_tagline']['
 }
 $templating->set('top_image_nobbcode', $top_image_nobbcode);
 $templating->set('tagline', $_POST['tagline']);
-$templating->set('text_full', $bbcode->parse_bbcode($_POST['text'], 1, 1, $tagline_bbcode, $bbcode_tagline_gallery));
+$templating->set('text_full', $bbcode->parse_bbcode($_POST['text'], 1, $tagline_bbcode, $bbcode_tagline_gallery));
 $templating->set('article_link', '#');
 $templating->set('comment_count', '0');
 

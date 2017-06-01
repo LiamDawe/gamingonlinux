@@ -295,7 +295,7 @@ if (isset($_GET['view']))
 	if ($_GET['view'] == 'deletetopic')
 	{
 		$return_page = "/admin.php?module=forum&view=reportedtopics";
-		forum_class::delete_topic($return_page, $return_page, "admin.php?module=forum&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
+		$forum_class->delete_topic($return_page, $return_page, "admin.php?module=forum&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
 	}
 
 	if ($_GET['view'] == 'reportedreplies')

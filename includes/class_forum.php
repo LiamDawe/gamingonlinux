@@ -76,7 +76,7 @@ class forum
 		}
 	}
 	
-	public static function delete_topic($return_page_done = NULL, $return_page_no = NULL, $post_page = NULL)
+	public function delete_topic($return_page_done = NULL, $return_page_no = NULL, $post_page = NULL)
 	{
 		global $core, $db, $parray, $templating;
 		
@@ -93,7 +93,7 @@ class forum
 		}
 
 		$this->forum_permissions($_GET['forum_id']);
-		if ($parray['delete'] == 0 || !isset($parray['delete']))
+		if ($parray['can_delete'] == 0 || !isset($parray['can_delete']))
 		{
 			header('Location: ' . $return_page_no);
 			die();
@@ -211,7 +211,7 @@ class forum
 		}
 
 		$this->forum_permissions($_GET['forum_id']);
-		if ($parray['delete'] == 0 || !isset($parray['delete']))
+		if ($parray['can_delete'] == 0 || !isset($parray['can_delete']))
 		{
 			header('Location: ' . $return_page_no);
 			die();

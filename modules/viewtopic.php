@@ -20,7 +20,7 @@ else
 			$return_no = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
 		}
 			
-		forum_class::delete_topic($return, $return_no, "/index.php?module=viewtopic&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
+		$forum_class->delete_topic($return, $return_no, "/index.php?module=viewtopic&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
 	}
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')

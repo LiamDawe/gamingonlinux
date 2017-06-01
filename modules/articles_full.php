@@ -750,14 +750,14 @@ if (!isset($_GET['go']))
 						$templating->set('profile_fields', $profile_fields_output);
 
 						$comment_edit_link = '';
-						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
+						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->can('mod_edit_comments'))
 						{
 							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $core->config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
 						}
 						$templating->set('edit', $comment_edit_link);
 
 						$comment_delete_link = '';
-						if ($user->check_group([1,2]) == true)
+						if ($user->can('mod_delete_comments'))
 						{
 							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . $core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 						}
@@ -898,7 +898,7 @@ if (!isset($_GET['go']))
 		$nice_title = core::nice_title($comment['title']);
 
 		// check if author
-		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
+		if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || $_SESSION['user_id'] == 0)
 		{
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 			die();
@@ -1275,7 +1275,7 @@ else if (isset($_GET['go']))
 		$comment = $db->fetch();
 
 		// check if author or editor/admin
-		if ($_SESSION['user_id'] != $comment['author_id'] && $user->check_group([1,2]) == false || $_SESSION['user_id'] == 0)
+		if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || $_SESSION['user_id'] == 0)
 		{
 			$nice_title = core::nice_title($comment['title']);
 			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
@@ -1325,7 +1325,7 @@ else if (isset($_GET['go']))
 
 		$article_link = $article_class->get_link($comment['article_id'], $comment['slug'], '#comments');
 
-		if ($user->check_group([1,2]) == false)
+		if ($user->can('mod_delete_comments') == false)
 		{
 			header("Location: ".$article_link);
 		}

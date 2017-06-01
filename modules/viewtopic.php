@@ -376,6 +376,10 @@ else
 					{
 						$username = "<a href=\"/profiles/{$topic['author_id']}\">{$topic['username']}</a>";
 					}
+					else
+					{
+						$username = 'Guest';
+					}
 
 					$into_username = '';
 					$into_username = $plugins->do_hooks('into_post_username', $topic);
@@ -512,6 +516,10 @@ else
 						if ($post['author_id'] != 0)
 						{
 							$username = "<a href=\"/profiles/{$post['author_id']}\">{$post['username']}</a>";
+						}
+						else
+						{
+							$username = 'Guest';
 						}
 
 						$into_username = '';

@@ -258,6 +258,38 @@ class bbcode
 		
 		return $text;
 	}
+	
+	function parse_links($text)
+	{
+		$URLRegex = '/(?:(?<!(\[\/url\]|\[\/url=))(\s|^))'; // No [url]-tag in front and is start of string, or has whitespace in front
+		$URLRegex.= '(';                                    // Start capturing URL
+		$URLRegex.= '(https?|ftps?|ircs?):\/\/';            // Protocol
+		$URLRegex.= '[\w\d\.\/#\_\-\?:=]+';                        // Any non-space character
+		$URLRegex.= ')';                                    // Stop capturing URL
+		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
+
+		$text = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $text);
+
+		$find = '~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i'; // don't even remember what this one was checking for exactly?
+
+		$replace = '<a href="$1" target="_blank"><img src="$2" alt="image" /></a>';
+
+		$text = preg_replace($find, $replace, $text);
+
+		$find = array(
+		"/\[url\=(.+?)\](.+?)\[\/url\]/is",
+		"/\[url\](.+?)\[\/url\]/is"
+		);
+
+		$replace = array(
+		"<a href=\"$1\" target=\"_blank\">$2</a>",
+		"<a href=\"$1\" target=\"_blank\">$1</a>"
+		);
+
+		$text = preg_replace($find, $replace, $text);
+		
+		return $text;
+	}
 
 	function parse_bbcode($body, $article = 1, $tagline_image = NULL, $gallery_tagline = NULL)
 	{
@@ -325,32 +357,7 @@ class bbcode
 			$body = preg_replace($find_resize, $replace_resize, $body);
 		}
 
-		$URLRegex = '/(?:(?<!(\[\/url\]|\[\/url=))(\s|^))'; // No [url]-tag in front and is start of string, or has whitespace in front
-		$URLRegex.= '(';                                    // Start capturing URL
-		$URLRegex.= '(https?|ftps?|ircs?):\/\/';            // Protocol
-		$URLRegex.= '[\w\d\.\/#\_\-\?:=]+';                        // Any non-space character
-		$URLRegex.= ')';                                    // Stop capturing URL
-		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
-
-		$body = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $body);
-
-		$find = '~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i';
-
-		$replace = '<a href="$1" target="_blank"><img src="$2" alt="image" /></a>';
-
-		$body = preg_replace($find, $replace, $body);
-
-		$find = array(
-		"/\[url\=(.+?)\](.+?)\[\/url\]/is",
-		"/\[url\](.+?)\[\/url\]/is"
-		);
-
-		$replace = array(
-		"<a href=\"$1\" target=\"_blank\">$2</a>",
-		"<a href=\"$1\" target=\"_blank\">$1</a>"
-		);
-
-		$body = preg_replace($find, $replace, $body);
+		$body = $this->parse_links($body);
 
 		// remove extra new lines, caused by editors adding a new line after bbcode elements for easier reading when editing
 		$find_lines = array(

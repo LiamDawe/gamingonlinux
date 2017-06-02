@@ -13,7 +13,7 @@ else
 		if ($_GET['view'] == 'add')
 		{
 			$templating->block('add', 'admin_modules/admin_module_blocks');
-			$core->editor('text', '', 1);
+			$core->editor(['name' => 'text', 'editor_id' => 'block']);
 			$templating->block('add_bottom', 'admin_modules/admin_module_blocks');
 
 			if (!isset($_GET['usercp']))
@@ -99,8 +99,8 @@ else
 					$templating->set('block_name', $blocks['block_name']);
 					$templating->set('block_title', $blocks['block_title']);
 					$templating->set('link', $blocks['block_title_link']);
-
-					$core->editor('text', $blocks['block_custom_content'], 1);
+					
+					$core->editor(['name' => 'text', 'content' => $blocks['block_custom_content'], 'editor_id' => 'block']);
 
 					$templating->block('custom_row_bottom', 'admin_modules/admin_module_blocks');
 

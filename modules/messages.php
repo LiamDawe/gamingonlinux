@@ -439,7 +439,7 @@ else
 		$templating->set('to', $user_to);
 		$templating->set('title', $title);
 
-		$core->editor(['name' => 'text', 'content' => $text]);
+		$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'pm_text']);
 
 		$templating->block('compose_bottom', 'private_messages');
 		$templating->block('preview', 'private_messages');

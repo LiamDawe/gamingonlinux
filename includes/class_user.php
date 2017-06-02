@@ -470,10 +470,11 @@ class user
 		return $their_groups;
 	}
 
-	// check a users group to perform a certain task, can check two groups
+	// check a users group to perform a certain task
 	// useful for seeing if they are an admin or editor to perform editing, deleting, publishing etc
 	function check_group($check_groups = NULL)
-	{		
+	{	
+		print_r($this->user_groups);
 		if ( is_array($check_groups) )
 		{
 			foreach ($check_groups as $group)

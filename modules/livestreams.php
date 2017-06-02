@@ -105,8 +105,8 @@ if (isset($_POST['act']))
 		$community_name = strip_tags($community_name);
 		$stream_url = trim($_POST['stream_url']);
 		$stream_url = strip_tags($stream_url);
-		$start_time = core::to_utc_time($_POST['date'], $_POST['timezone'], 'UTC');
-		$end_time = core::to_utc_time($_POST['end_date'], $_POST['timezone'], 'UTC');
+		$start_time = core::adjust_time($_POST['date'], $_POST['timezone'], 'UTC', 0);
+		$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone'], 'UTC', 0);
 		
 		$empty_check = core::mempty(compact('title', 'start_time', 'end_time', 'stream_url'));
 		
@@ -118,14 +118,14 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$date_created = date('Y-m-d H:i:s');
+		$date_created = core::$sql_date_now;
 
-		$db->sqlquery("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 0, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = 1, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $title, $date_created, $start_time, $end_time, $community_name, $stream_url));
-		$new_id = $db->grab_id();
+		$dbl->run("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 0, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = 1, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $title, $date_created, $start_time, $end_time, $community_name, $stream_url));
+		$new_id = $dbl->new_id();
 
 		$core->process_livestream_users($new_id);
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'new_livestream_submission', core::$date, $new_id));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'new_livestream_submission', core::$date, $new_id));
 
 		$_SESSION['message'] = 'livestream_submitted';
 		header("Location: /index.php?module=livestreams");

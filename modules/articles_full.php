@@ -741,9 +741,18 @@ if (!isset($_GET['go']))
 						$templating->set('logged_in_options', $logged_in_options);
 						$templating->set('bookmark', $bookmark_comment);
 
-						$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
-						$badges = user::user_badges($comments, 1);
-						$templating->set('badges', implode(' ', $badges));
+						// if we have some user groups for that user
+						if (array_key_exists($comments['author_id'], $comment_user_groups))
+						{
+							$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
+							$badges = user::user_badges($comments, 1);
+							$templating->set('badges', implode(' ', $badges));
+						}
+						// otherwise guest account or their account was removed, as we didn't get any groups for it
+						else
+						{
+							$templating->set('badges', '');
+						}
 						
 						$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
 

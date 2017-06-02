@@ -15,7 +15,7 @@ if (!isset($_GET['go']))
 	$templating->block('main', 'usercp_modules/notification_preferences');
 
 	$comments_check = '';
-	$user_comment_alerts = $user->get('display_comment_alerts');
+	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id']);
 	if ($user_comment_alerts == 1)
 	{
 		$comments_check = 'checked';

@@ -546,9 +546,18 @@ else
 						$avatar = $user->sort_avatar($post['author_id']);
 						$templating->set('avatar', $avatar);
 
-						$post['user_groups'] = $reply_user_groups[$post['author_id']];
-						$badges = user::user_badges($post, 1);
-						$templating->set('badges', implode(' ', $badges));
+						// if we have some user groups for that user
+						if (array_key_exists($post['author_id'], $reply_user_groups))
+						{
+							$post['user_groups'] = $reply_user_groups[$post['author_id']];
+							$badges = user::user_badges($post, 1);
+							$templating->set('badges', implode(' ', $badges));
+						}
+						// otherwise guest account or their account was removed, as we didn't get any groups for it
+						else
+						{
+							$templating->set('badges', '');
+						}
 
 						$profile_fields_output = user::user_profile_icons($profile_fields, $post);
 

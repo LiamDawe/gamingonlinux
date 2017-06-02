@@ -242,7 +242,7 @@ class bbcode
 				
 			$tagline_image = $article_class->tagline_image($article_info);
 			
-			$nice_link =  $this->core::nice_title($article_info['title']) . '.' . $article_info['article_id'];
+			$nice_link =  $this->core->nice_title($article_info['title']) . '.' . $article_info['article_id'];
 			
 			$date = $this->core->format_date($article_info['date']);
 			

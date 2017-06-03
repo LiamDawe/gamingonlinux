@@ -267,17 +267,8 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					// count how many there is in total
 					$db->sqlquery("SELECT `comment_id` FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
 					$total = $db->num_rows();
-
-					// paging for pagination
-					if (!isset($_GET['page']) || $_GET['page'] <= 0)
-					{
-						$page = 1;
-					}
-
-					else if (is_numeric($_GET['page']))
-					{
-						$page = $_GET['page'];
-					}
+					
+					$page = core::give_page();%
 
 					if ($core->config('pretty_urls') == 1)
 					{

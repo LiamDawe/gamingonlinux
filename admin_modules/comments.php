@@ -388,7 +388,7 @@ if (isset($_POST['act']))
 					if ($core->config('send_emails') == 1)
 					{
 						$mail = new mailer($core);
-						$mail->sendMail($emailer['email'], $subject, $html_message, $plain_message);
+						$mail->sendMail($email_user['email'], $subject, $html_message, $plain_message);
 					}
 				}
 			}

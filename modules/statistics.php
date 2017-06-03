@@ -66,27 +66,30 @@ foreach($charts_list as $chart)
   
 	$options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC'];
 
-	$grab_chart = $charts->stat_chart($get_chart_id['id'], $get_last_chart_id, $options);
-
-	// only do this once
-	if ($counter == 0)
+	if (isset($get_chart_id['id']))
 	{
-		$templating->block('info');
-		$templating->set('date', $grab_chart['date']);
-	}
+		$grab_chart = $charts->stat_chart($get_chart_id['id'], $get_last_chart_id, $options);
 
-	$templating->block('chart_section');
-	$templating->set('title', $chart['name']);
-	$templating->set('graph', $grab_chart['graph']);
-	$download_link = '';
-	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
-	{
-		$download_link = '<div style="text-align: center;"><em>Download Graph: (<a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats&download">SVG</a>)</em> | <a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats">Graph Link</a></div>';
+		// only do this once
+		if ($counter == 0)
+		{
+			$templating->block('info');
+			$templating->set('date', $grab_chart['date']);
+		}
+
+		$templating->block('chart_section');
+		$templating->set('title', $chart['name']);
+		$templating->set('graph', $grab_chart['graph']);
+		$download_link = '';
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			$download_link = '<div style="text-align: center;"><em>Download Graph: (<a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats&download">SVG</a>)</em> | <a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats">Graph Link</a></div>';
+		}
+		$templating->set('download_link', $download_link);
+		$templating->set('total_users', $grab_chart['total_users_answered']);
+		$templating->set('full_info', $grab_chart['full_info']);
+		$counter++;
 	}
-	$templating->set('download_link', $download_link);
-	$templating->set('total_users', $grab_chart['total_users_answered']);
-	$templating->set('full_info', $grab_chart['full_info']);
-	$counter++;
 }
 $templating->block('monthly_bottom');
 

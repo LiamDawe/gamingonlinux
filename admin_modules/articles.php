@@ -354,6 +354,13 @@ if (isset($_GET['view']))
 
 					// get the article row template
 					$templating->block('manage_row');
+					$inactive = '';
+					if ($_GET['category'] == 'inactive')
+					{
+						$inactive = '&inactive=1';
+					
+					}
+					$templating->set('inactive', $inactive);
 
 					// sort out the categories (tags)
 					$categories_list = '';
@@ -415,6 +422,7 @@ if (isset($_GET['view']))
 
 				// get the article row template
 				$templating->block('manage_row');
+				$templating->set('inactive', '');
 
 				// sort out the categories (tags)
 				$categories_list = '';
@@ -696,14 +704,19 @@ else if (isset($_POST['act']))
 			$return_page = "/admin.php?module=reviewqueue";
 			$post_page = "/admin.php?module=articles&article_id={$_GET['article_id']}&review=1";
 		}
+		else if (isset($_GET['inactive']) && $_GET['inactive'] == 1)
+		{
+			$return_page = "/admin.php?module=articles&view=manage&category=inactive";
+			$post_page = "/admin.php?module=articles&article_id={$_GET['article_id']}&inactive=1";			
+		}
 		else
 		{
-			$post_page = $return_page = "/admin.php?module=articles&amp;article_id={$_POST['article_id']}";
+			$post_page = $return_page = "/admin.php?module=articles&article_id={$_GET['article_id']}";
 		}
 
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
 			$check = $db->fetch();
 
 			// anti-cheese deleting the wrong article feature
@@ -749,8 +762,10 @@ else if (isset($_POST['act']))
 					else
 					{
 						$article_class->delete_article($check);
-
-						$core->message("That article has now been deleted! Options: <a href=\"$return_page\">Go back</a>.");
+						
+						$_SESSION['message'] = 'deleted';
+						$_SESSION['message_extra'] = 'article';
+						header("Location: $return_page");
 					}
 				}
 			}

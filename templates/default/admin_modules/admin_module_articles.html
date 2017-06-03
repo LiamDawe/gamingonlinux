@@ -133,8 +133,7 @@
 			<div class="body group">
 			<form method="post" action="admin.php?module=articles">
 			<button type="submit" formaction="admin.php?module=articles&view=Edit&article_id={:article_id}">Edit</button>
-			<button type="submit" name="act" value="Delete">Delete</button>
-			<input type="hidden" name="article_id" value="{:article_id}" />
+			<button type="submit" name="act" value="Delete" formaction="admin.php?module=articles&article_id={:article_id}{:inactive}">Delete</button>
 			</form>
 			</div>
 		</div>

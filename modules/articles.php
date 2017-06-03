@@ -172,7 +172,7 @@ if (isset($view))
 		}
 	}
 	
-	if ($total_items > 0)
+	if (isset($total_items) && $total_items > 0)
 	{
 		$db->sqlquery("SELECT
 			r.`article_id`,

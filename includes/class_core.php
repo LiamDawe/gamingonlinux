@@ -112,6 +112,7 @@ class core
 		return true;
 	}
 
+	// simple helper function to make sure we always have a page number set
 	public static function give_page()
 	{
 		$page = 1;

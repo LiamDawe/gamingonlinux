@@ -2,8 +2,10 @@
 $templating->set_previous('title', 'Linux Gamer User Profile', 1);
 
 // check user exists
-if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
+if (isset($_GET['user_id']))
 {
+	$profile_id = (int) $_GET['user_id'];
+	
 	if ($_GET['user_id'] == 1844)
 	{
 		$core->message('This is a bot.');
@@ -268,7 +270,7 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 					$db->sqlquery("SELECT `comment_id` FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
 					$total = $db->num_rows();
 					
-					$page = core::give_page();%
+					$page = core::give_page();
 
 					if ($core->config('pretty_urls') == 1)
 					{
@@ -359,7 +361,6 @@ if (isset($_GET['user_id']) && core::is_number($_GET['user_id']))
 	}
 }
 }
-
 else
 {
 	$core->message('No user id asked for to view! <a href="index.php">Click here to return</a>.');

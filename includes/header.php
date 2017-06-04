@@ -44,7 +44,7 @@ if ($theme == 'default')
 {
 	$body_class = '';
 }
-else if ($theme != 'default' && $user->check_group(6) == true)
+else if ($theme != 'default' && $user->can('premium_features') == true)
 {
 	$body_class = 'class="dark"';
 }

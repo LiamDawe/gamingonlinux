@@ -29,28 +29,22 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `secondary_user_group`, `user_group`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
 	$templating->block('top', 'usercp_modules/usercp_module_home');
 
-	if ($user->check_group([1,2,5,6]) == true)
+	if ($user->can('premium_features'))
 	{
 		$templating->block('premium', 'usercp_modules/usercp_module_home');
 		$templating->set('url', $core->config('website_url'));
-		$state = 'disabled';
-		if ($user->check_group([1,2,5,6]) == true)
-		{
-			$state = '';
-		}
-		$templating->set('state', $state);
 
 		$supporter_link = '';
-		if ($usercpcp['secondary_user_group'] == 6 && $usercpcp['user_group'] != 1 && $usercpcp['user_group'] != 2)
+		if ($user->check_group(6))
 		{
 			$supporter_link = "<br />Donate Page Link <em>Here you may enter a link to sit beside your name on the Support Us</em>:<br />
-			<input $state type=\"text\" name=\"supporter_link\" value=\"{$usercpcp['supporter_link']}\" /><br />";
+			<input type=\"text\" name=\"supporter_link\" value=\"{$usercpcp['supporter_link']}\" /><br />";
 		}
 
 		$templating->set('supporter_link', $supporter_link);
@@ -334,12 +328,12 @@ else if (isset($_POST['act']))
 			}
 			else if ($field['db_field'] == 'twitch' && ($_POST['twitch'] == 'https://www.twitch.tv/' || $_POST['twitch'] == 'http://www.twitch.tv/'))
 			{
-				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
+				$db->sqlquery("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
 			}
 			else
 			{
 				$sanatized = htmlspecialchars($_POST[$field['db_field']]);
-				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `{$field['db_field']}` = ? WHERE `user_id` = ?", array($sanatized, $_SESSION['user_id']));
+				$db->sqlquery("UPDATE `users` SET `{$field['db_field']}` = ? WHERE `user_id` = ?", array($sanatized, $_SESSION['user_id']));
 			}
 		}
 
@@ -349,29 +343,36 @@ else if (isset($_POST['act']))
 	// need to add in a check in here to doubly be sure they are a premium person
 	if ($_POST['act'] == 'premium')
 	{
-		$supporter_link = '';
-		// if they have a supporter link set
-		if (isset($_POST['supporter_link']))
+		if ($user->can('premium_features'))
 		{
-			$supporter_link = $_POST['supporter_link'];
+			$supporter_link = '';
+			// if they have a supporter link set
+			if (isset($_POST['supporter_link']))
+			{
+				$supporter_link = $_POST['supporter_link'];
+			}
+
+			// need to add theme updating back into here
+			$db->sqlquery("UPDATE `users` SET `supporter_link` = ?, `theme` = ? WHERE `user_id` = ?", array($supporter_link, $_POST['theme'], $_SESSION['user_id']), 'usercp_module_home.php');
+
+			header("Location: " . $core->config('website_url') . "usercp.php?module=home&updated");
 		}
-
-		// need to add theme updating back into here
-		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `supporter_link` = ?, `theme` = ? WHERE `user_id` = ?", array($supporter_link, $_POST['theme'], $_SESSION['user_id']), 'usercp_module_home.php');
-
-		header("Location: " . $core->config('website_url') . "usercp.php?module=home&updated");
+		else
+		{
+			header("Location: /usercp.php");
+		}
 	}
 
 	if ($_POST['act'] == 'twitter_remove')
 	{
-		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `twitter_username` = ?, `oauth_uid` = ?, `oauth_provider` = ? WHERE `user_id` = ?", array('', '', '', $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `users` SET `twitter_username` = ?, `oauth_uid` = ?, `oauth_provider` = ? WHERE `user_id` = ?", array('', '', '', $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}
 
 	if ($_POST['act'] == 'steam_remove')
 	{
-		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `steam_username` = ?, `steam_id` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `users` SET `steam_username` = ?, `steam_id` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}

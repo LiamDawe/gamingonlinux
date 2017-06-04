@@ -514,7 +514,7 @@ class user
 		}
 		else
 		{
-			$user_data = $this->get(['avatar', 'avatar_gravatar', 'gravatar_email', 'avatar_gallery', 'avatar_uploaded', 'theme'], $user_id);
+			$user_data = $this->get(['avatar', 'avatar_gravatar', 'gravatar_email', 'avatar_gallery', 'avatar_uploaded'], $user_id);
 			if (!empty($user_data))
 			{
 				$avatar = '';

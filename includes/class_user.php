@@ -804,13 +804,6 @@ class user
 		return $profile_fields_output;
 	}
 	
-	public function grab_user_groups()
-	{
-		$this->database->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM ".$this->core->db_tables['user_groups']." ORDER BY `group_name` ASC");		
-		self::$user_group_list = $this->database->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
-
-	}
-	
 	// this function gets a list of [user_id => [group id, group id], another_user_id => [group_id, group_id]]
 	// helper function for grabbing user badges for comments, forum posts etc
 	public function post_group_list($user_ids)
@@ -826,6 +819,14 @@ class user
 		}
 		
 		return $formatted_list;
+	}
+	
+	// helper function to get the data needed for sorting user_badges in the function below this one 
+	public function grab_user_groups()
+	{
+		$this->database->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM ".$this->core->db_tables['user_groups']." ORDER BY `group_name` ASC");		
+		self::$user_group_list = $this->database->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+
 	}
 	
 	// the actual user badge sorting, which gives the expected output of user badges for comments, forum posts etc

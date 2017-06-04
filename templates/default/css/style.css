@@ -1524,6 +1524,7 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .dark .golsvg_background {fill: #000000}
 .dark svg text {fill: white;}
 .golsvg_counters {fill: black}
+.golsvg_minmax {full: white; stroke: none;}
 .dark golsvg_counters {fill: white}
 .dark .select2-selection {background-color: #515151 !important}
 .dark .select2-selection__choice {background-color: #515151 !important}

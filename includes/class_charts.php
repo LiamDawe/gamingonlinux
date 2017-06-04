@@ -77,6 +77,9 @@ class charts
 		$this->chart_options['show_top_10'] = 0;
 		$this->chart_options['use_percentages'] = 0;
 		$this->chart_options['order'] = 'DESC';
+		$this->chart_options['min_max_font_size'] = 11;
+		$this->chart_options['min_max_y_padding'] = 2;
+		$this->chart_options['min_max_x_padding'] = 2;
 		
 		$this->chart_options['special_colours'] = [
 		'OpenGL' => '#a6cee3',
@@ -113,7 +116,7 @@ class charts
 		global $db;
 		
 		// set the right labels to the right data
-		$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`data_series` FROM `".$labels_table."` l LEFT JOIN `".$data_table."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_id))->fetch_all();
+		$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`min`, d.`max`, d.`data_series` FROM `".$labels_table."` l LEFT JOIN `".$data_table."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_id))->fetch_all();
 		
 		// if we are requesting the top 10, cut it down
 		$get_labels = $this->labels_raw_data;
@@ -132,6 +135,8 @@ class charts
 				end($this->labels);
 				$last_id=key($this->labels);
 				$this->labels[$last_id]['total'] = $label_loop['data'] + 0; // + 0 to remove extra needless zeros
+				$this->labels[$last_id]['min'] = $label_loop['min'] + 0; // + 0 to remove extra needless zeros
+				$this->labels[$last_id]['max'] = $label_loop['max'] + 0; // + 0 to remove extra needless zeros
 				$this->labels[$last_id]['colour'] = $label_loop['colour'];
 			}
 			else
@@ -140,6 +145,8 @@ class charts
 				if (!array_key_exists($label_loop['data_series'], $this->data_series))
 				{
 					$this->data_series[$label_loop['data_series']]['name'] = $label_loop['data_series'];
+					$this->data_series[$label_loop['data_series']]['min'] = $label_loop['min'] + 0;
+					$this->data_series[$label_loop['data_series']]['max'] = $label_loop['max'] + 0;
 					
 					// sort the bar colouring, taking into account any special colouring
 					// start off with the basic colour label_loop
@@ -370,7 +377,34 @@ class charts
 					
 					$bar_width = $data*$this->scale;
 					
-					$this->bars_output_array[] = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->data_series[$k]['colour'].'"><title>'.$k.' ' . $data . '</title></rect>';
+					$this_bar_output = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->data_series[$k]['colour'].'"><title>'.$k.' ' . $data . '</title></rect>';
+					
+					// sort out including min/max values
+					$min_max_y = $this_bar_y + $this->chart_options['min_max_font_size'] + $this->chart_options['min_max_y_padding'];
+					$min_max_x = $this->bars_x_start + $this->chart_options['min_max_x_padding'];
+					$min_max_text = NULL;
+					
+					if ($this->data_series[$k]['min'] != NULL && $this->data_series[$k]['min'] > 0)
+					{
+						$min_max_text = 'Min: '.$this->data_series[$k]['min'];
+						
+					}
+					if ($this->data_series[$k]['max'] != NULL && $this->data_series[$k]['max'] > 0)
+					{
+						// if we already have a min value, add a seperator
+						if ($min_max_text != NULL)
+						{
+							$min_max_text .= ' | ';
+						}
+						$min_max_text .= 'Max: '.$this->data_series[$k]['max'];
+					}
+					
+					if ($min_max_text != NULL)
+					{
+						$this_bar_output .= '<text class="golsvg_minmax" x="'.$min_max_x.'" y="'.$min_max_y.'" font-size="'.$this->chart_options['min_max_font_size'].'">'.$min_max_text.'</text>';
+					}
+					
+					$this->bars_output_array[] = $this_bar_output;
 				
 					// bar counters and their positions
 					$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];

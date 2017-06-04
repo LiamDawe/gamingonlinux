@@ -179,7 +179,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			
 			$dbl->run("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?, `grouped` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title, $grouped));
 
-			$new_chart_id = $db->grab_id();
+			$new_chart_id = $dbl->new_id();
 
 			$label_counter = 1;
 			foreach ($_POST['labels'] as $key => $label)
@@ -191,8 +191,8 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				}
 
 				$label = core::make_safe($label);
-				$dbk->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?, `colour` = ?", array($new_chart_id, $label, $this_label_colour));
-				$new_label_id = $db->grab_id();
+				$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?, `colour` = ?", array($new_chart_id, $label, $this_label_colour));
+				$new_label_id = $dbl->new_id();
 
 				// sort the data out for grouped charts
 				if (isset($_POST['grouped']))
@@ -203,7 +203,19 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 					{
 						$data_series = explode(',',$dat);
 						
-						$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?", array($new_chart_id, $new_label_id, $data_series[0], trim($data_series[1])));
+						$min = NULL;
+						if (isset($data_series[2]) && is_numeric($data_series[2]))
+						{
+							$min = $data_series[2];
+						}
+						
+						$max = NULL;
+						if (isset($data_series[3]) && is_numeric($data_series[3]))
+						{
+							$max = $data_series[3];
+						}
+						
+						$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?, `min` = ?, `max` = ?", array($new_chart_id, $new_label_id, $data_series[0], trim($data_series[1]), $min, $max));
 
 						$core->message("Data $dat added!");
 					}

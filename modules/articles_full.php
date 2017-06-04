@@ -600,6 +600,18 @@ if (!isset($_GET['go']))
 						// get a list of each users user groups, so we can display their badges
 						$comment_user_groups = $user->post_group_list($user_ids);
 					}
+					
+					// check over their permissions now
+					$can_delete = 0;
+					if ($user->can('mod_delete_comments'))
+					{
+						$can_delete = 1;
+					}
+					$can_edit = 0;
+					if ($user->can('mod_edit_comments'))
+					{
+						$can_edit = 1;
+					}
 
 					foreach ($comments_get as $comments)
 					{
@@ -759,14 +771,14 @@ if (!isset($_GET['go']))
 						$templating->set('profile_fields', $profile_fields_output);
 
 						$comment_edit_link = '';
-						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->can('mod_edit_comments'))
+						if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
 						{
 							$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $core->config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
 						}
 						$templating->set('edit', $comment_edit_link);
 
 						$comment_delete_link = '';
-						if ($user->can('mod_delete_comments'))
+						if ($can_delete == 1)
 						{
 							$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . $core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 						}

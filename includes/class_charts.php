@@ -76,7 +76,6 @@ class charts
 		$this->chart_options['ticks_total'] = 5;
 		$this->chart_options['show_top_10'] = 0;
 		$this->chart_options['use_percentages'] = 0;
-		$this->chart_options['order'] = 'DESC';
 		$this->chart_options['min_max_font_size'] = 11;
 		$this->chart_options['min_max_y_padding'] = 2;
 		$this->chart_options['min_max_x_padding'] = 2;
@@ -102,21 +101,39 @@ class charts
 	{
 		if ($type == 'normal')
 		{
-			$get_chart = $this->database->run("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped`, `enabled` FROM `charts` WHERE `id` = ?", [$chart_id]);
+			$get_chart = $this->database->run("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped`, `enabled`, `order_by_data` FROM `charts` WHERE `id` = ?", [$chart_id]);
 		}
 		if ($type == 'stat_chart')
 		{
-			$get_chart = $this->database->run("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `grouped`, `enabled` FROM `user_stats_charts` WHERE `id` = ?", [$chart_id]);
+			$get_chart = $this->database->run("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `enabled` FROM `user_stats_charts` WHERE `id` = ?", [$chart_id]);
 		}
 		$this->chart_info = $get_chart->fetch();
+		
+		// stat charts are never grouped, but we use this check a lot
+		if (!isset($this->chart_info['grouped']))
+		{
+			$this->chart_info['grouped'] = 0;
+		}
 	}
 	
-	function get_labels($chart_data)
+	function get_labels($chart_data, $type = 'normal')
 	{
 		if (isset($chart_data['id']))
 		{
-			// set the right labels to the right data
-			$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`min`, d.`max`, d.`data_series` FROM `".$chart_data['labels_table']."` l LEFT JOIN `".$chart_data['data_table']."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_data['id']))->fetch_all();
+			if ($type == 'normal')
+			{
+				$order_by = '';
+				if (isset($this->chart_info['order_by_data']) && $this->chart_info['order_by_data'] == 1)
+				{
+					$order_by = 'ORDER BY d.`data` DESC';
+				}
+				// set the right labels to the right data
+				$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`min`, d.`max`, d.`data_series` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? $order_by", array($chart_data['id']))->fetch_all();
+			}
+			else if ($type == 'stat_chart')
+			{
+				$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` DESC", array($chart_data['id']))->fetch_all();			
+			}
 		}
 		else
 		{
@@ -127,7 +144,7 @@ class charts
 		$get_labels = $this->labels_raw_data;
 		if ($this->chart_options['show_top_10'] == 1)
 		{
-			$get_labels = array_slice($this->labels_raw_data, -10);
+			$get_labels = array_slice($this->labels_raw_data, 0, 10);
 		}
 
 		$label_loop_counter = 0;
@@ -141,8 +158,14 @@ class charts
 				end($this->labels);
 				$last_id=key($this->labels);
 				$this->labels[$last_id]['total'] = $label_loop['data'] + 0; // + 0 to remove extra needless zeros
-				$this->labels[$last_id]['min'] = $label_loop['min'] + 0; // + 0 to remove extra needless zeros
-				$this->labels[$last_id]['max'] = $label_loop['max'] + 0; // + 0 to remove extra needless zeros
+				if (isset($label_loop['min']))
+				{
+					$this->labels[$last_id]['min'] = $label_loop['min'] + 0; // + 0 to remove extra needless zeros
+				}
+				if (isset($label_loop['max']))
+				{
+					$this->labels[$last_id]['max'] = $label_loop['max'] + 0; // + 0 to remove extra needless zeros
+				}
 				$this->labels[$last_id]['colour'] = $label_loop['colour'];
 			}
 			else
@@ -311,12 +334,11 @@ class charts
 		{
 			$this->get_chart($chart_data['id']);
 		}
+		// for previews/non-db charts
 		else
 		{
-			//$this->chart_info = ['name' => $chart_data['name'], 'subtitle' => $chart_data['subtitle'], 'h_label' => $chart_data['h_label'], 'grouped' => $chart_data['grouped'], 'enabled' => 1];
 			$this->chart_info = $chart_data;
 			$this->chart_info['enabled'] = 1;
-			//if (isset())
 		}
 		
 		if ($this->chart_info['enabled'] == 0 && $user->check_group([1,2,5]) == false)
@@ -324,7 +346,7 @@ class charts
 			return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="tiny" version="1.2" width="660" height="20"><text x="1" y="15">This chart is not currently enabled!</text></svg>';
 		}
 		
-		$this->get_labels($chart_data);
+		$this->get_labels($chart_data, 'normal');
 
 		self::chart_sizing();
 		
@@ -502,7 +524,7 @@ class charts
 
 		// set the right labels to the right data (OLD DATA)
 		$labels_old = [];
-		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($last_id));
+		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ", array($last_id));
 		$this->get_labels_old = $db->fetch_all_rows();
 	}
 	
@@ -526,16 +548,11 @@ class charts
 		}
 
 		// set the right labels to the right data (This months data)
-		$this->get_labels(['id' => $id, 'labels_table' => 'user_stats_charts_labels', 'data_table' => 'user_stats_charts_data']);
+		$this->get_labels(['id' => $id], 'stat_chart');
 		
 		// this is for the full info expand box, as charts only show 10 items, this expands to show them all
 		$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
 
-		// sort them from highest to lowest
-		usort($this->labels_raw_data, function($b, $a)
-		{
-			return $a['data'] - $b['data'];
-		});
 		foreach ($this->labels_raw_data as $k => $all_labels)
 		{
 			$icon = '';
@@ -593,11 +610,6 @@ class charts
 			
 		// get the max number to make the axis and bars
 		$this->total_labels = count($this->labels);
-			
-		usort($this->labels, function($a, $b) 
-		{
-			return $b['total'] - $a['total'];
-		});
 		
 		$max_data = $this->labels[0]['percent'];
 			
@@ -607,7 +619,7 @@ class charts
 		
 		$last_label_y = 0;
 		$label_counter = 0;
-			
+		
 		// sort labels, bars, bar counters and more
 		foreach ($this->labels as $key => $data)
 		{

@@ -65,4 +65,13 @@ foreach ($_POST['labels'] as $key => $label)
 	$label_counter++;
 }
 
-echo $charts->render(NULL, ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data]);
+if (isset($_POST['order_by_data']))
+{
+	// sort them from highest to lowest
+	usort($preview_data, function($b, $a)
+	{
+		return $a['data'] - $b['data'];
+	});
+}
+
+echo $charts->render(NULL, ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data, 'h_label' => $_POST['h_label']]);

@@ -64,7 +64,7 @@ foreach($charts_list as $chart)
   
 	$charts = new charts($dbl);
   
-	$options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC'];
+	$options = ['padding_right' => 70, 'show_top_10' => 1];
 
 	if (isset($get_chart_id['id']))
 	{

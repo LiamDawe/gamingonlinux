@@ -101,7 +101,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	if ($_GET['view'] == 'edit')
 	{
 		$chart_id = (int) $_GET['id'];
-		$db->sqlquery("SELECT `name`, `enabled`, `sub_title` FROM `charts` WHERE `id` = ?", array($chart_id));
+		$db->sqlquery("SELECT `name`, `enabled`, `sub_title`, `order_by_data` FROM `charts` WHERE `id` = ?", array($chart_id));
 		
 		if ($db->num_rows() == 1)
 		{
@@ -112,13 +112,20 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->block('chart', 'admin_modules/admin_module_charts');
 			$templating->set('chart_name', $chart_info['name']);
 			
-			$templating->set('chart', $charts->render(NULL, ['id' => $chart_id, 'labels_table' => 'charts_labels', 'data_table' => 'charts_data']));
+			$templating->set('chart', $charts->render(NULL, ['id' => $chart_id]));
 			
 			$enabled_check = '';
 			if ($chart_info['enabled'] == 1)
 			{
 				$enabled_check = 'checked';
 			}
+			
+			$data_order_check = '';
+			if ($chart_info['order_by_data'] == 1)
+			{
+				$data_order_check = 'checked';
+			}
+			$templating->set('data_order_check', $data_order_check);
 			$templating->set('enabled_check', $enabled_check);
 			$templating->set('chart_id', $chart_id);
 			$templating->set('name', $chart_info['name']);
@@ -179,7 +186,13 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				}
 			}
 			
-			$dbl->run("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?, `grouped` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title, $grouped));
+			$order_by_data = 0;
+			if (isset($_POST['order_by_data']))
+			{
+				$order_by_data = 1;
+			}
+			
+			$dbl->run("INSERT INTO `charts` SET `owner` = ?, `h_label` = ?, `name` = ?, `sub_title` = ?, `grouped` = ?, `order_by_data` = ?", array($_SESSION['user_id'], $_POST['h_label'], $_POST['name'], $sub_title, $grouped, $order_by_data));
 
 			$new_chart_id = $dbl->new_id();
 
@@ -318,6 +331,12 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$enabled_check = 1;
 		}
 		
+		$order_by_data = 0;
+		if (isset($_POST['order_by_data']))
+		{
+			$order_by_data = 1;
+		}
+		
 		$name = core::make_safe($_POST['name']);
 		$sub_title = core::make_safe($_POST['sub_title']);
 		
@@ -330,7 +349,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			die();
 		}
 		
-		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $chart_id));
+		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ?, `order_by_data` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $order_by_data, $chart_id));
 		
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'chart';

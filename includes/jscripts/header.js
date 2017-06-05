@@ -1085,7 +1085,6 @@ $(".poll_content").on("click", ".open_poll", function()
 			type: 'POST',
 			success: function (dataofconfirm) {
 				$('.chart_preview').html(dataofconfirm);
-				console.log(dataofconfirm)
 			}
 		});
 	});

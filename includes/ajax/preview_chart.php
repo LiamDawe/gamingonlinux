@@ -18,7 +18,6 @@ if (isset($_POST['grouped']))
 $label_counter = 1;
 foreach ($_POST['labels'] as $key => $label)
 {
-	echo $label;
 	$this_label_colour = NULL;
 	if (isset($_POST['colours'][$key]) && !empty($_POST['colours'][$key]))
 	{
@@ -34,19 +33,21 @@ foreach ($_POST['labels'] as $key => $label)
 		{
 			$data_series = explode(',',$dat);
 			
-			$total = $data_series[0];
-			echo $total;
+			$total = $data_series[0] + 0;
+			$total = bcdiv($total, 1, 2);
 						
 			$min = NULL;
 			if (isset($data_series[2]) && is_numeric($data_series[2]))
 			{
-				$min = $data_series[2];
+				$min = $data_series[2] + 0;
+				$min = bcdiv($min, 1, 2);
 			}
 						
 			$max = NULL;
 			if (isset($data_series[3]) && is_numeric($data_series[3]))
 			{
-				$max = $data_series[3];
+				$max = $data_series[3] + 0;
+				$max = bcdiv($max, 1, 2);
 			}
 			
 			$preview_data[]['name'] = $label;
@@ -56,6 +57,9 @@ foreach ($_POST['labels'] as $key => $label)
 			$preview_data[$last_id]['min'] = $min;
 			$preview_data[$last_id]['max'] = $max;
 			$preview_data[$last_id]['data_series'] = trim($data_series[1]);
+			
+			unset($min);
+			unset($max);
 		}
 	}
 	$label_counter++;

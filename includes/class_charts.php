@@ -116,7 +116,7 @@ class charts
 		if (isset($chart_data['id']))
 		{
 			// set the right labels to the right data
-			$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, $extra_fields  d.`data_series` FROM `".$chart_data['labels_table']."` l LEFT JOIN `".$chart_data['data_table']."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_data['id']))->fetch_all();
+			$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`min`, d.`max`, d.`data_series` FROM `".$chart_data['labels_table']."` l LEFT JOIN `".$chart_data['data_table']."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_data['id']))->fetch_all();
 		}
 		else
 		{
@@ -147,12 +147,16 @@ class charts
 			}
 			else
 			{
-				$this->labels[$label_loop['name']][$label_loop['data_series']] = $label_loop['data'] + 0; // + 0 to remove extra needless zeros
+				$this->labels[$label_loop['name']][$label_loop['data_series']]['data'] = $label_loop['data'] + 0; // + 0 to remove extra needless zeros
+				end($this->labels);
+				$last_id=key($this->labels);
+				
+				$this->labels[$label_loop['name']][$label_loop['data_series']]['min'] = $label_loop['min'] + 0;
+				$this->labels[$label_loop['name']][$label_loop['data_series']]['max'] = $label_loop['max'] + 0;
+				
 				if (!array_key_exists($label_loop['data_series'], $this->data_series))
 				{
 					$this->data_series[$label_loop['data_series']]['name'] = $label_loop['data_series'];
-					$this->data_series[$label_loop['data_series']]['min'] = $label_loop['min'] + 0;
-					$this->data_series[$label_loop['data_series']]['max'] = $label_loop['max'] + 0;
 					
 					// sort the bar colouring, taking into account any special colouring
 					// start off with the basic colour label_loop
@@ -400,28 +404,28 @@ class charts
 						$this_bar_y = $last_bar_y + $this->chart_options['bar_thickness'] + 2;
 					}
 					
-					$bar_width = $data*$this->scale;
+					$bar_width = $data['data']*$this->scale;
 					
-					$this_bar_output = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->data_series[$k]['colour'].'"><title>'.$k.' ' . $data . '</title></rect>';
+					$this_bar_output = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->data_series[$k]['colour'].'"><title>'.$k.' ' . $data['data'] . '</title></rect>';
 					
 					// sort out including min/max values
 					$min_max_y = $this_bar_y + $this->chart_options['min_max_font_size'] + $this->chart_options['min_max_y_padding'];
 					$min_max_x = $this->bars_x_start + $this->chart_options['min_max_x_padding'];
 					$min_max_text = NULL;
 					
-					if ($this->data_series[$k]['min'] != NULL && $this->data_series[$k]['min'] > 0)
+					if ($data['min'] != NULL && $data['min'] > 0)
 					{
-						$min_max_text = 'Min: '.$this->data_series[$k]['min'];
+						$min_max_text = 'Min: '.$data['min'];
 						
 					}
-					if ($this->data_series[$k]['max'] != NULL && $this->data_series[$k]['max'] > 0)
+					if ($data['max'] != NULL && $data['max'] > 0)
 					{
 						// if we already have a min value, add a seperator
 						if ($min_max_text != NULL)
 						{
 							$min_max_text .= ' | ';
 						}
-						$min_max_text .= 'Max: '.$this->data_series[$k]['max'];
+						$min_max_text .= 'Max: '.$data['max'];
 					}
 					
 					if ($min_max_text != NULL)
@@ -441,7 +445,7 @@ class charts
 						$force_counter_colour = 'fill="'.$this->chart_options['counter_colour'].'"';
 					}
 					
-					$this->counter_array[] = '<text class="golsvg_counters" '.$force_counter_colour.' x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data.'</text>';
+					$this->counter_array[] = '<text class="golsvg_counters" '.$force_counter_colour.' x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data['data'].'</text>';
 
 				
 					$data_series_counter++;

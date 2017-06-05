@@ -110,7 +110,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$charts = new charts($dbl);
 			
 			$templating->block('chart', 'admin_modules/admin_module_charts');
-			$templating->set('chart', $charts->render($chart_id, NULL, 'charts_labels', 'charts_data'));
+			$templating->set('chart_name', $chart_info['name']);
+			
+			$templating->set('chart', $charts->render(NULL, ['id' => $chart_id, 'labels_table' => 'charts_labels', 'data_table' => 'charts_data']));
 			
 			$enabled_check = '';
 			if ($chart_info['enabled'] == 1)

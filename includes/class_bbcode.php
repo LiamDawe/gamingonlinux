@@ -25,7 +25,7 @@ class bbcode
 		{
 			$charts = new charts($this->database);
 
-			$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", '<div style="text-align:center; width: 100%;">' . $charts->render($id, NULL, 'charts_labels', 'charts_data') . '</div>', $body);
+			$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", '<div style="text-align:center; width: 100%;">' . $charts->render(NULL, ['id' => $id, 'labels_table' => 'charts_labels', 'data_table' => 'charts_data']) . '</div>', $body);
 		}
 		return $body;
 	}

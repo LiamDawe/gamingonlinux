@@ -2,7 +2,7 @@
 <div class="box">
 	<div class="head">Add a new chart</div>
 	<div class="body group">
-		<form method="post" action="admin.php?module=charts">
+		<form id="chart_form" method="post" action="admin.php?module=charts">
 			Chart name: <input type="text" name="name" value="{:name}" /><br />
 			Sub title: <input type="text" name="sub_title" value="{:sub_title}" /><br />
 			<label><input type="checkbox" id="chart_grouped" name="grouped" /> Grouped chart? (for data comparisons like OpenGL vs Vulkan on different settings</label>
@@ -21,10 +21,12 @@
 				<div id="data-1" class="box">Data for Label #1<input class="data" name="data-1">{:data}</input></div>
 				<div id="data-2" class="box">Data for Label #2<input class="data" name="data-2">{:data}</input></div>
 			</div>
-			<input type="submit" name="submit" value="Add" />
-			<input type="hidden" name="act" value="add_chart" />
+			<button type="submit" name="submit" value="Add">Add</button> <button type="button" id="preview_chart" name="preview_chart">Preview Chart</button>
+			<input type="hidden" name="act" value="add_chart" /> 
 		</form>
 	</div>
+</div>
+<div class="chart_preview">
 </div>
 [/block: add_chart]
 
@@ -37,7 +39,13 @@
 
 [block: chart]
 <div class="box">
-	<div class="head">Here's how it looks currently</div>
+	<ul class="breadcrumb">
+		<li><a href="/admin.php?module=charts&view=manage">Back to your charts</a></li>
+		<li class="active">{:chart_name}</li>
+	</ul>
+</div>
+<div class="box">
+	<div class="head">Here's how it looks currently - <a href="/admin.php?module=charts&view=add">Create new chart</a></div>
 	<div class="body group">{:chart}</div>
 </div>
 <div class="box">

@@ -1072,6 +1072,24 @@ $(".poll_content").on("click", ".open_poll", function()
 		$('.preview_pm').highlight();
 	});
 	
+	$('#preview_chart').click(function()
+	{
+		var myform = document.getElementById("chart_form");
+		var fd = new FormData(myform);
+		$.ajax({
+			url: '/includes/ajax/preview_chart.php',
+			data: fd,
+			cache: false,
+			processData: false,
+			contentType: false,
+			type: 'POST',
+			success: function (dataofconfirm) {
+				$('.chart_preview').html(dataofconfirm);
+				console.log(dataofconfirm)
+			}
+		});
+	});
+	
 	var label_inputs = $('.labels').length;
 	var colour_inputs = $('.colours').length;
 	var data_inputs = $('.data').length;

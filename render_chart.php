@@ -1,11 +1,11 @@
 <?php
 define("APP_ROOT", dirname(__FILE__));
 
-$db_conf = include $file_dir . '/includes/config.php';
+$db_conf = include APP_ROOT . '/includes/config.php';
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$charts = new chart($dbl);
+$charts = new charts($dbl);
 
 if (!core::is_number($_GET['id']))
 {
@@ -25,7 +25,7 @@ else
 			header('Content-type: image/svg+xml');
 			header("Content-Disposition: attachment; filename=$file");
 		}
-		echo $charts->render($id, ['title_colour' => '#FFFFFF', 'counter_colour' => '#000000'], 'charts_labels', 'charts_data');
+		echo $charts->render(['title_colour' => '#FFFFFF', 'counter_colour' => '#000000'], ['id' => $id, 'labels_table' => 'charts_labels', 'data_table' => 'charts_data']);
 	}
 
 	if ($_GET['type'] == 'stats')

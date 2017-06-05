@@ -111,12 +111,17 @@ class charts
 		$this->chart_info = $get_chart->fetch();
 	}
 	
-	function get_labels($chart_id, $labels_table, $data_table)
+	function get_labels($chart_data)
 	{
-		global $db;
-		
-		// set the right labels to the right data
-		$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`min`, d.`max`, d.`data_series` FROM `".$labels_table."` l LEFT JOIN `".$data_table."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_id))->fetch_all();
+		if (isset($chart_data['id']))
+		{
+			// set the right labels to the right data
+			$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, $extra_fields  d.`data_series` FROM `".$chart_data['labels_table']."` l LEFT JOIN `".$chart_data['data_table']."` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` " . $this->chart_options['order'], array($chart_data['id']))->fetch_all();
+		}
+		else
+		{
+			$this->labels_raw_data = $chart_data['data'];
+		}
 		
 		// if we are requesting the top 10, cut it down
 		$get_labels = $this->labels_raw_data;
@@ -126,6 +131,7 @@ class charts
 		}
 
 		$label_loop_counter = 0;
+		
 		// make up the data array of labels for this chart
 		foreach ($get_labels as $label_loop)
 		{
@@ -282,20 +288,39 @@ class charts
 		
 		$this->chart_end_x = $this->chart_bar_start_x + $this->actual_chart_space + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 	}
-	
-	function render($id, $pass_options = NULL, $labels_table = NULL, $data_table = NULL)
+	/*
+	$chart_data:
+	- name
+	- subtitle
+	- h_label
+	- grouped
+	- labels_table
+	- data_table
+	*/
+	function render($pass_options = NULL, $chart_data = NULL)
 	{
 		global $user;
 		
 		$this->setup($pass_options);
-		$this->get_chart($id);
+		
+		if (isset($chart_data['id']))
+		{
+			$this->get_chart($chart_data['id']);
+		}
+		else
+		{
+			//$this->chart_info = ['name' => $chart_data['name'], 'subtitle' => $chart_data['subtitle'], 'h_label' => $chart_data['h_label'], 'grouped' => $chart_data['grouped'], 'enabled' => 1];
+			$this->chart_info = $chart_data;
+			$this->chart_info['enabled'] = 1;
+			//if (isset())
+		}
 		
 		if ($this->chart_info['enabled'] == 0 && $user->check_group([1,2,5]) == false)
 		{
 			return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="tiny" version="1.2" width="660" height="20"><text x="1" y="15">This chart is not currently enabled!</text></svg>';
 		}
 		
-		$this->get_labels($this->chart_info['id'], $labels_table, $data_table);
+		$this->get_labels($chart_data);
 
 		self::chart_sizing();
 		
@@ -497,7 +522,7 @@ class charts
 		}
 
 		// set the right labels to the right data (This months data)
-		$this->get_labels($id, 'user_stats_charts_labels', 'user_stats_charts_data');
+		$this->get_labels(['id' => $id, 'labels_table' => 'user_stats_charts_labels', 'data_table' => 'user_stats_charts_data']);
 		
 		// this is for the full info expand box, as charts only show 10 items, this expands to show them all
 		$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
@@ -750,11 +775,17 @@ class charts
 		$get_graph .= implode('', $this->counter_array);
 			
 		$get_graph .= '</g>';
+		
+		$h_label = '';
+		if (isset($this->chart_info['h_label']))
+		{
+			$h_label = $this->chart_info['h_label'];
+		}
 
 		$get_graph .= '<!-- bottom axis numbers -->
 		<g font-size="10" fill="#000000" text-anchor="middle">'.$this->divisions.'</g>
 		<!-- bottom axis label -->
-		<text x="285" y="'.$this->y_axis_label_y.'" font-size="15" fill="#000000" text-anchor="middle">'.$this->chart_info['h_label'].'</text>
+		<text x="285" y="'.$this->y_axis_label_y.'" font-size="15" fill="#000000" text-anchor="middle">'.$h_label.'</text>
 		</svg>';
 		
 		return $get_graph;	

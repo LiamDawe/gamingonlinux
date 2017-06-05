@@ -65,10 +65,4 @@ foreach ($_POST['labels'] as $key => $label)
 	$label_counter++;
 }
 
-// sort them from highest to lowest, by their actual data
-usort($preview_data, function($b, $a)
-{
-	return $a['data'] - $b['data'];
-});
-
 echo $charts->render(NULL, ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data]);

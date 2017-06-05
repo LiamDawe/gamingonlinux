@@ -174,7 +174,7 @@ class charts
 			$this->data_counts[] = $label_loop['data'];
 		}
 		
-		$this->max_data = $this->data_counts[0];
+		$this->max_data = max($this->data_counts);
 		
 		// total number of answers for this chart
 		$total_counter = 0;

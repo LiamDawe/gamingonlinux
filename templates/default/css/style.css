@@ -806,6 +806,12 @@ ul.social-networks li > a {
 	display: inline-block;
 }
 
+.user_avatar
+{
+	max-height: 125px;
+	max-width: 125px;
+}
+
 /*
  * ------------------------------
  * Control panels

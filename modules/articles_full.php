@@ -431,9 +431,8 @@ if (!isset($_GET['go']))
 				if ($article['active'] == 1)
 				{
 					// count how many there is in total
-					$sql_count = "SELECT `comment_id` FROM `articles_comments` WHERE `article_id` = ?";
-					$db->sqlquery($sql_count, array($_GET['aid']));
-					$total_comments = $db->num_rows();
+					$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `article_id` = ? AND `approved` = 1";
+					$total_comments = $dbl->run($sql_count, array($_GET['aid']))->fetchOne();
 
 					//lastpage is = total comments / items per page, rounded up.
 					if ($total_comments <= 10)
@@ -563,7 +562,7 @@ if (!isset($_GET['go']))
 						$per_page = $_SESSION['per-page'];
 					}
 
-					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN ".$core->db_tables['users']." u ON a.author_id = u.user_id LEFT JOIN ".$core->db_tables['users']." ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $_GET['aid'], $core->start, $per_page));
+					$db->sqlquery("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $_GET['aid'], $core->start, $per_page));
 					$comments_get = $db->fetch_all_rows();
 					
 					// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying

@@ -46,6 +46,7 @@ if (isset($view))
 		$_SESSION['message'] = 'none_found';
 		$_SESSION['message_extra'] = 'categories';
 		header("Location: /index.php?module=search");
+		die();
 	}
 	
 	// viewing a single category
@@ -55,7 +56,8 @@ if (isset($view))
 		{
 			$_SESSION['message'] = 'none_found';
 			$_SESSION['message_extra'] = 'categories';
-			header("Location: /index.php?module=search");		
+			header("Location: /index.php?module=search");
+			die();
 		}
 
 		$safe_category = core::make_safe($_GET['catid']);
@@ -66,6 +68,7 @@ if (isset($view))
 			$_SESSION['message'] = 'none_found';
 			$_SESSION['message_extra'] = 'categories';
 			header("Location: /index.php?module=search");
+			die();
 		}
 		$get_category = $db->fetch();
 
@@ -115,6 +118,7 @@ if (isset($view))
 				$_SESSION['message'] = 'none_found';
 				$_SESSION['message_extra'] = 'categories';
 				header("Location: /index.php?module=search");
+				die();
 			}
 			$categorys_ids = $_GET['catid'];
 		}

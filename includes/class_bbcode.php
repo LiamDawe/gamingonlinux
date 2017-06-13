@@ -405,7 +405,7 @@ class bbcode
 			=> "$2",
 		"/\[font\=(.+?)\](.+?)\[\/font\]/is" 
 			=> "$2",
-		"/\[center\](.+?)\[\/center\]/is" 
+		"/\[center\](.+?)\[\/center\](\r?\n)?/is" 
 			=> "<div style=\"text-align:center;\">$1</div>",
 		"/\[right\](.+?)\[\/right\]/is" 
 			=> "<div style=\"text-align:right;\">$1</div>",

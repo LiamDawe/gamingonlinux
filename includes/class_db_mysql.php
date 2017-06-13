@@ -11,9 +11,7 @@ class db_mysql extends PDO
 	// store all the queries for debugging
 	public $debug_queries = '';
 	
-	public $table_prefix = '';
-	
-	public function __construct($dsn, $username, $password, $table_prefix)
+	public function __construct($dsn, $username, $password)
 	{
 		$options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -22,7 +20,6 @@ class db_mysql extends PDO
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
         ];
         parent::__construct($dsn, $username, $password, $options);
-        $this->table_prefix = $table_prefix;
 	}
 	
 	// the most basic query

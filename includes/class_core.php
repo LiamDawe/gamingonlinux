@@ -225,14 +225,14 @@ class core
 	
 	function users_table()
 	{
-		$this->db_tables['users'] = '`'.$this->database->table_prefix.'users`';
-		$this->db_tables['session'] = '`'.$this->database->table_prefix.'saved_sessions`';
-		$this->db_tables['profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
-		$this->db_tables['user_groups'] = '`'.$this->database->table_prefix.'user_groups`';
- 		$this->db_tables['user_permissions'] = '`'.$this->database->table_prefix.'user_group_permissions`';
- 		$this->db_tables['user_profile_info'] = '`'.$this->database->table_prefix.'user_profile_info`';
- 		$this->db_tables['user_group_membership'] = '`'.$this->database->table_prefix.'user_group_membership`';
- 		$this->db_tables['user_group_permissions_membership'] = '`'.$this->database->table_prefix.'user_group_permissions_membership`';
+		$this->db_tables['users'] = '`users`';
+		$this->db_tables['session'] = '`saved_sessions`';
+		$this->db_tables['profile_info'] = '`user_profile_info`';
+		$this->db_tables['user_groups'] = '`user_groups`';
+ 		$this->db_tables['user_permissions'] = '`user_group_permissions`';
+ 		$this->db_tables['user_profile_info'] = '`user_profile_info`';
+ 		$this->db_tables['user_group_membership'] = '`user_group_membership`';
+ 		$this->db_tables['user_group_permissions_membership'] = '`user_group_permissions_membership`';
 	}
 
 	function get_client_ip()

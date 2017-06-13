@@ -1,6 +1,4 @@
 <?php
-$file_dir = dirname( dirname( __FILE__ ) );
-	
 class db_mysql extends PDO
 {	
 	public $stmt;

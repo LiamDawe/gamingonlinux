@@ -737,7 +737,7 @@ select.pagination {
 	}
 	.comment .comment-body {
 		margin-left: 155px;
-		margin-right: 14px;
+		margin-right: 10px;
 	}
     .comment .comment-quote {
         display: none;
@@ -1420,17 +1420,14 @@ body.dark {
 			 -o-border-radius: 3px;
 				border-radius: 3px;
 	}
-	/* Comment */
-	.comment .comment-author {
-		width: 75px;
-	}
-	.comment .comment-body {
-		margin-left: 100px;
-	}
 }
 /* MOBILE LANDSCAPE */
 @media only screen and (max-width: 480px) {
-
+	.hide-xsmall{display:none;}
+	/* Comments */
+	.comment .comment-body {
+		margin-left: 7px;
+	}
 }
 /* MOBILE PORTRAIT */
 @media only screen and (max-width: 320px)

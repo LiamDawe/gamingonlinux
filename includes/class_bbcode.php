@@ -439,7 +439,7 @@ class bbcode
 			=> '<code>$1</code>',
 		"/\[sup\](.+?)\[\/sup\]/is" 
 			=> '<sup>$1</sup>',
-		"/\[spoiler](.+?)\[\/spoiler\]/is" 
+		"/\[spoiler](.+?)\[\/spoiler\](\r?\n)?/is" 
 			=> '<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
 		"/\[mp3](.+?)\[\/mp3\]/is" 
 			=> '<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',

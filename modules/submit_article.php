@@ -133,7 +133,6 @@ if (isset($_POST['act']))
         $templating->set_previous('title', 'Submit An Article', 1);
         
         $title = strip_tags($_POST['title']);
-        $title = core::make_safe($title);
         $text = core::make_safe($_POST['text']);
         
         $name = '';

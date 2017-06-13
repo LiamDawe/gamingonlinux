@@ -82,7 +82,7 @@ class user
 					$generated_session = md5(mt_rand() . $user_info['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
 					// update IP address and last login
-					$db->sqlquery("UPDATE `".$this->database->table_prefix."users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
 
 					$this->new_login($user_info, $generated_session);
 
@@ -397,7 +397,7 @@ class user
 				$this->check_banned($user_data['user_id']);
 
 				// update IP address and last login
-				$db->sqlquery("UPDATE `".$this->database->table_prefix."users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
+				$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
 
 				$this->register_session($user_data);
 

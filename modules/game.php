@@ -130,6 +130,7 @@ if (!isset($_GET['game-id']) && !isset($_GET['view']))
 	$templating->block('edits_bottom', 'game_database');
 }
 
+// viewing an actual game
 if (isset($_GET['game-id']) && !isset($_GET['view']))
 {
 	if (!core::is_number($_GET['game-id']))
@@ -290,6 +291,19 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 				$same_games[] = $associations['name'];
 			}
 			$templating->set('games', implode(', ', $same_games));
+		}
+		
+		// DLC LIST 
+		$dlc_list = $dbl->run("SELECT `name` FROM `calendar` WHERE `base_game_id` = ?", [$game['id']])->fetch_all();
+		if ($dlc_list)
+		{
+			$templating->block('dlc_top');
+			foreach ($dlc_list as $item)
+			{
+				$templating->block('dlc_row');
+				$templating->set('dlc_name', $item['name']);
+			}
+			$templating->block('dlc_bottom');
 		}
 
 		$game['name'] = trim($game['name']);

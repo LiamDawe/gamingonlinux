@@ -297,13 +297,13 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 		$dlc_list = $dbl->run("SELECT `name` FROM `calendar` WHERE `base_game_id` = ?", [$game['id']])->fetch_all();
 		if ($dlc_list)
 		{
-			$templating->block('dlc_top');
+			$templating->block('dlc');
+			$dlc_output = [];
 			foreach ($dlc_list as $item)
 			{
-				$templating->block('dlc_row');
-				$templating->set('dlc_name', $item['name']);
+				$dlc_output[] = $item['name'];
 			}
-			$templating->block('dlc_bottom');
+			$templating->set('dlc_names', implode(', ', $dlc_output));
 		}
 
 		$game['name'] = trim($game['name']);

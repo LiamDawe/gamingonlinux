@@ -119,7 +119,7 @@ $counter = $db->fetch();
 
 $templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
 
-$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL ORDER BY `date` ASC, `name` ASC");
+$db->sqlquery("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc`, `link`,`gog_link`,`steam_link`,`itch_link` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL ORDER BY `date` ASC, `name` ASC");
 while ($listing = $db->fetch())
 {
     if (!isset($last_date) || $last_date !== $listing['date']) 
@@ -161,6 +161,25 @@ while ($listing = $db->fetch())
 	$game_name = '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
 
 	$templating->set('name', $game_name);
+	
+	$links = [];
+	if (!empty($listing['link']) && $listing['link'] != NULL)
+	{
+		$links[] = '<a href="'.$listing['link'].'">Official Site</a>';
+	}
+	if (!empty($listing['gog_link']) && $listing['gog_link'] != NULL)
+	{
+		$links[] = '<a href="'.$listing['gog_link'].'">GOG</a>';
+	}
+	if (!empty($listing['steam_link']) && $listing['steam_link'] != NULL)
+	{
+		$links[] = '<a href="'.$listing['steam_link'].'">Steam</a>';
+	}
+	if (!empty($listing['itch_link']) && $listing['itch_link'] != NULL)
+	{
+		$links[] = '<a href="'.$listing['itch_link'].'">itch.io</a>';
+	}
+	$templating->set('links', implode(' - ', $links));
 		
 	$edit = '';
 	if ($user->check_group([1,2,5]))

@@ -493,7 +493,7 @@ else
 					unlink('uploads/avatars/' . $deleted_info['avatar']);
 				}
 
-				$db->sqlquery("DELETE FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("DELETE FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['user_id']));

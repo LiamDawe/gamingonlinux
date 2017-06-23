@@ -27,7 +27,7 @@ if (!isset($_GET['view']))
 	if ($user->check_group(1))
 	{
 		$cron_list = '';
-		$templating->block('crons');
+		$templating->block('crons', "adminHome");
 		$crons = $dbl->run("SELECT `name`, `last_ran` FROM `crons` ORDER BY `last_ran` ASC")->fetch_all();
 		$total_crons = count($crons);
 		$counter = 0;

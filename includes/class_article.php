@@ -769,10 +769,13 @@ class article
 		}
 		
 		include($this->core->config('path') . 'includes/telegram_poster.php');
+		include($this->core->config('path') . 'includes/mastodon/post_status.php');
 
 		$article_link = self::get_link($article_id, $checked['slug']);
 		
 		telegram($checked['title'] . ' ' . $article_link);
+		
+		post_mastodon_status($checked['title'] . "\n\n" . $article_link);
 
 		if (!isset($_POST['show_block']))
 		{

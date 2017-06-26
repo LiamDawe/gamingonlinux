@@ -9,11 +9,11 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 if (isset($_GET['id']) && is_numeric($_GET['id']))
 {
-	$public = $dbl->run("SELECT `pc_info_public` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", [$_GET['id']])->fetchOne();
+	$public = $dbl->run("SELECT `pc_info_public` FROM `users` WHERE `user_id` = ?", [$_GET['id']])->fetchOne();
 
 	if ($public == 1)
 	{
-		$user_info = $dbl->run("SELECT u.`distro`, u.`username`, i.`desktop_environment`, i.`gpu_vendor`, i.`gpu_model`, i.`cpu_vendor`, i.`cpu_model` FROM ".$core->db_tables['users']." u LEFT JOIN `user_profile_info` i ON u.user_id = i.user_id WHERE u.`user_id` = ?", [$_GET['id']])->fetch();
+		$user_info = $dbl->run("SELECT u.`distro`, u.`username`, i.`desktop_environment`, i.`gpu_vendor`, i.`gpu_model`, i.`cpu_vendor`, i.`cpu_model` FROM `users` u LEFT JOIN `user_profile_info` i ON u.user_id = i.user_id WHERE u.`user_id` = ?", [$_GET['id']])->fetch();
 
 		$username = $user_info['username'];
 

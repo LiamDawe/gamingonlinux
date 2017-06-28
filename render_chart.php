@@ -32,7 +32,7 @@ else
 	{
 		if (isset($_GET['download']))
 		{
-			$info = $db->sqlquery("SELECT `name` FROM `user_stats_charts` WHERE `id` = ?", array($id))->fetch();
+			$info = $dbl->run("SELECT `name` FROM `user_stats_charts` WHERE `id` = ?", array($id))->fetch();
 			$file = $info['name'] . '.svg';
 			header('Content-type: image/svg+xml');
 			header("Content-Disposition: attachment; filename=$file");

@@ -45,8 +45,6 @@ class bbcode
 		{
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 			{
-				$game_info = $this->database->run("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
-
 				$your_key = $this->database->run("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", [$_SESSION['user_id'], $giveaway_id])->fetch();
 
 				// they have a key already
@@ -64,6 +62,8 @@ class bbcode
 						
 					if ($day_ago > $reg_fetch['register_date'])
 					{
+						$game_info = $this->database->run("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
+
 						$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
 					}
 					else

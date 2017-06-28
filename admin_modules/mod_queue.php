@@ -301,17 +301,19 @@ if (isset($_POST['action']))
 					$subject = "New reply to article {$approved['title']} on GamingOnLinux.com";
 
 					$comment_email = $bbcode->email_bbcode($approved['comment_text']);
+					
+					$article_link = $core->config('website_url') . 'index.php?module=articles_full&aid=' . $approved['article_id'] . '&comment_id=' . $_POST['post_id'] . '&clear_note=' . $new_notification_id[$email_user['user_id']];
 
 					// message
 					$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$approved['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "index.php?module=articles_full&aid={$approved['article_id']}&comment_id={$_POST['post_id']}&clear_note={$new_notification_id[$email_user['user_id']]}\">{$approved['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+					<p><strong>{$approved['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $article_link .  "\">{$approved['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 					<div>
 					<hr>
 					{$comment_email}
 					<hr>
 					<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$approved['article_id']}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
 
-					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$_POST['post_id']}&clear_note={$new_notification_id[$email_user['user_id']]}\r\n\r\n{$approved['comment_text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$approved['article_id']}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
+					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$approved['username']} replied to an article on GamingOnLinux: " . $article_link . "\r\n\r\n{$approved['comment_text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$approved['article_id']}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
 
 					// Mail it
 					if ($core->config('send_emails') == 1)

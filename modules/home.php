@@ -7,8 +7,6 @@ if (!isset($_GET['view']))
 {
 	$templating->set_previous('title', $core->config('meta_homepage_title'), 1);
 
-	$core->check_old_pc_info($_SESSION['user_id']);
-
 	$templating->block('articles_top', 'home');
 	
 	$top_of_home_hook = '';

@@ -156,6 +156,8 @@ if ($count_announcements > 0)
 	$templating->block('announcement_bottom', 'announcements');
 }
 
+$core->check_old_pc_info($_SESSION['user_id']);
+
 // let them know they aren't activated yet
 if (isset($_GET['user_id']))
 {

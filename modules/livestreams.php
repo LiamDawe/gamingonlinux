@@ -21,10 +21,9 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'])
 	$templating->set('timezones_list', $timezones);
 }
 
-$db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC");
-if ($db->num_rows() > 0)
+$grab_streams = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC")->fetch_all();
+if ($grab_streams)
 {
-	$grab_streams = $db->fetch_all_rows();
 	foreach ($grab_streams as $streams)
 	{
 		$templating->block('item', 'livestreams');
@@ -55,39 +54,34 @@ if ($db->num_rows() > 0)
 		$countdown = '<span id="timer'.$streams['row_id'].'"></span><script type="text/javascript">var timer' . $streams['row_id'] . ' = moment.tz("'.$streams['date'].'", "UTC"); $("#timer'.$streams['row_id'].'").countdown(timer'.$streams['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
 		$templating->set('countdown', $countdown);
 
-		$streamer_list = '';
-		$db->sqlquery("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN ".$core->db_tables['users']." u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']));
-		$total_streamers = $db->num_rows();
-		$streamer_counter = 0;
-		while ($grab_streamers = $db->fetch())
+		$streamer_list = [];
+		$grab_streamers = $dbl->run("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
+		foreach ($grab_streamers as $streamer)
 		{
-			$streamer_counter++;
 			if ($core->config('pretty_urls') == 1)
 			{
-				$streamer_list .= '<a href="/profiles/' . $grab_streamers['user_id'] . '">'.$grab_streamers['username'].'</a>';
+				$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
 			}
 			else
 			{
-				$streamer_list .= '<a href="/index.php?module=profile&user_id=' . $grab_streamers['user_id'] . '">'.$grab_streamers['username'].'</a>';
-			}
-			if ($streamer_counter != $total_streamers)
-			{
-				$streamer_list .= ', ';
+				$streamer_list[] = '<a href="/index.php?module=profile&user_id=' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
 			}
 		}
-		if (!empty($streams['streamer_community_name']))
+
+		if (!empty($streamer_list))
 		{
-			if (!empty($streamer_list))
+			$streamer_list = implode(', ', $streamer_list);
+			if (!empty($streams['streamer_community_name']))
 			{
-				$streamer_list = $streamer_list . ', ' . $streams['streamer_community_name'];
-			}
-			else
-			{
-				$streamer_list = $streams['streamer_community_name'];
+				$streamer_list .= ', ' . $streams['streamer_community_name'];
 			}
 		}
+		else
+		{
+			$streamer_list = $streams['streamer_community_name'];
+		}
+		
 		$templating->set('profile_links', $streamer_list);
-		$templating->set('users_list', $streamer_list);
   }
 }
 else

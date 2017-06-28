@@ -22,8 +22,7 @@ $page = core::give_page();
 $in = str_repeat('?,', count($user->user_groups) - 1) . '?';
 
 // get the forum ids this user is actually allowed to view
-$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups);
-$forum_ids = $db->fetch_all_rows();
+$forum_ids = $dbl->run("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all();
 
 $templating->block('options', 'flat_forum');
 $new_topic = '';
@@ -56,8 +55,7 @@ $templating->set('forum_list', $forum_list);
 $sql_forum_ids = implode(', ', $forum_id_list);
 
 // count how many there is in total
-$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1 AND `forum_id` IN ($sql_forum_ids)");
-$total_topics = $db->num_rows();
+$total_topics = $dbl->run("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1 AND `forum_id` IN ($sql_forum_ids)")->fetchOne();
 
 $comments_per_page = $core->config('default-comments-per-page');
 if (isset($_SESSION['per-page']))

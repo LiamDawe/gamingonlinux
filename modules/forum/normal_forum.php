@@ -36,7 +36,7 @@ WHERE
 ORDER BY
 	category.order, forum.order";
 
-$query_forums = $db->sqlquery($sql);
+$forum_rows = $dbl->run($sql)->fetch_all();
 
 // start the ids at 0
 $current_category_id = 0;
@@ -45,7 +45,7 @@ $category_array = array();
 $forum_array = array();
 
 // set the forum array so we can use it later and so we don't have to loop it just yet :)
-while ( $row = $db->fetch($query_forums) )
+foreach ( $forum_rows as $row )
 {
 	// make an array of categorys
 	if ($current_category_id != $row['CategoryId'])
@@ -149,36 +149,33 @@ $templating->set('this_template', $core->config('website_url') . '/templates/' .
 
 // lastest posts block below forums
 $forum_posts = '';
-$db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit 7");
-if ($db->num_rows() >= 1)
+$topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit 7")->fetch_all();
+if ($topics)
 {
-	while ($topics = $db->fetch())
+	$date = $core->format_date($topics['last_post_date']);
+
+	$post_count = $topics['replys'];
+	// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
+	if ($post_count <= $_SESSION['per-page'])
 	{
-		$date = $core->format_date($topics['last_post_date']);
-
-		$post_count = $topics['replys'];
-		// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-		if ($post_count <= $_SESSION['per-page'])
-		{
-			// it will be the first page
-			$postPage = 1;
-			$postNumber = 1;
-		}
-
-		// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-		if ($post_count >= $_SESSION['per-page'])
-		{
-			$rows_per_page = $_SESSION['per-page'];
-
-			// page we are going to
-			$postPage = ceil($post_count / $rows_per_page);
-
-			// the post we are going to
-			$postNumber = (($post_count - 1) % $rows_per_page) + 1;
-		}
-
-		$forum_posts .= "<a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\"><i class=\"icon-comment\"></i> {$topics['topic_title']}</a> {$date}<br />";
+		// it will be the first page
+		$postPage = 1;
+		$postNumber = 1;
 	}
+
+	// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
+	if ($post_count >= $_SESSION['per-page'])
+	{
+		$rows_per_page = $_SESSION['per-page'];
+
+		// page we are going to
+		$postPage = ceil($post_count / $rows_per_page);
+
+		// the post we are going to
+		$postNumber = (($post_count - 1) % $rows_per_page) + 1;
+	}
+
+	$forum_posts .= "<a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\"><i class=\"icon-comment\"></i> {$topics['topic_title']}</a> {$date}<br />";
 }
 else
 {

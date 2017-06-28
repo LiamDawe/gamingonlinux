@@ -35,35 +35,35 @@ class bbcode
 		$key_claim = '';
 		$nope_message = '[b]Grab a key[/b]<br />You must be logged in to grab a key, your account must also be older than one day!';
 		
-		$keys_left = $this->database->run("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", [$giveaway_id])->fetch();
-		
-		if ($keys_left['counter'] == 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$key_claim = '[b]Grab a key[/b]<br />All keys are now gone, sorry!';
-		}
-		else
-		{
-			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			$your_key = $this->database->run("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", [$_SESSION['user_id'], $giveaway_id])->fetch();
+
+			// they have a key already
+			if ($your_key['counter'] == 1)
 			{
-				$game_info = $this->database->run("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
+				$key_claim = '[b]Grab a key[/b]<br />You already claimed one: ' . $your_key['game_key'];
+			}
+			// they do not have a key
+			else if ($your_key['counter'] == 0)
+			{
+				$keys_left = $this->database->run("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", [$giveaway_id])->fetch();
 
-				$your_key = $this->database->run("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", [$_SESSION['user_id'], $giveaway_id])->fetch();
-
-				// they have a key already
-				if ($your_key['counter'] == 1)
+				if ($keys_left['counter'] == 0)
 				{
-					$key_claim = '[b]Grab a key[/b]<br />You already claimed one: ' . $your_key['game_key'];
+					$key_claim = '[b]Grab a key[/b]<br />All keys are now gone, sorry!';
 				}
-				// they do not have a key
-				else if ($your_key['counter'] == 0)
+				else
 				{
-					// check their registration date is older than one day
+					 // check their registration date is older than one day
 					$reg_fetch = $this->database->run("SELECT `register_date` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-							
+
 					$day_ago = time() - 24 * 3600;
-						
+
 					if ($day_ago > $reg_fetch['register_date'])
 					{
+						$game_info = $this->database->run("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
+
 						$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
 					}
 					else
@@ -72,12 +72,12 @@ class bbcode
 					}
 				}
 			}
-			else
-			{
-				$key_claim = $nope_message;
-			}
 		}
-		
+		else
+		{
+			$key_claim = $nope_message;
+		}
+
 		$text = preg_replace("/\[giveaway\]".$giveaway_id."\[\/giveaway\]/is", $key_claim, $text);
 
 		return $text;

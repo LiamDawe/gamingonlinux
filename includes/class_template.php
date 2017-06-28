@@ -40,7 +40,7 @@ class template
 
 		if (!is_dir($this->core->config('path') . "templates/{$template_folder}"))
 		{
-			die("Error loading template folder ($template_folder). " . $_SERVER['DOCUMENT_ROOT'] . $this->core->config('path') . "templates/" . $template_folder);
+			die("Error loading template folder ($template_folder). " . $this->core->config('path') . "templates/" . $template_folder);
 		}
 
 		$this->template = $this->core->config('path') . "templates/{$template_folder}";

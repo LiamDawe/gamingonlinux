@@ -13,7 +13,7 @@ $search_text = '';
 if (isset($_GET['q']))
 {
 	$search_text = str_replace("+", ' ', $_GET['q']);
-	$search_text = core::make_safe($search_text);
+	$search_text = strip_tags($_GET['q']);
 }
 $templating->set('search_text', $search_text);
 
@@ -50,19 +50,16 @@ foreach ($search_array[0] as $item)
 if (isset($search_text) && !empty($search_text))
 {
 	// do the search query
-	$db->sqlquery("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
+	$found_search = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
 	FROM `articles` a
-	LEFT JOIN ".$core->db_tables['users']." u ON a.`author_id` = u.`user_id`
+	LEFT JOIN `users` u ON a.`author_id` = u.`user_id`
 	WHERE a.`active` = 1
 	AND a.`title` LIKE ?
 	ORDER BY a.`date` DESC
-	LIMIT 0 , 100", array($search_through));
-	$total = $db->num_rows();
+	LIMIT 0 , 100", array($search_through))->fetch_all();
 
-	if ($total > 0)
+	if ($found_search)
 	{
-		$found_search = $db->fetch_all_rows();
-
 		$article_id_array = array();
 
 		foreach ($found_search as $article)

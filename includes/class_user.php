@@ -855,16 +855,19 @@ class user
 			
 			$badges[] = $text;
 		}
-		foreach ($data['user_groups'] as $group)
+		if (isset($data['user_groups']))
 		{
-			if (array_key_exists($group, self::$user_group_list) && self::$user_group_list[$group]['show_badge'] == 1)
+			foreach ($data['user_groups'] as $group)
 			{
-				$text = '<span class="badge '.self::$user_group_list[$group]['badge_colour'].'">'.self::$user_group_list[$group]['badge_text'].'</span>';
-				if ($list == 1)
+				if (array_key_exists($group, self::$user_group_list) && self::$user_group_list[$group]['show_badge'] == 1)
 				{
-					$text = '<li>'.$text.'</li>';
+					$text = '<span class="badge '.self::$user_group_list[$group]['badge_colour'].'">'.self::$user_group_list[$group]['badge_text'].'</span>';
+					if ($list == 1)
+					{
+						$text = '<li>'.$text.'</li>';
+					}
+					$badges[] = $text;
 				}
-				$badges[] = $text;
 			}
 		}
 		return $badges;

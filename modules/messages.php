@@ -253,6 +253,8 @@ else
 			$templating->set('user_id', $start['user_id']);
 			$templating->set('message_text', $bbcode->parse_bbcode($start['message']));
 
+			$their_groups = $user->post_group_list([$start['author_id']]);
+			$start['user_groups'] = $their_groups[$start['author_id']];
 			$badges = user::user_badges($start, 1);
 			$templating->set('badges', implode(' ', $badges));
 
@@ -305,8 +307,21 @@ else
 			$templating->set('edit_link', $edit_link);
 
 			// replies
-			$get_replies = $db->sqlquery("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN ".$core->db_tables['users']." u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start));
-			while ($replies = $get_replies->fetch())
+			$get_replies = $dbl->run("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN ".$core->db_tables['users']." u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start))->fetch_all();
+			
+			if ($get_replies)
+			{
+				$user_ids = [];
+				foreach ($get_replies as $id_loop)
+				{
+					$user_ids[] = (int) $id_loop['author_id'];
+				}
+				
+				// get a list of each users user groups, so we can display their badges
+				$comment_user_groups = $user->post_group_list($user_ids);
+			}
+			
+			foreach ($get_replies as $replies)
 			{
 				$templating->block('view_row_reply', 'private_messages');
 				$templating->set('message_date', $core->format_date($replies['creation_date']));
@@ -360,8 +375,18 @@ else
 
 				$templating->set('profile_fields', $profile_fields_output);
 
-				$badges = user::user_badges($replies, 1);
-				$templating->set('badges', implode(' ', $badges));
+				// if we have some user groups for that user
+				if (array_key_exists($replies['author_id'], $comment_user_groups))
+				{
+					$replies['user_groups'] = $comment_user_groups[$replies['author_id']];
+					$badges = user::user_badges($replies, 1);
+					$templating->set('badges', implode(' ', $badges));
+				}
+				// otherwise guest account or their account was removed, as we didn't get any groups for it
+				else
+				{
+					$templating->set('badges', '');
+				}
 
 				$edit_link = '';
 				if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $replies['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)

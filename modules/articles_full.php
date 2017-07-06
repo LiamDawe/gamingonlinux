@@ -863,7 +863,7 @@ if (!isset($_GET['go']))
 							
 										if ($forced_mod_queue == true || $mod_queue == 1)
 										{
-											$core->message('You are currently being moderated, so your comment will go through editor approval first. You\'re either a new user (anti-spam measure), or you\'ve landed yourself on the naughty list.', NULL, 2);
+											$core->message('Some comments are held for moderation. Your post may not appear right away.', NULL, 2);
 										}
 										$subscribe_check = $user->check_subscription($_GET['aid'], 'article');
 

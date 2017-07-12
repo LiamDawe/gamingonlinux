@@ -1,19 +1,17 @@
 <?php
-define('M_KEY', $core->config('mastodon_key'));
-define('M_USERNAME', $core->config('mastodon_username'));
-define('M_PASSWORD', $core->config('mastodon_password'));
+define('M_ID', $core->config('mastodon_client_id'));
+define('M_SECRET', $core->config('mastodon_secret'));
+define('M_BEARER', $core->config('mastodon_bearer'));
 
 function post_mastodon_status($status)
 {
 	require_once("autoload.php");
 
 	$t = new \theCodingCompany\Mastodon();
+	
+	$credentials = ["client_id" => M_ID, "client_secret" => M_SECRET, "bearer" => M_BEARER];
 
-	$token_info = $t->createApp("GamingOnLinux", "https://www.gamingonlinux.com");
+	$t->setCredentials($credentials);
 
-	$auth_url = $t->getAuthUrl();
-
-	$token_info = $t->getAccessToken(M_KEY);
-
-	$status = $t->authenticate(M_USERNAME, M_PASSWORD)->postStatus($status . ' #Linux #LinuxGaming');
+	$t->postStatus($status . ' #Linux #LinuxGaming');
 }

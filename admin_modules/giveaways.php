@@ -37,7 +37,7 @@ else if (isset($_GET['manage']))
 	$templating->set('claimed', $key_totals['claimed']);
 	$templating->set('total', $key_totals['total']);
 
-	$db->sqlquery("SELECT k.`game_key`, k.`claimed`, u.`user_id`, u.`username` FROM `game_giveaways_keys` k LEFT JOIN ".$core->db_tables['users']." u ON u.`user_id` = k.`claimed_by_id` WHERE k.`game_id` = ? ORDER BY k.`claimed` DESC", array($_GET['manage']));
+	$db->sqlquery("SELECT k.`game_key`, k.`claimed`, u.`user_id`, u.`username` FROM `game_giveaways_keys` k LEFT JOIN `users` u ON u.`user_id` = k.`claimed_by_id` WHERE k.`game_id` = ? ORDER BY k.`claimed` DESC", array($_GET['manage']));
 	while ($keys = $db->fetch())
 	{
 		$templating->block('key_row');

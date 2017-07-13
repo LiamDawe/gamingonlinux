@@ -6,7 +6,7 @@ $templating->load('about_us');
 $templating->block('top');
 $templating->set('about_text', $core->config('about_text'));
 
-$db->sqlquery("SELECT `user_id`, `username`, `article_bio` FROM ".$core->db_tables['users']." WHERE `user_group` IN (1,2) ORDER BY `user_id`");
+$db->sqlquery("SELECT `user_id`, `username`, `article_bio` FROM `users` WHERE `user_group` IN (1,2) ORDER BY `user_id`");
 while ($editors = $db->fetch())
 {
 	if (!empty($editors['article_bio']))

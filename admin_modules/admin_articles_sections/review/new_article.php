@@ -53,7 +53,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	$sql_replace[] = $_SESSION['user_id'];
 	
 	// email all editors apart from yourself
-	$users_array = $dbl->run("SELECT m.user_id, u.email, u.username from ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.user_id = u.user_id WHERE m.group_id IN ($in) AND u.`submission_emails` = 1 AND u.`user_id` != ?", $sql_replace)->fetch_all();
+	$users_array = $dbl->run("SELECT m.user_id, u.email, u.username from ".$core->db_tables['user_group_membership']." m INNER JOIN `users` u ON m.user_id = u.user_id WHERE m.group_id IN ($in) AND u.`submission_emails` = 1 AND u.`user_id` != ?", $sql_replace)->fetch_all();
 
 	// subject
 	$subject = $core->config('site_title') . ": article submitted for review by {$_SESSION['username']}";

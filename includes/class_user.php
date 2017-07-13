@@ -69,13 +69,13 @@ class user
 		if (!empty($password))
 		{
 			// check username/email exists first
-			$info = $this->database->run("SELECT `password` FROM ".$this->core->db_tables['users']." WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
+			$info = $this->database->run("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
 			if ($info)
 			{
 				// now check password matches
 				if (password_verify($password, $info['password']))
 				{
-					$user_info = $this->database->run("SELECT ".$this::$user_sql_fields." FROM ".$this->core->db_tables['users']." WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
+					$user_info = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
 
 					$this->check_banned($user_info['user_id']);
 
@@ -130,7 +130,7 @@ class user
 			$banned = 1;
 		}
 
-		$banning_check = $this->database->run("SELECT `banned` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", [$user_id])->fetchOne();
+		$banning_check = $this->database->run("SELECT `banned` FROM `users` WHERE `user_id` = ?", [$user_id])->fetchOne();
 			
 		if ($banning_check == 1)
 		{
@@ -140,7 +140,7 @@ class user
 		if ($banned == 1)
 		{
 			// update their ip in the user table
-			$this->database->run("UPDATE ".$this->core->db_tables['users']." SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $user_id]);
+			$this->database->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $user_id]);
 
 			// search the ip list, if it's not on it then add it in
 			$search_ips = $this->database->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
@@ -200,7 +200,7 @@ class user
 			{
 				$get_fields = implode(',', $grab_fields);
 
-				$sql = "SELECT ".$get_fields." FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?";
+				$sql = "SELECT ".$get_fields." FROM `users` WHERE `user_id` = ?";
 				$grabber = $this->database->run($sql, [$user_id])->fetch();
 				if ($grabber)
 				{
@@ -222,7 +222,7 @@ class user
 			}
 			else
 			{
-				$sql = "SELECT `".$fields."` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?";
+				$sql = "SELECT `".$fields."` FROM `users` WHERE `user_id` = ?";
 				$picked_field = $this->database->run($sql, [$user_id])->fetchOne();
 				
 				// set the cache
@@ -391,7 +391,7 @@ class user
 			if ($db->num_rows() == 1)
 			{
 				// login then
-				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
+				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
 				$user_data = $db->fetch();
 				
 				$this->check_banned($user_data['user_id']);
@@ -614,7 +614,7 @@ class user
 			FROM
 			".$this->core->db_tables['profile_info']." p
 			INNER JOIN
-			".$this->core->db_tables['users']." u ON u.user_id = p.user_id
+			`users` u ON u.user_id = p.user_id
 			WHERE
 			p.`user_id` = ?", array($user_id))->fetch();
 

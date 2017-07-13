@@ -32,7 +32,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
 	$templating->set('pagination', $pagination);
 
-	$result = $db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN ".$core->db_tables['users']." u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
+	$result = $db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
 	while ($commentsall = $result->fetch())
 	{
 		$templating->block('commentall', 'admin_modules/admin_module_more_comments');
@@ -70,7 +70,7 @@ if (isset($_POST['act']))
 
 		$db->sqlquery("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, core::$date));
 
-		$db->sqlquery("SELECT `username`, `email` FROM ".$core->db_tables['users']." WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `username`, `email` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
 
 		while ($emailer = $db->fetch())
 		{

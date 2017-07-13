@@ -7,7 +7,7 @@ if (!isset($_GET['aid']))
 {
 	$templating->block('review_top', 'admin_modules/reviewqueue');
 
-	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN ".$core->db_tables['users']." u on a.author_id = u.user_id WHERE `admin_review` = 1");
+	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `admin_review` = 1");
 	while ($article = $db->fetch())
 	{
 		$templating->block('review_row', 'admin_modules/reviewqueue');
@@ -48,8 +48,8 @@ else
 	u.`username`,
 	u2.`username` as username_lock
 	FROM `articles` a
-	LEFT JOIN ".$core->db_tables['users']." u on a.`author_id` = u.`user_id`
-	LEFT JOIN ".$core->db_tables['users']." u2 ON a.`locked_by` = u2.`user_id`
+	LEFT JOIN `users` u on a.`author_id` = u.`user_id`
+	LEFT JOIN `users` u2 ON a.`locked_by` = u2.`user_id`
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 	WHERE a.`article_id` = ?";
 
@@ -322,7 +322,7 @@ if (isset($_POST['act']))
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$db->sqlquery("SELECT `email` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
 				$author_email = $db->fetch();
 
 				// subject

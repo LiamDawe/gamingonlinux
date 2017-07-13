@@ -152,7 +152,7 @@ if ($core->config('allow_registrations') == 1)
 			if ($core->config('captcha_disabled') == 1 || ($core->config('captcha_disabled') == 0 && ($core->config('register_captcha') == 1 && $res['success']) || $core->config('register_captcha') == 0))
 			{
 				// check username isnt taken
-				$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `username` = ?", array($_POST['username']));
+				$db->sqlquery("SELECT `username` FROM `users` WHERE `username` = ?", array($_POST['username']));
 				if ($db->fetch())
 				{
 					$_SESSION['message'] = 'username_taken';
@@ -161,7 +161,7 @@ if ($core->config('allow_registrations') == 1)
 				}
 
 				// dont allow dupe emails
-				$db->sqlquery("SELECT `email` FROM ".$core->db_tables['users']." WHERE `email` = ?", array($_POST['uemail']));
+				$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['uemail']));
 				if ($db->fetch())
 				{
 					$_SESSION['message'] = 'email_taken';
@@ -192,22 +192,22 @@ if ($core->config('allow_registrations') == 1)
 					// register away
 					if ($_POST['register'] == 'Register')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code, $_POST['timezone']));
 					}
 
 					if ($_POST['register'] == 'twitter')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $_POST['timezone']));
 					}
 
 					if ($_POST['register'] == 'steam')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
 					}
 					
 					if ($_POST['register'] == 'google')
 					{
-						$db->sqlquery("INSERT INTO ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
 					}
 
 					$last_id = $db->grab_id();
@@ -219,7 +219,7 @@ if ($core->config('allow_registrations') == 1)
 					$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
 
 					// get the users info to log them in right away!
-					$db->sqlquery("SELECT ".$user::$user_sql_fields." FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($last_id));
+					$db->sqlquery("SELECT ".$user::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($last_id));
 					$new_user_info = $db->fetch();
 					
 					$generated_session = md5(mt_rand() . $last_id . $_SERVER['HTTP_USER_AGENT']);

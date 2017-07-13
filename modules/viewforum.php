@@ -39,7 +39,7 @@ else
 	$new_topic_bottom = '';
 	if (!isset($_SESSION['activated']))
 	{
-		$db->sqlquery("SELECT `activated` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 		$get_active = $db->fetch();
 		$_SESSION['activated'] = $get_active['activated'];
 	}
@@ -78,8 +78,8 @@ else
 		u2.`username` as `username_last`,
 		u2.`user_id` as `user_id_last`
 		FROM `forum_topics` t
-		LEFT JOIN ".$core->db_tables['users']." u ON t.`author_id` = u.`user_id`
-		LEFT JOIN ".$core->db_tables['users']." u2 ON t.`last_post_id` = u2.`user_id`
+		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
+		LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id`
 		WHERE t.`forum_id`= ? AND t.`approved` = 1
 		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, {$per_page}", array($_GET['forum_id'], $core->start));
 	while ($post = $db->fetch())

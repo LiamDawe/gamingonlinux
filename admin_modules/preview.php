@@ -24,9 +24,9 @@ if (isset($_POST['check']))
 		u2.`username` as username_lock
 		FROM `articles` a
 		LEFT JOIN
-		".$core->db_tables['users']." u1 ON u1.`user_id` = a.`author_id`
+		`users` u1 ON u1.`user_id` = a.`author_id`
 		LEFT JOIN
-		".$core->db_tables['users']." u2 ON a.`locked_by` = u2.`user_id`
+		`users` u2 ON a.`locked_by` = u2.`user_id`
 		LEFT JOIN
 		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 		WHERE `article_id` = ?";
@@ -174,7 +174,7 @@ $templating->set('comment_count', '0');
 
 // sort out the avatar
 // either no avatar (gets no avatar from gravatars redirect) or gravatar set
-$db->sqlquery("SELECT `avatar`, `avatar_gravatar`, `gravatar_email`, `article_bio`, `avatar_uploaded` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+$db->sqlquery("SELECT `avatar`, `avatar_gravatar`, `gravatar_email`, `article_bio`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 $article_avatar = $db->fetch();
 
 if (empty($article_avatar['avatar']) || $article_avatar['avatar_gravatar'] == 1)

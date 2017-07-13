@@ -438,7 +438,7 @@ class article
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 					
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
@@ -496,7 +496,7 @@ class article
 	function article_history($article_id)
 	{
 		global $db, $templating, $core;
-		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM ".$this->core->db_tables['users']." u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
+		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
 		$history = '';
 		while ($grab_history = $db->fetch())
 		{
@@ -561,7 +561,7 @@ class article
 		if (isset($_POST['article_id']))
 		{
 			// check it hasn't been accepted already
-			$db->sqlquery("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN ".$this->core->db_tables['users']." u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']));
+			$db->sqlquery("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']));
 			$check_article = $db->fetch();
 			if ($check_article['active'] == 1)
 			{
@@ -695,7 +695,7 @@ class article
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$db->sqlquery("SELECT `email` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_POST['author_id']));
+				$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
 				$author_email = $db->fetch();
 
 				// subject

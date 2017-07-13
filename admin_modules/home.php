@@ -48,7 +48,7 @@ if (!isset($_GET['view']))
 	{
 		$templating->block('comments_top', 'admin_modules/admin_home');
 
-		$grab_comments = $dbl->run("SELECT a.`text`, a.`date_posted`, u.`user_id`, u.`username` FROM `admin_discussion` a INNER JOIN ".$core->db_tables['users']." u ON a.`user_id` = u.`user_id` ORDER BY a.`id` DESC LIMIT 10")->fetch_all();
+		$grab_comments = $dbl->run("SELECT a.`text`, a.`date_posted`, u.`user_id`, u.`username` FROM `admin_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY a.`id` DESC LIMIT 10")->fetch_all();
 		foreach ($grab_comments as $comments)
 		{
 			$templating->block('comment', 'admin_modules/admin_home');
@@ -65,7 +65,7 @@ if (!isset($_GET['view']))
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_home');
 
-	$editor_chat = $dbl->run("SELECT a.*, u.`user_id`, u.`username` FROM `editor_discussion` a INNER JOIN ".$core->db_tables['users']." u ON a.`user_id` = u.`user_id` ORDER BY `id` DESC LIMIT 10")->fetch_all();
+	$editor_chat = $dbl->run("SELECT a.*, u.`user_id`, u.`username` FROM `editor_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY `id` DESC LIMIT 10")->fetch_all();
 	foreach ($editor_chat as $commentsall)
 	{
 		$templating->block('commentall', 'admin_modules/admin_home');
@@ -89,7 +89,7 @@ if (!isset($_GET['view']))
 		$types[$types_set['name']] = $types_set;
 	}
 
-	$get_notifications = $dbl->run("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN ".$core->db_tables['users']." u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 50")->fetch_all();
+	$get_notifications = $dbl->run("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 50")->fetch_all();
 	foreach ($get_notifications as $tracking)
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
@@ -180,7 +180,7 @@ if (isset($_POST['act']))
 		$date = core::$date;
 		$dbl->run("INSERT INTO `admin_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
+		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 		foreach ($grab_admins as $emailer)
 		{
 			$subject = "A new admin area comment on GamingOnLinux.com";
@@ -217,7 +217,7 @@ if (isset($_POST['act']))
 		$date = core::$date;
 		$dbl->run("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['users']." u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
+		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 
 		foreach ($grab_editors as $emailer)
 		{

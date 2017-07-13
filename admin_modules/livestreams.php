@@ -63,7 +63,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('timezones_list', '');
 
 			$streamer_list = '';
-			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN ".$core->db_tables['users']." u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
+			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
 			while ($grab_streamers = $db->fetch())
 			{
 				$streamer_list .= '<option value="'.$grab_streamers['user_id'].'" selected>'.$grab_streamers['username'].'</option>';
@@ -142,7 +142,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
 
 			$streamer_list = '';
-			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN ".$core->db_tables['users']." u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
+			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
 			while ($grab_streamers = $db->fetch())
 			{
 				$streamer_list .= '<option value="'.$grab_streamers['user_id'].'" selected>'.$grab_streamers['username'].'</option>';
@@ -293,7 +293,7 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'deny_submission')
 	{
-		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN ".$core->db_tables['users']." u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
+		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
 		$livestream = $db->fetch();
 
 		if (!isset($_POST['go']))
@@ -363,7 +363,7 @@ if (isset($_POST['act']))
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);
 
-		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN ".$core->db_tables['users']." u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
+		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
 		$livestream = $db->fetch();
 
 		$comment_email = $bbcode->email_bbcode($_POST['message']);

@@ -230,7 +230,7 @@ else
 					else
 					{
 						// see if we need to add it into the mod queue
-						$db->sqlquery("SELECT `in_mod_queue` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+						$db->sqlquery("SELECT `in_mod_queue` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 						$check_queue = $db->fetch();
 
 						$approved = 1;
@@ -242,7 +242,7 @@ else
 						// update user post counter
 						if ($approved == 1)
 						{
-							$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
+							$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
 						}
 
 						// add the topic

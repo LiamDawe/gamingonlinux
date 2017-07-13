@@ -56,7 +56,7 @@ class bbcode
 				else
 				{
 					 // check their registration date is older than one day
-					$reg_fetch = $this->database->run("SELECT `register_date` FROM ".$this->core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$reg_fetch = $this->database->run("SELECT `register_date` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 					$day_ago = time() - 24 * 3600;
 
@@ -153,7 +153,7 @@ class bbcode
 	// replace specific-user quotes, called by quotes()
 	function replace_quotes($matches)
 	{
-		$find_quoted = $this->database->run("SELECT `username`, `user_id` FROM ".$this->core->db_tables['users']." WHERE `username` = ?", [$matches[1]])->fetch();
+		$find_quoted = $this->database->run("SELECT `username`, `user_id` FROM `users` WHERE `username` = ?", [$matches[1]])->fetch();
 		if ($find_quoted)
 		{
 			if ($this->core->config('pretty_urls') == 1)
@@ -734,7 +734,7 @@ class bbcode
 					FROM
 					".$this->core->db_tables['profile_info']." p
 					INNER JOIN
-					".$this->core->db_tables['users']." u ON u.user_id = p.user_id
+					`users` u ON u.user_id = p.user_id
 					WHERE
 					p.`user_id` = ?", array($_SESSION['user_id']))->fetch();
 

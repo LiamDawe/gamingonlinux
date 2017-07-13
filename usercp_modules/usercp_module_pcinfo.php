@@ -9,7 +9,7 @@ if (isset($_GET['updated']))
 
 if (!isset($_POST['act']))
 {
-	$db->sqlquery("SELECT `pc_info_public`, `distro` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$usercpcp = $db->fetch();
 
 	$db->sqlquery("SELECT `date_updated`, `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
@@ -323,7 +323,7 @@ else if (isset($_POST['act']))
 		gmdate("Y-n-d H:i:s"),
 		$_SESSION['user_id']));
 
-		$user_update_sql = "UPDATE ".$core->db_tables['users']." SET `distro` = ?, `pc_info_public` = ?, `pc_info_filled` = ? WHERE `user_id` = ?";
+		$user_update_sql = "UPDATE `users` SET `distro` = ?, `pc_info_public` = ?, `pc_info_filled` = ? WHERE `user_id` = ?";
 		$user_update_query = $db->sqlquery($user_update_sql, array($_POST['distribution'], $public, $pc_info_filled, $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php?module=pcinfo&updated");

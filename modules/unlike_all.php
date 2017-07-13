@@ -15,7 +15,7 @@ if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION
 
 	else if (isset($_POST['yes']))
 	{
-		$db->sqlquery("SELECT `user_id` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `user_id` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 		if ($db->num_rows() == 1)
 		{
 				$db->sqlquery("DELETE FROM `likes` WHERE `user_id` = ?", array($_SESSION['user_id']));

@@ -94,9 +94,9 @@ FROM
 INNER JOIN
 	`forums` f ON t.forum_id = f.forum_id
 INNER JOIN
-	".$core->db_tables['users']." u ON t.author_id = u.user_id
+	`users` u ON t.author_id = u.user_id
 LEFT JOIN
-	".$core->db_tables['users']." u2 ON t.last_post_id = u2.user_id
+	`users` u2 ON t.last_post_id = u2.user_id
 WHERE
 	t.`approved` = 1
 AND

@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'Change Password' . $templating->get('title', 1)  , 1);
 
 // find current password
-$db->sqlquery("SELECT `username`, `password`, `email` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+$db->sqlquery("SELECT `username`, `password`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 $grab_current_password = $db->fetch();
 
 $templating->load('usercp_modules/usercp_module_password');
@@ -30,7 +30,7 @@ if (isset($_POST['act']))
 		$new_password = core::random_id(15);
 		$safe_password = password_hash($new_password, PASSWORD_BCRYPT);
 		
-		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `password` = ? WHERE `user_id` = ?", array($safe_password, $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($safe_password, $_SESSION['user_id']));
 		
 		// send an email to their old address to let them know
 		$subject = "Password requested on " . $core->config('site_title');
@@ -63,7 +63,7 @@ if (isset($_POST['act']))
 		}
 
 		// find current password
-		$db->sqlquery("SELECT `username`, `password`, `steam_id`, `oauth_uid`, `email` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT `username`, `password`, `steam_id`, `oauth_uid`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 		$grab_current_password = $db->fetch();
 
 		// if they have no password, they simply must have a steamid or a twitter oauth id
@@ -120,7 +120,7 @@ if (isset($_POST['act']))
 			$mail->sendMail($grab_current_password['email'], $subject, $html_message, $plain_message);
 		}
 
-		$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `password` = ? WHERE `user_id` = ?", array($new_password_safe, $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($new_password_safe, $_SESSION['user_id']));
 		
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'password';

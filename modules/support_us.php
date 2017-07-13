@@ -9,7 +9,7 @@ $templating->set('config_support_us_text', $core->config('support_us_text'));
 $templating->block('list_top');
 
 // get supporter list Sorted by last login
-$res = $db->sqlquery("SELECT u.`username`, u.`user_id`, u.`supporter_link` FROM ".$core->db_tables['users']." u INNER JOIN ".$core->db_tables['user_group_membership']." g ON u.user_id = g.user_id WHERE g.group_id = 6 ORDER BY RAND() DESC LIMIT 9");
+$res = $db->sqlquery("SELECT u.`username`, u.`user_id`, u.`supporter_link` FROM `users` u INNER JOIN ".$core->db_tables['user_group_membership']." g ON u.user_id = g.user_id WHERE g.group_id = 6 ORDER BY RAND() DESC LIMIT 9");
 $templating->block('list_row_start');
 while ($rowuser = $res->fetch())
 {

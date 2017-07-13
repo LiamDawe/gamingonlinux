@@ -1,5 +1,5 @@
 <?php
-$db->sqlquery("SELECT `email`, `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+$db->sqlquery("SELECT `email`, `username` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 $grab_email = $db->fetch();
 
 $templating->load('usercp_modules/usercp_module_email');
@@ -25,7 +25,7 @@ if (isset($_POST['Update']))
 	}
 
 	// find current password
-	$db->sqlquery("SELECT `password`, `steam_id`, `oauth_uid` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT `password`, `steam_id`, `oauth_uid` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$grab_current_password = $db->fetch();
 
 	if (!empty($grab_current_password['password']))
@@ -50,7 +50,7 @@ if (isset($_POST['Update']))
 	}
 
 	// check to see if this email exists
-	$db->sqlquery("SELECT `email` FROM ".$core->db_tables['users']." WHERE `email` = ?", array($_POST['new_email']));
+	$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['new_email']));
 	if ($db->num_rows() >= 1)
 	{
 		$_SESSION['message'] = 'email_used';
@@ -61,7 +61,7 @@ if (isset($_POST['Update']))
 	$new_email = trim($_POST['new_email']);
 
 	// update to the new email address
-	$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `email` = ? WHERE `user_id` = ?", array($new_email, $_SESSION['user_id']));
+	$db->sqlquery("UPDATE `users` SET `email` = ? WHERE `user_id` = ?", array($new_email, $_SESSION['user_id']));
 
 	// send an email to their old address to let them know
 	$subject = "Email changed on " . $core->config('site_title');

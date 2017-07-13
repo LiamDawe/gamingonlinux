@@ -50,7 +50,7 @@ if (!isset($_GET['go']))
 				u.`twitter_on_profile`
 				FROM `articles` a
 				LEFT JOIN
-				".$core->db_tables['users']." u on a.`author_id` = u.`user_id`
+				`users` u on a.`author_id` = u.`user_id`
 				LEFT JOIN
 				`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 				WHERE
@@ -847,7 +847,7 @@ if (!isset($_GET['go']))
 							{
 								if (!isset($_SESSION['activated']))
 								{
-									$db->sqlquery("SELECT `activated` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
+									$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
 									$get_active = $db->fetch();
 									$_SESSION['activated'] = $get_active['activated'];
 								}
@@ -1149,7 +1149,7 @@ else if (isset($_GET['go']))
 								$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
 
 								// update the posting users comment count
-								$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
+								$db->sqlquery("UPDATE `users` SET `comment_count` = (comment_count + 1) WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
 
 								// check if they are subscribing
 								if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
@@ -1168,7 +1168,7 @@ else if (isset($_GET['go']))
 								- Make an array of anyone who needs an email now
 								- Additionally, send a notification to anyone subscribed
 								*/
-								$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN ".$core->db_tables['users']." u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']));
+								$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']));
 								$users_array = array();
 								$users_to_email = $db->fetch_all_rows();
 								foreach ($users_to_email as $email_user)
@@ -1462,7 +1462,7 @@ else if (isset($_GET['go']))
 			$templating->set_previous('title', 'Reporting a comment', 1);
 
 			// show the comment they are reporting
-			$db->sqlquery("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN ".$core->db_tables['users']." u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
+			$db->sqlquery("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN `users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
 			$comment = $db->fetch();
 			$templating->block('report', 'articles_full');
 			$templating->set('text', $bbcode->parse_bbcode($comment['comment_text']));

@@ -31,11 +31,11 @@ else
 				{
 					if (isset($username) && !empty($username))
 					{
-						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM ".$core->db_tables['users']." WHERE `username` LIKE ?", array('%'.$username.'%'));
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `username` LIKE ?", array('%'.$username.'%'));
 					}
 					if (isset($email) && !empty($email))
 					{
-						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM ".$core->db_tables['users']." WHERE `email` LIKE ?", array('%'.$email.'%'));
+						$db->sqlquery("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `email` LIKE ?", array('%'.$email.'%'));
 					}
 					$templating->block('search_row_top', 'admin_modules/users');
 					while ($search = $db->fetch())
@@ -51,7 +51,7 @@ else
 
 		if ($_GET['view'] == 'premium')
 		{
-			$db->sqlquery("SELECT `user_id`, `username` FROM ".$core->db_tables['users']." WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2)");
+			$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2)");
 			$templating->block('premium_row_top');
 			while ($search = $db->fetch())
 			{
@@ -73,7 +73,7 @@ else
 			{
 				$templating->block('search','admin_modules/users');
 
-				$user_info = $dbl->run("SELECT * FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
+				$user_info = $dbl->run("SELECT * FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
 
 				$templating->block('edituser', 'admin_modules/users');
 
@@ -262,7 +262,7 @@ else
 					$dev_check = 1;
 				}
 
-				$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $dev_check, $_GET['user_id']));
+				$db->sqlquery("UPDATE `users` SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $dev_check, $_GET['user_id']));
 				
 				// user group updating
 				$current_groups = $dbl->run("SELECT `group_id` FROM ".$core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_GET['user_id']])->fetch_all(PDO::FETCH_COLUMN);
@@ -310,7 +310,7 @@ else
 
 		if ($_POST['act'] == 'ban')
 		{
-			$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 			$ban_info = $db->fetch();
 
 			if (!isset($_POST['yes']))
@@ -327,7 +327,7 @@ else
 
 				else
 				{
-					$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'banned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
@@ -339,7 +339,7 @@ else
 
 		if ($_POST['act'] == 'unban')
 		{
-			$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("UPDATE `users` SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unbanned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
 
@@ -367,7 +367,7 @@ else
 
 		if ($_POST['act'] == 'totalban')
 		{
-			$db->sqlquery("SELECT `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 			$ban_info = $db->fetch();
 
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
@@ -390,7 +390,7 @@ else
 
 				else
 				{
-					$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+					$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 					$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_SESSION['ban_ip'], core::$sql_date_now));
 
 					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'total_ban', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
@@ -455,7 +455,7 @@ else
 		if ($_POST['act'] == 'deleteavatar')
 		{
 			// remove any old avatar if one was uploaded
-			$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 			$avatar = $db->fetch();
 
 			if ($avatar['avatar_uploaded'] == 1)
@@ -463,7 +463,7 @@ else
 				unlink('uploads/avatars/' . $avatar['avatar']);
 			}
 
-			$db->sqlquery("UPDATE ".$core->db_tables['users']." SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
+			$db->sqlquery("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'avatar';
@@ -485,7 +485,7 @@ else
 			else
 			{
 				// remove any old avatar if one was uploaded
-				$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$deleted_info = $db->fetch();
 
 				if ($deleted_info['avatar_uploaded'] == 1)
@@ -520,7 +520,7 @@ else
 			}
 			else
 			{
-				$db->sqlquery("SELECT `username`, `banned` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']));
+				$db->sqlquery("SELECT `username`, `banned` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
 				$check_ban = $db->fetch();
 
 				if ($check_ban['banned'] !== "1")

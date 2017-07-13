@@ -12,7 +12,7 @@ $page = core::give_page();
 // first get a list of anyone who is actually live TODO
 $templating->block('online_top');
 $online_list = '';
-$db->sqlquery("SELECT `username`, `twitch` FROM ".$core->db_tables['users']." WHERE `twitch` != ''");
+$db->sqlquery("SELECT `username`, `twitch` FROM `users` WHERE `twitch` != ''");
 while ($get_online = $db->fetch())
 {
   $templating->block('user_online');
@@ -28,7 +28,7 @@ while ($get_online = $db->fetch())
 }
 
 // now get the full directory
-$db->sqlquery("SELECT COUNT(user_id) as count FROM ".$core->db_tables['users']." WHERE `twitch` != '' OR `youtube` != ''");
+$db->sqlquery("SELECT COUNT(user_id) as count FROM `users` WHERE `twitch` != '' OR `youtube` != ''");
 $counter = $db->fetch();
 
 // sort out the pagination link
@@ -36,7 +36,7 @@ $pagination = $core->pagination_link(30, $counter['count'], "/index.php?module=v
 
 $templating->block('directory_top');
 
-$db->sqlquery("SELECT `username`, `youtube`, `twitch` FROM ".$core->db_tables['users']." WHERE `twitch` != '' OR `youtube` != '' LIMIT ?, 30", array($core->start));
+$db->sqlquery("SELECT `username`, `youtube`, `twitch` FROM `users` WHERE `twitch` != '' OR `youtube` != '' LIMIT ?, 30", array($core->start));
 while ($user_list = $db->fetch())
 {
   $templating->block('user');

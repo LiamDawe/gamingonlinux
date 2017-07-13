@@ -9,7 +9,7 @@ $user = new user($dbl, $core);
 
 if(isset($_GET['user_id']))
 {
-	$grab_fields = $dbl->run("SELECT `username`, `pc_info_public`, `distro` FROM ".$core->db_tables['users']." WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
+	$grab_fields = $dbl->run("SELECT `username`, `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
 	if (!$grab_fields)
 	{
 		$core->message('That person does not exist here!');

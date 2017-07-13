@@ -11,7 +11,7 @@ $templating->block('users');
 $templating->set('site_title', $core->config('site_title'));
 $templating->set('total_users', number_format($core->config('total_users')));
 
-$count_monthly_users = $dbl->run("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM ".$core->db_tables['users']." WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)")->fetchOne();
+$count_monthly_users = $dbl->run("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM `users` WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)")->fetchOne();
 
 $templating->set('users_month', number_format($count_monthly_users));
 
@@ -45,7 +45,7 @@ $article_list = $dbl->run("SELECT
 FROM
     `articles` a
 LEFT JOIN
-    ".$core->db_tables['users']." u
+    `users` u
 ON
     u.`user_id` = a.`author_id`
 LEFT JOIN

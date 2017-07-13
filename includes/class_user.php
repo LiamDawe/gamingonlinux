@@ -36,7 +36,7 @@ class user
 
 			// check if they actually have any saved sessions, if they don't then logout to cancel everything
 			// this is also if we need to remove everyone being logged in due to any security issues
-			$session_exists = $this->database->run("SELECT `user_id` FROM ".$this->core->db_tables['session']." WHERE `user_id` = ?", [$safe_id])->fetch();
+			$session_exists = $this->database->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [$safe_id])->fetch();
 			if (!$session_exists)
 			{
 				$logout = 1;
@@ -325,7 +325,7 @@ class user
 		// they have a device cookie, let's check it bitches
 		if (isset($_COOKIE['gol-device']))
 		{
-			$device_test = $this->database->run("SELECT `device-id` FROM ".$this->core->db_tables['session']." WHERE `user_id` = ? AND `device-id` = ?", array($user_data['user_id'], $_COOKIE['gol-device']))->fetch();
+			$device_test = $this->database->run("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($user_data['user_id'], $_COOKIE['gol-device']))->fetch();
 			// cookie didn't match, don't let them in, hacking attempt probable
 			if (!$device_test)
 			{
@@ -373,7 +373,7 @@ class user
 
 		// keeping a log of logins, to review at anytime
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-		$this->database->run("INSERT INTO ".$this->core->db_tables['session']." SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
+		$this->database->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
 
 		$this->register_session($user_data);
 	}
@@ -385,7 +385,7 @@ class user
 		
 		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']))
 		{
-			$db->sqlquery("SELECT `session_id` FROM ".$this->core->db_tables['session']." WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']));
+			$db->sqlquery("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']));
 			$session = $db->fetch();
 
 			if ($db->num_rows() == 1)
@@ -424,7 +424,7 @@ class user
 	{
 		if (isset($_COOKIE['gol-device']))
 		{
-			$this->database->run("DELETE FROM ".$this->core->db_tables['session']." WHERE `user_id` = ? AND `device-id` = ?", [$_SESSION['user_id'], $_COOKIE['gol-device']]);
+			$this->database->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", [$_SESSION['user_id'], $_COOKIE['gol-device']]);
 		}
 
 		// remove all session information

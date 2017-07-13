@@ -212,9 +212,9 @@ if ($core->config('allow_registrations') == 1)
 
 					$last_id = $db->grab_id();
 					
-					$dbl->run("INSERT INTO ".$core->db_tables['user_group_membership']." SET `user_id` = ?, `group_id` = ?", [$last_id, 3]);
+					$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$last_id, 3]);
 
-					$db->sqlquery("INSERT INTO ".$core->db_tables['user_profile_info']." SET `user_id` = ?", array($last_id));
+					$db->sqlquery("INSERT INTO `user_profile_info` SET `user_id` = ?", array($last_id));
 
 					$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
 

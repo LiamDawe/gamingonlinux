@@ -238,10 +238,10 @@ class user
 	function get_group_ids($permission)
 	{
 		// find the requested permission
-		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$permission])->fetchOne();
+		$permission_id = $this->database->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$permission])->fetchOne();
 		
 		// find all groups that have that permission
-		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
 
 		$return_ids = [];
 		
@@ -276,7 +276,7 @@ class user
 	function can($do)
 	{
 		// find the requested permission
-		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetchOne();
+		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->`user_group_permissions`." WHERE `name` = ?", [$do])->fetchOne();
 		
 		// find all groups that have that permission
 		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
@@ -461,7 +461,7 @@ class user
 	{
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$their_groups = $this->database->run("SELECT `group_id` FROM ".$this->core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
+			$their_groups = $this->database->run("SELECT `group_id` FROM `user_group_membership` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
 		}
 		else
 		{

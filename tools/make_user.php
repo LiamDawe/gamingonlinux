@@ -37,7 +37,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 	$new_user_id = $dbl->new_id();
 	foreach ($_POST['user_groups'] as $key => $group)
 	{
-		$dbl->run("INSERT INTO ".$core->db_tables['user_group_membership']." SET `user_id` = ?, `group_id` = ?", [$new_user_id, $group]);
+		$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$new_user_id, $group]);
 	}
 
 	echo 'User <strong>' . $username . '</strong> created with password: ' . $_POST['password'];

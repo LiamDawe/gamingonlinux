@@ -180,7 +180,7 @@ if (isset($_POST['act']))
 		$date = core::$date;
 		$dbl->run("INSERT INTO `admin_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
+		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 		foreach ($grab_admins as $emailer)
 		{
 			$subject = "A new admin area comment on GamingOnLinux.com";
@@ -217,7 +217,7 @@ if (isset($_POST['act']))
 		$date = core::$date;
 		$dbl->run("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
+		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 
 		foreach ($grab_editors as $emailer)
 		{

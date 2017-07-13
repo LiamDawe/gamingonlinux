@@ -273,7 +273,7 @@ if (isset($_POST['act']))
                 
 			$in = str_repeat('?,', count($email_groups) - 1) . '?';
 			
-			$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` from ".$core->db_tables['user_group_membership']." m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups)->fetch_all();
+			$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` from `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups)->fetch_all();
 
 			foreach ($grab_editors as $get_emails)
 			{

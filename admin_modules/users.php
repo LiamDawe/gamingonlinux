@@ -95,7 +95,7 @@ else
 
 				$groups_list = '';
 				
-				$users_groups = $dbl->run("SELECT m.`group_id`, g.`group_name` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN `user_groups` g ON m.group_id = g.group_id WHERE m.`user_id` = ?", [$user_info['user_id']])->fetch_all();
+				$users_groups = $dbl->run("SELECT m.`group_id`, g.`group_name` FROM `user_group_membership` m INNER JOIN `user_groups` g ON m.group_id = g.group_id WHERE m.`user_id` = ?", [$user_info['user_id']])->fetch_all();
 
 				foreach($users_groups as $group)
 				{
@@ -193,9 +193,9 @@ else
 		{
 			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour`, `remote_group` FROM `user_groups` WHERE `group_id` = ?", [$_GET['id']])->fetch();
 			
-			$permissions_list = $dbl->run("SELECT `id`, `name` FROM ".$core->db_tables['user_permissions']." ORDER BY `id` ASC")->fetch_all();
+			$permissions_list = $dbl->run("SELECT `id`, `name` FROM `user_group_permissions` ORDER BY `id` ASC")->fetch_all();
 			
-			$current_permissions = $dbl->run("SELECT `permission_id` FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `group_id` = ?", [$_GET['id']])->fetch_all(PDO::FETCH_COLUMN);
+			$current_permissions = $dbl->run("SELECT `permission_id` FROM `user_group_permissions_membership` WHERE `group_id` = ?", [$_GET['id']])->fetch_all(PDO::FETCH_COLUMN);
 			
 			$templating->load('admin_modules/user_groups');
 			$templating->block('group_edit');
@@ -265,14 +265,14 @@ else
 				$db->sqlquery("UPDATE `users` SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $dev_check, $_GET['user_id']));
 				
 				// user group updating
-				$current_groups = $dbl->run("SELECT `group_id` FROM ".$core->db_tables['user_group_membership']." WHERE `user_id` = ?", [$_GET['user_id']])->fetch_all(PDO::FETCH_COLUMN);
+				$current_groups = $dbl->run("SELECT `group_id` FROM `user_group_membership` WHERE `user_id` = ?", [$_GET['user_id']])->fetch_all(PDO::FETCH_COLUMN);
 
 				// remove any groups no longer wanted
 				foreach ($current_groups as $key => $group)
 				{
 					if (!in_array($group, $_POST['user_groups']))
 					{
-						$dbl->run("DELETE FROM ".$core->db_tables['user_group_membership']." WHERE `user_id` = ? AND `group_id` = ?", [$_GET['user_id'], $group]);
+						$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ? AND `group_id` = ?", [$_GET['user_id'], $group]);
 					}
 				}
 				
@@ -281,7 +281,7 @@ else
 				{
 					if (!in_array($group, $current_groups))
 					{
-						$dbl->run("INSERT INTO ".$core->db_tables['user_group_membership']." SET `user_id` = ?, `group_id` = ?", [$_GET['user_id'], $group]);
+						$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$_GET['user_id'], $group]);
 					}
 				}
 					
@@ -606,14 +606,14 @@ else
 			$dbl->run("UPDATE `user_groups` SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $_POST['group_id']]);
 			
 			// user group updating
-			$current_permissions = $dbl->run("SELECT `permission_id` FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `group_id` = ?", [$_POST['group_id']])->fetch_all(PDO::FETCH_COLUMN);
+			$current_permissions = $dbl->run("SELECT `permission_id` FROM `user_group_permissions_membership` WHERE `group_id` = ?", [$_POST['group_id']])->fetch_all(PDO::FETCH_COLUMN);
 
 			// remove any permissions no longer wanted
 			foreach ($current_permissions as $key => $permission)
 			{
 				if (!in_array($permission, $_POST['permissions']))
 				{
-					$dbl->run("DELETE FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `permission_id` = ? AND `group_id` = ?", [$permission, $_POST['group_id']]);
+					$dbl->run("DELETE FROM `user_group_permissions_membership` WHERE `permission_id` = ? AND `group_id` = ?", [$permission, $_POST['group_id']]);
 				}
 			}
 			
@@ -622,7 +622,7 @@ else
 			{
 				if (!in_array($permission, $current_permissions))
 				{
-					$dbl->run("INSERT INTO ".$core->db_tables['user_group_permissions_membership']." SET `permission_id` = ?, `group_id` = ?", [$permission, $_POST['group_id']]);
+					$dbl->run("INSERT INTO `user_group_permissions_membership` SET `permission_id` = ?, `group_id` = ?", [$permission, $_POST['group_id']]);
 				}
 			}
 			

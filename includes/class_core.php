@@ -47,7 +47,6 @@ class core
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
 		$this->database = $database;
-		$this->users_table();
 	}
 	
 	// check in_array for a multidimensional array
@@ -221,14 +220,6 @@ class core
 
 		// invalidate the cache
 		self::$config = array();
-	}
-	
-	function users_table()
-	{
- 		$this->db_tables['user_permissions'] = '`user_group_permissions`';
- 		$this->db_tables['user_profile_info'] = '`user_profile_info`';
- 		$this->db_tables['user_group_membership'] = '`user_group_membership`';
- 		$this->db_tables['user_group_permissions_membership'] = '`user_group_permissions_membership`';
 	}
 
 	function get_client_ip()

@@ -241,7 +241,7 @@ class user
 		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$permission])->fetchOne();
 		
 		// find all groups that have that permission
-		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN ".$this->core->db_tables['user_groups']." g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
 
 		$return_ids = [];
 		
@@ -279,7 +279,7 @@ class user
 		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->db_tables['user_permissions']." WHERE `name` = ?", [$do])->fetchOne();
 		
 		// find all groups that have that permission
-		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN ".$this->core->db_tables['user_groups']." g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
 		
 		$check_against = [];
 		
@@ -612,7 +612,7 @@ class user
 			p.`date_updated`,
 			u.`distro`
 			FROM
-			".$this->core->db_tables['profile_info']." p
+			`user_profile_info` p
 			INNER JOIN
 			`users` u ON u.user_id = p.user_id
 			WHERE
@@ -824,7 +824,7 @@ class user
 	// helper function to get the data needed for sorting user_badges in the function below this one 
 	public function grab_user_groups()
 	{
-		$this->database->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM ".$this->core->db_tables['user_groups']." ORDER BY `group_name` ASC");		
+		$this->database->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC");		
 		self::$user_group_list = $this->database->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
 
 	}

@@ -95,7 +95,7 @@ else
 
 				$groups_list = '';
 				
-				$users_groups = $dbl->run("SELECT m.`group_id`, g.`group_name` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN ".$core->db_tables['user_groups']." g ON m.group_id = g.group_id WHERE m.`user_id` = ?", [$user_info['user_id']])->fetch_all();
+				$users_groups = $dbl->run("SELECT m.`group_id`, g.`group_name` FROM ".$core->db_tables['user_group_membership']." m INNER JOIN `user_groups` g ON m.group_id = g.group_id WHERE m.`user_id` = ?", [$user_info['user_id']])->fetch_all();
 
 				foreach($users_groups as $group)
 				{
@@ -180,7 +180,7 @@ else
 			$templating->load('admin_modules/user_groups');
 			$templating->block('start_top');
 			
-			$groups = $dbl->run("SELECT `group_id`, `group_name` FROM ".$core->db_tables['user_groups']." ORDER BY `group_name` ASC")->fetch_all();
+			$groups = $dbl->run("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_name` ASC")->fetch_all();
 			foreach ($groups as $group)
 			{
 				$templating->block('group_row');
@@ -191,7 +191,7 @@ else
 		
 		if ($_GET['view'] == 'edit_group')
 		{
-			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour`, `remote_group` FROM ".$core->db_tables['user_groups']." WHERE `group_id` = ?", [$_GET['id']])->fetch();
+			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour`, `remote_group` FROM `user_groups` WHERE `group_id` = ?", [$_GET['id']])->fetch();
 			
 			$permissions_list = $dbl->run("SELECT `id`, `name` FROM ".$core->db_tables['user_permissions']." ORDER BY `id` ASC")->fetch_all();
 			
@@ -603,7 +603,7 @@ else
 				$remote = 1;
 			}
 			
-			$dbl->run("UPDATE ".$core->db_tables['user_groups']." SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $_POST['group_id']]);
+			$dbl->run("UPDATE `user_groups` SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $_POST['group_id']]);
 			
 			// user group updating
 			$current_permissions = $dbl->run("SELECT `permission_id` FROM ".$core->db_tables['user_group_permissions_membership']." WHERE `group_id` = ?", [$_POST['group_id']])->fetch_all(PDO::FETCH_COLUMN);

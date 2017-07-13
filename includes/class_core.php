@@ -225,8 +225,6 @@ class core
 	
 	function users_table()
 	{
-		$this->db_tables['profile_info'] = '`user_profile_info`';
-		$this->db_tables['user_groups'] = '`user_groups`';
  		$this->db_tables['user_permissions'] = '`user_group_permissions`';
  		$this->db_tables['user_profile_info'] = '`user_profile_info`';
  		$this->db_tables['user_group_membership'] = '`user_group_membership`';

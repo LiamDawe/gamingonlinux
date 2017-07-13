@@ -732,7 +732,7 @@ class bbcode
 					p.`date_updated`,
 					u.`distro`
 					FROM
-					".$this->core->db_tables['profile_info']." p
+					`user_profile_info` p
 					INNER JOIN
 					`users` u ON u.user_id = p.user_id
 					WHERE

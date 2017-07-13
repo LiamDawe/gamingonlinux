@@ -1,7 +1,7 @@
 <?php
 if (!core::is_number($_GET['forum_id']))
 {
-	$core->message('The forum ID has to be a number!', NULL, 1);
+	$core->message('The forum ID has to be a number!', 1);
 	include('includes/footer.php');
 	die();
 }
@@ -11,7 +11,7 @@ $forum_class->forum_permissions($_GET['forum_id']);
 // permissions for viewforum page
 if($parray['can_view'] == 0)
 {
-	$core->message('You do not have permission to view this forum!', NULL, 1);
+	$core->message('You do not have permission to view this forum!', 1);
 }
 
 else

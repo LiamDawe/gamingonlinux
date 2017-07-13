@@ -253,12 +253,6 @@ class core
 		return substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
 	}
 
-	// find the current page we are on with path for sql errors handling
-	function current_page_path()
-	{
-		return $_SERVER["SCRIPT_FILENAME"];
-	}
-
 	public static function current_page_url()
 	{
 		$page_url = 'http';
@@ -452,7 +446,7 @@ class core
 	}
 
 	// $message = what to show them
-	function message($message, $redirect = NULL, $urgent = 0)
+	function message($message, $urgent = 0)
 	{
 		global $templating;
 
@@ -477,12 +471,6 @@ class core
 		}
 
 		$templating->set('message', $message);
-
-		if ($redirect != NULL)
-		{
-			$templating->block('redirect');
-			$templating->set('redirect', $redirect);
-		}
 	}
 
 	// check for multiple things being empty and return the name of what was empty

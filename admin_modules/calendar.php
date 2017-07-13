@@ -7,11 +7,11 @@ if (isset($_GET['error']))
 {
 	if ($_GET['error'] == 'missing')
 	{
-		$core->message("You have to put at least a name and date in!", NULL, 1);
+		$core->message("You have to put at least a name and date in!", 1);
 	}
 	if ($_GET['error'] == 'missing_id')
 	{
-		$core->message("The game id was missing, this is likely a code error or hacking attempt, bug Liam!", NULL, 1);
+		$core->message("The game id was missing, this is likely a code error or hacking attempt, bug Liam!", 1);
 	}
 }
 

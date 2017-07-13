@@ -14,7 +14,7 @@ if (!isset($_GET['aid']))
 
 	if (isset($_GET['error']) && $_GET['error'] == 'doesntexist')
 	{
-		$core->message('Article doesn\'t exist, someone must have gotten to it first!', NULL, 1);
+		$core->message('Article doesn\'t exist, someone must have gotten to it first!', 1);
 	}
 
 	if (isset($_GET['error']) && $_GET['error'] == 'alreadyapproved')
@@ -124,7 +124,7 @@ else if (isset($_GET['aid']))
 
 	if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", NULL, 1);
+		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", 1);
 
 		// we need to re-catch the article info as we have changed lock status
 		$db->sqlquery($article_sql, array($_GET['aid']));

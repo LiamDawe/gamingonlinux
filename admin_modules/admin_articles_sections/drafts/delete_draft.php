@@ -5,7 +5,7 @@ $check = $db->fetch();
 // anti-cheese deleting the wrong article feature, not sure this is even needed any more?
 if ($check['active'] == 1)
 {
-	$core->message("WARNING: You are about to delete a live article! THIS IS OBVIOUSLY A BUG AS THIS IS IN THE DRAFTS SECTION, REPORT THIS, DO NOT IGNORE THIS MESSAGE.", NULL, 1);
+	$core->message("WARNING: You are about to delete a live article! THIS IS OBVIOUSLY A BUG AS THIS IS IN THE DRAFTS SECTION, REPORT THIS, DO NOT IGNORE THIS MESSAGE.", 1);
 }
 
 if (!isset($_POST['yes']) && !isset($_POST['no']))

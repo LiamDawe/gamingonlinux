@@ -207,7 +207,7 @@ else
 		{
 			if (empty($_POST['name']) || empty($_POST['file']))
 			{
-				$core->message("You have to fill in a title and filename!", NULL, 1);
+				$core->message("You have to fill in a title and filename!", 1);
 			}
 
 			else

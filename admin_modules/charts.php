@@ -16,12 +16,12 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			if ($_GET['error'] == 'empty')
 			{
-				$core->message('You have to fill in all fields', NULL, 1);
+				$core->message('You have to fill in all fields', 1);
 			}
 
 			if ($_GET['error'] == 'notenough')
 			{
-				$core->message('The amount of labels doesn\'t match the amount of data! You might have missed a label, or a bit of data to be included.', NULL, 1);
+				$core->message('The amount of labels doesn\'t match the amount of data! You might have missed a label, or a bit of data to be included.', 1);
 			}
 
 			$name = $_SESSION['e_name'];

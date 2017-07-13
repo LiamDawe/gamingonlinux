@@ -12,7 +12,7 @@ if ($core->config('goty_page_open') == 0)
 	}
 	else
 	{
-		$core->message('The GOTY page is currently turned off, this is only accessible by editors!', NULL, 1);
+		$core->message('The GOTY page is currently turned off, this is only accessible by editors!', 1);
 	}
 }
 
@@ -32,7 +32,7 @@ if (isset($_GET['message']))
 		$extra = $_GET['extra'];
 	}
 	$message = $message_map->get_message($_GET['message'], $extra);
-	$core->message($message['message'], NULL, $message['error']);
+	$core->message($message['message'], $message['error']);
 }
 
 if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0))

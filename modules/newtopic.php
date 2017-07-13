@@ -29,7 +29,7 @@ else
 				$forum_class->forum_permissions($_GET['forum_id']);
 				if ($parray['can_topic'] == 0)
 				{
-					$core->message('You do not have permission to post in that selected forum (you shouldn\'t even be able to get here with that forum id set), but you can post in others!', NULL, 1);
+					$core->message('You do not have permission to post in that selected forum (you shouldn\'t even be able to get here with that forum id set), but you can post in others!', 1);
 				}
 				if ($parray['can_view'] == 1)
 				{

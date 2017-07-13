@@ -16,32 +16,32 @@ if (isset($_GET['message']))
 
 	if ($_GET['message'] == 'empty')
 	{
-		$core->message('You must fill out all fields!', 1, NULL);
+		$core->message('You must fill out all fields!', 1);
 	}
 
 	if ($_GET['message'] == 'nofile')
 	{
-		$core->message("No file was selected to upload!", NULL, 1);
+		$core->message("No file was selected to upload!", 1);
 	}
 
 	if ($_GET['message'] == 'filetype')
 	{
-		$core->message("You can only upload gif jpg and png files for featured images.", NULL, 1);
+		$core->message("You can only upload gif jpg and png files for featured images.", 1);
 	}
 
 	if ($_GET['message'] == 'dimensions')
 	{
-		$core->message('It was not the correct size!', NULL, 1);
+		$core->message('It was not the correct size!', 1);
 	}
 
 	if ($_GET['message'] == 'toobig')
 	{
-		$core->message('File size too big! The max is 300kb, try to use some more compression on it, or find another image.', NULL, 1);
+		$core->message('File size too big! The max is 300kb, try to use some more compression on it, or find another image.', 1);
 	}
 
 	if ($_GET['message'] == 'cantmove')
 	{
-		$core->message('Could not upload file! Upload folders may not have correct permissions.', NULL, 1);
+		$core->message('Could not upload file! Upload folders may not have correct permissions.', 1);
 	}
 	if ($_GET['message'] == 'edited')
 	{

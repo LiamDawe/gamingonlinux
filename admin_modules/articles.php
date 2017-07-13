@@ -82,7 +82,7 @@ if (isset($_GET['view']))
 
 			if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 			{
-				$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", NULL, 1);
+				$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", 1);
 
 				// we need to re-catch the article info as we have changed lock status
 				$db->sqlquery($article_info_sql, array($article_id));
@@ -722,7 +722,7 @@ else if (isset($_POST['act']))
 			// anti-cheese deleting the wrong article feature
 			if ($check['active'] == 1)
 			{
-				$core->message("WARNING: You are about to delete a live article!", NULL, 1);
+				$core->message("WARNING: You are about to delete a live article!", 1);
 			}
 
 			$core->yes_no('Are you sure you want to delete that article?', $post_page, "Delete");
@@ -818,7 +818,7 @@ else if (isset($_POST['act']))
 	{
 		if (!isset($_POST['article_id']))
 		{
-			$core->message("Not a correct article id set!", NULL, 1);
+			$core->message("Not a correct article id set!", 1);
 		}
 
 		else

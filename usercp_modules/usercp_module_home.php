@@ -8,11 +8,11 @@ if (isset($_GET['message']))
 {
 	if ($_GET['message'] == 'youtube-missing')
 	{
-		$core->message('That is not a correct Youtube URL format, please use a correct URL like: https://www.youtube.com/gamingonlinux', NULL, 1);
+		$core->message('That is not a correct Youtube URL format, please use a correct URL like: https://www.youtube.com/gamingonlinux', 1);
 	}
 	if ($_GET['message'] == 'twitch-missing')
 	{
-		$core->message('That is not a correct Twitch URL format, please use a correct URL like: http://www.twitch.tv/gamingonlinux', NULL, 1);
+		$core->message('That is not a correct Twitch URL format, please use a correct URL like: http://www.twitch.tv/gamingonlinux', 1);
 	}
 }
 

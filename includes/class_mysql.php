@@ -88,13 +88,13 @@ class mysql
 			$trace = $error->getTrace();
 			if ($_SESSION['user_id'] == 1)
 			{
-				$core->message( $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $STH->interpolateQuery(), NULL, 1);
+				$core->message( $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $STH->interpolateQuery(), 1);
 				echo $templating->output();
 				die();
 			}
 			else
 			{
-				$core->message("Something went wrong. The admin will be notified", NULL, 1);
+				$core->message("Something went wrong. The admin will be notified", 1);
 				$this->pdo_error($error->getMessage(), $trace[2]['file'], $STH->interpolateQuery(), core::current_page_url());
 				echo $templating->output();
 				die();

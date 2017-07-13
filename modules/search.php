@@ -133,7 +133,7 @@ if (isset($search_text) && !empty($search_text))
 	}
 	else
 	{
-		$core->message('Nothing was found with those search terms.', NULL, 1);
+		$core->message('Nothing was found with those search terms.', 1);
 	}
 }
 

@@ -86,7 +86,7 @@ else if (isset($_POST['action']))
 	{
 		if (empty($_POST['file']))
 		{
-			$core->message("You need to enter a filename!", NULL, 1);
+			$core->message("You need to enter a filename!", 1);
 		}
 		
 		else
@@ -107,7 +107,7 @@ else if (isset($_POST['action']))
 		 
 		if (!is_numeric($id))
 		{
-			$core->message('The module id has to be a number!', NULL, 1);
+			$core->message('The module id has to be a number!', 1);
 		}
 		
 		else
@@ -124,7 +124,7 @@ else if (isset($_POST['action']))
 		 
 		if (!is_numeric($id))
 		{
-			$core->message('The module id has to be a number!', NULL, 1);
+			$core->message('The module id has to be a number!', 1);
 		}
 		
 		else
@@ -139,7 +139,7 @@ else if (isset($_POST['action']))
 	{ 
 		if (!is_numeric($_POST['id']))
 		{
-			$core->message('The module id has to be a number!', NULL, 1);
+			$core->message('The module id has to be a number!', 1);
 		}
 		
 		else
@@ -154,7 +154,7 @@ else if (isset($_POST['action']))
 	{
 		if (!is_numeric($_POST['id']))
 		{
-			$core->message('The module id has to be a number!', NULL, 1);
+			$core->message('The module id has to be a number!', 1);
 		}
 		
 		else

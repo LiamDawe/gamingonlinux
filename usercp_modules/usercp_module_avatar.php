@@ -54,13 +54,13 @@ if (isset($_POST['action']))
 	{
 		if (empty($_POST['avatar_url']))
 		{
-			$core->message('You didn\'t enter anything into the url box!', NULL, 1);
+			$core->message('You didn\'t enter anything into the url box!', 1);
 		}
 
 		// check url is valid
 		else if ($core->file_get_contents_curl($_POST['avatar_url']) == false)
 		{
-			$core->message('Could not access the image!', NULL, 1);
+			$core->message('Could not access the image!', 1);
 		}
 
 		else

@@ -134,12 +134,12 @@ else
 	{
 		if (!isset($_GET['message_id']) || !is_numeric($_GET['message_id']))
 		{
-			$core->message('No message ID!', NULL, 1);
+			$core->message('No message ID!', 1);
 		}
 
 		else if (!isset($_GET['conversation_id']) || !is_numeric($_GET['conversation_id']))
 		{
-			$core->message('No conversation ID!', NULL, 1);
+			$core->message('No conversation ID!', 1);
 		}
 
 		else
@@ -166,7 +166,7 @@ else
 
 			else
 			{
-				$core->message('You are not authorized to edit this message!', NULL, 1);
+				$core->message('You are not authorized to edit this message!', 1);
 			}
 		}
 	}
@@ -184,7 +184,7 @@ else
 
 		if (!in_array($_SESSION['user_id'], $check_id_now))
 		{
-			$core->message('Naughty, that is not your message to view!', NULL, 1);
+			$core->message('Naughty, that is not your message to view!', 1);
 		}
 
 		else
@@ -728,12 +728,12 @@ else
 
 		if (!isset($_GET['message_id']) || !is_numeric($_GET['message_id']))
 		{
-			$core->message('No message ID!', NULL, 1);
+			$core->message('No message ID!', 1);
 		}
 
 		else if (!isset($_GET['conversation_id']) || !is_numeric($_GET['conversation_id']))
 		{
-			$core->message('No conversation ID!', NULL, 1);
+			$core->message('No conversation ID!', 1);
 		}
 
 		else if (empty($text))
@@ -771,7 +771,7 @@ else
 
 			else
 			{
-				$core->message('You are not authorized to edit this message!', NULL, 1);
+				$core->message('You are not authorized to edit this message!', 1);
 			}
 		}
 	}

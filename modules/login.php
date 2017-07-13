@@ -66,7 +66,7 @@ if (!isset($_POST['action']))
 
 		else
 		{
-			$core->message("You are already logged in!", NULL, 1);
+			$core->message("You are already logged in!", 1);
 		}
 	}
 
@@ -74,7 +74,7 @@ if (!isset($_POST['action']))
 	{
 		if (isset($_GET['bademail']))
 		{
-			$core->message("That is not a correct email address!", NULL, 1);
+			$core->message("That is not a correct email address!", 1);
 		}
 		$templating->block('forgot', 'login');
 	}

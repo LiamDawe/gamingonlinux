@@ -72,7 +72,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					}
 					if ($_GET['message'] == 'missing')
 					{
-						$core->message('Please fill a name, a release date and one link at a minimum!', null, 1);
+						$core->message('Please fill a name, a release date and one link at a minimum!', 1);
 					}
 				}
 

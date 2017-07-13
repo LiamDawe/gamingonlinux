@@ -23,7 +23,7 @@ if (!isset($_GET['view']))
 		{
 			$templating->set_previous('meta_description', 'Article error on GamingOnLinux', 1);
 			$templating->set_previous('title', 'Article Error', 1);
-			$core->message('Sorry but that article doesn\'t exist, if you have followed an old it link it may need updating for the new website.');
+			$core->message('Sorry but that article doesn\'t exist!');
 		}
 
 		else
@@ -223,7 +223,7 @@ if (!isset($_GET['view']))
 			{
 				if ($_GET['error'] == 'emptycomment')
 				{
-					$core->message('You cannot post an empty comment dummy!', NULL, 1);
+					$core->message('You cannot post an empty comment dummy!', 1);
 				}
 			}
 

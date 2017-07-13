@@ -6,7 +6,7 @@ if (isset($_GET['message']))
 {
 	if ($_GET['message'] == 'toomany')
 	{
-		$core->message('Spam prevention: You have made too many forum topics in a really short time, please wait a few minutes.', NULL, 1);
+		$core->message('Spam prevention: You have made too many forum topics in a really short time, please wait a few minutes.', 1);
 	}
 }
 

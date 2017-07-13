@@ -76,7 +76,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'delete_spam_report')
 {
 	if (!is_numeric($_GET['comment_id']))
 	{
-		$core->message("Not a correct id!", NULL, 1);
+		$core->message("Not a correct id!", 1);
 	}
 
 	else

@@ -6,7 +6,7 @@ include(APP_ROOT . '/includes/header.php');
 if (!$user->can('access_admin'))
 {
 	$templating->set_previous('title', 'No Access', 1);
-	$core->message('You do not have permissions to view this page! <a href="index.php" class="white-link">Please click here to return to the home page</a>.', NULL, 1);
+	$core->message('You do not have permissions to view this page! <a href="index.php" class="white-link">Please click here to return to the home page</a>.', 1);
 	include(APP_ROOT . '/includes/footer.php');
 	die();
 }

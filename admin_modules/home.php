@@ -13,7 +13,7 @@ if (!isset($_GET['view']))
 
 		if ($_GET['message'] == 'emptycomment')
 		{
-			$core->message('You can\'t submit an empty admin area comment silly!', NULL, 1);
+			$core->message('You can\'t submit an empty admin area comment silly!', 1);
 		}
 	}
 

@@ -17,11 +17,11 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			if ($_GET['message'] == 'missing')
 			{
-				$core->message('Please fill a title, and a date!', null, 1);
+				$core->message('Please fill a title, and a date!', 1);
 			}
 			if ($_GET['message'] == 'date_backwards')
 			{
-				$core->message('The livestream end date cannot be before it starts!', null, 1);
+				$core->message('The livestream end date cannot be before it starts!', 1);
 			}
 		}
 
@@ -111,11 +111,11 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			if ($_GET['message'] == 'missing')
 			{
-				$core->message('Please fill a title, and a date!', null, 1);
+				$core->message('Please fill a title, and a date!', 1);
 			}
 			if ($_GET['message'] == 'missing_id')
 			{
-				$core->message('The submission approval was missing an ID, this is likely a bug!', null, 1);
+				$core->message('The submission approval was missing an ID, this is likely a bug!', 1);
 			}
 		}
 

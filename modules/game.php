@@ -351,7 +351,7 @@ if (isset($_GET['game-id']) && !isset($_GET['view']))
 	{
 		$templating->set_previous('meta_description', 'Game does not exist - GamingOnLinux Linux games database,', 1);
 		$templating->set_previous('title', 'Game does not exist - GamingOnLinux Linux games database', 1);
-		$core->message("That game id does not exist!", NULL, 1);
+		$core->message("That game id does not exist!", 1);
 	}
 }
 ?>

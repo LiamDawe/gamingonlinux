@@ -5,7 +5,7 @@ if (!isset($_GET['view']))
 {
 	// better than showing a blank page
 	$templating->set_previous('title', 'Nothing to see here', 1);
-	$core->message("There must have been an error as accessing this page directly doesn't do anything, be sure to report exactly what you did.", NULL, 1);
+	$core->message("There must have been an error as accessing this page directly doesn't do anything, be sure to report exactly what you did.", 1);
 }
 
 $types_allowed = ['any', 'all'];

@@ -51,7 +51,7 @@ class template
 		$full_path = $this->template . '/' . $file . '.html';
 		if (!file_exists($full_path))
 		{
-			$this->core->message("Error merging template file, cannot find $full_path.", NULL, 1);
+			$this->core->message("Error merging template file, cannot find $full_path.", 1);
 		}
 
 		$this->files[$file] = file_get_contents("{$this->template}/{$file}.html");
@@ -63,7 +63,7 @@ class template
 	{
 		if (!file_exists($this->core->config('path') . "plugins/{$file}.html"))
 		{
-			$this->core->message("Error merging plugin template file, cannot find ({$this->template}/$file).", NULL, 1);
+			$this->core->message("Error merging plugin template file, cannot find ({$this->template}/$file).", 1);
 		}
 
 		else
@@ -100,7 +100,7 @@ class template
 
 		else
 		{
-			$this->core->message("Error cannot find block named ($block).", NULL, 1);
+			$this->core->message("Error cannot find block named ($block).", 1);
 		}
 	}
 
@@ -123,7 +123,7 @@ class template
 
 		else
 		{
-			$this->core->message("Error cannot find block named ($block).", NULL, 1);
+			$this->core->message("Error cannot find block named ($block).", 1);
 		}
 	}
 

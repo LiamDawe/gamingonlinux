@@ -134,7 +134,7 @@ if ($core->config('allow_registrations') == 1)
 		$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
 		if ($db->num_rows() == 1)
 		{
-			$core->message("You are banned!", NULL, 1);
+			$core->message("You are banned!", 1);
 		}
 
 		else
@@ -249,7 +249,7 @@ if ($core->config('allow_registrations') == 1)
 			else if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1 && !$res['success'])
 			{
 				// Add code to process the form.
-				$core->message("You need to complete the captcha to prove you are human and not a bot! <a href=\"index.php?module=register\">Click here to try again</a>.", NULL, 1);
+				$core->message("You need to complete the captcha to prove you are human and not a bot! <a href=\"index.php?module=register\">Click here to try again</a>.", 1);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 if (!$user->check_group([1,2]))
 {
-	$core->message("You need to be an editor or an admin to access this section!", NULL, 1);
+	$core->message("You need to be an editor or an admin to access this section!", 1);
 }
 else
 {
@@ -322,7 +322,7 @@ else
 			{
 				if ($_GET['user_id'] == 1)
 				{
-					$core->message("You cannot ban the main editor!", NULL, 1);
+					$core->message("You cannot ban the main editor!", 1);
 				}
 
 				else
@@ -385,7 +385,7 @@ else
 			{
 				if ($_GET['user_id'] == 1)
 				{
-					$db->message("You cannot ban the main editor!", NULL, 1);
+					$db->message("You cannot ban the main editor!", 1);
 				}
 
 				else

@@ -36,7 +36,7 @@ if (isset($_GET['user_id']))
 
 				if ($profile['banned'] == 1 && $user->check_group([1,2]) == false)
 				{
-					$core->message("That user is banned so you may not view their profile!", NULL, 1);
+					$core->message("That user is banned so you may not view their profile!", 1);
 				}
 
 				else if (($profile['banned'] == 1 && $user->check_group([1,2]) == true) || $profile['banned'] == 0)

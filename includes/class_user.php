@@ -276,10 +276,10 @@ class user
 	function can($do)
 	{
 		// find the requested permission
-		$permission_id = $this->database->run("SELECT `id` FROM ".$this->core->`user_group_permissions`." WHERE `name` = ?", [$do])->fetchOne();
+		$permission_id = $this->database->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$do])->fetchOne();
 		
 		// find all groups that have that permission
-		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name` FROM ".$this->core->db_tables['user_group_permissions_membership']." m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
 		
 		$check_against = [];
 		

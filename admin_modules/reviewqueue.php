@@ -81,7 +81,7 @@ else
 
 	if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", NULL, 1);
+		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", 1);
 
 		// we need to re-catch the article info as we have changed lock status
 		$db->sqlquery($query, array($_GET['aid']));

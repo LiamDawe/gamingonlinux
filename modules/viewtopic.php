@@ -382,7 +382,10 @@ else
 					}
 
 					$into_username = '';
-					$into_username = $plugins->do_hooks('into_post_username', $topic);
+					if (!empty($topic['distro']) && $topic['distro'] != 'Not Listed')
+					{
+						$into_username .= '<img title="' . $topic['distro'] . '" class="distro tooltip-top"  alt="" src="' . $core->config('website_url') . 'templates/'.$core->config('template').'/images/distros/' . $topic['distro'] . '.svg" />';
+					}
 
 					$templating->set('username', $into_username . $username);
 

@@ -8,13 +8,11 @@ class bbcode
 	private $database;
 	// the requred core class
 	private $core;
-	private $plugins;
 	
-	function __construct($database, $core, $plugins)
+	function __construct($database, $core)
 	{
 		$this->database = $database;
 		$this->core = $core;
-		$this->plugin = $plugins;
 	}
 	
 	function do_charts($body)
@@ -238,7 +236,7 @@ class bbcode
 				a.`article_id` = ?", [$article_id]);
 			$article_info = $get_article->fetch();
 			
-			$article_class = new article($this->database, $this->core, $this->plugins);
+			$article_class = new article($this->database, $this->core);
 				
 			$tagline_image = $article_class->tagline_image($article_info);
 			

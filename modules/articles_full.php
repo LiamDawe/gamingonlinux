@@ -343,8 +343,6 @@ if (!isset($_GET['go']))
 						$categories_list .= " <li><a href=\"/articles/category/$category_name\">{$get_categories['category_name']}</a></li> ";
 					}
 				}
-				
-				$categories_list .= $plugins->do_hooks('display_article_tags_list', $article['article_id']);
 
 				if (!empty($categories_list))
 				{

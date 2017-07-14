@@ -21,8 +21,6 @@ $article_id = $db->grab_id();
 
 article::process_categories($article_id);
 
-$plugins->do_hooks('article_database_entry', $article_id);
-
 // force subscribe, so they don't lose editors comments
 $db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
 

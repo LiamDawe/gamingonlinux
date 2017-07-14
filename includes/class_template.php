@@ -57,21 +57,6 @@ class template
 		$this->files[$file] = file_get_contents("{$this->template}/{$file}.html");
 		$this->last_file = $file;
 	}
-	
-	// for plugins
-	public function load_plugin($file)
-	{
-		if (!file_exists($this->core->config('path') . "plugins/{$file}.html"))
-		{
-			$this->core->message("Error merging plugin template file, cannot find ({$this->template}/$file).", 1);
-		}
-
-		else
-		{
-			$this->files[$file] = file_get_contents($this->core->config('path') . "plugins/{$file}.html");
-			$this->last_file = $file;
-		}
-	}
 
 	/*
 		set the current block to work with and later display

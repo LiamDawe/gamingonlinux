@@ -3,13 +3,11 @@ class article
 {
 	private $database;
 	private $core;
-	private $plugins;
 	
-	function __construct($database, $core, $plugins)
+	function __construct($database, $core)
 	{
 		$this->database = $database;
 		$this->core = $core;
-		$this->plugins = $plugins;
 	}
 	
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
@@ -170,8 +168,6 @@ class article
 		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
 		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
 		$db->sqlquery("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
-		
-		$this->database->run("DELETE FROM `article_game_assoc` WHERE `article_id` = ?", array($article['article_id']));
     
 		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article['article_id'], 'deleted_article', core::$date, core::$date));
@@ -662,8 +658,6 @@ class article
 		}
 		
 		self::process_categories($article_id);
-
-		$this->plugins->do_hooks('article_database_entry', $article_id);
 		
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

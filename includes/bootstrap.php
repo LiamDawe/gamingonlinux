@@ -12,8 +12,6 @@ define('url', $core->config('website_url'));
 
 $message_map = new message_map();
 
-$plugins = new plugins($dbl, $core, APP_ROOT);
+$article_class = new article($dbl, $core);
 
-$article_class = new article($dbl, $core, $plugins);
-
-$bbcode = new bbcode($dbl, $core, $plugins);
+$bbcode = new bbcode($dbl, $core);

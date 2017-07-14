@@ -107,8 +107,6 @@ if (!isset($_GET['view']))
 			{
 				$categories_list .= " <li><a href=\"/articles/category/{$get_categories['category_id']}\">{$get_categories['category_name']}</a></li> ";
 			}
-			
-			$categories_list .= $plugins->do_hooks('display_article_tags_list', $article['article_id']);
 
 			$templating->set('categories_list', $categories_list);
 

@@ -20,8 +20,6 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	article::process_categories($_POST['article_id']);
 
-	$plugins->do_hooks('article_database_entry', $_POST['article_id']);
-
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 	unset($_SESSION['atitle']);
 	unset($_SESSION['atagline']);

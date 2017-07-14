@@ -335,7 +335,7 @@ class user
 		}
 
 		$device_id = '';
-		// register the new device to their account, could probably add a small hook here to allow people to turn this email off at their own peril
+		// register the new device to their account
 		if ($new_device == 1)
 		{
 			$device_id = md5(mt_rand() . $user_data['user_id'] . $_SERVER['HTTP_USER_AGENT']);

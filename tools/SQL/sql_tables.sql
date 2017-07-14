@@ -477,12 +477,6 @@ CREATE TABLE `password_reset` (
   `expires` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE TABLE `plugins` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `name` text NOT NULL,
-  `enabled` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE `polls` (
   `poll_id` int(11) NOT NULL,
   `author_id` int(11) NOT NULL,
@@ -909,9 +903,6 @@ ALTER TABLE `modules`
 ALTER TABLE `password_reset`
   ADD PRIMARY KEY (`user_email`);
 
-ALTER TABLE `plugins`
-  ADD PRIMARY KEY (`id`);
-
 ALTER TABLE `polls`
   ADD PRIMARY KEY (`poll_id`);
 
@@ -1072,8 +1063,6 @@ ALTER TABLE `livestream_presenters`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `modules`
   MODIFY `module_id` int(11) NOT NULL AUTO_INCREMENT;
-ALTER TABLE `plugins`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 ALTER TABLE `polls`
   MODIFY `poll_id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `poll_options`

@@ -79,10 +79,6 @@ if (!empty(core::$editor_js) || isset(core::$editor_js))
 }
 $templating->set('editor_js', $editor_js);
 
-$footer_extra_code = '';
-$footer_extra_code = $plugins->do_hooks('footer_code');
-$templating->set('hook_footer_code', $footer_extra_code);
-
 echo $templating->output();
 
 // close the mysql connection

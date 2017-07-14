@@ -538,13 +538,6 @@ INSERT INTO `modules` (`module_id`, `module_file_name`, `activated`, `nice_title
 (38, 'user_search', 1, 'User Search', NULL, 0);
 
 --
--- Dumping data for table `plugins`
---
-
-INSERT INTO `plugins` (`id`, `name`, `enabled`) VALUES
-(1, 'games_database', 1);
-
---
 -- Dumping data for table `usercp_blocks`
 --
 

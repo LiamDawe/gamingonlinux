@@ -328,8 +328,7 @@ INSERT INTO `blocks` (`block_id`, `block_link`, `block_name`, `block_title`, `bl
 (23, 'block_forum_latest', 'Latest Forum Posts', 'Latest Forum Posts', '', 1, NULL, 7, 'block', 0, 0),
 (14, 'block_comments_latest', 'Latest Comments', 'Latest Comments', '', 1, NULL, 6, 'block', 0, 0),
 (21, 'block_facebook', 'Facebook', '', '', 1, NULL, 9, 'block', 0, 0),
-(24, 'block_misc', 'Misc', 'Misc', '', 1, NULL, 11, '', 0, 0),
-(29, 'block_games', 'games', 'games', '', 1, NULL, 0, '', 0, 0);
+(24, 'block_misc', 'Misc', 'Misc', '', 1, NULL, 11, '', 0, 0);
 
 --
 -- Dumping data for table `config`
@@ -525,17 +524,16 @@ INSERT INTO `modules` (`module_id`, `module_file_name`, `activated`, `nice_title
 (25, 'calendar', 1, 'Release Calendar', NULL, 1),
 (26, 'submit_article', 1, 'Submit Article', NULL, 0),
 (27, 'statistics', 1, 'Statistics', 'users/statistics', 1),
-(28, 'game', 1, 'Games Database', NULL, 1),
-(29, 'report_post', 1, 'Report Post', NULL, 0),
-(30, 'game-search', 1, 'Game Search', NULL, 0),
-(31, 'unlike_all', 1, 'Unlike All', NULL, 0),
-(32, 'livestreams', 1, 'Livestreams', NULL, 1),
-(33, 'website_stats', 1, 'Website Stats', NULL, 0),
-(34, 'video', 1, 'Video Directory', NULL, 0),
-(35, 'game_servers', 1, 'Game Servers', NULL, 1),
-(36, 'irc', 1, 'IRC', NULL, 0),
-(37, '404', 1, '404', NULL, 0),
-(38, 'user_search', 1, 'User Search', NULL, 0);
+(28, 'report_post', 1, 'Report Post', NULL, 0),
+(29, 'game-search', 1, 'Game Search', NULL, 0),
+(30, 'unlike_all', 1, 'Unlike All', NULL, 0),
+(31, 'livestreams', 1, 'Livestreams', NULL, 1),
+(32, 'website_stats', 1, 'Website Stats', NULL, 0),
+(33, 'video', 1, 'Video Directory', NULL, 0),
+(34, 'game_servers', 1, 'Game Servers', NULL, 1),
+(35, 'irc', 1, 'IRC', NULL, 0),
+(36, '404', 1, '404', NULL, 0),
+(37, 'user_search', 1, 'User Search', NULL, 0);
 
 --
 -- Dumping data for table `usercp_blocks`

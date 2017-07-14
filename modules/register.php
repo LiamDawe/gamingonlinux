@@ -202,7 +202,7 @@ if ($core->config('allow_registrations') == 1)
 
 					if ($_POST['register'] == 'steam')
 					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
+						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
 					}
 					
 					if ($_POST['register'] == 'google')

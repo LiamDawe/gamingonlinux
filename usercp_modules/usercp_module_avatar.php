@@ -137,18 +137,25 @@ if (isset($_POST['action']))
 
 	else if ($_POST['action'] == 'gallery')
 	{
-		// remove any old avatar if one was uploaded
-		$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		$avatar = $db->fetch();
-
-		if ($avatar['avatar_uploaded'] == 1)
+		if (isset($_POST['gallery']))
 		{
-			unlink('uploads/avatars/' . $avatar['avatar']);
+			// remove any old avatar if one was uploaded
+			$db->sqlquery("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+			$avatar = $db->fetch();
+
+			if ($avatar['avatar_uploaded'] == 1)
+			{
+				unlink('uploads/avatars/' . $avatar['avatar']);
+			}
+
+			$db->sqlquery("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = ? WHERE `user_id` = ?", array($_POST['gallery'], $_SESSION['user_id']));
+			
+			header("Location: /usercp.php?module=avatar&message=gallery");
 		}
-
-		$db->sqlquery("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = ? WHERE `user_id` = ?", array($_POST['gallery'], $_SESSION['user_id']));
-
-		header("Location: /usercp.php?module=avatar&message=gallery");
+		else
+		{
+			header("Location: /usercp.php?module=avatar");
+		}
 	}
 
 	else if ($_POST['action'] == 'Delete')

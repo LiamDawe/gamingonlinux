@@ -20,7 +20,7 @@ if (isset($_SESSION['per-page']))
 }
 
 $comment_posts = '';
-$db->sqlquery("SELECT comment_id, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.`comment_count`, a.`active` FROM `articles_comments` c INNER JOIN `articles` a ON c.`article_id` = a.`article_id` WHERE a.`active` = 1 ORDER BY `comment_id` DESC limit 5");
+$db->sqlquery("SELECT c.`comment_id`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.`comment_count`, a.`active` FROM `articles_comments` c INNER JOIN `articles` a ON c.`article_id` = a.`article_id` WHERE a.`active` = 1 AND c.`approved` = 1 ORDER BY `comment_id` DESC limit 5");
 while ($comments = $db->fetch())
 {
 	$date = $core->format_date($comments['time_posted']);

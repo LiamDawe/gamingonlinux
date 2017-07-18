@@ -52,7 +52,7 @@ $pagination = $core->pagination_link(9, $total_pages, "admin.php?module=correcti
       $templating->set('username', $username);
       $templating->set('title', $corrections['title']);
       $templating->set('article_link', $article_link);
-      $templating->set('correction', $corrections['correction_comment']);
+      $templating->set('correction', $bbcode->parse_bbcode($corrections['correction_comment']));
       $templating->set('correction_id', $corrections['row_id']);
     }
 

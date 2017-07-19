@@ -9,8 +9,7 @@ if ((!isset($_SESSION['user_id'])) || ( isset($_SESSION['user_id']) && $_SESSION
 else if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
 	// sort out private message unread counter
-	$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", array($_SESSION['user_id']));
-	$unread_counter = $db->num_rows();
+	$unread_counter = $dbl->run("SELECT COUNT(`conversation_id`) FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", array($_SESSION['user_id']))->fetchOne();
 
 	if ($unread_counter == 0)
 	{
@@ -27,8 +26,7 @@ else if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	$notifications_link = '';
 	if ($user->check_group([1,2,5]))
 	{
-		$db->sqlquery("SELECT `id` FROM `admin_notifications` WHERE `completed` = 0");
-		$admin_notes = $db->num_rows();
+		$admin_notes = $dbl->run("SELECT COUNT(`id`) FROM `admin_notifications` WHERE `completed` = 0")->fetchOne();
 		if ($admin_notes > 0)
 		{
 			$notifications_link = "<span class=\"badge badge-important\">$admin_notes</span>";

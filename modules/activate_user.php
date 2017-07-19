@@ -8,11 +8,10 @@ if (!isset($_GET['redo']))
 	}
 	else
 	{
-		$db->sqlquery("SELECT `user_id` FROM `users` WHERE `user_id` = ? AND `activation_code` = ?", array($_GET['user_id'], $_GET['code']));
-		$count_rows = $db->num_rows();
-		if ($count_rows == 1)
+		$check_code = $dbl->run("SELECT `user_id` FROM `users` WHERE `user_id` = ? AND `activation_code` = ?", array($_GET['user_id'], $_GET['code']))->fetchOne();
+		if ($check_code)
 		{
-			$db->sqlquery("UPDATE `users` SET `activated` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
+			$dbl->run("UPDATE `users` SET `activated` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['activated'] = 1;
 			$_SESSION['message'] = 'activated';

@@ -31,6 +31,13 @@ jQuery.fn.scrollMinimal = function(smooth)
 	}
 };
 
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
 jQuery.fn.highlight = function () {
     $(this).each(function () {
         var el = $(this);
@@ -265,21 +272,30 @@ jQuery(document).ready(function()
       }
     }
   }
+	$(".remove_announce").on('click', function(event)
+	{
+		event.preventDefault();
+		var announce_id = $(this).attr("data-announce-id");
+		
+		setCookie("gol_announce_" + announce_id, "set", 60);
+		
+		$(this).closest(".announce").hide();
+	});
 
-  $("#trends_link").on('click', function(event)
-  {
-    event.preventDefault();
-    document.location.hash = "#trends";
-    $("#trends").show();
-    $("#monthly").hide();
-  });
-  $("#monthly_link").on('click', function(event)
-  {
-    event.preventDefault();
-    document.location.hash = "#monthly";
-    $("#trends").hide();
-    $("#monthly").show();
-  });
+	$("#trends_link").on('click', function(event)
+	{
+		event.preventDefault();
+		document.location.hash = "#trends";
+		$("#trends").show();
+		$("#monthly").hide();
+	});
+	$("#monthly_link").on('click', function(event)
+	{
+		event.preventDefault();
+		document.location.hash = "#monthly";
+		$("#trends").hide();
+		$("#monthly").show();
+	});
   
   // navbar toggle menu
   $(".toggle-nav > a").on('click', function(event){
@@ -297,10 +313,11 @@ jQuery(document).ready(function()
     }
   });
 
-  // hide the toggle-nav if you click outside of it
-  $(document).on("click", function () {
-    $(".toggle-content").removeClass('toggle-active');
-  });
+	// hide the toggle-nav if you click outside of it
+	$(document).on("click", function ()
+	{
+		$(".toggle-content").removeClass('toggle-active');
+	});
   
   // hide the navbar on window resize, to prevent menus for small screens still appearing if open
   $(window).on('resize', function()

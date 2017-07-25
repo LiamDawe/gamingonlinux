@@ -92,64 +92,74 @@ if ($count_announcements > 0)
 	$templating->load('announcements');
 	$templating->block('announcement_top', 'announcements');
 	
-	$get_announcements = $dbl->run("SELECT `text`, `user_groups`, `type`, `modules` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+	$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
 	foreach ($get_announcements as $announcement)
 	{
-		$show = 0;
-		
-		// one to show to everyone (generic announcement)
-		if ((empty($announcement['user_groups']) || $announcement['user_groups'] == NULL) && (empty($announcement['modules']) || $announcement['modules'] == NULL))
+		if (!isset($_COOKIE['gol_announce_'.$announcement['id']]))
 		{
-			$show = 1;
-		}
-		// otherwise, we need to do some checks
-		else
-		{
-			$module_show = 0;
-			$group_show = 0;
+			$show = 0;
 			
-			// check if the currently loaded module is allow to show it
-			if (!empty($announcement['modules'] && $announcement['modules'] != NULL))
+			// one to show to everyone (generic announcement)
+			if ((empty($announcement['user_groups']) || $announcement['user_groups'] == NULL) && (empty($announcement['modules']) || $announcement['modules'] == NULL))
 			{
-				$modules_array = unserialize($announcement['modules']);
+				$show = 1;
+			}
+			// otherwise, we need to do some checks
+			else
+			{
+				$module_show = 0;
+				$group_show = 0;
 				
-				if (in_array(core::$current_module['module_id'], $modules_array))
+				// check if the currently loaded module is allow to show it
+				if (!empty($announcement['modules'] && $announcement['modules'] != NULL))
+				{
+					$modules_array = unserialize($announcement['modules']);
+					
+					if (in_array(core::$current_module['module_id'], $modules_array))
+					{
+						$module_show = 1;
+					}
+				}
+				else
 				{
 					$module_show = 1;
 				}
-			}
-			else
-			{
-				$module_show = 1;
+				
+				// check their user group against the setting
+				if (!empty($announcement['user_groups'] && $announcement['user_groups'] != NULL))
+				{
+					$group_ids_array = unserialize($announcement['user_groups']);
+					
+					// if this is to only be shown to specific groups, is the user in that group?
+					if ($announcement['type'] == 'in_groups' && $user->check_group($group_ids_array) == true)
+					{
+						$group_show = 1;				
+					}
+					
+					// if it's to only be shown if they aren't in those groups
+					if ($announcement['type'] == 'not_in_groups' && $user->check_group($group_ids_array) == false)
+					{
+						$group_show = 1;			
+					}
+				}
+				else
+				{
+					$group_show = 1;	
+				}
 			}
 			
-			// check their user group against the setting
-			if (!empty($announcement['user_groups'] && $announcement['user_groups'] != NULL))
+			if ($show == 1 || ($module_show == 1 && $group_show == 1))
 			{
-				$group_ids_array = unserialize($announcement['user_groups']);
+				$templating->block('announcement', 'announcements');
+				$templating->set('text', $bbcode->parse_bbcode($announcement['text']));
 				
-				// if this is to only be shown to specific groups, is the user in that group?
-				if ($announcement['type'] == 'in_groups' && $user->check_group($group_ids_array) == true)
+				$dismiss = '';
+				if ($announcement['can_dismiss'] == 1)
 				{
-					$group_show = 1;				
+					$dismiss = '<span class="fright"><a href="#" class="remove_announce" title="Hide Announcement" data-announce-id="'.$announcement['id'].'">&#10799;</a></span>';
 				}
-				
-				// if it's to only be shown if they aren't in those groups
-				if ($announcement['type'] == 'not_in_groups' && $user->check_group($group_ids_array) == false)
-				{
-					$group_show = 1;			
-				}
+				$templating->set('dismiss', $dismiss);
 			}
-			else
-			{
-				$group_show = 1;	
-			}
-		}
-		
-		if ($show == 1 || ($module_show == 1 && $group_show == 1))
-		{
-			$templating->block('announcement', 'announcements');
-			$templating->set('text', $bbcode->parse_bbcode($announcement['text']));
 		}
 	}
 

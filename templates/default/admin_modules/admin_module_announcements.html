@@ -22,6 +22,7 @@
 		Who to show it to (ignore if not setting any): <select name="type">{:types_list}</select>
 		Modules: <em>Enter the names of some modules, leave blank to show on all</em><br />
 		<select tabindex="-1" multiple="" name="module_ids[]" class="call_modules" style="width:300px" class="populate select2-offscreen"></select><br />
+		<label><input type="checkbox" name="dismiss" checked> Allow it to be dismissed by users?</label>
 		<button type="submit" formaction="/admin.php?module=announcements" name="act" value="add">Add</button>
 		</form>
 	</div>
@@ -34,6 +35,7 @@
 		Who to show it to (ignore if not setting any): <select name="type">{:types_list}</select>
 		Modules: <em>Enter the names of some modules, leave blank to show on all</em><br />
 		<select tabindex="-1" multiple="" name="module_ids[]" class="call_modules" style="width:300px" class="populate select2-offscreen">{:module_ids}</select><br />
+		<label><input type="checkbox" name="dismiss" {:can_dismiss}> Allow it to be dismissed by users?</label>
 		<input type="hidden" name="id" value="{:id}" />
 		<button type="submit" formaction="/admin.php?module=announcements" name="act" value="edit">Edit</button> <button type="submit" formaction="/admin.php?module=announcements" name="act" value="delete">Delete</button></form>
 	</div>

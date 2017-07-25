@@ -21,10 +21,10 @@ if (isset($_GET['view']))
 		$templating->block('manage', 'admin_modules/admin_module_announcements');
 
 		// get existing announcements
-		$get_announcements = $db->sqlquery("SELECT `id`, `text`, `author_id`, `user_groups`, `type`, `modules` FROM `announcements` ORDER BY `id` ASC");
-		if ($db->num_rows() >= 1)
+		$get_announcements = $dbl->run("SELECT `id`, `text`, `author_id`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` ASC")->fetch_all();
+		if ($get_announcements)
 		{
-			while ($announce = $get_announcements->fetch())
+			foreach ($get_announcements as $announce)
 			{
 				$templating->block('row', 'admin_modules/admin_module_announcements');
 				$core->editor(['name' => 'text', 'content' => $announce['text'], 'editor_id' => 'announcement-' . $announce['id']]);
@@ -70,6 +70,14 @@ if (isset($_GET['view']))
 					}
 				}
 				$templating->set('module_ids', $modules_list);
+				
+				// can users dismiss it?
+				$dismiss = '';
+				if ($announce['can_dismiss'] == 1)
+				{
+					$dismiss = 'checked';
+				}
+				$templating->set('can_dismiss', $dismiss);
 			}
 		}
 		else 
@@ -103,8 +111,14 @@ if (isset($_POST['act']))
 		{
 			$modules = serialize($_POST['module_ids']);
 		}
+		
+		$dismiss = 0;
+		if (isset($_POST['dismiss']))
+		{
+			$dismiss = 1;
+		}
 
-		$db->sqlquery("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?, `user_groups` = ?, `type` = ?, `modules` = ?", array($text, $_SESSION['user_id'], $user_groups, $_POST['type'], $modules));
+		$dbl->run("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ?", array($text, $_SESSION['user_id'], $user_groups, $_POST['type'], $modules, $dismiss));
 		header("Location: /admin.php?module=announcements&view=manage&message=saved&extra=announcement");
 	}
 	if ($_POST['act'] == 'edit')
@@ -138,8 +152,14 @@ if (isset($_POST['act']))
 		{
 			$modules = serialize($_POST['module_ids']);
 		}
+		
+		$dismiss = 0;
+		if (isset($_POST['dismiss']))
+		{
+			$dismiss = 1;
+		}
 
-		$db->sqlquery("UPDATE `announcements` SET `text` = ?, `user_groups` = ?, `type` = ?, `modules` = ? WHERE `id` = ?", array($text, $user_groups, $_POST['type'], $modules, $_POST['id']));
+		$dbl->run("UPDATE `announcements` SET `text` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ? WHERE `id` = ?", array($text, $user_groups, $_POST['type'], $modules, $dismiss, $_POST['id']));
 		$_SESSION['message'] = 'edited';
 		$_SESSION['message_extra'] = 'announcement';
 		header("Location: /admin.php?module=announcements&view=manage");
@@ -157,7 +177,7 @@ if (isset($_POST['act']))
 		}
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
+			$dbl->run("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'announcement';
 			header("Location: /admin.php?module=announcements&view=manage");

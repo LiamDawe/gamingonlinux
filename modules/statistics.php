@@ -11,21 +11,21 @@ $templating->block('top', 'statistics');
 $templating->set('total_users', $core->config('total_users'));
 
 $charts_list = array(
-  array("name" => "Linux Distributions (Combined)"),
-  array("name" => "Linux Distributions (Split)"),
-  array("name" => "Desktop Environment"),
-  array("name" => "Distro Architecture"),
-  array("name" => "Dual Booting"),
-  array("name" => "CPU Vendor"),
-  array("name" => "GPU Vendor"),
-  array("name" => "GPU Driver", "order" => "drivers"),
-  array("name" => "GPU Driver (Nvidia)", "order" => "drivers"),
-  array("name" => "GPU Driver (AMD)", "order" => "drivers"),
-  array("name" => "RAM"),
-  array("name" => "Monitors"),
-  array("name" => "Resolution"),
-  array("name" => "Main Gaming Machine"),
-  array("name" => "Main Gamepad")
+	array("name" => "Linux Distributions (Combined)"),
+	array("name" => "Linux Distributions (Split)"),
+	array("name" => "Desktop Environment"),
+	array("name" => "Distro Architecture"),
+	array("name" => "Dual Booting"),
+	array("name" => "RAM"),
+	array("name" => "CPU Vendor"),
+	array("name" => "GPU Vendor"),
+	array("name" => "GPU Driver", "order" => "drivers"),
+	array("name" => "GPU Driver (Nvidia)", "order" => "drivers"),
+	array("name" => "GPU Driver (AMD)", "order" => "drivers"),
+	array("name" => "Monitors"),
+	array("name" => "Resolution"),
+	array("name" => "Main Gaming Machine"),
+	array("name" => "Main Gamepad")
 );
 
 $templating->block('monthly_top');

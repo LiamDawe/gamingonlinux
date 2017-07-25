@@ -759,6 +759,12 @@ class bbcode
 					$counter++;
 					$pc_info['dual_boot'] = '<strong>Do you dual-boot with a different operating system?</strong> '.$additionaldb['dual_boot'];
 				}
+				
+				if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
+				{
+					$counter++;
+					$pc_info['ram_count'] = '<strong>RAM:</strong> '.$additionaldb['ram_count'].'GB';
+				}
 
 				if ($additionaldb['cpu_vendor'] != NULL && !empty($additionaldb['cpu_vendor']))
 				{
@@ -788,12 +794,6 @@ class bbcode
 				{
 					$counter++;
 					$pc_info['gpu_driver'] = '<strong>GPU Driver:</strong> ' . $additionaldb['gpu_driver'];
-				}
-
-				if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
-				{
-					$counter++;
-					$pc_info['ram_count'] = '<strong>RAM:</strong> '.$additionaldb['ram_count'].'GB';
 				}
 
 				if ($additionaldb['monitor_count'] != NULL && !empty($additionaldb['monitor_count']))

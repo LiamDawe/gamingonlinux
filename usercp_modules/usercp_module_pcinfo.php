@@ -12,8 +12,13 @@ if (!isset($_POST['act']))
 	$db->sqlquery("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$usercpcp = $db->fetch();
 
-	$db->sqlquery("SELECT `date_updated`, `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']));
-	$additional = $db->fetch();
+	$additional = $dbl->run("SELECT `date_updated`, `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+	
+	// if for some reason they don't have a profile info row, give them one
+	if (!$additional)
+	{
+		$dbl->run("INSERT INTO `user_profile_info` SET `user_id` = ?", array($_SESSION['user_id']));
+	}
 
 	$templating->block('pcdeets', 'usercp_modules/usercp_module_pcinfo');
 	$templating->set('user_id', $_SESSION['user_id']);

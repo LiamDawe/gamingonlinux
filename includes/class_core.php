@@ -1017,11 +1017,19 @@ class core
 
 				if (strtotime($checker['date_updated']) < $minus_4months)
 				{
-					$templating->load('announcements');
-					$templating->block('announcement_top', 'announcements');
-					$templating->block('announcement', 'announcements');
-					$templating->set('text', 'You haven\'t updated your PC information in over 4 months! <a href="/usercp.php?module=pcinfo">Click here to go and check</a>. You can simply update if nothing has changed to be included in our statistics!');
-					$templating->block('announcement_bottom', 'announcements');
+					if (!isset($_COOKIE['gol_announce_pc_info']))
+					{
+						$templating->load('announcements');
+						$templating->block('announcement_top', 'announcements');
+						$templating->block('announcement', 'announcements');
+						$templating->set('text', 'You haven\'t updated your PC information in over 4 months! <a href="/usercp.php?module=pcinfo">Click here to go and check</a>. You can simply update if nothing has changed to be included in our statistics!');
+						
+						$dismiss = '<span class="fright"><a href="#" class="remove_announce" title="Hide Announcement" data-announce-id="pc_info">&#10799;</a></span>';
+						$templating->set('dismiss', $dismiss);
+
+											
+						$templating->block('announcement_bottom', 'announcements');
+					}
 				}
 			}
 		}

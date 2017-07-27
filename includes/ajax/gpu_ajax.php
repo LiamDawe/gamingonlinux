@@ -7,7 +7,7 @@ $cat_array = array();
 
 if(isset($_GET['q']))
 {
-	$get_data = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();
+	$get_data = $dbl->run("SELECT `id`, `name` FROM `gpu_models` WHERE `name` LIKE ? ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();
 	// Make sure we have a result
 	if($get_data)
 	{
@@ -18,7 +18,7 @@ if(isset($_GET['q']))
 	}
 	else
 	{
-		$data[] = array('id' => '0', 'text' => 'No games found that match!');
+		$data[] = array('id' => '0', 'text' => 'No GPUs found that match!');
 	}
 	echo json_encode($data);
 }

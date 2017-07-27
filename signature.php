@@ -13,7 +13,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
 
 	if ($public == 1)
 	{
-		$user_info = $dbl->run("SELECT u.`distro`, u.`username`, i.`desktop_environment`, i.`gpu_vendor`, i.`gpu_model`, i.`cpu_vendor`, i.`cpu_model` FROM `users` u LEFT JOIN `user_profile_info` i ON u.user_id = i.user_id WHERE u.`user_id` = ?", [$_GET['id']])->fetch();
+		$user_info = $dbl->run("SELECT u.`distro`, u.`username`, i.`desktop_environment`, i.`gpu_vendor`, i.`cpu_vendor`, i.`cpu_model`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model` FROM `users` u LEFT JOIN `user_profile_info` i ON u.user_id = i.user_id LEFT JOIN `gpu_models` g ON g.id = i.gpu_model WHERE u.`user_id` = ?", [$_GET['id']])->fetch();
 
 		$username = $user_info['username'];
 
@@ -31,7 +31,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
 		if (!empty($user_info['gpu_vendor']))
 		{
 			$gpu = $user_info['gpu_vendor'];
-			if (!empty($user_info['gpu_model']))
+			if (is_numeric($user_info['gpu_id']))
 			{
 				$gpu .= ' : ' . $user_info['gpu_model'];
 			}

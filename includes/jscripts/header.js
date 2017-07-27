@@ -353,30 +353,56 @@ jQuery(document).ready(function()
   }
   });
 
-  if ( $.isFunction($.fn.select2) ) {
-  $("#articleCategories").select2({
-    selectOnClose: true,
-    width: '100%',
-    ajax: {
-      url: "/includes/ajax/categories_ajax.php",
-      dataType: 'json',
-      delay: 250,
-      data: function (params) {
-        return {
-          q: params.term // search term
-        };
-      },
-      processResults: function (data) {
-        return {
-          results: $.map(data, function(obj) {
-            return { id: obj.id, text: obj.text };
-          })
-        };
-      },
-      cache: true,
-    },
-    minimumInputLength: 2
-  });
+	if ( $.isFunction($.fn.select2) ) 
+	{
+		$("#articleCategories").select2({
+			selectOnClose: true,
+			width: '100%',
+			ajax: {
+			url: "/includes/ajax/categories_ajax.php",
+			dataType: 'json',
+			delay: 250,
+			data: function (params) {
+				return {
+				q: params.term // search term
+				};
+			},
+			processResults: function (data) {
+				return {
+				results: $.map(data, function(obj) {
+					return { id: obj.id, text: obj.text };
+				})
+				};
+			},
+			cache: true,
+			},
+			minimumInputLength: 2
+		});
+		
+		$("#gpu_picker").select2({
+			selectOnClose: true,
+			width: '100%',
+			ajax: {
+			url: "/includes/ajax/gpu_ajax.php",
+			dataType: 'json',
+			delay: 250,
+			data: function (params) {
+				return {
+				q: params.term // search term
+				};
+			},
+			processResults: function (data) {
+				return {
+				results: $.map(data, function(obj) {
+					return { id: obj.id, text: obj.text };
+				})
+				};
+			},
+			cache: true,
+			},
+			minimumInputLength: 2
+		});
+		
   $(".call_usernames").select2({
     selectOnClose: true,
     width: '100%',
@@ -446,53 +472,7 @@ jQuery(document).ready(function()
     },
     minimumInputLength: 2
   });
-  var $gamesMulti = $("#articleGames").select2({
-  selectOnClose: true,
-  width: '100%',
-  ajax: {
-    url: "/includes/ajax/games_ajax.php",
-    dataType: 'json',
-    delay: 250,
-    data: function (params) {
-      return {
-        q: params.term // search term
-      };
-    },
-    processResults: function (data) {
-      return {
-        results: $.map(data, function(obj) {
-          return { id: obj.id, text: obj.text };
-        })
-      };
-    },
-    cache: true,
-  },
-  minimumInputLength: 2
-  });
-  $(".clear-games").on("click", function (e) { e.preventDefault(); $gamesMulti.val(null).trigger("change"); });
-	var $genres = $("#genres").select2({
-	selectOnClose: true,
-	width: '100%',
-	ajax: {
-    url: "/includes/ajax/game_genres_ajax.php",
-    dataType: 'json',
-    delay: 250,
-    data: function (params) {
-      return {
-        q: params.term // search term
-      };
-    },
-    processResults: function (data) {
-      return {
-        results: $.map(data, function(obj) {
-          return { id: obj.id, text: obj.text };
-        })
-      };
-    },
-    cache: true,
-  },
-  minimumInputLength: 2
-  });
+
 }
   var clipboard = new Clipboard('.btn');
   

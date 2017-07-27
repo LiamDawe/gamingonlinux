@@ -79,6 +79,7 @@ array ("name" => "Distro Architecture", "db_field" => "what_bits"),
 array ("name" => "Dual Booting", "db_field" => "dual_boot"),
 array ("name" => "CPU Vendor", "db_field" => "cpu_vendor"),
 array ("name" => "GPU Vendor", "db_field" => "gpu_vendor"),
+array ("name" => "GPU Model", "db_field" => "name", "table" => "user_profile_info p INNER JOIN `gpu_models` g ON p.gpu_model = g.id"),
 array ("name" => "GPU Driver", "db_field" => "gpu_driver"),
 array ("name" => "GPU Driver (Nvidia)", "db_field" => "gpu_driver", "gpu_vendor" => "Nvidia"),
 array ("name" => "GPU Driver (AMD)", "db_field" => "gpu_driver", "gpu_vendor" => "AMD"),
@@ -103,7 +104,8 @@ foreach ($charts as $chart)
 		$sql_vendor = "`gpu_vendor` = '{$chart['gpu_vendor']}' AND";
 	}
 
-	$users = $dbl->run("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor `{$chart['db_field']}` != '' AND `{$chart['db_field']}` != 'Not Listed' AND `{$chart['db_field']}` IS NOT NULL GROUP BY {$chart['db_field']} ORDER BY `total` DESC")->fetch_all();
+	$users = $dbl->run("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor {$chart['db_field']} != '' AND {$chart['db_field']} != 'Not Listed' AND {$chart['db_field']} IS NOT NULL GROUP BY {$chart['db_field']} ORDER BY `total` DESC")->fetch_all();
+	
 	$labels = array();
 	$data = array();
 
@@ -112,8 +114,8 @@ foreach ($charts as $chart)
 	
 	foreach ($users as $user)
 	{
-			$labels[] = $user[$chart['db_field']];
-			$data[] = $user['total'];
+		$labels[] = $user[$chart['db_field']];
+		$data[] = $user['total'];
 	}
 
 	$label_counter = 0;

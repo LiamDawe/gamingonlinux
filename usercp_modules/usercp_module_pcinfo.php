@@ -12,7 +12,7 @@ if (!isset($_POST['act']))
 	$db->sqlquery("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$usercpcp = $db->fetch();
 
-	$additional = $dbl->run("SELECT `date_updated`, `desktop_environment`, `what_bits`, `dual_boot`, `cpu_vendor`, `cpu_model`, `gpu_vendor`, `gpu_model`, `gpu_driver`, `ram_count`, `monitor_count`, `gaming_machine_type`, `resolution`, `gamepad` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+	$additional = $dbl->run("SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?", array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
 	if (!$additional)
@@ -129,7 +129,13 @@ if (!isset($_POST['act']))
 	$gpu_options = '<option value="AMD" '.$amd_gpu.'>AMD</option><option value="Intel" '.$intel_gpu.'>Intel</option><option value="Nvidia" '.$nvidia_gpu.'>Nvidia</option>';
 	$templating->set('gpu_options', $gpu_options);
 
-	$templating->set('gpu_model', $additional['gpu_model']);
+	// GPU MODEL 
+	$gpu_model = '';
+	if (is_numeric($additional['gpu_id']))
+	{
+		$gpu_model = "<option value=\"{$additional['gpu_id']}\" selected>{$additional['gpu_model']}</option>";
+	}
+	$templating->set('gpu_model', $gpu_model);
 
 	$open = '';
 	if ($additional['gpu_driver'] == 'Open Source')

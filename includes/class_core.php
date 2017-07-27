@@ -739,149 +739,158 @@ class core
 		$labels = array();
 
 		// get each chart along with the date they were generated to make the axis
-		$get_charts = $db->sqlquery("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ?", array($name));
-		while ($chart_info = $get_charts->fetch())
+		$get_charts = $this->database->run("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ?", array($name))->fetch_all();
+		if ($get_charts)
 		{
-			$chart_ids[] = $chart_info['id'];
-
-			$make_time = strtotime($chart_info['generated_date']);
-			$dates[] = "'".date("M-Y", $make_time) . "'";
-		}
-
-		$chart_ids_sql = implode(',', $chart_ids);
-
-		// get the names of all the labels
-		$find_labels = $db->sqlquery("SELECT DISTINCT(`name`) FROM `user_stats_charts_labels` WHERE `chart_id` IN ($chart_ids_sql)");
-		$get_labels = $find_labels->fetch_all_rows();
-
-		// how many data points in total we need for each label
-		$total_points = count($dates);
-
-		// only grab the top 10 labels, so graphs don't get messy with tons of labels
-		$top_10_labels = array_slice($get_labels, 0, 10);
-		if ($name == 'RAM' || $name == 'Resolution')
-		{
-			uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
-		}
-		foreach ($top_10_labels as $sort_labels)
-		{
-			$find_data = $db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id` LIMIT 10");
-			$get_data = $find_data->fetch_all_rows();
-			$total_data = $db->num_rows();
-
-			// calculate how many data points are missing
-			$missing_data = $total_points - $total_data;
-
-			$label_add = '';
-			if ($name == 'RAM')
+			foreach ($get_charts as $chart_info)
 			{
-				$label_add = 'GB';
-			}
-
-			// adjust the data points for this label if it started late (not enough data points), so the data point starts at the right place
-			for ($data_counter = 0; $data_counter < $missing_data; $data_counter++)
-			{
-				$labels[$sort_labels['name'] . $label_add][] = 0;
-			}
-			// add in the actual data we do have for this label
-			foreach ($get_data as $data)
-			{
-				$percent = round(($data['data'] / $data['total_answers']) * 100, 2);
-				$labels[$data['name'] . $label_add][] = $percent;
-			}
-		}
-
-		$colours = array(
-		'#a6cee3',
-		'#1f78b4',
-		'#b2df8a',
-		'#33a02c',
-		'#fb9a99',
-		'#e31a1c',
-		'#fdbf6f',
-		'#ff7f00',
-		'#cab2d6',
-		'#6a3d9a'
-		);
-
-		$graph_name = str_replace(' ', '', $name); // Replaces all spaces with hyphens.
- 		$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
-
-		$get_graph['graph'] = '<canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
-
-		$total_array = count($labels);
-
-		$data_sets = '';
-		$counter = 0;
-		foreach ($labels as $key => $data)
-		{
-			$colour = $colours[$counter];
-			if ($key == 'Intel')
-			{
-				$colour = "#1f78b4";
-			}
-			if ($key == 'AMD' || $key == 'Proprietary')
-			{
-				$colour = "#e31a1c";
-			}
-			if ($key == 'Nvidia' || $key == 'Open Source')
-			{
-				$colour = "#33a02c";
-			}
-
-			$data_sets .= "{
-      label: '".$key."',
-			fill: false,
-      data: [";
-			$data_sets .= implode(',', $data);
-			$data_sets .= "],
-      borderColor: '$colour',
-      borderWidth: 1
-      }";
-			$counter++;
-			if ($counter != $total_array)
-			{
-				$data_sets .= ',';
-			}
-		}
-
-		$javascript = "<script>
-		var ".$graph_name." = document.getElementById('".$graph_name."');
-		var myChart = new Chart.Line(".$graph_name.", {
-			type: 'bar',
-			data: {
-      labels: [".implode(',', $dates)."],
-      datasets: [$data_sets]
-			},
-			options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero:true
-            },
-						scaleLabel: {
-        			display: true,
-        			labelString: 'Percentage of users'
-      			}
-          }]
-        },
-				tooltips:
+				if ($chart_info['total_answers'] > 0)
 				{
-					callbacks: {
-						label: function(tooltipItem, data) {
-              var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-							var label = data.datasets[tooltipItem.datasetIndex].label;
-              return label + ' ' + value + '%';
-        		}
-    			},
+					$chart_ids[] = $chart_info['id'];
+
+					$make_time = strtotime($chart_info['generated_date']);
+					$dates[] = "'".date("M-Y", $make_time) . "'";
+				}
+			}
+
+			$chart_ids_sql = implode(',', $chart_ids);
+
+			if (count($chart_ids) > 0)
+			{
+				// get the names of all the labels
+				$find_labels = $db->sqlquery("SELECT DISTINCT(`name`) FROM `user_stats_charts_labels` WHERE `chart_id` IN ($chart_ids_sql)");
+				$get_labels = $find_labels->fetch_all_rows();
+
+				// how many data points in total we need for each label
+				$total_points = count($dates);
+
+				// only grab the top 10 labels, so graphs don't get messy with tons of labels
+				$top_10_labels = array_slice($get_labels, 0, 10);
+				if ($name == 'RAM' || $name == 'Resolution')
+				{
+					uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
+				}
+				foreach ($top_10_labels as $sort_labels)
+				{
+					$find_data = $db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id` LIMIT 10");
+					$get_data = $find_data->fetch_all_rows();
+					$total_data = $db->num_rows();
+
+					// calculate how many data points are missing
+					$missing_data = $total_points - $total_data;
+
+					$label_add = '';
+					if ($name == 'RAM')
+					{
+						$label_add = 'GB';
+					}
+
+					// adjust the data points for this label if it started late (not enough data points), so the data point starts at the right place
+					for ($data_counter = 0; $data_counter < $missing_data; $data_counter++)
+					{
+						$labels[$sort_labels['name'] . $label_add][] = 0;
+					}
+					// add in the actual data we do have for this label
+					foreach ($get_data as $data)
+					{
+						$percent = round(($data['data'] / $data['total_answers']) * 100, 2);
+						$labels[$data['name'] . $label_add][] = $percent;
+					}
+				}
+
+				$colours = array(
+				'#a6cee3',
+				'#1f78b4',
+				'#b2df8a',
+				'#33a02c',
+				'#fb9a99',
+				'#e31a1c',
+				'#fdbf6f',
+				'#ff7f00',
+				'#cab2d6',
+				'#6a3d9a'
+				);
+
+				$graph_name = str_replace(' ', '', $name); // Replaces all spaces with hyphens.
+				$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
+
+				$get_graph['graph'] = '<canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
+
+				$total_array = count($labels);
+
+				$data_sets = '';
+				$counter = 0;
+				foreach ($labels as $key => $data)
+				{
+					$colour = $colours[$counter];
+					if ($key == 'Intel')
+					{
+						$colour = "#1f78b4";
+					}
+					if ($key == 'AMD' || $key == 'Proprietary')
+					{
+						$colour = "#e31a1c";
+					}
+					if ($key == 'Nvidia' || $key == 'Open Source')
+					{
+						$colour = "#33a02c";
+					}
+
+					$data_sets .= "{
+					label: '".$key."',
+					fill: false,
+					data: [";
+					$data_sets .= implode(',', $data);
+					$data_sets .= "],
+					borderColor: '$colour',
+					borderWidth: 1
+					}";
+					$counter++;
+					if ($counter != $total_array)
+					{
+						$data_sets .= ',';
+					}
+				}
+
+				$javascript = "<script>
+				var ".$graph_name." = document.getElementById('".$graph_name."');
+				var myChart = new Chart.Line(".$graph_name.", {
+				type: 'bar',
+				data: {
+				labels: [".implode(',', $dates)."],
+				datasets: [$data_sets]
+					},
+					options: {
+				scales: {
+				yAxes: [{
+					ticks: {
+					beginAtZero:true
+					},
+								scaleLabel: {
+							display: true,
+							labelString: 'Percentage of users'
+						}
+				}]
 				},
-    	}
-		});
-		</script>";
+						tooltips:
+						{
+							callbacks: {
+								label: function(tooltipItem, data) {
+					var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+									var label = data.datasets[tooltipItem.datasetIndex].label;
+					return label + ' ' + value + '%';
+						}
+						},
+						},
+				}
+				});
+				</script>";
 
-	core::$user_graphs_js .= $javascript;
+				core::$user_graphs_js .= $javascript;
 
-	return $get_graph;
+				return $get_graph;
+			}
+		}
 
 	}
 

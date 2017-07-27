@@ -1290,6 +1290,9 @@ body.dark {
 	background-color: #428BCA;
 }
 
+.dark .select2-selection__rendered {
+color: #fff !important;
+}
 /* Responsive CSS */
 @media only screen and (min-width: 700px) {
     .masonry {

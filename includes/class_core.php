@@ -316,7 +316,7 @@ class core
 			//previous button
 			if ($page > 1)
 			{
-				$pagination.= "<li class=\"previouspage\"><a href=\"{$targetpage}page=$prev$extra\">&laquo;</a></li>";
+				$pagination.= "<li class=\"previouspage\"><a data-page=\"{$prev}\" href=\"{$targetpage}page=$prev$extra\">&laquo;</a></li>";
 			}
 
 			// current page
@@ -333,13 +333,13 @@ class core
 
 			else
 			{
-				$pagination .= "<li><a href=\"{$targetpage}page={$lastpage}$extra\">{$lastpage}</a></li>";
+				$pagination .= "<li><a data-page=\"{$lastpage}\" href=\"{$targetpage}page={$lastpage}$extra\">{$lastpage}</a></li>";
 			}
 
 			// next button
 			if ($page < $lastpage)
 			{
-				$pagination .= "<li class=\"nextpage\"><a href=\"{$targetpage}page=$next$extra\">&raquo;</a></li>";
+				$pagination .= "<li class=\"nextpage\"><a data-page=\"{$next}\" href=\"{$targetpage}page=$next$extra\">&raquo;</a></li>";
 			}
 
 			$pagination .= "</ul>";

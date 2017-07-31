@@ -1034,10 +1034,11 @@ $(".poll_content").on("click", ".open_poll", function()
 	$('#preview_text_button').click(function()
 	{
 		var text = $('.bbcode_editor').val();
-		$('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text});
+		$('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text}, function() {
 		$('.preview_pm').show();
 		$('#preview').scrollMinimal();
 		$('.preview_pm').highlight();
+		});
 	});
 	
 	$('#preview_chart').click(function()

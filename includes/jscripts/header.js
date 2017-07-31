@@ -166,30 +166,7 @@ $(function(){
         });
 });
 jQuery(document).ready(function()
-{
-	$("#game-options").change(function() 
-	{
-		var all_fields = [];
-		$("#games_options option:selected").each(function() {
-			all_fields.push($(this).parent().attr("name") + '=' + $(this).val());
-        });
-				
-		$('input[type="checkbox"]').each(function(i)
-		{
-			var data = {};
-			if(this.checked)
-			{
-				if(!data.hasOwnProperty(this.name))
-				{
-					data[this.name] = [];
-				}
-				all_fields.push($(this).attr("name") + '=' + $(this).val());
-			}
-		});
-
-		$(location).attr('href', 'index.php?module=game&view=all&' + all_fields.join('&'));
-	});
-  
+{  
 	// this function may eventually handle pasting rich html from a pre-written doc into gol's editor
 	/*$('textarea').on('paste',function(e) 
 	{
@@ -318,12 +295,6 @@ jQuery(document).ready(function()
 	{
 		$(".toggle-content").removeClass('toggle-active');
 	});
-  
-  // hide the navbar on window resize, to prevent menus for small screens still appearing if open
-  $(window).on('resize', function()
-  {
-	  $(".toggle-content").removeClass('toggle-active');
-  });
 
   // for checking usernames
   var charReg = /^\s*[a-zA-Z0-9-_]+\s*$/;

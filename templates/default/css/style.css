@@ -243,12 +243,12 @@ margin-bottom: -3px;
 .login-box li a {padding: 5px; color: #999;}
 .login-box li a:hover {padding: 5px; color: #fff;}
 .divider {
-		width: 100%;
-		height: 1px;
-		padding: 0px !important;
-		margin: 9px 0;
-		overflow: hidden;
-		background-color: #383838;
+	width: 100%;
+	height: 1px;
+	padding: 0px !important;
+	margin: 9px 0;
+	overflow: hidden;
+	background-color: #383838;
 }
 
 /* Mobile Navigation */
@@ -264,8 +264,17 @@ margin-bottom: -3px;
 	height: 49px;
 	width: 50px;
 }
-#navigation-mobile .toggle-content {width: 100%; border-top: 1px solid black; text-align: center;}
+#navigation-mobile .toggle-content {width: 100%; border-top: 1px solid black; text-align: left;}
 #navigation-mobile a {display:block; width: 100%; height: 100%;}
+#navigation-mobile ul {
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
+    padding-left: 3px;
+}
+#navigation-mobile li:hover {
+	background-color: #428BCA;
+}
 
 /* Body */
 #body {

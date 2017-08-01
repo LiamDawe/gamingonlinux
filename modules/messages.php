@@ -158,7 +158,7 @@ else
 				$templating->block('edit', 'private_messages');
 				$templating->set('formaction', $core->config('website_url') . 'index.php?module=messages&message_id='.$_GET['message_id'].'&conversation_id='.$_GET['conversation_id'].'&page=' . $page);
 
-				$core->editor(['name' => 'text', 'content' => $info['message'], 'editor_id' => 'pm_text']);
+				$core->editor(['name' => 'text', 'content' => $info['message'], 'editor_id' => 'comment']);
 
 				$templating->block('edit_bottom', 'private_messages');
 				$templating->block('preview', 'private_messages');
@@ -409,7 +409,7 @@ else
 				$templating->block('reply', 'private_messages');
 				$templating->set('pagination', $pagination);
 
-				$core->editor(['name' => 'text', 'editor_id' => 'pm_text']);
+				$core->editor(['name' => 'text', 'editor_id' => 'comment']);
 
 				$templating->block('reply_bottom', 'private_messages');
 				$templating->set('conversation_id', $start['conversation_id']);
@@ -464,7 +464,7 @@ else
 		$templating->set('to', $user_to);
 		$templating->set('title', $title);
 
-		$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'pm_text']);
+		$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment']);
 
 		$templating->block('compose_bottom', 'private_messages');
 		$templating->block('preview', 'private_messages');

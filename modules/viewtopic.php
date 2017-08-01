@@ -772,7 +772,7 @@ else
 
 								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 								{
-									$core->editor(['name' => 'text', 'editor_id' => 'comment_text']);
+									$core->editor(['name' => 'text', 'editor_id' => 'comment']);
 
 									$templating->block('reply_buttons', 'viewtopic');
 									$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);

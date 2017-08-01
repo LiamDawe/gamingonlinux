@@ -443,15 +443,7 @@ if (!isset($_GET['go']))
 					}
 
 					// paging for pagination
-					if (!isset($_GET['page']) || $_GET['page'] == 0)
-					{
-						$page = 1;
-					}
-
-					else if (is_numeric($_GET['page']))
-					{
-						$page = $_GET['page'];
-					}
+					$page = core::give_page();
 
 					if ($page > $lastpage)
 					{
@@ -874,7 +866,7 @@ if (!isset($_GET['go']))
 										$templating->set('url', $core->config('website_url'));
 										$templating->set('article_id', $_GET['aid']);
 
-										$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment_text']);
+										$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
 
 										$templating->block('comment_buttons', 'articles_full');
 										$templating->set('url', $core->config('website_url'));
@@ -940,7 +932,7 @@ if (!isset($_GET['go']))
 
 		$templating->block('edit_top', 'articles_full');
 
-		$core->editor(['name' => 'text', 'content' => $comment_text, 'editor_id' => 'comment_text']);
+		$core->editor(['name' => 'text', 'content' => $comment_text, 'editor_id' => 'comment']);
 
 		$templating->block('edit_comment_buttons', 'articles_full');
 		$templating->set('comment_id', $comment['comment_id']);

@@ -605,6 +605,10 @@ class charts
 
 				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)' . $old_info . '<br />';
 			}
+			else
+			{
+				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)<br />';
+			}
 		}
 		$full_info .= '</div></div>';
 			

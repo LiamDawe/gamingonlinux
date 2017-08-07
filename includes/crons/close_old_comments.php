@@ -16,7 +16,7 @@ foreach ($closing as $to_close)
 
 $dbl->run("UPDATE `articles` SET `comments_open` = 0 WHERE `date` < ?", array($stamp));
 
-$subject = $core->config('site_title') . ' CRON - Comments Closed';
+$subject = 'GamingOnLinux CRON - Comments Closed';
 
 // To send HTML mail, the Content-type header must be set
 $headers  = 'MIME-Version: 1.0' . "\r\n";

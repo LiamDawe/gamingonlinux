@@ -5,10 +5,8 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 $templating->load('website_stats');
 
 $templating->block('top');
-$templating->set('site_title', $core->config('site_title'));
 
 $templating->block('users');
-$templating->set('site_title', $core->config('site_title'));
 $templating->set('total_users', number_format($core->config('total_users')));
 
 $count_monthly_users = $dbl->run("SELECT COUNT( DISTINCT user_id ) AS `counter` FROM `users` WHERE MONTH(FROM_UNIXTIME(`register_date`)) >= MONTH(NOW()) AND YEAR(FROM_UNIXTIME(`register_date`)) = YEAR(CURRENT_DATE)")->fetchOne();
@@ -64,7 +62,6 @@ DESC,
 DESC")->fetch_all();
 
 $templating->block('articles', 'website_stats');
-$templating->set('site_title', $core->config('site_title'));
 $author_list = '';
 
 $last_month = date("j M Y", strtotime("first day of previous month"));
@@ -104,7 +101,7 @@ foreach ($article_list as $fetch_authors)
 		$username = '<a href="'. $profile_url . $fetch_authors['user_id'] . '">' . $fetch_authors['username'] . '</a>';
 	}
 
-	$author_list .= '<li>' . $username . ' (' . $article_count . ') <em>Last article: ' . $core->format_date($fetch_authors['last_date']) . '</em></li>';
+	$author_list .= '<li>' . $username . ' (' . $article_count . ') <em>Last article: ' . $core->human_date($fetch_authors['last_date']) . '</em></li>';
 	$counter++;
 }
 $templating->set('author_list', $author_list);

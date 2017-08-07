@@ -33,9 +33,9 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute( 'xmlns:atom', 'http://www.w3.org/2005/Atom' );
 
 	$xml->startElement('channel');
-	$xml->writeElement('title', $core->config('site_title') . ' Latest Articles');
+	$xml->writeElement('title', 'GamingOnLinux Latest Articles');
 	$xml->writeElement('link', $core->config('website_url'));
-	$xml->writeElement('description', 'The latest articles from ' . $core->config('site_title'));
+	$xml->writeElement('description', 'The latest articles from GamingOnLinux');
 	$xml->writeElement('pubDate', $last_date);
 	$xml->writeElement('language', 'en-us');
 	$xml->writeElement('lastBuildDate', $last_date);

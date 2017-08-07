@@ -29,7 +29,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
 
@@ -143,6 +143,13 @@ if (!isset($_POST['act']))
 		$submission_emails = "Get article submission emails? <input type=\"checkbox\" name=\"submission_emails\" $submission_emails_check /><br />";
 	}
 	$templating->set('submission_emails', $submission_emails);
+	
+	$daily_article_emails = '';
+	if ($usercpcp['email_articles'] == 'daily')
+	{
+		$daily_article_emails = 'checked';
+	}
+	$templating->set('daily_check', $daily_article_emails);
 
 	$single_article_yes = '';
 	if ($usercpcp['single_article_page'] == 1)
@@ -295,11 +302,17 @@ else if (isset($_POST['act']))
 		{
 			$forum_type_sql = 'normal_forum';
 		}
+		
+		$daily_articles = NULL;
+		if (isset($_POST['daily_news']))
+		{
+			$daily_articles = 'daily';
+		}
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
-		$user_update_sql = "UPDATE `users` SET `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ? WHERE `user_id` = ?";
-		$user_update_query = $db->sqlquery($user_update_sql, array($submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_SESSION['user_id']));
+		$user_update_sql = "UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ? WHERE `user_id` = ?";
+		$user_update_query = $db->sqlquery($user_update_sql, array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;

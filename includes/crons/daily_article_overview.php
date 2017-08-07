@@ -6,8 +6,8 @@ require APP_ROOT . "/includes/bootstrap.php";
 // gather a list of users who want a daily email of articles
 $email_users = $dbl->run("SELECT `username`, `email` FROM `users` WHERE `email_articles` = 'daily'")->fetch_all();
 
-$beginOfDay = strtotime("midnight", time());
-$endOfDay   = strtotime("tomorrow", $beginOfDay) - 1;
+$beginOfDay = strtotime("midnight yesterday");
+$endOfDay   = strtotime("midnight today") - 1;
 
 // gather a list of articles in the last day
 $article_list = $dbl->run("SELECT `title`, `article_id` FROM `articles` WHERE `date` >= $beginOfDay AND `date` <= $endOfDay")->fetch_all();

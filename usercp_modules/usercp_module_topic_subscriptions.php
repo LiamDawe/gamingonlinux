@@ -46,7 +46,7 @@ if (!isset($_GET['go']))
 		$templating->set('topic_id', $post['topic_id']);
 		$templating->set('post_title', $post['topic_title']);
 		$templating->set('author_id', $post['author_id']);
-		$templating->set('post_date', $core->format_date($post['creation_date']));
+		$templating->set('post_date', $core->human_date($post['creation_date']));
 		$templating->set('post_author', $post['username']);
 		$templating->set('replies', $post['replys']);
 		$templating->set('views', $post['views']);
@@ -54,7 +54,7 @@ if (!isset($_GET['go']))
 		$username_last = 'No replies!';
 		if (!empty($post['username_last']))
 		{
-			$date = $core->format_date($post['last_post_date']);
+			$date = $core->human_date($post['last_post_date']);
 			$username_last = "by <a href=\"/profiles/{$post['user_id_last']}\">{$post['username_last']}</a><br />
 			on {$date}";
 		}

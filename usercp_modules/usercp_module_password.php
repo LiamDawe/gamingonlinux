@@ -33,11 +33,11 @@ if (isset($_POST['act']))
 		$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `user_id` = ?", array($safe_password, $_SESSION['user_id']));
 		
 		// send an email to their old address to let them know
-		$subject = "Password requested on " . $core->config('site_title');
+		$subject = "Password requested on GamingOnLinux";
 
 		// message
 		$html_message = "<p>Hello <strong>{$grab_current_password['username']}</strong>,</p>
-		<p>Someone, hopefully you, has requested a password for your account on <a href=\"".$core->config('website_url')."\">".$core->config('site_title')."</a>. If this <strong>wasn't you</strong>, then your account has somehow been compromised.</p>
+		<p>Someone, hopefully you, has requested a password for your account on <a href=\"".$core->config('website_url')."\">GamingOnLinux</a>. If this <strong>wasn't you</strong>, then your account has somehow been compromised.</p>
 		<p>Your new password is: ".$new_password.", please keep a note of it!</p>";
 
 		$plain_message = PHP_EOL."Hello {$grab_current_password['username']}! Someone, hopefully you, has requested a password for your account on ".$core->config('website_url').". If this wasn't you, then your account has somehow been compromised. Your new password is: ".$new_password . ", please keep a note of it!";
@@ -105,11 +105,11 @@ if (isset($_POST['act']))
 		}
 
 		// send an email to their old address to let them know
-		$subject = "Password changed on " . $core->config('site_title');
+		$subject = "Password changed on GamingOnLinux";
 
 		// message
 		$html_message = "<p>Hello <strong>{$grab_current_password['username']}</strong>,</p>
-		<p>Someone, hopefully you, has changed your password on <a href=\"".$core->config('website_url')."\">".$core->config('site_title')."</a>. If this was you, please ignore this email as it's just a security measure.</p>";
+		<p>Someone, hopefully you, has changed your password on <a href=\"".$core->config('website_url')."\">GamingOnLinux</a>. If this was you, please ignore this email as it's just a security measure.</p>";
 
 		$plain_message = PHP_EOL."Hello {$grab_current_password['username']}! Someone, hopefully you, has changed your password on ".$core->config('website_url').". If this was you, please ignore this email as it's just a security measure.";
 

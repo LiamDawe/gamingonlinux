@@ -64,11 +64,11 @@ if (isset($_POST['Update']))
 	$db->sqlquery("UPDATE `users` SET `email` = ? WHERE `user_id` = ?", array($new_email, $_SESSION['user_id']));
 
 	// send an email to their old address to let them know
-	$subject = "Email changed on " . $core->config('site_title');
+	$subject = "Email changed on GamingOnLinux";
 
 	// message
 	$html_message = "<p>Hello <strong>{$grab_email['username']}</strong>,</p>
-	<p>Someone, hopefully you, has changed your email address on <a href=\"".$core->config('website_url')."\">".$core->config('site_title')."</a> to: {$_POST['new_email']}. If this was you, please ignore this email as it's just a security measure.</p>";
+	<p>Someone, hopefully you, has changed your email address on <a href=\"".$core->config('website_url')."\">GamingOnLinux</a> to: {$_POST['new_email']}. If this was you, please ignore this email as it's just a security measure.</p>";
 
 	$plain_message = PHP_EOL."Hello {$grab_email['username']}! Someone, hopefully you, has changed your email address on ".$core->config('website_url')." to: {$_POST['new_email']}. If this was you, please ignore this email as it's just a security measure.";
 

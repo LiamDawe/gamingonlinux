@@ -31,7 +31,7 @@
 [/block: tags]
 
 [block: article_meta]
-	<div class="likes bottom-meta group">
+	<div class="article_likes bottom-meta group">
 	<span id="article-likes">{:total_likes} Likes</span><span id="who-likes-article">{:who_likes_alink}</span> <ul class="fright"><li><span class="like-button" style="display:none !important">{:like_button}</span></li> <li><span class="fright">{:bookmark_link}</span></li></ul>
 	</div>
 [/block: article_meta]
@@ -97,8 +97,7 @@
 								<div id="{:comment_id}">
 									{:text}
 								</div>
-								<hr />
-								<div class="likes">{:total_likes} Likes<span id="who-likes">{:who_likes_link}</span></div>
+								<div class="likes {:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
 							</div>
 						</div>
 [/block: article_comments]

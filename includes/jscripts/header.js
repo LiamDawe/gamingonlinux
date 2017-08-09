@@ -643,138 +643,159 @@ jQuery(document).ready(function()
 
     $(".like-button").show();
 
-    $(".likebutton").click(function(){
-    //Get our comment
-    var comment = $(this).parents('.comment')[0];
-    //Get the post ID
-    var sid = $(this).attr("data-id");
-    // get the author id of the comment itself
-    var author_id = $(this).attr("data-author-id");
-    // get the id of the article it's on
-    var article_id = $(this).attr("data-article-id");
-    // the type of like this is
-    var type = $(this).attr("data-type");
-    //Send of a like (needs a like/dislike check)
-      var $that = $(this);
-      $.post('/includes/ajax/like.php', {
-       comment_id: sid,
-       author_id: author_id,
-       article_id: article_id,
-       type: type,
-       sta: $that.find("span").text().toLowerCase()
-      }, function (returndata){
-        if(returndata === "liked")
-        {
-          var likeobj = $("#"+sid+" div.likes");
-          var numlikes = likeobj.html().replace(" Likes","");
-          numlikes = parseInt(numlikes) + 1;
-          var wholikes = "";
-          if (numlikes > 0)
-          {
-            wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
-          }
-          likeobj.html(numlikes + " Likes" + wholikes);
-          var button = $(comment).find(".likebutton span");
-          button.text("Unlike").removeClass("like").addClass("unlike");
-      }
-      else if(returndata === "unliked")
-      {
-          var likeobj = $("#"+sid+" div.likes");
-          var numlikes = likeobj.html().replace(" Likes","");
-          numlikes = parseInt(numlikes) - 1;
-          var wholikes = "";
-          if (numlikes > 0)
-          {
-            wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
-          }
-          likeobj.html(numlikes + " Likes" + wholikes);
-          var button = $(comment).find(".likebutton span");
-          button.text("Like").removeClass("unlike").addClass("like");
-      }
-      else if ( returndata === "5" ) {
-          $that.qtip({
-            content: {
-              text: 'You need to be <a href="/index.php?module=login">logged in</a> to like a post. Or <a href="/index.php?module=register">register</a> to become a GOL member'
-            },
-            position: {
-                my: 'bottom center',
-                at: 'top center'
-            },
-            style: {
-                classes: 'qtip-bootstrap qtip-shadow'
-            },
-            hide: {
-                delay: 2000
-            },
-            show: true
-          });
-        }
-      }); //end of .post callback
-  }); //end of .click callback
+	$(document).on('click', '.likebutton', function()
+	{
+		//Get our comment
+		var comment = $(this).parents('.comment')[0];
+		//Get the post ID
+		var sid = $(this).attr("data-id");
+		// get the author id of the comment itself
+		var author_id = $(this).attr("data-author-id");
+		// get the id of the article it's on
+		var article_id = $(this).attr("data-article-id");
+		// the type of like this is
+		var type = $(this).attr("data-type");
+		//Send off a like
+		var $that = $(this);
+		$.post('/includes/ajax/like.php', 
+		{
+			comment_id: sid,
+			author_id: author_id,
+			article_id: article_id,
+			type: type,
+			sta: $that.find("span").text().toLowerCase()
+		}, 
+		function (returndata)
+		{
+			if(returndata['result'] == "liked")
+			{
+				var likeobj = $("#"+sid+" div.likes");
+				var total_likes_obj = likeobj.find('.total_likes');
+				var who_likes_obj = likeobj.find('.who-likes');
 
-  $(".likearticle").click(function(){
-  // get this like link
-  var this_link = $(this).parents('.likes')[0];
-  //Get the comment ID
-  var article_id = $(this).attr("data-id");
-  var likeobj = $("#article-likes");
-  var type = $(this).attr("data-type");
+				var wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+				total_likes_obj.text(returndata['total']);
+				who_likes_obj.html(wholikes);
+				
+				if ( $(likeobj).css('display') == 'none' )
+				{
+					likeobj.show();
+				}
 
-  //Send of a like (needs a like/dislike check)
-    var $that = $(this);
-    $.post('/includes/ajax/like.php', {
-     article_id: article_id,
-     type: type,
-     sta: $that.find("span").text().toLowerCase()
-    }, function (returndata){
-      if(returndata === "liked")
-      {
-        var numlikes = likeobj.html().replace(" Likes","");
-        numlikes = parseInt(numlikes) + 1;
-        var wholikes = "";
-        if (numlikes > 0)
-        {
-          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
-        }
-        $("#who-likes-article").html(wholikes);
-        likeobj.html(numlikes + " Likes");
-        var button = $(this_link).find(".likearticle span");
-        button.text("Unlike").removeClass("like").addClass("unlike");
-    }
-    else if(returndata === "unliked")
-    {
-        var numlikes = likeobj.html().replace(" Likes","");
-        numlikes = parseInt(numlikes) - 1;
-        var wholikes = "";
-        if (numlikes > 0)
-        {
-          wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
-        }
-        $("#who-likes-article").html(wholikes);
-        likeobj.html(numlikes + " Likes" );
-        var button = $(this_link).find(".likearticle span");
-        button.text("Like").removeClass("unlike").addClass("like");
-    }
-    else if ( returndata === "5" ) {
-        $that.qtip({
-          content: {
-            text: 'You need to be <a href="/index.php?module=login">logged in</a> to like a post. Or <a href="/index.php?module=register">register</a> to become a GOL member'
-          },
-          position: {
-              my: 'bottom center',
-              at: 'top center'
-          },
-          style: {
-              classes: 'qtip-bootstrap qtip-shadow'
-          },
-          hide: {
-              delay: 2000
-          },
-          show: true
-        });
-      }
-    }); //end of .post callback
-}); //end of .click callback
+				var button = $(comment).find(".likebutton span");
+				button.text("Unlike").removeClass("like").addClass("unlike");
+			}
+			else if(returndata['result'] == "unliked")
+			{
+				var likeobj = $("#"+sid+" div.likes");
+				var total_likes_obj = likeobj.find('.total_likes');
+				var who_likes_obj = likeobj.find('.who-likes');
+				
+				var wholikes = "";
+				if (returndata['total'] > 0)
+				{
+					wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+					total_likes_obj.text(returndata['total']);
+					who_likes_obj.html(wholikes);
+				}
+				else
+				{
+					likeobj.hide();
+				}
+				var button = $(comment).find(".likebutton span");
+				button.text("Like").removeClass("unlike").addClass("like");
+			}
+			else if (returndata['result'] == "nope") 
+			{
+				$that.qtip(
+				{
+					content: {
+					text: 'You need to be <a href="/index.php?module=login">logged in</a> to like a post. Or <a href="/index.php?module=register">register</a> to become a GOL member'
+					},
+					position: {
+						my: 'bottom center',
+						at: 'top center'
+					},
+					style: {
+						classes: 'qtip-bootstrap qtip-shadow'
+					},
+					hide: {
+						delay: 2000
+					},
+					show: true
+				});
+			}
+		});
+	});
+
+	$(document).on('click', '.likearticle', function()
+	{
+		// get this like link
+		var this_link = $(this).parents('.article_likes')[0];
+		//Get the article ID
+		var article_id = $(this).attr("data-id");
+		var likeobj = $("#article-likes");
+		var type = $(this).attr("data-type");
+
+		//Send off a like
+		var $that = $(this);
+		$.post('/includes/ajax/like.php', 
+		{
+			article_id: article_id,
+			type: type,
+			sta: $that.find("span").text().toLowerCase()
+		}, function (returndata)
+		{
+			if(returndata['result'] == "liked")
+			{
+				var numlikes = likeobj.html().replace(" Likes","");
+				numlikes = parseInt(numlikes) + 1;
+				var wholikes = "";
+				if (numlikes > 0)
+				{
+					wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
+				}
+				$("#who-likes-article").html(wholikes);
+				likeobj.html(numlikes + " Likes");
+				var button = $(this_link).find(".likearticle span");
+				button.text("Unlike").removeClass("like").addClass("unlike");
+			}
+			if(returndata['result'] == "unliked")
+			{
+				var numlikes = likeobj.html().replace(" Likes","");
+				numlikes = parseInt(numlikes) - 1;
+				var wholikes = "";
+				if (numlikes > 0)
+				{
+					wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
+				}
+				$("#who-likes-article").html(wholikes);
+				likeobj.html(numlikes + " Likes" );
+				var button = $(this_link).find(".likearticle span");
+				button.text("Like").removeClass("unlike").addClass("like");
+			}
+			else if (returndata['result'] == "nope")
+			{
+				$that.qtip(
+				{
+					content: {
+						text: 'You need to be <a href="/index.php?module=login">logged in</a> to like a post. Or <a href="/index.php?module=register">register</a> to become a GOL member'
+					},
+					position: {
+						my: 'bottom center',
+						at: 'top center'
+					},
+					style: {
+						classes: 'qtip-bootstrap qtip-shadow'
+					},
+					hide: {
+						delay: 2000
+					},
+					show: true
+				});
+			}
+		});
+	});
 
 	// bookmark content
 	$('.bookmark-content').click(function(event)

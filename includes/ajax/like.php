@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+header('Content-Type: application/json');
+
 define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
@@ -46,7 +48,10 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		if ($count_notifications == 0)
 		{
 			$dbl->run("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($pinsid, $_SESSION['user_id'], core::$date));
-			echo 'liked';
+			
+			$total_likes = $dbl->run("SELECT COUNT(like_id) FROM `$table` WHERE `$field` = ?", array($pinsid))->fetchOne();
+			
+			echo json_encode(array("result" => 'liked', 'total' => $total_likes));
 			return true;
 		}
 		echo 2; //Bad Checknum
@@ -85,7 +90,10 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				}
 			}
 			$dbl->run("DELETE FROM `$table` WHERE $type_delete `$field` = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
-			echo 'unliked';
+			
+			$total_likes = $dbl->run("SELECT COUNT(like_id) FROM `$table` WHERE `$field` = ?", array($pinsid))->fetchOne();
+			
+			echo json_encode(array("result" => 'unliked', 'total' => $total_likes));
 			return true;
 		}
 		echo 2; //Bad Checknum
@@ -94,7 +102,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 	echo 3; //Bad Status
 	return true;
 }
-echo 5; //Bad Post or Session
+echo json_encode(array("result" => 'nope'));
 
 return true;
 ?>

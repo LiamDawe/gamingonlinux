@@ -1163,6 +1163,13 @@ class article
 				$who_likes_link = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
 			}
 			$this->templating->set('who_likes_link', $who_likes_link);
+			
+			$likes_hidden = '';
+			if ($total_likes == 0)
+			{
+				$likes_hidden = 'likes_hidden';
+			}
+			$this->templating->set('hidden_likes_class', $likes_hidden);
 
 			$logged_in_options = '';
 			$bookmark_comment = '';

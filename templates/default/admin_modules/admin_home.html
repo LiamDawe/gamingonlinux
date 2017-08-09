@@ -17,12 +17,13 @@
 					<div class="head">Admin message-box</div>
 					<div class="body group">
 						<form method="post" action="admin.php?module=home">
-							<textarea name="text" class="form-control" rows="5"></textarea><br />
-							<button class="btn btn-primary" type="submit" name="act" value="comment">Add Comment</button>
+							<textarea name="text" class="admin_text form-control" rows="5"></textarea><br />
+							<input type="hidden" name="type" value="admin" />
+							<button class="send_admin_comment" type="submit" name="act" value="comment">Add Comment</button>
 						</form>
 					</div>
-					<div class="body list noblock" style="overflow:auto; height:250px;">
-						<ul>
+					<div class="body list noblock admin_comments_div" style="overflow:auto; height:250px;">
+						<ul class="admin_comments_list">
 [/block: comments_top]
 
 [block: comment]
@@ -40,12 +41,13 @@
 					<div class="head">Message all editors here</div>
 					<div class="body group">
 						<form method="post" action="admin.php?module=home">
-							<textarea name="text" class="form-control" rows="8"></textarea><br />
-							<button class="btn btn-primary" type="submit" name="act" value="commentall">Add Comment</button>
+							<textarea name="text" class="editor_text form-control" rows="8"></textarea><br />
+							<input type="hidden" name="type" value="editor" />
+							<button class="send_admin_comment" type="submit" name="act" value="commentall">Add Comment</button>
 						</form>
 					</div>
-					<div class="body list noblock" style="overflow:auto; height:400px;">
-						<ul>
+					<div class="body list noblock editor_comments_div" style="overflow:auto; height:400px;">
+						<ul class="editor_comments_list">
 [/block: comments_alltop]
 
 [block: commentall]

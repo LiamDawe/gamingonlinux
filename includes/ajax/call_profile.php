@@ -3,10 +3,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$templating = new template($core, $core->config('template'));
-
-$user = new user($dbl, $core);
-
 if(isset($_GET['user_id']))
 {
 	$grab_fields = $dbl->run("SELECT `username`, `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();

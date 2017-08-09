@@ -105,9 +105,9 @@ else
 
 			$templating->set('title', $message['title']);
 			$templating->set('reply_count', $message['replies']);
-			$templating->set('last_reply_date', $core->format_date($message['last_reply_date']));
+			$templating->set('last_reply_date', $core->human_date($message['last_reply_date']));
 			$templating->set('author', "<a href=\"/profiles/{$message['user_id']}/\">{$message['username']}</a>");
-			$templating->set('creation_date', $core->format_date($message['creation_date']));
+			$templating->set('creation_date', $core->human_date($message['creation_date']));
 			$templating->set('last_reply_username', "<a href=\"/profiles/{$message['last_user_id']}/\">{$message['last_username']}</a>");
 		}
 
@@ -238,7 +238,7 @@ else
 			$templating->block('view_row', 'private_messages');
 			$templating->set('title', $start['title']);
 			$templating->set('post_id', $start['message_id']);
-			$templating->set('message_date', $core->format_date($start['creation_date']));
+			$templating->set('message_date', $core->human_date($start['creation_date']));
 			$templating->set('tzdate', date('c',$start['creation_date']) ); //piratelv timeago
 			$templating->set('plain_username',$start['username']);
 			$templating->set('text_plain', htmlspecialchars($start['message'], ENT_QUOTES));
@@ -324,7 +324,7 @@ else
 			foreach ($get_replies as $replies)
 			{
 				$templating->block('view_row_reply', 'private_messages');
-				$templating->set('message_date', $core->format_date($replies['creation_date']));
+				$templating->set('message_date', $core->human_date($replies['creation_date']));
 				$templating->set('tzdate', date('c',$replies['creation_date']) ); //piratelv timeago
 				$templating->set('post_id', $replies['message_id']);
 				$templating->set('plain_username',$replies['username']);
@@ -566,9 +566,9 @@ else
 
 				$templating->set('title', $search['title']);
 				$templating->set('reply_count', $search['replies']);
-				$templating->set('last_reply_date', $core->format_date($search['last_reply_date']));
+				$templating->set('last_reply_date', $core->human_date($search['last_reply_date']));
 				$templating->set('author', "<a href=\"/profiles/{$search['user_id']}/\">{$search['username']}</a>");
-				$templating->set('creation_date', $core->format_date($search['creation_date']));
+				$templating->set('creation_date', $core->human_date($search['creation_date']));
 				$templating->set('last_reply_username', "<a href=\"/profiles/{$search['last_user_id']}/\">{$search['last_username']}</a>");
 			}
 		}
@@ -680,7 +680,7 @@ else
 			if ($email_data['email_on_pm'] == 1)
 			{
 				// subject
-				$subject = 'New conversation started on ' . $core->config('site_title');
+				$subject = 'New conversation started on GamingOnLinux';
 
 				$email_text = $bbcode->email_bbcode($text);
 
@@ -688,7 +688,7 @@ else
 
 				// message
 				$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
-				<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">".$core->config('site_title')."</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
+				<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">GamingOnLinux</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
 				<br style=\"clear:both\">
 				<div>
 				<hr>
@@ -860,13 +860,13 @@ else
 				if ($email_data['email_on_pm'] == 1)
 				{
 					// subject
-					$subject = 'New reply to a conversation on ' . $core->config('site_title');
+					$subject = 'New reply to a conversation on GamingOnLinux';
 
 					$email_text = $bbcode->email_bbcode($text);
 
 					// message
 					$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">".$core->config('site_title')."</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$_POST['conversation_id']}\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">GamingOnLinux</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$_POST['conversation_id']}\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
 					<br style=\"clear:both\">
 					<div>
 				 	<hr>

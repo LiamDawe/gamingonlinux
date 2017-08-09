@@ -3,7 +3,7 @@ $templating->load('search');
 if (!isset($_GET['author_id']))
 {
 	$templating->set_previous('title', 'Article Search', 1);
-	$templating->set_previous('meta_description', 'Search for articles on ' . $core->config('site_title'), 1);
+	$templating->set_previous('meta_description', 'Search for articles on GamingOnLinux', 1);
 
 	$templating->block('top');
 	$templating->set('url', $core->config('website_url'));
@@ -86,7 +86,7 @@ if (isset($search_text) && !empty($search_text))
 		// loop through results
 		foreach ($found_search as $found)
 		{
-			$date = $core->format_date($found['date']);
+			$date = $core->human_date($found['date']);
 
 			$templating->block('row');
 
@@ -174,7 +174,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		// loop through results
 		foreach ($found_search as $found)
 		{
-			$date = $core->format_date($found['date']);
+			$date = $core->human_date($found['date']);
 
 			$templating->block('row');
 

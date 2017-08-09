@@ -5,10 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$templating = new template($core, $core->config('template'));
-
-$user = new user($dbl, $core);
-
 if(isset($_GET['comment_id']) || isset($_GET['article_id']))
 {
 	if (isset($_GET['comment_id']))

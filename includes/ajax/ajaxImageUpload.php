@@ -5,7 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user = new user($dbl, $core);
 $user->check_session();
 
 include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');

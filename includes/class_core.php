@@ -4,9 +4,6 @@ class core
 	// the database connection
 	public $database = null;
 	
-	// the user table information
-	public $db_tables = [];
-	
 	// the current date and time for the mysql
 	public static $date;
 	
@@ -265,14 +262,7 @@ class core
 	}
 
 	// $date_to_format = a timestamp to make more human readable
-	function format_date($timestamp, $format = "j F Y \a\\t g:i a")
-	{
-		$text = date($format, $timestamp);
-
-		return $text . ' UTC';
-	}
-
-	function normal_date($timestamp, $format = "F j, Y \a\\t g:i a")
+	function human_date($timestamp, $format = "j F Y \a\\t g:i a")
 	{
 		$text = date($format, $timestamp);
 
@@ -346,7 +336,7 @@ class core
 
 			$pagination .= "</div> <div class=\"fnone\">
 			<form name=\"form2\" class=\"form-inline\">
-			 &nbsp; Go to: <select class=\"wrap ays-ignore pagination\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
+			 &nbsp; Go to: <select class=\"wrap ays-ignore pagination\" name=\"jumpmenu\">";
 
 			for ($i = 1; $i <= $lastpage; $i++)
 			{
@@ -355,7 +345,7 @@ class core
 				{
 					$selected = 'selected';
 				}
-				$pagination .= "<option value=\"{$targetpage}page={$i}{$extra}\" $selected>$i</option>";
+				$pagination .= "<option data-page=\"{$i}\" value=\"{$targetpage}page={$i}{$extra}\" $selected>$i</option>";
 			}
 
 			$pagination .= '</select></form></div>';
@@ -403,7 +393,7 @@ class core
 			//previous button
 			if ($page > 1)
 			{
-				$pagination.= "<a href=\"{$targetpage}page=$prev$extra\"><span class=\"previouspage\">&laquo;</span></a>";
+				$pagination.= "<a data-page=\"{$prev}\" href=\"{$targetpage}page=$prev$extra\"><span class=\"previouspage\">&laquo;</span></a>";
 			}
 
 			// current page
@@ -418,16 +408,16 @@ class core
 			}
 			else
 			{
-				$pagination .= "<a href=\"{$targetpage}page={$lastpage}$extra\"><span>{$lastpage}</span></a>";
+				$pagination .= "<a data-page=\"{$lastpage}\" href=\"{$targetpage}page={$lastpage}$extra\"><span>{$lastpage}</span></a>";
 			}
 
 			// next button
 			if ($page < $lastpage)
 			{
-				$pagination .= "<a href=\"{$targetpage}page=$next$extra\"><span class=\"nextpage\">&raquo;</span></a>";
+				$pagination .= "<a data-page=\"{$next}\" href=\"{$targetpage}page=$next$extra\"><span class=\"nextpage\">&raquo;</span></a>";
 			}
 
-			$pagination .= "<form name=\"form2\" class=\"form-inline\">&nbsp; Go to: <select class=\"wrap ays-ignore\" name=\"jumpmenu\" onchange=\"window.open(this.options[this.selectedIndex].value, '_self')\">";
+			$pagination .= "<form name=\"form2\" class=\"form-inline\">&nbsp; Go to: <select class=\"wrap ays-ignore\" name=\"jumpmenu\">";
 
 			for ($i = 1; $i <= $lastpage; $i++)
 			{
@@ -436,7 +426,7 @@ class core
 				{
 					$selected = 'selected';
 				}
-				$pagination .= "<option value=\"{$targetpage}page={$i}{$extra}\" $selected>$i</option>";
+				$pagination .= "<option data-page=\"{$i}\" value=\"{$targetpage}page={$i}{$extra}\" $selected>$i</option>";
 			}
 
 			$pagination .= '</select></form>';
@@ -926,85 +916,6 @@ class core
 					if (!in_array($streamer_id, $current_streamers))
 					{
 						$db->sqlquery("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
-					}
-				}
-			}
-		}
-	}
-	
-	// list the genres for the current game
-	function display_game_genres($game_id = NULL)
-	{
-		global $db;
-		
-		// for a specific game
-		if (isset($game_id) && self::is_number($game_id))
-		{
-			// sort out genre tags
-			$genre_list = '';
-			$grab_genres = $db->sqlquery("SELECT g.`id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON r.genre_id = g.id WHERE r.`game_id` = ?", array($game_id));
-			while ($genres = $grab_genres->fetch())
-			{
-				$genre_list .= '<option value="'.$genres['id'].'" selected>'.$genres['name'].'</option>';
-			}
-		}
-		return $genre_list;
-	}
-	
-	// list all genres to select and search
-	function display_all_genres()
-	{
-		global $db;
-		
-		$genre_list = '';
-		
-		// sort out genre tags
-		$grab_genres = $db->sqlquery("SELECT `id`, `name` FROM `game_genres` ORDER BY `name` ASC");
-		while ($genres = $grab_genres->fetch())
-		{
-			$selected = '';
-			if (isset($_GET['genre']) && is_array($_GET['genre']) && in_array($genres['id'], $_GET['genre']))
-			{
-				$selected = 'checked';
-			}
-			$genre_list .= '<label><input class="ays-ignore" name="genre[]" type="checkbox" value="'.$genres['id'].'" '.$selected.'> '.$genres['name'].'</label>';
-		}	
-		return $genre_list;
-	}
-	
-	// for editing a game in the database, adjust what genre's it's linked with
-	function process_game_genres($game_id)
-	{
-		global $db;
-		
-		if (isset($game_id) && is_numeric($game_id))
-		{
-			// delete any existing genres that aren't in the final list for publishing
-			$db->sqlquery("SELECT `id`, `game_id`, `genre_id` FROM `game_genres_reference` WHERE `game_id` = ?", array($game_id));
-			$current_genres = $db->fetch_all_rows();
-
-			if (!empty($current_genres))
-			{
-				foreach ($current_genres as $current_genre)
-				{
-					if (!in_array($current_genre['genre_id'], $_POST['genre_ids']))
-					{
-						$db->sqlquery("DELETE FROM `game_genres_reference` WHERE `genre_id` = ? AND `game_id` = ?", array($current_genre['genre_id'], $game_id));
-					}
-				}
-			}
-
-			// get fresh list of genres, and insert any that don't exist
-			$db->sqlquery("SELECT `genre_id` FROM `game_genres_reference` WHERE `game_id` = ?", array($game_id));
-			$current_genres = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
-
-			if (isset($_POST['genre_ids']) && !empty($_POST['genre_ids']) && core::is_number($_POST['genre_ids']))
-			{
-				foreach($_POST['genre_ids'] as $genre_id)
-				{
-					if (!in_array($genre_id, $current_genres))
-					{
-						$db->sqlquery("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", array($game_id, $genre_id));
 					}
 				}
 			}

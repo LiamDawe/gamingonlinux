@@ -1,42 +1,5 @@
-[block: comments_top]
-<div class="box comments group">
-	<div class="head"><a name="comments">Editor Comments</a></div>
-	<div class="body group">
-[/block: comments_top]
-
-[block: review_comments]
-						<div id="r{:comment_id}" class="comment group">
-							<div class="comment-meta group">
-								<div class="comment-post">
-									{:username} commented <abbr title="{:tzdate}" class="timeago">on {:date}</abbr>
-								</div>
-								<div class="comment-actions">
-									<ul>
-										<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:plain_username}" data-comment="{:text_plain}"><span class="icon quote">Quote</span></a></li>
-									</ul>
-								</div>
-							</div>
-							<div class="comment-author">
-								<img class="avatar" alt="" src="{:comment_avatar}" />
-								<ul class="comment-social">
-								</ul>
-							</div>
-							<div id="{:comment_id}" class="comment-body">
-								<div id="{:comment_id}">
-									<p>{:text}</p>
-								</div>
-								<div class="comment-quote">{:text_plain}</div>
-							</div>
-						</div>
-[/block: review_comments]
-
-[block: bottom]
-	</div>
-</div>
-[/block: bottom]
-
 [block: form_top]
-<form method="post" action="/admin.php?module=comments&amp;aid={:article_id}">
+<form id="admin_comment" method="post">
 [/block: form_top]
 
 [block: form_bottom]
@@ -48,8 +11,11 @@
 				<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to comments
 			</label>
 			<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select><br />
-			<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" name="act" value="comment" class="btn btn-primary">Post Comment</button>
+			<input type="hidden" name="article_id" value="{:article_id}" />
+			<input type="hidden" name="type" value="add" />
+			<button id="send" class="admin_article_comment_button" onclick="setTimeout(disableFunction, 1);" type="button">Post Comment</button>
 		</div>
 	</div>
 </form>
+<a class="button_link" href="#top">Back to the top</a>
 [/block: form_bottom]

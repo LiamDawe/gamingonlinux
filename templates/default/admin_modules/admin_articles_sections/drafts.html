@@ -18,6 +18,8 @@
 [/block: others_drafts]
 
 [block: single_draft_top]
+<a class="admin_preview_article button_link" href="#preview">Preview</a>
+<hr />
 <div class="box"><div class="head">Viewing Draft Article</div></div>
 [/block: single_draft_top]
 
@@ -32,8 +34,7 @@
 	<div class="body group">
 		<form method="post" role="form">
 			<strong>{:article_title}</strong> by {:username} created {:date_created} <br />
-			{:edit_button}
-			<button type="submit" name="act" value="Preview" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview</button>
+			<button type="submit" formaction="/admin.php?module=articles&view=drafts&aid={:article_id}">View</button>
 			{:delete_button}
 			<input type="hidden" name="article_id" value="{:article_id}" />
 		</form>
@@ -52,7 +53,7 @@
 		<label class="checkbox">
 			<input type="checkbox" name="show_block" /> Editors Pick? <em>This will show the article under the Editors Pick heading on the Articles block!</em>
 		</label>
-		<button type="submit" name="act" value="add_draft" class="btn btn-primary">Publish Now</button> <button type="submit" name="act" value="Move_Draft" class="btn btn-info" />Move to Admin Review Queue</button> <button type="submit" name="act" value="Edit_Draft" class="btn btn-primary" >Edit</button> <button type="submit" name="act" value="Preview" class="btn btn-info" formaction="/admin.php?module=preview" />Preview</button>
+		<button type="submit" name="act" value="add_draft" class="btn btn-primary" {:edit_state}>Publish Now</button> <button type="submit" name="act" value="Move_Draft" class="btn btn-info" {:edit_state}>Move to Admin Review Queue</button> <button type="submit" name="act" value="Edit_Draft" class="btn btn-primary" {:edit_state}>Edit</button> <button class="admin_preview_article" type="button">Preview</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />
 		<input type="hidden" name="author_id" value="{:author_id}" />
 		<input type="hidden" name="check" value="Draft" />
@@ -67,7 +68,7 @@
 				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>
 			</div>
 			<div id='imageloadbutton'>
-				<input type="file" name="photos[]" id="photoimg" multiple="true" />
+				<input type="file" name="photos[]" id="photoimg" multiple="true" {:edit_state} />
 			</div>
 			<input type="hidden" name="article_id" value="{:article_id}" />
 		</form>

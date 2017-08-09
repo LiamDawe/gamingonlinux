@@ -16,9 +16,8 @@ if (!isset($_GET['aid']))
 			$templating->set('article_title', $article['title']);
 			$templating->set('username', $article['username']);
 
-			$templating->set('date_created', $core->format_date($article['date']));
+			$templating->set('date_created', $core->human_date($article['date']));
 			$templating->set('delete_button', '<button type="submit" name="act" value="delete_draft" formaction="'.$core->config('website_url').'admin.php?module=articles">Delete</button>');
-			$templating->set('edit_button', '<button type="submit" formaction="'.$core->config('website_url').'admin.php?module=articles&view=drafts&aid='.$article['article_id'].'">Edit</button>');
 		}
 	}
 	else
@@ -40,9 +39,8 @@ if (!isset($_GET['aid']))
 			$templating->set('article_title', $article['title']);
 			$templating->set('username', $article['username']);
 
-			$templating->set('date_created', $core->format_date($article['date']));
+			$templating->set('date_created', $core->human_date($article['date']));
 			$templating->set('delete_button', '');
-			$templating->set('edit_button', '');
 		}
 	}
 	else
@@ -64,6 +62,16 @@ else
 	$db->sqlquery("SELECT a.`article_id`, a.`preview_code`, a.`title`, a.`slug`, a.`text`, a.`tagline`, a.`show_in_menu`, a.`active`, a.`tagline_image`, a.`guest_username`, a.`author_id`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.gallery_tagline WHERE `article_id` = ?", array($_GET['aid']));
 
 	$article = $db->fetch();
+	
+	$edit_state = '';
+	$edit_state_textarea = '';
+	$editor_disabled = 0;
+	if ($article['author_id'] != $_SESSION['user_id'])
+	{
+		$edit_state = 'disabled="disabled"';
+		$edit_state_textarea = 'disabled';
+		$editor_disabled = 1;
+	}
 
 	$_SESSION['original_text'] = $article['text'];
 
@@ -71,7 +79,7 @@ else
 
 	$templating->block('preview_code', 'admin_modules/article_form');
 	$templating->set('preview_url', $core->config('website_url') . 'index.php?module=articles_full&aid=' . $article['article_id'] . '&preview_code=' . $article['preview_code']);
-	$templating->set('edit_state', '');
+	$templating->set('edit_state', $edit_state);
 	$templating->set('article_id', $article['article_id']);
 
 	// get the edit row
@@ -80,11 +88,11 @@ else
 	$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 
 	// remove these, as it's a draft, we don't lock/disable crap here as it's personal to the user
-	$templating->set('edit_state', '');
-	$templating->set('edit_state_textarea', '');
+	$templating->set('edit_state', $edit_state);
+	$templating->set('edit_state_textarea', $edit_state_textarea);
 
 	$templating->set('url', $core->config('website_url'));
-	$templating->set('main_formaction', '<form method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+	$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 
 	// get categorys
 	$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
@@ -143,9 +151,10 @@ else
 	$templating->set('max_height', $core->config('article_image_max_height'));
 	$templating->set('max_width', $core->config('article_image_max_width'));
 
-	$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text', 'article_editor' => 1]);
+	$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text', 'article_editor' => 1, 'disabled' => $editor_disabled]);
 
 	$templating->block('drafts_bottom', 'admin_modules/admin_articles_sections/drafts');
+	$templating->set('edit_state', $edit_state);
 	$templating->set('article_id', $article['article_id']);
 	$templating->set('author_id', $article['author_id']);
 

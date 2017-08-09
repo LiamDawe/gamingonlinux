@@ -359,7 +359,7 @@ else
 					$templating->set('user_info_extra', $pc_info);
 					$templating->set('topic_title', $topic['topic_title']);
 
-					$topic_date = $core->format_date($topic['creation_date']);
+					$topic_date = $core->human_date($topic['creation_date']);
 					$templating->set('topic_date', $topic_date);
 					$templating->set('tzdate', date('c',$topic['creation_date']) ); // timeago
 					$templating->set('edit_link', $edit_link);
@@ -421,7 +421,7 @@ else
 						{
 							$bookmark = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="forum_topic" data-id="'.$_GET['topic_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
 						}
-						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$topic['username']."\" data-comment=\"".htmlspecialchars($topic['topic_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
+						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$topic['topic_id']."\" data-type=\"forum_topic\"><span class=\"icon quote\">Quote</span></a></li>";
 					}
 					$templating->set('bookmark', $bookmark);
 					$templating->set('user_options', $user_options);
@@ -494,7 +494,7 @@ else
 						$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
 						$templating->set('permalink', $permalink);
 
-						$reply_date = $core->format_date($post['creation_date']);
+						$reply_date = $core->human_date($post['creation_date']);
 						$templating->set('tzdate', date('c',$post['creation_date']) ); // timeago
 						$templating->set('reply_date', $reply_date);
 
@@ -574,7 +574,7 @@ else
 						$bookmark_reply = '';
 						if ($_SESSION['user_id'] != 0)
 						{
-							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-quote=\"".$post['username']."\" data-comment=\"".htmlspecialchars($post['reply_text'], ENT_QUOTES)."\"><span class=\"icon quote\">Quote</span></a></li>";
+							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\"><span class=\"icon quote\">Quote</span></a></li>";
 							// sort bookmark icon out
 							if (in_array($post['post_id'], $bookmarks_array))
 							{

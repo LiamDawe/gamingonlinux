@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Contact Us', 1);
-$templating->set_previous('meta_description', 'Contact Us form for ' . $core->config('site_title'), 1);
+$templating->set_previous('meta_description', 'Contact Us form for GamingOnLinux', 1);
 
 $templating->load('contact');
 $templating->block('top');

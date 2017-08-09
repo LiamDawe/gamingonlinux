@@ -7,7 +7,6 @@ $timer_start = microtime(true);
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user = new user($dbl, $core);
 if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {
 	$user->logout();
@@ -16,9 +15,6 @@ $user->check_session();
 $user->grab_user_groups();
 
 $forum_class = new forum($dbl, $core, $user);
-
-// setup the templating, if not logged in default theme, if logged in use selected theme
-$templating = new template($core, $core->config('template'));
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
@@ -33,7 +29,6 @@ else
 // get the header template html
 $templating->load('header');
 $templating->block('header', 'header');
-$templating->set('site_title', $core->config('site_title'));
 $templating->set('meta_keywords', $core->config('meta_keywords'));
 $templating->set('url', $core->config('website_url'));
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
@@ -56,7 +51,7 @@ else
 
 $templating->set('body_class', $body_class);
 
-$templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for '.$core->config('site_title').'" href="'.$core->config('website_url').'article_rss.php" />');
+$templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for GamingOnLinux" href="'.$core->config('website_url').'article_rss.php" />');
 
 // set a blank article image as its set again in articles_full.php
 if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'articles_full' || $_GET['module'] == 'articles_full' && isset($_GET['go']))
@@ -71,7 +66,7 @@ $templating->set('this_template', $core->config('website_url') . 'templates/' . 
 $templating->set('url', $core->config('website_url'));
 
 $branding['icon'] = $core->config('navbar_logo_icon');
-$branding['title'] = $core->config('site_title');
+$branding['title'] ='GamingOnLinux';
 
 // april fools, because why not
 if (date('dm') == '0104' && date('H') < 14)

@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Login', 1);
-$templating->set_previous('meta_description', 'Login page for ' . $core->config('site_title'), 1);
+$templating->set_previous('meta_description', 'Login page for GamingOnLinux', 1);
 
 $templating->load('login');
 
@@ -216,7 +216,7 @@ else if (isset($_POST['action']))
 			if ($core->config('send_emails') == 1)
 			{
 				$mail = new mailer($core);
-				$mail->sendMail($_POST['email'], $core->config('site_title') . ' password reset request', $html_message, $plain_message);
+				$mail->sendMail($_POST['email'], 'GamingOnLinux password reset request', $html_message, $plain_message);
 
 				$core->message("An email has been sent to {$_POST['email']} with instructions on how to change your password.");
 			}

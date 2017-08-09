@@ -111,7 +111,7 @@ foreach ($get_topics as $topics)
 {
 	$templating->block('topics', 'flat_forum');
 
-	$last_date = $core->format_date($topics['last_post_date']);
+	$last_date = $core->human_date($topics['last_post_date']);
 	$templating->set('tzdate', date('c',$topics['last_post_date']) );
 
 	$post_count = $topics['replys'];

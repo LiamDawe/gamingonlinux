@@ -1681,4 +1681,5 @@ hr.content_split {
 	-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-    
+#article_preview {display:none;}
+.admin_article_preview_box {border: 1px solid #999999; padding: 2px;}

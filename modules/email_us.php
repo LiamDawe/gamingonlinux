@@ -76,7 +76,7 @@ if (isset($_POST['act']))
 				$name = 'Anonymous';
 			}
 			
-			$subject = $core->config('site_title') . ' Contact Us - ' . $name;
+			$subject = 'GamingOnLinux Contact Us - ' . $name;
 			
 			$message = core::make_safe($_POST['message']);
 			

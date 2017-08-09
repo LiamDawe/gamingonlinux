@@ -106,12 +106,12 @@ else
 		$article_link = article::get_link($_POST['article_id'], $checked['slug']);
 
 		// subject
-		$subject = 'Your article was approved and published on ' . $core->config('site_title');
+		$subject = 'Your article was approved and published on GamingOnLinux';
 		
-		$html_message = '<p>We have accepted your article titled "<a href="'.$article_link.'">'.$checked['title'].'</a>" on <a href="'.$core->config('website_url').'" target="_blank">'.$core->config('site_title').'</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome!</p>';
+		$html_message = '<p>We have accepted your article titled "<a href="'.$article_link.'">'.$checked['title'].'</a>" on <a href="'.$core->config('website_url').'" target="_blank">GamingOnLinux</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome!</p>';
 
 		// message
-		$plain_message = 'We have accepted your article titled "'.$checked['title'].'" on '.$core->config('site_title').', you can see it here: '.$article_link;
+		$plain_message = 'We have accepted your article titled "'.$checked['title'].'" on GamingOnLinux, you can see it here: '.$article_link;
 		
 		if ($core->config('send_emails') == 1)
 		{			

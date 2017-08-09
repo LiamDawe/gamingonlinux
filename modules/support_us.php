@@ -1,6 +1,6 @@
 <?php
-$templating->set_previous('meta_description', 'There are ways you can help ' . $core->config('site_title'), 1);
-$templating->set_previous('title', 'Support ' . $core->config('site_title'), 1);
+$templating->set_previous('meta_description', 'There are ways you can help GamingOnLinux', 1);
+$templating->set_previous('title', 'Support GamingOnLinux', 1);
 
 $templating->load('support_us');
 $templating->block('main');

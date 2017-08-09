@@ -242,7 +242,7 @@ class bbcode
 			
 			$nice_link =  $this->core->nice_title($article_info['title']) . '.' . $article_info['article_id'];
 			
-			$date = $this->core->format_date($article_info['date']);
+			$date = $this->core->human_date($article_info['date']);
 			
 			$views = number_format($article_info['views'], 0, '.', ',');
 				

@@ -68,7 +68,7 @@ if (isset($_GET['user_id']))
 					$badges = user::user_badges($profile);
 					$templating->set('badges', implode(' ', $badges));
 
-					$registered_date = $core->format_date($profile['register_date']);
+					$registered_date = $core->human_date($profile['register_date']);
 					$templating->set('registered_date', $registered_date);
 
 					$avatar = $user->sort_avatar($profile['user_id']);
@@ -118,7 +118,7 @@ if (isset($_GET['user_id']))
 
 					$templating->set('profile_fields', $profile_fields_output);
 
-					$templating->set('last_login', $core->format_date($profile['last_login']));
+					$templating->set('last_login', $core->human_date($profile['last_login']));
 
 					$message_link = '';
 					if ($_SESSION['user_id'] != 0)
@@ -195,7 +195,7 @@ if (isset($_GET['user_id']))
 						$comments_execute = $db->fetch_all_rows();
 						foreach ($comments_execute as $comments)
 						{
-							$date = $core->format_date($comments['time_posted']);
+							$date = $core->human_date($comments['time_posted']);
 							$title = $comments['title'];
 
 							// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
@@ -321,7 +321,7 @@ if (isset($_GET['user_id']))
 					
 					foreach ($all_comments as $comments)
 					{
-						$date = $core->format_date($comments['time_posted']);
+						$date = $core->human_date($comments['time_posted']);
 						$title = $comments['title'];
 						
 						// sort out the likes

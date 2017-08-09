@@ -13,7 +13,8 @@
 [/block: submitted_top]
 
 [block: item_top]
-{:lock_button}
+{:lock_button} <a class="button_link" href="#comments">View Comments</a> <a class="admin_preview_article button_link" href="#preview">Preview</a>
+<hr />
 [/block: item_top]
 
 [block: submitted_row]
@@ -21,8 +22,7 @@
 	<div class="body group">
 	<form method="post" role="form">
 		<strong>{:article_title}</strong> by {:username} submitted on {:date_submitted} <br />
-		<button type="submit" class="btn btn-primary" formaction="{:url}admin.php?module=articles&view=Submitted&aid={:article_id}">Edit</button>
-		<button type="submit" class="btn btn-info" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview & Comments</button>
+		<button type="submit" class="btn btn-primary" formaction="{:url}admin.php?module=articles&view=Submitted&aid={:article_id}">View</button>
 	</form>
 	</div>
 </div>
@@ -37,7 +37,6 @@
 
 [block: submitted_item]
 <script src="{:url}includes/jscripts/jquery.form.min.js"></script>
-{:lock_button}
 <div class="box">
 	<div class="body group">
 		<form id="imageform2" method="post" enctype="multipart/form-data" action='{:url}includes/ajax/ajax_tagline_upload.php' style="clear:both">
@@ -88,7 +87,7 @@
 		<label class="checkbox">
 			<input type="checkbox" name="submit_as_self" {:self_check}/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em>
 		</label>
-		<button type="submit" name="act" value="Approve" {:edit_state}/>Approve & Publish Now</button> <button type="submit" name="act" value="Edit_Submitted" class="btn btn-primary" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Deny" {:edit_state}/>Deny</button> <button type="submit" value="Preview_Submitted" {:preview_action} name="act" class="btn btn-info">Preview Submitted Article & Edit More</button>
+		<button type="submit" name="act" value="Approve" {:edit_state}/>Approve & Publish Now</button> <button type="submit" name="act" value="Edit_Submitted" class="btn btn-primary" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Deny" {:edit_state}/>Deny</button> <button class="admin_preview_article" type="button">Preview</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />
 		<input type="hidden" name="check" value="Submitted" />
 		<input type="hidden" name="author_id" value="{:author_id}" />

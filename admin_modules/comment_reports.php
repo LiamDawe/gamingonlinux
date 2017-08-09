@@ -36,7 +36,7 @@ if (!isset($_GET['ip_id']))
 		while ($comments = $db->fetch())
 		{
 			// make date human readable
-			$date = $core->format_date($comments['time_posted']);
+			$date = $core->human_date($comments['time_posted']);
 
 			if ($comments['author_id'] == 0)
 			{

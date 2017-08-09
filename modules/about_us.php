@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'About Us', 1);
-$templating->set_previous('meta_description', 'About Us information for ' . $core->config('site_title'), 1);
+$templating->set_previous('meta_description', 'About Us information for GamingOnLinux', 1);
 
 $templating->load('about_us');
 $templating->block('top');

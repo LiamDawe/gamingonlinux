@@ -5,8 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$templating = new template($core, $core->config('template'));
-
 if($_POST)
 {
     if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)

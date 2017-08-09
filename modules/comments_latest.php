@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Latest Comments', 1);
-$templating->set_previous('meta_description', 'The latest article comments on ' . $core->config('site_title'), 1);
+$templating->set_previous('meta_description', 'The latest article comments on GamingOnLinux', 1);
 
 // main menu block
 $templating->load('comments_latest');
@@ -29,7 +29,7 @@ WHERE
 	a.active = 1 ORDER BY `comment_id` DESC limit 20");
 while ($comments = $db->fetch())
 {
-	$date = $core->format_date($comments['time_posted']);
+	$date = $core->human_date($comments['time_posted']);
 
 	// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
 	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);

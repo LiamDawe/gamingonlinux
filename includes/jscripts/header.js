@@ -31,6 +31,21 @@ jQuery.fn.scrollMinimal = function(smooth)
 	}
 };
 
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+}
+
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -91,14 +106,14 @@ function slug(update)
 	{
 		var title = document.getElementById("title").value;
 		$.ajax({
-		type:'POST',
-		url:'/includes/ajax/slug.php',
-		datatype: 'text',
-		data:{'title':title},
-		success: function(data)
-		{
-			$('#slug').val(data);
-		}
+			type:'POST',
+			url:'/includes/ajax/slug.php',
+			datatype: 'text',
+			data:{'title':title},
+			success: function(data)
+			{
+				$('#slug').val(data);
+			}
 		});
 	}
 }
@@ -519,18 +534,20 @@ jQuery(document).ready(function()
 		autoCenter : false
 	});
 
-  // Enable on all forms
-  $('form').areYouSure();
+	// Enable on all forms
+	$('form').areYouSure();
 
 	var input_counter = 2;
-	$("#add-poll").click(function () {
+	$("#add-poll").click(function () 
+	{
 		$('#pquestion').prop("disabled", false);
 		$('.poll-option').prop("disabled", false);
 		$('#addButton').prop("disabled", false);
 		$('#removeButton').prop("disabled", false);
 		$("#create-poll").show();
 	});
-	$("#delete-poll").click(function () {
+	$("#delete-poll").click(function () 
+	{
 		$('#pquestion').prop("disabled", true);
 		$('.poll-option').prop("disabled", true);
 		$('#addButton').prop("disabled", true);
@@ -544,9 +561,10 @@ jQuery(document).ready(function()
 		newTextBoxDiv.after().html('<input type="text" name="poption[]" class="poll-option" id="option'+ input_counter +'" value="" />');
 		newTextBoxDiv.appendTo("#TextBoxesGroup");
 	});
-	$("#removeButton").click(function () {
-	 $("#TextBoxDiv" + input_counter).remove();
-	 input_counter--;
+	$("#removeButton").click(function () 
+	{
+		$("#TextBoxDiv" + input_counter).remove();
+		input_counter--;
 	});
 
 	$(document).on('click', ".collapse_header", function()
@@ -558,13 +576,6 @@ jQuery(document).ready(function()
 		$content.slideToggle(500)
 	});
 
-	$('.quote_function').click(function()
-	{
-	    $('html, body').animate({
-		scrollTop: $('.octus-editor').offset().top
-	    }, 1000);
-	    return false;
-	});
 	if($("#tagline").length > 0)
 	{
 		countchars();
@@ -765,146 +776,148 @@ jQuery(document).ready(function()
     }); //end of .post callback
 }); //end of .click callback
 
-  // bookmark content
-  $('.bookmark-content').click(function(event)
-  {
-    event.preventDefault();
-    var id = $(this).data('id');
-    var type = $(this).data('type');
-    var method = $(this).data('method');
-    var page = $(this).data('page');
-    var parent_id = $(this).data('parent-id');
-    var link = $(this);
-
-    $.post('/includes/ajax/bookmark-content.php', {'id':id, 'type':type, 'method':method, 'parent_id':parent_id},
-    function(data)
-    {
-      // we need to do this, or else it's seen as text and not a JSON
-      //data = JSON.parse(data);
-      if (data.result == 'added')
-      {
-        link.data("method", 'remove');
-        link.addClass("bookmark-saved");
-        link.attr('title','Remove Bookmark');
-      }
-      else if (data.result = 'removed')
-      {
-        if (page != 'usercp')
-        {
-          link.data("method", 'add');
-          link.removeClass("bookmark-saved");
-          link.attr('title','Bookmark');
-        }
-        else if (page == 'usercp')
-        {
-          link.parent().parent().parent().fadeOut(500);
-        }
-      }
-    });
-  });
-
-  // delete a single notification from the users list
-  var $this_link = $('.delete_notification').click(function(event)
-  {
-    event.preventDefault();
-    var note_id = $(this).data('note-id');
-
-    $.post('/includes/ajax/delete-notification.php', {'note_id':note_id},
-    function(data)
-    {
-      // we need to do this, or else it's seen as text and not a JSON
-      data = JSON.parse(data);
-      if (data.result == 1)
-      {
-        // adjust the navbar counter if this was an unread item
-        if($('#note-' + note_id + ' img').hasClass('envelope'))
-        {
-          $('#notes-counter').html(parseInt($('#notes-counter').html(), 10)-1);
-        }
-        $('#note-' + note_id).find('span').remove();
-        $('#note-' + note_id).fadeOut(500);
-
-        // change the alertbox to normal if there's none left and remove the counter
-        var total_left = parseInt($('#notes-counter').text());
-        if (total_left === 0)
-        {
-          $("#alert_box").toggleClass('alerts-box-new alerts-box-normal');
-          $("#notes-counter").remove();
-        }
-      }
-    });
-  });
-
-  $(".poll_content").on("click", ".close_poll", function()
-  {
-    var poll_id = $(this).data('poll-id');
-  $.post('/includes/ajax/close_poll.php', {'poll_id':poll_id},
- function(data){
-     if (data.result == 1)
-   {
-     $('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
-      window.alert("Poll closed!");
-     }
-   else if (data.result == 2)
-   {
-     window.alert("Sorry, I am unable to do that.");
-   }
-});
-});
-
-$(".poll_content").on("click", ".open_poll", function()
-{
-	var poll_id = $(this).data('poll-id');
-	$.post('/includes/ajax/open_poll.php', {'poll_id':poll_id},
-	function(data)
+	// bookmark content
+	$('.bookmark-content').click(function(event)
 	{
-		if (data.result == 1)
+		event.preventDefault();
+		var id = $(this).data('id');
+		var type = $(this).data('type');
+		var method = $(this).data('method');
+		var page = $(this).data('page');
+		var parent_id = $(this).data('parent-id');
+		var link = $(this);
+
+		$.post('/includes/ajax/bookmark-content.php', {'id':id, 'type':type, 'method':method, 'parent_id':parent_id},
+		function(data)
 		{
-			$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
-			window.alert("Poll opened!");
-		}
-		else if (data.result == 2)
-		{
-			$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
-			window.alert("Poll opened!");
-		}
-		else if (data.result == 3)
-		{
-			window.alert("Sorry, I am unable to do that.");
-		}
+			// we need to do this, or else it's seen as text and not a JSON
+			//data = JSON.parse(data);
+			if (data.result == 'added')
+			{
+				link.data("method", 'remove');
+				link.addClass("bookmark-saved");
+				link.attr('title','Remove Bookmark');
+			}
+			else if (data.result = 'removed')
+			{
+				if (page != 'usercp')
+				{
+					link.data("method", 'add');
+					link.removeClass("bookmark-saved");
+					link.attr('title','Bookmark');
+				}
+				else if (page == 'usercp')
+				{
+					link.parent().parent().parent().fadeOut(500);
+				}
+			}
+		});
 	});
-});
 
-  $(".poll_content").on("click", ".results_button", function(){
-  	var poll_id = $(this).data('poll-id');
-  	$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
-  });
+	// delete a single notification from the users list
+	var $this_link = $('.delete_notification').click(function(event)
+	{
+		event.preventDefault();
+		var note_id = $(this).data('note-id');
 
-  $(".poll_content").on("click", ".poll_button_vote", function(){
-  	var button = $(this);
-  	var poll_id = $(this).data('poll-id');
-  	var option_id = $(this).data('option-id');
-  	$.post('/includes/ajax/poll_vote.php', {'poll_id':poll_id, 'option_id':option_id},
-  	function(data){
-  	    if (data.result == 1)
-  		{
-  			$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
-  	    }
-  		else if (data.result == 2)
-  		{
-  			window.alert("Sorry, but voting is closed!");
-  		}
-  		else if (data.result == 3)
-  		{
-  			window.alert("Sorry, but you have already voted in this poll!");
-  		}
-  		else {
-  	      button.text("Try again later, something broke").attr('disabled', 'disabled');
-  	      setTimeout(function(){ button.removeAttr('disabled') }, 2000);
-  	    }
-          });
+		$.post('/includes/ajax/delete-notification.php', {'note_id':note_id},
+		function(data)
+		{
+			// we need to do this, or else it's seen as text and not a JSON
+			data = JSON.parse(data);
+			if (data.result == 1)
+			{
+				// adjust the navbar counter if this was an unread item
+				if($('#note-' + note_id + ' img').hasClass('envelope'))
+				{
+					$('#notes-counter').html(parseInt($('#notes-counter').html(), 10)-1);
+				}
+				$('#note-' + note_id).find('span').remove();
+				$('#note-' + note_id).fadeOut(500);
 
-  });
+				// change the alertbox to normal if there's none left and remove the counter
+				var total_left = parseInt($('#notes-counter').text());
+				if (total_left === 0)
+				{
+					$("#alert_box").toggleClass('alerts-box-new alerts-box-normal');
+					$("#notes-counter").remove();
+				}
+			}
+		});
+	});
+
+	$(".poll_content").on("click", ".close_poll", function()
+	{
+		var poll_id = $(this).data('poll-id');
+		$.post('/includes/ajax/close_poll.php', {'poll_id':poll_id},
+		function(data)
+		{
+			if (data.result == 1)
+			{
+				$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
+				window.alert("Poll closed!");
+			}
+			else if (data.result == 2)
+			{
+				window.alert("Sorry, I am unable to do that.");
+			}
+		});
+	});
+
+	$(".poll_content").on("click", ".open_poll", function()
+	{
+		var poll_id = $(this).data('poll-id');
+		$.post('/includes/ajax/open_poll.php', {'poll_id':poll_id},
+		function(data)
+		{
+			if (data.result == 1)
+			{
+				$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
+				window.alert("Poll opened!");
+			}
+			else if (data.result == 2)
+			{
+				$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
+				window.alert("Poll opened!");
+			}
+			else if (data.result == 3)
+			{
+				window.alert("Sorry, I am unable to do that.");
+			}
+		});
+	});
+
+	$(".poll_content").on("click", ".results_button", function(){
+		var poll_id = $(this).data('poll-id');
+		$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
+	});
+
+	$(".poll_content").on("click", ".poll_button_vote", function(){
+		var button = $(this);
+		var poll_id = $(this).data('poll-id');
+		var option_id = $(this).data('option-id');
+		$.post('/includes/ajax/poll_vote.php', {'poll_id':poll_id, 'option_id':option_id},
+		function(data)
+		{
+			if (data.result == 1)
+			{
+				$('.poll_content').load('/includes/ajax/poll_results.php', {'poll_id':poll_id});
+			}
+			else if (data.result == 2)
+			{
+				window.alert("Sorry, but voting is closed!");
+			}
+			else if (data.result == 3)
+			{
+				window.alert("Sorry, but you have already voted in this poll!");
+			}
+			else 
+			{
+				button.text("Try again later, something broke").attr('disabled', 'disabled');
+				setTimeout(function(){ button.removeAttr('disabled') }, 2000);
+			}
+		});
+	});
 
 	$(".poll_content").on("click", ".back_vote_button", function()
 	{
@@ -912,73 +925,73 @@ $(".poll_content").on("click", ".open_poll", function()
 		$('.poll_content').load('/includes/ajax/poll_options.php', {'poll_id':poll_id});
 	});
 
-  // claim a key from bbcode key giveaway
-  $(document).on('click', '#claim_key', function(e)
-  {
-    e.preventDefault();
+	// claim a key from bbcode key giveaway
+	$(document).on('click', '#claim_key', function(e)
+	{
+		e.preventDefault();
 
-    var giveaway_id = $(this).attr('data-game-id');
-    $.post('/includes/ajax/claim_key.php', { 'giveaway_id':giveaway_id },
-    function(data)
-    {
-		console.log(data.result);
-      if (data.result == 1)
-      {
-        $('#key-area').text("Here's your key: " + data.key);
-      }
-	  if (data.result == 3)
-      {
-        $('#key-area').text("You have to login to redeem a key!");
-      }
-    });
-  });
+		var giveaway_id = $(this).attr('data-game-id');
+		$.post('/includes/ajax/claim_key.php', { 'giveaway_id':giveaway_id },
+		function(data)
+		{
+			console.log(data.result);
+			if (data.result == 1)
+			{
+				$('#key-area').text("Here's your key: " + data.key);
+			}
+			if (data.result == 3)
+			{
+				$('#key-area').text("You have to login to redeem a key!");
+			}
+		});
+	});
 
-  // to mark PC info as being up to date
-  $(document).on('click', '#pc_info_update', function(e)
-  {
-    e.preventDefault();
-    $.post('/includes/ajax/pc-info-update.php', function(data)
-    {
-      if (data.result == 1)
-      {
-        $('#pc_info_done').show();
-        $('#pc_info_done').html("<br />Thank you, your PC info has been updated!");
-      }
-    });
-  });
+	// to mark PC info as being up to date
+	$(document).on('click', '#pc_info_update', function(e)
+	{
+		e.preventDefault();
+		$.post('/includes/ajax/pc-info-update.php', function(data)
+		{
+			if (data.result == 1)
+			{
+				$('#pc_info_done').show();
+				$('#pc_info_done').html("<br />Thank you, your PC info has been updated!");
+			}
+		});
+	});
 
-  // this is for voting in the GOTY awards
-  $('.votebutton').click(function()
-  {
-  	var button = $(this);
-  	var category_id = $(this).data('category-id');
-  	var game_id = $(this).data('game-id');
-  	$.post('/includes/ajax/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
-  	function(data)
-    {
-  	  if (data.result == 1)
-      {
-  			$(button).html('Vote Saved!');
-  			$(button).addClass("vote_done");
-  			$.fancybox.open({type:"inline", href:"#wrap"})
-  	  }
-  		else if (data.result == 2)
-  		{
-  			document.getElementById("wrap_text").innerHTML = "Sorry, but voting is closed!";
-  			$.fancybox.open({type:"inline", href:"#wrap"})
-  		}
-  		else if (data.result == 3)
-  		{
-  			document.getElementById("wrap_text").innerHTML = "Sorry, but you have already voted in this category!";
-  			$.fancybox.open({type:"inline", href:"#wrap"})
-  		}
-  		else
-      {
-  	    button.text("Try again later, something broke").attr('disabled', 'disabled');
-  	    setTimeout(function(){ button.removeAttr('disabled') }, 2000);
-  	  }
-    });
-  });
+	// this is for voting in the GOTY awards
+	$('.votebutton').click(function()
+	{
+		var button = $(this);
+		var category_id = $(this).data('category-id');
+		var game_id = $(this).data('game-id');
+		$.post('/includes/ajax/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
+		function(data)
+		{
+			if (data.result == 1)
+			{
+				$(button).html('Vote Saved!');
+				$(button).addClass("vote_done");
+				$.fancybox.open({type:"inline", href:"#wrap"})
+			}
+			else if (data.result == 2)
+			{
+				document.getElementById("wrap_text").innerHTML = "Sorry, but voting is closed!";
+				$.fancybox.open({type:"inline", href:"#wrap"})
+			}
+			else if (data.result == 3)
+			{
+				document.getElementById("wrap_text").innerHTML = "Sorry, but you have already voted in this category!";
+				$.fancybox.open({type:"inline", href:"#wrap"})
+			}
+			else
+			{
+				button.text("Try again later, something broke").attr('disabled', 'disabled');
+				setTimeout(function(){ button.removeAttr('disabled') }, 2000);
+			}
+		});
+	});
 
 	$(".uploads").on("click", ".add_button", function()
 	{
@@ -986,41 +999,41 @@ $(".poll_content").on("click", ".open_poll", function()
 		$('.bbcode_editor').val($('.bbcode_editor').val() + text);
 	});
 
-  $('#generate_preview').click(function()
-  {
-      var article_id = $(this).data('article-id');
-      $.post('/includes/ajax/generate_preview_code.php', { article_id: article_id })
-      .done (function(result)
-      {
-          $('#preview_code').val(result);
-      });
-  });
+	$('#generate_preview').click(function()
+	{
+		var article_id = $(this).data('article-id');
+		$.post('/includes/ajax/generate_preview_code.php', { article_id: article_id })
+		.done (function(result)
+		{
+			$('#preview_code').val(result);
+		});
+	});
 
-  // this controls the subscribe to comments link inside articles_full.php
-  $(document).on('click', '#subscribe-link', function(e)
-  {
-    e.preventDefault();
+	// this controls the subscribe to comments link inside articles_full.php
+	$(document).on('click', '#subscribe-link', function(e)
+	{
+		e.preventDefault();
 
-    var type = $(this).attr('data-sub');
-    var article_id = $(this).attr('data-article-id');
-    $.post('/includes/ajax/subscribe-article.php', { 'type':type, 'article-id':article_id },
-    function(data)
-    {
-      var myData = JSON.parse(data);
-      if (myData.result == 'subscribed')
-      {
-        $('#subscribe-link').attr('data-sub','unsubscribe');
-        $("#subscribe-link").attr("href", "/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id=" + article_id);
-        $('#subscribe-link span').text('Unsubscribe from comments');
-      }
-      else if (myData.result == 'unsubscribed')
-      {
-        $('#subscribe-link').attr('data-sub','subscribe');
-        $("#subscribe-link").attr("href", "/index.php?module=articles_full&amp;go=subscribe&amp;article_id=" + article_id);
-        $('#subscribe-link span').text('Subscribe to comments');
-      }
-    });
-  });
+		var type = $(this).attr('data-sub');
+		var article_id = $(this).attr('data-article-id');
+		$.post('/includes/ajax/subscribe-article.php', { 'type':type, 'article-id':article_id },
+		function(data)
+		{
+			var myData = JSON.parse(data);
+			if (myData.result == 'subscribed')
+			{
+				$('#subscribe-link').attr('data-sub','unsubscribe');
+				$("#subscribe-link").attr("href", "/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id=" + article_id);
+				$('#subscribe-link span').text('Unsubscribe from comments');
+			}
+			else if (myData.result == 'unsubscribed')
+			{
+				$('#subscribe-link').attr('data-sub','subscribe');
+				$("#subscribe-link").attr("href", "/index.php?module=articles_full&amp;go=subscribe&amp;article_id=" + article_id);
+				$('#subscribe-link span').text('Subscribe to comments');
+			}
+		});
+	});
 
 	$(document).on('click', ".gallery_item", function() 
 	{
@@ -1040,6 +1053,109 @@ $(".poll_content").on("click", ".open_poll", function()
 		$('.preview_pm').highlight();
 		});
 	});
+	
+	$('.admin_article_comment_button').click(function(e)
+	{
+		e.preventDefault();
+		
+		var url = "/includes/ajax/article_comment_pagination.php";
+
+		$.ajax({
+			type: "POST",
+			url: url,
+			dataType:"json",
+			data: $("#admin_comment").serialize(),
+			success: function(data)
+			{
+				if (data['result'] == 'done')
+				{
+					$('.comments').load('/includes/ajax/article_comment_pagination.php', {'type':'reload', 'article_id':data['article_id'], 'page':data['page']}, function()
+					{
+						$('.comments #r' + data['comment_id']).scrollMinimal();
+						$('.comments').highlight();
+					});
+					$('#comment').val('');
+				}
+				if (data['result'] == 'error')
+				{
+					alert(data['message']);
+				}
+			}
+		}).done(function() 
+		{
+			$('.admin_article_comment_button').prop('disabled', false);
+		});
+	});
+	
+	/* ADMIN HOME ADMIN + EDITOR COMMENTS */
+	
+	$('.send_admin_comment').click(function(e)
+	{
+		e.preventDefault();
+		var form_data = $(this).closest('form').serialize();
+		var url = "/includes/ajax/admin/admin_home_comment.php"; 
+		
+		$.ajax({
+			type: "POST",
+			url: url,
+			dataType:"json",
+			data: form_data, 
+			success: function(data)
+			{
+				if (data['result'] == 'done')
+				{
+					$('.' + data['type'] + '_text').val('');
+					$('.' + data['type'] + '_comments_list').html(data['text']);
+					$('.' + data['type'] + '_comments_div').highlight();
+				}
+				else
+				{
+					alert(data['message']);
+				}
+			}
+		});
+	});
+	
+	function ajax_page_comments(e, element)
+	{
+		var url = window.location.href;
+		var host = window.location.host;
+		// limit to the admin review queue for now
+		if(url.indexOf(host + '/admin.php?module=reviewqueue') != -1 || url.indexOf(host + '/admin.php?module=articles&view=Submitted') != -1 || url.indexOf(host + '/admin.php?module=articles&view=Submitted') != -1) 
+		{
+			e.preventDefault();
+			var page = element.attr("data-page");
+			var article_id = getUrlParameter('aid');
+			$('.comments').load('/includes/ajax/article_comment_pagination.php', {'type':'reload', 'article_id':article_id, 'page':page}, function() 
+			{
+				$('.comments').scrollMinimal();
+				$('.comments').highlight();
+			});
+			return true;
+		}
+		return false;
+	}
+	
+	$(document).on('click', "ul.pagination li a, .head-list-position a", function(e)
+	{
+		var $this = $(this);
+		ajax_page_comments(e, $this);
+	});
+	
+	$(document).on('change', ".head-list-position select, .pagination", function(e)
+	{
+		var $this = $(this).find(':selected');
+		if (!ajax_page_comments(e, $this))
+		{
+			var url = $(this).val(); // get selected value
+			if (url) 
+			{ // require a URL
+				window.location = url; // redirect
+			}
+		}
+	});
+	
+	/* CHARTS */
 	
 	$('#preview_chart').click(function()
 	{
@@ -1108,4 +1224,68 @@ $(".poll_content").on("click", ".open_poll", function()
 		}
 	});
 	
+	/* ARTICLE PREVIEW */
+	
+	$('.admin_preview_article').click(function(e)
+	{
+		e.preventDefault();
+		var url = "/includes/ajax/admin/preview_article.php";
+		
+		// if the preview is hidden, open it
+		if ( $('#article_preview').css('display') == 'none' )
+		{
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: $("#article_editor").serialize(), 
+				success: function(data)
+				{
+					$('#article_preview').html(data);
+					$('#article_preview').show();
+					$('.admin_preview_article').html('Close Preview');
+					$('#article_preview').scrollMinimal();
+				}
+			});
+		}
+		else
+		{
+			$('#article_preview').hide();
+			$('.admin_preview_article').html('Preview');
+		}
+	});
+	
+	/* BBCODE EDITOR BITS */
+	
+	// quoting a comment
+	$(document).on('click', ".quote_function", function(e) 
+	{
+		e.preventDefault();
+		
+		var id = $(this).attr('data-id');
+		var type = $(this).attr('data-type');
+		var url = "/includes/ajax/quote_comment.php";
+		
+		$.ajax({
+			type:'POST',
+			url: url,
+			dataType: 'json',
+			data:{'id':id, 'type':type},
+			success: function(data)
+			{
+				if (data['result'] == 'done')
+				{
+					content = "[quote=" + data['username'] + "]" + data['text'];
+					content += "[/quote]";
+					
+					$('#comment').append(content); 
+					
+					$('#comment').scrollMinimal();
+				}
+				if (data['result'] == 'error')
+				{
+					alert(data['message']);
+				}
+			}
+		});
+    });
 });

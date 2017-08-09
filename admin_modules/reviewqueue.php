@@ -16,7 +16,7 @@ if (!isset($_GET['aid']))
 		$templating->set('article_title', $article['title']);
 		$templating->set('username', $article['username']);
 
-		$templating->set('date_submitted', $core->format_date($article['date']));
+		$templating->set('date_submitted', $core->human_date($article['date']));
 	}
 }
 
@@ -104,7 +104,7 @@ else
 			$templating->block('edit_locked');
 			$templating->set('locked_username', $article['username_lock']);
 
-			$lock_date = $core->format_date($article['locked_date']);
+			$lock_date = $core->human_date($article['locked_date']);
 
 			$templating->set('locked_date', $lock_date);
 
@@ -132,11 +132,11 @@ else
 	$lock_button = '';
 	if ($article['locked'] == 0)
 	{
-		$lock_button = '<a class="button_link" href="/admin.php?module=reviewqueue&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a><hr />';
+		$lock_button = '<a class="button_link" href="/admin.php?module=reviewqueue&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
 	}
 	else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$lock_button = '<a class="button_link" href="/admin.php?module=reviewqueue&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a><hr />';
+		$lock_button = '<a class="button_link" href="/admin.php?module=reviewqueue&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
 	}
 	$templating->set('lock_button', $lock_button);
 
@@ -152,7 +152,7 @@ else
 	$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 	$templating->set('edit_state', $edit_state);
 	$templating->set('edit_state_textarea', $edit_state_textarea);
-	$templating->set('main_formaction', '<form method="post" action="'.url.'admin.php?module=reviewqueue" enctype="multipart/form-data">');
+	$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.url.'admin.php?module=reviewqueue" enctype="multipart/form-data">');
 
 	// get categorys
 	$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
@@ -194,8 +194,6 @@ else
 	}
 
 	$templating->set('categories_list', $categorys_list);
-
-	$templating->set('article_form_top', $article_form_top);
 
 	$templating->set('username', $article['username']);
 
@@ -258,6 +256,47 @@ else
 	$templating->set('previously_uploaded', $previously_uploaded);
 
 	$article_class->article_history($article['article_id']);
+	
+	/*
+		EDITOR COMMENTS
+	*/
+	$pagination_link = 'test';
+	
+	$templating->load('articles_full');
+		
+	$article_class->display_comments(['article' => $article, 'pagination_link' => $pagination_link, 'type' => 'admin']);
+
+	$templating->load('admin_modules/admin_module_comments');
+
+	// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
+	$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
+	$sub_exists = $db->num_rows();
+
+	if ($sub_exists == 1)
+	{
+		$check_current_sub = $db->fetch();
+	}
+
+	$subscribe_check = '';
+	if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
+	{
+		$subscribe_check = 'checked';
+	}
+
+	$subscribe_email_check = '';
+	if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
+	{
+		$subscribe_email_check = 'selected';
+	}
+
+	$templating->block('form_top');
+
+	$core->editor(['name' => 'text', 'content' => '', 'editor_id' => 'comment']);
+
+	$templating->block('form_bottom', 'admin_modules/admin_module_comments');
+	$templating->set('subscribe_check', $subscribe_check);
+	$templating->set('subscribe_email_check', $subscribe_email_check);
+	$templating->set('article_id', $_GET['aid']);
 }
 
 if (isset($_POST['act']))
@@ -323,7 +362,7 @@ if (isset($_POST['act']))
 				$author_email = $db->fetch();
 
 				// subject
-				$subject = 'Your article was reviewed and edited on ' . $core->config('site_title');
+				$subject = 'Your article was reviewed and edited on GamingOnLinux';
 
 				$nice_title = core::nice_title($_POST['title']);
 

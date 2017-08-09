@@ -11,7 +11,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
 	$templating->block('history');
 	$templating->set('title', $article['title']);
 
-	$date = $core->format_date($article['date']);
+	$date = $core->human_date($article['date']);
 	$templating->set('date', $date);
 
 	$text = $bbcode->parse_bbcode($article['text']);

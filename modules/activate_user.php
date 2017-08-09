@@ -38,7 +38,7 @@ else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 		$db->sqlquery("UPDATE `users` SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
 
 		// subject
-		$subject = 'Welcome to '.$core->config('site_title').', activation needed!';
+		$subject = 'Welcome to GamingOnLinux, activation needed!';
 
 		// message
 		$html_message = "<p>Hello {$_SESSION['username']},</p>

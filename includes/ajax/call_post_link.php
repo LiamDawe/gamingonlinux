@@ -4,7 +4,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 require APP_ROOT . "/includes/bootstrap.php";
 
 $forum_class = new forum($dbl, $core);
-$templating = new template($core, $core->config('template'));
 
 if(isset($_GET['post_id']))
 {

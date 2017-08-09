@@ -12,6 +12,11 @@ define('url', $core->config('website_url'));
 
 $message_map = new message_map();
 
-$article_class = new article($dbl, $core);
+// setup the templating, if not logged in default theme, if logged in use selected theme
+$templating = new template($core, $core->config('template'));
+
+$user = new user($dbl, $core);
 
 $bbcode = new bbcode($dbl, $core);
+
+$article_class = new article($dbl, $core, $user, $templating, $bbcode);

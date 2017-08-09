@@ -134,7 +134,7 @@ foreach ($category_array as $category)
 
 
 				$last_username = "<a href=\"/profiles/{$forum['last_post_id']}\">{$forum['last_post_username']}</a>";
-				$last_post_time = $core->format_date($forum['last_post_time']);
+				$last_post_time = $core->human_date($forum['last_post_time']);
 			}
 			$templating->set('last_post_title', $last_title);
 			$templating->set('last_post_username', $last_username);
@@ -154,7 +154,7 @@ if ($grab_topics)
 {
 	foreach ($grab_topics as $topics)
 	{
-		$date = $core->format_date($topics['last_post_date']);
+		$date = $core->human_date($topics['last_post_date']);
 
 		$post_count = $topics['replys'];
 		// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page

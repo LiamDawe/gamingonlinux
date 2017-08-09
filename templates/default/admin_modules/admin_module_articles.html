@@ -2,6 +2,9 @@
 				<div class="box">
 					<div class="head">Add a new Article here.</div>
 				</div>
+				<a class="admin_preview_article button_link" href="#preview">Preview</a>
+				<hr />
+				<div id="article_preview"></div>
 [/block: add]
 
 [block: add_bottom]
@@ -18,7 +21,7 @@
 							<label class="checkbox">
 								<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to article to receive comment replies via email?
 							</label>
-							<button type="submit" name="act" value="publish_now" formaction="{:website_url}admin.php?module=add_article" class="btn btn-primary">Publish Now</button> <button type="submit" name="act" value="Preview" formaction="/admin.php?module=preview">Preview</button> <button type="submit" name="act" value="review" class="btn btn-info">Submit for Review</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info">Save as draft</button>
+							<button type="submit" name="act" value="publish_now" formaction="{:website_url}admin.php?module=add_article" class="btn btn-primary">Publish Now</button> <button class="admin_preview_article" type="button">Preview</button> <button type="submit" name="act" value="review" class="btn btn-info">Submit for Review</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info">Save as draft</button>
 							<input type="hidden" name="check" value="Add" />
 							<input type="hidden" name="temp_tagline_image" value="{:temp_tagline_image}" />
 					</div>
@@ -48,7 +51,9 @@
 [/block: edit_locked]
 
 [block: edit_top]
-				{:lock_button}
+				{:lock_button} <a class="admin_preview_article button_link" href="#preview">Preview</a>
+				<hr />
+				<div id="article_preview"></div>
 				<div class="box">
 					<div class="head">Edit the article here.</div>
 				</div>
@@ -65,7 +70,7 @@
 						<label class="checkbox">
 							<input type="checkbox" name="show_article" {:show_article_check} /> Enable article?
 						</label>
-						<button  type="submit" name="act" value="Edit" class="btn btn-primary" {:edit_state}>Edit</button> <button type="submit" name="act" value="Preview" formaction="/admin.php?module=preview" class="btn btn-info" {:edit_state}>Preview</button>
+						<button type="submit" name="act" value="Edit" {:edit_state}>Edit</button> <button class="admin_preview_article" type="button">Preview</button>
 						<input type="hidden" name="article_id" value="{:article_id}" />
 						<input type="hidden" name="check" value="Edit" />
 						<input type="hidden" name="temp_tagline_image" value="{:temp_tagline_image}" />
@@ -144,7 +149,8 @@
 [/block: manage_bottom]
 
 [block: preview_row]
-		<script src="{:url}includes/jscripts/jquery.form.js"></script>
+<h3>Preview</h3>
+<div class="admin_article_preview_box">
 		<div class="box">
 			<div class="head">Here is how it would look on the homepage</div>
 		</div>
@@ -152,13 +158,11 @@
 		<div class="articles">
 				<div class="article group">
 					<div class="image group">
-					<a href="articles/{:article_link}">
 						{:top_image_nobbcode}
-					</a>
 					</div>
 					<div class="info group">
-						<div class="title"><a href="articles/{:article_link}">{:title}</a></div>
-						<div class="meta">Posted by {:username}, {:date} (<a href="/articles/{:article_link}/#comments">{:comment_count} Comments</a>)</div>
+						<div class="title">{:title}</div>
+						<div class="meta">Posted by {:username}, {:date} (0 Comments)</div>
 						<div class="desc">{:tagline} </div>
 						<div class="tags">
 							<ul>
@@ -195,48 +199,8 @@
 						</ul>
 					</div>
 				</div>
-	<div class="box">
-		<div class="head">Edit some more below</div>
-	</div>
+</div>
 [/block: preview_row]
-
-[block: preview_bottom]
-</div>
-</div>
-<div class="box">
-	<div class="body group">
-		{:subscribe_box}
-		<label class="checkbox">
-			<input type="checkbox" name="show_block" {:pick_check}/> Editors Pick?
-		</label>
-		{:enable_article}
-		{:submit_as_self}
-		{:buttons}
-		<input type="hidden" name="article_id" value="{:article_id}" />
-		<input type="hidden" name="author_id" value="{:author_id}" />
-		<input type="hidden" name="check" value="{:check}" />
-		</form>
-	</div>
-</div>
-<div class="box">
-	<div class="body group">
-		<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajax/ajaxImageUpload.php' style="clear:both">
-			Upload your images, no bigger than 1MB!
-			<div id='imageloadstatus' style='display:none'>
-				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>
-			</div>
-			<div id='imageloadbutton'>
-				<input type="file" name="photos[]" id="photoimg" multiple="true" />
-			</div>
-			<input type="hidden" name="article_id" value="{:article_id}" />
-		</form>
-
-		<div class="col-md-12" id='preview'>
-		</div>
-	</div>
-</div>
-{:previously_uploaded}
-[/block: preview_bottom]
 
 [block: history]
 <div class="box">

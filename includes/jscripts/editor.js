@@ -8,16 +8,8 @@ function gol_editor(editor_id)
 
 	function start() 
 	{
-		var quotes  = document.querySelectorAll('[data-quote]');
-
 		// Register tags
 		registerElements(editor_bar);
-
-        // Register all possible quotes.
-		for (var x = 0; x < quotes.length; x++) 
-		{
-            quotes[x].addEventListener("click", registerQuote, false);
-		}
 	}
 
     /*
@@ -82,46 +74,13 @@ function gol_editor(editor_id)
         // Fire snippet
         snippet(this.dataset.snippet);
     }
-
-    /*
-	 * registerQuote()
-	 *
-	 * Register all quotes
-	 */
-    function registerQuote() 
-	{
-        var username = this.dataset.quote;
-        var text = this.dataset.comment;
-        quote(text, username);
-    }
-    
-	/*
-	 * quote()
-	 *
-	 * Insert a quote, decodeEntities sorts out the html for the textarea
-	 */
-     function decodeEntities(encodedString)
-     {
-         var textArea = document.createElement('textarea');
-         textArea.innerHTML = encodedString;
-         return textArea.value;
-     }
      
      function list(text)
 	 {
 		text = '[li]' + text.replace(/\r\n/g, "\r\n[/li]").replace(/[\r\n]/g, '[/li]\r\n[li]') + '[/li]';
-		return text;
+		list_nospaces = text.replace(/\[li\] +/gm, '[li]');
+		return list_nospaces;
 	 }
-
-     function quote(text, name)
-     {
-         text = decodeEntities(text);
-
-         content = "[quote=" + name + "]" + text;
-         content += "[/quote]";
-
-		 this_editor.value += content;
-     }
 
     /*
 	 * bbcode()

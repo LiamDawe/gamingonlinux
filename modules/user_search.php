@@ -4,7 +4,7 @@ $templating->load('user_search');
 if (!isset($_GET['author_id']))
 {
 	$templating->set_previous('title', 'User Search', 1);
-	$templating->set_previous('meta_description', 'Search for users on ' . $core->config('site_title'), 1);
+	$templating->set_previous('meta_description', 'Search for users on GamingOnLinux', 1);
 
 	$templating->block('user_search');
 	$templating->set('url', $core->config('website_url'));

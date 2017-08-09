@@ -260,7 +260,7 @@ if (isset($_GET['view']))
 			}
 			$templating->set('topic_link', $topic_link);
 
-			$topic_date = $core->format_date($topic['creation_date']);
+			$topic_date = $core->human_date($topic['creation_date']);
 			$templating->set('topic_date', $topic_date);
 
 			if ($topic['author_id'] != 0)
@@ -329,7 +329,7 @@ if (isset($_GET['view']))
 			}
 			$templating->set('topic_link', $topic_link);
 
-			$topic_date = $core->format_date($topic['creation_date']);
+			$topic_date = $core->human_date($topic['creation_date']);
 			$templating->set('post_date', $topic_date);
 
 			if ($topic['author_id'] != 0)

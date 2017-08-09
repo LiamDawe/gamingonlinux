@@ -5,8 +5,9 @@
 [/block: review_top]
 
 [block: review_item_top]
-{:lock_button}
-<div class="box">
+{:lock_button} <a class="button_link" href="#comments">View Comments</a> <a class="admin_preview_article button_link" href="#preview">Preview</a>
+<hr />
+<div id="#top" class="box">
 	<div class="head">Reviewing another editors article</div>
 </div>
 [/block: review_item_top]
@@ -23,8 +24,7 @@
 	<div class="body group">
 		<form method="post" role="form">
 			<strong>{:article_title}</strong> by {:username} submitted on {:date_submitted} <br />
-			<button type="submit" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}">Edit</button>
-			<button type="submit" formaction="{:url}admin.php?module=comments&aid={:article_id}">Preview & Comments</button>
+			<button type="submit" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}">View</button>
 			<button type="submit" name="act" value="Delete" formaction="{:url}admin.php?module=articles&article_id={:article_id}&review=1">Delete</button>
 		</form>
 	</div>
@@ -40,7 +40,7 @@
 		<label class="checkbox">
 			<input type="checkbox" name="show_block" /> Editors Pick? <em>This will show the article under the Editors Pick heading on the Articles block!</em>
 		</label>
-		<button type="submit" name="act" value="Approve_Admin" {:edit_state}/>Publish Now</button> <button type="submit" name="act" value="edit" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Preview" {:preview_action} />{:preview_text}</button>
+		<button type="submit" name="act" value="Approve_Admin" {:edit_state}/>Publish Now</button> <button type="submit" name="act" value="edit" {:edit_state}>Finish Edit</button> <button class="admin_preview_article" type="button">Preview</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />
 		<input type="hidden" name="author_id" value="{:author_id}" />
 		<input type="hidden" name="check" value="Review" />

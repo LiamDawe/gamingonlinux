@@ -6,8 +6,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user = new user($dbl, $core);
-
 if($_POST)
 {
 	// make sure the poll is open

@@ -227,15 +227,15 @@ if ($core->config('allow_registrations') == 1)
 					$user->new_login($new_user_info, $generated_session);
 
 					// subject
-					$subject = 'Welcome to '.$core->config('site_title').', activation needed!';
+					$subject = 'Welcome to GamingOnLinux, activation needed!';
 
 					// message
 					$html_message = '<p>Hello '.$_POST['username'].',</p>
-					<p>Thanks for registering on <a href="'.$core->config('website_url').'" target="_blank">'.$core->config('site_title').'</a>!</p>
+					<p>Thanks for registering on <a href="'.$core->config('website_url').'" target="_blank">GamingOnLinux</a>!</p>
 					<p><strong><a href="'.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code.'">You need to activate your account before you can post! Click here to activate!</a></strong></p>
 					<p>If you&#39;re new, consider saying hello in the <a href="'.$core->config('website_url').'forum/" target="_blank">forum</a>.</p>';
 
-					$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on '.$core->config('site_title').'. You need to activate your account before you can post! Go here to activate: '.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
+					$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on GamingOnLinux. You need to activate your account before you can post! Go here to activate: '.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
 
 					$mail = new mailer($core);
 					$mail->sendMail($_POST['uemail'], $subject, $html_message, $plain_message);

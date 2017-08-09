@@ -1,6 +1,6 @@
 <?php
 $templating->set_previous('title', 'Forum Search', 1);
-$templating->set_previous('meta_description', 'Search the forum on ' . $core->config('site_title'), 1);
+$templating->set_previous('meta_description', 'Search the forum on GamingOnLinux', 1);
 
 $templating->load('forum_search');
 $templating->block('top');
@@ -87,7 +87,7 @@ if (isset($search_text) && !empty($search_text))
 		// loop through results
 		foreach ($found_search as $found)
 		{
-			$date = $core->format_date($found['creation_date']);
+			$date = $core->human_date($found['creation_date']);
 
 			$templating->block('row');
 

@@ -13,7 +13,7 @@ $forum_posts = '';
 $db->sqlquery("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit 5");
 while ($topics = $db->fetch())
 {
-	$date = $core->format_date($topics['last_post_date']);
+	$date = $core->human_date($topics['last_post_date']);
 
 	$post_count = $topics['replys'];
 	// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page

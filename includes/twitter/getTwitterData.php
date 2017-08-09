@@ -5,8 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user = new user($dbl, $core);
-
 include (APP_ROOT . "/includes/twitter/twitteroauth.php");
 include (APP_ROOT . "/includes/twitter/functions.php");
 

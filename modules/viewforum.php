@@ -159,7 +159,7 @@ else
 		$templating->set('title', $post['topic_title']);
 		$templating->set('author_id', $post['author_id']);
 		
-		$date = $core->format_date($post['creation_date']);
+		$date = $core->human_date($post['creation_date']);
 		$tzdate = date('c',$post['creation_date']);
 		$post_date = '<abbr title="'.$tzdate.'" class="timeago">'.$date.'</abbr>';
 		$templating->set('post_date', $post_date);
@@ -177,7 +177,7 @@ else
 		$last_post = 'No replies!';
 		if ($post['replys'] > 0)
 		{
-			$date = $core->format_date($post['last_post_date']);
+			$date = $core->human_date($post['last_post_date']);
 			$tzdate = date('c',$post['last_post_date']);
 			$last_post = 'Latest by <a href="/profiles/'.$post['user_id_last'].'">'.$post['username_last'].'</a><br />
 			<abbr title="'.$tzdate.'" class="timeago">'.$date.'</abbr>';

@@ -5,7 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user = new user($dbl, $core);
 $user->check_session();
 
 if ($user->check_group([1,2,5]) == false)

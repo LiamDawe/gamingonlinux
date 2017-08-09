@@ -141,93 +141,17 @@ if(isset($_POST))
 	
 	if ($_POST['type'] == 'reload')
 	{
+		$pagination_link = 'test';
+		
 		$user->check_session();
+		$user->grab_user_groups();
 		
-		$templating->load('admin_modules/admin_module_comments');
+		$templating->load('articles_full');
 		
-		$templating->block('comments_top', 'admin_modules/admin_module_comments');
+		$article_info = $dbl->run("SELECT `article_id`, `slug`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 		
-		// count how many there is in total
-		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `article_id` = ? AND `approved` = 1";
-		$total_comments = $dbl->run($sql_count, array($_POST['article_id']))->fetchOne();
+		$article_class->display_comments(['article' => $article_info, 'pagination_link' => $pagination_link, 'type' => 'admin', 'page' => $_POST['page']]);
 
-		//lastpage is = total comments / items per page, rounded up.
-		if ($total_comments <= 10)
-		{
-			$lastpage = 1;
-		}
-		else
-		{
-			$lastpage = ceil($total_comments/$_SESSION['per-page']);
-		}
-
-		// paging for pagination
-		if (!isset($_POST['page']) || $_POST['page'] == 0)
-		{
-			$page = 1;
-		}
-
-		else if (is_numeric($_POST['page']))
-		{
-			$page = $_POST['page'];
-		}
-
-		if ($page > $lastpage)
-		{
-			$page = $lastpage;
-		}
-		
-		$per_page = 15;
-		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
-		{
-			$per_page = $_SESSION['per-page'];
-		}
-		
-		$pagination_linking = 'test';
-		
-		$pagination = $core->pagination_link($_SESSION['per-page'], $total_comments, $pagination_linking, $page, '#comments');
-
-		$get_comments = $dbl->run("SELECT a.*, u.username, u.user_group, u.secondary_user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.avatar_gallery, u.steam, u.twitter_on_profile, u.website FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`article_id` = ? ORDER BY a.`comment_id` ASC LIMIT ?, ?", array($_POST['article_id'], $core->start, $per_page))->fetch_all();
-		foreach ($get_comments as $comments)
-		{
-			// make date human readable
-			$date = $core->human_date($comments['time_posted']);
-
-			$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
-			$quote_username = $comments['username'];
-
-			$comment_avatar = $user->sort_avatar($comments['author_id']);
-
-			$templating->block('review_comments', 'admin_modules/admin_module_comments');
-			$templating->set('user_id', $comments['author_id']);
-			$templating->set('username', $username);
-			$templating->set('plain_username', $quote_username);
-			$templating->set('comment_avatar', $comment_avatar);
-			$templating->set('date', $date);
-			$templating->set('text', $bbcode->parse_bbcode($comments['comment_text'], 0));
-			$templating->set('text_plain', $comments['comment_text']);
-			$templating->set('article_id', $_POST['article_id']);
-			$templating->set('comment_id', $comments['comment_id']);
-
-			$comment_edit_link = '';
-			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $comments['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
-			{
-				$comment_edit_link = "<a href=\"/index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-edit\"></i> Edit</a>";
-			}
-			$templating->set('edit', $comment_edit_link);
-
-			$comment_delete_link = '';
-			if ($user->check_group([1,2]) == true)
-			{
-				$comment_delete_link = "<a href=\"/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><i class=\"icon-remove\"></i> Delete</a>";
-			}
-			$templating->set('delete', $comment_delete_link);
-		}
-
-		$templating->block('bottom', 'admin_modules/admin_module_comments');
-		
-		$templating->set('pagination', $pagination);
-		
 		echo $templating->output();
 	}
 }

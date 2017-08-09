@@ -78,7 +78,7 @@
 									<ul>
 										{:report_link}
 										{:edit} {:delete} {:bookmark}
-										<li><a class="post_link tooltip-top" data-post-id="{:comment_id}" data-type="comment" href="{:comment_permalink}" title="Link to this comment"><span class="icon link">Link</span></a></li>
+										{:link_to_comment}
 										{:logged_in_options}
 									</ul>
 								</div>
@@ -104,21 +104,24 @@
 [/block: article_comments]
 
 [block: logged_in_options]
-<li><a class="tooltip-top quote_function" title="Quote" data-quote="{:plain_username}" data-comment="{:text_plain}"><span class="icon quote">Quote</span></a></li>
+<li><a class="tooltip-top quote_function" title="Quote" data-id="{:post_id}" data-type="article_comment"><span class="icon quote">Quote</span></a></li>
 {:like_button}
 [/block: logged_in_options]
 
 [block: bottom]
 					</div>
+					{:pagination}
 				</div>
-{:pagination}
 </article>
+[/block: bottom]
+
+[block: patreon_comments]
 <div class="box">
 	<div class="body group">
 		<img style="float: right;" src="/templates/default/images/patreon_logo.png" alt=""> While you're here, please consider <a href="https://www.patreon.com/liamdawe">supporting GamingOnLinux on Patreon</a>. We have no adverts, no paywalls, no timed exclusive articles. Just good, fresh content. We also accept <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P85ZZX9W8HFMW">Paypal</a> donations! If you already are, thank you!
 	</div>
 </div>
-[/block: bottom]
+[/block: patreon_comments]
 
 [block: comments_closed]
 <div class="box">

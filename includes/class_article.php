@@ -3,11 +3,17 @@ class article
 {
 	private $database;
 	private $core;
+	private $user;
+	private $templating;
+	private $bbcode;
 	
-	function __construct($database, $core)
+	function __construct($database, $core, $user, $templating, $bbcode)
 	{
 		$this->database = $database;
 		$this->core = $core;
+		$this->user = $user;
+		$this->templating = $templating;
+		$this->bbcode = $bbcode;
 	}
 	
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
@@ -501,7 +507,7 @@ class article
 			{
 				$view_link = '- <a href="/admin.php?module=article_history&id='.$grab_history['id'].'">View text</a>';
 			}
-			$date = $core->format_date($grab_history['date']);
+			$date = $core->human_date($grab_history['date']);
 			$history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> '.$view_link.' - ' . $date . '</li>';
 		}
 
@@ -789,7 +795,7 @@ class article
 		foreach ($article_list as $article)
 		{
 			// make date human readable
-			$date = $this->core->format_date($article['date']);
+			$date = $this->core->human_date($article['date']);
 
 			// get the article row template
 			$templating->block('article_row', 'articles');
@@ -801,7 +807,7 @@ class article
 				{
 					if ($this->core->config('total_featured') < 5)
 					{
-						$editor_pick_expiry = $this->core->format_date($article['date'] + 1209600, 'd/m/y');
+						$editor_pick_expiry = $this->core->human_date($article['date'] + 1209600, 'd/m/y');
 						$templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
 					}
 					else if ($this->core->config('total_featured') == 5)
@@ -881,6 +887,382 @@ class article
 				
 			$templating->set('article_link', $this->get_link($article['article_id'], $article['slug']));
 			$templating->set('comment_count', $article['comment_count']);
+		}
+	}
+	
+	// placeholder, so we can merge admin comments, plain article comments and the ajax updater into one function
+	// article_info = required article details
+	// pagination_link = destination link for pagination
+	public function display_comments($article_info)
+	{
+		// count how many there is in total
+		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `article_id` = ? AND `approved` = 1";
+		$total_comments = $this->database->run($sql_count, array($article_info['article']['article_id']))->fetchOne();
+		
+		$per_page = 15;
+		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
+		{
+			$per_page = $_SESSION['per-page'];
+		}
+
+		//lastpage is = total comments / items per page, rounded up.
+		if ($total_comments <= 10)
+		{
+			$lastpage = 1;
+		}
+		else
+		{
+			$lastpage = ceil($total_comments/$per_page);
+		}
+
+		// paging for pagination
+		if (!isset($article_info['page']) || $article_info['page'] == 0)
+		{
+			$page = 1;
+		}
+
+		else if (is_numeric($article_info['page']))
+		{
+			$page = $article_info['page'];
+		}
+
+		if ($page > $lastpage)
+		{
+			$page = $lastpage;
+		}
+		
+		// sort out the pagination link
+		$pagination = $this->core->pagination_link($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
+		$pagination_head = $this->core->head_pagination($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
+		
+		$this->templating->block('comments_top', 'articles_full');
+		$this->templating->set('pagination_head', $pagination_head);
+		$this->templating->set('pagination', $pagination);
+		
+		if (isset($article_info['type']) && $article_info['type'] != 'admin')
+		{
+			// update their subscriptions if they are reading the last page
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+			{
+				$check_sub = $this->database->run("SELECT `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']))->fetch();
+				if ($check_sub)
+				{
+					if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
+					{
+						// they have read all new comments (or we think they have since they are on the last page)
+						if ($page == $lastpage)
+						{
+							// send them an email on a new comment again
+							$this->database->run("UPDATE `articles_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']));
+						}
+					}
+				}
+			}
+
+			$subscribe_link = '';
+			$close_comments_link = '';
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+			{
+				// find out if this user has subscribed to the comments
+				if ($_SESSION['user_id'] != 0)
+				{
+					$book_test = $this->database->run("SELECT `user_id` FROM `articles_subscriptions` WHERE `article_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetchOne();
+					if ($book_test)
+					{
+						$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$article_info['article']['article_id']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe</span></a>";
+					}
+
+					else
+					{
+						$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"subscribe\" data-article-id=\"{$article_info['article']['article_id']}\" href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Subscribe</span></a>";
+					}
+				}
+
+				if ($this->user->check_group([1,2]) == true)
+				{
+					if ($article_info['article']['comments_open'] == 1)
+					{
+						$close_comments_link = "<a href=\"/index.php?module=articles_full&go=close_comments&article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Close Comments</a></span>";
+					}
+					else if ($article_info['comments_open'] == 0)
+					{
+						$close_comments_link = "<a href=\"/index.php?module=articles_full&go=open_comments&article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Open Comments</a></span>";
+					}
+				}
+			}
+			
+			$this->templating->set('subscribe_link', $subscribe_link);
+			$this->templating->set('close_comments', $close_comments_link);
+			
+			if ($article_info['article']['comments_open'] == 0)
+			{
+				$this->templating->block('comments_closed', 'articles_full');
+			}
+		}
+		else
+		{
+			$this->templating->set('subscribe_link', '');
+			$this->templating->set('close_comments', '');		
+		}
+		
+		//
+		/* DISPLAY THE COMMENTS */
+		//
+
+		if ($total_comments > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			// first grab a list of their bookmarks
+			$bookmarks_array = $this->database->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'comment' AND `parent_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
+		}
+
+		$profile_fields = include dirname ( dirname ( __FILE__ ) ) . '/includes/profile_fields.php';
+
+		$db_grab_fields = '';
+		foreach ($profile_fields as $field)
+		{
+			$db_grab_fields .= "u.`{$field['db_field']}`,";
+		}
+
+		$comments_get = $this->database->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $article_info['article']['article_id'], $this->core->start, $per_page))->fetch_all();
+		
+		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
+		$like_array = [];
+		$sql_replacers = [];
+		foreach ($comments_get as $id_loop)
+		{
+			$like_array[] = (int) $id_loop['comment_id'];
+			$user_ids[] = (int) $id_loop['author_id'];
+			$sql_replacers[] = '?';
+		}
+					
+		if (!empty($sql_replacers))
+		{
+			$to_replace = implode(',', $sql_replacers);
+						
+			// Total number of likes for the comments
+			$get_likes = $this->database->run("SELECT data_id, COUNT(*) FROM `likes` WHERE `data_id` IN ( $to_replace ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+						
+			// this users likes
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			{
+				$replace = [$_SESSION['user_id']];
+				foreach ($like_array as $comment_id)
+				{
+					$replace[] = $comment_id;
+				}
+
+				$get_user_likes = $this->database->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'comment'", $replace)->fetch_all(PDO::FETCH_COLUMN);
+			}
+						
+			// get a list of each users user groups, so we can display their badges
+			$comment_user_groups = $this->user->post_group_list($user_ids);
+		}
+		
+		// check over their permissions now
+		$can_delete = 0;
+		if ($this->user->can('mod_delete_comments'))
+		{
+			$can_delete = 1;
+		}
+		$can_edit = 0;
+		if ($this->user->can('mod_edit_comments'))
+		{
+			$can_edit = 1;
+		}
+		
+		foreach ($comments_get as $comments)
+		{
+			$comment_date = $this->core->human_date($comments['time_posted']);
+
+			if ($comments['author_id'] == 0 || empty($comments['username']))
+			{
+				if (empty($comments['username']))
+				{
+					$username = 'Guest';
+				}
+				if (!empty($comments['guest_username']))
+				{
+					if ($this->user->check_group([1,2]) == true)
+					{
+						$username = "<a href=\"/admin.php?module=articles&view=comments&ip_id={$comments['comment_id']}\">{$comments['guest_username']}</a>";
+					}
+					else
+					{
+						$username = $comments['guest_username'];
+					}
+				}
+				$quote_username = $comments['guest_username'];
+			}
+			else
+			{
+				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
+				$quote_username = $comments['username'];
+			}
+
+			// sort out the avatar
+			$comment_avatar = $this->user->sort_avatar($comments['author_id']);
+						
+			$into_username = '';
+			if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
+			{
+				$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . $this->core->config('website_url') . 'templates/'.$this->core->config('template').'/images/distros/' . $comments['distro'] . '.svg" />';
+			}
+						
+			$pc_info = '';
+			if (isset($comments['pc_info_public']) && $comments['pc_info_public'] == 1)
+			{
+				if ($comments['pc_info_filled'] == 1)
+				{
+					$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="'.$this->core->config('website_url').'includes/ajax/call_profile.php?user_id='.$comments['author_id'].'">View PC info</a>';
+				}
+			}
+
+			$this->templating->block('article_comments', 'articles_full');
+			$permalink = $this->get_link($article_info['article']['article_id'], $article_info['article']['slug'], 'comment_id=' . $comments['comment_id']);
+			$this->templating->set('comment_permalink', $permalink);
+			$this->templating->set('user_id', $comments['author_id']);
+			$this->templating->set('username', $into_username . $username);
+			$this->templating->set('comment_avatar', $comment_avatar);
+			$this->templating->set('date', $comment_date);
+			$this->templating->set('tzdate', date('c',$comments['time_posted']) );
+			$this->templating->set('user_info_extra', $pc_info);
+
+			$cake_bit = '';
+			if ($username != 'Guest')
+			{
+				$cake_bit = $this->user->cake_day($comments['register_date'], $comments['username']);
+			}
+			$this->templating->set('cake_icon', $cake_bit);
+
+			$last_edited = '';
+			$edit_counter = '';
+			if ($comments['last_edited'] != 0)
+			{
+				if ($comments['edit_counter'] > 1)
+				{
+					$edit_counter = '. Edited ' . $comments['edit_counter'] . ' times.';
+				}
+							
+				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' at ' . $this->core->human_date($comments['last_edited_time']) . $edit_counter . '[/i]';
+			}
+
+			$this->templating->set('article_id', $article_info['article']['article_id']);
+			$this->templating->set('comment_id', $comments['comment_id']);
+ 						
+			$total_likes = 0;
+			if (isset($get_likes[$comments['comment_id']][0]))
+			{
+				$total_likes = $get_likes[$comments['comment_id']][0];
+			}
+
+			$this->templating->set('total_likes', $total_likes);
+
+			$who_likes_link = '';
+			if ($total_likes > 0)
+			{
+				$who_likes_link = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
+			}
+			$this->templating->set('who_likes_link', $who_likes_link);
+
+			$logged_in_options = '';
+			$bookmark_comment = '';
+			$report_link = '';
+			$comment_edit_link = '';
+			$like_button = '';
+			$comment_delete_link = '';
+			$link_to_comment = '';
+			if (isset($article_info['type']) && $article_info['type'] != 'admin')
+			{
+				$link_to_comment = '<li><a class="post_link tooltip-top" data-post-id="{:comment_id}" data-type="comment" href="{:comment_permalink}" title="Link to this comment"><span class="icon link">Link</span></a></li>';
+			}
+			$this->templating->set('link_to_comment', $link_to_comment);
+			
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+			{
+				$logged_in_options = $this->templating->block_store('logged_in_options', 'articles_full');
+				
+				if (isset($article_info['type']) && $article_info['type'] != 'admin')
+				{
+					// sort bookmark icon out
+					if (in_array($comments['comment_id'], $bookmarks_array))
+					{
+						$bookmark_comment = '<li><a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="comment" data-id="'.$comments['comment_id'].'" data-parent-id="'.$article_info['article']['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a></li>';
+					}
+					else
+					{
+						$bookmark_comment = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="comment" data-id="'.$comments['comment_id'].'" data-parent-id="'.$article_info['article']['article_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
+					}
+
+					$like_text = "Like";
+					$like_class = "like";
+					if ($_SESSION['user_id'] != 0)
+					{								
+						if (in_array($comments['comment_id'], $get_user_likes))
+						{
+							$like_text = "Unlike";
+							$like_class = "unlike";									
+						}
+						else
+						{
+							$like_text = "Like";
+							$like_class = "like";
+						}
+					}
+
+					// don't let them like their own post
+					if ($comments['author_id'] != $_SESSION['user_id'])
+					{
+						$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="comment" data-id="'.$comments['comment_id'].'" data-article-id="'.$article_info['article']['article_id'].'" data-author-id="'.$comments['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+					}
+					
+					$report_link = "<li><a class=\"tooltip-top\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$article_info['article']['article_id']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
+					
+					if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
+					{
+						$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
+					}
+					
+					if ($can_delete == 1)
+					{
+						$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
+					}
+				}
+				
+				$logged_in_options = $this->templating->store_replace($logged_in_options, array('post_id' => $comments['comment_id'], 'like_button' => $like_button));
+			}
+			$this->templating->set('logged_in_options', $logged_in_options);
+			$this->templating->set('bookmark', $bookmark_comment);
+			$this->templating->set('edit', $comment_edit_link);
+			$this->templating->set('delete', $comment_delete_link);
+			$this->templating->set('report_link', $report_link);
+
+			// if we have some user groups for that user
+			if (array_key_exists($comments['author_id'], $comment_user_groups))
+			{
+				$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
+				$badges = user::user_badges($comments, 1);
+				$this->templating->set('badges', implode(' ', $badges));
+			}
+			// otherwise guest account or their account was removed, as we didn't get any groups for it
+			else
+			{
+				$this->templating->set('badges', '');
+			}
+						
+			$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
+
+			$this->templating->set('profile_fields', $profile_fields_output);
+
+			// do this last, to help stop templating tags getting parsed in user text
+			$this->templating->set('text', $this->bbcode->parse_bbcode($comments['comment_text'] . $last_edited, 0));
+		}
+
+		$this->templating->block('bottom', 'articles_full');
+		$this->templating->set('pagination', $pagination);
+		
+		if (isset($article_info['type']) && $article_info['type'] != 'admin')
+		{
+			$this->templating->block('patreon_comments', 'articles_full');
 		}
 	}
 	

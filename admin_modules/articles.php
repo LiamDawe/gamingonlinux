@@ -102,7 +102,7 @@ if (isset($_GET['view']))
 					$templating->block('edit_locked');
 					$templating->set('locked_username', $article['username_lock']);
 
-					$lock_date = $core->format_date($article['locked_date']);
+					$lock_date = $core->human_date($article['locked_date']);
 
 					$templating->set('locked_date', $lock_date);
 
@@ -122,11 +122,11 @@ if (isset($_GET['view']))
 			$lock_button = '';
 			if ($article['locked'] == 0)
 			{
-				$lock_button = '<a class="button_link" href="/admin.php?module=articles&view=Edit&article_id=' . $article['article_id'] . '&lock=1">Lock For Editing</a><hr />';
+				$lock_button = '<a class="button_link" href="/admin.php?module=articles&view=Edit&article_id=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
 			}
 			else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 			{
-				$lock_button = '<a class="button_link" href="/admin.php?module=articles&view=Edit&article_id=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a><hr />';
+				$lock_button = '<a class="button_link" href="/admin.php?module=articles&view=Edit&article_id=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
 			}
 			$templating->set('lock_button', $lock_button);
 
@@ -134,7 +134,7 @@ if (isset($_GET['view']))
 			$templating->load('admin_modules/article_form');
 			$templating->block('full_editor', 'admin_modules/article_form');
 			$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
-			$templating->set('!_state', $edit_state);
+			$templating->set('edit_state', $edit_state);
 			$templating->set('edit_state_textarea', $edit_state_textarea);
 
 			$brandnew = '';
@@ -176,8 +176,6 @@ if (isset($_GET['view']))
 
 			$templating->set('categories_list', $categorys_list);
 
-			$templating->set('article_form_top', $article_form_top);
-
 			$text = $article['text'];
 			$previously_uploaded = '';
 			// if they have done it before set title, text and tagline
@@ -200,7 +198,7 @@ if (isset($_GET['view']))
 				$templating->set('slug', $article['slug']);
 			}
 
-			$templating->set('main_formaction', '<form method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+			$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 
 			if (empty($article['username']))
 			{
@@ -349,7 +347,7 @@ if (isset($_GET['view']))
 				foreach ($article_manage as $article)
 				{
 					// make date human readable
-					$date = $core->format_date($article['date']);
+					$date = $core->human_date($article['date']);
 
 					// get the article row template
 					$templating->block('manage_row');
@@ -417,7 +415,7 @@ if (isset($_GET['view']))
 			foreach ($article_get as $article)
 			{
 				// make date human readable
-				$date = $core->format_date($article['date']);
+				$date = $core->human_date($article['date']);
 
 				// get the article row template
 				$templating->block('manage_row');
@@ -563,7 +561,7 @@ else if (isset($_POST['act']))
 				foreach ($users_array as $email_user)
 				{
 					// subject
-					$subject = "New comment on your unpublished article {$title['title']} on " . $core->config('site_title');
+					$subject = "New comment on your unpublished article {$title['title']} on GamingOnLinux";
 
 					$comment_email = $bbcode->email_bbcode($comment);
 

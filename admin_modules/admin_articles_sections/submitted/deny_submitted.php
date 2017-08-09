@@ -48,16 +48,16 @@ else
 				}
 
 				// subject
-				$subject = 'Your article was denied on ' . $core->config('site_title');
+				$subject = 'Your article was denied on GamingOnLinux';
 				
-				$html_message = '<p>Your article submission on ' . $core->config('site_title') . ' was denied and the editor left a message for you below:</p>
+				$html_message = '<p>Your article submission on GamingOnLinux was denied and the editor left a message for you below:</p>
 				<p>'.$_POST['message'].'</p>
 				<p>Here is a copy below are your article:<br />
 				Title: '.$check['title'].'<br />
 				' . $check['text']. '</p>';
 
 				// message
-				$plain_message = 'Your article submission on ' . $core->config('site_title') . ' was denied and the editor said this' . "\n\n" . $_POST['message'] . "\n\n" . 'Here\'s a copy of your article below' . "\n\n" . $check['text'];
+				$plain_message = 'Your article submission on GamingOnLinux was denied and the editor said this' . "\n\n" . $_POST['message'] . "\n\n" . 'Here\'s a copy of your article below' . "\n\n" . $check['text'];
 				
 				if ($core->config('send_emails') == 1)
 				{

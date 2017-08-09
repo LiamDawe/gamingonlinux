@@ -2,6 +2,18 @@
 $templating->set_previous('title', 'Home' . $templating->get('title', 1)  , 1);
 $templating->load('admin_modules/admin_home');
 
+if (isset($_GET['wipe_note']) && is_numeric($_GET['wipe_note']))
+{
+	// check they own it
+	$check = $dbl->run("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array($_GET['wipe_note']))->fetchOne();
+	
+	// wipe it
+	if ($check == $_SESSION['user_id'])
+	{
+		$dbl->run("UPDATE `user_notifications` SET `seen` = 1, `seen_date` = ? WHERE `id` = ?", array(core::$date, $_GET['wipe_note']));
+	}
+}
+
 if (!isset($_GET['view']))
 {
 	if (isset($_GET['message']))

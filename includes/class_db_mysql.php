@@ -35,6 +35,7 @@ class db_mysql extends PDO
 			$trace = $error->getTrace();
 			//$this->pdo_error($error->getMessage(), $trace[2]['file'], $this->replaced_query($sql, $data), core::current_page_url());
 			//echo  $error->getMessage() . '<br /><strong>Plain Query:</strong><br />' . htmlspecialchars($sql) . '<br /><strong>Replaced Query:</strong><br />' . $this->replaced_query($sql, $data);
+			error_log('SQL ERROR ' . $error->getMessage());
 			die('SQL Error');
         }
     }

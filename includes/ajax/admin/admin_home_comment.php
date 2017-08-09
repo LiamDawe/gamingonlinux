@@ -21,7 +21,7 @@ if(isset($_POST))
 		$date = core::$date;
 		$dbl->run("INSERT INTO `admin_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
+		$grab_admins = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username`, u.`admin_comment_alerts` FROM `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 		foreach ($grab_admins as $emailer)
 		{
 			$subject = "A new admin area comment on GamingOnLinux.com";
@@ -38,6 +38,21 @@ if(isset($_POST))
 			{
 				$mail = new mailer($core);
 				$mail->sendMail($emailer['email'], $subject, $html_message, $plain_message);
+			}
+			if ($emailer['admin_comment_alerts'] == 1)
+			{			
+				// check for existing notification
+				$check_notes = $dbl->run("SELECT `id` FROM `user_notifications` WHERE `type` = 'admin_comment' AND `seen` = 0 AND `owner_id` = ?", array($emailer['user_id']))->fetchOne();
+				// they have one, add to the total + set you as the last person
+				if ($check_notes)
+				{
+					$dbl->run("UPDATE `user_notifications` SET `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], $check_notes));
+				}
+				// insert notification as there was none
+				else
+				{
+					$dbl->run("INSERT INTO `user_notifications` SET `type` = 'admin_comment', `owner_id` = ?, `notifier_id` = ?, `total` = 1", array($emailer['user_id'], $_SESSION['user_id']));
+				}
 			}
 		}
 		
@@ -71,7 +86,7 @@ if(isset($_POST))
 		$date = core::$date;
 		$dbl->run("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
 
-		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
+		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username`, u.`admin_comment_alerts` FROM `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
 
 		foreach ($grab_editors as $emailer)
 		{
@@ -89,6 +104,22 @@ if(isset($_POST))
 			{
 				$mail = new mailer($core);
 				$mail->sendMail($emailer['email'], $subject, $html_message, $plain_message);
+			}
+			
+			if ($emailer['admin_comment_alerts'] == 1)
+			{
+				// check for existing notification
+				$check_notes = $dbl->run("SELECT `id` FROM `user_notifications` WHERE `type` = 'editor_comment' AND `seen` = 0 AND `owner_id` = ?", array($emailer['user_id']))->fetchOne();
+				// they have one, add to the total + set you as the last person
+				if ($check_notes)
+				{
+					$dbl->run("UPDATE `user_notifications` SET `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], $check_notes));
+				}
+				// insert notification as there was none
+				else
+				{
+					$dbl->run("INSERT INTO `user_notifications` SET `type` = 'editor_comment', `owner_id` = ?, `notifier_id` = ?, `total` = 1", array($emailer['user_id'], $_SESSION['user_id']));
+				}
 			}
 		}
 		

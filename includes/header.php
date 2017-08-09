@@ -212,8 +212,13 @@ else if ($_SESSION['user_id'] > 0)
 	// set these by default as comment notifications can be turned off
 	$new_comments_line = '';
 	$unread_comments_counter = 0;
+	$admin_comment_alerts = 0;
 	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id']);
-	if ($user_comment_alerts == 1)
+	if ($user->check_group([1,2,5]))
+	{
+		$admin_comment_alerts = $user->get('admin_comment_alerts', $_SESSION['user_id']);
+	}
+	if ($user_comment_alerts == 1 || $admin_comment_alerts == 1)
 	{
 		// sort out the number of unread comments
 		$unread_comments_counter = $dbl->run("SELECT count(`id`) as `counter` FROM `user_notifications` WHERE `seen` = 0 AND owner_id = ?", [$_SESSION['user_id']])->fetchOne();

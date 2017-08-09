@@ -21,6 +21,21 @@ if (!isset($_GET['go']))
 		$comments_check = 'checked';
 	}
 	$templating->set('comments_check', $comments_check);
+	
+	$admin_comment_pref = '';
+	if ($user->check_group([1,2,5]))
+	{
+		$admin_comment_alerts = $user->get('admin_comment_alerts', $_SESSION['user_id']);
+		
+		$admin_comment_check = '';
+		if ($admin_comment_alerts == 1)
+		{
+			$admin_comment_check = 'checked';
+		}
+		
+		$admin_comment_pref = '<label><input type="checkbox" name="admin_comments" '.$admin_comment_check.'> Admin area comments</label><br />';
+	}
+	$templating->set('admin_comment_pref', $admin_comment_pref);
 
 	$db->sqlquery("SELECT `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$usercpcp = $db->fetch();
@@ -149,6 +164,17 @@ else if (isset($_GET['go']))
 		$_SESSION['email_options'] = $_POST['email_options'];
 		$_SESSION['auto_subscribe'] = $auto_subscribe;
 		$_SESSION['auto_subscribe_email'] = $subscribe_emails;
+		
+		if ($user->check_group([1,2,5]))
+		{
+			$admin_comment_check = 0;
+			if (isset($_POST['admin_comments']))
+			{
+				$admin_comment_check = 1;
+			}
+			
+			$dbl->run("UPDATE `users` SET `admin_comment_alerts` = ? WHERE `user_id` = ?", array($admin_comment_check, $_SESSION['user_id']));
+		}
 
 		header("Location: /usercp.php?module=notification_preferences&message=updated");
 	}

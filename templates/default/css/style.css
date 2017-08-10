@@ -1693,18 +1693,20 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 }
 .dark .likes
 {
-background: #383838;
-background: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
+	background: #383838;
+	background: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
 }
 .likes_hidden{display:none;}
-.article_likes {line-height: 1.5;
-font-size: .85rem;
-padding: 4px 7px;
-clear: both;
-background: #DFDFDF; /* For browsers that do not support gradients */
-background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
+.article_likes
+{
+	font-size: .85rem;
+	padding: 4px 7px;
+	clear: both;
+	background: #DFDFDF; /* For browsers that do not support gradients */
+	background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 }
-.dark .article_likes{
-background: #383838;
-background: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
+.dark .article_likes
+{
+	background: #383838;
+	background: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
 }

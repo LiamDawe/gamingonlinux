@@ -72,6 +72,8 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^articles/?$ /index.php?module=home [N]
 
   RewriteRule ^articles/(.+?)\.([0-9]+)/?$ /index.php?module=articles_full&title=$1&aid=$2 [N,NC,QSA]
+  
+  RewriteRule ^articles/([0-9]+)/?$ /index.php?module=articles_full&aid=$1 [N,NC,QSA]
 
   RewriteRule ^articles/(.+?)\.([0-9]+)/error=(.+?)?$ /index.php?module=articles_full&aid=$2&title=$1&error=$3 [N,NC,QSA]
 

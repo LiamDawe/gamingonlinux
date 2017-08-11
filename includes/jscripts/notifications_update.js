@@ -4,8 +4,15 @@ function update_notifications()
 		url: "/includes/ajax/update_notifications.php",  
 		success: function(data) 
 		{
-			// give them a badge in the page title
-			document.title = '(' + data.title_total + ') ' + current_page_title;
+			// give them a badge in the page title, remove the badge if they have none
+			if (data.title_total > 0)
+			{
+				document.title = '(' + data.title_total + ') ' + current_page_title;
+			}
+			else if (data.title_total == 0 && current_page_title != $(document).find("title").text())
+			{
+				document.title = current_page_title;
+			}
 			
 			// replace the dropdown badge
 			$('#notifications_total').html(data.dropdown_indicator);

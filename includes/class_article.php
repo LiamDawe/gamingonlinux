@@ -544,7 +544,7 @@ class article
 	
 	public function tag_link($name)
 	{
-		$name = str_replace(' ', '-', $name);
+		$name = urlencode($name);
 		if ($this->core->config('pretty_urls') == 1)
 		{
 			$link = 'articles/category/'.$name;

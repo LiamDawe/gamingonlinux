@@ -848,21 +848,9 @@ jQuery(document).ready(function()
 			data = JSON.parse(data);
 			if (data.result == 1)
 			{
-				// adjust the navbar counter if this was an unread item
-				if($('#note-' + note_id + ' img').hasClass('envelope'))
-				{
-					$('#notes-counter').html(parseInt($('#notes-counter').html(), 10)-1);
-				}
+				update_notifications();
 				$('#note-' + note_id).find('span').remove();
 				$('#note-' + note_id).fadeOut(500);
-
-				// change the alertbox to normal if there's none left and remove the counter
-				var total_left = parseInt($('#notes-counter').text());
-				if (total_left === 0)
-				{
-					$("#alert_box").toggleClass('alerts-box-new alerts-box-normal');
-					$("#notes-counter").remove();
-				}
 			}
 		});
 	});

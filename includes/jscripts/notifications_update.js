@@ -29,8 +29,6 @@ function update_notifications()
 			
 			// update pm counter
 			$('#pm_counter').replaceWith(data.pms_badge);
-			
-			console.log('ran');
 		}
 	});
 }

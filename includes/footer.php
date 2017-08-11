@@ -45,6 +45,14 @@ foreach ($social_icons as $social)
 }
 $templating->set('social_icons', $social_output);
 
+// notification update checker, only if logged in
+$notification_updates = '';
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+{
+	$notification_updates = $templating->block_store('notification_updates', 'footer');
+}
+$templating->set('notification_updates', $notification_updates);
+
 // info for admins to see execution time and mysql queries per page
 $debug = '';
 if ($user->check_group(1) && $core->config('show_debug') == 1)

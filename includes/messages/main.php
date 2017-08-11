@@ -84,7 +84,7 @@ return [
 	],
 	"none_found" => 
 	[
-		"text" => "No %s where found!",
+		"text" => "No %s were found!",
 		"additions" => 1
 	],
 	"notloggedin" => 

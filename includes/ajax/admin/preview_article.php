@@ -7,6 +7,7 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 if(isset($_POST))
 {
+	// if it's an existing article: draft, submitted, review
 	if (isset($_POST['article_id']) && $_POST['article_id'] > 0)
 	{
 		$check_article_sql = "SELECT
@@ -17,6 +18,7 @@ if(isset($_POST))
 		a.`author_id`,
 		a.`guest_username`,
 		a.`tagline_image`,
+		a.`draft`,
 		a.`locked`,
 		a.`locked_by`,
 		a.`locked_date`,
@@ -35,19 +37,43 @@ if(isset($_POST))
 		WHERE `article_id` = ?";
 		$article = $dbl->run($check_article_sql, array($_POST['article_id']))->fetch();
 		
-		if ($article['locked'] == 0)
+		if ($article['draft'] == 1)
 		{
-			$title = $article['title'];
-			$tagline = $article['tagline'];
-			$text = $article['text'];
+			// if it's a draft and they own it, use the post content
+			if ($_SESSION['user_id'] == $article['author_id'])
+			{
+				$title = strip_tags($_POST['title']);
+				$tagline = $_POST['tagline'];
+				$text = $_POST['text'];
+			}
+			// otherwise, you cannot edit, view the saved details
+			else
+			{
+				$title = $article['title'];
+				$tagline = $article['tagline'];
+				$text = $article['text'];				
+			}
 		}
+		
 		else
 		{
-			$title = strip_tags($_POST['title']);
-			$tagline = $_POST['tagline'];
-			$text = $_POST['text'];
+			// not a draft, check they have it locked to edit
+			if ($article['locked'] == 0)
+			{
+				$title = $article['title'];
+				$tagline = $article['tagline'];
+				$text = $article['text'];
+			}
+			// locked for editing, use the post content
+			else
+			{
+				$title = strip_tags($_POST['title']);
+				$tagline = $_POST['tagline'];
+				$text = $_POST['text'];
+			}
 		}
 	}
+	// unsaved article, always use post content
 	else
 	{
 		$title = strip_tags($_POST['title']);

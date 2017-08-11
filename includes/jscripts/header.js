@@ -1310,4 +1310,14 @@ jQuery(document).ready(function()
 			}
 		});
     });
+	
+	$(document).on('click', ".logout_link", function(e) 
+	{
+		e.preventDefault();
+		// Logout confirmation
+		if (confirm('Are you sure you want to logout?')) 
+		{
+			window.location = '/index.php?act=Logout';
+		}
+	});
 });

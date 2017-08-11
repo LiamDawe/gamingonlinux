@@ -19,6 +19,7 @@
 </footer>
 <script type="text/javascript" src="{:url}includes/jscripts/notifications_update.js"></script>
 <script type="text/javascript">
+var current_page_title = $(document).find("title").text();
 update_notifications();
 setInterval ( "update_notifications()", 60000 );
 </script>

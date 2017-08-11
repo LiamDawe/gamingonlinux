@@ -1113,18 +1113,19 @@ jQuery(document).ready(function()
 	$('.send_admin_comment').click(function(e)
 	{
 		e.preventDefault();
-		var form_data = $(this).closest('form').serialize();
+		var form = $(this).closest('form');
 		var url = "/includes/ajax/admin/admin_home_comment.php"; 
 		
 		$.ajax({
 			type: "POST",
 			url: url,
 			dataType:"json",
-			data: form_data, 
+			data: form.serialize(), 
 			success: function(data)
 			{
 				if (data['result'] == 'done')
 				{
+					$(form).removeClass('dirty'); // prevent ays dialogue when leaving
 					$('.' + data['type'] + '_text').val('');
 					$('.' + data['type'] + '_comments_list').html(data['text']);
 					$('.' + data['type'] + '_comments_div').highlight();

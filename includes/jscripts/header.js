@@ -290,7 +290,7 @@ jQuery(document).ready(function()
 	});
   
   // navbar toggle menu
-  $(".toggle-nav > a").on('click', function(event){
+	$(document).on('click', ".toggle-nav > a", function(event) {
     event.preventDefault();
     event.stopPropagation();
   	var $toggle = $(this).closest('.toggle-nav').children('.toggle-content');

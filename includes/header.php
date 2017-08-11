@@ -139,8 +139,7 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 
 	$templating->set('user_menu', $login_menu);
 	$templating->set('notifications_menu', '');
-
-	}
+}
 
 else if ($_SESSION['user_id'] > 0)
 {
@@ -161,7 +160,7 @@ else if ($_SESSION['user_id'] > 0)
 			$admin_indicator = 0;
 		}
 		$admin_link = '<li><a href="'.$core->config('website_url').'admin.php">Admin CP</a></li>';
-		$admin_line = '<li><a href="'.$core->config('website_url').'admin.php">'.$admin_indicator.' new admin notifications</a></li>';
+		$admin_line = '<li id="admin_notifications"><a href="'.$core->config('website_url').'admin.php">'.$admin_indicator.' new admin notifications</a></li>';
 	}
 
 	// for the mobile navigation
@@ -189,7 +188,6 @@ else if ($_SESSION['user_id'] > 0)
 
 	/* This section is for general user notifications, it covers:
 	- article comments
-	- comment likes TODO
 	- forum replies TODO
 	*/
 
@@ -201,12 +199,12 @@ else if ($_SESSION['user_id'] > 0)
 	$unread_messages_counter = $dbl->run("SELECT COUNT(`conversation_id`) FROM `user_conversations_participants` WHERE `unread` = 1 AND `participant_id` = ?", [$_SESSION['user_id']])->fetchOne();
 	if ($unread_messages_counter == 0)
 	{
-		$messages_indicator = 0;
+		$messages_indicator = '<span id="pm_counter">0</span>';
 	}
 
 	else if ($unread_messages_counter > 0)
 	{
-		$messages_indicator = "<span class=\"badge badge-important\">$unread_messages_counter</span>";
+		$messages_indicator = "<span id=\"pm_counter\" class=\"badge badge-important\">$unread_messages_counter</span>";
 	}
 
 	// set these by default as comment notifications can be turned off
@@ -232,7 +230,7 @@ else if ($_SESSION['user_id'] > 0)
 		{
 			$comments_indicator = '<span class="badge badge-important">'.$unread_comments_counter.'</span>';
 		}
-		$new_comments_line = '<li><a href="/usercp.php?module=notifications">'.$comments_indicator.' new notifications</a></li>';
+		$new_comments_line = '<li id="normal_notifications"><a href="/usercp.php?module=notifications">'.$comments_indicator.' new notifications</a></li>';
 	}
 
 	// sort out the main navbar indicator

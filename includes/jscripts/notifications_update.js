@@ -6,7 +6,7 @@ function update_notifications()
 		{
 			// give them a badge in the page title
 			//var current_page_title = $(document).find("title").text();
-			//document.title = '(' + data.title_total + ') ' + current_page_title;
+			//document.title = '(' + data.title_total + ') ' + $(document).find("title").text();
 			
 			// replace the dropdown badge
 			$('#notifications_total').html(data.dropdown_indicator);

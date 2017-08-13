@@ -29,9 +29,9 @@ if ($article_list)
 
 		// message
 		$html_message = "<p>Hello <strong>{$email['username']}</strong>,</p>
-		<p>Here is your daily news digest from GamingOnLinux!</p>" . $email_article_list;
+		<p>Here is your daily news digest from GamingOnLinux!</p>" . $email_article_list . '<p><em>Please be aware we generally post less on weekends as we take a little time off!</em></p>';
 		
-		$plain_message = PHP_EOL."Hello {$email['username']}, here is your daily news digest from GamingOnLinux!" . $email_article_list_plain;
+		$plain_message = PHP_EOL."Hello {$email['username']}, here is your daily news digest from GamingOnLinux!" . $email_article_list_plain . PHP_EOL . 'Please be aware we generally post less on weekends as we take a little time off!';
 
 		// Mail it
 		if ($core->config('send_emails') == 1)

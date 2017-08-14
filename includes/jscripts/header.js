@@ -1287,9 +1287,9 @@ jQuery(document).ready(function()
 					content = "[quote=" + data['username'] + "]" + data['text'];
 					content += "[/quote]";
 					
-					var current_text = $('#comment').val();
+					var current_text = $('#comment').html();
 					
-					$('#comment').val(current_text + content); 
+					$('#comment').html(current_text + content); 
 					
 					$('#comment').scrollMinimal();
 				}

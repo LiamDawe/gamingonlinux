@@ -13,6 +13,10 @@ $count_monthly_users = $dbl->run("SELECT COUNT( DISTINCT user_id ) AS `counter` 
 
 $templating->set('users_month', number_format($count_monthly_users));
 
+// active users
+$monthly_active_users = $dbl->run("SELECT COUNT(`user_id`) FROM `users` WHERE `last_login` >= unix_timestamp(CURDATE() - INTERVAL 30 DAY) ORDER BY `users`.`last_login` ASC")->fetchOne();
+$templating->set('monthly_active', number_format($monthly_active_users));
+
 $total_articles = $dbl->run("SELECT COUNT(article_id) as `total` FROM `articles` WHERE `active` = 1")->fetchOne();
 
 $templating->set('total_articles', number_format($total_articles));

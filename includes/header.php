@@ -12,7 +12,6 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 	$user->logout();
 }
 $user->check_session();
-$user->grab_user_groups();
 
 $forum_class = new forum($dbl, $core, $user);
 

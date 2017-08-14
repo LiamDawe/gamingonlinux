@@ -22,6 +22,7 @@ class user
 	{
 		$this->database = $database;
 		$this->core = $core;
+		$this->grab_user_groups();
 	}
 
 	// check their session is valid and register guest session if needed

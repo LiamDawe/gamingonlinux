@@ -144,7 +144,6 @@ if(isset($_POST))
 		$pagination_link = 'test';
 		
 		$user->check_session();
-		$user->grab_user_groups();
 		
 		$templating->load('articles_full');
 		

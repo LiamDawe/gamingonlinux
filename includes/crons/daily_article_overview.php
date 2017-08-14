@@ -10,7 +10,7 @@ $beginOfDay = strtotime("midnight yesterday");
 $endOfDay   = strtotime("midnight today") - 1;
 
 // gather a list of articles in the last day
-$article_list = $dbl->run("SELECT `title`, `article_id` FROM `articles` WHERE `date` >= $beginOfDay AND `date` <= $endOfDay")->fetch_all();
+$article_list = $dbl->run("SELECT `title`, `article_id` FROM `articles` WHERE `date` >= $beginOfDay AND `date` <= $endOfDay AND `active` = 1 AND `draft` = 0")->fetch_all();
 if ($article_list)
 {
 	$email_article_list = '';

@@ -1068,6 +1068,8 @@ jQuery(document).ready(function()
 		e.preventDefault();
 		
 		var url = "/includes/ajax/article_comment_pagination.php";
+		
+		var form = $(this).closest('form');
 
 		$.ajax({
 			type: "POST",
@@ -1080,6 +1082,7 @@ jQuery(document).ready(function()
 				{
 					$('.comments').load('/includes/ajax/article_comment_pagination.php', {'type':'reload', 'article_id':data['article_id'], 'page':data['page']}, function()
 					{
+						$(form).removeClass('dirty'); // prevent ays dialogue when leaving
 						$('.comments #r' + data['comment_id']).scrollMinimal();
 						$('.comments').highlight();
 					});

@@ -44,7 +44,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			if ($size < (MAX_SIZE))
 			{
 				// main image
-				$image_name = time().$filename;
+				$image_name = rand().time().'gol'.$_SESSION['user_id'].'.'.$ext;
 				$main_newname = $uploaddir.$image_name; //Check / delete file it exists
 
 				// thumbs

@@ -1,0 +1,25 @@
+[block: preview]
+<div class="preview_pm">
+	<div class="box">
+		<div class="head">Preview</div>
+		<div id="preview" class="pm_text_preview body group"></div>
+	</div>
+</div>
+[/block: preview]
+
+[block: edit_top]
+<div class="box"><div class="head">Editing an article comment</div></div>
+<form method="post">
+[/block: edit_top]
+
+[block: edit_comment_buttons]
+<div class="box">
+	<div class="body group">
+		<button type="submit" class="button" name="act" value="editcomment" formaction="{:url}index.php?module=edit_comment&amp;&page={:page}">Save Edit</button>
+		<button id="preview_text_button" type="button">Preview Comment</button>
+		<button type="submit" formaction="{:cancel_action}">Cancel</button>
+		<input type="hidden" name="comment_id" value="{:comment_id}" />
+	</div>
+</div>
+</form>
+[/block: edit_comment_buttons]

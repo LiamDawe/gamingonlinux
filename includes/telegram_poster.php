@@ -84,21 +84,16 @@ function apiRequest($method, $parameters)
 	return exec_curl_request($handle);
 }
 
-function processMessage($message)
-{
-	// process incoming message
-	$chat_id = "@" . CHAT_ID;
-	if (isset($message))
-	{
-		apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $message));
-	}
-}
-
-function telegram($link)
+function telegram($message)
 {
 	if (!empty(BOT_TOKEN))
 	{
-		processMessage($link);
+		// process incoming message
+		$chat_id = "@" . CHAT_ID;
+		if (isset($message))
+		{
+			apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $message));
+		}
 	}
 }
 ?>

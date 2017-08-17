@@ -18,11 +18,14 @@ class user
 	
 	public $user_groups;
 	
+	public $blocked_users;
+	
 	function __construct($database, $core)
 	{
 		$this->database = $database;
 		$this->core = $core;
 		$this->grab_user_groups();
+		$this->block_list();
 	}
 
 	// check their session is valid and register guest session if needed
@@ -47,9 +50,13 @@ class user
 		}
 		else
 		{
-			if ($this->stay_logged_in() == false)
+			if ($this->stay_logged_in() == false) // make a guest session if they aren't saved
 			{
-				$this->make_guest_session();
+				$_SESSION['user_id'] = 0;
+				$_SESSION['username'] = 'Guest'; // not even sure why I set this
+				$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
+				$_SESSION['articles-per-page'] = 15;
+				$this->user_details[0] = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0];
 			}
 		}
 		
@@ -154,16 +161,6 @@ class user
 		}
 	}
 	
-	// need to implement this and do checks to only use it if not logging out or banned etc
-	function make_guest_session()
-	{
-		$_SESSION['user_id'] = 0;
-		$_SESSION['username'] = 'Guest'; // not even sure why I set this
-		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
-		$_SESSION['articles-per-page'] = 15;
-		$this->user_details[0] = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0];
-	}
-	
 	public function register_session($user_data)
 	{
 		session_regenerate_id(true);
@@ -179,6 +176,10 @@ class user
 		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
 	}
 
+	function block_list()
+	{
+		$this->blocked_users = $this->database->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+	}
 	
 	// helper func to get a user field(s)
 	function get($fields, $user_id)

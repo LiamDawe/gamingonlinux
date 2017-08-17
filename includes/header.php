@@ -28,7 +28,6 @@ else
 // get the header template html
 $templating->load('header');
 $templating->block('header', 'header');
-$templating->set('meta_keywords', $core->config('meta_keywords'));
 $templating->set('url', $core->config('website_url'));
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 

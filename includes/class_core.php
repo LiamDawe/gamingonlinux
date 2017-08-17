@@ -245,6 +245,7 @@ class core
 	}
 
 	// find the current page we are on
+	// only used in old mysql class, can remove once thats removed
 	function current_page()
 	{
 		return substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);

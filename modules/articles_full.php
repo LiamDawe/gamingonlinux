@@ -22,7 +22,7 @@ if (!isset($_GET['go']))
 		else
 		{
 			// get the article
-			$db->sqlquery("SELECT
+			$article = $dbl->run("SELECT
 				a.`article_id`,
 				a.`slug`,
 				a.`preview_code`,
@@ -54,8 +54,7 @@ if (!isset($_GET['go']))
 				LEFT JOIN
 				`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 				WHERE
-				a.`article_id` = ?", array((int) $_GET['aid']));
-			$article = $db->fetch();
+				a.`article_id` = ?", array((int) $_GET['aid']))->fetch();
 
 			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
 			if (isset($_GET['comment_id']) && core::is_number($_GET['comment_id']))
@@ -111,7 +110,7 @@ if (!isset($_GET['go']))
 				}
 			}
 
-			if ($db->num_rows() == 0)
+			if (!$article)
 			{
 				http_response_code(404);
 				$templating->set_previous('meta_data', '', 1);
@@ -368,10 +367,8 @@ if (!isset($_GET['go']))
 				}
 				$templating->set('bookmark_link', $bookmark_link);
 
-				// Total number of likes for the status message
-				$db->sqlquery("SELECT COUNT(article_id) as `total` FROM `article_likes` WHERE `article_id` = ?", array($article['article_id']));
-				$get_article_likes = $db->fetch();
-				$total_alikes = $get_article_likes['total'];
+				// Total number of likes for the article
+				$total_alikes = $dbl->run("SELECT COUNT(article_id) as `total` FROM `article_likes` WHERE `article_id` = ?", array($article['article_id']))->fetchOne();
 
 				$templating->set('total_likes', $total_alikes);
 
@@ -550,53 +547,6 @@ if (!isset($_GET['go']))
 				}
 			}
 		}
-	}
-
-	else if (isset($_GET['view']) && $_GET['view'] == 'Edit')
-	{
-		$templating->set_previous('meta_data', '', 1);
-
-		$db->sqlquery("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
-		$comment = $db->fetch();
-
-		$nice_title = core::nice_title($comment['title']);
-
-		// check if author
-		if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || $_SESSION['user_id'] == 0)
-		{
-			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
-			die();
-		}
-
-		$templating->set_previous('meta_description', 'Editing a comment on GamingOnLinux', 1);
-		$templating->set_previous('title', 'Editing a comment', 1);
-
-		$comment_text = $comment['comment_text'];
-
-		if (isset($_GET['error']))
-		{
-			$comment_text = $_SESSION['acomment'];
-		}
-
-		$page = 1;
-		if (isset($_GET['page']))
-		{
-			$page = $_GET['page'];
-		}
-
-		$templating->block('edit_top', 'articles_full');
-
-		$core->editor(['name' => 'text', 'content' => $comment_text, 'editor_id' => 'comment']);
-
-		$templating->block('edit_comment_buttons', 'articles_full');
-		$templating->set('comment_id', $comment['comment_id']);
-		$templating->set('url', $core->config('website_url'));
-		$templating->set('page', $page);
-		
-		$cancel_action = $article_class->get_link($comment['article_id'], $nice_title);
-
-		$templating->set('cancel_action', $cancel_action);
-		$templating->block('preview', 'articles_full');
 	}
 }
 
@@ -929,48 +879,6 @@ else if (isset($_GET['go']))
 						}
 					}
 				}
-			}
-		}
-	}
-
-	if ($_GET['go'] == 'editcomment')
-	{
-		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_POST['comment_id']));
-		$comment = $db->fetch();
-
-		// check if author or editor/admin
-		if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || $_SESSION['user_id'] == 0)
-		{
-			$nice_title = core::nice_title($comment['title']);
-			header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
-		}
-
-		// do the edit since we are allowed
-		else
-		{
-			$comment_text = trim($_POST['text']);
-			// check empty
-			if (empty($comment_text))
-			{
-				$_SESSION['message'] = 'empty';
-				$_SESSION['message_extra'] = 'text';
-				$article_link = $article_class->get_link($comment['article_id'], $comment['slug']);
-
-				header("Location: " . $article_link);
-
-				die();
-			}
-
-			// update comment
-			else
-			{
-				$comment_text = core::make_safe($comment_text);
-
-				$db->sqlquery("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ?, `edit_counter` = (edit_counter + 1) WHERE `comment_id` = ?", array($comment_text, (int) $_SESSION['user_id'], core::$date, (int) $_POST['comment_id']));
-				
-				$edit_redirect = $article_class->get_link($comment['article_id'], $comment['slug'], 'comment_id=' . $_POST['comment_id']);
-
-				header("Location: ".$edit_redirect);
 			}
 		}
 	}

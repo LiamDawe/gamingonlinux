@@ -895,9 +895,25 @@ class article
 	// pagination_link = destination link for pagination
 	public function display_comments($article_info)
 	{
+		// get blocked id's
+		$blocked_sql = '';
+		$blocked_ids = [];
+		$blocked_usernames = [];
+		if (count($this->user->blocked_users) > 0)
+		{
+			foreach ($this->user->blocked_users as $username => $blocked_id)
+			{
+				$blocked_ids[] = $blocked_id[0];
+				$blocked_usernames[] = $username;
+			}
+
+			$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
+			$blocked_sql = "AND a.`author_id` NOT IN ($in)";
+		}
+		
 		// count how many there is in total
-		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `article_id` = ? AND `approved` = 1";
-		$total_comments = $this->database->run($sql_count, array($article_info['article']['article_id']))->fetchOne();
+		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` a WHERE a.`article_id` = ? AND a.`approved` = 1 $blocked_sql";
+		$total_comments = $this->database->run($sql_count, array_merge([$article_info['article']['article_id']], $blocked_ids))->fetchOne();
 		
 		$per_page = 15;
 		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
@@ -1022,12 +1038,15 @@ class article
 		{
 			$db_grab_fields .= "u.`{$field['db_field']}`,";
 		}
-
-		$comments_get = $this->database->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`comment_id` ASC LIMIT ?, ?", array((int) $article_info['article']['article_id'], $this->core->start, $per_page))->fetch_all();
+		
+		$params = array_merge([(int) $article_info['article']['article_id']], $blocked_ids, [$this->core->start], [$per_page]);
+		
+		$comments_get = $this->database->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 $blocked_sql ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
 		
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
 		$sql_replacers = [];
+		
 		foreach ($comments_get as $id_loop)
 		{
 			$like_array[] = (int) $id_loop['comment_id'];
@@ -1072,6 +1091,45 @@ class article
 		
 		foreach ($comments_get as $comments)
 		{
+			// remove blocked users quotes
+			if (count($blocked_usernames) > 0)
+			{
+				foreach($blocked_usernames as $username)
+				{
+					
+					$capture_quotes = preg_split('~(\[/?quote[^]]*\])~', $comments['comment_text'], NULL, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+					
+					// need to count the amount of [quote=?
+					// each time we hit [/quote] take one away from counter
+					// snip the comment between the start and the final index number?
+					foreach ($capture_quotes as $index => $quote)
+					{
+						if(!isset($start) && $quote == "[quote={$username}]")
+						{
+							$start = $index;
+							$opens = 1;
+						}
+						else if(isset($start))
+						{
+							if(strpos($quote,'[quote=') !== false || strpos($quote,'[quote]') !== false)
+							{
+								++$opens;
+							}	
+							else if(strpos($quote,'[/quote]')!==false)
+							{
+								--$opens;
+								if($opens == 0)
+								{
+									$capture_quotes = array_diff_key($capture_quotes,array_flip(range($start,$index)));
+									$comments['comment_text'] = trim(implode($capture_quotes));
+									unset($start);
+								}
+							}
+						}
+					}
+				}
+			}
+			
 			$comment_date = $this->core->human_date($comments['time_posted']);
 
 			if ($comments['author_id'] == 0 || empty($comments['username']))
@@ -1118,8 +1176,6 @@ class article
 			}
 
 			$this->templating->block('article_comments', 'articles_full');
-			$permalink = $this->get_link($article_info['article']['article_id'], $article_info['article']['slug'], 'comment_id=' . $comments['comment_id']);
-			$this->templating->set('comment_permalink', $permalink);
 			$this->templating->set('user_id', $comments['author_id']);
 			$this->templating->set('username', $into_username . $username);
 			$this->templating->set('comment_avatar', $comment_avatar);
@@ -1178,9 +1234,10 @@ class article
 			$like_button = '';
 			$comment_delete_link = '';
 			$link_to_comment = '';
+			$permalink = $this->get_link($article_info['article']['article_id'], $article_info['article']['slug'], 'comment_id=' . $comments['comment_id']);
 			if (isset($article_info['type']) && $article_info['type'] != 'admin')
 			{
-				$link_to_comment = '<li><a class="post_link tooltip-top" data-post-id="{:comment_id}" data-type="comment" href="{:comment_permalink}" title="Link to this comment"><span class="icon link">Link</span></a></li>';
+				$link_to_comment = '<li><a class="post_link tooltip-top" data-post-id="'.$comment['comment_id'].'" data-type="comment" href="'.$permalink.'" title="Link to this comment"><span class="icon link">Link</span></a></li>';
 			}
 			$this->templating->set('link_to_comment', $link_to_comment);
 			
@@ -1226,7 +1283,7 @@ class article
 					
 					if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
 					{
-						$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;view=Edit&amp;comment_id={$comments['comment_id']}&page=$page\"><span class=\"icon edit\">Edit</span></a></li>";
+						$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
 					}
 					
 					if ($can_delete == 1)

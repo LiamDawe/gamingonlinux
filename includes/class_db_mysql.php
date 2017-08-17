@@ -96,40 +96,4 @@ class db_mysql extends PDO
 		}
 		return $query;
 	}
-	
-	function pdo_error($exception, $page, $sql, $url)
-	{
-		$to = core::config('contact_email');
-
-		// subject
-		$subject = "GOL PDO Error: " . core::config('site_title');
-
-		$make_sql_safe = core::make_safe($sql);
-		$make_url_safe = core::make_safe($url);
-
-		// message
-		$message = "
-		<html>
-		<head>
-		<title>A PDO Error Report For ".core::config('site_title')."</title>
-		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-		</head>
-		<body>
-		<img src=\"" . core::config('website_url') . core::config('template') . "/default/images/logo.png\" alt=\"".core::config('site_title')."\">
-		<br />
-		$exception on page <br />
-		<strong>URL:</strong> $make_url_safe<br />
-		SQL QUERY<br />
-		$make_sql_safe<br />
-		</body>
-		</html>";
-
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-		$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-		// Mail it
-		mail($to, $subject, $message, $headers);
-	}
 }

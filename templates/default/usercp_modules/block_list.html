@@ -1,0 +1,24 @@
+[block: main]
+<div class="box"><div class="head">Here you can block users.</div></div>
+<div class="box">
+	<div class="body group">
+		<p>Adding a user to this list will stop you seeing their article comments, forum posts and they won't be able to send you a PM. They also won't be able to find you in the <a href="/index.php?module=user_search">User Search</a>.</p>
+		<form method="post">
+		Username, begin typing for it to search:
+		<select tabindex="-1" name="block_id" class="call_usernames" style="width:300px"></select><br />
+		<button formaction="/usercp.php?module=block_list" name="act" value="add">Add</button>
+		<p>Please note: We cannot block literally everything. People can freely quote parts of other people's comments and forum posts and we have no way of blocking that.</p>
+	</div>
+</div>
+[/block: main]
+
+[block: blocked_list]
+<div class="box">
+	<div class="head">Currently blocked users</div>
+	<div class="body list">
+		<ul>
+			{:list}
+		</ul>
+	</div>
+</div>
+[/block: blocked_list]

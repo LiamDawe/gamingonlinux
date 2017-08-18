@@ -353,7 +353,7 @@ else
 					{
 						if ($topic['pc_info_filled'] == 1)
 						{
-							$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$topic['author_id'].'">View PC info</a>';
+							$pc_info = '<a class="computer_deets" data-fancybox data-type="ajax" href="javascript;;" data-src="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$topic['author_id'].'">View PC info</a>';
 						}
 					}
 					$templating->set('user_info_extra', $pc_info);
@@ -539,7 +539,7 @@ else
 						{
 							if ($post['pc_info_filled'] == 1)
 							{
-								$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$post['author_id'].'">View PC info</a>';
+								$pc_info = '<a class="computer_deets" data-fancybox data-type="ajax" href="javascript;;" data-src="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$post['author_id'].'">View PC info</a>';
 							}
 						}
 						$templating->set('user_info_extra', $pc_info);

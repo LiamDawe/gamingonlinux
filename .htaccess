@@ -30,6 +30,8 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
 
   RewriteRule ^home/?$ /index.php?module=home [N]
+  
+  RewriteRule ^mailinglist/?$ /index.php?module=mailing_list [N]
 
   RewriteRule ^articles/?$ /index.php?module=home [N]
 

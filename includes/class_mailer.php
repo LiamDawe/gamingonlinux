@@ -21,7 +21,7 @@ class mailer
 		// add in footer
 		$body = $body . '<div>
 		<hr>
-		<p>If you haven\'t registered at <a href="' . $this->core->config('website_url') . '" target="_blank">' . $this->core->config('website_url') . '</a>, please forward this email to '. $this->core->config('contact_email') .' so that we can take action.</p>
+		<p><em>If you think you shouldn\'t be getting this email, please forward this email to '. $this->core->config('contact_email') .' so that we can take action.</em></p>
 		</div>';
 
         $this->mail->addAddress($to);

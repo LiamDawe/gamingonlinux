@@ -1727,3 +1727,8 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 	width: 80%;
 	height: 80%;
 }
+.pc_info_div {
+	width: 70%; 
+	max-width: 800px; 
+	max-height: 600px;
+}

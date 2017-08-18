@@ -620,7 +620,7 @@ jQuery(document).ready(function()
 				var wholikes = "";
 				if (returndata['total'] > 0)
 				{
-					wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+					wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
 					total_likes_obj.text(returndata['total']);
 					who_likes_obj.html(wholikes);
 				}
@@ -679,7 +679,7 @@ jQuery(document).ready(function()
 				var wholikes = "";
 				if (numlikes > 0)
 				{
-					wholikes = ', <a class="who_likes" data-fancybox-type="ajax" data-src="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
+					wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
 				}
 				$("#who-likes-article").html(wholikes);
 				likeobj.html(numlikes + " Likes");
@@ -693,7 +693,7 @@ jQuery(document).ready(function()
 				var wholikes = "";
 				if (numlikes > 0)
 				{
-					wholikes = ', <a class="who_likes" data-fancybox-type="ajax" data-src="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
+					wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
 				}
 				$("#who-likes-article").html(wholikes);
 				likeobj.html(numlikes + " Likes" );

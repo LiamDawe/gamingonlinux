@@ -50,6 +50,6 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']))
 		}
 
 		$templating->block('end');
-		echo $templating->output();
+		echo '<div class="who_likes_div">' . $templating->output() . '</div>';
 	}
 }

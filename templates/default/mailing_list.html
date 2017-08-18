@@ -1,0 +1,25 @@
+[block: top]
+<div class="box">
+	<div class="head">Daily article email mailing list</div>
+	<div class="body group">This mailing list will email you once a day, with a list of all articles posted on that day.</div>
+[/block: top]
+
+[block: user_edit]
+	<div class="body group">
+		<form method="post">
+			Hello {:username}! Your current email is: {:email}<br />
+			<button type="submit" name="act" value="{:action}">{:text}</button>
+		</form>
+	</div>
+</div>
+[/block: user_edit]
+
+[block: guest_add]
+	<div class="body group">
+		<form method="post">
+			Email: <input type="email" name="email" /><br />
+			<button type="submit" name="act" value="guest_sub">Subscribe</button>
+		</form>
+	</div>
+</div>
+[/block: guest_add]

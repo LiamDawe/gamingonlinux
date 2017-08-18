@@ -142,10 +142,12 @@ if (!isset($_GET['go']))
 			else if ($article['active'] == 0 && $article['preview_code'] == $_GET['preview_code'] || $article['active'] == 1)
 			{
 				$templating->set_previous('meta_description', $article['tagline'], 1);
+				
+				$html_title = htmlentities($article['title'], ENT_COMPAT);
 
 				if (!isset($_GET['preview_code']))
 				{
-					$templating->set_previous('title', $article['title'], 1);
+					$templating->set_previous('title', $html_title, 1);
 
 					// update the view counter if it is not a preview
 					$db->sqlquery("UPDATE `articles` SET `views` = (views + 1) WHERE `article_id` = ?", array($article['article_id']));
@@ -169,6 +171,7 @@ if (!isset($_GET['go']))
 				}
 
 				$nice_title = core::nice_title($article['title']);
+				
 
 				// twitter info card
 				$twitter_card = "<!-- twitter card -->\n";
@@ -179,7 +182,7 @@ if (!isset($_GET['go']))
 					$twitter_card .= '<meta name="twitter:creator" content="@'.$article['twitter_on_profile'].'">';
 				}
 
-				$twitter_card .= '<meta name="twitter:title" content="'.$article['title'].'">';
+				$twitter_card .= '<meta name="twitter:title" content="'.$html_title.'">';
 				$twitter_card .= '<meta name="twitter:description" content="'.$article['tagline'].'">';
 				$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">';
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
@@ -187,7 +190,7 @@ if (!isset($_GET['go']))
 				$published_date_meta = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
 
 				// meta tags for g+, facebook and twitter images
-				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $article['title'] . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . $core->config('website_url') . "/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $article['title'] . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n$twitter_card", 1);
+				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $html_title . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . $core->config('website_url') . "/articles/$nice_title.{$article['article_id']}\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $html_title . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n$twitter_card", 1);
 
 				// make date human readable
 				$date = $core->human_date($article['date']);

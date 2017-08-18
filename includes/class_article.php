@@ -1171,7 +1171,7 @@ class article
 			{
 				if ($comments['pc_info_filled'] == 1)
 				{
-					$pc_info = '<a class="computer_deets fancybox.ajax" data-fancybox-type="ajax" href="'.$this->core->config('website_url').'includes/ajax/call_profile.php?user_id='.$comments['author_id'].'">View PC info</a>';
+					$pc_info = '<a class="computer_deets" data-fancybox data-type="ajax" href="javascript:;" data-src="'.$this->core->config('website_url').'includes/ajax/call_profile.php?user_id='.$comments['author_id'].'">View PC info</a>';
 				}
 			}
 
@@ -1216,7 +1216,7 @@ class article
 			$who_likes_link = '';
 			if ($total_likes > 0)
 			{
-				$who_likes_link = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
+				$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
 			}
 			$this->templating->set('who_likes_link', $who_likes_link);
 			
@@ -1237,7 +1237,7 @@ class article
 			$permalink = $this->get_link($article_info['article']['article_id'], $article_info['article']['slug'], 'comment_id=' . $comments['comment_id']);
 			if (isset($article_info['type']) && $article_info['type'] != 'admin')
 			{
-				$link_to_comment = '<li><a class="post_link tooltip-top" data-post-id="'.$comment['comment_id'].'" data-type="comment" href="'.$permalink.'" title="Link to this comment"><span class="icon link">Link</span></a></li>';
+				$link_to_comment = '<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" href="'.$permalink.'" data-src="/includes/ajax/call_post_link.php?post_id=' . $comments['comment_id'] . '&type=comment" title="Link to this comment"><span class="icon link">Link</span></a></li>';
 			}
 			$this->templating->set('link_to_comment', $link_to_comment);
 			

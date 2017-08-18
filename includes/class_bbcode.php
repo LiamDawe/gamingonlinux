@@ -408,9 +408,9 @@ class bbcode
 		"/\[left\](.+?)\[\/left\]/is" 
 			=> "<div style=\"text-align:left;\">$1</div>",
 		"/\[img-thumb\](.+?)\[\/img-thumb\]/is" 
-			=> "<a class=\"fancybox-thumb\" rel=\"fancybox-thumb\" href=\"/uploads/articles/article_images/$1\"><img itemprop=\"image\" src=\"/uploads/articles/article_images/thumbs/$1\" class=\"img-responsive\" alt=\"image\" /></a>",
+			=> "<a data-fancybox=\"images\" href=\"/uploads/articles/article_images/$1\"><img itemprop=\"image\" src=\"/uploads/articles/article_images/thumbs/$1\" class=\"img-responsive\" alt=\"image\" /></a>",
 		"/\[img\](.+?)\[\/img\]/is" 
-			=> "<a class=\"fancybox\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
+			=> "<a data-fancybox=\"images\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
 		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" 
 			=> "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
 		"/\[email\](.+?)\[\/email\]/is" 

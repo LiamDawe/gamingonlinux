@@ -70,7 +70,7 @@ if(isset($_GET['user_id']))
 			}
 			$templating->set('edit_link', $edit_link);
 
-			echo $templating->output();
+			echo '<div>' . $templating->output() . '</div>';
 		}
 	}
 }

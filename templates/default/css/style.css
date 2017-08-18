@@ -1132,7 +1132,9 @@ body.dark {
 	-o-border-radius: 3px;
 	border-radius: 3px;
 }
-.dark .fancybox-skin {background: #000000}
+.dark .fancybox-slide > div {
+	background: #000000;
+}
 .dark .comment .comment-social li a {
     background: #333333;
 }
@@ -1709,4 +1711,19 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 {
 	background: #383838;
 	background: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
+}
+/* FANCYBOXES */
+.who_likes_div {
+	width: 70%; 
+	max-width: 800px; 
+	max-height: 600px;
+}
+.post_link_div {
+	width: 70%; 
+	max-width: 800px; 
+	max-height: 600px;
+}
+.tagline_gallery_div{
+	width: 80%;
+	height: 80%;
 }

@@ -460,79 +460,7 @@ jQuery(document).ready(function()
   });
 
 }
-  var clipboard = new Clipboard('.btn');
-  
-
-  
-  	$(".fancybox-thumb").fancybox({
-		prevEffect	: 'none',
-		nextEffect	: 'none',
-		helpers	: {
-			title	: {
-				type: 'outside'
-			},
-			thumbs	: {
-				width	: 50,
-				height	: 50
-			}
-		}
-	});
-
-	$(".computer_deets").fancybox({
-		maxWidth	: 800,
-		maxHeight	: 600,
-		fitToView	: false,
-		width		: '70%',
-		height		: '60%',
-		autoSize	: false,
-		closeClick	: false,
-		openEffect	: 'none',
-		closeEffect	: 'none'
-	});
-	$('.post_link').on('click', function(e)
-	{
-		e.preventDefault();
-		var post_id = $(this).attr("data-post-id");
-		var type = $(this).attr("data-type");
-		console.log(post_id);
-		$.fancybox({
-			maxWidth	: 800,
-			maxHeight	: 300,
-			fitToView	: false,
-			width		: '70%',
-			height		: '28%',
-			autoSize	: false,
-			closeClick	: false,
-			openEffect	: 'none',
-			closeEffect	: 'none',
-			title : null,
-			href: '/includes/ajax/call_post_link.php?post_id=' + post_id + '&type=' + type,
-			type: 'ajax'
-		});
-	});
-
-	$(".who_likes").fancybox({
-		maxWidth	: 800,
-		maxHeight	: 600,
-		fitToView	: false,
-		width		: '70%',
-		height		: '60%',
-		autoSize	: false,
-		closeClick	: false,
-		openEffect	: 'none',
-		closeEffect	: 'none'
-	});
-
-	$(".gallery_tagline").fancybox({
-		fitToView	: false,
-		width		: '80%',
-		height		: '80%',
-		autoSize	: false,
-		closeClick	: false,
-		openEffect	: 'none',
-		closeEffect	: 'none',
-		autoCenter : false
-	});
+	var clipboard = new Clipboard('.btn');
 
 	// Enable on all forms
 	$('form').areYouSure();
@@ -592,8 +520,6 @@ jQuery(document).ready(function()
 			jQuery("#title").keyup(slug);
 		}
 	}
-
-	$(".fancybox").fancybox();
 
 	$('#photoimg').off('click').on('change', function()
 	{
@@ -673,7 +599,7 @@ jQuery(document).ready(function()
 				var total_likes_obj = likeobj.find('.total_likes');
 				var who_likes_obj = likeobj.find('.who-likes');
 
-				var wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+				var wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
 				total_likes_obj.text(returndata['total']);
 				who_likes_obj.html(wholikes);
 				
@@ -753,7 +679,7 @@ jQuery(document).ready(function()
 				var wholikes = "";
 				if (numlikes > 0)
 				{
-					wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
+					wholikes = ', <a class="who_likes" data-fancybox-type="ajax" data-src="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
 				}
 				$("#who-likes-article").html(wholikes);
 				likeobj.html(numlikes + " Likes");
@@ -767,7 +693,7 @@ jQuery(document).ready(function()
 				var wholikes = "";
 				if (numlikes > 0)
 				{
-					wholikes = ', <a class="who_likes fancybox.ajax" data-fancybox-type="ajax" href="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
+					wholikes = ', <a class="who_likes" data-fancybox-type="ajax" data-src="/includes/ajax/who_likes.php?article_id='+article_id+'">Who?</a>';
 				}
 				$("#who-likes-article").html(wholikes);
 				likeobj.html(numlikes + " Likes" );

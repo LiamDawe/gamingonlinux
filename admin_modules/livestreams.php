@@ -51,7 +51,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		foreach ($streams_store as $streams)
 		{
 			$templating->block('item', 'admin_modules/livestreams');
-			$templating->set('title', $streams['title']);
+			$templating->set('title', htmlentities($streams['title'], ENT_QUOTES));
 			$templating->set('id', $streams['row_id']);
 
 			$date = new DateTime($streams['date']);
@@ -130,7 +130,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		foreach ($streams_store as $streams)
 		{
 			$templating->block('item', 'admin_modules/livestreams');
-			$templating->set('title', $streams['title']);
+			$templating->set('title', htmlentities($streams['title'], ENT_QUOTES));
 			$templating->set('id', $streams['row_id']);
 			
 			$templating->set('timezones_list', '');

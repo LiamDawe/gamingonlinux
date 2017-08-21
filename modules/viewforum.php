@@ -57,13 +57,11 @@ else
 	// get blocked id's
 	$blocked_sql = '';
 	$blocked_ids = [];
-	$blocked_usernames = [];
 	if (count($user->blocked_users) > 0)
 	{
 		foreach ($user->blocked_users as $username => $blocked_id)
 		{
 			$blocked_ids[] = $blocked_id[0];
-			$blocked_usernames[] = $username;
 		}
 
 		$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';

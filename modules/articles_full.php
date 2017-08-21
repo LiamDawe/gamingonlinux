@@ -73,33 +73,29 @@ if (!isset($_GET['go']))
 				}
 
 				// check comment still exists
-				$db->sqlquery("SELECT COUNT(`comment_id`) as `count` FROM `articles_comments` WHERE `comment_id` = ? AND `article_id` = ?", array((int) $_GET['comment_id'], (int) $_GET['aid']));
-				$check = $db->fetch();
-				if ($check['count'] == 1)
+				$check = $dbl->run("SELECT `comment_id` FROM `articles_comments` WHERE `comment_id` = ? AND `article_id` = ?", array((int) $_GET['comment_id'], (int) $_GET['aid']))->fetchOne();
+				if ($check)
 				{
-					// see if we are above their set limit per-page
-					$db->sqlquery("SELECT `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']));
-					$count = $db->fetch();
-
-					if ($count['comment_count'] > $_SESSION['per-page'])
+					// get blocked id's
+					$blocked_sql = '';
+					$blocked_ids = [];
+					if (count($user->blocked_users) > 0)
 					{
-						// count how many are below and equal to this comment, to find how many comments that is
-						$db->sqlquery("SELECT count(`comment_id`) as counter FROM `articles_comments` WHERE `article_id` = ? AND `comment_id` <= ?", array((int) $_GET['aid'], (int) $_GET['comment_id']));
-						$current_number = $db->fetch();
+						foreach ($user->blocked_users as $username => $blocked_id)
+						{
+							$blocked_ids[] = $blocked_id[0];
+						}
 
-						$last_page = ceil($current_number['counter']/$_SESSION['per-page']);
+						$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
+						$blocked_sql = "AND c.`author_id` NOT IN ($in)";
+					}					
+					$current_number = $dbl->run("SELECT count(c.`comment_id`) as counter FROM `articles_comments` c WHERE c.`article_id` = ? AND c.`comment_id` <= ? $blocked_sql", array_merge([(int) $_GET['aid']], [(int) $_GET['comment_id']], $blocked_ids))->fetchOne();
+
+					$last_page = ceil($current_number/$_SESSION['per-page']);
 						
-						$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
+					$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
 
-						header("Location: " . $article_link);
-
-					}
-					else
-					{
-						$article_link = $article_class->get_link($article['article_id'], $article['slug'], '#r' . $_GET['comment_id']);
-
-						header("Location: " . $article_link);
-					}
+					header("Location: " . $article_link);
 				}
 				else
 				{

@@ -29,9 +29,21 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles`, `mailing_list_key` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 	$usercpcp = $db->fetch();
+	
+	// make sure they have a mailing_list_key
+	// if they unsubscribe it's wiped, but if they stay subscribed/make a new sub = use new or existing key
+	$mail_list_key = $usercpcp['mailing_list_key'];
+	if (empty($usercpcp['mailing_list_key']) || $usercpcp['mailing_list_key'] = NULL)
+	{
+		$unsub_key = core::random_id();
+		$mail_list_key = $unsub_key;
+
+		$dbl->run("UPDATE `users` SET `mailing_list_key` = ? WHERE `user_id` = ?", array($unsub_key, $_SESSION['user_id']));
+	}
+	$templating->set('unsub_key', $mail_list_key);
 
 	$templating->block('top', 'usercp_modules/usercp_module_home');
 
@@ -304,9 +316,11 @@ else if (isset($_POST['act']))
 		}
 		
 		$daily_articles = NULL;
+		$mailing_list_key = NULL;
 		if (isset($_POST['daily_news']))
 		{
 			$daily_articles = 'daily';
+			$mailing_list_key = $_POST['mailing_list_key'];
 		}
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);

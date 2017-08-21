@@ -33,6 +33,7 @@
 			<select name="forum_type">{:forum_types}</select><br />
 			<strong>Articles &amp; Forum topics</strong><br />
 			<label><input type="checkbox" name="daily_news" {:daily_check} /> Get a daily news digest emailed to you?</label><br />
+			<input type="hidden" name="mailing_list_key" value="{:unsub_key}" />
 			Article paging<br />
 			<em>Display articles meant for multiple pages as one single page?</em><br />
 			<select name="single_article_page"><option value="1" {:single_article_yes}>Yes</option><option value="0" {:single_article_no}>No</option></select><br />

@@ -1,0 +1,20 @@
+[block: main]
+<div class="box">
+	<div class="head">Privacy Controls</div>
+	<form method="post">
+		<div class="body group">
+			<strong>General</strong><br />
+			<label><input type="checkbox" name="user_search" {:search_check}/> Show up in the global user search</label>
+			<label><input type="checkbox" name="private_profile" {:private_check} /> Set profile to private?</label>
+		</div>
+		<div class="body group">
+			<strong>Personal Messages</strong><br />
+			<label><input type="checkbox" name="enable_pm" {:pm_check}/> Enable users to send you a Personal Message</label>
+			<em>Please note: moderators and admins will still be able to send you messages if you disable the above!</em><br />
+		</div>
+		<div class="body group">
+			<button type="submit" name="act" value="update">Update</button>
+		</div>
+	</form>
+</div>
+[/block: main]

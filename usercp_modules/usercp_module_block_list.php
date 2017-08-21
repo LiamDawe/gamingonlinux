@@ -1,4 +1,6 @@
 <?php
+$templating->set_previous('title', 'Block List' . $templating->get('title', 1)  , 1);
+
 $templating->load('usercp_modules/block_list');
 $templating->block('main');
 

@@ -1,4 +1,6 @@
 <?php
+$templating->set_previous('title', 'Privacy' . $templating->get('title', 1)  , 1);
+
 $templating->load('usercp_modules/privacy');
 $templating->block('main');
 

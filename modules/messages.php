@@ -41,9 +41,23 @@ else
 		
 		$templating->block('search');
 		$templating->set('search_term', '');
+		
+		// get blocked id's
+		$blocked_sql = '';
+		$blocked_ids = [];
+		if (count($user->blocked_users) > 0)
+		{
+			foreach ($user->blocked_users as $username => $blocked_id)
+			{
+				$blocked_ids[] = $blocked_id[0];
+			}
+
+			$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
+			$blocked_sql = "AND i.`author_id` NOT IN ($in)";
+		}
 
 		// count them for pagination
-		$db->sqlquery("SELECT i.`conversation_id` FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id` WHERE i.`owner_id` = ?", array($_SESSION['user_id']));
+		$db->sqlquery("SELECT i.`conversation_id` FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id` WHERE i.`owner_id` = ? $blocked_sql", array_merge([$_SESSION['user_id']], $blocked_ids));
 		$total = $db->num_rows();
 
 		// sort out the pagination link
@@ -71,9 +85,9 @@ else
 		LEFT JOIN
 			`users` u2 ON u2.`user_id` = i.`last_reply_id`
 		WHERE
-			i.`owner_id` = ?
+			i.`owner_id` = ? $blocked_sql
 		ORDER BY
-			i.`last_reply_date` DESC LIMIT ?, 9", array($_SESSION['user_id'], $core->start));
+			i.`last_reply_date` DESC LIMIT ?, 9", array_merge([$_SESSION['user_id']], $blocked_ids, [$core->start]));
 		while ($message = $get_pms->fetch())
 		{
 			$templating->block('message_row');

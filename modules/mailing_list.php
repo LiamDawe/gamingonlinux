@@ -52,10 +52,56 @@ if (isset($_GET['type']))
 		if (isset($_GET['id']) && isset($_GET['key']))
 		{
 			// check key
-			$check = $dbl->run("SELECT `email` FROM `mailing_list` WHERE `id` = ? AND `activation_key` = ?", array($_GET['id'], $_GET['key']))->fetch();
+			$check = $dbl->run("SELECT `email` FROM `mailing_list` WHERE `id` = ? AND `unsub_key` = ?", array($_GET['id'], $_GET['key']))->fetch();
 			if ($check)
 			{
 				$dbl->run("DELETE FROM `mailing_list` WHERE `id` = ?", array($_GET['id']));
+				$_SESSION['message'] = 'mail_list_unsubbed';
+				if ($core->config('pretty_urls') == 1)
+				{
+					header('Location: '.$core->config('website_url').'mailinglist');
+				}
+				else
+				{
+					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
+				}				
+			}
+			else
+			{
+				$_SESSION['message'] = 'no_key_match';
+				if ($core->config('pretty_urls') == 1)
+				{
+					header('Location: '.$core->config('website_url').'mailinglist');
+				}
+				else
+				{
+					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
+				}
+			}
+		}
+		else
+		{
+			$_SESSION['message'] = 'keys_missing';
+			if ($core->config('pretty_urls') == 1)
+			{
+				header('Location: '.$core->config('website_url').'mailinglist');
+			}
+			else
+			{
+				header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
+			}
+		}		
+	}
+	
+	if ($_GET['type'] == 'remove_user')
+	{
+		if (isset($_GET['id']) && isset($_GET['key']))
+		{
+			// check key
+			$check = $dbl->run("SELECT `user_id` FROM `users` WHERE `user_id` = ? AND `mailing_list_key` = ?", array($_GET['id'], $_GET['key']))->fetch();
+			if ($check)
+			{
+				$dbl->run("UPDATE `users` SET `email_articles` = NULL WHERE `user_id` = ?", array($_GET['id']));
 				$_SESSION['message'] = 'mail_list_unsubbed';
 				if ($core->config('pretty_urls') == 1)
 				{
@@ -146,7 +192,8 @@ if (isset($_POST['act']))
 	
 	if ($_POST['act'] == 'user_sub')
 	{
-		$dbl->run("UPDATE `users` SET `email_articles` = 'daily' WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$activation_key = core::random_id();
+		$dbl->run("UPDATE `users` SET `email_articles` = 'daily', `mailing_list_key` = ? WHERE `user_id` = ?", array($activation_key, $_SESSION['user_id']));
 		
 		$_SESSION['message'] = 'mail_list_subbed';
 		if ($core->config('pretty_urls') == 1)

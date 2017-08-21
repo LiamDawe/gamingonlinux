@@ -57,8 +57,7 @@ else
 		}
 
 		// count them for pagination
-		$db->sqlquery("SELECT i.`conversation_id` FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id` WHERE i.`owner_id` = ? $blocked_sql", array_merge([$_SESSION['user_id']], $blocked_ids));
-		$total = $db->num_rows();
+		$total = $dbl->run("SELECT COUNT(i.`conversation_id`) FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id` WHERE i.`owner_id` = ? $blocked_sql", array_merge([$_SESSION['user_id']], $blocked_ids))->fetchOne();
 
 		// sort out the pagination link
 		$pagination = $core->pagination_link(9, $total, "/private-messages/", $page);
@@ -955,35 +954,40 @@ else
 			$participants = $db->fetch_all_rows();
 			foreach ($participants as $person)
 			{
-				$db->sqlquery("UPDATE `user_conversations_participants` SET `unread` = 1 WHERE `participant_id` = ? AND `conversation_id` = ?", array($person['participant_id'], $_POST['conversation_id']));
-
-				// also while we are here, email each user to tell them they have a new reply
-				$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($person['participant_id'], $_SESSION['user_id']));
-				$email_data = $db->fetch();
-
-				if ($email_data['email_on_pm'] == 1)
+				// check to see if they're blocking you, otherwise, don't notify them of this at all
+				$check = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($person['participant_id'], $_SESSION['user_id']))->fetch();
+				if (!$check)
 				{
-					// subject
-					$subject = 'New reply to a conversation on GamingOnLinux';
+					$db->sqlquery("UPDATE `user_conversations_participants` SET `unread` = 1 WHERE `participant_id` = ? AND `conversation_id` = ?", array($person['participant_id'], $_POST['conversation_id']));
 
-					$email_text = $bbcode->email_bbcode($text);
+					// also while we are here, email each user to tell them they have a new reply
+					$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($person['participant_id'], $_SESSION['user_id']));
+					$email_data = $db->fetch();
 
-					// message
-					$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">GamingOnLinux</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$_POST['conversation_id']}\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
-					<br style=\"clear:both\">
-					<div>
-				 	<hr>
-					{$email_text}";
-
-					$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has replied to a conversation with you on ".$core->config('website_url')."private-messages/, titled \"{$last['title']}\",\r\n{$_POST['text']}";
-					$boundary = uniqid('np');
-
-					// Mail it
-					if ($core->config('send_emails') == 1)
+					if ($email_data['email_on_pm'] == 1)
 					{
-						$mail = new mailer($core);
-						$mail->sendMail($email_data['email'], $subject, $html_message, $plain_message);
+						// subject
+						$subject = 'New reply to a conversation on GamingOnLinux';
+
+						$email_text = $bbcode->email_bbcode($text);
+
+						// message
+						$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
+						<p><strong>{$_SESSION['username']}</strong> has replied to a conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">GamingOnLinux</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$_POST['conversation_id']}\" target=\"_blank\"><strong>{$last['title']}</strong></a>\".</p>
+						<br style=\"clear:both\">
+						<div>
+						<hr>
+						{$email_text}";
+
+						$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has replied to a conversation with you on ".$core->config('website_url')."private-messages/, titled \"{$last['title']}\",\r\n{$_POST['text']}";
+						$boundary = uniqid('np');
+
+						// Mail it
+						if ($core->config('send_emails') == 1)
+						{
+							$mail = new mailer($core);
+							$mail->sendMail($email_data['email'], $subject, $html_message, $plain_message);
+						}
 					}
 				}
 			}

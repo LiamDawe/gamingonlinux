@@ -19,10 +19,10 @@ $templating->block('small');
 // paging for pagination
 $page = core::give_page();
 
-$in = str_repeat('?,', count($user->user_groups) - 1) . '?';
+$groups_in = str_repeat('?,', count($user->user_groups) - 1) . '?';
 
 // get the forum ids this user is actually allowed to view
-$forum_ids = $dbl->run("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all();
+$forum_ids = $dbl->run("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all();
 
 $templating->block('options', 'flat_forum');
 $new_topic = '';
@@ -52,10 +52,29 @@ foreach ($forum_ids as $forum)
 }
 $templating->set('forum_list', $forum_list);
 
-$sql_forum_ids = implode(', ', $forum_id_list);
+$forum_id_in  = str_repeat('?,', count($forum_id_list) - 1) . '?';
+
+// get blocked id's
+$blocked_sql = '';
+$blocked_ids = [];
+$blocked_usernames = [];
+if (count($user->blocked_users) > 0)
+{
+	foreach ($user->blocked_users as $username => $blocked_id)
+	{
+		$blocked_ids[] = $blocked_id[0];
+		$blocked_usernames[] = $username;
+	}
+	
+	$blocked_in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
+
+	$blocked_sql = "AND t.`author_id` NOT IN ($blocked_in)";
+}
+
+$test = array_merge($forum_id_list, $blocked_ids);
 
 // count how many there is in total
-$total_topics = $dbl->run("SELECT `topic_id` FROM `forum_topics` WHERE `approved` = 1 AND `forum_id` IN ($sql_forum_ids)")->fetchOne();
+$total_topics = $dbl->run('SELECT COUNT(t.`topic_id`) FROM `forum_topics` t WHERE t.`approved` = 1 AND t.`forum_id` IN ('.$forum_id_in.') ' . $blocked_sql, $test)->fetchOne();
 
 $comments_per_page = $core->config('default-comments-per-page');
 if (isset($_SESSION['per-page']))
@@ -75,7 +94,7 @@ $this_template = $core->config('website_url') . 'templates/' . $core->config('te
 // sort out the pagination link
 $pagination = $core->pagination_link($comments_per_page, $total_topics, "/forum/", $page);
 
-$sql = "
+$sql = '
 SELECT
 	t.`topic_id`,
 	t.`forum_id`,
@@ -100,12 +119,12 @@ LEFT JOIN
 WHERE
 	t.`approved` = 1
 AND
-	f.forum_id IN ($sql_forum_ids)
+	f.forum_id IN ('.$forum_id_in.') ' . $blocked_sql . '
 ORDER BY
 	t.`last_post_date`
-DESC LIMIT ?, $comments_per_page";
+DESC LIMIT ?, '.$comments_per_page;
 
-$get_topics = $dbl->run($sql, [$core->start])->fetch_all();
+$get_topics = $dbl->run($sql, array_merge($forum_id_list, $blocked_ids, [$core->start]))->fetch_all();
 
 foreach ($get_topics as $topics)
 {

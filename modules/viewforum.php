@@ -53,10 +53,25 @@ else
 		}
 	}
 	$templating->set('new_topic_link', $new_topic);
+	
+	// get blocked id's
+	$blocked_sql = '';
+	$blocked_ids = [];
+	$blocked_usernames = [];
+	if (count($user->blocked_users) > 0)
+	{
+		foreach ($user->blocked_users as $username => $blocked_id)
+		{
+			$blocked_ids[] = $blocked_id[0];
+			$blocked_usernames[] = $username;
+		}
+
+		$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
+		$blocked_sql = "AND t.`author_id` NOT IN ($in)";
+	}
 
 	// count how many there is in total
-	$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_GET['forum_id']));
-	$total_pages = $db->num_rows();
+	$total_topics = $dbl->run('SELECT COUNT(t.`topic_id`) FROM `forum_topics` t WHERE t.`forum_id` = ? ' . $blocked_sql, array_merge([$_GET['forum_id']],$blocked_ids))->fetchOne();
 	
 	$per_page = $core->config('default-comments-per-page');
 	if (isset($_SESSION['per-page']) && core::is_number($_SESSION['per-page']))
@@ -65,10 +80,10 @@ else
 	}
 
 	// sort out the pagination link
-	$pagination = $core->pagination_link($per_page, $total_pages, "/forum/{$_GET['forum_id']}/", $page);
+	$pagination = $core->pagination_link($per_page, $total_topics, "/forum/{$_GET['forum_id']}/", $page);
 
 	// get the posts for this forum
-	$db->sqlquery("SELECT
+	$all_posts = $dbl->run('SELECT
 		t.*,
 		u.`username`,
 		u.`avatar`,
@@ -80,9 +95,9 @@ else
 		FROM `forum_topics` t
 		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
 		LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id`
-		WHERE t.`forum_id`= ? AND t.`approved` = 1
-		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, {$per_page}", array($_GET['forum_id'], $core->start));
-	while ($post = $db->fetch())
+		WHERE t.`forum_id`= ? AND t.`approved` = 1 ' . $blocked_sql . '
+		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, ' . $per_page, array_merge([$_GET['forum_id']], $blocked_ids, [$core->start]))->fetch_all();
+	foreach ($all_posts as $post)
 	{		
 		$pagination_post = '';
 		

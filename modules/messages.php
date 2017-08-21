@@ -428,6 +428,7 @@ else
 		$text = '';
 		$user_to = '';
 
+		// if there was some sort of error
 		if (isset($_GET['message']))
 		{			
 			if (isset($_SESSION['mto']) && is_array($_SESSION['mto']) && core::is_number($_SESSION['mto']))
@@ -451,13 +452,49 @@ else
 			$text = $_SESSION['mtext'];
 		}
 
+		// if they've click a link to PM someone specific
 		if (isset($_GET['user']))
 		{
-			// find the username of the person requested
-			$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_id` = ?", array($_GET['user']));
+			$db->sqlquery("SELECT `user_id`, `username`, `get_pms` FROM `users` WHERE `user_id` = ?", array($_GET['user']));
 			$user_info = $db->fetch();
 
-			$user_to = '<option value="'.$user_info['user_id'].'" selected>'.$user_info['username'].'</option>';
+			// check your ability to send it to them, don't even list them in the send to box if you cannot
+			$can_send = 0;
+			if ($user_info['get_pms'] == 1)
+			{
+				$can_send = 1;
+			}
+			// if they don't want a PM, check if mod or admin to force allow
+			else if ($user_info['get_pms'] == 0)
+			{
+				if ($user->check_group([1,2,5]))
+				{
+					$can_send = 1;
+				}
+				else
+				{
+					$can_send = 0;
+				}
+			}
+			
+			// check they haven't blocked you
+			$blocked = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_GET['user'], $_SESSION['user_id']))->fetchOne();
+			if ($blocked)
+			{
+				$can_send = 0;
+			}
+			
+			// check you haven't blocked them
+			$blocked = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $_GET['user']))->fetchOne();
+			if ($blocked)
+			{
+				$can_send = 0;
+			}
+			
+			if ($can_send == 1)
+			{
+				$user_to = '<option value="'.$user_info['user_id'].'" selected>'.$user_info['username'].'</option>';
+			}
 		}
 
 		$templating->block('compose_top', 'private_messages');
@@ -658,66 +695,119 @@ else
 				die();
 			}
 		}
+		
+		// make sure they're allow to send it to at least one person
+		$check = $dbl->run("SELECT `user_id`, `get_pms` FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids)->fetch_all();
 
-		// make the new message
-		$db->sqlquery("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
-
-		$conversation_id = $db->grab_id();
-
-		// send message to each user
-		foreach ($_POST['user_ids'] as $user_id)
+		$can_send_to = [];
+		foreach ($check as $test)
 		{
-			// make the duplicate message for other participants
-			$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));
-
-			// Add all the participants
-			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
-
-			// also while we are here, email each user to tell them they have a new convo
-			$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']));
-			$email_data = $db->fetch();
-
-			if ($email_data['email_on_pm'] == 1)
+			if ($test['get_pms'] == 1)
 			{
-				// subject
-				$subject = 'New conversation started on GamingOnLinux';
-
-				$email_text = $bbcode->email_bbcode($text);
-
-				$message = '';
-
-				// message
-				$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
-				<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">GamingOnLinux</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
-				<br style=\"clear:both\">
-				<div>
-				<hr>
-				{$email_text}";
-
-				$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has started a new conversation with you on ".$core->config('website_url')."private-messages/, titled \"{$_POST['title']}\",\r\n{$_POST['text']}";
-				$boundary = uniqid('np');
-
-				// Mail it
-				if ($core->config('send_emails') == 1)
+				$can_send_to[] = $test['user_id'];
+			}
+			else if ($test['get_pms'] == 0)
+			{
+				if ($user->check_group([1,2,5]))
 				{
-					$mail = new mailer($core);
-					$mail->sendMail($email_data['email'], $subject, $html_message, $plain_message);
+					$can_send_to[] = $test['user_id'];
 				}
 			}
 		}
-
-		$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
-
-		$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
-
-		$_SESSION['message'] = 'pm_sent';
-		if ($core->config('pretty_urls') == 1)
+		
+		// blocking check
+		foreach ($can_send_to as $key => $user_id)
 		{
-			header("Location: /private-messages/");
+			// check they haven't blocked you
+			$blocked = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($user_id, $_SESSION['user_id']))->fetchOne();
+			if ($blocked)
+			{
+				unset($can_send_to[$key]);
+			}
+			
+			// check you haven't blocked them
+			$blocked = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id))->fetchOne();
+			if ($blocked)
+			{
+				unset($can_send_to[$key]);
+			}
 		}
-		else 
+		
+		// at least one person they can send the message to
+		if (count($can_send_to) > 0)
 		{
-			header("Location: " . $core->config('website_url') . 'index.php?module=messages');
+			// make the new message
+			$db->sqlquery("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
+
+			$conversation_id = $db->grab_id();
+
+			// send message to each user
+			foreach ($can_send_to as $user_id)
+			{
+				// make the duplicate message for other participants
+				$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));
+
+				// Add all the participants
+				$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
+
+				// also while we are here, email each user to tell them they have a new convo
+				$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']));
+				$email_data = $db->fetch();
+
+				if ($email_data['email_on_pm'] == 1)
+				{
+					// subject
+					$subject = 'New conversation started on GamingOnLinux';
+
+					$email_text = $bbcode->email_bbcode($text);
+
+					$message = '';
+
+					// message
+					$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
+					<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">GamingOnLinux</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$_POST['title']}</strong></a>\".</p>
+					<br style=\"clear:both\">
+					<div>
+					<hr>
+					{$email_text}";
+
+					$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has started a new conversation with you on ".$core->config('website_url')."private-messages/, titled \"{$_POST['title']}\",\r\n{$_POST['text']}";
+					$boundary = uniqid('np');
+
+					// Mail it
+					if ($core->config('send_emails') == 1)
+					{
+						$mail = new mailer($core);
+						$mail->sendMail($email_data['email'], $subject, $html_message, $plain_message);
+					}
+				}
+			}
+
+			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
+
+			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
+
+			$_SESSION['message'] = 'pm_sent';
+			if ($core->config('pretty_urls') == 1)
+			{
+				header("Location: /private-messages/");
+			}
+			else 
+			{
+				header("Location: " . $core->config('website_url') . 'index.php?module=messages');
+			}
+		}
+		else
+		{
+			$_SESSION['message'] = 'cannot_send_pm';
+			if ($core->config('pretty_urls') == 1)
+			{
+				header("Location: /private-messages/");
+			}
+			else 
+			{
+				header("Location: " . $core->config('website_url') . 'index.php?module=messages');
+			}			
 		}
 	}
 

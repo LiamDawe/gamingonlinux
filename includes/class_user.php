@@ -18,7 +18,7 @@ class user
 	
 	public $user_groups;
 	
-	public $blocked_users;
+	public $blocked_users = [];
 	
 	function __construct($database, $core)
 	{
@@ -178,7 +178,10 @@ class user
 
 	function block_list()
 	{
-		$this->blocked_users = $this->database->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+		if (isset($_SESSION) && $_SESSION['user_id'] > 0)
+		{
+			$this->blocked_users = $this->database->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+		}
 	}
 	
 	// helper func to get a user field(s)
@@ -189,7 +192,7 @@ class user
 			$to_return = [];
 			foreach ($fields as $field)
 			{
-				if (isset($this->user_details[$user_id]) && in_array($field, $this->user_details[$user_id]))
+				if (isset($this->user_details[$user_id]) && array_key_exists($field, $this->user_details[$user_id]))
 				{
 					$to_return[$field] = $this->user_details[$user_id][$field];
 				}

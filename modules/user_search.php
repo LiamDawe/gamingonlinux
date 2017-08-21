@@ -32,13 +32,13 @@ if (isset($search_text) && !empty($search_text))
 	// paging for pagination
 	$page = core::give_page();
 	
-	$total = $dbl->run("SELECT COUNT(`user_id`) FROM `users` WHERE `username` LIKE ? AND `global_search_visible` = 1 ORDER BY `username` ASC", [$search_through])->fetchOne();
+	$total = $dbl->run("SELECT COUNT(u.`user_id`) FROM `users` u WHERE u.`username` LIKE ? AND u.`global_search_visible` = 1 AND NOT EXISTS(SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = u.user_id AND `blocked_id` = 1) ORDER BY u.`username` ASC ", [$search_through])->fetchOne();
 	
 	// sort out the pagination link
 	$pagination = $core->pagination_link(15, $total, "/index.php?module=user_search&username={$_GET['username']}&", $page);
 	
 	// do the search query
-	$user_list = $dbl->run("SELECT `user_id`, `username` FROM `users` WHERE `username` LIKE ? AND `global_search_visible` = 1 ORDER BY `username` ASC LIMIT ?, 50", [$search_through, $core->start])->fetch_all();
+	$user_list = $dbl->run("SELECT u.`user_id`, u.`username` FROM `users` u WHERE u.`username` LIKE ? AND u.`global_search_visible` = 1 AND NOT EXISTS(SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = u.user_id AND `blocked_id` = 1) ORDER BY u.`username` ASC LIMIT ?, 50", [$search_through, $core->start])->fetch_all();
 
 	if ($user_list)
 	{

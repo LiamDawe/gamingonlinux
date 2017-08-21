@@ -129,7 +129,16 @@ class template
 	{
 		$this->values[$this->block][$key] = $value;
 	}
-
+	
+	// set multiple values to be replaced
+	public function set_many($replaces)
+	{
+		foreach ($replaces as $key => $value)
+		{
+			$this->values[$this->block][$key] = $value;
+		}
+	}
+	
 	// set a value for a tag to be replaced in a previous block
 	public function set_previous($key, $value, $block)
 	{

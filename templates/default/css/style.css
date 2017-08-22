@@ -1566,7 +1566,9 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 	margin-top: 14px;
 	line-height: 30px;
 }
-.patreon-small{line-height: 30px;}
+.patreon_comments {
+	border-top: 1px solid yellow;
+}
 .dark pre {background:#222;}
 .preview_pm{display: none;}
 .register-warning {

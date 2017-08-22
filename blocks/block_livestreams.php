@@ -5,11 +5,9 @@ $templating->block('list');
 
 // count how many there is due this month and today
 $count_query = "SELECT `row_id`, `title`, `date`, `community_stream`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` ORDER BY `date` ASC LIMIT 1";
-$db->sqlquery($count_query);
-if ($db->num_rows() == 1)
+$get_info = $dbl->run($count_query)->fetch();
+if ($get_info)
 {
-	$get_info = $db->fetch();
-
 	$stream_url = 'https://www.twitch.tv/gamingonlinux';
 	if ($get_info['community_stream'] == 1)
 	{

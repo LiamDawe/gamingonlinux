@@ -442,7 +442,7 @@ else
 		$user_to = '';
 
 		// if there was some sort of error
-		if (isset($_GET['message']))
+		if (isset($message_map::$error) && $message_map::$error == 1)
 		{			
 			if (isset($_SESSION['mto']) && is_array($_SESSION['mto']) && core::is_number($_SESSION['mto']))
 			{

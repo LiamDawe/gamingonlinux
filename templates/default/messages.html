@@ -9,6 +9,7 @@
 					<div class="head">{:message}</div>
 					<div class="body group">
 						<form method="post" action="{:action_url}">
+							{:extra_content}
 							<input type="submit" name="yes" value="Yes" class="btn btn-primary"/>
 							<input type="submit" name="no" value="No" class="btn btn-danger" />
 							<input type="hidden" name="act" value="{:act}" />
@@ -17,3 +18,18 @@
 					</div>
 				</div>
 [/block: yes_no]
+
+[block: confirmation]
+				<div class="box">
+					<div class="head">{:title}</div>
+					<div class="body group">
+						<form method="post" action="{:action_url}">
+							<p>{:text}</p>
+							<input type="submit" name="yes" value="Yes" class="btn btn-primary"/>
+							<input type="submit" name="no" value="No" class="btn btn-danger" />
+							<input type="hidden" name="act" value="{:act}" />
+							{:act2}
+						</form>
+					</div>
+				</div>
+[/block: confirmation]

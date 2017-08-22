@@ -212,8 +212,14 @@ if (isset($_POST['act']))
 
 		$dbl->run("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 1, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $title, $date_created, $start_time, $end_time, $community, $community_name, $stream_url));
 		$new_id = $dbl->new_id();
+		
+		$user_ids = [];
+		if (isset($_POST['user_ids']) && !empty($_POST['user_ids']))
+		{
+			$user_ids = $_POST['user_ids'];
+		}
 
-		$core->process_livestream_users($new_id);
+		$core->process_livestream_users($new_id, $user_ids);
 
 		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'new_livestream_event', core::$date, core::$date));
 
@@ -247,8 +253,14 @@ if (isset($_POST['act']))
 		}
 
 		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url, $_POST['id']));
+		
+		$user_ids = [];
+		if (isset($_POST['user_ids']) && !empty($_POST['user_ids']))
+		{
+			$user_ids = $_POST['user_ids'];
+		}
 
-		$core->process_livestream_users($_POST['id']);
+		$core->process_livestream_users($_POST['id'], $user_ids);
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'edit_livestream_event', $_POST['id'], core::$date, core::$date));
 
@@ -385,8 +397,14 @@ if (isset($_POST['act']))
 		}
 
 		$db->sqlquery("UPDATE `livestreams` SET `accepted` = 1, `title` = ?, `date` = ?, `end_date` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community_name, $stream_url, $_POST['id']));
+		
+		$user_ids = [];
+		if (isset($_POST['user_ids']) && !empty($_POST['user_ids']))
+		{
+			$user_ids = $_POST['user_ids'];
+		}
 
-		$core->process_livestream_users($_POST['id']);
+		$core->process_livestream_users($_POST['id'], $user_ids);
 
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'accepted_livestream_submission', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
 		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE type = 'new_livestream_submission' AND `data` = ?", array(core::$date, $livestream['row_id']));

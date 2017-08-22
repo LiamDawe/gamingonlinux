@@ -486,12 +486,18 @@ class core
 	// $act = a hidden $_POST box to define where to send them on the action url
 	// $act2 = if we need a second stage act for any reason
 	// $act2_custom_name = incase we aren't using "act2" (maybe i should go through and re-name all custom second bits like "moderator_options" to "act2" to just simplify it?)
-	function yes_no($message, $action_url, $act = NULL, $act2 = NULL, $act2_custom_name = 'act2')
+	function yes_no($message, $action_url, $act = NULL, $act2 = NULL, $act2_custom_name = 'act2', $extra_content = NULL)
 	{
 		global $templating;
 
 		$templating->load('messages');
 		$templating->block('yes_no');
+		$extra = '';
+		if ($extra_content != NULL)
+		{
+			$extra = $extra_content;
+		}
+		$templating->set('extra_content', $extra);
 		$templating->set('message', $message);
 		$templating->set('action_url', $action_url);
 		$templating->set('act', $act);
@@ -507,7 +513,39 @@ class core
 		}
 		$templating->set('act2', $act2_text);
 	}
+	
+	// a yes/no confirmation box
+	// this better one is to eventually replace the older one above
+	function confirmation($details)
+	{
+		global $templating;
 
+		$templating->load('messages');
+		$templating->block('confirmation');
+		$templating->set('title', $details['title']);
+		
+		$text = '';
+		if (isset($details['text']))
+		{
+			$text = $details['text'];
+		}
+		$templating->set('text', $text);
+		
+		$templating->set('action_url', $details['action_url']);
+		$templating->set('act', $details['act']);
+
+		if (!isset($details['act2']))
+		{
+			$act2_text = '';
+		}
+
+		else
+		{
+			$act2_text = "<input type=\"hidden\" name=\"{$details['act_2_name']}\" value=\"{$details['act_2_value']}\" />";
+		}
+		$templating->set('act2', $act2_text);
+	}
+	
 	public static function nice_title($title)
 	{
 		$clean = trim($title);
@@ -885,40 +923,36 @@ class core
 
 	}
 
-	function process_livestream_users($livestream_id)
+	function process_livestream_users($livestream_id, $user_ids)
 	{
-		global $db;
-
 		if (isset($livestream_id) && is_numeric($livestream_id))
 		{
-			// delete any existing categories that aren't in the final list for publishing
-			$db->sqlquery("SELECT `id`, `livestream_id`, `user_id` FROM `livestream_presenters` WHERE `livestream_id` = ?", array($livestream_id));
-			$current_users = $db->fetch_all_rows();
+			// find existing users, if any
+			$current_users = $this->database->run("SELECT `user_id` FROM `livestream_presenters` WHERE `livestream_id` = ?", array($livestream_id))->fetch_all(PDO::FETCH_COLUMN);
 
-			if (!empty($current_users))
+			// if the existing users aren't in the new list, remove them
+			if ($current_users)
 			{
 				foreach ($current_users as $current_user)
 				{
-					if (!in_array($current_user['user_id'], $_POST['user_ids']))
+					if (!in_array($current_user, $user_ids))
 					{
-						$db->sqlquery("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($current_user['id']));
+						$this->database->run("DELETE FROM `livestream_presenters` WHERE `livestream_id` = ? AND `user_id` = ?", array($livestream_id, $current_user));
 					}
 				}
 			}
-
-			// get fresh list of categories, and insert any that don't exist
-			$db->sqlquery("SELECT `user_id` FROM `livestream_presenters` WHERE `livestream_id` = ?", array($livestream_id));
-			$current_streamers = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
-
-			if (isset($_POST['user_ids']) && !empty($_POST['user_ids']))
+			
+			// we have a list of user ids
+			if (!empty($user_ids) && is_array($user_ids))
 			{
-				foreach($_POST['user_ids'] as $streamer_id)
+				foreach($user_ids as $streamer_id)
 				{
-					if (!in_array($streamer_id, $current_streamers))
+					// if this user_id isn't in the current list, add them
+					if (!in_array($streamer_id, $current_users))
 					{
-						$db->sqlquery("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
+						$this->database->run("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
 					}
-				}
+				}				
 			}
 		}
 	}

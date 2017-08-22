@@ -4,7 +4,7 @@ define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) );
 require APP_ROOT . "/includes/bootstrap.php";
 
 // gather a list of users who want a daily email of articles
-$email_users = $dbl->run("SELECT `username`, `email`, `mailing_list_key` FROM `users` WHERE `email_articles` = 'daily'")->fetch_all();
+$email_users = $dbl->run("SELECT `username`, `email`, `mailing_list_key`,`user_id` FROM `users` WHERE `email_articles` = 'daily'")->fetch_all();
 $guest_subs = $dbl->run("SELECT `email`,`id`,`unsub_key` FROM `mailing_list` WHERE `activated` = 1")->fetch_all();
 
 $beginOfDay = strtotime("midnight yesterday");
@@ -25,7 +25,7 @@ if ($article_list)
 
 	foreach ($email_users as $email)
 	{
-		$unsub_link = $core->config('website_url') . 'index.php?module=mailing_list&type=remove_user&key=' . $email['mailing_list_key'] . '&id=' . $email['id'];
+		$unsub_link = $core->config('website_url') . 'index.php?module=mailing_list&type=remove_user&key=' . $email['mailing_list_key'] . '&id=' . $email['user_id'];
 		
 		// subject
 		$subject = "Your daily Linux gaming news fix from GamingOnLinux";

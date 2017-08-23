@@ -12,32 +12,31 @@ $page = core::give_page();
 // first get a list of anyone who is actually live TODO
 $templating->block('online_top');
 $online_list = '';
-$db->sqlquery("SELECT `username`, `twitch` FROM `users` WHERE `twitch` != ''");
-while ($get_online = $db->fetch())
+$get_online = $dbl->run("SELECT `username`, `twitch` FROM `users` WHERE `twitch` != ''")->fetch_all();
+foreach ($get_online as $list)
 {
   $templating->block('user_online');
   // their username will be the last thing in the path after the slash (we remove the slash to get it)
-  $url = parse_url($get_online['twitch']);
+  $url = parse_url($list['twitch']);
   if (isset($url['path']))
   {
     $twitch_username = str_replace('/', '', $url['path']);
   }
   $templating->set('twitch_username', $twitch_username);
-  $templating->set('username', $get_online['username']);
+  $templating->set('username', $list['username']);
   $templating->set('twitch_link', '<a href="https://www.twitch.tv/'.$twitch_username.'">Twitch</a>');
 }
 
 // now get the full directory
-$db->sqlquery("SELECT COUNT(user_id) as count FROM `users` WHERE `twitch` != '' OR `youtube` != ''");
-$counter = $db->fetch();
+$counter = $dbl->run("SELECT COUNT(user_id) as count FROM `users` WHERE `twitch` != '' OR `youtube` != ''")->fetchOne();
 
 // sort out the pagination link
-$pagination = $core->pagination_link(30, $counter['count'], "/index.php?module=video&amp;", $page);
+$pagination = $core->pagination_link(30, $counter, "/index.php?module=video&amp;", $page);
 
 $templating->block('directory_top');
 
-$db->sqlquery("SELECT `username`, `youtube`, `twitch` FROM `users` WHERE `twitch` != '' OR `youtube` != '' LIMIT ?, 30", array($core->start));
-while ($user_list = $db->fetch())
+$get_users = $dbl->run("SELECT `username`, `youtube`, `twitch` FROM `users` WHERE `twitch` != '' OR `youtube` != '' LIMIT ?, 30", array($core->start))->fetch_all();
+foreach ($get_users as $user_list)
 {
   $templating->block('user');
   $templating->set('username', $user_list['username'] . '<br />');

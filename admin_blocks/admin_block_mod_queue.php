@@ -12,5 +12,5 @@ if ($post_counter > 0)
 
 else if ($post_counter == 0)
 {
-	$templating->set('post_counter', "(0)");
+	$templating->set('post_counter', '(0)');
 }

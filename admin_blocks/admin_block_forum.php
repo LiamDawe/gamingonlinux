@@ -12,8 +12,7 @@ if ($user->check_group(1) == true)
 $templating->set('admin_links', $admin_links);
 
 // sort out the counters for topic and reply reports
-$db->sqlquery("SELECT `reported` FROM `forum_topics` WHERE `reported` = 1");
-$topic_count = $db->num_rows();
+$topic_count = $dbl->run("SELECT COUNT(`reported`) FROM `forum_topics` WHERE `reported` = 1")->fetchOne();
 
 if ($topic_count > 0)
 {
@@ -25,8 +24,7 @@ else if ($topic_count == 0)
 	$templating->set('topic_count', "($topic_count)");
 }
 
-$db->sqlquery("SELECT `reported` FROM `forum_replies` WHERE `reported` = 1");
-$replies_count = $db->num_rows();
+$replies_count = $dbl->run("SELECT COUNT(`reported`) FROM `forum_replies` WHERE `reported` = 1")->fetchOne();
 
 if ($replies_count > 0)
 {

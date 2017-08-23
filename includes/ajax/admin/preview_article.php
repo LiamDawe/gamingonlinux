@@ -140,8 +140,7 @@ if(isset($_POST))
 	
 	if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
 	{
-		$db->sqlquery("SELECT `filename` FROM `articles_tagline_gallery` WHERE `id` = ?", array($_SESSION['gallery_tagline_id']));
-		$gallery_image = $db->fetch();
+		$gallery_image = $dbl->run("SELECT `filename` FROM `articles_tagline_gallery` WHERE `id` = ?", array($_SESSION['gallery_tagline_id']))->fetch();
 		$top_image_nobbcode = "<img src=\"" . $core->config('website_url') . "uploads/tagline_gallery/{$gallery_image['filename']}\" alt=\"[articleimage]\" class=\"imgList\">";
 	}
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

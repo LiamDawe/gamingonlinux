@@ -25,8 +25,7 @@ if(isset($_POST))
 			$comment = trim($_POST['text']);
 
 			// check for double comment
-			$db->sqlquery("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array($_POST['article_id']));
-			$check_comment = $db->fetch();
+			$check_comment = $dbl->run("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array($_POST['article_id']))->fetch();
 
 			if ($check_comment['comment_text'] == $comment)
 			{
@@ -53,12 +52,12 @@ if(isset($_POST))
 				$dbl->run("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
 
 				// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
-				$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
-				if ($db->num_rows() == 1)
+				$check_sub = $dbl->run("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id))->fetch();
+				if ($check_sub)
 				{
 					if (!isset($_POST['subscribe']))
 					{
-						$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+						$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
 					}
 				}
 

@@ -26,21 +26,19 @@ else
 
 	$templating->load('viewforum');
 
-	$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
-	$name = $db->fetch();
+	$name = $dbl->run("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetchOne();
 
-	$templating->set_previous('title', "Viewing forum {$name['name']}", 1);
-	$templating->set_previous('meta_description', "GamingOnLinux forum - Viewing forum {$name['name']}", 1);
+	$templating->set_previous('title', 'Viewing forum ' . $name, 1);
+	$templating->set_previous('meta_description', 'GamingOnLinux forum - Viewing forum ' . $name, 1);
 
 	$templating->block('main_top', 'viewforum');
-	$templating->set('forum_name', $name['name']);
+	$templating->set('forum_name', $name);
 
 	$new_topic = '';
 	$new_topic_bottom = '';
 	if (!isset($_SESSION['activated']))
 	{
-		$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		$get_active = $db->fetch();
+		$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 		$_SESSION['activated'] = $get_active['activated'];
 	}
 

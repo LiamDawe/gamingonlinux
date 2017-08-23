@@ -18,12 +18,12 @@ $templating->block('full_editor', 'admin_modules/article_form');
 $templating->set('main_formaction', '<form id="article_editor" method="post" name="article-form" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 $templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 
-// get categorys
+// get categorys if we need to
 $categorys_list = '';
-$db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
-while ($categorys = $db->fetch())
+if ((isset($message_map::$error) && $message_map::$error == 1) || isset($_GET['dump']))
 {
-	if (isset($_SESSION['error']) || isset($_GET['dump']))
+	$res = $dbl->run("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+	foreach ($res as $categorys)
 	{
 		if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 		{
@@ -64,11 +64,9 @@ $templating->set('categories_list', $categorys_list);
 $templating->set('max_height', $core->config('article_image_max_height'));
 $templating->set('max_width', $core->config('article_image_max_width'));
 
-$db->sqlquery("SELECT `auto_subscribe_new_article` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-$grab_subscribe = $db->fetch();
-
+$grab_subscribe = $dbl->run("SELECT `auto_subscribe_new_article` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetchOne();
 $auto_subscribe = '';
-if ($grab_subscribe['auto_subscribe_new_article'] == 1)
+if ($grab_subscribe == 1)
 {
 	$auto_subscribe = 'checked';
 }

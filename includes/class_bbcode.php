@@ -213,49 +213,6 @@ class bbcode
 
 		return $body;
 	}
-
-	// for showing a nicely formatted article info box inside anything called by [article]ID[/article]
-	function replace_article($text, $article_id)
-	{
-		if ($this->core->is_number($article_id))
-		{
-			$get_article = $this->database->run("SELECT 
-				a.`title`, 
-				a.`article_id`, 
-				a.`tagline`, 
-				a.`tagline_image`, 
-				a.`gallery_tagline`, 
-				a.`views`, 
-				a.`date`,
-				t.`filename` as `gallery_tagline_filename` 
-			FROM 
-				`articles` a 
-			LEFT JOIN 
-				`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
-			WHERE 
-				a.`article_id` = ?", [$article_id]);
-			$article_info = $get_article->fetch();
-			
-			$article_class = new article($this->database, $this->core);
-				
-			$tagline_image = $article_class->tagline_image($article_info);
-			
-			$nice_link =  $this->core->nice_title($article_info['title']) . '.' . $article_info['article_id'];
-			
-			$date = $this->core->human_date($article_info['date']);
-			
-			$views = number_format($article_info['views'], 0, '.', ',');
-				
-			$article_replace = "<div class=\"article_bbcode\">
-				<a href=\"". $this->core->config('website_url') . $nice_link . "\">".$tagline_image."</a>
-				<div class=\"tagline\"><a href=\"". $this->core->config('website_url') . 'articles/' . $nice_link . "\">" . $article_info['title'] . "</a><br /><em>" . $date . " - Views: " . $views . "</em><br />".$article_info['tagline']."</div>
-			</div>";
-				
-			$text = preg_replace("/\[article\]".$article_id."\[\/article\]/is", $article_replace, $text);
-		}
-		
-		return $text;
-	}
 	
 	function parse_links($text)
 	{
@@ -463,14 +420,6 @@ class bbcode
 		}
 
 		$body = nl2br($body);
-		
-		if (preg_match_all("/\[article\]([0-9]+)\[\/article\]/is", $body, $article_matches))
-		{
-			foreach ($article_matches[1] as $match)
-			{
-				$body = $this->replace_article($body, $match);
-			}
-		}
 
 		// stop adding breaks to lists
 		$body = str_replace('<ul><br />', '<ul>', $body);

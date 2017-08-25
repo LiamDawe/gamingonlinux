@@ -1,3 +1,10 @@
+// update ckeditor so it can be captured and parsed by the article preview
+function CKupdate() 
+{
+	for (instance in CKEDITOR.instances)
+		CKEDITOR.instances[instance].updateElement();
+	return true;
+}
 // scroll to an element if it's not in view, all other ways I could find completely sucked
 jQuery.fn.scrollMinimal = function(smooth)
 {
@@ -1168,6 +1175,7 @@ jQuery(document).ready(function()
 	$('.admin_preview_article').click(function(e)
 	{
 		e.preventDefault();
+		CKupdate();
 		var url = "/includes/ajax/admin/preview_article.php";
 		
 		// if the preview is hidden, open it
@@ -1230,6 +1238,16 @@ jQuery(document).ready(function()
 		});
     });
 	
+	/* CKEditor */
+	// insert tagline image html into editor
+	$(document).on('click', ".insert_tagline_image", function(e) 
+	{
+		e.preventDefault();
+		var tagline_image = $('.tagline-image').attr('href');
+		CKEDITOR.instances.ckeditor.insertHtml('<img src="'+tagline_image+'" />');
+	});	
+	
+	// prevent accidental logouts
 	$(document).on('click', ".logout_link", function(e) 
 	{
 		e.preventDefault();

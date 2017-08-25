@@ -46,12 +46,6 @@ button[disabled=disabled], button:disabled {
   color: red;
 cursor: default;
 }
- img {
-   max-width: 100%;
-}
-a {
-	color: #428BCA;
-}
 .content a:hover {text-decoration: underline;}
 .fnone {float: none;}
 .fleft {float: left;}
@@ -1029,18 +1023,9 @@ ul.social-networks li > a {
 .bookmark-saved {background-color: yellow !important;}
 
 /* Dark CSS */
-body.dark {
-	background: #151515;
-	color: #ffffff;
-}
 .dark input[type="text"][readonly] {
     background-color: #000000;
 }
-.dark a, .dark a:hover, .dark a:active {
-    color: #428BCA;
-}
-.dark hr {border-color: #111111;}
-
 .dark input, .dark textarea, .dark select {
     background: #333;
     border: 1px solid #444;
@@ -1284,8 +1269,6 @@ body.dark {
   background: #ffb7b7; /* Gecko Browsers */
 }
 
-.dark strong {color: #ffffff}
-
 .dark .article .bottom-meta ul li a {
 	background: #222222;
 	float: left;
@@ -1470,22 +1453,6 @@ th, td { vertical-align: top; }
          -o-border-radius: 3px;
             border-radius: 3px;
 }
-.collapse_container {
-	border:1px solid #d3d3d3;
-}
-.collapse_container div {
-}
-.collapse_container .collapse_header {
-    background-color:#d3d3d3;
-    padding: 7px 10px;
-    cursor: pointer;
-    font-weight: bold;
-}
-.collapse_container .collapse_content {
-    display: none;
-    padding : 5px;
-}
-
 .game-box{
 	border: 1px solid #DADADA;
 }
@@ -1503,36 +1470,6 @@ th, td { vertical-align: top; }
 	box-shadow: inset 0 -3px rgba(0, 0, 0, 0.1);
 }
 .article .info .meta .meta-date {display: inline-block;}
-/* release calendar admin submitted items section, to split up each item in the month */
-div.cal:nth-child(even) {background: #CCC}
-div.cal:nth-child(odd) {background: #FFF}
-.bbcodeblock {
-	margin: 0px;
-	border: 1px solid #DDD;
-	background-color: #F8F8F8;
-	border-radius: 3px;
-	max-width: 100%;
-	width: 100%;
-	max-height: 400px;
-	display: inline-block;
-	white-space: pre;
-	overflow: auto;
-	vertical-align: middle;
-	line-height: 1em;
-	padding: 5px;
-	font-family: monospace;
-}
-.bbcodeblock:before {
-    content: "Code";
-    display: block;
-    font-style: italic;
-    font-size: 0.9em;
-}
-
-.dark .bbcodeblock, .dark .bbcodeblock:before {
-	color: #ccc;
-	background-color: #383838;
-}
 
 div.announce:nth-of-type(odd) {background: #609FA9; margin-bottom: 7px; color: #000}
 div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: #000}
@@ -1569,7 +1506,6 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .patreon_comments {
 	border-top: 1px solid yellow;
 }
-.dark pre {background:#222;}
 .preview_pm{display: none;}
 .register-warning {
 	color:#d2232a;
@@ -1584,13 +1520,6 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 	display:none;
 }
 .input-alert-text {padding: 5px 5px 5px 5px;}
-.database_stores{display: inline;list-style-type: none; padding: 0; margin: 0;}
-.database_stores li + li:before {
-    content: ", ";
-}
-.database_stores li {display: inline;}
-.database_extra{display: inline;list-style-type: none; padding: 0; margin: 0;}
-.database_extra li {padding: 0px;}
 /* fix fancybox going under the navbar */
 .fancybox-wrap {
 	 position: absolute;
@@ -1617,10 +1546,6 @@ a.anchor {
   height:100px;
   overflow:auto;
 }
-hr.content_split { 
-	background-color: #fff;
-	border-top: 2px dotted #8c8b8b;
-} 
 .table-stripes {border-collapse: collapse;}
 .table-stripes tr:nth-child(even) {background: #e5e5e5}
 .table-stripes tr:nth-child(odd) {background: #FFF}

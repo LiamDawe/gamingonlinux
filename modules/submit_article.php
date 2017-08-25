@@ -107,7 +107,7 @@ if (isset($_GET['view']))
             $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
         }
 
-        $core->editor(['name' => 'text', 'editor_id' => 'article_text']);
+        $core->article_editor(['content' => '']);
 
         $templating->block('submit_bottom', 'submit_article');
         $templating->set('captcha', $captcha_output);
@@ -120,9 +120,8 @@ if (isset($_POST['act']))
 	if ($_POST['act'] == 'Submit')
 	{
 		// check for ipban (spammers) and don't let them submit
-        $db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-        $get_ip = $db->fetch();
-        if ($db->num_rows() > 0)
+        $get_ip = $dbl->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip))->fetchOne();
+        if ($get_ip)
         {
             header('Location: /index.php');
             die();
@@ -338,8 +337,7 @@ if (isset($_POST['act']))
         $templating->set('date', $date);
         $templating->set('submitted_date', 'Submitted ' . $date);
 
-        $text = htmlentities($_POST['text']);
-        $templating->set('text_full', $bbcode->parse_bbcode($text));
+        $templating->set('text_full', $_POST['text']);
         $templating->set('article_link', '#');
         $templating->set('comment_count', '0');
 
@@ -400,7 +398,7 @@ if (isset($_POST['act']))
             $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
         }
 
-        $core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'article_text']);
+        $core->article_editor(['content' => $_POST['text']]);
 
         $templating->block('submit_bottom', 'submit_article');
         $templating->set('captcha', $captcha_output);

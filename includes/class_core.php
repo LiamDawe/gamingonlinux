@@ -569,7 +569,7 @@ class core
 	}
 
 	// move previously uploaded tagline image to correct directory
-	function move_temp_image($article_id, $file)
+	function move_temp_image($article_id, $file, $text)
 	{
 		global $db;
 
@@ -638,8 +638,12 @@ class core
 						unlink($this->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $image['tagline_image']);
 					}
 				}
+				
+				// replace the temp filename with the new filename
+				$text = preg_replace('/(<img src=".+temp\/thumbnails\/.+" \/>)/', '<img src="/uploads/articles/tagline_images/thumbnails/'.$imagename.'" />', $text);
+				$text = preg_replace('/<img src=".+temp\/.+" \/>/', '<img src="/uploads/articles/tagline_images/'.$imagename.'" />', $text);
 
-				$db->sqlquery("UPDATE `articles` SET `tagline_image` = ?, `gallery_tagline` = 0 WHERE `article_id` = ?", array($imagename, $article_id));
+				$this->database->run("UPDATE `articles` SET `tagline_image` = ?, `gallery_tagline` = 0, `text` = ? WHERE `article_id` = ?", array($imagename, $text, $article_id));
 				return true;
 			}
 
@@ -720,6 +724,58 @@ class core
 		$templating->set('editor_id', $editor['editor_id']);
 		
 		core::$editor_js[] = 'gol_editor(\''.$editor['editor_id'].'\');';
+	}
+	
+	/* For generating a bbcode editor form, options are:
+	name - name of the textarea
+	content
+	article_editor
+	disabled
+	anchor_name
+	ays_ignore
+	editor_id
+	*/
+	// include this anywhere to show the bbcode editor
+	function article_editor($custom_options)
+	{
+		global $templating;
+		
+		if (!is_array($custom_options))
+		{
+			die('CKEditor editor not setup correctly!');
+		}
+		
+		// sort some defaults
+		$editor['disabled'] = 0;
+		$editor['ays_ignore'] = 0;
+		$editor['content'] = '';
+		$editor['anchor_name'] = 'commentbox';
+		
+		foreach ($custom_options as $option => $value)
+		{
+			$editor[$option] = $value;
+		}
+		
+		$templating->load('ckeditor');
+		$templating->block('editor');
+		$templating->set('this_template', $this->config('website_url') . 'templates/' . $this->config('template'));
+		$templating->set('url', $this->config('website_url'));
+		$templating->set('content', $editor['content']);
+		$templating->set('anchor_name', $editor['anchor_name']);
+		
+		$disabled = '';
+		if ($editor['disabled'] == 1)
+		{
+			$disabled = 'disabled';
+		}
+		$templating->set('disabled', $disabled);
+
+		$ays_check = '';
+		if ($editor['ays_ignore'] == 1)
+		{
+			$ays_check = 'class="ays-ignore"';
+		}
+		$templating->set('ays_ignore', $ays_check);
 	}
 
 	// convert bytes to human readable stuffs, only up to MB as we will never be uploading more than MB files directly

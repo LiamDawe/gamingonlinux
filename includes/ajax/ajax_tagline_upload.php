@@ -174,10 +174,10 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			unset($_SESSION['gallery_tagline_rand']);
 			unset($_SESSION['gallery_tagline_filename']);
 
-			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".$core->config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\" class='imgList'><br />";
-			echo "BBCode: <input type=\"text\" value=\"[img]tagline-image[/img]\" /><br />";
+			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".$core->config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\"><br />";
 			echo "<input type=\"hidden\" name=\"image_name\" value=\"{$imagename}\" />";
-			echo "<a href=\"#\" id=\"{$imagename}\" class=\"trash_tagline\">Delete Image</a></div>";
+			echo 'Full Image Url: <a class="tagline-image" href="' . $core->config('website_url') . 'uploads/articles/tagline_images/temp/'.$imagename.'" target="_blank">Click Me</a> - <a href=\"#\" id=\"{$imagename}\" class=\"trash_tagline\">Delete Image</a>';
+			echo '<br /><button type="button" class="insert_tagline_image">Insert into editor</button></div>';
 		}
 
 		else

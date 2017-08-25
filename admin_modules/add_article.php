@@ -71,7 +71,7 @@ if ($grab_subscribe == 1)
 	$auto_subscribe = 'checked';
 }
 
-$core->editor(['name'=> 'text', 'content' => $text, 'article_editor' => 1, 'editor_id' => 'article_text']);
+$core->article_editor(['content' => $text]);
 
 $templating->block('add_bottom', 'admin_modules/admin_module_articles');
 $templating->set('website_url', $core->config('website_url'));

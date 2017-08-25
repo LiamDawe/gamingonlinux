@@ -228,7 +228,7 @@ if (isset($_GET['view']))
 			$templating->set('max_height', $core->config('article_image_max_height'));
 			$templating->set('max_width', $core->config('article_image_max_width'));
 
-			$core->editor(['name' => 'text', 'content' => $text, 'disabled' => $editor_disabled, 'editor_id' => 'article_text']);
+			$core->article_editor(['content' => $text, 'disabled' => $editor_disabled]);
 
 			$templating->block('edit_bottom', 'admin_modules/admin_module_articles');
 			$templating->set('edit_state', $edit_state);
@@ -616,11 +616,7 @@ else if (isset($_POST['act']))
 				$show = 1;
 			}
 
-			
-
 			$article_class->gallery_tagline($checked);
-
-			
 
 			// first check if it was disabled
 			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
@@ -634,15 +630,13 @@ else if (isset($_POST['act']))
 				{
 					$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
 				}
-			}
-
-			
+			}			
 
 			article::process_categories($_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
-				$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
+				$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 			}
 
 			// update admin notes if it was disabled

@@ -42,7 +42,14 @@ CKEDITOR.editorConfig = function( config ) {
 	
 	// allow these tags to accept classes
 	config.extraAllowedContent = 'hr(*)';
+	config.extraAllowedContent = 'audio(*)';
+	config.extraAllowedContent = 'source(*)';
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
+	
+	config.extraPlugins = 'widget';
+	config.extraPlugins = 'widgetselection';
+	config.extraPlugins = 'lineutils';
+	config.extraPlugins = 'html5audio';
 };

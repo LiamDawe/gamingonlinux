@@ -401,15 +401,7 @@ class bbcode
 		"/\[ogg](.+?)\[\/ogg\]/is" 
 			=> '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>',
 		"/(\[split\])(\s)*/is"
-			=> '<hr class="content_split">',
-		"/\[h1](.+?)\[\/h1]/is"
-			=> '<h1>$1</h1>',
-		"/\[h2](.+?)\[\/h2]/is"
-			=> '<h2>$1</h2>',
-		"/\[h3](.+?)\[\/h3]/is"
-			=> '<h3>$1</h3>',
-		"/\[h4](.+?)\[\/h4]/is"
-			=> '<h4>$1</h4>',
+			=> '<hr class="content_split">'
 		);
 
 		$body = $this->emoticons($body);
@@ -809,6 +801,28 @@ class bbcode
 		}
 
 		return $body;
+	}
+	
+	// convert helpers into the html for displaying on the site
+	function article_bbcode($text)
+	{
+		$text = $this->pc_info($text);
+		
+		$text = $this->do_charts($text);
+		
+		$text = $this->logged_in_code($text);
+
+		if (preg_match_all("/\[giveaway\](.+?)\[\/giveaway\]/is", $text, $giveaway_matches))
+		{
+			foreach ($giveaway_matches[1] as $match)
+			{
+				$text = $this->replace_giveaways($text, $match);
+			}
+		}
+
+		$text = $this->do_timers($text);
+		
+		return $text;
 	}
 }
 ?>

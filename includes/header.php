@@ -7,6 +7,13 @@ $timer_start = microtime(true);
 
 require APP_ROOT . "/includes/bootstrap.php";
 
+// site offline for whatever
+if ($core->config('site_online') == 0)
+{
+	include(APP_ROOT . '/templates/default/down.html');
+	die();
+}
+
 if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {
 	$user->logout();

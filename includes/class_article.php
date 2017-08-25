@@ -290,7 +290,7 @@ class article
 		}
 		// prevent ckeditor just giving us a blank article (this is the default for an empty editor)
 		// this way if there's an issue and it gets wiped, we still don't get a blank article published
-		else if ($text = '<p>&nbsp;</p>')
+		else if ($text == '<p>&nbsp;</p>')
 		{
 			$redirect = 1;
 

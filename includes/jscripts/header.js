@@ -1244,7 +1244,7 @@ jQuery(document).ready(function()
 	{
 		e.preventDefault();
 		var tagline_image = $('.tagline-image').attr('href');
-		CKEDITOR.instances.ckeditor.insertHtml('<img src="'+tagline_image+'" />');
+		CKEDITOR.instances.ckeditor_gol.insertHtml('<img src="'+tagline_image+'" />');
 	});	
 	
 	// prevent accidental logouts

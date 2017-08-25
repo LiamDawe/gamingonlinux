@@ -91,6 +91,23 @@ setInterval ( "update_notifications()", 60000 );
     toolbar: 'insert',
     icon: '/templates/default/images/spoiler.png'
 });
+this.editor.on('instanceReady', function(){
+    // Note nested arrays
+    // http://docs.ckeditor.com/#!/api/CKEDITOR.filter-method-addTransformations
+    // This rule will add the target="_blank" attribute to all links that
+    // do not have it.
+    this.editor.filter.addTransformations([
+      [{
+        element: 'a',
+        left: function( el ) {
+          return el.target !== '_blank';
+        },
+        right: function( el, tools ) {
+          el.attributes.target = '_blank';
+        }
+      }]
+    ]);
+  }.bind(this));
 </script>
 {:editor_js}
 {:user_graph_js}

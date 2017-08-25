@@ -7,18 +7,25 @@ $timer_start = microtime(true);
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-// site offline for whatever
-if ($core->config('site_online') == 0)
-{
-	include(APP_ROOT . '/templates/default/down.html');
-	die();
-}
-
 if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {
 	$user->logout();
 }
 $user->check_session();
+
+// site offline for whatever
+if ($core->config('site_online') == 0)
+{
+	if (!$user->check_group(1))
+	{
+		include(APP_ROOT . '/templates/default/down.html');
+		die();
+	}
+	else
+	{
+		$core->message('The website is currently in OFFLINE mode for maintenance!', 1);
+	}
+}
 
 $forum_class = new forum($dbl, $core, $user);
 

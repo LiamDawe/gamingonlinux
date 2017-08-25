@@ -178,9 +178,13 @@ class user
 
 	function block_list()
 	{
-		if (isset($_SESSION) && $_SESSION['user_id'] > 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			$this->blocked_users = $this->database->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+		}
+		else
+		{
+			$this->blocked_users = [];
 		}
 	}
 	

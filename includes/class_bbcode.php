@@ -806,6 +806,7 @@ class bbcode
 	// convert helpers into the html for displaying on the site
 	function article_bbcode($text)
 	{
+		$text = $this->parse_links($text);
 		$text = $this->pc_info($text);
 		
 		$text = $this->do_charts($text);

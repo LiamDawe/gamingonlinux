@@ -668,7 +668,6 @@ class bbcode
 					p.`cpu_vendor`,
 					p.`cpu_model`,
 					p.`gpu_vendor`,
-					p.`gpu_model`,
 					p.`gpu_driver`,
 					p.`ram_count`,
 					p.`monitor_count`,
@@ -677,11 +676,15 @@ class bbcode
 					p.`dual_boot`,
 					p.`gamepad`,
 					p.`date_updated`,
-					u.`distro`
+					u.`distro`,
+					g.`id` AS `gpu_id`, 
+					g.`name` AS `gpu_model`
 					FROM
 					`user_profile_info` p
 					INNER JOIN
 					`users` u ON u.user_id = p.user_id
+					LEFT JOIN
+					`gpu_models` g ON g.id = p.gpu_model 
 					WHERE
 					p.`user_id` = ?", array($_SESSION['user_id']))->fetch();
 

@@ -16,7 +16,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
-		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
+		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $text);
 	}
 
 	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));

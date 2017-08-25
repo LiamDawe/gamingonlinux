@@ -28,7 +28,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	// upload tagline image
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
-		$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name']);
+		$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 	}
 
 	// article has been posted, remove any saved info from errors (so the fields don't get populated if you post again)

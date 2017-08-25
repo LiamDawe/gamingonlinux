@@ -16,7 +16,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{
-		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
+		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 	}
 
 	// update history

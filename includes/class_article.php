@@ -1,4 +1,6 @@
 <?php
+use claviska\SimpleImage;
+
 class article
 {
 	private $database;
@@ -72,60 +74,69 @@ class article
 		}
 	}
 
-  function display_previous_uploads($article_id = NULL)
-  {
-    global $db;
+	function display_previous_uploads($article_id = NULL)
+	{
+		global $db;
 
-    $previously_uploaded = '';
-    if ($article_id != NULL)
-    {
-      // add in uploaded images from database
-      $db->sqlquery("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id));
-      $article_images = $db->fetch_all_rows();
+		$previously_uploaded = '';
+		if ($article_id != NULL)
+		{
+			// add in uploaded images from database
+			$db->sqlquery("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id));
+			$article_images = $db->fetch_all_rows();
 
-      foreach($article_images as $value)
-      {
-        $bbcode = "[img]" . $this->core->config('website_url') . "uploads/articles/article_images/{$value['filename']}[/img]";
-        $bbcode_thumb = "[img-thumb]{$value['filename']}[/img-thumb]";
+			foreach($article_images as $value)
+			{
+				$main_url = $this->core->config('website_url') . 'uploads/articles/article_images/' . $value['filename'];
+				$main_path = APP_ROOT . '/uploads/articles/article_images/' . $value['filename'];
+				
+				$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $value['filename'];
+				$thumb_path = APP_ROOT . '/uploads/articles/article_images/thumbs/' . $value['filename'];
+								        
+				// for old uploads where no thumbnail was made, make one
+				if (!file_exists($thumb_path) && file_exists($main_path))
+				{
+					include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
+					
+					$img = new SimpleImage();
+					$img->fromFile($main_path)->resize(350, null)->toFile($thumb_path);					
+				}
         
-        // for old uploads where no thumbnail was made
-        $show_thumb = '';
-        $main_image = $this->core->config('website_url') . 'uploads/articles/article_images/'.$value['filename'];
-        if (file_exists($this->core->config('path') . 'uploads/articles/article_images/thumbs/'.$value['filename']))
-        {
-			$main_image = $this->core->config('website_url') . 'uploads/articles/article_images/thumbs/'.$value['filename'];
-			$show_thumb = 'BBCode (thumbnail): <input id="img'.$value['id'].'_thumb" type="text" class="form-control" value="'.$bbcode_thumb.'" /> <button class="btn" data-clipboard-target="#img'.$value['id'].'_thumb">Copy</button> <button data-bbcode="'.$bbcode_thumb.'" class="add_button">Add to editor</button>';
-        }
-        
-        $previously_uploaded .= '<div class="box"><div class="body group"><div id="'.$value['id'].'"><img src="'.$main_image.'" class="imgList"><br />
-        BBCode: <input id="img'.$value['id'].'" type="text" class="form-control" value="'.$bbcode.'" />
-        <button class="btn" data-clipboard-target="#img'.$value['id'].'">Copy</button> <button data-bbcode="'.$bbcode.'" class="add_button">Add to editor</button> ' . $show_thumb .'
-        <button id="'.$value['id'].'" class="trash">Delete image</button>
-        </div>
-        </div>
-        </div>';
-      }
-    }
-    else if ($article_id == NULL)
-    {
-      // sort out previously uploaded images
-      if (isset($_SESSION['uploads']))
-      {
-        foreach($_SESSION['uploads'] as $key)
-        {
-          if ($key['image_rand'] == $_SESSION['image_rand'])
-          {
-            $bbcode = "[img]" . $this->core->config('website_url') . "uploads/articles/article_images/{$key['image_name']}[/img]";
-            $previously_uploaded .= "<div class=\"box\"><div class=\"body group\"><div id=\"{$key['image_id']}\"><img src=\"/uploads/articles/article_images/{$key['image_name']}\" class='imgList'><br />
-            BBCode: <input id=\"img{$key['image_id']}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" />
-            <button class=\"btn\" data-clipboard-target=\"#img{$key['image_id']}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button> <button id=\"{$key['image_id']}\" class=\"trash\">Delete image</button>
-            </div></div></div>";
-          }
-        }
-      }
-    }
-    return $previously_uploaded;
-  }
+				$previously_uploaded .= '<div class="box">
+				<div class="body group">
+				<div id="'.$value['id'].'"><img src="' . $thumb_url . '" class="imgList"><br />
+				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $value['id'] . '" class="trash">Delete image</button>
+				</div>
+				</div>
+				</div>';
+			}
+		}
+		else if ($article_id == NULL)
+		{
+			// sort out previously uploaded images
+			if (isset($_SESSION['uploads']))
+			{
+				print_r($_SESSION['uploads']);
+				foreach($_SESSION['uploads'] as $key)
+				{
+					if ($key['image_rand'] == $_SESSION['image_rand'])
+					{
+						$main_url = $this->core->config('website_url') . 'uploads/articles/article_images/' . $key['image_name'];
+						$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $key['image_name'];
+						
+						$previously_uploaded .= '<div class="box uploads">
+						<div class="body group">
+						<div id="'.$key['image_id'].'"><img src="' . $thumb_url . '" class="imgList"><br />
+						URL: <input id="img' . $key['image_id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $key['image_id'] . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $key['image_id'] . '" class="trash">Delete image</button>
+						</div>
+						</div>
+						</div>';
+					}
+				}
+			}
+		}
+		return $previously_uploaded;
+	}
 
   public static function process_categories($article_id)
   {

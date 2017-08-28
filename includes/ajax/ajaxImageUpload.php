@@ -69,17 +69,16 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						$_SESSION['uploads'][$image_id]['image_rand'] = $_SESSION['image_rand'];
 					}
 
-					$bbcode = "[img]" . $core->config('website_url') . "uploads/articles/article_images/{$image_name}[/img]";
-					$bbcode_thumb = "[img-thumb]{$image_name}[/img-thumb]";
+					$main_url = $core->config('website_url') . 'uploads/articles/article_images/' . $image_name;
+					$thumb_url = $core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $image_name;
 
-					echo "<div class=\"box\">
-					<div class=\"body group\">
-					<div id=\"{$image_id}\"><img src=\"" . $core->config('website_url') . "uploads/articles/article_images/thumbs/$image_name\" class='imgList'><br />
-					BBCode: <input id=\"img{$image_id}\" type=\"text\" class=\"form-control\" value=\"{$bbcode}\" /> <button class=\"btn\" data-clipboard-target=\"#img{$image_id}\">Copy</button> <button data-bbcode=\"{$bbcode}\" class=\"add_button\">Add to editor</button>
-					BBCode (thumbnail): <input id=\"img{$image_id}_thumb\" type=\"text\" class=\"form-control\" value=\"{$bbcode_thumb}\" /> <button class=\"btn\" data-clipboard-target=\"#img{$image_id}_thumb\">Copy</button> <button data-bbcode=\"{$bbcode_thumb}\" class=\"add_button\">Add to editor</button> <button id=\"{$image_id}\" class=\"trash\">Delete image</button>
+					echo '<div class="box">
+					<div class="body group">
+					<div id="'.$image_id.'"><img src="' . $thumb_url . '" class="imgList"><br />
+					URL: <input id="img' . $image_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $image_id . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $image_id . '" class="trash">Delete image</button>
 					</div>
 					</div>
-					</div>";
+					</div>';
 				}
 
 				else

@@ -935,12 +935,6 @@ jQuery(document).ready(function()
 		});
 	});
 
-	$(".uploads").on("click", ".add_button", function()
-	{
-		var text = $(this).data('bbcode');
-		$('.bbcode_editor').val($('.bbcode_editor').val() + text);
-	});
-
 	$('#generate_preview').click(function()
 	{
 		var article_id = $(this).data('article-id');
@@ -1244,8 +1238,23 @@ jQuery(document).ready(function()
 	{
 		e.preventDefault();
 		var tagline_image = $('.tagline-image').attr('href');
-		CKEDITOR.instances.ckeditor_gol.insertHtml('<img src="'+tagline_image+'" />');
+		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><img src="'+tagline_image+'" /></p>');
 	});	
+	
+	// insert normal image uploads into article textarea
+	// main image
+	$(document).on('click', ".uploads .add_button", function(e) 
+	{
+		var text = $(this).data('url');
+		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><img src="'+text+'" /></p>');
+	});
+	
+	// thumbnail insertion
+	$(document).on('click', ".uploads .add_thumbnail_button", function(e) 
+	{
+		var text = $(this).data('url');
+		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><img src="'+text+'" /></p>');
+	});
 	
 	// prevent accidental logouts
 	$(document).on('click', ".logout_link", function(e) 

@@ -246,7 +246,7 @@ class bbcode
 		return $text;
 	}
 
-	function parse_bbcode($body, $article = 1, $tagline_image = NULL, $gallery_tagline = NULL)
+	function parse_bbcode($body, $article = 1)
 	{
 		//  get rid of empty BBCode, is there a point in having excess markup?
 		$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
@@ -279,38 +279,6 @@ class bbcode
 			$body);
 
 		$body = $this->pc_info($body);
-
-		if ($tagline_image != NULL)
-		{	
-			// plain image, no resizing
-			$find = "[img]tagline-image[/img]";
-
-			if ($gallery_tagline == NULL)
-			{
-				$file_path = "uploads/articles/tagline_images/";
-			}
-			else
-			{
-				$file_path = "uploads/tagline_gallery/";
-			}
-			$replace = "<img itemprop=\"image\" src=\"" . $this->core->config('website_url') . $file_path . $tagline_image . "\" alt=\"tagline-image\" />";
-
-			$body = str_replace($find, $replace, $body);
-			
-			// if they have set a size on it
-			$find_resize = "/\[img=([0-9]+)x([0-9]+)?\]tagline-image\[\/img\]/";
-			if ($gallery_tagline == NULL)
-			{
-				$file_path = "uploads/articles/tagline_images/";
-			}
-			else
-			{
-				$file_path = "uploads/tagline_gallery/";
-			}
-			$replace_resize = "<img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"" . $this->core->config('website_url') . $file_path . $tagline_image . "\" alt=\"tagline-image\" />";
-			
-			$body = preg_replace($find_resize, $replace_resize, $body);
-		}
 
 		$body = $this->parse_links($body);
 
@@ -364,8 +332,6 @@ class bbcode
 			=> "<div style=\"text-align:right;\">$1</div>",
 		"/\[left\](.+?)\[\/left\]/is" 
 			=> "<div style=\"text-align:left;\">$1</div>",
-		"/\[img-thumb\](.+?)\[\/img-thumb\]/is" 
-			=> "<a data-fancybox=\"images\" href=\"/uploads/articles/article_images/$1\"><img itemprop=\"image\" src=\"/uploads/articles/article_images/thumbs/$1\" class=\"img-responsive\" alt=\"image\" /></a>",
 		"/\[img\](.+?)\[\/img\]/is" 
 			=> "<a data-fancybox=\"images\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
 		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" 
@@ -424,10 +390,6 @@ class bbcode
 		$body = str_replace('</td><br />', '</td>', $body);
 		$body = str_replace('</tr><br />', '</tr>', $body);
 		$body = preg_replace('/\<table (.+?)\>\<br \/\>/is', '<table $1>', $body);
-
-		// stop big gaps after embedding a tweet from twitter
-		$body = str_replace('</a></blockquote><br />', '</a></blockquote>', $body);
-		$body = str_replace('</script><br />', '</script>', $body);
 
 		// Put the code blocks back in
 		foreach ($codeBlocks as $key => $codeblock)
@@ -594,23 +556,6 @@ class bbcode
 	// remove bits to make sure RSS validates, and to make sure hidden bits don't become available to all
 	function rss_stripping($text, $tagline_image = NULL, $gallery_tagline = NULL)
 	{
-		if ($tagline_image != NULL)
-		{
-			$find = "[img]tagline-image[/img]";
-
-			if ($gallery_tagline == NULL)
-			{
-				$file_path = "uploads/articles/tagline_images/";
-			}
-			else
-			{
-				$file_path = "uploads/tagline_gallery/";
-			}
-			$replace = "<img src=\"" . $this->core->config('website_url') . $file_path . $tagline_image . "\" alt=\"tagline-image\" />";
-
-			$text = str_replace($find, $replace, $text);
-		}
-
 		$text = str_replace('<*PAGE*>', '', $text);
 
 		$text = str_replace('[pcinfo]', '', $text);

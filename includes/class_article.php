@@ -116,7 +116,6 @@ class article
 			// sort out previously uploaded images
 			if (isset($_SESSION['uploads']))
 			{
-				print_r($_SESSION['uploads']);
 				foreach($_SESSION['uploads'] as $key)
 				{
 					if ($key['image_rand'] == $_SESSION['image_rand'])

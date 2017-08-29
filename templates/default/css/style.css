@@ -1480,7 +1480,6 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .dark .announce a {color: #191919; font-style: italic;}
 .dark .announce a:link {color: #191919; font-style: italic;}
 .dark .breadcrumb {background: #2E2E2E;}
-.dark .collapse_header {background: #000;}
 .vote_done {color: white; background-color: green;}
 .dark .vote_done {color: white; background-color: green;}
 .dark #wrap strong {color: black;}

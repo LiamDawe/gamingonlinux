@@ -1246,7 +1246,7 @@ jQuery(document).ready(function()
 	$(document).on('click', ".uploads .add_button", function(e) 
 	{
 		var text = $(this).data('url');
-		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><img src="'+text+'" /></p>');
+		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+text+'" data-fancybox="images"><img src="'+text+'" /></a></p>');
 	});
 	
 	// thumbnail insertion

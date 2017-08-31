@@ -105,7 +105,7 @@ class article
 				$previously_uploaded .= '<div class="box">
 				<div class="body group">
 				<div id="'.$value['id'].'"><img src="' . $thumb_url . '" class="imgList"><br />
-				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $value['id'] . '" class="trash">Delete image</button>
+				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $value['id'] . '" class="trash">Delete image</button>
 				</div>
 				</div>
 				</div>';

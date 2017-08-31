@@ -75,7 +75,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					echo '<div class="box">
 					<div class="body group">
 					<div id="'.$image_id.'"><img src="' . $thumb_url . '" class="imgList"><br />
-					URL: <input id="img' . $image_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $image_id . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $image_id . '" class="trash">Delete image</button>
+					URL: <input id="img' . $image_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $image_id . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $image_id . '" class="trash">Delete image</button>
 					</div>
 					</div>
 					</div>';

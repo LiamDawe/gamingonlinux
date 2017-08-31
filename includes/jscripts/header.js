@@ -1252,8 +1252,9 @@ jQuery(document).ready(function()
 	// thumbnail insertion
 	$(document).on('click', ".uploads .add_thumbnail_button", function(e) 
 	{
-		var text = $(this).data('url');
-		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><img src="'+text+'" /></p>');
+		var thumbnail = $(this).data('url');
+		var big_image = $(this).data('main-url');
+		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+big_image+'" data-fancybox="images"><img src="'+thumbnail+'" /></a></p>');
 	});
 	
 	// prevent accidental logouts

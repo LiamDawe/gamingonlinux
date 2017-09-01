@@ -26,7 +26,7 @@ INNER JOIN
 LEFT JOIN 
 	`users` u ON u.user_id = c.author_id 
 WHERE 
-	a.active = 1 ORDER BY `comment_id` DESC limit 20");
+	a.active = 1 AND c.`approved` = 1 ORDER BY `comment_id` DESC limit 20");
 while ($comments = $db->fetch())
 {
 	$date = $core->human_date($comments['time_posted']);

@@ -12,6 +12,8 @@ a {
 }
 .content a:hover {text-decoration: underline;}
 
+/* CK Editor specific stuff */
+
 .cke_editable {padding: 10px;}
 
 /* spoiler container */
@@ -54,6 +56,7 @@ body.dark {
 .dark pre {background:#222;}
 
 .dark .collapse_header {background: #000;}
+.dark .cke_dialog_contents textarea, .dark .cke_dialog_contents input[type="text"], .dark .cke_dialog_ui_input_select { background-color: #151515 !important; color: #ffffff;}
 
 /* misc elements */
 .bbcodeblock, code {

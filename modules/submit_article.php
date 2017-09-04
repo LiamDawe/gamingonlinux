@@ -132,7 +132,7 @@ if (isset($_POST['act']))
         $templating->set_previous('title', 'Submit An Article', 1);
         
         $title = strip_tags($_POST['title']);
-        $text = core::make_safe($_POST['text']);
+        $text = trim($_POST['text']);
         
         $name = '';
         if (isset($_POST['name']))
@@ -184,6 +184,22 @@ if (isset($_POST['act']))
             header("Location: " . $redirect . '&error');
             die();
         }
+        
+		// prevent ckeditor just giving us a blank article (this is the default for an empty editor)
+		// this way if there's an issue and it gets wiped, we still don't get a blank article published
+		if ($text == '<p>&nbsp;</p>')
+		{
+            $_SESSION['atitle'] = $title;
+            $_SESSION['atext'] = $text;
+            $_SESSION['aname'] = $name;
+            $_SESSION['aemail'] = $guest_email;
+
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'text';	
+			
+            header("Location: " . $redirect . '&error');
+            die();
+		}
 
 		if ($core->config('captcha_disabled') == 0 && $captcha == 1)
 		{

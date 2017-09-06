@@ -68,6 +68,20 @@ if (!isset($_GET['go']))
 						}
 						$note_row = $templating->store_replace($note_row, array('additional_comments' => $additional_comments));
 					}
+					if ($note_list['type'] == 'editor_plan')
+					{
+						$note_row = $templating->block_store('editor_plan', 'usercp_modules/notifications');
+						if ($note_list['total'] > 1)
+						{
+							$total = $note_list['total'] - 1;
+							$additional_comments = ' plus ' . $total . ' more plans';
+						}
+						else if ($note_list['total'] == 1)
+						{
+							$additional_comments = '';
+						}
+						$note_row = $templating->store_replace($note_row, array('additional_comments' => $additional_comments));
+					}
 				}
 				if ($note_list['is_like'] == 0 && $note_list['is_quote'] == 0 && $note_list['type'] == NULL)
 				{

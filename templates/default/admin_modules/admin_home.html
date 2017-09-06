@@ -12,6 +12,29 @@
 				</div>
 [/block: crons]
 
+[block: plans]
+				<div class="box editor_plans_box">
+					<div class="head">Articles planned/in progress</div>
+					<div class="body group">
+						Please take note of everyone's plans for articles here and add your own! Please check this every time before writing an article.
+						<form method="post" action="admin.php?module=home">
+							<input type="text" name="text" class="form-control" /><br />
+							<input type="hidden" name="type" value="add_plan" />
+							<button class="send_editor_plan" type="submit" name="act" value="plan">Add plan</button>
+						</form>
+					</div>
+					<div class="body list editor_plans_content" style="overflow:auto; height:250px;">
+						<ul class="editor_plans">
+							{:editor_plans}
+						</ul>
+					</div>
+				</div>	
+[/block: plans]
+
+[block: plan_row]
+<li id="plan-{:id}"><a href="/profiles/{:user_id}">{:username}</a> - {:date}<br /> {:text} {:delete_icon}</li>
+[/block: plan_row]
+
 [block: comments_top]
 				<div class="box">
 					<div class="head">Admin message-box</div>

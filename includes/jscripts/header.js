@@ -1056,6 +1056,60 @@ jQuery(document).ready(function()
 		});
 	});
 	
+	/* ADMIN HOME ARTICLE PLANNER */
+	
+	$(document).on('click', ".send_editor_plan", function(e)
+	{
+		e.preventDefault();
+		var form = $(this).closest('form');
+		var url = "/includes/ajax/admin/editor_plans.php"; 
+		
+		$.ajax({
+			type: "POST",
+			url: url,
+			dataType:"json",
+			data: form.serialize(), 
+			success: function(data)
+			{
+				if (data['result'] == 'done')
+				{
+					$(form).removeClass('dirty'); // prevent ays dialogue when leaving
+					$('.editor_plans_box').html(data['text']);
+					$('.editor_plans_content').highlight();
+				}
+				else
+				{
+					alert(data['message']);
+				}
+			}
+		});
+	});
+	
+	$(document).on('click', ".delete_editor_plan", function(e)
+	{
+		e.preventDefault();
+		var note_id = $(this).data('note-id');
+		var owner_id = $(this).data('owner-id');
+		
+		$.ajax({
+			type: "POST",
+			url: '/includes/ajax/admin/editor_plans.php',
+			dataType:"json",
+			data: {'note_id':note_id, 'owner_id': owner_id, 'type':'remove'}, 
+			success: function(data)
+			{
+				if (data['result'] == 'done')
+				{
+					$('#plan-' + note_id).fadeOut(500);
+				}
+				else
+				{
+					alert(data['message']);
+				}
+			}
+		});
+	});
+	
 	function ajax_page_comments(e, element)
 	{
 		var url = window.location.href;

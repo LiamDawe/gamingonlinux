@@ -54,6 +54,36 @@ if (!isset($_GET['view']))
 		}
 		$templating->set('cron_list', $cron_list);
 	}
+	
+	// editor plans
+	$grab_comments = $dbl->run("SELECT p.`id`, p.`text`, p.`date_posted`, u.`user_id`, u.`username` FROM `editor_plans` p INNER JOIN `users` u ON p.`user_id` = u.`user_id` ORDER BY p.`id` DESC")->fetch_all();
+	$templating->block('plans', 'admin_modules/admin_home');
+	$plans_list = [];
+	if ($grab_comments)
+	{
+		foreach ($grab_comments as $comments)
+		{
+			$comment_text = $bbcode->parse_bbcode($comments['text'], 0);
+			$date = $core->human_date(strtotime($comments['date_posted']));
+			
+			$plans = $templating->block_store('plan_row', 'admin_modules/admin_home');
+			
+			$delete_icon = '';
+			if (($_SESSION['user_id'] == $comments['user_id']) || $user->check_group(1))
+			{
+				$delete_icon = '<span class="fright"><a href="#" class="delete_editor_plan" title="Delete Plan" data-note-id="'.$comments['id'].'" data-owner-id="'.$comments['user_id'].'">&#10799;</a></span>';
+			}
+			
+			$plans = $templating->store_replace($plans, array('id' => $comments['id'], 'user_id' => $comments['user_id'], 'username' => $comments['username'], 'date' => $date, 'text' => $comments['text'], 'delete_icon' => $delete_icon));
+			
+			$plans_list[] = $plans;
+		}
+		$templating->set('editor_plans', implode('', $plans_list));
+	}
+	else
+	{
+		$templating->set('editor_plans', '<li>None</li>');
+	}
 
 	// only show admin/editor comments to admins and editors
 	if ($user->check_group([1,2]) == true)

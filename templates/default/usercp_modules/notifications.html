@@ -31,6 +31,10 @@
 <div id="note-{:id}" class="box"><div class="body group"><img class="{:icon}" src="{:this_template}/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> left a message in <a href="/admin.php?wipe_note={:id}">the admin area</a> {:additional_comments}<span class="fright"><a href="#" class="delete_notification" title="Remove Notification" data-note-id="{:id}">&#10799;</a></span></div></div>
 [/block: admin_area_comment]
 
+[block: editor_plan]
+<div id="note-{:id}" class="box"><div class="body group"><img class="{:icon}" src="{:this_template}/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> added a new article plan in <a href="/admin.php?wipe_note={:id}">the admin area</a> {:additional_comments}<span class="fright"><a href="#" class="delete_notification" title="Remove Notification" data-note-id="{:id}">&#10799;</a></span></div></div>
+[/block: editor_plan]
+
 [block: none]
 <div class="box"><div class="body group">You have zero :(</div></div>
 [/block: none]

@@ -175,7 +175,7 @@ if(isset($_POST))
 	}
 	$templating->set('top_image_nobbcode', $top_image_nobbcode);
 	$templating->set('tagline', $tagline);
-	$templating->set('text_full', $text);
+	$templating->set('text_full', $bbcode->article_bbcode($text));
 	
 	echo $templating->output();
 }

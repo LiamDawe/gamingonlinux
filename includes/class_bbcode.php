@@ -31,7 +31,7 @@ class bbcode
 	function replace_giveaways($text, $giveaway_id)
 	{
 		$key_claim = '';
-		$nope_message = '[b]Grab a key[/b]<br />You must be logged in to grab a key, your account must also be older than one day!';
+		$nope_message = '<strong>Grab a key</strong><br />You must be logged in to grab a key, your account must also be older than one day!';
 		
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
@@ -40,7 +40,7 @@ class bbcode
 			// they have a key already
 			if ($your_key['counter'] == 1)
 			{
-				$key_claim = '[b]Grab a key[/b]<br />You already claimed one: ' . $your_key['game_key'];
+				$key_claim = '<strong>Grab a key<strong><br />You already claimed one: ' . $your_key['game_key'];
 			}
 			// they do not have a key
 			else if ($your_key['counter'] == 0)
@@ -49,7 +49,7 @@ class bbcode
 
 				if ($keys_left['counter'] == 0)
 				{
-					$key_claim = '[b]Grab a key[/b]<br />All keys are now gone, sorry!';
+					$key_claim = '<strong>Grab a key</strong><br />All keys are now gone, sorry!';
 				}
 				else
 				{
@@ -62,7 +62,7 @@ class bbcode
 					{
 						$game_info = $this->database->run("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
 
-						$key_claim = '[b]Grab a key[/b] (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
+						$key_claim = '<strong>Grab a key</strong> (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
 					}
 					else
 					{
@@ -106,46 +106,6 @@ class bbcode
 		$pattern = '/\[[^\]]+\]/si'; //More effecient striping regex thx to tadzik
 		$replace = '';
 		return preg_replace($pattern, $replace, $string);
-	}
-
-	// this is the replacement function the the article dump module in admin, it sorts the different sections and splits them
-	function article_dump($dump)
-	{
-		$sections = array();
-
-		// title
-		$sections['title'] = '';
-		$pattern = '/\=title\=(.+?)\=title\=/is';
-		if (preg_match($pattern, $dump, $title))
-		{
-			$sections['title'] = $title[1];
-		}
-
-		// tags
-		$sections['tags'] = '';
-		$pattern = '/\=tags\=(.+?)\=tags\=/is';
-		if (preg_match($pattern, $dump, $tags))
-		{
-			$sections['tags'] = $tags[1];
-		}
-		
-		// tagline
-		$sections['tagline'] = '';
-		$pattern = '/\=tagline\=(.+?)\=tagline\=/is';
-		if (preg_match($pattern, $dump, $tagline))
-		{
-			$sections['tagline'] = $tagline[1];
-		}
-		
-		// text
-		$sections['text'] = '';
-		$pattern = '/\=text\=(.+?)\=text\=/is';
-		if (preg_match($pattern, $dump, $text))
-		{
-			$sections['text'] = $text[1];
-		}
-		
-		return $sections;
 	}
 
 	// replace specific-user quotes, called by quotes()

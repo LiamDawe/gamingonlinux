@@ -406,7 +406,7 @@ else if (isset($_POST['act']))
 	
 	if ($_POST['act'] == 'google_remove')
 	{
-		$db->sqlquery("UPDATE `users` SET `google_email` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
+		$db->sqlquery("UPDATE `users` SET `google_email` = ? WHERE `user_id` = ?", array('', $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}

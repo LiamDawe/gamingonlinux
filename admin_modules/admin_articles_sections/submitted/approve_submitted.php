@@ -77,19 +77,8 @@ else
 			$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 		}
 
-		unset($_SESSION['atitle']);
-		unset($_SESSION['atagline']);
-		unset($_SESSION['atext']);
-		unset($_SESSION['aslug']);
-		unset($_SESSION['acategories']);
-		unset($_SESSION['aactive']);
-		unset($_SESSION['uploads']);
-		unset($_SESSION['uploads_tagline']);
-		unset($_SESSION['image_rand']);
+		$article_class->reset_sessions();
 		unset($_SESSION['original_text']);
-		unset($_SESSION['gallery_tagline_id']);
-		unset($_SESSION['gallery_tagline_rand']);
-		unset($_SESSION['gallery_tagline_filename']);
 
 		// pick the email to use
 		$email = '';

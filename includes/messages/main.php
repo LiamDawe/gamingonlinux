@@ -137,6 +137,12 @@ return [
 	[
 		"text" => "Thank you for registering %s, you are now logged in, <strong>but you need to confirm your email before being able to post</strong>!",
 		"additions" => 1
+	],
+	"article_conflicts" =>
+	[
+		"text" => "Warning: These articles have been posted before you, please check for conflicts (links open a new tab): %s",
+		"error" => 2,
+		"additions" => 1
 	]
 ];
 ?>

@@ -21,11 +21,24 @@ class article
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
 	function reset_sessions()
 	{
+		$_SESSION['image_rand'] = rand();
+		$_SESSION['article_timer'] = core::$date;
 		unset($_SESSION['uploads']);
 		unset($_SESSION['uploads_tagline']);
 		unset($_SESSION['gallery_tagline_id']);
 		unset($_SESSION['gallery_tagline_rand']);
 		unset($_SESSION['gallery_tagline_filename']);
+		// clear the conflict checker, since this is a fresh load
+		if (isset($_SESSION['conflict_checked']))
+		{
+			unset($_SESSION['conflict_checked']);
+		}
+		
+		unset($_SESSION['atitle']);
+		unset($_SESSION['aslug']);
+		unset($_SESSION['atagline']);
+		unset($_SESSION['atext']);
+		unset($_SESSION['acategories']);
 	}
 
 	public function tagline_image($data)
@@ -208,27 +221,24 @@ class article
 		$db->sqlquery("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
 	}
 
-  function display_tagline_image($article = NULL)
-  {
-    $tagline_image = '';
+	function display_tagline_image($article = NULL)
+	{
+		$tagline_image = '';
 
-    // if it's an existing article, see if there's a tagline image to grab
-    if ($article != NULL)
-    {
-      if (!empty($article['tagline_image']))
-      {
-        $tagline_image = "<div class=\"test\" id=\"{$article['tagline_image']}\"><img src=\"" . $this->core->config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-        Full Image Url: <a class=\"tagline-image\" href=\"" . $this->core->config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a><br /><button type=\"button\" class=\"insert_tagline_image\">Insert into editor</button></div>";
-      }
-      if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
-      {
-        $tagline_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . $this->core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />
-        Full Image Url: <a class=\"tagline-image\" href=\"" . $this->core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a><br /><button type=\"button\" class=\"insert_tagline_image\">Insert into editor</button></div>";
+		// if it's an existing article, see if there's a tagline image to grab
+		if ($article != NULL)
+		{
+			if (!empty($article['tagline_image']))
+			{
+				$tagline_image = "<div class=\"test\" id=\"{$article['tagline_image']}\"><img src=\"" . $this->core->config('website_url') . "uploads/articles/tagline_images/thumbnails/{$article['tagline_image']}\" alt=\"[articleimage]\" class=\"imgList\"><br />Full Image Url: <a class=\"tagline-image\" href=\"" . $this->core->config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}\" target=\"_blank\">Click Me</a><br /><button type=\"button\" class=\"insert_tagline_image\">Insert into editor</button></div>";
+			}
+			if ($article['gallery_tagline'] > 0 && !empty($article['gallery_tagline_filename']))
+			{
+				$tagline_image = "<div class=\"test\" id=\"{$article['gallery_tagline']}\"><img src=\"" . $this->core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" alt=\"[articleimage]\" class=\"imgList\"><br />Full Image Url: <a class=\"tagline-image\" href=\"" . $this->core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}\" target=\"_blank\">Click Me</a><br /><button type=\"button\" class=\"insert_tagline_image\">Insert into editor</button></div>";
+			}
+		}
 
-      }
-    }
-
-    if (isset(message_map::$error) && message_map::$error == 1)
+    if (isset(message_map::$error) && message_map::$error == 1 || message_map::$error == 2)
     {
       if ($_GET['temp_tagline'] == 1)
       {
@@ -255,7 +265,7 @@ class article
     return $tagline_image;
   }
 
-	// this function will check over everything necessary for an article to be correctly done
+	// this function will check over everything necessary for an article to be correctly done, including an article crossover checker
 	public function check_article_inputs($return_page)
 	{
 		global $core;
@@ -288,104 +298,132 @@ class article
 		{
 			$slug = core::nice_title($_POST['title']);
 		}
-
-		// make sure its not empty
-		$empty_check = core::mempty(compact('title', 'tagline', 'text', 'categories'));
-		if ($empty_check !== true)
+		
+		// check for newer articles, to prevent crossover
+		if (isset($_SESSION['conflict_checked']) && is_array($_SESSION['conflict_checked']))
 		{
-			$redirect = 1;
-
-			$_SESSION['message'] = 'empty';
-			$_SESSION['message_extra'] = $empty_check;
+			$in  = str_repeat('?,', count($_SESSION['conflict_checked']) - 1) . '?';
+			$article_res = $this->database->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ? AND `article_id` NOT IN ($in)", array_merge([$_SESSION['article_timer']], $_SESSION['conflict_checked']))->fetch_all();
 		}
-		// prevent ckeditor just giving us a blank article (this is the default for an empty editor)
-		// this way if there's an issue and it gets wiped, we still don't get a blank article published
-		else if ($text == '<p>&nbsp;</p>')
+		else
 		{
-			$redirect = 1;
-
-			$_SESSION['message'] = 'empty';
-			$_SESSION['message_extra'] = 'text';		
+			$article_res = $this->database->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ?", array($_SESSION['article_timer']))->fetch_all();
 		}
-
-		else if (strlen($tagline) < 100)
+		if ($article_res)
 		{
-			$redirect = 1;
-
-			$_SESSION['message'] = 'shorttagline';
-		}
-
-		else if (strlen($tagline) > $core->config('tagline-max-length'))
-		{
-			$redirect = 1;
-
-			$_SESSION['message'] = 'taglinetoolong';
-			$_SESSION['message_extra'] = $core->config('tagline-max-length');
-		}
-
-		else if (strlen($title) < 10)
-		{
-			$redirect = 1;
-
-			$_SESSION['message'] = 'shorttitle';
-		}
-
-		else if (isset($_POST['show_block']) && $core->config('total_featured') == $core->config('editor_picks_limit'))
-		{
-			$redirect = 1;
-			
-			$_SESSION['message'] = 'editor_picks_full';
-			$_SESSION['message_extra'] = $core->config('editor_picks_limit');
-		}
-
-		// if it's an existing article, check tagline image
-		// if database tagline_image is empty and there's no upload OR upload doesn't match (previous left over)
-		else if (isset($_POST['article_id']) && !empty($_POST['article_id']))
-		{
-			$has_tagline_img = 0;
-			if (!empty($check_article['tagline_image']) || $check_article['gallery_tagline'] > 0)
+			$article_list = '<form><ul>';
+			foreach($article_res as $res)
 			{
-				$has_tagline_img = 1;
+				$article_link = $this->get_link($res['article_id'], $res['title']);
+				$article_list .= '<li><a href="'.$article_link.'" target="_blank">'.$res['title'].'</a><input type="hidden" name="article_ids[]" value="'.$res['article_id'].'" /></li>';
 			}
 			
-			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-			{
-				$has_tagline_img = 1;
-			}
+			$article_list .= '</ul><button type="button" class="conflict_confirmed">Confirmed</button></form>';
 			
-			if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+			$redirect = 1;
+			$_SESSION['message'] = 'article_conflicts';
+			$_SESSION['message_extra'] = $article_list;
+		}
+		else
+		{
+			// make sure its not empty
+			$empty_check = core::mempty(compact('title', 'tagline', 'text', 'categories'));
+			if ($empty_check !== true)
 			{
-				$has_tagline_img = 1;
+				$redirect = 1;
+
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = $empty_check;
 			}
-			
-			if ($has_tagline_img == 0)
+			// prevent ckeditor just giving us a blank article (this is the default for an empty editor)
+			// this way if there's an issue and it gets wiped, we still don't get a blank article published
+			else if ($text == '<p>&nbsp;</p>')
+			{
+				$redirect = 1;
+
+				$_SESSION['message'] = 'empty';
+				$_SESSION['message_extra'] = 'text';		
+			}
+
+			else if (strlen($tagline) < 100)
+			{
+				$redirect = 1;
+
+				$_SESSION['message'] = 'shorttagline';
+			}
+
+			else if (strlen($tagline) > $core->config('tagline-max-length'))
+			{
+				$redirect = 1;
+
+				$_SESSION['message'] = 'taglinetoolong';
+				$_SESSION['message_extra'] = $core->config('tagline-max-length');
+			}
+
+			else if (strlen($title) < 10)
+			{
+				$redirect = 1;
+
+				$_SESSION['message'] = 'shorttitle';
+			}
+
+			else if (isset($_POST['show_block']) && $core->config('total_featured') == $core->config('editor_picks_limit'))
 			{
 				$redirect = 1;
 				
-				$_SESSION['message'] = 'noimageselected';
+				$_SESSION['message'] = 'editor_picks_full';
+				$_SESSION['message_extra'] = $core->config('editor_picks_limit');
 			}
-		}
 
-		// if it's a new article, check for tagline image in a simpler way
-		// if there's no upload, gallery or they don't match (one from a previous article that wasn't wiped)
-		else if (!isset($_POST['article_id']))
-		{
-			$has_tagline_img = 0;
-			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+			// if it's an existing article, check tagline image
+			// if database tagline_image is empty and there's no upload OR upload doesn't match (previous left over)
+			else if (isset($_POST['article_id']) && !empty($_POST['article_id']))
 			{
-				$has_tagline_img = 1;
-			}
-			
-			if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
-			{
-				$has_tagline_img = 1;
-			}
-			
-			if ($has_tagline_img == 0)
-			{
-				$redirect = 1;
+				$has_tagline_img = 0;
+				if (!empty($check_article['tagline_image']) || $check_article['gallery_tagline'] > 0)
+				{
+					$has_tagline_img = 1;
+				}
 				
-				$_SESSION['message'] = 'noimageselected';
+				if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+				{
+					$has_tagline_img = 1;
+				}
+				
+				if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+				{
+					$has_tagline_img = 1;
+				}
+				
+				if ($has_tagline_img == 0)
+				{
+					$redirect = 1;
+					
+					$_SESSION['message'] = 'noimageselected';
+				}
+			}
+
+			// if it's a new article, check for tagline image in a simpler way
+			// if there's no upload, gallery or they don't match (one from a previous article that wasn't wiped)
+			else if (!isset($_POST['article_id']))
+			{
+				$has_tagline_img = 0;
+				if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
+				{
+					$has_tagline_img = 1;
+				}
+				
+				if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
+				{
+					$has_tagline_img = 1;
+				}
+				
+				if ($has_tagline_img == 0)
+				{
+					$redirect = 1;
+					
+					$_SESSION['message'] = 'noimageselected';
+				}
 			}
 		}
 
@@ -399,11 +437,6 @@ class article
 			if (isset($_POST['categories']) && !empty($_POST['categories']))
 			{
 				$_SESSION['acategories'] = $_POST['categories'];
-			}
-
-			if (isset($_POST['games']) && !empty($_POST['games']))
-			{
-				$_SESSION['agames'] = $_POST['games'];
 			}
 
 			if (isset($_POST['show_article']))
@@ -587,19 +620,19 @@ class article
 				header("Location: ".$options['return_page']);
 			}
 		}
-			
+
 		// check everything is set correctly
 		$checked = $this->check_article_inputs($options['return_page']);
-			
+				
 		// check if it's an editors pick
 		$editors_pick = 0;
 		if (isset($_POST['show_block']))
 		{
 			$editors_pick = 1;
 		}
-		
+			
 		$gallery_tagline_sql = self::gallery_tagline($checked);
-		
+			
 		// an existing article needs cleaning up and updating
 		if (isset($_POST['article_id']) && !empty($_POST['article_id']))
 		{
@@ -630,23 +663,23 @@ class article
 			{
 				$author_id = $check_article['author_id'];
 			}
-		
+			
 			$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
 			$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
-			
+				
 			if ($options['type'] != 'draft')
 			{
 				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], $options['clear_notification_type']));
 			}
-			
+				
 			$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
-			
+				
 			// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
 			if ($_SESSION['original_text'] != $checked['text'])
 			{
 				$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 			}
-			
+				
 			if ($_SESSION['user_id'] == $author_id)
 			{
 				if (isset($_POST['subscribe']))
@@ -654,22 +687,22 @@ class article
 					$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $_POST['article_id']));
 				}
 			}
-			
+				
 			$article_id = $_POST['article_id'];
 		}
 		// otherwise make the new article
 		else
 		{
 			$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date));
-			
+				
 			$article_id = $db->grab_id();
-			
+				
 			if (isset($_POST['subscribe']))
 			{
 				$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
 			}
 		}
-		
+			
 		// upload attached images
 		if (isset($_SESSION['uploads']))
 		{
@@ -678,33 +711,23 @@ class article
 				$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
 			}
 		}
-		
+			
 		self::process_categories($article_id);
-		
+			
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{
 			$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 		}
-		
+			
 		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $options['new_notification_type'], core::$date, core::$date, $article_id));
-		
+			
 		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
-		
-		unset($_SESSION['atitle']);
-		unset($_SESSION['aslug']);
-		unset($_SESSION['atagline']);
-		unset($_SESSION['atext']);
-		unset($_SESSION['acategories']);
-		unset($_SESSION['agame']);
-		unset($_SESSION['uploads']);
-		unset($_SESSION['image_rand']);
-		unset($_SESSION['uploads_tagline']);
+			
 		unset($_SESSION['original_text']);
-		unset($_SESSION['gallery_tagline_id']);
-		unset($_SESSION['gallery_tagline_rand']);
-		unset($_SESSION['gallery_tagline_filename']);
-		
+
+		$this->reset_sessions();
+			
 		// if the person publishing it is not the author then email them
 		if ($options['type'] == 'admin_review')
 		{
@@ -742,7 +765,7 @@ class article
 				}
 			}
 		}
-		
+			
 		if ($options['type'] == 'submitted_article')
 		{
 			// pick the email to use
@@ -783,14 +806,14 @@ class article
 				mail($email, $subject, $message, $headers);
 			}
 		}
-		
+			
 		include($this->core->config('path') . 'includes/telegram_poster.php');
 		include($this->core->config('path') . 'includes/mastodon/post_status.php');
 
 		$article_link = self::get_link($article_id, $checked['slug']);
-		
+			
 		telegram($checked['title'] . ' ' . $article_link);
-		
+			
 		post_mastodon_status($checked['title'] . "\n\n" . $article_link);
 
 		if (!isset($_POST['show_block']))
@@ -801,7 +824,7 @@ class article
 		{
 			$redirect = $this->core->config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id;
 		}
-		header("Location: " . $redirect);	
+		header("Location: " . $redirect);
 	}
 	
 	public function display_article_list($article_list, $get_categories)
@@ -1016,7 +1039,7 @@ class article
 					{
 						$close_comments_link = "<a href=\"/index.php?module=articles_full&go=close_comments&article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Close Comments</a></span>";
 					}
-					else if ($article_info['comments_open'] == 0)
+					else if ($article_info['article']['comments_open'] == 0)
 					{
 						$close_comments_link = "<a href=\"/index.php?module=articles_full&go=open_comments&article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Open Comments</a></span>";
 					}

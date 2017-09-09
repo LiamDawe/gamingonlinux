@@ -1110,6 +1110,32 @@ jQuery(document).ready(function()
 		});
 	});
 	
+	/* to set the conflict checker session */
+	$(document).on('click', ".conflict_confirmed", function(e)
+	{
+		var form = $(this).closest('form');
+		var url = '/includes/ajax/admin/article_conflict_session.php';
+		
+		$.ajax({
+			type: "POST",
+			url: url,
+			dataType:"json",
+			data: form.serialize(), 
+			success: function(data)
+			{
+				if (data['result'] == 'done')
+				{
+					$('.box.warning.message').fadeOut(500);
+				}
+				else
+				{
+					alert(data['message']);
+				}
+			}
+		});
+	});
+
+	
 	function ajax_page_comments(e, element)
 	{
 		var url = window.location.href;

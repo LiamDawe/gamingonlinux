@@ -22,10 +22,8 @@ if (!isset($_GET['aid']))
 
 else
 {
-	if (!isset($message_map::$error) || $message_map::$error == 0)
+	if (!isset($message_map::$error) || (isset($message_map::$error) && $message_map::$error == 0))
 	{
-		$_SESSION['image_rand'] = rand();
-		$_SESSION['article_timer'] = core::$date;
 		$article_class->reset_sessions();
 	}
 
@@ -166,7 +164,7 @@ else
 	$db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
 	while ($categorys = $db->fetch())
 	{
-		if (isset($message_map::$error) && $message_map::$error == 1)
+		if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
 		{
 			if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 			{
@@ -199,7 +197,7 @@ else
 	$templating->set('username', $article['username']);
 
 	// if they have done it before set title, text and tagline
-	if (isset($message_map::$error) && $message_map::$error == 1)
+	if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
 	{
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
@@ -261,7 +259,7 @@ else
 	/*
 		EDITOR COMMENTS
 	*/
-	$pagination_link = 'test';
+	$pagination_link = '#';
 	
 	$templating->load('articles_full');
 		
@@ -342,19 +340,8 @@ if (isset($_POST['act']))
 			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
-			unset($_SESSION['atitle']);
-			unset($_SESSION['atagline']);
-			unset($_SESSION['atext']);
-			unset($_SESSION['acategories']);
-			unset($_SESSION['aactive']);
-			unset($_SESSION['uploads']);
-			unset($_SESSION['uploads_tagline']);
-			unset($_SESSION['image_rand']);
-			unset($_SESSION['aslug']);
+			$article_class->reset_sessions();
 			unset($_SESSION['original_text']);
-			unset($_SESSION['gallery_tagline_id']);
-			unset($_SESSION['gallery_tagline_rand']);
-			unset($_SESSION['gallery_tagline_filename']);
 
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{

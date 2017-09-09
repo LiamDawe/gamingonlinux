@@ -57,9 +57,8 @@ if (!isset($_GET['aid']))
 
 else if (isset($_GET['aid']))
 {
-	if (!isset($message_map::$error) || $message_map::$error == 0)
+	if (!isset($message_map::$error) || (isset($message_map::$error) && $message_map::$error == 0))
 	{
-		$_SESSION['image_rand'] = rand();
 		$article_class->reset_sessions();
 	}
 	if (isset ($_GET['message']))
@@ -198,7 +197,7 @@ else if (isset($_GET['aid']))
 	$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
 	while ($categorys = $db->fetch())
 	{
-		if (isset($_GET['error']))
+		if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
 		{
 			if (isset($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 			{
@@ -258,7 +257,7 @@ else if (isset($_GET['aid']))
 	$templating->set('ip_address', $user_ip);
 
 	// if they have done it before set title, text and tagline
-	if (isset($message_map::$error) && $message_map::$error == 1)
+	if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
 	{
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
@@ -280,7 +279,7 @@ else if (isset($_GET['aid']))
 
 	// if they have done it before set the text
 	$text = $article['text'];
-	if (isset($message_map::$error) && $message_map::$error == 1)
+	if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
 	{
 		$text = $_SESSION['atext'];
 	}
@@ -311,7 +310,7 @@ else if (isset($_GET['aid']))
 	/*
 		EDITOR COMMENTS
 	*/
-	$pagination_link = 'test';
+	$pagination_link = '#';
 	
 	$templating->load('articles_full');
 		

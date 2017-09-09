@@ -23,19 +23,8 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
-	unset($_SESSION['atitle']);
-	unset($_SESSION['aslug']);
-	unset($_SESSION['atagline']);
-	unset($_SESSION['atext']);
-	unset($_SESSION['acategories']);
-	unset($_SESSION['aactive']);
-	unset($_SESSION['uploads']);
-	unset($_SESSION['uploads_tagline']);
-	unset($_SESSION['image_rand']);
+	$article_class->reset_sessions();
 	unset($_SESSION['original_text']);
-	unset($_SESSION['gallery_tagline_id']);
-	unset($_SESSION['gallery_tagline_rand']);
-	unset($_SESSION['gallery_tagline_filename']);
 
 	$_SESSION['message'] = 'edited';
 	$_SESSION['message_extra'] = 'submitted';

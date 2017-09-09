@@ -5,9 +5,8 @@ $templating->set('article_css', 'articleadmin');
 $templating->set_previous('title', 'New article ' . $templating->get('title', 1)  , 1);
 
 // only refresh the tagline image session identifier on a brand new page, if there's an error or we are publishing, we need it the same to compare
-if ((isset($message_map::$error) && $message_map::$error == 0) && !isset($_POST['act']))
+if (!isset($message_map::$error) || (isset($message_map::$error) && $message_map::$error == 0) && !isset($_POST['act']))
 {
-	$_SESSION['image_rand'] = rand();
 	$article_class->reset_sessions();
 }
 
@@ -20,7 +19,7 @@ $templating->set('max_filesize', core::readable_bytes($core->config('max_tagline
 
 // get categorys if we need to
 $categorys_list = '';
-if ((isset($message_map::$error) && $message_map::$error == 1) || isset($_GET['dump']))
+if ((isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2))
 {
 	$res = $dbl->run("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
 	foreach ($res as $categorys)
@@ -40,7 +39,7 @@ $tagline = '';
 $tagline_image = '';
 $previously_uploaded = '';
 
-if ((isset($message_map::$error) && $message_map::$error == 1) || isset($_GET['dump']))
+if ((isset($message_map::$error) && $message_map::$error == 1|| $message_map::$error == 2))
 {
 	$title = $_SESSION['atitle'];
 	$tagline = $_SESSION['atagline'];

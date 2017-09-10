@@ -1,3 +1,9 @@
+// for the quote function, so we don't end up with garbled html and get the proper output instead
+function decodeEntities(encodedString) {
+    var textArea = document.createElement('textarea');
+    textArea.innerHTML = encodedString;
+    return textArea.value;
+}
 // update ckeditor so it can be captured and parsed by the article preview
 function CKupdate() 
 {
@@ -1295,7 +1301,7 @@ jQuery(document).ready(function()
 			{
 				if (data['result'] == 'done')
 				{
-					content = "[quote=" + data['username'] + "]" + data['text'];
+					content = "[quote=" + data['username'] + "]" + decodeEntities(data['text']);
 					content += "[/quote]";
 					
 					var current_text = $('#comment').val();

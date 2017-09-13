@@ -310,7 +310,12 @@ else
 								}
 							}
 						}
-						$total_perc = round($option['votes'] / $total_votes * 100);
+						
+						$total_perc = 0;
+						if ($total_votes > 0)
+						{
+							$total_perc = round($option['votes'] / $total_votes * 100);
+						}
 						$results .= '<div class="group"><div class="col-4">' . $star . $option['option_title'] . $star . '</div> <div class="col-4"><div style="background:#CCCCCC; border:1px solid #666666;"><div style="background: #28B8C0; width:'.$total_perc.'%;">&nbsp;</div></div></div> <div class="col-2">'.$option['votes'].' vote(s)</div> <div class="col-2">'.$total_perc.'%</div></div>';
 						$star = '';
 					}

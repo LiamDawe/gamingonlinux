@@ -436,13 +436,11 @@ else if (isset($_POST['act']))
 				$name = strip_tags($name);
 				
 				// find the last order
-				$db->sqlquery("SELECT `order` FROM `forums` WHERE `is_category` = 1 ORDER BY `order` DESC LIMIT 1");
-				$order = $db->fetch();
-
+				$order = $dbl->run("SELECT `order` FROM `forums` WHERE `is_category` = 1 ORDER BY `order` DESC LIMIT 1")->fetch();
 				$order_now = $order['order'] + 1;
 
 				// make the category
-				$query = $db->sqlquery("INSERT INTO `forums` SET `name` = ?, `is_category` = 1, `order` = ?", array($name, $order_now));
+				$dbl->run("INSERT INTO `forums` SET `name` = ?, `is_category` = 1, `order` = ?", array($name, $order_now));
 
 				$core->message("Category $name added!");
 			}

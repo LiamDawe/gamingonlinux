@@ -265,8 +265,6 @@ else if (isset($_POST['act']))
 		// check if the have set any of their pc info
 		foreach ($_POST['pc_info'] as $field)
 		{
-			echo $field;
-			
 			if (isset($field) && !empty($field) && $field != 'Not Listed')
 			{
 				$pc_info_filled = 1;

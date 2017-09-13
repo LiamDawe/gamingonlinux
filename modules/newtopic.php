@@ -275,6 +275,8 @@ else
 										$db->sqlquery("INSERT INTO `polls` SET `author_id` = ?, `poll_question` = ?, `topic_id` = ?", array($_SESSION['user_id'], $_POST['pquestion'], $topic_id));
 										$poll_id = $db->grab_id();
 
+										$dbl->run("UPDATE `forum_topics` SET `has_poll` = 1 WHERE `topic_id` = ?", array($topic_id));
+
 										foreach ($_POST['poption'] as $option)
 										{
 											// don't add in empty left-over options for voting
@@ -282,7 +284,7 @@ else
 
 											if (!empty($option))
 											{
-												$db->sqlquery("INSERT INTO `poll_options` SET `poll_id` = ?, `option_title` = ?", array($poll_id, $option));
+												$dbl->run("INSERT INTO `poll_options` SET `poll_id` = ?, `option_title` = ?", array($poll_id, $option));
 											}
 										}
 									}

@@ -105,6 +105,7 @@ SELECT
 	t.`last_post_date`,
 	t.`last_post_id`,
 	t.`is_locked`,
+	t.`has_poll`,
 	f.name as forum_name,
 	u.`username`,
 	u2.`username` as username_last
@@ -177,8 +178,12 @@ foreach ($get_topics as $topics)
 		$locked = ' <img width="15" height="15" src="'.$this_template.'/images/forum/lock.svg" onerror="'.$this_template.'/images/forum/lock.png" alt=""> ';
 	}
 	$templating->set('is_locked', $locked);
-
-	$templating->set('title', $topics['topic_title']);
+	$poll_title = '';
+	if ($topics['has_poll'] == 1)
+	{
+		$poll_title = '<strong>POLL:</strong> ';
+	}
+	$templating->set('title', $poll_title . $topics['topic_title']);
 	$templating->set('link', $link);
 	$replies = '';
 	if ($topics['replys'] > 0)

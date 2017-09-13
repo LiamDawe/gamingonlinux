@@ -167,7 +167,12 @@ else
 		$topic_link = $forum_class->get_link($post['topic_id']);
 		$templating->set('topic_link', $topic_link);
 		$templating->set('topic_id', $post['topic_id']);
-		$templating->set('title', $post['topic_title']);
+		$poll_title = '';
+		if ($post['has_poll'] == 1)
+		{
+			$poll_title = '<strong>POLL:</strong> ';
+		}
+		$templating->set('title', $poll_title . $post['topic_title']);
 		$templating->set('author_id', $post['author_id']);
 		
 		$date = $core->human_date($post['creation_date']);

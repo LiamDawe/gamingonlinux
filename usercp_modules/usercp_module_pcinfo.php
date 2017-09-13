@@ -263,22 +263,10 @@ else if (isset($_POST['act']))
 		}
 
 		// check if the have set any of their pc info
-		$pc_info_fields = array(
-			$_POST['desktop'],
-			$_POST['what_bits'],
-			$_POST['dual_boot'],
-			$_POST['cpu_vendor'],
-			$_POST['cpu_model'],
-			$_POST['gpu_vendor'],
-			$_POST['gpu_model'],
-			$_POST['gpu_driver'],
-			$_POST['ram_count'],
-			$_POST['monitor_count'],
-			$_POST['resolution'],
-			$_POST['gaming_machine_type'],
-			$_POST['gamepad']);
-		foreach ($pc_info_fields as $field)
+		foreach ($_POST['pc_info'] as $field)
 		{
+			echo $field;
+			
 			if (isset($field) && !empty($field) && $field != 'Not Listed')
 			{
 				$pc_info_filled = 1;
@@ -288,51 +276,37 @@ else if (isset($_POST['act']))
 
 		// they have to be a number, no matter what
 		$ram_count = NULL;
-		if (isset($_POST['ram_count']) && is_numeric($_POST['ram_count']))
+		if (isset($_POST['pc_info']['ram_count']) && is_numeric($_POST['pc_info']['ram_count']))
 		{
-			$ram_count = $_POST['ram_count'];
+			$ram_count = $_POST['pc_info']['ram_count'];
 		}
 
 		$monitor_count = NULL;
-		if (isset($_POST['monitor_count']) && is_numeric($_POST['monitor_count']))
+		if (isset($_POST['pc_info']['monitor_count']) && is_numeric($_POST['pc_info']['monitor_count']))
 		{
-			$monitor_count = $_POST['monitor_count'];
+			$monitor_count = $_POST['pc_info']['monitor_count'];
 		}
 
-		// additional profile fields
-		$sql_additional = "UPDATE `user_profile_info` SET
-		`desktop_environment` = ?,
-		`what_bits` = ?,
-		`dual_boot` = ?,
-		`cpu_vendor` = ?,
-		`cpu_model` = ?,
-		`gpu_vendor` = ?,
-		`gpu_model` = ?,
-		`gpu_driver` = ?,
-		`ram_count` = ?,
-		`monitor_count` = ?,
-		`resolution` = ?,
-		`gaming_machine_type` = ?,
-		`gamepad` = ?,
-		`date_updated` = ?
-		WHERE
-		`user_id` = ?";
-		$db->sqlquery($sql_additional, array(
-		$_POST['desktop'],
-		$_POST['what_bits'],
-		$_POST['dual_boot'],
-		trim($_POST['cpu_vendor']),
-		trim($_POST['cpu_model']),
-		trim($_POST['gpu_vendor']),
-		trim($_POST['gpu_model']),
-		$_POST['gpu_driver'],
-		$ram_count,
-		$monitor_count,
-		$_POST['resolution'],
-		$_POST['gaming_machine_type'],
-		$_POST['gamepad'],
-		gmdate("Y-n-d H:i:s"),
-		$_SESSION['user_id']));
+		// build the query of fields to update
+		$update_sql = "UPDATE `user_profile_info` SET ";
+		$fields_sql = [];
+		$values_sql = [];
+		foreach ($_POST['pc_info'] as $key => $value)
+		{
+			$fields_sql[] = ' `' . $key . '` = ?, ';
+			if (!empty($value))
+			{
+				$values_sql[] = $value;
+			}
+			else
+			{
+				$values_sql[] = NULL;
+			}
+		}
+
+		$update_sql = $update_sql . implode(' ', $fields_sql) . ' `date_updated` = ? WHERE `user_id` = ?';
+
+		$dbl->run($update_sql, array_merge($values_sql, [gmdate("Y-n-d H:i:s")], [$_SESSION['user_id']]));
 
 		$user_update_sql = "UPDATE `users` SET `distro` = ?, `pc_info_public` = ?, `pc_info_filled` = ? WHERE `user_id` = ?";
 		$user_update_query = $db->sqlquery($user_update_sql, array($_POST['distribution'], $public, $pc_info_filled, $_SESSION['user_id']));

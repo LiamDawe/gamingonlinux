@@ -21,32 +21,32 @@
 		We separate things like Ubuntu &amp; Xubuntu, Arch &amp; Manjaro etc.<br />
 		<select name="distribution"><option value=""></option>{:distro_list}</select><br />
 		<strong>Desktop Environment:</strong><br />
-		<select name="desktop"><option value=""></option>{:desktop_list}</select><br />
+		<select name="pc_info[desktop_environment]"><option value=""></option>{:desktop_list}</select><br />
 		<strong>Distro Architecture:</strong><br />
-		<select name="what_bits"><option value=""></option>{:what_bits_options}</select><br />
+		<select name="pc_info[what_bits]"><option value=""></option>{:what_bits_options}</select><br />
 		<strong>Do you dual-boot with a different operating system?</strong><br />
-		<select name="dual_boot"><option value=""></option>{:dual_boot_options}</select>
+		<select name="pc_info[dual_boot]"><option value=""></option>{:dual_boot_options}</select>
 		<strong>RAM:</strong>
-		<select name="ram_count"><option value=""></option>{:ram_options}</select><br />
+		<select name="pc_info[ram_count]"><option value=""></option>{:ram_options}</select><br />
 		<strong>CPU Vendor:</strong><br />
-		<select name="cpu_vendor"><option value=""></option>{:cpu_options}</select><br />
+		<select name="pc_info[cpu_vendor]"><option value=""></option>{:cpu_options}</select><br />
 		<strong>CPU Model:</strong><br />
-		<input type="text" name="cpu_model" value="{:cpu_model}"/><br />
+		<input name="pc_info[cpu_model]" type="text" value="{:cpu_model}"/><br />
 		<strong>GPU Vendor:</strong>
-		<select name="gpu_vendor"><option value=""></option>{:gpu_options}</select><br />
+		<select name="pc_info[gpu_vendor]"><option value=""></option>{:gpu_options}</select><br />
 		<strong>GPU Model:</strong><br />
-		<select name="gpu_model" id="gpu_picker" style="width:300px" >{:gpu_model}</select><br />
+		<select name="pc_info[gpu_model]" id="gpu_picker" style="width:300px" >{:gpu_model}</select><br />
 		<small>Missing your GPU Model? <a href="https://www.gamingonlinux.com/email-us/">Email us here</a>!</small><br />
 		<strong>GPU Driver:</strong>
-		<select name="gpu_driver"><option value=""></option>{:gpu_driver}</select><br />
+		<select name="pc_info[gpu_driver]"><option value=""></option>{:gpu_driver}</select><br />
 		<strong>Monitors:</strong>
-		<select name="monitor_count"><option value=""></option>{:monitor_options}</select><br />
+		<select name="pc_info[monitor_count]"><option value=""></option>{:monitor_options}</select><br />
 		<strong>Main Gaming Resolution</strong><br />
-		<select name="resolution"><option value=""></option>{:resolution_options}</select><br />
+		<select name="pc_info[resolution]"><option value=""></option>{:resolution_options}</select><br />
 		<strong>Main gaming machine:</strong>
-		<select name="gaming_machine_type"><option value=""></option>{:machine_options}</select><br />
+		<select name="pc_info[gaming_machine_type]"><option value=""></option>{:machine_options}</select><br />
 		<strong>Main Gamepad</strong>
-		<select name="gamepad"><option value=""></option>{:gamepad_options}</select><br />
+		<select name="pc_info[gamepad]"><option value=""></option>{:gamepad_options}</select><br />
 	</div>
 	<button type="submit" name="act" value="Update" formaction="{:url}usercp.php?module=pcinfo">Update</button><br />
 	<br />

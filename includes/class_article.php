@@ -287,7 +287,12 @@ class article
 		$title = strip_tags($_POST['title']);
 		$tagline = trim($_POST['tagline']);
 		$text = trim($_POST['text']);
-		$categories = $_POST['categories'];
+		$categories = '';
+		if (!empty($_POST['categories']))
+		{
+			die();
+			$categories = $_POST['categories'];
+		}
 
 		// check its set, if not hard-set it based on the article title
 		if (isset($_POST['slug']) && !empty($_POST['slug']))
@@ -433,11 +438,7 @@ class article
 			$_SESSION['aslug'] = $slug;
 			$_SESSION['atagline'] = $tagline;
 			$_SESSION['atext'] = $text;
-
-			if (isset($_POST['categories']) && !empty($_POST['categories']))
-			{
-				$_SESSION['acategories'] = $_POST['categories'];
-			}
+			$_SESSION['acategories'] = $categories;
 
 			if (isset($_POST['show_article']))
 			{

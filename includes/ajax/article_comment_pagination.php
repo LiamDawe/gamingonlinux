@@ -76,8 +76,8 @@ if(isset($_POST))
 					$article_class->subscribe($article_id, $emails);
 				}
 
-				// email anyone subscribed which isn't you
-				$fetch_users = $dbl->run("SELECT s.`user_id`, s.emails, s.`secret_key`, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id))->fetch_all();
+				// email anyone subscribed which isn't you, as long as they are a contrubitor, editor or admin
+				$fetch_users = $dbl->run("SELECT m.`user_id`, s.emails, s.`secret_key`, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id INNER JOIN `user_group_membership` m ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND `article_id` = ?", array($article_id))->fetch_all();
 				$users_array = array();
 				foreach ($fetch_users as $users)
 				{

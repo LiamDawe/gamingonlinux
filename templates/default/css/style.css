@@ -1660,3 +1660,7 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 	max-width: 800px; 
 	max-height: 600px;
 }
+.gol_twitch{display: none;}
+div.gol_twitch .twitch_announce{background-color: #4b367c; color: #fff; font-style: italic;}
+div.gol_twitch .twitch_announce a, div.gol_twitch .twitch_announce a:link {color: #ffffff; font-style: normal; text-decoration: underline;}
+div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}

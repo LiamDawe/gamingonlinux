@@ -272,7 +272,7 @@ if (!isset($_GET['go']))
 				$article_bottom = '';
 				if ($article['user_group'] != 1 && $article['user_group'] != 2 && $article['user_group'] != 5)
 				{
-					$article_bottom = "\n<br /><br /><p class=\"small muted\">This article was submitted by a guest, we encourage anyone to <a href=\"".$core->config('website_url')."submit-article/\">submit their own articles</a>.</p>";
+					$article_bottom = "<br /><p><em>This article was submitted by a guest, we encourage anyone to <a href=\"".$core->config('website_url')."submit-article/\">submit their own articles</a>.</em></p>";
 				}
 
 				//piratelv timeago: 12/11/14

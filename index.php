@@ -86,6 +86,10 @@ if (core::$current_module['module_file_name'] == 'home')
 	}
 }
 
+// TWITCH ONLINE INDICATOR
+$templating->load('twitch_bar');
+$templating->block('main', 'twitch_bar');
+
 $count_announcements = $dbl->run("SELECT count(id) as count FROM `announcements`")->fetchOne();
 if ($count_announcements > 0)
 {

@@ -34,6 +34,8 @@ setInterval ( "update_notifications()", 60000 );
 	</div>
 </footer>
 {:notification_updates}
+<script src="{:url}includes/jscripts/twitch_checker.js"></script>
+<script>twitch_check("{:twitch_dev_key}", "gamingonlinux"); setInterval ( "twitch_check('{:twitch_dev_key}', 'gamingonlinux')", 60000 );</script>
 <script type="text/javascript" src="{:url}includes/jscripts/jquery.timeago.js"></script>
 <script type="text/javascript" src="{:url}includes/jscripts/jquery.qtip.min.js"></script>
 

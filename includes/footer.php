@@ -26,6 +26,8 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 }
 $templating->set('notification_updates', $notification_updates);
 
+$templating->set('twitch_dev_key', $core->config('twitch_dev_key'));
+
 // info for admins to see execution time and mysql queries per page
 $debug = '';
 if ($user->check_group(1) && $core->config('show_debug') == 1)

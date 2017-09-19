@@ -281,8 +281,15 @@ jQuery(document).ready(function()
 	{
 		event.preventDefault();
 		var announce_id = $(this).attr("data-announce-id");
+		var days = $(this).attr('data-days');
+		var expiry_days = 60;
+
+		if (typeof days !== typeof undefined && days !== false) 
+		{
+			expiry_days = days;
+		}
 		
-		setCookie("gol_announce_" + announce_id, "set", 60);
+		setCookie("gol_announce_" + announce_id, "set", expiry_days);
 		
 		$(this).closest(".announce").hide();
 	});

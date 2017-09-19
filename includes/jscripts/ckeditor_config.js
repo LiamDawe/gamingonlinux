@@ -44,6 +44,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.extraAllowedContent = 'hr(*)';
 	config.extraAllowedContent = 'audio(*)';
 	config.extraAllowedContent = 'source(*)';
+	config.extraAllowedContent = 'code';
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';

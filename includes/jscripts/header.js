@@ -1360,4 +1360,13 @@ jQuery(document).ready(function()
 			window.location = '/index.php?act=Logout';
 		}
 	});
+
+	// send comment by CTRL + Enter
+	$('#comment_form').on('keydown', function(e) 
+	{
+		if (e.ctrlKey && e.keyCode === 13) 
+		{
+			$('#comment_form').trigger('submit');
+		}
+	});
 });

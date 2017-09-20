@@ -654,8 +654,7 @@ else if (isset($_GET['go']))
 				else
 				{
 					// get article name for the email and redirect
-					$db->sqlquery("SELECT `title`, `comment_count`, `comments_open`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']));
-					$title = $db->fetch();
+					$title = $dbl->run("SELECT `title`, `comment_count`, `comments_open`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']))->fetch();
 					$title_nice = core::nice_title($title['title']);
 
 					if ($title['comments_open'] == 0 && $user->check_group([1,2]) == false)
@@ -683,8 +682,7 @@ else if (isset($_GET['go']))
 						$comment = trim($_POST['text']);
 
 						// check for double comment
-						$db->sqlquery("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array((int) $_POST['aid']));
-						$check_comment = $db->fetch();
+						$check_comment = $dbl->run("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array((int) $_POST['aid']))->fetch();
 
 						if ($check_comment['comment_text'] == $comment)
 						{
@@ -724,9 +722,9 @@ else if (isset($_GET['go']))
 							$article_id = (int) $_POST['aid'];
 
 							// add the comment
-							$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?, `approved` = ?", array($article_id, (int) $_SESSION['user_id'], core::$date, $comment, $approved));
+							$dbl->run("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?, `approved` = ?", array($article_id, (int) $_SESSION['user_id'], core::$date, $comment, $approved));
 							
-							$new_comment_id = $db->grab_id();
+							$new_comment_id = $dbl->new_id();
 							
 							// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 							$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article_id));

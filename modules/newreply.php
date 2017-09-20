@@ -9,9 +9,7 @@ if ($core->config('forum_posting_open') == 1)
 
 	$forum_class->forum_permissions($forum_id);
 
-	$db->sqlquery("SELECT t.`topic_title`, t.`replys`, t.`is_locked`, t.`is_sticky`, f.`name`, f.`forum_id` FROM `forum_topics` t JOIN `forums` f ON t.`forum_id` = f.`forum_id` WHERE topic_id = ?", array($topic_id));
-
-	$name = $db->fetch();
+	$name = $dbl->run("SELECT t.`topic_title`, t.`replys`, t.`is_locked`, t.`is_sticky`, f.`name`, f.`forum_id` FROM `forum_topics` t JOIN `forums` f ON t.`forum_id` = f.`forum_id` WHERE topic_id = ?", array($topic_id))->fetch();
 
 	// check topic exists
 	if ($db->num_rows() != 1)
@@ -121,23 +119,22 @@ if ($core->config('forum_posting_open') == 1)
 				}
 
 				// add the reply
-				$db->sqlquery("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?, `approved` = ?", array($topic_id, $author, $message, core::$date, $approved));
-				$post_id = $db->grab_id();
+				$dbl->run("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?, `approved` = ?", array($topic_id, $author, $message, core::$date, $approved));
+				$post_id = $dbl->new_id();
 
 				// update user post counter
 				if ($approved == 1)
 				{
-					$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
+					$dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
 
 					// update forums post counter and last post info
-					$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $forum_id));
+					$dbl->run("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $forum_id));
 
 					// update topic reply count and last post info
-					$db->sqlquery("UPDATE `forum_topics` SET `replys` = (replys + 1), `last_post_date` = ?, $mod_sql `last_post_id` = ? WHERE `topic_id` = ?", array(core::$date, $author, $topic_id));
+					$dbl->run("UPDATE `forum_topics` SET `replys` = (replys + 1), `last_post_date` = ?, $mod_sql `last_post_id` = ? WHERE `topic_id` = ?", array(core::$date, $author, $topic_id));
 
 					// get article name for the email and redirect
-					$db->sqlquery("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id));
-					$title = $db->fetch();
+					$title = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id))->fetch();
 						
 					// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 					$db->sqlquery("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));

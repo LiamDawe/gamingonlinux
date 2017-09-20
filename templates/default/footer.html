@@ -42,7 +42,7 @@ setInterval ( "update_notifications()", 60000 );
 <script type="text/javascript">
 	// if (typeof postdate == "undefined") { postdate = 0; } else { postdate.setDate(postdate.getDate() + 1); }
 	jQuery("abbr.timeago").timeago('init'); //, {cutoff:86400}
-	jQuery('a.tooltip-top').qtip({
+	jQuery('.tooltip-top').qtip({
 	    position: {
 	        my: 'bottom center',
 	        at: 'top center'
@@ -51,33 +51,14 @@ setInterval ( "update_notifications()", 60000 );
 	        classes: 'qtip-bootstrap qtip-shadow'
 	    }
 	});
-	jQuery('span.tooltip-top').qtip({
-	    position: {
-	        my: 'bottom center',
-	        at: 'top center'
-	    },
-	    style: {
-	        classes: 'qtip-bootstrap qtip-shadow'
-	    }
-	});
-	jQuery('img.tooltip-top').qtip({
-		position: {
-			my: 'bottom center',
-			at: 'top center'
-		},
-		style: {
-			classes: 'qtip-bootstrap qtip-shadow'
-		}
-	});
-	jQuery('button.tooltip-top').qtip({
-		position: {
-			my: 'bottom center',
-			at: 'top center'
-		},
-		style: {
-			classes: 'qtip-bootstrap qtip-shadow'
-		}
-	});
+
+	CKEDITOR.on('instanceCreated', function(e) {
+		e.editor.on('change', function(event) {
+			var textarea = event.editor.element.$;
+			$(textarea).val(event.editor.getData().trim());
+			$(textarea.form).trigger('checkform.areYouSure');
+		});
+	})
 	
 	editor = CKEDITOR.replace( 'ckeditor_gol', {
     customConfig: '/includes/jscripts/ckeditor_config.js',

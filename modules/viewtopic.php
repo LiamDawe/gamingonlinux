@@ -774,6 +774,9 @@ else
 								}
 
 								$templating->block('reply_top', 'viewtopic');
+								$templating->set('url', $core->config('website_url'));
+								$templating->set('topic_id', $_GET['topic_id']);
+								$templating->set('forum_id', $topic['forum_id']);
 
 								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 								{

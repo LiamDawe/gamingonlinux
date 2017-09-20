@@ -4,9 +4,15 @@ $templating->load('blocks/block_livestreams');
 $templating->block('list');
 
 // count how many there is due this month and today
-$count_query = "SELECT `row_id`, `title`, `date`, `community_stream`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` ORDER BY `date` ASC LIMIT 1";
+$count_query = "SELECT `row_id`, `title`, `date`, `community_stream`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` ORDER BY `date`";
 $get_info = $dbl->run($count_query)->fetch();
-if ($get_info)
+$total = count($get_info);
+if ($total > 1)
+{
+	$templating->set('title', '<li>Next: <a href="https://www.gamingonlinux.com/index.php?module=livestreams">There\'s more than one at the same time!</a></li>');
+	$templating->set('date', '');
+}
+else if ($total == 1)
 {
 	$stream_url = 'https://www.twitch.tv/gamingonlinux';
 	if ($get_info['community_stream'] == 1)

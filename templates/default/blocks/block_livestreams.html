@@ -1,14 +1,36 @@
-[block: list]
+[block: block]
 				<!-- Misc Links & Stuff -->
 				<div class="box">
 					<div class="head">Livestreams &amp; Videos</div>
+					{:none}
+					{:official}
+					{:community}
+					<div class="subhead">See more!</div>
 					<div class="body list">
 					<ul>
-						{:title}
-						{:date}
 						<li><a href="/index.php?module=livestreams">View all scheduled streams</a></li>
 						<li><a href="/index.php?module=video">View video creator directory</a></li>
 					</ul>
 					</div>
 				</div>
-[/block: list]
+[/block: block]
+
+[block: official_streams]
+<div class="subhead">Official Livestreams</div>
+<div class="body list">
+	<ul>
+		<li><a href="https://www.twitch.tv/gamingonlinux">{:title}</a></li>
+		<li>Date: {:date}</li>		
+	</ul>
+</div>
+[/block: official_streams]
+
+[block: community_streams]
+<div class="subhead">Community Livestreams</div>
+<div class="body list">
+	<ul>
+		<li><a href="{:url}">{:title}</a></li>
+		<li>Date: {:date}</li>		
+	</ul>
+</div>
+[/block: community_streams]

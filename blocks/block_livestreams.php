@@ -1,27 +1,38 @@
 <?php
 // Article categorys block
 $templating->load('blocks/block_livestreams');
-$templating->block('list');
+$templating->block('block');
 
-// count how many there is due this month and today
-$count_query = "SELECT `row_id`, `title`, `date`, `community_stream`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` ORDER BY `date`";
-$get_info = $dbl->run($count_query)->fetch();
-$total = count($get_info);
-if ($total > 1)
+// official gol streams
+$count_query = "SELECT `row_id`, `title`, `date` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 0 ORDER BY `date` DESC LIMIT 1";
+$get_official = $dbl->run($count_query)->fetch();
+
+if ($get_official)
 {
-	$templating->set('title', '<li>Next: <a href="https://www.gamingonlinux.com/index.php?module=livestreams">There\'s more than one at the same time!</a></li>');
-	$templating->set('date', '');
-}
-else if ($total == 1)
-{
-	$stream_url = 'https://www.twitch.tv/gamingonlinux';
-	if ($get_info['community_stream'] == 1)
+	if ($get_official['date'] <= date('Y-m-d H:i:s'))
 	{
-		$stream_url = $get_info['stream_url'];
+		$countdown = 'Happening now!';
+	}
+	else
+	{
+		$countdown = '<noscript>'.$get_official['date'].' UTC</noscript><span id="livestream'.$get_official['row_id'].'"></span><script type="text/javascript">var livestream' . $get_official['row_id'] . ' = moment.tz("'.$get_official['date'].'", "UTC"); $("#livestream'.$get_official['row_id'].'").countdown(livestream'.$get_official['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
 	}
 
-	$templating->set('title', '<li><a href="'.$stream_url.'">' . $get_info['title'] . '</a></li>');
+	$official = $templating->block_store('official_streams');
+	$official = $templating->store_replace($official, array('title' => $get_official['title'], 'date' => $countdown));
+	$templating->set('official', $official);
+}
+else
+{
+	$templating->set('official', '');
+}
 
+// community streams
+$count_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 ORDER BY `date` DESC LIMIT 1";
+$get_info = $dbl->run($count_query)->fetch();
+
+if ($get_info)
+{
 	if ($get_info['date'] <= date('Y-m-d H:i:s'))
 	{
 		$countdown = 'Happening now!';
@@ -30,10 +41,21 @@ else if ($total == 1)
 	{
 		$countdown = '<noscript>'.$get_info['date'].' UTC</noscript><span id="livestream'.$get_info['row_id'].'"></span><script type="text/javascript">var livestream' . $get_info['row_id'] . ' = moment.tz("'.$get_info['date'].'", "UTC"); $("#livestream'.$get_info['row_id'].'").countdown(livestream'.$get_info['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
 	}
-	$templating->set('date', '<li>Date: ' . $countdown . '</li>');
+
+	$community = $templating->block_store('community_streams');
+	$community = $templating->store_replace($community, array('title' => $get_info['title'], 'date' => $countdown, 'url' => $get_info['stream_url']));
+	$templating->set('community', $community);
 }
 else
 {
-	$templating->set('title', '<li>None currently</li>');
-	$templating->set('date', '');
+	$templating->set('community', '');
+}
+
+if (empty($get_official) && empty($get_info))
+{
+	$templating->set('none', '<div class="body group">None currently, <a href="/index.php?module=livestreams">submit yours here!</a></div>');
+}
+else
+{
+	$templating->set('none', '');
 }

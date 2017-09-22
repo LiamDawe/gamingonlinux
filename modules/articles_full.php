@@ -167,7 +167,6 @@ if (!isset($_GET['go']))
 				}
 
 				$nice_title = core::nice_title($article['title']);
-				
 
 				// twitter info card
 				$twitter_card = "<!-- twitter card -->\n";
@@ -196,7 +195,7 @@ if (!isset($_GET['go']))
 				
 				$share_url = $article_class->get_link($_GET['aid'], $nice_title);
 				
-				$twitter_share = '<a class="button small fnone" href="https://twitter.com/intent/tweet?text='.$article['title'].'%20%23Linux&amp;url='.$share_url.'&amp;via=gamingonlinux" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/social/twitter.svg" alt="" /></a>';
+				$twitter_share = '<a class="button small fnone" href="https://twitter.com/intent/tweet?text='.urlencode($article['title']).'%20%23Linux&amp;url='.$share_url.'&amp;via=gamingonlinux" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/social/twitter.svg" alt="" /></a>';
 				$templating->set('twitter_share', $twitter_share);
 
 				$fb_onclick = "window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('$share_url'), 'height=279, width=575'); return false;";

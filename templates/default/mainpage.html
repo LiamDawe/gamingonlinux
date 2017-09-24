@@ -1,22 +1,22 @@
 [block: top]
 	<nav class="navigation-main">
 		<div class="container group">
-			<ul class="header-navbar">
-				<div id="navigation-mobile" class="toggle-nav">
-					<a href="#" onclick="return false;"></a>
-					<div class="toggle-content" id="nav-hidden">
-						<ul>
-							{:user_link}
-							{:sections_links}
-							<li><a href="/wiki/">Wiki</a></li>
-							<li><a href="{:contact_link}">Contact Us</a></li>
-							<li><a href="{:forum_link}">Forum</a></li>
-							<li><a href="{:irc_link}">IRC</a></li>
-							<li><a href="/index.php?module=search">Search</a></li>
-							<li><a href="/index.php?module=user_search">User search</a></li>
-						</ul>
-					</div>
+			<div id="navigation-mobile" class="toggle-nav">
+				<a href="#" onclick="return false;"></a>
+				<div class="toggle-content" id="nav-hidden">
+					<ul>
+						{:user_link}
+						{:sections_links}
+						<li><a href="/wiki/">Wiki</a></li>
+						<li><a href="{:contact_link}">Contact Us</a></li>
+						<li><a href="{:forum_link}">Forum</a></li>
+						<li><a href="{:irc_link}">IRC</a></li>
+						<li><a href="/index.php?module=search">Search</a></li>
+						<li><a href="/index.php?module=user_search">User search</a></li>
+					</ul>
 				</div>
+			</div>
+			<ul class="header-navbar">
 				<li class="gol-icon"><a href="{:url}" title="{:site_title} Home"><img src="{:this_template}/images/{:icon}" width="35" height="35" alt="{:site_title}"></a></li>
 				<li class="nav-title"><a href="{:url}">{:site_title}</a></li>
 				<li class="dropdown hide-small">

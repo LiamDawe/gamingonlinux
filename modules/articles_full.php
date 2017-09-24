@@ -265,6 +265,7 @@ if (!isset($_GET['go']))
 				$templating->set('username', $username);
 
 				$templating->set('date', $date);
+				$templating->set('machine_time', $published_date_meta);
 
 				$templating->set('article_views', $article['views']);
 

@@ -4,7 +4,7 @@ $templating->load('blocks/block_livestreams');
 $templating->block('block');
 
 // official gol streams
-$count_query = "SELECT `row_id`, `title`, `date` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 0 ORDER BY `date` DESC LIMIT 1";
+$count_query = "SELECT `row_id`, `title`, `date` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 0 ORDER BY `date` ASC LIMIT 1";
 $get_official = $dbl->run($count_query)->fetch();
 
 if ($get_official)
@@ -28,7 +28,7 @@ else
 }
 
 // community streams
-$count_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 ORDER BY `date` DESC LIMIT 1";
+$count_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 ORDER BY `date` ASC LIMIT 1";
 $get_info = $dbl->run($count_query)->fetch();
 
 if ($get_info)

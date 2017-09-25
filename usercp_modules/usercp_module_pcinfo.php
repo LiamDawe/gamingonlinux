@@ -12,7 +12,7 @@ if (!isset($_POST['act']))
 	$db->sqlquery("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
 	$usercpcp = $db->fetch();
 
-	$additional = $dbl->run("SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?", array($_SESSION['user_id']))->fetch();
+	$additional = $dbl->run("SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?", array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
 	if (!$additional)
@@ -95,6 +95,20 @@ if (!isset($_POST['act']))
 		$dual_boot_options .= '<option value="'.$system.'" '.$selected.'>'.$system.'</option>';
 	}
 	$templating->set('dual_boot_options', $dual_boot_options);
+
+	// WINE USE
+	$wine_options_output = '';
+	$options = array("Yes", "No", "Never");
+	foreach ($options as $option)
+	{
+		$selected = '';
+		if ($additional['wine'] == $option)
+		{
+			$selected = 'selected';
+		}
+		$wine_options_output .= '<option value="'.$option.'" '.$selected.'>'.$option.'</option>';
+	}
+	$templating->set('wine_options', $wine_options_output);
 
 	$intel = '';
 	if ($additional['cpu_vendor'] == 'Intel')

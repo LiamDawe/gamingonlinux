@@ -77,6 +77,7 @@ array ("name" => "Linux Distributions (Split)", "db_field" => "distro", "table" 
 array ("name" => "Desktop Environment", "db_field" => "desktop_environment"),
 array ("name" => "Distro Architecture", "db_field" => "what_bits"),
 array ("name" => "Dual Booting", "db_field" => "dual_boot"),
+array ("name" => "Wine", "db_field" => "wine"),
 array ("name" => "CPU Vendor", "db_field" => "cpu_vendor"),
 array ("name" => "GPU Vendor", "db_field" => "gpu_vendor"),
 array ("name" => "GPU Model", "db_field" => "name", "table" => "user_profile_info p INNER JOIN `gpu_models` g ON p.gpu_model = g.id"),

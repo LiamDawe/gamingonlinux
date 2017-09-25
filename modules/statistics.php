@@ -16,6 +16,7 @@ $charts_list = array(
 	array("name" => "Desktop Environment"),
 	array("name" => "Distro Architecture"),
 	array("name" => "Dual Booting"),
+	array("name" => "Wine"),
 	array("name" => "RAM"),
 	array("name" => "CPU Vendor"),
 	array("name" => "GPU Vendor"),

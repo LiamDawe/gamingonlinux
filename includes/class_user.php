@@ -616,6 +616,7 @@ class user
 			p.`gaming_machine_type`,
 			p.`resolution`,
 			p.`dual_boot`,
+			p.`wine`,
 			p.`gamepad`,
 			p.`date_updated`,
 			u.`distro`,
@@ -652,6 +653,12 @@ class user
 		{
 			$counter++;
 			$pc_info['dual_boot'] = '<strong>Do you dual-boot with a different operating system?</strong> '.$additionaldb['dual_boot'];
+		}
+
+		if ($additionaldb['wine'] != NULL && !empty($additionaldb['wine']))
+		{
+			$counter++;
+			$pc_info['wine'] = '<strong> Do you use Wine to play Windows games?</strong> '.$additionaldb['wine'];
 		}
 		
 		if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))

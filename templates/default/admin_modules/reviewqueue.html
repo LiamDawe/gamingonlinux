@@ -25,6 +25,7 @@
 		<form method="post" role="form">
 			<strong>{:article_title}</strong> by {:username} submitted on {:date_submitted} <br />
 			<button type="submit" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}">View</button>
+			<button type="submit" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}#comments">Go to Comments ({:comment_count})</button>
 			<button type="submit" name="act" value="Delete" formaction="{:url}admin.php?module=articles&article_id={:article_id}&review=1">Delete</button>
 		</form>
 	</div>

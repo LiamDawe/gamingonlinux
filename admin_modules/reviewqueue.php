@@ -7,7 +7,7 @@ if (!isset($_GET['aid']))
 {
 	$templating->block('review_top', 'admin_modules/reviewqueue');
 
-	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `admin_review` = 1");
+	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username, COUNT(c.comment_id) as comments_total FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_comments` c ON c.article_id = a.article_id WHERE a.`admin_review` = 1 GROUP BY a.article_id ");
 	while ($article = $db->fetch())
 	{
 		$templating->block('review_row', 'admin_modules/reviewqueue');
@@ -15,6 +15,7 @@ if (!isset($_GET['aid']))
 		$templating->set('article_id', $article['article_id']);
 		$templating->set('article_title', $article['title']);
 		$templating->set('username', $article['username']);
+		$templating->set('comment_count', $article['comments_total']);
 
 		$templating->set('date_submitted', $core->human_date($article['date']));
 	}

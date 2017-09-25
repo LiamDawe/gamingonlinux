@@ -19,12 +19,10 @@ $templating->block('left');
 // Here we sort out what modules we are allowed to load
 $modules_allowed = [];
 $module_links = '';
-$get_modules = $dbl->run('SELECT `module_file_name`, `module_link`, `module_title`, `show_in_sidebar` FROM `usercp_modules` WHERE `activated` = 1')->fetch_all();
+$get_modules = $dbl->run('SELECT `module_file_name`, `module_link`, `module_title`, `show_in_sidebar`, `activated` FROM `usercp_modules`')->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
+$get_modules = array_map('reset', $get_modules); // strip useless zero index
 foreach ($get_modules as $modules)
 {
-	// modules allowed for loading
-	$modules_allowed[] = $modules['module_file_name'];
-
 	// links
 	if ($modules['show_in_sidebar'] == 1)
 	{
@@ -53,9 +51,16 @@ if (isset($_SESSION['message']))
 	$message_map->display_message('usercp/'.$module, $_SESSION['message'], $extra);
 }
 
-if (in_array($module, $modules_allowed))
+if (array_key_exists($module, $get_modules))
 {
-	include(APP_ROOT . "/usercp_modules/usercp_module_$module.php");
+	if ($get_modules[$module]['activated'] == 1)
+	{
+		include(APP_ROOT . "/usercp_modules/usercp_module_$module.php");
+	}
+	else
+	{
+		$core->message('That module is currently turned off!');
+	}
 }
 
 else

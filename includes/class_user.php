@@ -658,7 +658,7 @@ class user
 		if ($additionaldb['wine'] != NULL && !empty($additionaldb['wine']))
 		{
 			$counter++;
-			$pc_info['wine'] = '<strong> Do you use Wine to play Windows games?</strong> '.$additionaldb['wine'];
+			$pc_info['wine'] = '<strong>When was the last time you used Wine to play a Windows game?</strong> '.$additionaldb['wine'];
 		}
 		
 		if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))

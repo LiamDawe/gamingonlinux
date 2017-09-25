@@ -98,7 +98,7 @@ if (!isset($_POST['act']))
 
 	// WINE USE
 	$wine_options_output = '';
-	$options = array("Yes", "No");
+	$options = array("In the last month", "In the last three months", "In the last six months", "Over six months ago", "I never use it");
 	foreach ($options as $option)
 	{
 		$selected = '';

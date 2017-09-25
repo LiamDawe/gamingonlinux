@@ -98,7 +98,7 @@ if (!isset($_POST['act']))
 
 	// WINE USE
 	$wine_options_output = '';
-	$options = array("Yes", "No", "Never");
+	$options = array("Yes", "No");
 	foreach ($options as $option)
 	{
 		$selected = '';

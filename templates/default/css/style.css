@@ -1012,6 +1012,9 @@ ul.social-networks li > a {
 .icon.delete {
     background-image: url('../images/comments/delete.svg');
 }
+.icon.block {
+    background-image: url('../images/comments/block_user.svg');
+}
 .icon.envelope {
     background-image: url('../images/comments/envelope.svg');
 }
@@ -1253,6 +1256,9 @@ ul.social-networks li > a {
 }
 .dark .icon.delete {
     background-image: url('../images/comments/white/delete.svg');
+}
+.dark .icon.block {
+    background-image: url('../images/comments/white/block_user.svg');
 }
 .dark .icon.envelope {
     background-image: url('../images/comments/white/envelope.svg');

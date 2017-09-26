@@ -1295,6 +1295,14 @@ class article
 						$bookmark_comment = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="comment" data-id="'.$comments['comment_id'].'" data-parent-id="'.$article_info['article']['article_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
 					}
 
+					// block icon
+					$block_icon = '';
+					if ($_SESSION['user_id'] != $comments['author_id'])
+					{
+						$block_icon = '<li><a class="tooltip-top" href="/index.php?module=block_user&block='.$comments['author_id'].'" title="Block User"><span class="icon block"></span></a></li>';
+					}
+					$this->templating->set('block', $block_icon);
+
 					$like_text = "Like";
 					$like_class = "like";
 					if ($_SESSION['user_id'] != 0)

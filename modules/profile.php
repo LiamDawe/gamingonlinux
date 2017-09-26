@@ -53,10 +53,40 @@ if (isset($_GET['user_id']))
 
 						$templating->set_previous('meta_description', "Viewing {$profile['username']} profile on GamingOnLinux.com", 1);
 
-						if ($_SESSION['user_id'] == $_GET['user_id'])
+						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 						{
 							$templating->block('top');
-							$templating->set('url', $core->config('website_url'));
+
+							$user_action_links = [];
+
+							// give them an edit link if it's their profile
+							if ($_SESSION['user_id'] == $_GET['user_id'])
+							{
+								$user_action_links[] = '<a href="/usercp.php">Click here to edit your profile</a>';						
+							}
+
+							// get blocked id's
+							$blocked_ids = [];
+							if (count($user->blocked_users) > 0)
+							{
+								foreach ($user->blocked_users as $username => $blocked_id)
+								{
+									$blocked_ids[] = $blocked_id[0];
+								}
+							}		
+							
+							if ($_SESSION['user_id'] != $_GET['user_id'])
+							{
+								$block = '<a href="/index.php?module=block_user&block='.$_GET['user_id'].'">Block/Ignore User</a>';
+								if (in_array($_GET['user_id'], $blocked_ids))
+								{
+									$block = '<a href="/index.php?module=block_user&unblock='.$_GET['user_id'].'">UnBlock User</a>';
+								}
+
+								$user_action_links[] = $block;
+							}
+
+							$templating->set('user_actions', implode(' | ', $user_action_links));
 						}
 
 						$templating->block('main', 'profile');

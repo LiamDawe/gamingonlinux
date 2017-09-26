@@ -891,4 +891,46 @@ class user
 		}
 		return $badges;
 	}
+
+	function block_user($user_id)
+	{
+		// get their username
+		$username = $this->database->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
+		
+		// check they're not on the list already
+		$check = $this->database->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id))->fetchOne();
+		if ($check)
+		{
+			$_SESSION['message'] = 'already_blocked';
+			$_SESSION['message_extra'] = $username;
+			
+			header("Location: /usercp.php?module=block_list");
+			die();
+		}
+		else
+		{
+			// add them to the block block list 
+			$this->database->run("INSERT INTO `user_block_list` SET `user_id` = ?, `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
+
+			$_SESSION['message'] = 'blocked';
+			$_SESSION['message_extra'] = $username;
+			
+			header("Location: /usercp.php?module=block_list");
+			die();
+		}		
+	}
+
+	function unblock_user($user_id)
+	{
+		// get their username
+		$username = $this->database->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
+		
+		$this->database->run("DELETE FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
+		
+		$_SESSION['message'] = 'unblocked';
+		$_SESSION['message_extra'] = $username;
+			
+		header("Location: /usercp.php?module=block_list");
+		die();
+	}
 }

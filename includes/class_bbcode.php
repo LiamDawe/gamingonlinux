@@ -571,6 +571,7 @@ class bbcode
 					p.`gaming_machine_type`,
 					p.`resolution`,
 					p.`dual_boot`,
+					p.`wine`,
 					p.`gamepad`,
 					p.`date_updated`,
 					u.`distro`,
@@ -607,6 +608,12 @@ class bbcode
 				{
 					$counter++;
 					$pc_info['dual_boot'] = '<strong>Do you dual-boot with a different operating system?</strong> '.$additionaldb['dual_boot'];
+				}
+
+				if ($additionaldb['wine'] != NULL && !empty($additionaldb['wine']))
+				{
+					$counter++;
+					$pc_info['wine'] = '<strong>When was the last time you used Wine to play a Windows game?</strong> '.$additionaldb['wine'];
 				}
 				
 				if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))

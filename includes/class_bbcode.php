@@ -122,11 +122,11 @@ class bbcode
 			{
 				$profile_link = '/index.php?module=profile&user_id=' . $find_quoted['user_id'];
 			}
-			return '<blockquote><cite><a href="'.$profile_link.'">'.$matches[1].'</a></cite>'.$matches[2].'</blockquote>';
+			return '<blockquote class="comment_quote"><cite><a href="'.$profile_link.'">'.$matches[1].'</a></cite>'.$matches[2].'</blockquote>';
 		}
 		else
 		{
-			return '<blockquote><cite>'.$matches[1].'</cite>'.$matches[2].'</blockquote>';
+			return '<blockquote class="comment_quote"><cite>'.$matches[1].'</cite>'.$matches[2].'</blockquote>';
 		}
 	}
 

@@ -750,6 +750,7 @@ select.pagination {
 .comment .comment-body blockquote {
     margin: 0 0 14px 0;
 }
+	.morecontent {display: none;}
 .comment:last-child {border: none;}
 .comment .comment-meta .comment-actions li a:hover, .comment .comment-social li a:hover {background: #428BCA;}
 

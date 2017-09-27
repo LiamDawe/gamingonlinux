@@ -11,6 +11,10 @@ function CKupdate()
 		CKEDITOR.instances[instance].updateElement();
 	return true;
 }
+jQuery.fn.outerHTML = function() {
+	return (this[0]) ? this[0].outerHTML : '';  
+ };
+
 // scroll to an element if it's not in view, all other ways I could find completely sucked
 jQuery.fn.scrollMinimal = function(smooth)
 {
@@ -1369,4 +1373,38 @@ jQuery(document).ready(function()
 			$('#comment_form').trigger('submit');
 		}
 	});
+
+	// hide long quotes
+	var showChar = 600;
+	var moretext = "<em>Click to view long quote</em>";
+	var lesstext = "<em>Click to hide long quote</em>";
+	$('.comment_quote').each(function() 
+	{
+		var actual_text = $(this).text();
+		var content = $(this).outerHTML();
+
+		if(actual_text.length > showChar) 
+		{
+			var html = '<span class="morecontent">' + content + '</span><a href="" class="morelink">' + moretext + '</a><br />';
+
+			$(this).replaceWith(html);
+		}
+
+	});
+
+	$(".morelink").click(function()
+	{
+		if($(this).hasClass("less")) 
+		{
+			$(this).removeClass("less");
+			$(this).html(moretext);
+		} 
+		else 
+		{
+			$(this).addClass("less");
+			$(this).html(lesstext);
+		}
+		$(this).prev().toggle();
+		return false;
+	});	
 });

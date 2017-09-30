@@ -498,7 +498,7 @@ else
 				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['user_id']));
 				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($_GET['user_id']));
-				$dbl->run("UPDATE `article_comments` SET `author_id` = 0 WHERE `author_id` = ?", [$_GET['user_id']]);
+				$dbl->run("UPDATE `articles_comments` SET `author_id` = 0 WHERE `author_id` = ?", [$_GET['user_id']]);
 
 				$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
 

@@ -1278,7 +1278,7 @@ class article
 				$link_to_comment = '<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" href="'.$permalink.'" data-src="/includes/ajax/call_post_link.php?post_id=' . $comments['comment_id'] . '&type=comment" title="Link to this comment"><span class="icon link">Link</span></a></li>';
 			}
 			$this->templating->set('link_to_comment', $link_to_comment);
-			
+			$block_icon = '';
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
 				$logged_in_options = $this->templating->block_store('logged_in_options', 'articles_full');
@@ -1301,7 +1301,6 @@ class article
 					{
 						$block_icon = '<li><a class="tooltip-top" href="/index.php?module=block_user&block='.$comments['author_id'].'" title="Block User"><span class="icon block"></span></a></li>';
 					}
-					$this->templating->set('block', $block_icon);
 
 					$like_text = "Like";
 					$like_class = "like";
@@ -1345,6 +1344,7 @@ class article
 			$this->templating->set('edit', $comment_edit_link);
 			$this->templating->set('delete', $comment_delete_link);
 			$this->templating->set('report_link', $report_link);
+			$this->templating->set('block', $block_icon);
 
 			// if we have some user groups for that user
 			if (array_key_exists($comments['author_id'], $comment_user_groups))

@@ -139,84 +139,109 @@ if (isset($search_text) && !empty($search_text))
 
 if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 {
-	// paging for pagination
-	$page = core::give_page();
-	
-	// count how many there is in total
-	$db->sqlquery("SELECT `article_id` FROM `articles` WHERE active = 1 AND `author_id` = ?", array($_GET['author_id']), 'search.php');
-	$total = $db->num_rows();
+	$pagination = '';
 
-	// sort out the pagination link
-	$pagination = $core->pagination_link(15, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
-
-	// do the search query
-	$db->sqlquery("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start));
-	$found_search = $db->fetch_all_rows();
-
-	if ($total > 0)
+	// check they actually exist
+	$username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['author_id']))->fetchOne();
+	if ($username)
 	{
-		$templating->set_previous('title', 'Viewing articles by ' . $found_search[0]['username'], 1);
-		$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $found_search[0]['username'], 1);
+		// paging for pagination
+		$page = core::give_page();
+		
+		// count how many there is in total
+		$db->sqlquery("SELECT `article_id` FROM `articles` WHERE active = 1 AND `author_id` = ?", array($_GET['author_id']));
+		$total = $db->num_rows();
 
-		$templating->block('author_top');
-		$templating->set('username', $found_search[0]['username']);
+		// sort out the pagination link
+		$pagination = $core->pagination_link(15, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
-		if ($core->config('pretty_urls') == 1)
+		// do the search query
+		$db->sqlquery("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start));
+		$found_search = $db->fetch_all_rows();
+
+		if ($total > 0)
 		{
-			$profile_link = $core->config('website_url') . 'profiles/' . $found_search[0]['author_id'];
+			$templating->set_previous('title', 'Viewing articles by ' . $username, 1);
+			$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $username, 1);
+
+			$templating->block('author_top');
+			$templating->set('username', $username);
+
+			if ($core->config('pretty_urls') == 1)
+			{
+				$profile_link = $core->config('website_url') . 'profiles/' . $found_search[0]['author_id'];
+			}
+			else
+			{
+				$profile_link = $core->config('website_url') . 'index.php?module=profile&user_id=' . $found_search[0]['author_id'];
+			}
+			$templating->set('profile_link', $profile_link);
+
+			// loop through results
+			foreach ($found_search as $found)
+			{
+				$date = $core->human_date($found['date']);
+
+				$templating->block('row');
+
+				$templating->set('date', $date);
+				$templating->set('title', $found['title']);
+				$templating->set('article_link', $article_class->get_link($found['article_id'], $found['slug']));
+
+				$username_link = "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>';
+				
+				$templating->set('username', $username_link);
+
+				// sort out the categories (tags)
+				$categories_list = '';
+				$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']));
+				while ($get_categories = $db->fetch())
+				{
+					$tag_link = $article_class->tag_link($get_categories['category_name']);
+					
+					if ($get_categories['category_id'] == 60)
+					{
+						$categories_list .= " <li class=\"ea\"><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
+					}
+
+					else
+					{
+						$categories_list .= " <li><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
+					}
+				}
+
+
+				$templating->set('categories_list', $categories_list);
+			}
 		}
 		else
 		{
-			$profile_link = $core->config('website_url') . 'index.php?module=profile&user_id=' . $found_search[0]['author_id'];
-		}
-		$templating->set('profile_link', $profile_link);
+			$templating->set_previous('title', 'Viewing articles by ' . $username, 1);
+			$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $username, 1);
 
-		// loop through results
-		foreach ($found_search as $found)
-		{
-			$date = $core->human_date($found['date']);
-
-			$templating->block('row');
-
-			$templating->set('date', $date);
-			$templating->set('title', $found['title']);
-			$templating->set('article_link', $article_class->get_link($found['article_id'], $found['slug']));
-
-			if ($found['author_id'] == 0)
-			{
-				$username = $found['guest_username'];
-			}
-
-			else
-			{
-				$username = "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>';
-			}
+			$templating->block('author_top');
 			$templating->set('username', $username);
 
-			// sort out the categories (tags)
-			$categories_list = '';
-			$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']));
-			while ($get_categories = $db->fetch())
+			if ($core->config('pretty_urls') == 1)
 			{
-				$tag_link = $article_class->tag_link($get_categories['category_name']);
-				
-				if ($get_categories['category_id'] == 60)
-				{
-					$categories_list .= " <li class=\"ea\"><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
-				}
-
-				else
-				{
-					$categories_list .= " <li><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
-				}
+				$profile_link = $core->config('website_url') . 'profiles/' . $_GET['author_id'];
 			}
+			else
+			{
+				$profile_link = $core->config('website_url') . 'index.php?module=profile&user_id=' . $_GET['author_id'];
+			}
+			$templating->set('profile_link', $profile_link);
 
-
-			$templating->set('categories_list', $categories_list);
+			$core->message('They have posted no articles!');
 		}
 	}
+	else
+	{
+		$templating->set_previous('title', 'No user found!', 1);
+		$core->message("That user doesn't exist!");
+	}
 
-	$templating->block('bottom');
+	$templating->block('bottom', 'search');
 	$templating->set('pagination', $pagination);
 }
 ?>

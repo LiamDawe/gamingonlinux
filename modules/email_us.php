@@ -38,6 +38,22 @@ if (isset($_POST['act']))
 	{
 		if ($captcha == 1)
 		{
+			if (!isset($_POST['g-recaptcha-response']))
+			{
+				$_SESSION['aname'] = $_POST['name'];
+				$_SESSION['aemail'] = $_POST['email'];
+				$_SESSION['atext'] = $_POST['message'];
+				$_SESSION['message'] = 'captcha';
+				
+				if ($core->config('pretty_urls') == 1)
+				{
+					header('Location: /email-us/');
+				}
+				else
+				{
+					header('Location: /index.php?module=email_us');
+				}				
+			}
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";
 			$ip=core::$ip;

@@ -247,6 +247,19 @@ if (!isset($_GET['type']))
 				}
 				die();
 			}
+			if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+			{
+				$_SESSION['message'] = 'email_wrong';
+				if ($core->config('pretty_urls') == 1)
+				{
+					header('Location: '.$core->config('website_url').'mailinglist');
+				}
+				else
+				{
+					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
+				}
+				die();
+			}
 			else
 			{
 				// check it's not already in there

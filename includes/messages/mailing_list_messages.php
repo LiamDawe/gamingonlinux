@@ -26,6 +26,11 @@ return [
 	[
 		"text" => "Sorry, but your ID and Key didn't match our records, we couldn't adjust your subscription!",
 		"error" => 1
+	],
+	"email_wrong" =>
+	[
+		"text" => "That was not an email address, please try again!",
+		"error" => 1
 	]
 ];
 ?>

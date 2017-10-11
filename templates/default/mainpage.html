@@ -35,59 +35,64 @@
 				</li>
 				<li class="hide-small"><a href="{:forum_link}">Forum</a></li>
 				<li class="hide-small"><a href="/irc/">IRC</a></li>
-				<li class="dropdown hide-small">
-					<a href="/index.php?module=search">Search <b class="caret-down"></b></a>
-					<ul class="dropdown-menu">
-						<li>
-							<form class="header-search" method="get" action="{:url}index.php?module=search">
-								<input type="hidden" name="module" value="search" />
-								<input type="text" class="search-field ays-ignore" name="q" placeholder="Search Articles…" />
-								<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
-							</form>
-						</li>
-						<li class="divider"></li>
-						<li><a href="/index.php?module=search">Advanced search</a></li>
-						<li><a href="/index.php?module=user_search">User search</a></li>
-					</ul>
-				</li>
 			</ul>
 			<div class="right-menu">
+				<div id="search-button-nav" class="toggle-nav search-box">
+					<a href="#"><img src="{:this_template}/images/search.png" alt=""/></a>
+					<div class="toggle-content">
+							<form method="get" action="{:url}index.php?module=search">
+								<input type="hidden" name="module" value="search" />
+								<input type="text" class="search-field ays-ignore" name="q" placeholder="Search Articles…" />
+								<button type="submit" class="search-button">Go</button>
+								<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+							</form>
+					</div>
+				</div>
 				{:notifications_menu}
 				{:user_menu}
 			</div>
+			<ul class="header-navbar fright header-search">
+				<li>
+					<form method="get" action="{:url}index.php?module=search">
+					<input type="hidden" name="module" value="search" />
+					<input type="text" class="search-field ays-ignore" name="q" placeholder="Search Articles…" />
+					<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+					</form>
+				</li>
+			</ul>
 		</div>
 	</nav>
 	<div id="body" class="smooth group">
 [/block: top]
 
 [block: user_menu]
-	<div class="toggle-nav user-box hide-small">
-		<a href="#"><div class="avatar-container"><img id="nav-avatar" src="{:avatar}" alt="" width="35" height="35"></div></a>
-			<div class="toggle-content">
-				<ul>
-					<li style="padding:5px;"><strong>{:username}</strong></li>
-					<li class="divider"></li>
-					<li><a href="{:profile_link}">View Profile</a></li>
-					<li><a href="{:url}usercp.php">User CP</a></li>
-					<li><a href="{:url}usercp.php?module=bookmarks">Bookmarks</a></li>
-					{:admin_link}
-					<li><a class="logout_link" href="{:url}index.php?act=Logout">Logout</a></li>
-				</ul>
-		</div>
+<div class="toggle-nav user-box hide-small">
+	<a href="#"><div class="avatar-container"><img id="nav-avatar" src="{:avatar}" alt="" width="35" height="35"></div></a>
+	<div class="toggle-content">
+		<ul>
+			<li style="padding:5px;"><strong>{:username}</strong></li>
+			<li class="divider"></li>
+			<li><a href="{:profile_link}">View Profile</a></li>
+			<li><a href="{:url}usercp.php">User CP</a></li>
+			<li><a href="{:url}usercp.php?module=bookmarks">Bookmarks</a></li>
+			{:admin_link}
+			<li><a class="logout_link" href="{:url}index.php?act=Logout">Logout</a></li>
+		</ul>
 	</div>
+</div>
 [/block: user_menu]
 
 [block: notifications]
-	<div id="alert_box" class="toggle-nav alerts-box right alerts-box-{:alert_box_type}">
-		<a href="#" id="notifications_total">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.png" alt=""/></a>
-		<div class="toggle-content">
-				<ul>
-					{:admin_line}
-					{:comments_line}
-					<li><a href="{:messages_link}">{:message_count} new messages</a></li>
-				</ul>
-		</div>
+<div id="alert_box" class="toggle-nav alerts-box right alerts-box-{:alert_box_type}">
+	<a href="#" id="notifications_total">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.png" alt=""/></a>
+	<div class="toggle-content">
+		<ul>
+			{:admin_line}
+			{:comments_line}
+			<li><a href="{:messages_link}">{:message_count} new messages</a></li>
+		</ul>
 	</div>
+</div>
 [/block: notifications]
 
 [block: login_menu]

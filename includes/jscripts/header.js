@@ -199,38 +199,6 @@ $(function(){
 });
 jQuery(document).ready(function()
 {  
-	// this function may eventually handle pasting rich html from a pre-written doc into gol's editor
-	/*$('textarea').on('paste',function(e) 
-	{
-		e.preventDefault();
-		var text = (e.originalEvent || e).clipboardData.getData('text/html') || prompt('Paste something..');
-		text = "<div>" + text + "</div>";
-		console.log(text);
-		
-		var jqTxt = jQuery(text);
-
-		jqTxt.find("a").each(function(item, el)
-		{
-			$(el).replaceWith("[url=" + el.href + "]" + el.textContent + "[/url]");
-		});
-
-		jqTxt.find("br").each(function(item, el)
-		{
-			$(el).replaceWith("\n");
-		});
-		
-		jqTxt.find("b").each(function(item, el)
-		{
-			$(el).replaceWith("[b]" + el.textContent + "[/b]");
-		});
-		
-		jqTxt.find("p").each(function(item, el)
-		{
-			$(el).replaceWith(el.textContent+"\r\n");
-		});
-		
-		window.document.execCommand('insertText', false, jqTxt.text());
-	});*/
   // this will grab any url parameter like ?module=test and give you "test" if you search for "module"
   var getUrlParameter = function getUrlParameter(sParam) {
       var sPageURL = decodeURIComponent(window.location.search.substring(1)),
@@ -329,10 +297,12 @@ jQuery(document).ready(function()
     }
   });
 
-	// hide the toggle-nav if you click outside of it
-	$(document).on("click", function ()
+	$(document).click(function(e) 
 	{
-		$(".toggle-content").removeClass('toggle-active');
+		if (!$(e.target).is('#search-button-nav .toggle-content .search-field') && !$(e.target).is('#search-button-nav .toggle-content')) 
+		{
+			$(".toggle-content").removeClass('toggle-active');
+		}
 	});
 
   // for checking usernames
@@ -1375,9 +1345,11 @@ jQuery(document).ready(function()
 	});
 
 	// hide long quotes
+	// NOT FINISHED
+	// Need to find the best approach to making the entire line italic, including the "from" bit
 	var showChar = 600;
-	var moretext = "<em>Click to view long quote</em>";
-	var lesstext = "<em>Click to hide long quote</em>";
+	var moretext = "<em>Click to view long quote </em>";
+	var lesstext = "<em>Click to hide long quote </em>";
 	$('.comment_quote').each(function() 
 	{
 		var actual_text = $(this).text();
@@ -1385,24 +1357,39 @@ jQuery(document).ready(function()
 
 		if(actual_text.length > showChar) 
 		{
-			var html = '<span class="morecontent">' + content + '</span><a href="" class="morelink">' + moretext + '</a><br />';
+			var cite = $(this).find('cite').first().text();
+			var cite_link = '';
+
+			if (cite != 'Quote')
+			{
+				cite_link = 'from ' + cite;
+			}
+
+			var html = '<span class="morecontent">' + content + '</span><a href="" class="morelink">' + moretext + cite_link + '</a><br />';
 
 			$(this).replaceWith(html);
 		}
-
 	});
 
 	$(".morelink").click(function()
 	{
+		var cite = $(this).prev().find('cite').first().text();
+		var cite_link = '';
+
+		if (cite != 'Quote')
+		{
+			cite_link = 'from ' + cite;
+		}
+
 		if($(this).hasClass("less")) 
 		{
 			$(this).removeClass("less");
-			$(this).html(moretext);
+			$(this).html(moretext + cite_link);
 		} 
 		else 
 		{
 			$(this).addClass("less");
-			$(this).html(lesstext);
+			$(this).html(lesstext + cite_link);
 		}
 		$(this).prev().toggle();
 		return false;

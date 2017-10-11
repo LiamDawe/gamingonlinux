@@ -100,7 +100,7 @@ margin-bottom: -3px;
  .header-navbar>li>a {
      display: block;
      color: #999;
-     padding: 14px;
+     padding: 14px 5px 14px 10px;
  }
  .header-navbar>.active>a {
      color: #FFF;
@@ -112,13 +112,17 @@ margin-bottom: -3px;
  }
  .header-navbar>.gol-icon>a {
      line-height: 0;
-     padding: 9px 14px;
+	 padding-top: 9px;
+	 padding-right: 0px;
+	 padding-bottom: 9px;
+	 padding-left: 14px;
  }
- .header-search {
-     padding: 9px 0;
- }
+.header-search {
+	padding: 9px 0;
+	margin-right: 5px;
+}
  .header-search .search-field {
-     width: auto;
+     width: 200px;
      background-color: #333;
      border: 1px solid #5c5c5c;
      outline: none;
@@ -190,8 +194,12 @@ margin-bottom: -3px;
 	background: #222;
 	box-shadow: 1px 1px 1px black;
 	padding: 5px;
+	box-sizing: border-box;
 	word-wrap: normal;
 	z-index: 999999;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+     box-sizing: border-box;
 }
 .toggle-active {display: block;}
 .toggle-content ul 
@@ -211,13 +219,32 @@ margin-bottom: -3px;
 {
 	display: block; 
 	color: #999; 
-	padding: 5px 
+	padding: 5px
 	!important;
-	
 }
 .toggle-content a:hover {color: #fff;}
+/* search box */
+.search-box {float: left; color: #999; line-height: 29px; background-color: #383838;}
+.search-box:hover{background-color: #4B4B4B;}
+.search-box a {padding: 10px; height: 29px; display: block; color: #999;}
+.search-box:hover{cursor: pointer;}
+#search-button-nav .toggle-content {width: 100%; border-top: 1px solid black; text-align: center; left: 0px;}
+#search-button-nav input {width: calc(100% - 64px); display: inline-block; vertical-align: bottom;}
+#search-button-nav .search-button {
+	border: 1px solid #ddd;
+	color: #444444;
+	margin-bottom: 0px;
+	padding: 7px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	border-radius: .2em;
+	height: 34px;
+	vertical-align: baseline;
+	display: inline-block;
+}
 /* alerts menu */
-.alerts-box {position: relative; float: left; color: #999; line-height: 29px; right: 1px;}
+.alerts-box {position: relative; float: left; color: #999; line-height: 29px;}
 .alerts-box-new{background-color: #609FA9;}
 .alerts-box-new:hover{background-color: #6FA8B1;}
 .alerts-box-normal{background-color: #383838;}
@@ -225,7 +252,8 @@ margin-bottom: -3px;
 .alerts-box a {padding: 10px; height: 29px; display: block; color: #999;}
 .alerts-box:hover{cursor: pointer;}
 /* user menu */
-.user-box {position: relative; float: right; color: #999; background-color: #383838; height: 49px; padding-left: 5px; padding-right: 5px;}
+.user-box {position: relative; float: right; color: #999; background-color: #383838; height: 49px;}
+.user-box a {display: block; padding-left: 5px; padding-right: 5px;}
 .user-box:hover {background-color: #4B4B4B;}
 /* getting the avatar to align in the middle */
 .avatar-container {height: 49px;}
@@ -305,7 +333,7 @@ margin-bottom: -3px;
 	padding: 0;
 }
 #footer #social ul li:hover {
-	background: #444444;login
+	background: #444444;
 }
 #footer #social ul li > a {
 	display: inherit;
@@ -784,13 +812,6 @@ select.pagination {
     background: #ccb845;
 }
 
-/* Login Page */
-#login-center {
-	margin: 0px auto;
-	max-width: 400px;
-	min-width: 280px;
-}
-
 /* Social Networks */
 ul.social-networks {
 	list-style: none;
@@ -907,10 +928,6 @@ ul.social-networks li > a {
 .support-us-box a:hover {
 	color: #518FD0;
 }
-
-/* Games Database */
-.database-latest{float: left; width: 49%;}
-.database-updated{float: right; width: 49%;}
 
 /* Forum */
 .dark .post_row {background: #333333; border-bottom: 1px solid #868686;}
@@ -1353,6 +1370,16 @@ color: #fff !important;
 	}
 }
 
+/* for the searchbar */
+@media only screen and (max-width: 855px) {
+	.header-search {display: none;}
+	#search-button-nav {display: block;}
+}
+@media only screen and (min-width: 854px) {
+	.header-search {display: block;}
+	#search-button-nav {display: none;}
+}
+
 /* Above tablet */
 @media only screen and (min-width: 768px) {
     .articles .article .image {
@@ -1407,9 +1434,6 @@ color: #fff !important;
 
 	.head-list-position {float: left; margin-top: 5px;}
 
-	.database-latest{float: left; width: 100%; clear: both;}
-	.database-updated{float: left; width: 100%; clear: both;}
-
 	.article.individual.no-image .info {
 		padding: 14px;
 		background: none;
@@ -1438,7 +1462,10 @@ color: #fff !important;
 /* MOBILE PORTRAIT */
 @media only screen and (max-width: 320px)
 {
-
+	.header-navbar>.gol-icon>a {
+		line-height: 0;
+		padding: 9px 3px !important;
+	}
 }
 /* LANDSCAPE ORIENTATION */
 @media only screen and (orientation: landscape) {
@@ -1500,7 +1527,7 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .dark .golsvg_background {fill: #000000}
 .dark svg text {fill: white;}
 .golsvg_counters {fill: black}
-.golsvg_minmax {full: white; stroke: none;}
+.golsvg_minmax {fill: white; stroke: none;}
 .dark golsvg_counters {fill: white}
 .dark .select2-selection {background-color: #515151 !important}
 .dark .select2-selection__choice {background-color: #515151 !important}
@@ -1512,7 +1539,7 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 	line-height: 30px;
 }
 .patreon_comments {
-	border-top: 1px solid yellow;
+	border-top: 1px solid rgb(90, 215, 253);
 }
 .preview_pm{display: none;}
 .register-warning {
@@ -1549,7 +1576,6 @@ a.anchor {
     top: -50px;
     visibility: hidden;
 }
-#calendar_today {background-color: #005880; color: white;}
 .scrollbox {
   height:100px;
   overflow:auto;

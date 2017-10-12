@@ -62,11 +62,13 @@ while ($comments = $db->fetch())
 	
 	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#r' . $comments['comment_id']);
 
-	$comment_posts .= "<li class=\"list-group-item\">
-	<a href=\"".$article_link."\">{$title}</a><br />
-	$text<br />
-	<small>by {$username} {$date}</small>
-</li>";
+	$machine_time = date("Y-m-d\TH:i:s", $comments['time_posted']) . 'Z';	
+
+	$comment_posts .= '<li class="list-group-item">
+	<a href="'.$article_link.'">'.$title.'</a><br />
+	'.$text.'<br />
+	<small>by '.$username.' <time class="timeago" datetime="'.$machine_time.'">'.$date.'</time></small>
+	</li>';
 }
 
 $templating->set('comment_posts', $comment_posts);

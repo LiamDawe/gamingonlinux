@@ -45,15 +45,19 @@ while ($topics = $db->fetch())
 		$title = $topics['topic_title'];
 	}
 
-	if ($core->config('pretty_urls') == 1)
+	$machine_time = date("Y-m-d\TH:i:s", $topics['last_post_date']) . 'Z';
+
+	if ($postPage > 1)
 	{
-		$forum_posts .= "<li class=\"list-group-item\"><a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\">{$title}</a><br /><small>{$date}</small></li>";
+		$link_page = 'page=' . $postPage;
 	}
-	else {
-		$forum_posts .= '<li class="list-group-item"><a href="' . url . 'index.php?module=viewtopic&amp;topic_id=' . $topics['topic_id'] . '&amp;page=' . $postPage . '">' . $title . '</a><br />
-		<small>' . $date .'</small></li>';
+	else if ($postPage <= 1)
+	{
+		$link_page = '';
 	}
 
+	$forum_posts .= '<li class="list-group-item"><a href="'. $forum_class->get_link($topics['topic_id'], $link_page) . '">' . $title . '</a><br />
+	<small><time class="timeago" datetime="'.$machine_time.'">' . $date .'</time></small></li>';
 }
 
 $templating->set('forum_posts', $forum_posts);

@@ -39,8 +39,7 @@ setInterval ( "update_notifications()", 60000 );
 <script type="text/javascript" src="{:url}includes/jscripts/jquery.qtip.min.js"></script>
 
 <script type="text/javascript">
-	// if (typeof postdate == "undefined") { postdate = 0; } else { postdate.setDate(postdate.getDate() + 1); }
-	jQuery("abbr.timeago").timeago('init'); //, {cutoff:86400}
+	jQuery("abbr.timeago").timeago('init');
 	jQuery('.tooltip-top').qtip({
 	    position: {
 	        my: 'bottom center',

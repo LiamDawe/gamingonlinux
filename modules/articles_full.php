@@ -275,7 +275,6 @@ if (!isset($_GET['go']))
 					$article_bottom = "<br /><p><em>This article was submitted by a guest, we encourage anyone to <a href=\"".$core->config('website_url')."submit-article/\">submit their own articles</a>.</em></p>";
 				}
 
-				//piratelv timeago: 12/11/14
 				$templating->set('article_meta', "<meta itemprop=\"image\" content=\"$article_meta_image\" /> <script>var postdate=new Date('".date('c', $article['date'])."')</script>");
 
 				$tagline_bbcode = '';

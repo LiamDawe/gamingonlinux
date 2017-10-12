@@ -60,7 +60,7 @@ if (!isset($_GET['go']))
 			if (isset($_GET['comment_id']) && core::is_number($_GET['comment_id']))
 			{
 				// have they come from a notification/alert box link?
-				if (isset($_GET['clear_note']) && core::is_number($_GET['clear_note']))
+				if (isset($_GET['clear_note']))
 				{
 					// make sure they own it to clear it
 					$db->sqlquery("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array((int) $_GET['clear_note']));
@@ -89,9 +89,8 @@ if (!isset($_GET['go']))
 						$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
 						$blocked_sql = "AND c.`author_id` NOT IN ($in)";
 					}					
-					$current_number = $dbl->run("SELECT count(c.`comment_id`) as counter FROM `articles_comments` c WHERE c.`article_id` = ? AND c.`comment_id` <= ? $blocked_sql", array_merge([(int) $_GET['aid']], [(int) $_GET['comment_id']], $blocked_ids))->fetchOne();
 
-					$last_page = ceil($current_number/$_SESSION['per-page']);
+					$last_page = ceil($article['comment_count']/$_SESSION['per-page']);
 						
 					$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
 

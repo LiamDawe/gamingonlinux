@@ -37,6 +37,7 @@ if (!isset($_GET['go']))
 				a.`views`,
 				a.`tagline_image`,
 				a.`gallery_tagline`,
+				a.`comment_count`,
 				t.`filename` as `gallery_tagline_filename`,
 				a.`comments_open`,
 				u.`username`,
@@ -88,11 +89,18 @@ if (!isset($_GET['go']))
 
 						$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
 						$blocked_sql = "AND c.`author_id` NOT IN ($in)";
-					}					
+					}
 
-					$last_page = ceil($article['comment_count']/$_SESSION['per-page']);
-						
-					$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $last_page . '#r' . $_GET['comment_id']);
+					// calculate the page this comment is on
+					$prev_comments = $dbl->run("SELECT COUNT(comment_id) AS total FROM `articles_comments` WHERE `comment_id` < ? AND `article_id` = ?", array($_GET['comment_id'], $article['article_id']))->fetchOne();
+
+					$comment_page = 1;
+					if ($article['comment_count'] > $comments_per_page)
+					{
+						$comment_page = ceil($prev_comments/$_SESSION['per-page']);
+					}
+
+					$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $comment_page . '#r' . $_GET['comment_id']);
 
 					header("Location: " . $article_link);
 				}

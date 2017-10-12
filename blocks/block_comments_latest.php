@@ -44,9 +44,11 @@ while ($comments = $db->fetch())
 	
 	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#' . $comments['comment_id']);
 
+	$machine_time = date("Y-m-d\TH:i:s", $comments['time_posted']) . 'Z';
+
 	$comment_posts .= "<li class=\"list-group-item\">
 	<a href=\"{$article_link}\">{$title}</a><br />
-	<small>{$date}</small>
+	<small><time class=\"timeago\" datetime=\"$machine_time\">{$date}</time></small>
 </li>";
 }
 

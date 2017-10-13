@@ -63,13 +63,7 @@ if (!isset($_GET['go']))
 				// have they come from a notification/alert box link?
 				if (isset($_GET['clear_note']))
 				{
-					// make sure they own it to clear it
-					$check_note = $dbl->run("SELECT 1 FROM `user_notifications` WHERE `id` = ? AND `owner_id` = ?", array((int) $_GET['clear_note'], (int) $_SESSION['user_id']))->fetchOne();
-					if ($check_note)
-					{
-						// they have seen it and when they saw it
-						$dbl->run("UPDATE `user_notifications` SET `seen` = 1, `seen_date` = ? WHERE `id` = ?", array(core::$date, (int) $_GET['clear_note']));
-					}
+					$dbl->run("UPDATE `user_notifications` SET `seen` = 1, `seen_date` = ? WHERE `id` = ? AND `owner_id` = ? AND `seen` = 0", array(core::$date, (int) $_GET['clear_note'], (int) $_SESSION['user_id']));
 				}
 
 				// check comment still exists
@@ -92,6 +86,12 @@ if (!isset($_GET['go']))
 
 					// calculate the page this comment is on
 					$prev_comments = $dbl->run("SELECT COUNT(comment_id) AS total FROM `articles_comments` WHERE `comment_id` <= ? AND `article_id` = ?", array($_GET['comment_id'], $article['article_id']))->fetchOne();
+
+					$comments_per_page = $core->config('default-comments-per-page');
+					if (isset($_SESSION['per-page']))
+					{
+						$comments_per_page = $_SESSION['per-page'];
+					}
 
 					$comment_page = 1;
 					if ($article['comment_count'] > $comments_per_page)

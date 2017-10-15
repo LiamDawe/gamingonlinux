@@ -51,7 +51,7 @@ if ($core->config('articles_rss') == 1)
 	LEFT JOIN
 		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` 
 	LEFT JOIN 
-		`".$dbl->table_prefix."users` u ON a.author_id = u.user_id $sql_join
+		`users` u ON a.author_id = u.user_id $sql_join
 	WHERE a.`active` = 1 $sql_addition
 	ORDER BY a.`date` DESC
 	LIMIT 15")->fetch_all();

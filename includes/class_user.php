@@ -248,18 +248,6 @@ class user
 		return false;
 	}
 	
-	function user_timezone($user_id)
-	{
-		if (!isset($user_id) || $user_id == 0)
-		{
-			return 'UTC';
-		}
-		else
-		{
-			return $this->get('timezone', $user_id);
-		}
-	}
-	
 	// check if it's a new device, then set the session up
 	public function new_login($generated_session)
 	{

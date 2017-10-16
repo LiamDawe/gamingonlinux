@@ -14,7 +14,7 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('edit_link', $edit_link);
 
-	$user_timezone = $user->user_timezone($_SESSION['user_id']);
+	$user_timezone = $user->user_details['timezone'];
 
 	if (isset($_SESSION['user_id']) && $_SESSION['user_id'])
 	{

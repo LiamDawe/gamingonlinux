@@ -12,7 +12,7 @@ if ($core->config('forum_posting_open') == 1)
 	$name = $dbl->run("SELECT t.`topic_title`, t.`replys`, t.`is_locked`, t.`is_sticky`, f.`name`, f.`forum_id` FROM `forum_topics` t JOIN `forums` f ON t.`forum_id` = f.`forum_id` WHERE topic_id = ?", array($topic_id))->fetch();
 
 	// check topic exists
-	if ($db->num_rows() != 1)
+	if (!$name)
 	{
 		$core->message('That is not a valid forum topic!');
 	}

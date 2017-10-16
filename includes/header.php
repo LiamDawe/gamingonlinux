@@ -31,7 +31,7 @@ $forum_class = new forum($dbl, $core, $user);
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
-	$theme = $user->get('theme', $_SESSION['user_id']);
+	$theme = $user->user_details['theme'];
 }
 
 else
@@ -77,15 +77,7 @@ $templating->block('top');
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 $templating->set('url', $core->config('website_url'));
 
-$branding['icon'] = $core->config('navbar_logo_icon');
-$branding['title'] ='GamingOnLinux';
-
-// april fools, because why not
-if (date('dm') == '0104' && date('H') < 14)
-{
-	$branding['icon'] = 'windows_logo.png';
-	$branding['title'] = 'Gaming On Windows 10';
-}
+$branding['icon'] = 'icon.svg';
 // christmas
 if (date('m') == '12')
 {
@@ -93,7 +85,6 @@ if (date('m') == '12')
 }
 
 $templating->set('icon', $branding['icon'] );
-$templating->set('site_title', $branding['title']);
 
 // Here we sort out what modules we are allowed to load, this also grabs links needed for the navbar
 $core->load_modules(['db_table' => 'modules']);
@@ -192,8 +183,8 @@ else if ($_SESSION['user_id'] > 0)
 		$messages_html_link = $core->config('website_url') . "index.php?module=messages";
 	}
 	
-	$user_avatar = $user->sort_avatar($_SESSION['user_id']);
-	$username = $user->get('username', $_SESSION['user_id']);
+	$user_avatar = $user->sort_avatar($user->user_details);
+	$username = $user->user_details['username'];
 	
 	$user_menu = $templating->store_replace($user_menu, array('avatar' => $user_avatar, 'username' => $username, 'profile_link' => $profile_link, 'admin_link' => $admin_link, 'url' => $core->config('website_url')));
 	$templating->set('user_menu', $user_menu);
@@ -223,10 +214,10 @@ else if ($_SESSION['user_id'] > 0)
 	$new_comments_line = '';
 	$unread_comments_counter = 0;
 	$admin_comment_alerts = 0;
-	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id']);
+	$user_comment_alerts = $user->user_details['display_comment_alerts'];
 	if ($user->check_group([1,2,5]))
 	{
-		$admin_comment_alerts = $user->get('admin_comment_alerts', $_SESSION['user_id']);
+		$admin_comment_alerts = $user->user_details['admin_comment_alerts'];
 	}
 	if ($user_comment_alerts == 1 || $admin_comment_alerts == 1)
 	{

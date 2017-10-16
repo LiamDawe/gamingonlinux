@@ -1019,8 +1019,7 @@ class core
 
 		if (isset($user_id) && $user_id != 0)
 		{
-			$db->sqlquery("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($user_id));
-			$checker = $db->fetch();
+			$checker = $this->database->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($user_id))->fetch();
 
 			if ($checker['date_updated'] != NULL)
 			{
@@ -1120,11 +1119,9 @@ class core
 	
 	public function load_modules($options)
 	{
-		global $db;
-		
 		$module_links = '';
-		$fetch_modules = $db->sqlquery('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC');
-		while ($modules = $fetch_modules->fetch())
+		$fetch_modules = $this->database->run('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC')->fetch_all();
+		foreach ($fetch_modules as $modules)
 		{
 			// modules allowed for loading
 			self::$allowed_modules[$modules['module_file_name']] = $modules;

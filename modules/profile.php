@@ -104,7 +104,7 @@ if (isset($_GET['user_id']))
 						$registered_date = $core->human_date($profile['register_date']);
 						$templating->set('registered_date', $registered_date);
 
-						$avatar = $user->sort_avatar($profile['user_id']);
+						$avatar = $user->sort_avatar($profile);
 
 						$templating->set('avatar', $avatar);
 						$templating->set('article_comments', $profile['comment_count']);

@@ -262,8 +262,8 @@ class article
       }
     }
 
-    return $tagline_image;
-  }
+		return $tagline_image;
+	}
 
 	// this function will check over everything necessary for an article to be correctly done, including an article crossover checker
 	public function check_article_inputs($return_page)
@@ -1196,7 +1196,7 @@ class article
 			}
 
 			// sort out the avatar
-			$comment_avatar = $this->user->sort_avatar($comments['author_id']);
+			$comment_avatar = $this->user->sort_avatar($comments);
 						
 			$into_username = '';
 			if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')

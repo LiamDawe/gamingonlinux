@@ -15,7 +15,7 @@ if (!isset($_GET['go']))
 	$templating->block('main', 'usercp_modules/notification_preferences');
 
 	$comments_check = '';
-	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id']);
+	$user_comment_alerts = $user->user_details['display_comment_alerts'];
 	if ($user_comment_alerts == 1)
 	{
 		$comments_check = 'checked';
@@ -25,7 +25,7 @@ if (!isset($_GET['go']))
 	$admin_comment_pref = '';
 	if ($user->check_group([1,2,5]))
 	{
-		$admin_comment_alerts = $user->get('admin_comment_alerts', $_SESSION['user_id']);
+		$admin_comment_alerts = $user->user_details['admin_comment_alerts'];
 		
 		$admin_comment_check = '';
 		if ($admin_comment_alerts == 1)

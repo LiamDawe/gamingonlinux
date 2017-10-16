@@ -1,7 +1,7 @@
 <?php
 if ($core->config('forum_posting_open') == 1)
 {
-	$mod_queue = $user->get('in_mod_queue', $_SESSION['user_id']);
+	$mod_queue = $user->user_details['in_mod_queue'];
 	$forced_mod_queue = $user->can('forced_mod_queue');
 	
 	$forum_id = (int) $_GET['forum_id'];

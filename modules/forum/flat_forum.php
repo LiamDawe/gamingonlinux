@@ -108,6 +108,11 @@ SELECT
 	t.`has_poll`,
 	f.name as forum_name,
 	u.`username`,
+	u.`avatar`, 
+	u.`avatar_gravatar`, 
+	u.`gravatar_email`,
+	u.`avatar_uploaded`, 
+	u.`avatar_gallery`,
 	u2.`username` as username_last
 FROM
 	`forum_topics` t
@@ -155,7 +160,7 @@ foreach ($get_topics as $topics)
 		$postNumber = (($post_count - 1) % $rows_per_page) + 1;
 	}
 	
-	$avatar = $user->sort_avatar($topics['author_id']);
+	$avatar = $user->sort_avatar($topics);
 
 	if ($core->config('pretty_urls') == 1)
 	{

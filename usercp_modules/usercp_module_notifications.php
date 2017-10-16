@@ -34,7 +34,7 @@ if (!isset($_GET['go']))
 	$templating->block('top', 'usercp_modules/notifications');
 
 	$pagination = '';
-	$user_comment_alerts = $user->get('display_comment_alerts', $_SESSION['user_id']);
+	$user_comment_alerts = $user->user_details['display_comment_alerts'];
 	if ($user_comment_alerts == 1)
 	{
 		// count how many there is in total
@@ -143,7 +143,7 @@ if (!isset($_GET['go']))
 					$username = 'Guest';
 				}
 
-				$avatar = $user->sort_avatar($note_list['user_id']);
+				$avatar = $user->sort_avatar($note_list);
 
 				$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
 

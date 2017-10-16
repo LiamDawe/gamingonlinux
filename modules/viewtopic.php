@@ -59,9 +59,9 @@ else
 			u.`avatar`,
 			u.`avatar_uploaded`,
 			u.`avatar_gravatar`,
-			u.`register_date`,
 			u.`gravatar_email`,
 			u.`avatar_gallery`,
+			u.`register_date`,
 			u.`forum_posts`,
 			u.`game_developer`,
 			$db_grab_fields
@@ -398,7 +398,7 @@ else
 					$templating->set('cake_icon', $cake_bit);
 
 					// sort out the avatar
-					$avatar = $user->sort_avatar($topic['author_id']);
+					$avatar = $user->sort_avatar($topic);
 					$templating->set('avatar', $avatar);
 
 					$their_groups = $user->post_group_list([$topic['author_id']]);
@@ -551,7 +551,7 @@ else
 
 						$templating->set('username', $into_username . $username);
 
-						$avatar = $user->sort_avatar($post['author_id']);
+						$avatar = $user->sort_avatar($post);
 						$templating->set('avatar', $avatar);
 
 						// if we have some user groups for that user

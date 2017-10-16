@@ -86,6 +86,7 @@ else
 		u.`gravatar_email`,
 		u.`avatar_gravatar`,
 		u.`avatar_uploaded`,
+		u.`avatar_gallery`,
 		u2.`username` as `username_last`,
 		u2.`user_id` as `user_id_last`
 		FROM `forum_topics` t
@@ -145,7 +146,7 @@ else
 		$templating->block('post_row', 'viewforum');
 
 		// sort out user icon
-		$avatar = $user->sort_avatar($post['author_id']);
+		$avatar = $user->sort_avatar($post);
 		$templating->set('avatar', $avatar);
 
 		// Let them know if it's a sticky post or not

@@ -76,7 +76,6 @@ else
 		$templating->set('youtube_channel', $core->config('youtube_channel'));
 		
 		// THEMING
-		$templating->set('navbar_logo_icon', $core->config('navbar_logo_icon'));
 		$templating->set('template', $core->config('template'));
 	}
 
@@ -162,7 +161,6 @@ else
 			
 			// THEMING
 			$core->set_config($_POST['template'], 'template');
-			$core->set_config($_POST['navbar_logo_icon'], 'navbar_logo_icon');
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';

@@ -1,7 +1,7 @@
 <?php
 $forum_types = ['normal_forum', 'flat_forum'];
 
-$forum_type = $user->get('forum_type', $_SESSION['user_id']);
+$forum_type = $user->user_details['forum_type'];
 
 if (!empty($forum_type) && in_array($forum_type, $forum_types))
 {

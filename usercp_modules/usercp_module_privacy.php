@@ -4,22 +4,20 @@ $templating->set_previous('title', 'Privacy' . $templating->get('title', 1)  , 1
 $templating->load('usercp_modules/privacy');
 $templating->block('main');
 
-$check = $user->get(['global_search_visible', 'get_pms', 'private_profile'], $_SESSION['user_id']);
-
 $search = '';
-if ($check['global_search_visible'] == 1)
+if ($user->user_details['global_search_visible'] == 1)
 {
 	$search = 'checked';
 }
 
 $pms = '';
-if ($check['get_pms'] == 1)
+if ($user->user_details['get_pms'] == 1)
 {
 	$pms = 'checked';
 }
 
 $private = '';
-if ($check['private_profile'] == 1)
+if ($user->user_details['private_profile'] == 1)
 {
 	$private = 'checked';
 }

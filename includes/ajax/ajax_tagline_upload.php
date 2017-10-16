@@ -1,9 +1,13 @@
 <?php
 session_start();
 
+error_reporting(-1);
+
 define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
+
+$user->check_session();
 
 include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
@@ -156,7 +160,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 
 		// make the thumbnail, nice and small
 		$img->fromFile($_FILES['photos2']['tmp_name'])->resize(350, null)->toFile($core->config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename);
-
+		
 		if (move_uploaded_file($source, $target))
 		{
 			// replace any existing just-uploaded image

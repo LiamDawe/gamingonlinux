@@ -23,8 +23,8 @@ $templating->set('submit_article_link', $submit_link);
 
 // Get the categorys, for the jump list, also used in "block_article_categorys.php"
 $articles_categorys = '';
-$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
-while ($categorys = $db->fetch())
+$fetch_cats = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+foreach ($fetch_cats as $categorys)
 {
 	$articles_categorys .= '<option value="'.$article_class->tag_link($categorys['category_name']).'">'.$categorys['category_name'].'</option>';
 }
@@ -36,8 +36,8 @@ $templating->set('category_links', $articles_categorys);
 $timestamp = strtotime("-7 days");
 
 $hot_articles = '';
-$db->sqlquery("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ? AND `views` > ".$core->config('hot-article-viewcount')." AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4", array($timestamp));
-while ($top_articles = $db->fetch())
+$fetch_top = $dbl->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ? AND `views` > ".$core->config('hot-article-viewcount')." AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4", array($timestamp))->fetch_all();
+foreach ($fetch_top as $top_articles)
 {
 	$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a></li>';
 }

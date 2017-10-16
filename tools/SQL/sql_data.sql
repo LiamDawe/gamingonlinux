@@ -386,7 +386,6 @@ INSERT INTO `config` (`id`, `data_key`, `data_value`) VALUES
 (59, 'twitter_username', 'gamingonlinux'),
 (60, 'about_text', ''),
 (61, 'mailer_email', 'noreply@site.com'),
-(62, 'navbar_logo_icon', 'icon.svg'),
 (63, 'quick_nav', '1'),
 (64, 'recaptcha_public', ''),
 (65, 'steam_openid_key', ''),

@@ -14,7 +14,7 @@ class user
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`,
-	`display_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
+	`display_comment_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
 	
 	public $user_groups;
 	
@@ -45,8 +45,9 @@ class user
 			{
 				$logout = 1;
 			}
+			$this->user_details = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
 			
-			$this->check_banned($_SESSION['user_id']);
+			$this->check_banned();
 		}
 		else
 		{
@@ -56,7 +57,7 @@ class user
 				$_SESSION['username'] = 'Guest'; // not even sure why I set this
 				$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 				$_SESSION['articles-per-page'] = 15;
-				$this->user_details[0] = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0];
+				$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gravatar' => 0, 'avatar_gallery' => NULL];
 			}
 		}
 		
@@ -83,16 +84,16 @@ class user
 				// now check password matches
 				if (password_verify($password, $info['password']))
 				{
-					$user_info = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
+					$this->user_details = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
 
-					$this->check_banned($user_info['user_id']);
+					$this->check_banned($this->user_details['user_id']);
 
-					$generated_session = md5(mt_rand() . $user_info['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+					$generated_session = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
 					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_info['user_id']));
+					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
-					$this->new_login($user_info, $generated_session);
+					$this->new_login($generated_session);
 
 					if ($remember_username == 1)
 					{
@@ -101,7 +102,7 @@ class user
 
 					if ($stay == 1)
 					{
-						setcookie('gol_stay', $user_info['user_id'], time()+31556926, '/', $this->core->config('cookie_domain'));
+						setcookie('gol_stay', $this->user_details['user_id'], time()+31556926, '/', $this->core->config('cookie_domain'));
 						setcookie('gol_session', $generated_session, time()+31556926, '/', $this->core->config('cookie_domain'));
 					}
 
@@ -127,25 +128,18 @@ class user
 		}
 	}
 
-	public function check_banned($user_id)
+	public function check_banned()
 	{
-		$banned = 0;
+		$ip_banned = 0;
 
 		// now check IP ban
 		$check_ip = $this->database->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
 		if ($check_ip)
 		{
-			$banned = 1;
+			$ip_banned = 1;
 		}
 
-		$banning_check = $this->database->run("SELECT `banned` FROM `users` WHERE `user_id` = ?", [$user_id])->fetchOne();
-			
-		if ($banning_check == 1)
-		{
-			$banned = 1;
-		}
-
-		if ($banned == 1)
+		if ($this->user_details['banned'] == 1 || $ip_banned == 1)
 		{
 			// update their ip in the user table
 			$this->database->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $user_id]);
@@ -161,19 +155,19 @@ class user
 		}
 	}
 	
-	public function register_session($user_data)
+	public function register_session()
 	{
 		session_regenerate_id(true);
 		
-		$_SESSION['user_id'] = $user_data['user_id'];
-		$_SESSION['username'] = $user_data['username'];
+		$_SESSION['user_id'] = $this->user_details['user_id'];
+		$_SESSION['username'] = $this->user_details['username'];
 		$_SESSION['new_login'] = 1;
-		$_SESSION['activated'] = $user_data['activated'];
-		$_SESSION['per-page'] = $user_data['per-page'];
-		$_SESSION['articles-per-page'] = $user_data['articles-per-page'];
-		$_SESSION['email_options'] = $user_data['email_options'];
-		$_SESSION['auto_subscribe'] = $user_data['auto_subscribe'];
-		$_SESSION['auto_subscribe_email'] = $user_data['auto_subscribe_email'];
+		$_SESSION['activated'] = $this->user_details['activated'];
+		$_SESSION['per-page'] = $this->user_details['per-page'];
+		$_SESSION['articles-per-page'] = $this->user_details['articles-per-page'];
+		$_SESSION['email_options'] = $this->user_details['email_options'];
+		$_SESSION['auto_subscribe'] = $this->user_details['auto_subscribe'];
+		$_SESSION['auto_subscribe_email'] = $this->user_details['auto_subscribe_email'];
 	}
 
 	function block_list()
@@ -185,61 +179,6 @@ class user
 		else
 		{
 			$this->blocked_users = [];
-		}
-	}
-	
-	// helper func to get a user field(s)
-	function get($fields, $user_id)
-	{
-		if (is_array($fields))
-		{
-			$to_return = [];
-			foreach ($fields as $field)
-			{
-				if (isset($this->user_details[$user_id]) && array_key_exists($field, $this->user_details[$user_id]))
-				{
-					$to_return[$field] = $this->user_details[$user_id][$field];
-				}
-				else
-				{
-					$grab_fields[] = "`" . $field . "`";
-				}
-			}
-			if (!empty($grab_fields))
-			{
-				$get_fields = implode(',', $grab_fields);
-
-				$sql = "SELECT ".$get_fields." FROM `users` WHERE `user_id` = ?";
-				$grabber = $this->database->run($sql, [$user_id])->fetch();
-				if ($grabber)
-				{
-					foreach ($grabber as $field => $put)
-					{
-						$to_return[$field] = $put;
-						$this->user_details[$user_id][$field] = $put;
-					}
-				}
-			}
-			return $to_return;
-		}
-		else
-		{
-			// if we already have it in the cache
-			if (isset($this->user_details[$user_id][$fields]))
-			{
-				return $this->user_details[$user_id][$fields];
-			}
-			else
-			{
-				$sql = "SELECT `".$fields."` FROM `users` WHERE `user_id` = ?";
-				$picked_field = $this->database->run($sql, [$user_id])->fetchOne();
-				
-				// set the cache
-				$this->user_details[$user_id][$fields] = $picked_field;
-				
-				// return the details
-				return $picked_field;
-			}
 		}
 	}
 	
@@ -322,7 +261,7 @@ class user
 	}
 	
 	// check if it's a new device, then set the session up
-	public function new_login($user_data, $generated_session)
+	public function new_login($generated_session)
 	{
 		// check if it's a new device straight away
 		$new_device = 0;
@@ -334,7 +273,7 @@ class user
 		// they have a device cookie, let's check it bitches
 		if (isset($_COOKIE['gol-device']))
 		{
-			$device_test = $this->database->run("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($user_data['user_id'], $_COOKIE['gol-device']))->fetch();
+			$device_test = $this->database->run("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($this->user_details['user_id'], $_COOKIE['gol-device']))->fetch();
 			// cookie didn't match, don't let them in, hacking attempt probable
 			if (!$device_test)
 			{
@@ -347,23 +286,23 @@ class user
 		// register the new device to their account
 		if ($new_device == 1)
 		{
-			$device_id = md5(mt_rand() . $user_data['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+			$device_id = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
 			setcookie('gol-device', $device_id, time()+31556926, '/', $this->core->config('cookie_domain'));
 
-			if ($user_data['login_emails'] == 1 && $this->core->config('send_emails'))
+			if ($this->user_details['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
 				// send email about new device
-				$html_message = "<p>Hello <strong>{$user_data['username']}</strong>,</p>
+				$html_message = "<p>Hello <strong>" . $this->user_details['username'] . "</strong>,</p>
 				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.</p>
 				<div>
 				<hr>
 				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>";
 
-				$plain_message = "Hello {$user_data['username']},\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
+				$plain_message = "Hello " . $this->user_details['username'] . ",\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
 
 				$mail = new mailer($this->core);
-				$mail->sendMail($user_data['email'], $this->core->config('site_title') . ": New Login Notification", $html_message, $plain_message);
+				$mail->sendMail($this->user_details['email'], $this->core->config('site_title') . ": New Login Notification", $html_message, $plain_message);
 			}
 		}
 		else
@@ -382,33 +321,31 @@ class user
 
 		// keeping a log of logins, to review at anytime
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-		$this->database->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($user_data['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
+		$this->database->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
 
-		$this->register_session($user_data);
+		$this->register_session();
 	}
 
 	// if they have a stay logged in cookie log them in
 	function stay_logged_in()
 	{
- 		global $db, $core;
+ 		global $core;
 		
 		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']))
 		{
-			$db->sqlquery("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']));
-			$session = $db->fetch();
+			$session = $this->database->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']))->fetch();
 
-			if ($db->num_rows() == 1)
+			if ($session)
 			{
 				// login then
-				$db->sqlquery("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']));
-				$user_data = $db->fetch();
+				$this->user_details = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']))->fetch();
 				
-				$this->check_banned($user_data['user_id']);
+				$this->check_banned();
 
 				// update IP address and last login
-				$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $user_data['user_id']));
+				$this->database->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
-				$this->register_session($user_data);
+				$this->register_session();
 
 				return true;
 			}
@@ -504,9 +441,9 @@ class user
 		return false;
 	}
 
-	public function sort_avatar($user_id)
+	public function sort_avatar($data)
 	{
-		$your_theme = $this->get('theme', $_SESSION['user_id']);
+		$your_theme = $this->user_details['theme'];
 		
 		if ($your_theme == 'dark')
 		{
@@ -517,49 +454,41 @@ class user
 			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar.png";
 		}
 		
-		if ($user_id == 0)
+		if (!empty($data))
 		{
-			return $default_avatar;
-		}
-		else
-		{
-			$user_data = $this->get(['avatar', 'avatar_gravatar', 'gravatar_email', 'avatar_gallery', 'avatar_uploaded'], $user_id);
-			if (!empty($user_data))
+			$avatar = '';
+			if ($data['avatar_gravatar'] == 1)
 			{
-				$avatar = '';
-				if ($user_data['avatar_gravatar'] == 1)
-				{
-					$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $user_data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
-				}
+				$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
+			}
 
-				else if ($user_data['avatar_gallery'] != NULL)
-				{
-					$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$user_data['avatar_gallery']}.png";
-				}
+			else if ($data['avatar_gallery'] != NULL)
+			{
+				$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$data['avatar_gallery']}.png";
+			}
 
-				// either uploaded or linked an avatar
-				else if (!empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0)
+			// either uploaded or linked an avatar
+			else if (!empty($data['avatar']) && $data['avatar_gravatar'] == 0)
+			{
+				$avatar = $data['avatar'];
+				if ($data['avatar_uploaded'] == 1)
 				{
-					$avatar = $user_data['avatar'];
-					if ($user_data['avatar_uploaded'] == 1)
-					{
-						$avatar = $this->core->config('website_url') . "uploads/avatars/{$user_data['avatar']}";
-					}
-				}
-
-				// else no avatar, then as a fallback use gravatar if they have an email left-over
-				else if (empty($user_data['avatar']) && $user_data['avatar_gravatar'] == 0 && $user_data['avatar_gallery'] == NULL)
-				{
-					$avatar = $default_avatar;
+					$avatar = $this->core->config('website_url') . "uploads/avatars/{$data['avatar']}";
 				}
 			}
-			else
+
+			// else no avatar, then as a fallback use gravatar if they have an email left-over
+			else if (empty($data['avatar']) && $data['avatar_gravatar'] == 0 && $data['avatar_gallery'] == NULL)
 			{
 				$avatar = $default_avatar;
 			}
-			
-			return $avatar;
 		}
+		else
+		{
+			$avatar = $default_avatar;
+		}
+			
+		return $avatar;
 	}
 
 	// give them a cake icon if they have been here for x years
@@ -746,16 +675,10 @@ class user
 			
 			// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 			$subscribe_check = [];
-			$db->sqlquery("SELECT `$sql_id_field`, `emails`, `send_email` FROM `$sql_table` WHERE `user_id` = ? AND `$sql_id_field` = ?", array($_SESSION['user_id'], $data_id));
-			$sub_exists = $db->num_rows();
-
-			if ($sub_exists == 1)
-			{
-				$check_current_sub = $db->fetch();
-			}
+			$check_current_sub = $this->database->run("SELECT `$sql_id_field`, `emails`, `send_email` FROM `$sql_table` WHERE `user_id` = ? AND `$sql_id_field` = ?", array($_SESSION['user_id'], $data_id))->fetch();
 
 			$subscribe_check['auto_subscribe'] = '';
-			if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
+			if ($check_current_sub || $_SESSION['auto_subscribe'] == 1)
 			{
 				$subscribe_check['auto_subscribe'] = 'checked';
 			}

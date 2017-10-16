@@ -135,7 +135,7 @@ class bbcode
 	{
 		// Quote on its own, do these first so they don't get in the way
 		$pattern = '/\[quote\](?:\s)*(.+?)\[\/quote\]/is';
-		$replace = "<blockquote><cite>Quote</cite>$1</blockquote>";
+		$replace = "<blockquote class=\"comment_quote\"><cite>Quote</cite>$1</blockquote>";
 
 		while(preg_match($pattern, $body))
 		{
@@ -213,16 +213,6 @@ class bbcode
 		
 		$body = $this->logged_in_code($body);
 
-		if (preg_match_all("/\[giveaway\](.+?)\[\/giveaway\]/is", $body, $giveaway_matches))
-		{
-			foreach ($giveaway_matches[1] as $match)
-			{
-				$body = $this->replace_giveaways($body, $match);
-			}
-		}
-
-		$body = $this->do_timers($body);
-
 		// Array for tempory storing codeblock contents
 		$codeBlocks = [];
 
@@ -237,8 +227,6 @@ class bbcode
 				return "!!@codeblock".$k."!!";
 			},
 			$body);
-
-		$body = $this->pc_info($body);
 
 		$body = $this->parse_links($body);
 

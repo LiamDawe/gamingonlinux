@@ -123,7 +123,7 @@ if (($_SESSION['user_id'] != 0) && (!isset($_GET['message']) || isset($_GET['mes
 {
 	$name = $_SESSION['username'];
 	
-	$email = $user->get('email', $_SESSION['user_id']);
+	$email = $user->user_details['email'];
 }
 
 if (isset($_SESSION['message']) && $_SESSION['message'] == 'empty')

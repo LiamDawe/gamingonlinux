@@ -46,7 +46,7 @@ while ($gallery = $db->fetch())
 }
 $templating->set('avatar_gallery', $avatar_gallery);
 
-$templating->set('gravatar_email', $user->get('gravatar_email', $_SESSION['user_id']));
+$templating->set('gravatar_email', $user->user_details['gravatar_email']);
 
 if (isset($_POST['action']))
 {

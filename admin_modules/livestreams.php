@@ -30,7 +30,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('add_top', 'admin_modules/livestreams');
 		
-		$timezones = core::timezone_list($user->user_timezone($_SESSION['user_id']));
+		$timezones = core::timezone_list($user->user_details['timezone']);
 
 		$templating->block('item', 'admin_modules/livestreams');
 		$templating->set('title', '');

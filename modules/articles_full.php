@@ -275,12 +275,6 @@ if (!isset($_GET['go']))
 
 				$templating->set('article_views', $article['views']);
 
-				$article_bottom = '';
-				if ($article['user_group'] != 1 && $article['user_group'] != 2 && $article['user_group'] != 5)
-				{
-					$article_bottom = "<br /><p><em>This article was submitted by a guest, we encourage anyone to <a href=\"".$core->config('website_url')."submit-article/\">submit their own articles</a>.</em></p>";
-				}
-
 				$templating->set('article_meta', "<meta itemprop=\"image\" content=\"$article_meta_image\" /> <script>var postdate=new Date('".date('c', $article['date'])."')</script>");
 
 				$tagline_bbcode = '';
@@ -317,7 +311,7 @@ if (!isset($_GET['go']))
 				
 				$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
-				$templating->set('text', $bbcode->article_bbcode($article_body) . $article_bottom);
+				$templating->set('text', $bbcode->article_bbcode($article_body));
 
 				$article_link = "/articles/$nice_title.{$_GET['aid']}/";
 				if (isset($_GET['preview']))

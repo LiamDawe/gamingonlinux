@@ -19,10 +19,9 @@ else
 			$block = 1;
 		}
 
-		// if the editor is submitting it as themselves, thank the submitter automatically
 		$author_id = $_POST['author_id'];
 		$submission_date = $check_article['date_submitted'];
-
+		// if the author is submitting it as themselves
 		if (isset($_POST['submit_as_self']))
 		{
 			$author_id = $_SESSION['user_id'];

@@ -47,7 +47,6 @@ if (!isset($_GET['go']))
 				u.`avatar_uploaded`,
 				u.`avatar_gallery`,
 				u.`article_bio`,
-				u.`user_group`,
 				u.`twitter_on_profile`
 				FROM `articles` a
 				LEFT JOIN

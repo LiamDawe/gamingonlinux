@@ -26,24 +26,6 @@ else
 		if (isset($_POST['submit_as_self']))
 		{
 			$author_id = $_SESSION['user_id'];
-			$submission_date = '';
-
-			if (!empty($check_article['username']))
-			{
-				$submitted_by_user = $check_article['username'];
-			}
-
-			else if (!empty($check_article['guest_username']))
-			{
-				$submitted_by_user = $check_article['guest_username'];
-			}
-
-			else
-			{
-				$submitted_by_user = "a guest submitter";
-			}
-
-			$checked['text'] = $checked['text'] . "\r\n\r\n[i]Thanks to " . $submitted_by_user . ' for letting us know![/i]';
 		}
 		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], 'submitted_article'));
 

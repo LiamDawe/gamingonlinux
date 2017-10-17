@@ -15,6 +15,9 @@
 [block: item_top]
 {:lock_button} <a class="button_link" href="#comments">View Comments</a> <a class="admin_preview_article button_link" href="#preview">Preview</a>
 <hr />
+<div class="box">
+	<div class="body group">Article submitted by: <span id="submitter-username">{:username}</span></div>
+</div>
 [/block: item_top]
 
 [block: submitted_row]
@@ -85,7 +88,7 @@
 			<input type="checkbox" name="show_block" /> Editors Pick? <em>This will show the article under the Editors Pick heading on the Articles block!</em>
 		</label>
 		<label class="checkbox">
-			<input type="checkbox" name="submit_as_self" {:self_check}/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em>
+			<input type="checkbox" id="self-submit" name="submit_as_self" {:self_check}/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em>
 		</label>
 		<button type="submit" name="act" value="Approve" {:edit_state}/>Approve & Publish Now</button> <button type="submit" name="act" value="Edit_Submitted" class="btn btn-primary" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Deny" {:edit_state}/>Deny</button> <button class="admin_preview_article" type="button">Preview</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />

@@ -1323,6 +1323,16 @@ jQuery(document).ready(function()
 		var big_image = $(this).data('main-url');
 		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+big_image+'" data-fancybox="images"><img src="'+thumbnail+'" /></a></p>');
 	});
+
+	// approving submitted article as yourself (if you re-wrote large portions)
+	$(document).on('click', "#self-submit", function(e) 
+	{
+		var username = $("#submitter-username").text();   
+		var targetEditor = CKEDITOR.instances.ckeditor_gol;
+		var range = targetEditor.createRange();
+		range.moveToElementEditEnd(range.root);
+		targetEditor.insertHtml('<p>&nbsp;</p><p style="text-align:right"><em>With thanks to the original submission from ' + username + '!</em></p>', 'html', range);
+	});
 	
 	// prevent accidental logouts
 	$(document).on('click', ".logout_link", function(e) 

@@ -89,7 +89,9 @@ else if (isset($_GET['aid']))
 	a.`locked_date`,
 	a.`gallery_tagline`,
 	t.`filename` as gallery_tagline_filename,
-	u.`username`, u2.`username` as `username_lock`
+	u.`username`, 
+	u.user_id, 
+	u2.`username` as `username_lock`
 	FROM
 	`articles` a
 	LEFT JOIN `users` u on a.`author_id` = u.`user_id`
@@ -171,6 +173,26 @@ else if (isset($_GET['aid']))
 		$lock_button = '<a class="button_link" href="'.$core->config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
 	}
 	$templating->set('lock_button', $lock_button);
+
+	if (empty($article['username']))
+	{
+		if (empty($article['guest_username']))
+		{
+			$username = 'Guest';
+		}
+
+		else
+		{
+			$username = $article['guest_username'];
+		}
+	}
+
+	else
+	{
+		$username = '<a href="/profiles/'.$article['user_id'].'">' . $article['username'] . '</a>';
+	}
+
+	$templating->set('username', $username);
 
 	// get the edit row
 	$templating->load('admin_modules/article_form');

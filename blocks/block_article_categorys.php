@@ -10,7 +10,7 @@ if (!$user->check_group([1,2,5]))
 	}
 	else 
 	{
-		$submit_link = $core->config('website_url') . 'index.php?module=articles&amp;view=Submit';
+		$submit_link = $core->config('website_url') . 'index.php?module=submit_article&amp;view=Submit';
 	}
 }
 

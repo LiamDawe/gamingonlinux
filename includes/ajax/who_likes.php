@@ -41,7 +41,7 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']))
 				$profile_link = '/index.php?module=profile&user_id=' . $user_who['user_id'];
 			}
 
-			$avatar = $user->sort_avatar($user_who['user_id']);
+			$avatar = $user->sort_avatar($user_who);
 
 			$templating->block('user_row');
 			$templating->set('username', $user_who['username']);

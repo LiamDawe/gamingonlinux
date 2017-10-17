@@ -1,4 +1,14 @@
 <?php
+// check for ipban (spammers) and don't let them submit
+$get_ip = $dbl->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip))->fetchOne();
+if ($get_ip)
+{
+	$_SESSION['message'] = 'spam';
+	header('Location: /index.php?module=home');
+	die();
+}
+$core->check_ip_from_stopforumspam(core::$ip);
+
 $templating->load('submit_article');
 
 require_once("includes/curl_data.php");
@@ -13,17 +23,6 @@ if (isset($_GET['view']))
 {
     if ($_GET['view'] == 'Submit')
     {
-        // check for ipban (spammers) and don't let them submit
-        $db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-        $get_ip = $db->fetch();
-        if ($db->num_rows() > 0)
-        {
-            header('Location: /index.php');
-            die();
-        }
-
-		$core->check_ip_from_stopforumspam(core::$ip);
-
         // allow people to go back from say previewing (if they hit the back button) and not have some browsers wipe what they wrote
         // only do this if they haven't just logged in (to prevent the cache'd content showing guest boxes)
         if (isset($_SESSION['new_login']) && $_SESSION['new_login'] == 1)
@@ -119,16 +118,6 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'Submit')
 	{
-		// check for ipban (spammers) and don't let them submit
-        $get_ip = $dbl->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip))->fetchOne();
-        if ($get_ip)
-        {
-            header('Location: /index.php');
-            die();
-        }
-
-		$core->check_ip_from_stopforumspam(core::$ip);
-
         $templating->set_previous('title', 'Submit An Article', 1);
         
         $title = strip_tags($_POST['title']);
@@ -262,11 +251,11 @@ if (isset($_POST['act']))
 			$title_slug = core::nice_title($_POST['title']);
 
 			// insert the article itself
-			$db->sqlquery("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
+			$dbl->run("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
 
-			$article_id = $db->grab_id();
+			$article_id = $dbl->new_id();
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_article', core::$date, $article_id));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_article', core::$date, $article_id));
 
 			// check if they are subscribing
 			if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)

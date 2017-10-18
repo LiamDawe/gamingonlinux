@@ -1,6 +1,5 @@
 <?php
-$db->sqlquery("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-$grab_author = $db->fetch();
+$grab_author = $dbl->run("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 if ($grab_author['author_id'] == $_SESSION['user_id'])
 {
 	$text = trim($_POST['text']);
@@ -8,10 +7,10 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	$article_class->gallery_tagline($grab_author);
 
-	$db->sqlquery("UPDATE `articles` SET `draft` = 0, `admin_review` = 1, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ? WHERE `article_id` = ?", array($title, $_POST['slug'], $_POST['tagline'], $text, $_POST['article_id']));
+	$dbl->run("UPDATE `articles` SET `draft` = 0, `admin_review` = 1, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ? WHERE `article_id` = ?", array($title, $_POST['slug'], $_POST['tagline'], $text, $_POST['article_id']));
 
 	// update admin notifications
-	$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'article_admin_queue', core::$date, $_POST['article_id']));
+	$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'article_admin_queue', core::$date, $_POST['article_id']));
 
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{

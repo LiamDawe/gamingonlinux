@@ -35,8 +35,8 @@ if (isset($_GET['view']))
 				// get groups
 				$group_ids_array = unserialize($announce['user_groups']);
 				$groups_list = '';
-				$get_groups = $db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_name` ASC");
-				while ($groups = $get_groups->fetch())
+				$get_groups = $dbl->run("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_name` ASC")->fetch_all();
+				foreach ($get_groups as $groups)
 				{
 					if (!empty($group_ids_array) && in_array($groups['group_id'], $group_ids_array))
 					{
@@ -61,8 +61,8 @@ if (isset($_GET['view']))
 				// get modules
 				$module_ids_array = unserialize($announce['modules']);
 				$modules_list = '';
-				$get_modules = $db->sqlquery("SELECT `nice_title`, `module_id` FROM `modules` ORDER BY `nice_title` ASC");
-				while ($modules = $get_modules->fetch())
+				$get_modules = $dbl->run("SELECT `nice_title`, `module_id` FROM `modules` ORDER BY `nice_title` ASC")->fetch_all();
+				while ($get_modules as $modules)
 				{
 					if (!empty($module_ids_array) && in_array($modules['module_id'], $module_ids_array))
 					{

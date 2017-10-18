@@ -24,8 +24,8 @@ if (!isset($_GET['q']) && !isset($_GET['author_id']))
 
 	$templating->block('articles_top', 'articles');
 	$options = '';
-	$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
-	while ($get_cats = $db->fetch())
+	$res = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+	foreach ($res as $get_cats)
 	{
 		$options .= '<option value="'.$get_cats['category_id'].'">'.$get_cats['category_name'].'</option>';
 	}
@@ -69,7 +69,7 @@ if (isset($search_text) && !empty($search_text))
 		$article_id_sql = implode(', ', $article_id_array);
 	
 		// this is required to properly count up the rank for the tags
-		$db->sqlquery("SET @rank=null, @val=null");
+		$dbl->run("SET @rank=null, @val=null");
 
 		$category_tag_sql = "SELECT * FROM (
 			SELECT r.`article_id`, c.`category_name` , c.`category_id` , @rank := IF( @val = r.`article_id`, @rank +1, 1 ) AS rank, @val := r.`article_id`
@@ -80,8 +80,7 @@ if (isset($search_text) && !empty($search_text))
 			ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
 		) AS a
 		WHERE rank < 5";
-		$db->sqlquery($category_tag_sql);
-		$get_categories = $db->fetch_all_rows();
+		$get_categories = $dbl->run($category_tag_sql)->fetch_all();
 
 		// loop through results
 		foreach ($found_search as $found)
@@ -149,15 +148,13 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		$page = core::give_page();
 		
 		// count how many there is in total
-		$db->sqlquery("SELECT `article_id` FROM `articles` WHERE active = 1 AND `author_id` = ?", array($_GET['author_id']));
-		$total = $db->num_rows();
+		$total = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE active = 1 AND `author_id` = ?", array($_GET['author_id']))->fetchOne();
 
 		// sort out the pagination link
 		$pagination = $core->pagination_link(15, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
 		// do the search query
-		$db->sqlquery("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start));
-		$found_search = $db->fetch_all_rows();
+		$found_search = $dbl->run("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();
 
 		if ($total > 0)
 		{
@@ -194,8 +191,8 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 				// sort out the categories (tags)
 				$categories_list = '';
-				$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']));
-				while ($get_categories = $db->fetch())
+				$res = $dbl->run("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']))->fetch_all();
+				foreach ($res as $get_categories)
 				{
 					$tag_link = $article_class->tag_link($get_categories['category_name']);
 					

@@ -16,14 +16,14 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	{
 		foreach($_SESSION['uploads'] as $key)
 		{
-			$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
+			$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
 		}
 	}
 
 	article::process_categories($article_id);
 
 	// force subscribe, so they don't lose editors comments
-	$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
+	$dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
 
 	// upload tagline image
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

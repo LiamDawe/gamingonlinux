@@ -2,10 +2,9 @@
 $templating->load('admin_modules/admin_articles_sections/submitted_articles');
 
 // first check if there is a guest email or a users email
-$db->sqlquery("SELECT a.`article_id`, a.`tagline_image`, a.`title`, a.`text`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
-$check = $db->fetch();
+$check = $dbl->run("SELECT a.`article_id`, a.`tagline_image`, a.`title`, a.`text`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
-if ($db->num_rows() == 0)
+if ($check)
 {
 	header("Location: /admin.php?module=articles&view=Submitted&error=doesntexist");
 }
@@ -27,8 +26,8 @@ else
 	{
 		$article_class->delete_article($check);
 
-		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_article' AND `data` = ?", array(core::$date, $_GET['article_id']));
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'denied_submitted_article', core::$date, core::$date, $_GET['article_id']));
+		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_article' AND `data` = ?", array(core::$date, $_GET['article_id']));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'denied_submitted_article', core::$date, core::$date, $_GET['article_id']));
 
 		if (isset($_POST['message']))
 		{

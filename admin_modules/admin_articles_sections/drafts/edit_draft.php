@@ -1,6 +1,5 @@
 <?php
-$db->sqlquery("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-$grab_author = $db->fetch();
+$grab_author = $dbl->run("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 if ($grab_author['author_id'] == $_SESSION['user_id'])
 {
 	$title = strip_tags($_POST['title']);
@@ -10,7 +9,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 	$article_class->gallery_tagline($grab_author);
 
-	$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $_POST['article_id']));
+	$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = 0 WHERE `article_id` = ?", array($title, $slug, $tagline, $text, $_POST['article_id']));
 
 	article::process_categories($_POST['article_id']);
 
@@ -19,7 +18,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $text);
 	}
 
-	$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+	$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 	unset($_SESSION['atitle']);
 	unset($_SESSION['atagline']);

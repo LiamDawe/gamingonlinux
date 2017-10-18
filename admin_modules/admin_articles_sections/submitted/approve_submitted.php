@@ -1,7 +1,6 @@
 <?php
 // check it hasn't been accepted already
-$db->sqlquery("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']));
-$check_article = $db->fetch();
+$check_article = $dbl->run("SELECT a.tagline_image, a.`active`, a.`date_submitted`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 if ($check_article['active'] == 1)
 {
 	header("Location: /admin.php?module=articles&view=Submitted&error=alreadyapproved");
@@ -26,29 +25,29 @@ else
 		{
 			$author_id = $_SESSION['user_id'];
 		}
-		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], 'submitted_article'));
+		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], 'submitted_article'));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'approve_submitted_article', core::$date, core::$date, $_POST['article_id']));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'approve_submitted_article', core::$date, core::$date, $_POST['article_id']));
 
 		// remove all the comments made by admins
-		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
+		$dbl->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
 
 		$article_class->gallery_tagline($checked);
 
-		$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date, $submission_date, $_POST['article_id']));
+		$dbl->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `date_submitted` = ?, `submitted_unapproved` = 0, `locked` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, core::$date, $submission_date, $_POST['article_id']));
 
 		if (isset($_SESSION['uploads']))
 		{
 			foreach($_SESSION['uploads'] as $key)
 			{
-				$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
+				$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
 			}
 		}
 
 		// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
 		if ($_SESSION['original_text'] != $checked['text'])
 		{
-			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+			$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 		}
 
 		article::process_categories($_POST['article_id']);

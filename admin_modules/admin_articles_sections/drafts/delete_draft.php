@@ -1,6 +1,5 @@
 <?php
-$db->sqlquery("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image', `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-$check = $db->fetch();
+$check = $dbl->run("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image', `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
 // anti-cheese deleting the wrong article feature, not sure this is even needed any more?
 if ($check['active'] == 1)

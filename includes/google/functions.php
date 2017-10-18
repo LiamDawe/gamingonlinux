@@ -15,8 +15,6 @@ class google_check
 
 	function checkUser($google_email)
 	{
-		global $core;
-
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
@@ -37,8 +35,6 @@ class google_check
 
 				return $result;
 			}
-
-
 		}
 
 		// if they are linking via usercp to a logged in account

@@ -66,6 +66,8 @@ if (isset($_GET['code']))
 		{
 			die('There was an error getting your user data!');
 		}
+
+		$user->user_details = $userdata;
 		
 		// update IP address and last login
 		$dbl->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
@@ -74,7 +76,7 @@ if (isset($_GET['code']))
 
 		$generated_session = md5(mt_rand()  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
-		$user->new_login($userdata, $generated_session);
+		$user->new_login($generated_session);
 
 		setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', $core->config('cookie_domain'));
 		setcookie('gol_session', $generated_session,  time()+31556926, '/', $core->config('cookie_domain'));

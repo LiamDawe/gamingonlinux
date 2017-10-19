@@ -31,7 +31,7 @@ $templating->load('usercp_modules/usercp_module_avatar');
 $templating->block('main');
 
 // sort out the avatar
-$avatar = $user->sort_avatar($_SESSION['user_id']);
+$avatar = $user->sort_avatar($user->user_details);
 $templating->set('current_avatar', $avatar);
 
 $templating->set('width', $core->config('avatar_width'));
@@ -58,7 +58,7 @@ if (isset($_POST['action']))
 		}
 
 		// check url is valid
-		else if ($core->file_get_contents_curl($_POST['avatar_url']) == false)
+		else if (core::file_get_contents_curl($_POST['avatar_url']) == false)
 		{
 			$core->message('Could not access the image!', 1);
 		}

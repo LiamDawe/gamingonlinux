@@ -72,7 +72,7 @@ if (isset($_GET['code']))
 		// update IP address and last login
 		$dbl->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
-		$user->check_banned($userdata['user_id']);
+		$user->check_banned();
 
 		$generated_session = md5(mt_rand()  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 

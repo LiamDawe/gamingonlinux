@@ -111,21 +111,7 @@ else
 				$templating->set('developer_check', $developer_check);
 
 				// sort out the avatar
-				// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-				if (empty($user_info['avatar']) || $user_info['avatar_gravatar'] == 1)
-				{
-					$comment_avatar = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $user_info['gravatar_email'] ) ) ) . "?d=http://www.gamingonlinux.com/uploads/avatars/no_avatar.png";
-				}
-
-				// either uploaded or linked an avatar
-				else
-				{
-					$comment_avatar = $user_info['avatar'];
-					if ($user_info['avatar_uploaded'] == 1)
-					{
-						$comment_avatar = "/uploads/avatars/{$user_info['avatar']}";
-					}
-				}
+				$comment_avatar = $user->sort_avatar($user_info);
 				$templating->set('avatar', $comment_avatar);
 
 				if ($user_info['banned'] == 1)

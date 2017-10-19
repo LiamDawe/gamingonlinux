@@ -26,6 +26,7 @@ class user
 		$this->core = $core;
 		$this->grab_user_groups();
 		$this->block_list();
+		$this->check_session();
 	}
 
 	// check their session is valid and register guest session if needed

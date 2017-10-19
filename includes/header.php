@@ -11,7 +11,6 @@ if (isset($_GET['act']) && $_GET['act'] == 'Logout')
 {
 	$user->logout();
 }
-$user->check_session();
 
 // site offline for whatever
 if ($core->config('site_online') == 0)

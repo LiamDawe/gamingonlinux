@@ -125,21 +125,29 @@ class core
 		return $page;
 	}
 
-	function file_get_contents_curl($url) 
+	public static function file_get_contents_curl($url, $type = NULL, $post_fields = NULL, $headers = NULL) 
 	{
 	    $ch = curl_init($url);
 	    
 	    curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-	    
-	    $data = curl_exec($ch);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+		if ($type == 'POST')
+		{
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+		}
+		if ($headers != NULL)
+		{
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		}
+		$data = curl_exec($ch);
 		
 		if (curl_getinfo ( $ch )['http_code'] != 200)
 		{
 			curl_close ( $ch );
 			return false;
-		} 
+		}
 		else 
 		{
 			curl_close ( $ch );

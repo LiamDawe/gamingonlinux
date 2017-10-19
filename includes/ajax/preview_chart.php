@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 define("APP_ROOT", dirname (dirname ( dirname(__FILE__) )));
 
 $db_conf = include APP_ROOT . '/includes/config.php';

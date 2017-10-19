@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $file_dir = dirname( dirname( dirname(__FILE__) ) );
 
 define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );

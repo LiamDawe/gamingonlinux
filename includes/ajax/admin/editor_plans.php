@@ -5,8 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user->check_session();
-
 if(isset($_POST))
 {
 	if ($_POST['type'] == 'add_plan')

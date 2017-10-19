@@ -7,8 +7,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user->check_session();
-
 include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 $img = new SimpleImage();

@@ -7,8 +7,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user->check_session();
-
 if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {	
 	// give admin link to who is allowed it, and sort out admin notifications

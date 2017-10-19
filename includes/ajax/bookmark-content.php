@@ -7,8 +7,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$user->check_session();
-
 if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
 	if ($_POST['method'] == 'add')

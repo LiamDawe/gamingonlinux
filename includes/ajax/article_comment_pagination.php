@@ -142,8 +142,6 @@ if(isset($_POST))
 	{
 		$pagination_link = 'test';
 		
-		$user->check_session();
-		
 		$templating->load('articles_full');
 		
 		$article_info = $dbl->run("SELECT `article_id`, `slug`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();

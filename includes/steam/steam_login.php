@@ -9,7 +9,7 @@ class steam_user
 	public static $domain;
 	public static $return_url;
 	public $data_array;
-	private $user;
+	public $user;
 	private $core;
 	
 	function __construct($user, $core)
@@ -62,14 +62,16 @@ class steam_user
 				// logging in via steam
 				else if ($steam_user->new == 1)
 				{
+					$this->user->user_details = $userdata;
+
 					// update IP address and last login
 					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
-					$this->user->check_banned($userdata['user_id']);
+					$this->user->check_banned();
 
 					$generated_session = md5(mt_rand  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
-					$this->user->new_login($userdata, $generated_session);
+					$this->user->new_login($generated_session);
 
 					setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', $this->core->config('cookie_domain'));
 					setcookie('gol_session', $generated_session,  time()+31556926, '/', $this->core->config('cookie_domain'));

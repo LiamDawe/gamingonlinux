@@ -20,9 +20,7 @@ class steam_user
 
 	public function GetPlayerSummaries ($steamid)
 	{
-		global $core;
-
-		$response = $core->file_get_contents_curl('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' . $this->apikey . '&steamids=' . $steamid);
+		$response = core::file_get_contents_curl('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' . $this->apikey . '&steamids=' . $steamid);
 		$json = json_decode($response);
 		return $json->response->players[0];
 	}

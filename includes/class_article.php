@@ -63,8 +63,6 @@ class article
 	// if they have set a tagline image from the gallery, remove any existing images
 	public static function gallery_tagline($data = NULL)
 	{
-		global $db;
-
 		$gallery_tagline_sql = '';
 
 		if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
@@ -77,7 +75,7 @@ class article
 					unlink($this->core->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
 				}
 
-				$db->sqlquery("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
+				$this->database->run("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
 			}
 			else if ($data == NULL || $data['article_id'] == NULL)
 			{
@@ -89,14 +87,11 @@ class article
 
 	function display_previous_uploads($article_id = NULL)
 	{
-		global $db;
-
 		$previously_uploaded = '';
 		if ($article_id != NULL)
 		{
 			// add in uploaded images from database
-			$db->sqlquery("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id));
-			$article_images = $db->fetch_all_rows();
+			$article_images = $this->database->run("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
 
 			foreach($article_images as $value)
 			{
@@ -150,56 +145,49 @@ class article
 		return $previously_uploaded;
 	}
 
-  public static function process_categories($article_id)
-  {
-    global $db;
+	public function process_categories($article_id)
+	{
+		if (isset($article_id) && is_numeric($article_id))
+		{
+			// delete any existing categories that aren't in the final list for publishing
+			$current_categories = $this->database->run("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id))->fetch_all();
 
-    if (isset($article_id) && is_numeric($article_id))
-    {
-      // delete any existing categories that aren't in the final list for publishing
-      $db->sqlquery("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id));
-      $current_categories = $db->fetch_all_rows();
+			if (!empty($current_categories))
+			{
+				foreach ($current_categories as $current_category)
+				{
+					if (!in_array($current_category['category_id'], $_POST['categories']))
+					{
+						$this->database->run("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
+					}
+				}
+			}
+			// get fresh list of categories, and insert any that don't exist
+			$current_categories = $this->database->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id))->fetch_all(PDO::FETCH_COLUMN, 0);
 
-      if (!empty($current_categories))
-      {
-        foreach ($current_categories as $current_category)
-        {
-        	if (!in_array($current_category['category_id'], $_POST['categories']))
-        	{
-        		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
-        	}
-        }
-      }
-
-      // get fresh list of categories, and insert any that don't exist
-      $db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id));
-      $current_categories = $db->fetch_all_rows(PDO::FETCH_COLUMN, 0);
-
-      if (isset($_POST['categories']) && !empty($_POST['categories']))
-      {
-        foreach($_POST['categories'] as $category)
-        {
-        	if (!in_array($category, $current_categories))
-        	{
-        		$db->sqlquery("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
-        	}
-        }
-      }
-    }
-  }
+			if (isset($_POST['categories']) && !empty($_POST['categories']))
+			{
+				foreach($_POST['categories'] as $category)
+				{
+					if (!in_array($category, $current_categories))
+					{
+						$this->database->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
+					}
+				}
+			}
+		}
+	}
 
 	function delete_article($article)
 	{
-		global $db;
-
-		$db->sqlquery("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
-		$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
-		$db->sqlquery("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
-		$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
-		$db->sqlquery("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
+		$this->database->run("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
+		$this->database->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
+		$this->database->run("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
+		$this->database->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
+		$this->database->run("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
     
-		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article['article_id'], 'deleted_article', core::$date, core::$date));
+		$this->database->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
+		$this->database->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article['article_id'], 'deleted_article', core::$date, core::$date));
 
 		// if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
 		if ($article['author_id'] != 1844)
@@ -212,13 +200,13 @@ class article
 		}
 
 		// find any uploaded images, and remove them
-		$db->sqlquery("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
-		while ($image_search = $db->fetch())
+		$res = $this->database->run("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
+		foreach ($res as $image_search)
 		{
 			unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $image_search['filename']);
 		}
 
-		$db->sqlquery("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
+		$this->database->run("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
 	}
 
 	function display_tagline_image($article = NULL)
@@ -546,10 +534,11 @@ class article
 
 	function article_history($article_id)
 	{
-		global $db, $templating, $core;
-		$db->sqlquery("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id));
+		global $templating, $core;
+
+		$res = $this->database->run("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id))->fetch_all();
 		$history = '';
-		while ($grab_history = $db->fetch())
+		foreach ($res as $grab_history)
 		{
 			$view_link = '';
 			if ($grab_history['text'] != NULL && !empty($grab_history['text']))
@@ -607,7 +596,7 @@ class article
 	
 	public function publish_article($options)
 	{
-		global $db, $core;
+		global $core;
 
 		if (isset($_POST['article_id']))
 		{
@@ -663,15 +652,15 @@ class article
 				$author_id = $check_article['author_id'];
 			}
 			
-			$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
-			$db->sqlquery("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
+			$this->database->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
+			$this->database->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
 				
 			if ($options['type'] != 'draft')
 			{
-				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], $options['clear_notification_type']));
+				$this->database->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], $options['clear_notification_type']));
 			}
 				
-			$db->sqlquery("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
+			$this->database->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 				
 			// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
 			if ($_SESSION['original_text'] != $checked['text'])
@@ -711,7 +700,7 @@ class article
 			}
 		}
 			
-		self::process_categories($article_id);
+		$this->process_categories($article_id);
 			
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
@@ -733,8 +722,7 @@ class article
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
-				$author_email = $db->fetch();
+				$author_email = $this->database->run("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
 
 				// subject
 				$subject = 'Your article was reviewed and published on GamingOnLinux.com!';
@@ -828,7 +816,7 @@ class article
 	
 	public function display_article_list($article_list, $get_categories)
 	{
-		global $db, $templating, $user;
+		global $templating, $user;
 
 		foreach ($article_list as $article)
 		{
@@ -1378,13 +1366,13 @@ class article
 	
 	public static function display_category_picker($categorys_ids = NULL)
 	{
-		global $templating, $db;
+		global $templating;
 		
 		// show the category selection box
 		$templating->block('articles_top', 'articles');
 		$options = '';
-		$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
-		while ($get_cats = $db->fetch())
+		$res = $this->database->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+		foreach ($res as $get_cats)
 		{
 			$selected = '';
 			if (isset($categorys_ids) && in_array($get_cats['category_id'], $categorys_ids))

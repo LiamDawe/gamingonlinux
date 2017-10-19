@@ -330,7 +330,7 @@ if (isset($_POST['act']))
 				}
 			}
 
-			article::process_categories($_POST['article_id']);
+			$article_class->process_categories($_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{

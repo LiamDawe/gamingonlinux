@@ -4,7 +4,7 @@ $templating->load('admin_modules/admin_articles_sections/submitted_articles');
 // first check if there is a guest email or a users email
 $check = $dbl->run("SELECT a.`article_id`, a.`tagline_image`, a.`title`, a.`text`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON a.author_id = u.user_id WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
-if ($check)
+if (!$check)
 {
 	header("Location: /admin.php?module=articles&view=Submitted&error=doesntexist");
 }

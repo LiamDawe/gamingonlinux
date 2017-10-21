@@ -130,127 +130,108 @@ if ($core->config('allow_registrations') == 1)
 			die();
 		}
 
-		// check ip bans
-		$db->sqlquery("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip));
-		if ($db->num_rows() == 1)
+		if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1)
 		{
-			$core->message("You are banned!", 1);
+			$recaptcha=$_POST['g-recaptcha-response'];
+			$google_url="https://www.google.com/recaptcha/api/siteverify";
+			$ip=core::$ip;
+			$url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
+			$res=getCurlData($url);
+			$res= json_decode($res, true);
 		}
 
-		else
+		if ($core->config('captcha_disabled') == 1 || ($core->config('captcha_disabled') == 0 && ($core->config('register_captcha') == 1 && $res['success']) || $core->config('register_captcha') == 0))
 		{
-			if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1)
+			// check username isnt taken
+			$username_test = $dbl->run("SELECT `username` FROM `users` WHERE `username` = ?", array($_POST['username']))->fetchOne();
+			if ($username_test)
 			{
-				$recaptcha=$_POST['g-recaptcha-response'];
-				$google_url="https://www.google.com/recaptcha/api/siteverify";
-				$ip=core::$ip;
-				$url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
-				$res=getCurlData($url);
-				$res= json_decode($res, true);
+				$_SESSION['message'] = 'username_taken';
+				header("Location: ".$redirect);
+				die();
 			}
 
-			if ($core->config('captcha_disabled') == 1 || ($core->config('captcha_disabled') == 0 && ($core->config('register_captcha') == 1 && $res['success']) || $core->config('register_captcha') == 0))
+			// dont allow dupe emails
+			$email_test = $dbl->run("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['uemail']))->fetch();
+			if ($email_test)
 			{
-				// check username isnt taken
-				$db->sqlquery("SELECT `username` FROM `users` WHERE `username` = ?", array($_POST['username']));
-				if ($db->fetch())
-				{
-					$_SESSION['message'] = 'username_taken';
-					header("Location: ".$redirect);
-					die();
-				}
+				$_SESSION['message'] = 'email_taken';
 
-				// dont allow dupe emails
-				$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['uemail']));
-				if ($db->fetch())
-				{
-					$_SESSION['message'] = 'email_taken';
-					
-					if ($core->config('pretty_urls') == 1)
-					{
-						
-						header("Location: ".$redirect);
-					}
-					else
-					{
-						header("Location: ".$redirect);
-					}
-					die();
-				}
+				header("Location: ".$redirect);
+				die();
+			}
 				
-				// get the session register time plus 2 seconds, if it's under that it was too fast and done by a bot
-				$register_time = $_SESSION['register_time'] + 2;
+			// get the session register time plus 2 seconds, if it's under that it was too fast and done by a bot
+			$register_time = $_SESSION['register_time'] + 2;
 
-				// anti-spam, if a bot auto fills this hidden field don't register them, but say you did
-				if (empty($_POST['email']) && time() > $register_time)
-				{
-					// make random registration code for activating the account
-					$code = sha1(mt_rand(10000,99999).time().$_POST['uemail']);
-					
-					$email = trim($_POST['uemail']);
-
-					// register away
-					if ($_POST['register'] == 'Register')
-					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code, $_POST['timezone']));
-					}
-
-					if ($_POST['register'] == 'twitter')
-					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $_POST['timezone']));
-					}
-
-					if ($_POST['register'] == 'steam')
-					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
-					}
-					
-					if ($_POST['register'] == 'google')
-					{
-						$db->sqlquery("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
-					}
-
-					$last_id = $db->grab_id();
-					
-					$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$last_id, 3]);
-
-					$db->sqlquery("INSERT INTO `user_profile_info` SET `user_id` = ?", array($last_id));
-
-					$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
-
-					// get the users info to log them in right away!
-					$db->sqlquery("SELECT ".$user::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($last_id));
-					$new_user_info = $db->fetch();
-					
-					$generated_session = md5(mt_rand() . $last_id . $_SERVER['HTTP_USER_AGENT']);
-					
-					$user->new_login($new_user_info, $generated_session);
-
-					// subject
-					$subject = 'Welcome to GamingOnLinux, activation needed!';
-
-					// message
-					$html_message = '<p>Hello '.$_POST['username'].',</p>
-					<p>Thanks for registering on <a href="'.$core->config('website_url').'" target="_blank">GamingOnLinux</a>!</p>
-					<p><strong><a href="'.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code.'">You need to activate your account before you can post! Click here to activate!</a></strong></p>
-					<p>If you&#39;re new, consider saying hello in the <a href="'.$core->config('website_url').'forum/" target="_blank">forum</a>.</p>';
-
-					$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on GamingOnLinux. You need to activate your account before you can post! Go here to activate: '.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
-
-					$mail = new mailer($core);
-					$mail->sendMail($_POST['uemail'], $subject, $html_message, $plain_message);
-
-					$_SESSION['message'] = 'new_account';
-					$_SESSION['message_extra'] = $_POST['username'];
-					header("Location: ". $core->config('website_url'));
-				}
-			}
-			// Check the score to determine what to do.
-			else if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1 && !$res['success'])
+			// anti-spam
+			if (time() > $register_time)
 			{
-				// Add code to process the form.
-				$core->message("You need to complete the captcha to prove you are human and not a bot! <a href=\"index.php?module=register\">Click here to try again</a>.", 1);
+				// make random registration code for activating the account
+				$code = sha1(mt_rand(10000,99999).time().$_POST['uemail']);
+					
+				$email = trim($_POST['uemail']);
+
+				// register away
+				if ($_POST['register'] == 'Register')
+				{
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code, $_POST['timezone']));
+				}
+
+				if ($_POST['register'] == 'twitter')
+				{
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $_POST['timezone']));
+				}
+
+				if ($_POST['register'] == 'steam')
+				{
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $_POST['timezone']));
+				}
+					
+				if ($_POST['register'] == 'google')
+				{
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_email'], $code, $_POST['timezone']));
+				}
+
+				$last_id = $dbl->new_id();
+
+				$dbl->run("INSERT INTO `user_profile_info` SET `user_id` = ?", array($last_id));
+					
+				$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$last_id, 3]);
+
+				$dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
+
+				// get the users info to log them in right away!
+				$user->user_details = $dbl->run("SELECT ".$user::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($last_id))->fetch();
+					
+				$generated_session = md5(mt_rand() . $last_id . $_SERVER['HTTP_USER_AGENT']);
+					
+				$user->new_login($generated_session);
+
+				// subject
+				$subject = 'Welcome to GamingOnLinux, activation needed!';
+
+				// message
+				$html_message = '<p>Hello '.$_POST['username'].',</p>
+				<p>Thanks for registering on <a href="'.$core->config('website_url').'" target="_blank">GamingOnLinux</a>!</p>
+				<p><strong><a href="'.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code.'">You need to activate your account before you can post! Click here to activate!</a></strong></p>
+				<p>If you&#39;re new, consider saying hello in the <a href="'.$core->config('website_url').'forum/" target="_blank">forum</a>.</p>';
+
+				$plain_message = 'Hello '.$_POST['username'].', Thanks for registering on GamingOnLinux. You need to activate your account before you can post! Go here to activate: '.$core->config('website_url').'index.php?module=activate_user&user_id='.$last_id.'&code='.$code;
+
+				$mail = new mailer($core);
+				$mail->sendMail($_POST['uemail'], $subject, $html_message, $plain_message);
+
+				$_SESSION['message'] = 'new_account';
+				$_SESSION['message_extra'] = $_POST['username'];
+				header("Location: ". $core->config('website_url'));
 			}
+		}
+		// Check the score to determine what to do.
+		else if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1 && !$res['success'])
+		{
+			// Add code to process the form.
+			$core->message("You need to complete the captcha to prove you are human and not a bot! <a href=\"index.php?module=register\">Click here to try again</a>.", 1);
 		}
 	}
 }

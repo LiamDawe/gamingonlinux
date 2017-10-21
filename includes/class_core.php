@@ -1,10 +1,7 @@
 <?php
 class core
 {	
-	protected $db;
-	// the database connection
-	public $database = null;
-	
+	protected $db;	
 	// the current date and time for the mysql
 	public static $date;
 	

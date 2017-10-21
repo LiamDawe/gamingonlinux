@@ -630,7 +630,7 @@ class core
 
 			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail))
 			{
-				$image = $this->db-run("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
+				$image = $this->db->run("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
 
 				// remove old image
 				if (isset($image))

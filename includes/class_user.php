@@ -1,15 +1,11 @@
 <?php
 class user
 {
-	// the required database connection
-	private $database;
-	// the required core class
+	protected $db;
 	private $core;
 	// cache stored user information grabbed from the database, built up as the script runs
 	public $user_details = [];
-	
 	public static $user_group_list;
-
 	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
@@ -17,12 +13,11 @@ class user
 	`display_comment_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
 	
 	public $user_groups;
-	
 	public $blocked_users = [];
 	
-	function __construct($database, $core)
+	function __construct($core)
 	{
-		$this->database = $database;
+		$this->db = db_mysql::instance();
 		$this->core = $core;
 		$this->grab_user_groups();
 		$this->block_list();
@@ -41,12 +36,12 @@ class user
 
 			// check if they actually have any saved sessions, if they don't then logout to cancel everything
 			// this is also if we need to remove everyone being logged in due to any security issues
-			$session_exists = $this->database->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [$safe_id])->fetch();
+			$session_exists = $this->db->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [$safe_id])->fetch();
 			if (!$session_exists)
 			{
 				$logout = 1;
 			}
-			$this->user_details = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
+			$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
 			
 			$this->check_banned();
 		}
@@ -79,20 +74,20 @@ class user
 		if (!empty($password))
 		{
 			// check username/email exists first
-			$info = $this->database->run("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
+			$info = $this->db->run("SELECT `password` FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
 			if ($info)
 			{
 				// now check password matches
 				if (password_verify($password, $info['password']))
 				{
-					$this->user_details = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
+					$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
 
 					$this->check_banned($this->user_details['user_id']);
 
 					$generated_session = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
 					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
+					$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
 					$this->new_login($generated_session);
 
@@ -134,7 +129,7 @@ class user
 		$ip_banned = 0;
 
 		// now check IP ban
-		$check_ip = $this->database->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
+		$check_ip = $this->db->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
 		if ($check_ip)
 		{
 			$ip_banned = 1;
@@ -143,13 +138,13 @@ class user
 		if ($this->user_details['banned'] == 1 || $ip_banned == 1)
 		{
 			// update their ip in the user table
-			$this->database->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $user_id]);
+			$this->db->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $user_id]);
 
 			// search the ip list, if it's not on it then add it in
-			$search_ips = $this->database->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
+			$search_ips = $this->db->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
 			if (!$search_ips)
 			{
-				$this->database->run("INSERT INTO `ipbans` SET `ip` = ?", [core::$ip]);
+				$this->db->run("INSERT INTO `ipbans` SET `ip` = ?", [core::$ip]);
 			}
 			
 			$this->logout(1);
@@ -175,7 +170,7 @@ class user
 	{
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$this->blocked_users = $this->database->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+			$this->blocked_users = $this->db->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 		}
 		else
 		{
@@ -187,10 +182,10 @@ class user
 	function get_group_ids($permission)
 	{
 		// find the requested permission
-		$permission_id = $this->database->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$permission])->fetchOne();
+		$permission_id = $this->db->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$permission])->fetchOne();
 		
 		// find all groups that have that permission
-		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		$allowed_groups = $this->db->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
 
 		$return_ids = [];
 		
@@ -225,10 +220,10 @@ class user
 	function can($do)
 	{
 		// find the requested permission
-		$permission_id = $this->database->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$do])->fetchOne();
+		$permission_id = $this->db->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$do])->fetchOne();
 		
 		// find all groups that have that permission
-		$allowed_groups = $this->database->run("SELECT m.`group_id`, g.`group_name` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
+		$allowed_groups = $this->db->run("SELECT m.`group_id`, g.`group_name` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
 		
 		$check_against = [];
 		
@@ -262,7 +257,7 @@ class user
 		// they have a device cookie, let's check it bitches
 		if (isset($_COOKIE['gol-device']))
 		{
-			$device_test = $this->database->run("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($this->user_details['user_id'], $_COOKIE['gol-device']))->fetch();
+			$device_test = $this->db->run("SELECT `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", array($this->user_details['user_id'], $_COOKIE['gol-device']))->fetch();
 			// cookie didn't match, don't let them in, hacking attempt probable
 			if (!$device_test)
 			{
@@ -310,7 +305,7 @@ class user
 
 		// keeping a log of logins, to review at anytime
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-		$this->database->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
+		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
 
 		$this->register_session();
 	}
@@ -322,17 +317,17 @@ class user
 		
 		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']))
 		{
-			$session = $this->database->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']))->fetch();
+			$session = $this->db->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']))->fetch();
 
 			if ($session)
 			{
 				// login then
-				$this->user_details = $this->database->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']))->fetch();
+				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']))->fetch();
 				
 				$this->check_banned();
 
 				// update IP address and last login
-				$this->database->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
+				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
 				$this->register_session();
 
@@ -359,7 +354,7 @@ class user
 	{
 		if (isset($_COOKIE['gol-device']))
 		{
-			$this->database->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", [$_SESSION['user_id'], $_COOKIE['gol-device']]);
+			$this->db->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", [$_SESSION['user_id'], $_COOKIE['gol-device']]);
 		}
 
 		// remove all session information
@@ -396,7 +391,7 @@ class user
 	{
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$their_groups = $this->database->run("SELECT `group_id` FROM `user_group_membership` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
+			$their_groups = $this->db->run("SELECT `group_id` FROM `user_group_membership` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch_all(PDO::FETCH_COLUMN);
 		}
 		else
 		{
@@ -505,13 +500,13 @@ class user
 
 	public function delete_user_notification($note_id)
 	{
-		$checker = $this->database->run("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array($note_id))->fetch();
+		$checker = $this->db->run("SELECT `owner_id` FROM `user_notifications` WHERE `id` = ?", array($note_id))->fetch();
 		if ($checker['owner_id'] != $_SESSION['user_id'])
 		{
 			return false;
 		}
 
-		$this->database->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($note_id));
+		$this->db->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($note_id));
 
 		return true;
 	}
@@ -522,7 +517,7 @@ class user
 
 		$counter = 0;
 
-		$additionaldb = $this->database->run("SELECT
+		$additionaldb = $this->db->run("SELECT
 			p.`desktop_environment`,
 			p.`what_bits`,
 			p.`cpu_vendor`,
@@ -664,7 +659,7 @@ class user
 			
 			// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 			$subscribe_check = [];
-			$check_current_sub = $this->database->run("SELECT `$sql_id_field`, `emails`, `send_email` FROM `$sql_table` WHERE `user_id` = ? AND `$sql_id_field` = ?", array($_SESSION['user_id'], $data_id))->fetch();
+			$check_current_sub = $this->db->run("SELECT `$sql_id_field`, `emails`, `send_email` FROM `$sql_table` WHERE `user_id` = ? AND `$sql_id_field` = ?", array($_SESSION['user_id'], $data_id))->fetch();
 
 			$subscribe_check['auto_subscribe'] = '';
 			if ($check_current_sub || $_SESSION['auto_subscribe'] == 1)
@@ -740,7 +735,7 @@ class user
 	public function post_group_list($user_ids)
 	{
 		$in  = str_repeat('?,', count($user_ids) - 1) . '?';
-		$group_list = $this->database->run("SELECT u.`user_id`, m.`group_id` FROM `users` u LEFT JOIN `user_group_membership` m ON u.user_id = m.user_id WHERE u.`user_id` IN ( $in ) ORDER BY u.`user_id` ASC", $user_ids)->fetch_all();
+		$group_list = $this->db->run("SELECT u.`user_id`, m.`group_id` FROM `users` u LEFT JOIN `user_group_membership` m ON u.user_id = m.user_id WHERE u.`user_id` IN ( $in ) ORDER BY u.`user_id` ASC", $user_ids)->fetch_all();
 		
 		$formatted_list = [0 => [0]]; // guest user/group
 		
@@ -755,8 +750,8 @@ class user
 	// helper function to get the data needed for sorting user_badges in the function below this one 
 	public function grab_user_groups()
 	{
-		$this->database->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC");		
-		self::$user_group_list = $this->database->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+		$this->db->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC");		
+		self::$user_group_list = $this->db->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
 
 	}
 	
@@ -807,10 +802,10 @@ class user
 	function block_user($user_id)
 	{
 		// get their username
-		$username = $this->database->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
+		$username = $this->db->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
 		
 		// check they're not on the list already
-		$check = $this->database->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id))->fetchOne();
+		$check = $this->db->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id))->fetchOne();
 		if ($check)
 		{
 			$_SESSION['message'] = 'already_blocked';
@@ -822,7 +817,7 @@ class user
 		else
 		{
 			// add them to the block block list 
-			$this->database->run("INSERT INTO `user_block_list` SET `user_id` = ?, `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
+			$this->db->run("INSERT INTO `user_block_list` SET `user_id` = ?, `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
 
 			$_SESSION['message'] = 'blocked';
 			$_SESSION['message_extra'] = $username;
@@ -835,9 +830,9 @@ class user
 	function unblock_user($user_id)
 	{
 		// get their username
-		$username = $this->database->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
+		$username = $this->db->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
 		
-		$this->database->run("DELETE FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
+		$this->db->run("DELETE FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
 		
 		$_SESSION['message'] = 'unblocked';
 		$_SESSION['message_extra'] = $username;

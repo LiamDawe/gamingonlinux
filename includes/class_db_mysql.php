@@ -1,6 +1,8 @@
 <?php
 class db_mysql extends PDO
 {	
+	protected static $instance;
+
 	public $stmt;
 	
 	// the query counter
@@ -9,7 +11,7 @@ class db_mysql extends PDO
 	// store all the queries for debugging
 	public $debug_queries = '';
 	
-	public function __construct($dsn, $username, $password)
+	public function __construct()
 	{
 		$options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -17,8 +19,18 @@ class db_mysql extends PDO
             PDO::ATTR_EMULATE_PREPARES   => false, // allows LIMIT placeholders
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
         ];
-        parent::__construct($dsn, $username, $password, $options);
+        parent::__construct("mysql:host=".DB['DB_HOST_NAME'].";dbname=".DB['DB_DATABASE'],DB['DB_USER_NAME'],DB['DB_PASSWORD'], $options);
 	}
+
+    // a classical static method to make it universally available
+    public static function instance()
+    {
+        if (self::$instance === null)
+        {
+            self::$instance = new self;
+        }
+        return self::$instance;
+    }
 	
 	// the most basic query
     public function run($sql, $data = NULL)

@@ -5,9 +5,9 @@ include(dirname(__FILE__) . '/PHPMailer/PHPMailerAutoload.php');
 $db_conf = include dirname(__FILE__) . '/config.php';
 
 $db = new mysql($db_conf['host'], $db_conf['username'], $db_conf['password'], $db_conf['database']);
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password']);
+$dbl = new db_mysql();
 
-$core = new core($dbl);
+$core = new core();
 define('url', $core->config('website_url'));
 
 $message_map = new message_map();
@@ -15,7 +15,7 @@ $message_map = new message_map();
 // setup the templating, if not logged in default theme, if logged in use selected theme
 $templating = new template($core, $core->config('template'));
 
-$user = new user($dbl, $core);
+$user = new user($core);
 
 $bbcode = new bbcode($dbl, $core);
 

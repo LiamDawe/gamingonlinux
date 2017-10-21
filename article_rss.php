@@ -1,7 +1,10 @@
 <?php
-define("APP_ROOT", dirname(__FILE__));
-
-require APP_ROOT . "/includes/bootstrap.php";
+// we dont need the whole bootstrap
+require dirname(__FILE__) . "/includes/loader.php";
+include dirname(__FILE__) . '/includes/config.php';
+$dbl = new db_mysql();
+$core = new core();
+$bbcode = new bbcode($dbl, $core);
 
 if ($core->config('articles_rss') == 1)
 {
@@ -74,8 +77,20 @@ if ($core->config('articles_rss') == 1)
 			$username = $line['username'];
 		}
 		$xml->writeElement('author', $core->config('contact_email') . " ($username)");
+
+		// smaller function as found in class_article.php get_link (dont need the entire article class for this!)
+		$nice_title = core::nice_title($line['title']);
 		
-		$article_link = $article_class->get_link($line['article_id'], $line['title']);
+		if ($core->config('pretty_urls') == 1)
+		{
+			$link = 'articles/'.$nice_title.'.'.$line['article_id'];
+		}
+		else
+		{
+			$link = 'index.php?module=articles_full&aid='.$line['article_id'].'&title='.$nice_title;
+		}
+		$article_link = $core->config('website_url') . $link;
+
 		$xml->writeElement('link', $article_link);
 		$xml->writeElement('guid', $article_link);
 		

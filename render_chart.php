@@ -1,8 +1,6 @@
 <?php
 define("APP_ROOT", dirname(__FILE__));
 
-$db_conf = include APP_ROOT . '/includes/config.php';
-
 require APP_ROOT . "/includes/bootstrap.php";
 
 $charts = new charts($dbl);

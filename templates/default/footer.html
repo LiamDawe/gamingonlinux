@@ -1,11 +1,55 @@
 [block: notification_updates]
 <script type="text/javascript" src="/includes/jscripts/notifications_update.js?v=1.1"></script>
-<script type="text/javascript">
+<script>
 var current_page_title = $(document).find("title").text();
 update_notifications();
 setInterval ( "update_notifications()", 60000 );
 </script>
 [/block: notification_updates]
+
+[block: ckeditor]
+<script>	
+CKEDITOR.on('instanceCreated', function(e) {
+	e.editor.on('change', function(event) {
+		var textarea = event.editor.element.$;
+		$(textarea).val(event.editor.getData().trim());
+		$(textarea.form).trigger('checkform.areYouSure');
+	});
+})
+
+editor = CKEDITOR.replace( 'ckeditor_gol', {
+customConfig: '/includes/jscripts/ckeditor_config.js',
+});
+editor.addCommand("spoiler", {
+	exec: function(edt) {
+		edt.insertHtml('<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">hidden text here</div></div></div>');
+	}
+});
+editor.ui.addButton('spoilerbutton', {
+label: "Spoiler",
+command: 'spoiler',
+toolbar: 'insert',
+icon: '/templates/default/images/spoiler.png'
+});
+this.editor.on('instanceReady', function(){
+// Note nested arrays
+// http://docs.ckeditor.com/#!/api/CKEDITOR.filter-method-addTransformations
+// This rule will add the target="_blank" attribute to all links that
+// do not have it.
+this.editor.filter.addTransformations([
+  [{
+	element: 'a',
+	left: function( el ) {
+	  return el.target !== '_blank';
+	},
+	right: function( el, tools ) {
+	  el.attributes.target = '_blank';
+	}
+  }]
+]);
+}.bind(this));
+</script>
+[/block: ckeditor]
 
 [block: footer]
 </div>
@@ -50,47 +94,8 @@ setInterval ( "update_notifications()", 60000 );
 	        classes: 'qtip-bootstrap qtip-shadow'
 	    }
 	});
-
-	CKEDITOR.on('instanceCreated', function(e) {
-		e.editor.on('change', function(event) {
-			var textarea = event.editor.element.$;
-			$(textarea).val(event.editor.getData().trim());
-			$(textarea.form).trigger('checkform.areYouSure');
-		});
-	})
-	
-	editor = CKEDITOR.replace( 'ckeditor_gol', {
-    customConfig: '/includes/jscripts/ckeditor_config.js',
-	});
-	editor.addCommand("spoiler", {
-		exec: function(edt) {
-			edt.insertHtml('<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">hidden text here</div></div></div>');
-		}
-	});
-	editor.ui.addButton('spoilerbutton', {
-    label: "Spoiler",
-    command: 'spoiler',
-    toolbar: 'insert',
-    icon: '/templates/default/images/spoiler.png'
-});
-this.editor.on('instanceReady', function(){
-    // Note nested arrays
-    // http://docs.ckeditor.com/#!/api/CKEDITOR.filter-method-addTransformations
-    // This rule will add the target="_blank" attribute to all links that
-    // do not have it.
-    this.editor.filter.addTransformations([
-      [{
-        element: 'a',
-        left: function( el ) {
-          return el.target !== '_blank';
-        },
-        right: function( el, tools ) {
-          el.attributes.target = '_blank';
-        }
-      }]
-    ]);
-  }.bind(this));
 </script>
+{:ckeditor_js}
 {:editor_js}
 {:user_graph_js}
 <!-- Piwik -->

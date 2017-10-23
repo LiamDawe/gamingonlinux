@@ -26,6 +26,13 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 }
 $templating->set('notification_updates', $notification_updates);
 
+$ckeditor_js = '';
+if ($core->current_page() == 'admin.php')
+{
+	$ckeditor_js = $templating->block_store('ckeditor', 'footer');
+}
+$templating->set('ckeditor_js', $ckeditor_js);
+
 $templating->set('twitch_dev_key', $core->config('twitch_dev_key'));
 
 // info for admins to see execution time and mysql queries per page

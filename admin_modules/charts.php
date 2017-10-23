@@ -51,8 +51,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('manage_charts', 'admin_modules/admin_module_charts');
 
 		$chart_list = '';
-		$db->sqlquery("SELECT * FROM `charts` WHERE `owner` = ? ORDER BY `id` DESC", array($_SESSION['user_id']));
-		while($charts = $db->fetch())
+		$res = $dbl->run("SELECT * FROM `charts` WHERE `owner` = ? ORDER BY `id` DESC", array($_SESSION['user_id']))->fetch_all();
+		foreach($res as $charts)
 		{
 			$chart_list .= '<div class="box"><div class="body group"><a href="/admin.php?module=charts&view=edit&id='.$charts['id'].'">'.$charts['name'].'</a> - [chart]'.$charts['id'].'[/chart] - Generated: '.$charts['generated_date'].'<br />
 			<form method="post">
@@ -76,9 +76,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('manage_charts', 'admin_modules/admin_module_charts');
 
 		$chart_list = '';
-		$db->sqlquery("SELECT * FROM `user_stats_charts` ORDER BY `id` DESC", array($_SESSION['user_id']));
+		$res = $dbl->run("SELECT * FROM `user_stats_charts` ORDER BY `id` DESC", array($_SESSION['user_id']))->fetch_all();
 		$grouping_id = '';
-		while($charts = $db->fetch())
+		foreach ($res as $charts)
 		{
 			$charts['generated_date'] = date("Y-m-d", strtotime($charts['generated_date']));
 			if ($grouping_id != $charts['grouping_id'])
@@ -101,12 +101,10 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	if ($_GET['view'] == 'edit')
 	{
 		$chart_id = (int) $_GET['id'];
-		$db->sqlquery("SELECT `name`, `enabled`, `sub_title`, `order_by_data` FROM `charts` WHERE `id` = ?", array($chart_id));
+		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
 		
-		if ($db->num_rows() == 1)
+		if ($chart_info)
 		{
-			$chart_info = $db->fetch();
-			
 			$charts = new charts($dbl);
 			
 			$templating->block('chart', 'admin_modules/admin_module_charts');

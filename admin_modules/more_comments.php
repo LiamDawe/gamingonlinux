@@ -15,9 +15,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	}
 
 	// count how many there is in total
-	$sql_count = "SELECT `id` FROM `editor_discussion`";
-	$db->sqlquery($sql_count);
-	$total_comments = $db->num_rows();
+	$total_comments = $dbl->run("SELECT COUNT(`id`) FROM `editor_discussion`")->fetchOne();
 
 	$comments_per_page = $core->config('default-comments-per-page');
 	if (isset($_SESSION['per-page']))
@@ -32,14 +30,14 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
 	$templating->set('pagination', $pagination);
 
-	$result = $db->sqlquery("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']));
-	while ($commentsall = $result->fetch())
+	$result = $dbl->run("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']))->fetch_all();
+	foreach ($result as $commentsall)
 	{
 		$templating->block('commentall', 'admin_modules/admin_module_more_comments');
 
 		// sort out the avatar
 		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
-		$comment_avatar = $user->sort_avatar($commentsall['user_id']);
+		$comment_avatar = $user->sort_avatar($commentsall);
 
 		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0);
 		$dateall = $core->human_date($commentsall['date_posted']);
@@ -68,11 +66,11 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$db->sqlquery("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, core::$date));
+		$dbl->run("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, core::$date));
 
-		$db->sqlquery("SELECT `username`, `email` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']));
+		$res = $dbl->run("SELECT `username`, `email` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']))->fetch_all();
 
-		while ($emailer = $db->fetch())
+		foreach ($res as $emailer)
 		{
 			$subject = "A new editor area comment on GamingOnLinux.com";
 

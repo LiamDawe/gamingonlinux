@@ -60,11 +60,9 @@ if (isset($_GET['view']))
 	{
 		if (isset($_GET['article_id']))
 		{
-			$db->sqlquery("SELECT `title` FROM `articles`	WHERE `article_id` = ?", array($_GET['article_id']));
-			if ($db->num_rows() == 1)
+			$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
+			if ($title)
 			{
-				$title = $db->fetch();
-
 				$templating->block('add', 'admin_modules/admin_module_featured');
 				$templating->set('max_width', $core->config('carousel_image_width'));
 				$templating->set('max_height', $core->config('carousel_image_height'));
@@ -72,7 +70,8 @@ if (isset($_GET['view']))
 				$templating->set('article_title', $title['title']);
 				$templating->set('article_id', $_GET['article_id']);
 			}
-			else {
+			else 
+			{
 				$core->message('Article does not exist!');
 			}
 		}
@@ -86,10 +85,9 @@ if (isset($_GET['view']))
 	{
 		$templating->block('manage_top', 'admin_modules/admin_module_featured');
 
-		$db->sqlquery("SELECT p.`article_id`, p.featured_image, p.hits, a.`title` FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id");
-		$count = $db->num_rows();
+		$res = $dbl->run("SELECT p.`article_id`, p.featured_image, p.hits, a.`title` FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id")->fetch_all();
 
-		while ($items = $db->fetch())
+		foreach ($res as $items)
 		{
 			$templating->block('manage_item', 'admin_modules/admin_module_featured');
 			$templating->set('title', $items['title']);
@@ -138,16 +136,17 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'delete')
 	{
-		$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']));
-		$featured = $db->fetch();
+		$featured = $dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
+		if ($featured)
+		{
+			$dbl->run("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']));
+			unlink($core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
 
-		$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']));
-		unlink($core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
+			$dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 
-		$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
+			$dbl->run("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_POST['article_id']));
 
-		$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_POST['article_id']));
-
-		header("Location: /admin.php?module=featured&view=manage&message=deleted");
+			header("Location: /admin.php?module=featured&view=manage&message=deleted");
+		}
 	}
 }

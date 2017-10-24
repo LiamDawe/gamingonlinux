@@ -26,7 +26,7 @@ if ($core->config('site_online') == 0)
 	}
 }
 
-$forum_class = new forum($dbl, $core, $user);
+$forum_class = new forum($core, $user);
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {

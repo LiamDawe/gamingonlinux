@@ -194,11 +194,11 @@ if (isset($_GET['user_id']))
 						}
 
 						// gather latest articles
-						$db->sqlquery("SELECT `article_id`, `title`, `slug` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']));
-						if ($db->num_rows() != 0)
+						$article_res = $dbl->run("SELECT `article_id`, `title`, `slug` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']))->fetch_all();
+						if ($article_res)
 						{
 							$templating->block('articles_top');
-							while ($article_link = $db->fetch())
+							foreach ($article_res as $article_link)
 							{
 								$templating->block('articles');
 
@@ -218,14 +218,15 @@ if (isset($_GET['user_id']))
 
 						$comment_posts = '';
 						$view_more_comments = '';
-						$db->sqlquery("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.approved = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC limit 5", array($_GET['user_id']));
-						$count_comments = $db->num_rows();
-						if ($count_comments > 0)
+						$comments_execute = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.approved = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC limit 5", array($_GET['user_id']))->fetch_all();
+
+						if ($comments_execute)
 						{
+							$total_comments = count($comments_execute);
+
 							// comments block
 							$templating->block('article_comments_list', 'profile');
 
-							$comments_execute = $db->fetch_all_rows();
 							foreach ($comments_execute as $comments)
 							{
 								$date = $core->human_date($comments['time_posted']);
@@ -244,7 +245,7 @@ if (isset($_GET['user_id']))
 						</li>";
 							}
 
-							if ($count_comments >= 5)
+							if ($total_comments >= 5)
 							{
 								if ($core->config('pretty_urls') == 1)
 								{
@@ -294,15 +295,11 @@ if (isset($_GET['user_id']))
 		{
 			if (isset($_GET['user_id']) && is_numeric($_GET['user_id']))
 			{
-				$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
-				$exists = $db->num_rows();
-				if ($exists == 1)
+				$get_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
+				if ($get_username)
 				{
-					$get_username = $db->fetch();
-
 					// count how many there is in total
-					$db->sqlquery("SELECT `comment_id` FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
-					$total = $db->num_rows();
+					$total = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']))->fetchOne();
 					
 					$page = core::give_page();
 
@@ -321,7 +318,7 @@ if (isset($_GET['user_id']))
 
 					// get top of comments section
 					$templating->block('more_comments');
-					$templating->set('username', $get_username['username']);
+					$templating->set('username', $get_username);
 
 					if ($core->config('pretty_urls') == 1)
 					{
@@ -335,8 +332,7 @@ if (isset($_GET['user_id']))
 					$templating->set('profile_link', $profile_link);
 
 					$comment_posts = '';
-					$db->sqlquery("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start));
-					$all_comments = $db->fetch_all_rows();
+					$all_comments = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start))->fetch_all();
 					
 					// make an array of all comment ids to search for likes (instead of one query per comment for likes)
 					$like_array = [];
@@ -349,8 +345,7 @@ if (isset($_GET['user_id']))
 					if (!empty($sql_replacers))
 					{
 						// Total number of likes for the comments
-						$qtotallikes = $db->sqlquery("SELECT data_id, COUNT(*) FROM likes WHERE data_id IN ( ".implode(',', $sql_replacers)." ) AND `type` = 'comment' GROUP BY data_id", $like_array);
-						$get_likes = $db->fetch_all_rows(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+						$get_likes = $dbl->run("SELECT data_id, COUNT(*) FROM likes WHERE data_id IN ( ".implode(',', $sql_replacers)." ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 					}
 					
 					foreach ($all_comments as $comments)

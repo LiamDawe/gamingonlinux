@@ -884,11 +884,7 @@ else
 	{
 		if ($_GET['go'] == 'subscribe')
 		{
-			// make sure we don't make lots of doubles
-			$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
-
-			// now subscribe
-			$db->sqlquery("INSERT INTO `forum_topics_subscriptions` SET `user_id` = ?, `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+			$forum_class->subscribe($_GET['topic_id']);
 
 			header("Location: /forum/topic/{$_GET['topic_id']}");
 		}

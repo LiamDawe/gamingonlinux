@@ -43,8 +43,8 @@ if (!isset($_POST['act']))
 
 	// grab distros
 	$distro_list = '';
-	$db->sqlquery("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC");
-	while ($distros = $db->fetch())
+	$get_distros = $dbl->run("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all();
+	foreach ($get_distros as $distros)
 	{
 		$selected = '';
 		if ($usercpcp['distro'] == $distros['name'])
@@ -57,8 +57,8 @@ if (!isset($_POST['act']))
 
 	// Desktop environment
 	$desktop_list = '';
-	$db->sqlquery("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC");
-	while ($desktops = $db->fetch())
+	$get_desktops = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all();
+	foreach ($get_desktops as $desktops)
 	{
 		$selected = '';
 		if ($additional['desktop_environment'] == $desktops['name'])
@@ -320,7 +320,7 @@ else if (isset($_POST['act']))
 		$dbl->run($update_sql, array_merge($values_sql, [gmdate("Y-n-d H:i:s")], [$_SESSION['user_id']]));
 
 		$user_update_sql = "UPDATE `users` SET `distro` = ?, `pc_info_public` = ?, `pc_info_filled` = ? WHERE `user_id` = ?";
-		$user_update_query = $db->sqlquery($user_update_sql, array($_POST['distribution'], $public, $pc_info_filled, $_SESSION['user_id']));
+		$dbl->run($user_update_sql, array($_POST['distribution'], $public, $pc_info_filled, $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php?module=pcinfo&updated");
 	}

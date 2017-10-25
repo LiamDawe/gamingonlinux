@@ -5,8 +5,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 {
 	$templating->set_previous('meta_data', '', 1);
 
-	$db->sqlquery("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
-	$comment = $db->fetch();
+	$comment = $dbl->run("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
 
 	$nice_title = core::nice_title($comment['title']);
 

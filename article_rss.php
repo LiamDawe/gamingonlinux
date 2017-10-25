@@ -148,4 +148,5 @@ else
 {
 	echo 'RSS feed is not active!';
 }
+$dbl = NULL;
 ?>

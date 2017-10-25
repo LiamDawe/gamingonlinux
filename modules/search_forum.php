@@ -20,9 +20,9 @@ if (isset($_GET['forums']) && $_GET['forums'] != 'all')
 	$search_sql = ' AND t.`forum_id` IN ('.$forum_id.')';
 }
 
-$db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 0 ORDER BY `name` ASC");
+$res = $dbl->run("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 0 ORDER BY `name` ASC")->fetch_all();
 $options = '';
-while ($forum_list = $db->fetch())
+foreach ($res as $forum_list)
 {
 	$options .= '<option value="'.$forum_list['forum_id'].'">'.$forum_list['name'].'</option>';
 }
@@ -49,7 +49,7 @@ if (isset($search_text) && !empty($search_text))
 	if (!isset($_GET['strict']))
 	{
 		// do the search query
-		$db->sqlquery("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
+		$found_search = $dbl->run("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
 		FROM `forum_topics` t
 		LEFT JOIN `users` u ON t.author_id = u.user_id
 		WHERE MATCH (
@@ -59,7 +59,7 @@ if (isset($search_text) && !empty($search_text))
 		? IN BOOLEAN MODE
 		) $search_sql AND t.approved = 1
 		ORDER BY t.creation_date DESC
-		LIMIT 0 , 30", array($search_text));
+		LIMIT 0 , 30", array($search_text))->fetch_all();
 	}
 
 	else
@@ -67,7 +67,7 @@ if (isset($search_text) && !empty($search_text))
 		$search_text = preg_replace("/\w+/", '+\0*', $search_text);
 
 		// do the search query
-		$db->sqlquery("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
+		$found_search = $dbl->run("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
 		FROM `forum_topics` t
 		LEFT JOIN `users` u ON t.author_id = u.user_id
 		WHERE MATCH (
@@ -77,12 +77,10 @@ if (isset($search_text) && !empty($search_text))
 		? IN BOOLEAN MODE
 		) $search_sql AND t.approved = 1
 		ORDER BY t.creation_date DESC
-		LIMIT 0 , 30", array($search_text));
+		LIMIT 0 , 30", array($search_text))->fetch_all();
 	}
-	$found_search = $db->fetch_all_rows();
-	$total = $db->num_rows();
 
-	if ($total > 0)
+	if ($found_search)
 	{
 		// loop through results
 		foreach ($found_search as $found)

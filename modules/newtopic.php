@@ -14,15 +14,13 @@ else
 		$in = str_repeat('?,', count($user->user_groups) - 1) . '?';
 		
 		// get forum permissions
-		$db->sqlquery("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE p.`can_topic` = 1 AND p.`group_id` IN ($in) GROUP BY p.forum_id ORDER BY f.`name` ASC ", $user->user_groups);
-		if ($db->num_rows() == 0)
+		$forums_list = $dbl->run("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE p.`can_topic` = 1 AND p.`group_id` IN ($in) GROUP BY p.forum_id ORDER BY f.`name` ASC ", $user->user_groups)->fetch_all();
+		if (!$forums_list)
 		{
 			$core->message('You do not have permission to post in any forums!');
 		}
 		else
 		{
-			$forums_list = $db->fetch_all_rows();
-
 			$show_forum_breadcrumb = 0;
 			if (isset($_GET['forum_id']))
 			{
@@ -38,10 +36,9 @@ else
 			}
 
 			$tenMinAgo = time() - 600;
-			$db->sqlquery("SELECT COUNT(author_id) as c FROM `forum_topics` WHERE `author_id` = ? AND `creation_date` >= ?", array($_SESSION['user_id'], $tenMinAgo));
-			$amountOfPosts = $db->fetch();
+			$user_post_count = $dbl->run("SELECT COUNT(author_id) FROM `forum_topics` WHERE `author_id` = ? AND `creation_date` >= ?", array($_SESSION['user_id'], $tenMinAgo))->fetchOne();
 
-			if ($amountOfPosts['c'] > 5)
+			if ($user_post_count > 5)
 			{
 				$_SESSION['message'] = 'toomany';
 				if ($core->config('pretty_urls') == 1)
@@ -58,8 +55,7 @@ else
 			{
 				$templating->load('newtopic');
 
-				$db->sqlquery("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']));
-				$name = $db->fetch();
+				$name = $dbl->run("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetch();
 
 				$title = '';
 				$text = '';
@@ -230,8 +226,7 @@ else
 					else
 					{
 						// see if we need to add it into the mod queue
-						$db->sqlquery("SELECT `in_mod_queue` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-						$check_queue = $db->fetch();
+						$check_queue = $dbl->run("SELECT `in_mod_queue` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 						$approved = 1;
 						if ($mod_queue == 1 || $forced_mod_queue == true)
@@ -242,24 +237,24 @@ else
 						// update user post counter
 						if ($approved == 1)
 						{
-							$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
+							$dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($author));
 						}
 
 						// add the topic
-						$db->sqlquery("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($_POST['category'], $author, $title, $text, core::$date, core::$date, $author, $approved));
-						$topic_id = $db->grab_id();
+						$dbl->run("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_id` = ?, `approved` = ?", array($_POST['category'], $author, $title, $text, core::$date, core::$date, $author, $approved));
+						$topic_id = $dbl->new_id();
 
 						// update forums post counter and last post info
 						if ($approved == 1)
 						{
-							$db->sqlquery("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $_POST['category']));
+							$dbl->run("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $_POST['category']));
 						}
 
 						// if they are subscribing
 						if (isset($_POST['subscribe']))
 						{
 							$secret_key = core::random_id(15);
-							$db->sqlquery("INSERT INTO `forum_topics_subscriptions` SET `user_id` = ?, `topic_id` = ?, `secret_key` = ?", array($_SESSION['user_id'], $topic_id, $secret_key));
+							$dbl->run("INSERT INTO `forum_topics_subscriptions` SET `user_id` = ?, `topic_id` = ?, `secret_key` = ?", array($_SESSION['user_id'], $topic_id, $secret_key));
 						}
 
 						if ($approved == 1)
@@ -272,8 +267,8 @@ else
 									// if there's actually two or more options (let's not allow single question or broken polls eh!)
 									if (count($_POST['poption']) >= 2)
 									{
-										$db->sqlquery("INSERT INTO `polls` SET `author_id` = ?, `poll_question` = ?, `topic_id` = ?", array($_SESSION['user_id'], $_POST['pquestion'], $topic_id));
-										$poll_id = $db->grab_id();
+										$dbl->run("INSERT INTO `polls` SET `author_id` = ?, `poll_question` = ?, `topic_id` = ?", array($_SESSION['user_id'], $_POST['pquestion'], $topic_id));
+										$poll_id = $dbl->new_id();
 
 										$dbl->run("UPDATE `forum_topics` SET `has_poll` = 1 WHERE `topic_id` = ?", array($topic_id));
 
@@ -316,7 +311,7 @@ else
 
 						else if ($approved == 0)
 						{
-							$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue'", array($_SESSION['user_id'], core::$date, $topic_id));
+							$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue'", array($_SESSION['user_id'], core::$date, $topic_id));
 
 							$_SESSION['message'] = 'mod_queue';
 							

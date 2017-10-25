@@ -15,11 +15,11 @@ if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION
 
 	else if (isset($_POST['yes']))
 	{
-		$db->sqlquery("SELECT `user_id` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-		if ($db->num_rows() == 1)
+		$check = $dbl->run("SELECT `user_id` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		if ($check)
 		{
-				$db->sqlquery("DELETE FROM `likes` WHERE `user_id` = ?", array($_SESSION['user_id']));
-				$db->sqlquery("DELETE FROM `article_likes` WHERE `user_id` = ?", array($_SESSION['user_id']));
+				$dbl->run("DELETE FROM `likes` WHERE `user_id` = ?", array($_SESSION['user_id']));
+				$dbl->run("DELETE FROM `article_likes` WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 				$_SESSION['message'] = 'unliked';
 				if ($core->config('pretty_urls') == 1)

@@ -38,8 +38,7 @@ if (!isset($_GET['go']))
 	if ($user_comment_alerts == 1)
 	{
 		// count how many there is in total
-		$db->sqlquery("SELECT `id` FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `date`", array($_SESSION['user_id']));
-		$total_notifications = $db->num_rows();
+		$total_notifications = $dbl->run("SELECT COUNT(`id`) FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `date`", array($_SESSION['user_id']))->fetchOne();
 
 		if ($total_notifications > 0)
 		{
@@ -48,8 +47,8 @@ if (!isset($_GET['go']))
 			$unread_array = array();
 			$read_array = array();
 			// show the notifications here
-			$db->sqlquery("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.is_like, n.is_quote, n.total, n.`type`, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start));
-			while ($note_list = $db->fetch())
+			$res_list = $dbl->run("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.is_like, n.is_quote, n.total, n.`type`, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
+			foreach ($res_list as $note_list)
 			{
 				$additional_comments = '';
 				if ($note_list['type'] != NULL)
@@ -200,7 +199,7 @@ else if (isset($_GET['go']))
 
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("UPDATE `user_notifications` SET `seen` = 1, `seen_date` = ? WHERE `owner_id` = ?", array(core::$date, $_SESSION['user_id']));
+			$dbl->run("UPDATE `user_notifications` SET `seen` = 1, `seen_date` = ? WHERE `owner_id` = ?", array(core::$date, $_SESSION['user_id']));
 			header("Location: /usercp.php?module=notifications&message=all_clear");
 		}
 	}
@@ -220,7 +219,7 @@ else if (isset($_GET['go']))
 
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("DELETE FROM `user_notifications` WHERE `seen` = 1 AND `owner_id` = ?", array($_SESSION['user_id']));
+			$dbl->run("DELETE FROM `user_notifications` WHERE `seen` = 1 AND `owner_id` = ?", array($_SESSION['user_id']));
 			header("Location: /usercp.php?module=notifications&message=removed_read");
 		}
 	}
@@ -240,7 +239,7 @@ else if (isset($_GET['go']))
 
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("DELETE FROM `user_notifications` WHERE `owner_id` = ?", array($_SESSION['user_id']));
+			$dbl->run("DELETE FROM `user_notifications` WHERE `owner_id` = ?", array($_SESSION['user_id']));
 			header("Location: /usercp.php?module=notifications&message=removed_all");
 		}
 	}

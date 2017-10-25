@@ -6,11 +6,11 @@ $templating->load('game_servers');
 
 $templating->block('head', 'game_servers');
 
-$get_servers = $db->sqlquery("SELECT s.`id`, g.`name`, s.`connection_info`, s.`official` FROM `game_servers` s INNER JOIN `calendar` g ON g.id = s.game_id ORDER BY s.`id`, s.`official`");
-$count_servers = $db->num_rows();
-if ($count_servers > 0)
+$get_servers = $dbl->run("SELECT s.`id`, g.`name`, s.`connection_info`, s.`official` FROM `game_servers` s INNER JOIN `calendar` g ON g.id = s.game_id ORDER BY s.`id`, s.`official`")->fetch_all();
+
+if ($get_servers)
 {
-	while ($servers = $get_servers->fetch())
+	foreach ($get_servers as $servers)
 	{
 		$templating->block('server', 'game_servers');
 		$templating->set('name', $servers['name']);

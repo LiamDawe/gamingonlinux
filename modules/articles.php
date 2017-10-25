@@ -61,15 +61,14 @@ if (isset($view))
 		}
 
 		$safe_category = urldecode($_GET['catid']);
-		$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `category_name` = ?", array($safe_category));
-		if ($db->num_rows() == 0)
+		$get_category = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `category_name` = ?", array($safe_category))->fetch();
+		if (!$get_category)
 		{
 			$_SESSION['message'] = 'none_found';
 			$_SESSION['message_extra'] = 'categories';
 			header("Location: /index.php?module=search");
 			die();
-		}
-		$get_category = $db->fetch();
+		};
 
 		$templating->set_previous('meta_description', 'GamingOnLinux viewing Linux gaming news from the '.$get_category['category_name'].' category', 1);
 		$templating->set_previous('title', 'Article category: ' . $get_category['category_name'], 1);
@@ -88,8 +87,7 @@ if (isset($view))
 			$all_sql = 'having count(r.`category_id`) = ?';
 		}
 
-		$db->sqlquery("SELECT r.`article_id` FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE r.category_id IN (?) GROUP BY r.`article_id` $all_sql", $safe_ids);
-		$total_items = $db->num_rows();
+		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE r.category_id IN (?) $all_sql", $safe_ids)->fetchOne();
 
 		if ($total_items > 0)
 		{
@@ -132,32 +130,18 @@ if (isset($view))
 		
 		// this is really ugly, but I can't think of a better way to do it
 		$count_array = count($safe_ids);
-		$counter = 1;
-		
-		$cat_sql = '';
-		foreach ($safe_ids as $cat)
-		{
-			$cat_sql .= '?';
-			if ($counter < $count_array)
-			{
-				$cat_sql .= ',';
-			}
-			$counter++;
-		}
-		
-		$cat_sql = sprintf(" r.`category_id` IN (%s) ", $cat_sql);
+		// sort placeholders for sql
+		$cat_sql  = 'r.`category_id` IN (' . str_repeat('?,', count($safe_ids) - 1) . '?)';
 		
 		// count how many there is in total
 		$all_sql = '';
 		if ($type == 'all')
 		{
-			$all_sql = 'having count(r.`category_id`) = ' . $count_array;
+			$all_sql = 'GROUP BY r.`article_id` having count(r.`category_id`) = ' . $count_array;
 		}
 		
 		// otherwise, pick articles that have any of the selected tags
-		$db->sqlquery("SELECT r.`article_id` FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql GROUP BY r.`article_id` $all_sql", $safe_ids);
-		
-		$total_items = $db->num_rows();
+		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql $all_sql", $safe_ids)->fetchOne();
 		
 		if ($total_items > 0)
 		{
@@ -177,7 +161,7 @@ if (isset($view))
 	
 	if (isset($total_items) && $total_items > 0)
 	{
-		$db->sqlquery("SELECT
+		$articles_get = $dbl->run("SELECT
 			r.`article_id`,
 			a.`author_id`,
 			a.`title`,
@@ -197,13 +181,10 @@ if (isset($view))
 			LEFT JOIN `users` u on a.`author_id` = u.`user_id`
 			LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 			WHERE $cat_sql AND a.`active` = 1
-			GROUP BY r.`article_id` $all_sql
-			ORDER BY a.`date` DESC LIMIT {$core->start}, $articles_per_page", $safe_ids);
-		$articles_get = $db->fetch_all_rows();
+			$all_sql
+			ORDER BY a.`date` DESC LIMIT {$core->start}, $articles_per_page", $safe_ids)->fetch_all();
 
-		$count_rows = $db->num_rows();
-
-		if ($count_rows > 0)
+		if ($total_items > 0)
 		{
 			$article_id_array = array();
 
@@ -214,7 +195,7 @@ if (isset($view))
 			$article_id_sql = implode(', ', $article_id_array);
 
 			// this is required to properly count up the rank for the tags
-			$db->sqlquery("SET @rank=null, @val=null");
+			$dbl->run("SET @rank=null, @val=null");
 
 			$category_tag_sql = "SELECT * FROM (
 				SELECT r.article_id, c.`category_name` , c.`category_id`,
@@ -226,8 +207,7 @@ if (isset($view))
 				ORDER BY CASE WHEN ($cat_sql) THEN 0 ELSE 1 END, r.`article_id` ASC
 				) AS a
 				WHERE rank < 5";
-			$db->sqlquery($category_tag_sql, $safe_ids);
-			$get_categories = $db->fetch_all_rows();
+			$get_categories = $dbl->run($category_tag_sql, $safe_ids)->fetch_all();
 
 			$article_class->display_article_list($articles_get, $get_categories);
 				

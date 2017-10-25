@@ -13,8 +13,7 @@ if (isset($_GET['view']))
 		}
 	
 		// first check it's not already reported
-		$db->sqlquery("SELECT `reported`, `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-		$check_report = $db->fetch();
+		$check_report = $dbl->run("SELECT `reported`, `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 		// send them back
 		if ($check_report['reported'] == 1)
 		{
@@ -51,8 +50,7 @@ if (isset($_GET['view']))
 		}
 	
 		// first check it's not already reported
-		$db->sqlquery("SELECT `reported` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-		$check_report = $db->fetch();
+		$check_report = $dbl->run("SELECT `reported` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']))->fetch();
 		// send them back
 		if ($check_report['reported'] == 1)
 		{
@@ -107,10 +105,10 @@ if (isset($_POST['act']))
 			else if (isset($_POST['yes']))
 			{
 				// update admin notifications
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_topic_report', core::$date, $_GET['topic_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_topic_report', core::$date, $_GET['topic_id']));
 
 				// give it a report
-				$db->sqlquery("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
 
 				$_SESSION['message'] = 'reported';
 				$_SESSION['message_extra'] = 'topic';
@@ -150,10 +148,10 @@ if (isset($_POST['act']))
 			else if (isset($_POST['yes']))
 			{
 				// update admin notifications
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_reply_report', core::$date, $_GET['post_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_reply_report', core::$date, $_GET['post_id']));
 
 				// give it a report
-				$db->sqlquery("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));
+				$dbl->run("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));
 
 				$_SESSION['message'] = 'reported';
 				$_SESSION['message_extra'] = 'post';

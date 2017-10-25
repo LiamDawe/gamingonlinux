@@ -6,15 +6,21 @@ class check_user
 	// 2 = making a new user
 	public $new = '';
 
+	protected $dbl;
+	
+	function __construct()
+	{
+		$this->dbl = db_mysql::instance();
+	}
+
 	function check_that_id($steam_id, $steam_username)
 	{
-		global $db, $core;
+		global $core;
 
 		// if they are logging in
 		if ($_SESSION['user_id'] == 0)
 		{
-			$db->sqlquery("SELECT ".user::$user_sql_fields." FROM `users` WHERE `steam_id` = ?", array($steam_id));
-			$result = $db->fetch();
+			$result = $this->dbl->run("SELECT ".user::$user_sql_fields." FROM `users` WHERE `steam_id` = ?", array($steam_id))->fetch();
 			if (!empty($result))
 			{
 				$this->new = 1;
@@ -39,7 +45,7 @@ class check_user
 		// if they are linking via usercp to a logged in account
 		else
 		{
-			$db->sqlquery("UPDATE `users` SET steam_id = ?, `steam_username` = ? WHERE `user_id` = ?", array($steam_id, $steam_username, $_SESSION['user_id']));
+			$this->dbl->run("UPDATE `users` SET steam_id = ?, `steam_username` = ? WHERE `user_id` = ?", array($steam_id, $steam_username, $_SESSION['user_id']));
 			$this->new = 0;
 			return;
 		}

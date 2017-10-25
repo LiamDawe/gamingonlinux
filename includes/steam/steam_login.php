@@ -11,11 +11,13 @@ class steam_user
 	public $data_array;
 	public $user;
 	private $core;
-	
+	protected $dbl;
+
 	function __construct($user, $core)
 	{
 		$this->user = $user;
 		$this->core = $core;
+		$this->dbl = db_mysql::instance();
 	}
 
 	public function GetPlayerSummaries ($steamid)
@@ -27,8 +29,6 @@ class steam_user
 
 	public function signIn ()
 	{
-		global $db;
-
 		require_once 'openid.php';
 		$openid = new LightOpenID($this->domain);// put your domain
 		if(!$openid->mode)
@@ -65,7 +65,7 @@ class steam_user
 					$this->user->user_details = $userdata;
 
 					// update IP address and last login
-					$db->sqlquery("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
+					$this->dbl->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
 					$this->user->check_banned();
 

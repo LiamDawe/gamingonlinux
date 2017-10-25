@@ -1,7 +1,7 @@
 <?php
 class core
 {	
-	protected $db;	
+	protected $dbl;	
 	// the current date and time for the mysql
 	public static $date;
 	
@@ -41,7 +41,7 @@ class core
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
-		$this->db = db_mysql::instance();
+		$this->dbl = db_mysql::instance();
 	}
 	
 	// check in_array for a multidimensional array
@@ -205,7 +205,7 @@ class core
 		if (empty(self::$config))
 		{
 			// get config
-			$get_config = $this->db->run("SELECT `data_key`, `data_value` FROM config")->fetch_all();
+			$get_config = $this->dbl->run("SELECT `data_key`, `data_value` FROM config")->fetch_all();
 			foreach ($get_config as $config_set)
 			{
 				self::$config[$config_set['data_key']] = $config_set['data_value'];
@@ -219,7 +219,7 @@ class core
 	// update a single config var
 	function set_config($value, $key)
 	{
-		$this->db->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
+		$this->dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
 
 		// invalidate the cache
 		self::$config = array();
@@ -630,7 +630,7 @@ class core
 
 			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail))
 			{
-				$image = $this->db->run("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
+				$image = $this->dbl->run("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
 
 				// remove old image
 				if (isset($image))
@@ -646,7 +646,7 @@ class core
 				$text = preg_replace('/(<img src=".+temp\/thumbnails\/.+" \/>)/', '<img src="/uploads/articles/tagline_images/thumbnails/'.$imagename.'" />', $text);
 				$text = preg_replace('/<img src=".+temp\/.+" \/>/', '<img src="/uploads/articles/tagline_images/'.$imagename.'" />', $text);
 
-				$this->db->run("UPDATE `articles` SET `tagline_image` = ?, `gallery_tagline` = 0, `text` = ? WHERE `article_id` = ?", array($imagename, $text, $article_id));
+				$this->dbl->run("UPDATE `articles` SET `tagline_image` = ?, `gallery_tagline` = 0, `text` = ? WHERE `article_id` = ?", array($imagename, $text, $article_id));
 				return true;
 			}
 
@@ -825,7 +825,7 @@ class core
 		$labels = array();
 
 		// get each chart along with the date they were generated to make the axis
-		$get_charts = $this->db->run("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ?", array($name))->fetch_all();
+		$get_charts = $this->dbl->run("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ?", array($name))->fetch_all();
 		if ($get_charts)
 		{
 			foreach ($get_charts as $chart_info)
@@ -844,7 +844,7 @@ class core
 			if (count($chart_ids) > 0)
 			{
 				// get the names of all the labels
-				$get_labels = $this->db->run("SELECT DISTINCT(`name`) FROM `user_stats_charts_labels` WHERE `chart_id` IN ($chart_ids_sql)")->fetch_all();
+				$get_labels = $this->dbl->run("SELECT DISTINCT(`name`) FROM `user_stats_charts_labels` WHERE `chart_id` IN ($chart_ids_sql)")->fetch_all();
 
 				// how many data points in total we need for each label
 				$total_points = count($dates);
@@ -857,7 +857,7 @@ class core
 				}
 				foreach ($top_10_labels as $sort_labels)
 				{
-					$get_data = $this->db->run("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id` LIMIT 10")->fetch_all();
+					$get_data = $this->dbl->run("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id` LIMIT 10")->fetch_all();
 
 					$total_data = count($get_data);
 
@@ -984,7 +984,7 @@ class core
 		if (isset($livestream_id) && is_numeric($livestream_id))
 		{
 			// find existing users, if any
-			$current_users = $this->db->run("SELECT `user_id` FROM `livestream_presenters` WHERE `livestream_id` = ?", array($livestream_id))->fetch_all(PDO::FETCH_COLUMN);
+			$current_users = $this->dbl->run("SELECT `user_id` FROM `livestream_presenters` WHERE `livestream_id` = ?", array($livestream_id))->fetch_all(PDO::FETCH_COLUMN);
 
 			// if the existing users aren't in the new list, remove them
 			if ($current_users)
@@ -993,7 +993,7 @@ class core
 				{
 					if (!in_array($current_user, $user_ids))
 					{
-						$this->db->run("DELETE FROM `livestream_presenters` WHERE `livestream_id` = ? AND `user_id` = ?", array($livestream_id, $current_user));
+						$this->dbl->run("DELETE FROM `livestream_presenters` WHERE `livestream_id` = ? AND `user_id` = ?", array($livestream_id, $current_user));
 					}
 				}
 			}
@@ -1006,7 +1006,7 @@ class core
 					// if this user_id isn't in the current list, add them
 					if (!in_array($streamer_id, $current_users))
 					{
-						$this->db->run("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
+						$this->dbl->run("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
 					}
 				}				
 			}
@@ -1019,7 +1019,7 @@ class core
 
 		if (isset($user_id) && $user_id != 0)
 		{
-			$checker = $this->db->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($user_id))->fetch();
+			$checker = $this->dbl->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($user_id))->fetch();
 
 			if ($checker['date_updated'] != NULL)
 			{
@@ -1120,7 +1120,7 @@ class core
 	public function load_modules($options)
 	{
 		$module_links = '';
-		$fetch_modules = $this->db->run('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC')->fetch_all();
+		$fetch_modules = $this->dbl->run('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC')->fetch_all();
 		foreach ($fetch_modules as $modules)
 		{
 			// modules allowed for loading

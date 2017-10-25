@@ -1,7 +1,7 @@
 <?php
-header('Content-Type: application/json');
-
 session_start();
+
+header('Content-Type: application/json');
 
 define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 

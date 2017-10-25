@@ -29,9 +29,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$db->sqlquery("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles`, `mailing_list_key` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-
-	$usercpcp = $db->fetch();
+	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles`, `mailing_list_key` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 	
 	// make sure they have a mailing_list_key
 	// if they unsubscribe it's wiped, but if they stay subscribed/make a new sub = use new or existing key
@@ -325,8 +323,7 @@ else if (isset($_POST['act']))
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
-		$user_update_sql = "UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ? WHERE `user_id` = ?";
-		$user_update_query = $db->sqlquery($user_update_sql, array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ? WHERE `user_id` = ?", array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;
@@ -351,16 +348,16 @@ else if (isset($_POST['act']))
 			// make sure the fields can't be just the basic url for broken junk links
 			if ($field['db_field'] == 'steam' && ($_POST['steam'] == 'http://steamcommunity.com/id/' || $_POST['steam'] == 'https://steamcommunity.com/id/'))
 			{
-				$db->sqlquery("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
+				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
 			}
 			else if ($field['db_field'] == 'twitch' && ($_POST['twitch'] == 'https://www.twitch.tv/' || $_POST['twitch'] == 'http://www.twitch.tv/'))
 			{
-				$db->sqlquery("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
+				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
 			}
 			else
 			{
 				$sanatized = htmlspecialchars($_POST[$field['db_field']]);
-				$db->sqlquery("UPDATE `users` SET `{$field['db_field']}` = ? WHERE `user_id` = ?", array($sanatized, $_SESSION['user_id']));
+				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = ? WHERE `user_id` = ?", array($sanatized, $_SESSION['user_id']));
 			}
 		}
 
@@ -380,7 +377,7 @@ else if (isset($_POST['act']))
 			}
 
 			// need to add theme updating back into here
-			$db->sqlquery("UPDATE `users` SET `supporter_link` = ?, `theme` = ? WHERE `user_id` = ?", array($supporter_link, $_POST['theme'], $_SESSION['user_id']), 'usercp_module_home.php');
+			$dbl->run("UPDATE `users` SET `supporter_link` = ?, `theme` = ? WHERE `user_id` = ?", array($supporter_link, $_POST['theme'], $_SESSION['user_id']), 'usercp_module_home.php');
 
 			header("Location: " . $core->config('website_url') . "usercp.php?module=home&updated");
 		}
@@ -392,21 +389,21 @@ else if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'twitter_remove')
 	{
-		$db->sqlquery("UPDATE `users` SET `twitter_username` = ?, `oauth_uid` = ?, `oauth_provider` = ? WHERE `user_id` = ?", array('', '', '', $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `twitter_username` = ?, `oauth_uid` = ?, `oauth_provider` = ? WHERE `user_id` = ?", array('', '', '', $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}
 
 	if ($_POST['act'] == 'steam_remove')
 	{
-		$db->sqlquery("UPDATE `users` SET `steam_username` = ?, `steam_id` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `steam_username` = ?, `steam_id` = ? WHERE `user_id` = ?", array('', '', $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}
 	
 	if ($_POST['act'] == 'google_remove')
 	{
-		$db->sqlquery("UPDATE `users` SET `google_email` = ? WHERE `user_id` = ?", array('', $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `google_email` = ? WHERE `user_id` = ?", array('', $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}

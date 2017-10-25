@@ -5,7 +5,11 @@ header("Pragma: no-cache");
 
 define("APP_ROOT", dirname(__FILE__));
 
-require APP_ROOT . "/includes/bootstrap.php";
+// we dont need the whole bootstrap
+require dirname(__FILE__) . "/includes/loader.php";
+include dirname(__FILE__) . '/includes/config.php';
+$dbl = new db_mysql();
+$core = new core();
 
 if (isset($_GET['id']) && is_numeric($_GET['id']))
 {

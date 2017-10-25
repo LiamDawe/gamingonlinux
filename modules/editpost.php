@@ -19,8 +19,7 @@ if (!isset($_POST['act']))
 	// editing the main topic
 	if (isset($_GET['topic_id']) && is_numeric($_GET['topic_id']))
 	{
-		$db->sqlquery("SELECT `topic_id`, `author_id`, `topic_title`, `topic_text` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-		$topic = $db->fetch();
+		$topic = $dbl->run("SELECT `topic_id`, `author_id`, `topic_title`, `topic_text` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 
 		if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 		{
@@ -72,8 +71,7 @@ if (!isset($_POST['act']))
 	// if its a reply
 	if (isset($_GET['post_id']) && is_numeric($_GET['post_id']))
 	{
-		$db->sqlquery("SELECT `post_id`, `topic_id`, `author_id`, `reply_text` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-		$post = $db->fetch();
+		$post = $dbl->run("SELECT `post_id`, `topic_id`, `author_id`, `reply_text` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']))->fetch();
 
 		if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 		{
@@ -138,14 +136,13 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 
 		else
 		{
-			$db->sqlquery("SELECT `author_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-			$topic = $db->fetch();
+			$topic = $dbl->run("SELECT `author_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 
 			if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 			{
 				// update the topic
 				$message = core::make_safe($_POST['text']);
-				$db->sqlquery("UPDATE `forum_topics` SET `topic_title` = ?, `topic_text` = ? WHERE `topic_id` = ?", array($_POST['title'], $message, $_GET['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `topic_title` = ?, `topic_text` = ? WHERE `topic_id` = ?", array($_POST['title'], $message, $_GET['topic_id']));
 
 				// get them to go back
 				header("Location: index.php?module=viewtopic&topic_id={$_GET['topic_id']}&page={$_POST['page']}");
@@ -180,14 +177,13 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 
 		else
 		{
-			$db->sqlquery("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-			$post = $db->fetch();
+			$post = $dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']))->fetch();
 
 			if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 			{
 				// update the topic
 				$message = htmlspecialchars($_POST['text'], ENT_QUOTES);
-				$db->sqlquery("UPDATE `forum_replies` SET `reply_text` = ? WHERE `post_id` = ?", array($message, $_GET['post_id']));
+				$dbl->run("UPDATE `forum_replies` SET `reply_text` = ? WHERE `post_id` = ?", array($message, $_GET['post_id']));
 
 				// get them to go back
 				header("Location: index.php?module=viewtopic&topic_id={$_POST['topic_id']}&page={$_POST['page']}");

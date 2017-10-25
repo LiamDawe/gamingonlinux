@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 define("APP_ROOT", dirname(__FILE__));
 
 require APP_ROOT . "/includes/bootstrap.php";

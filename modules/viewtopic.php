@@ -49,7 +49,7 @@ else
 		}
 
 		// get topic info/make sure it exists
-		$db->sqlquery("SELECT
+		$topic = $dbl->run("SELECT
 			t.*,
 			u.`user_id`,
 			u.`distro`,
@@ -69,16 +69,14 @@ else
 			FROM `forum_topics` t
 			LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
 			INNER JOIN `forums` f ON t.`forum_id` = f.`forum_id`
-			WHERE t.`topic_id` = ? AND t.`approved` = 1", array($_GET['topic_id']));
-		if ($db->num_rows() != 1)
+			WHERE t.`topic_id` = ? AND t.`approved` = 1", array($_GET['topic_id']))->fetch();
+		if (!$topic)
 		{
 			$core->message('That is not a valid forum topic!');
 		}
 
 		else
 		{
-			$topic = $db->fetch();
-
 			$remove_bbcode = $bbcode->remove_bbcode($topic['topic_text']);
 			$rest = substr($remove_bbcode, 0, 70);
 
@@ -96,11 +94,10 @@ else
 			else
 			{
 				// update topic views
-				$db->sqlquery("UPDATE `forum_topics` SET `views` = (views + 1) WHERE `topic_id` = ?", array($_GET['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `views` = (views + 1) WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// count how many replies this topic has
-				$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-				$total_replies = $db->num_rows();
+				$total_replies = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
 
 				//lastpage = total pages / items per page, rounded up.
 				if ($total_replies < $_SESSION['per-page'])
@@ -140,35 +137,24 @@ else
 					$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"/index.php?module=editpost&amp;topic_id={$topic['topic_id']}&page=$page\"><span class=\"icon edit\"></span></a></li>";
 				}
 
-				// update their subscriptions if they are reading the last page
+				// update their subscriptions if they are reading the last page, also adjust sub link
+				$subscribe_link = '';
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
-					$db->sqlquery("SELECT `send_email` FROM `forum_topics_subscriptions` WHERE `topic_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']));
-					$count_rows = $db->num_rows();
-					if ($count_rows == 1)
+					$check_sub = $dbl->run("SELECT `send_email` FROM `forum_topics_subscriptions` WHERE `topic_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']))->fetch();
+					
+					if ($check_sub)
 					{
-						$check_sub = $db->fetch();
-
 						if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
 						{
 							// they have read all new comments (or we think they have since they are on the last page)
 							if ($page == $lastpage)
 							{
 								// send them an email on a new comment again
-								$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+								$dbl->run("UPDATE `forum_topics_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
 							}
 						}
-					}
-				}
 
-				// sort out the pagination link
-				$pagination = $core->pagination_link($_SESSION['per-page'], $total_replies, "/forum/topic/{$_GET['topic_id']}/", $page);
-
-				// find out if this user has subscribed to the comments
-				if ($_SESSION['user_id'] != 0)
-				{
-					if ($count_rows == 1)
-					{
 						$subscribe_link = "<a href=\"/index.php?module=viewtopic&amp;go=unsubscribe&amp;topic_id={$_GET['topic_id']}\"> <i class=\"icon-trash\"></i>Unsubscribe</a><br />";
 					}
 
@@ -178,11 +164,8 @@ else
 					}
 				}
 
-				// if they are a guest don't show them a link
-				else
-				{
-					$subscribe_link = '';
-				}
+				// sort out the pagination link
+				$pagination = $core->pagination_link($_SESSION['per-page'], $total_replies, "/forum/topic/{$_GET['topic_id']}/", $page);
 
 				// get the template, sort out the breadcrumb
 				$templating->block('top', 'viewtopic');
@@ -231,19 +214,18 @@ else
 				$show_results = 1;
 				if (isset($_SESSION['user_id']))
 				{
-					$db->sqlquery("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					if ($poll_count = $db->num_rows() == 1)
+					$grab_poll = $dbl->run("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
+					if ($grab_poll)
 					{
 						if ($_SESSION['user_id'] != 0)
 						{
-							$grab_poll = $db->fetch();
 							if ($grab_poll['poll_open'] == 1)
 							{
 								// find if they have voted or not
-								$db->sqlquery("SELECT `user_id` FROM `poll_votes` WHERE `poll_id` = ? AND `user_id` = ?", array($grab_poll['poll_id'], $_SESSION['user_id']));
+								$voted = $dbl->run("SELECT 1 FROM `poll_votes` WHERE `poll_id` = ? AND `user_id` = ?", array($grab_poll['poll_id'], $_SESSION['user_id']))->fetchOne();
 
 								// if they haven't voted
-								if ($db->num_rows() == 0)
+								if (!$voted)
 								{
 									// don't show the results, let them vote!
 									$show_results = 0;
@@ -251,7 +233,7 @@ else
 									$templating->block('poll_vote');
 									$templating->set('poll_question', $grab_poll['poll_question']);
 									$options = '';
-									$grab_options = $db->sqlquery("SELECT `option_id`, `poll_id`, `option_title` FROM `poll_options` WHERE `poll_id` = ?", array($grab_poll['poll_id']));
+									$grab_options = $dbl->run("SELECT `option_id`, `poll_id`, `option_title` FROM `poll_options` WHERE `poll_id` = ?", array($grab_poll['poll_id']))->fetch_all();
 									foreach ($grab_options as $option)
 									{
 										$options .= '<li><button name="pollvote" class="poll_button_vote poll_button" data-poll-id="'.$option['poll_id'].'" data-option-id="'.$option['option_id'].'">'.$option['option_title'].'</button></li>';
@@ -270,24 +252,16 @@ else
 				}
 
 				// show results as it's either closed, they are a guest, or they have voted already
-				if ($show_results == 1 && $poll_count == 1)
+				if ($show_results == 1 && $grab_poll)
 				{
-					$db->sqlquery("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					$grab_poll = $db->fetch();
-
 					$templating->block('poll_results');
 
-					$db->sqlquery("SELECT `option_id`, `option_title`, `votes` FROM `poll_options` WHERE `poll_id` = ? ORDER BY `votes` DESC", array($grab_poll['poll_id']));
-					$options = $db->fetch_all_rows();
+					$options = $dbl->run("SELECT `option_id`, `option_title`, `votes` FROM `poll_options` WHERE `poll_id` = ? ORDER BY `votes` DESC", array($grab_poll['poll_id']))->fetch_all();
 
 					// see if they voted to make their option have a star * by the name
-					if (isset($_SESSION['user_id']))
+					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 					{
-						if ($_SESSION['user_id'] != 0)
-						{
-							$db->sqlquery("SELECT `user_id`, `option_id` FROM `poll_votes` WHERE `user_id` = ? AND `poll_id` = ?", array($_SESSION['user_id'], $grab_poll['poll_id']));
-							$get_user = $db->fetch();
-						}
+						$get_user = $dbl->run("SELECT `user_id`, `option_id` FROM `poll_votes` WHERE `user_id` = ? AND `poll_id` = ?", array($_SESSION['user_id'], $grab_poll['poll_id']))->fetch();
 					}
 
 					$total_votes = 0;
@@ -343,8 +317,7 @@ else
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 				{
 					// first grab a list of their bookmarks
-					$db->sqlquery("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'forum_topic' AND `user_id` = ? AND `data_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
-					$bookmarks_array = $db->fetch_all_rows(PDO::FETCH_COLUMN);
+					$bookmarks_array = $dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'forum_topic' AND `user_id` = ? AND `data_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']))->fetch_all(PDO::FETCH_COLUMN);
 				}
 
 				// if we are on the first page then show the initial topic post
@@ -444,34 +417,29 @@ else
 				// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
 				if (isset($_GET['post_id']) && is_numeric($_GET['post_id']))
 				{
-					// see if we are above their set limit per-page
-					$db->sqlquery("SELECT `replys` FROM `forum_topics` WHERE `topic_id` = ? AND `approved` = 1", array($_GET['topic_id']));
-					$count = $db->fetch();
-
-					if ($count['replys'] + 1 > $_SESSION['per-page'])
+					$prev_comments = $dbl->run("SELECT count(`post_id`) FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ? AND `approved` = 1", array($_GET['topic_id'], $_GET['post_id']))->fetchOne();
+					
+					$comments_per_page = $core->config('default-comments-per-page');
+					if (isset($_SESSION['per-page']))
 					{
-						$db->sqlquery("SELECT count(`post_id`) as counter FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ? AND `approved` = 1", array($_GET['topic_id'], $_GET['post_id']));
-						$number = $db->fetch();
-
-						$last_page = ceil($number['counter']/$_SESSION['per-page']);
-						
-						$redirect = $forum_class->get_link($_GET['topic_id'], 'page=' . $last_page . '#r' . $_GET['post_id']);
-
-						header("Location: " . $redirect);
+						$comments_per_page = $_SESSION['per-page'];
 					}
-					else
+					
+					$comment_page = 1;
+					if ($topic['replys'] > $comments_per_page)
 					{
-						$redirect = $forum_class->get_link($_GET['topic_id'], '#r' . $_GET['post_id']);
-
-						header("Location: " . $redirect);
+						$comment_page = ceil($prev_comments/$_SESSION['per-page']);
 					}
+
+					$post_link = $forum_class->get_link($_GET['topic_id'], 'page=' . $comment_page . '#r' . $_GET['post_id']);
+
+					header("Location: " . $post_link);
 				}
 
 				if ($total_replies > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 				{
 					// first grab a list of their bookmarks
-					$db->sqlquery("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'forum_reply' AND `parent_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']));
-					$bookmarks_array = $db->fetch_all_rows(PDO::FETCH_COLUMN);
+					$bookmarks_array = $dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'forum_reply' AND `parent_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
 				}
 
 				if ($topic['replys'] > 0)
@@ -760,16 +728,15 @@ else
 						if ($reply_access == 1)
 						{
 							// check they don't already have a reply in the mod queue for this forum topic
-							$db->sqlquery("SELECT COUNT(`post_id`) AS `count` FROM `forum_replies` WHERE `approved` = 0 AND `author_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
-							$check = $db->fetch();
-							if ($check['count'] == 0)
+							$check = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `approved` = 0 AND `author_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']))->fetchOne();
+							
+							if ($check == 0)
 							{
 								$subscribe_check = $user->check_subscription($_GET['topic_id'], 'forum');
 
 								if (!isset($_SESSION['activated']))
 								{
-									$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-									$get_active = $db->fetch();
+									$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 									$_SESSION['activated'] = $get_active['activated'];
 								}
 
@@ -891,7 +858,7 @@ else
 
 		if ($_GET['go'] == 'unsubscribe')
 		{
-			$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
+			$dbl->run("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
 
 			header("Location: /forum/topic/{$_GET['topic_id']}");
 		}
@@ -909,8 +876,8 @@ else
 					$templating->block('move');
 
 					$options = '';
-					$db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `forum_id` <> ? AND `is_category` = 0", array($_GET['forum_id']));
-					while ($forums = $db->fetch())
+					$res = $dbl->run("SELECT `forum_id`, `name` FROM `forums` WHERE `forum_id` <> ? AND `is_category` = 0", array($_GET['forum_id']))->fetch_all();
+					foreach ($res as $forums)
 					{
 						$options .= "<option value=\"{$forums['forum_id']}\">{$forums['name']}</option>";
 					}
@@ -924,45 +891,40 @@ else
 				else
 				{
 					// count all the posts
-					$db->sqlquery("SELECT `post_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					$total_count = $db->num_rows() + 1;
+					$total_count = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
+					$total_count = $total_count + 1;
 
 					// remove count from current forum
-					$db->sqlquery("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $_POST['old_forum_id']));
+					$dbl->run("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $_POST['old_forum_id']));
 
 					// add to new forum
-					$db->sqlquery("UPDATE `forums` SET `posts` = (posts + ?) WHERE `forum_id` = ?", array($total_count, $_POST['new_forum']));
+					$dbl->run("UPDATE `forums` SET `posts` = (posts + ?) WHERE `forum_id` = ?", array($total_count, $_POST['new_forum']));
 
 					// update the topic
-					$db->sqlquery("UPDATE `forum_topics` SET `forum_id` = ? WHERE `topic_id` = ?", array($_POST['new_forum'], $_GET['topic_id']));
+					$dbl->run("UPDATE `forum_topics` SET `forum_id` = ? WHERE `topic_id` = ?", array($_POST['new_forum'], $_GET['topic_id']));
 
 					// finally check if this is the latest topic we are moving to update the latest topic info for the previous forum
-					$db->sqlquery("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_POST['old_forum_id']));
-					$last_post = $db->fetch();
+					$last_post = $dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
 
 					// if it is then we need to get the *now* newest topic and update the forums info
 					if ($last_post['last_post_topic_id'] == $_GET['topic_id'])
 					{
-						$db->sqlquery("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['old_forum_id']));
-						$new_info = $db->fetch();
+						$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
 
-						$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['old_forum_id']));
+						$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['old_forum_id']));
 					}
 
 					// now we need to check if the topic being moved is newer than the new forums last post and update if needed
-					$db->sqlquery("SELECT `last_post_time` FROM `forums` WHERE `forum_id` = ?", array($_POST['new_forum']));
-					$last_post_new = $db->fetch();
+					$last_post_new = $dbl->run("SELECT `last_post_time` FROM `forums` WHERE `forum_id` = ?", array($_POST['new_forum']))->fetch();
 
-					$db->sqlquery("SELECT `last_post_date` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-					$last_post_topic = $db->fetch();
+					$last_post_topic = $dbl->run("SELECT `last_post_date` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 
 					//
 					if ($last_post_topic['last_post_date'] > $last_post_new['last_post_time'])
 					{
-						$db->sqlquery("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-						$new_info = $db->fetch();
+						$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 
-						$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['new_forum']));
+						$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['new_forum']));
 					}
 
 					// add to editor tracking
@@ -1031,10 +993,10 @@ else
 				}
 
 				// do the lock/stick action
-				$db->sqlquery("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// add to editor tracking
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `created_date` = ?, `completed` = 1, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $sql_type, core::$date, core::$date, $_GET['topic_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `created_date` = ?, `completed` = 1, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $sql_type, core::$date, core::$date, $_GET['topic_id']));
 
 				$core->message("You have {$action} the topic! <a href=\"/forum/topic/{$_GET['topic_id']}\">Click here to return.</a>");
 			}

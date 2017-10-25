@@ -7,8 +7,8 @@ if (isset($_GET['page']) && !isset($_POST['action']))
 	{
 		$templating->block('main');
 		
-		$db->sqlquery("SELECT `module_id`, `module_file_name`, `activated` FROM `modules` ORDER BY `module_file_name` ASC");
-		while ($module = $db->fetch())
+		$mod_res = $dbl->run("SELECT `module_id`, `module_file_name`, `activated` FROM `modules` ORDER BY `module_file_name` ASC")->fetch_all();
+		foreach ($mod_res as $module)
 		{
 			$templating->block('main_module');
 			$templating->set('module_file_name', $module['module_file_name']);
@@ -36,8 +36,8 @@ if (isset($_GET['page']) && !isset($_POST['action']))
 	{
 		$templating->block('usercp');
 		
-		$db->sqlquery("SELECT `module_id`, `module_file_name`, `module_title`, `module_link`, `show_in_sidebar`, `activated` FROM `usercp_modules` ORDER BY `module_file_name` ASC");
-		while ($module = $db->fetch())
+		$mod_res = $dbl->run("SELECT `module_id`, `module_file_name`, `module_title`, `module_link`, `show_in_sidebar`, `activated` FROM `usercp_modules` ORDER BY `module_file_name` ASC")->fetch_all();
+		foreach ($mod_res as $module)
 		{
 			$templating->block('usercp_module');
 			$templating->set('module_file_name', $module['module_file_name']);
@@ -96,7 +96,7 @@ else if (isset($_POST['action']))
 			{
 				$active = 1;
 			}
-			$db->sqlquery("INSERT INTO `modules` SET `module_file_name` = ?, `activated` = ?", array($_POST['file'], $active));
+			$dbl->run("INSERT INTO `modules` SET `module_file_name` = ?, `activated` = ?", array($_POST['file'], $active));
 			$core->message("The module {$_POST['file']} has been added! <a href=\"admin.php?module=modules&page={$_POST['type']}\">Click here to return.</a>");
 		}
 	}
@@ -112,7 +112,7 @@ else if (isset($_POST['action']))
 		
 		else
 		{
-			$db->sqlquery("UPDATE `{$type}modules` SET `activated` = 1 WHERE `module_id` = ?", array($id));
+			$dbl->run("UPDATE `{$type}modules` SET `activated` = 1 WHERE `module_id` = ?", array($id));
 			
 			$core->message('That module is now active!');
 		}
@@ -129,7 +129,7 @@ else if (isset($_POST['action']))
 		
 		else
 		{
-			$db->sqlquery("UPDATE `{$type}modules` SET `activated` = 0 WHERE `module_id` = ", array($id));
+			$dbl->run("UPDATE `{$type}modules` SET `activated` = 0 WHERE `module_id` = ", array($id));
 			
 			$core->message('That module is now deactivated! Be sure to delete/disable any block using it or you will encouter errors!');
 		}

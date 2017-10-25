@@ -45,8 +45,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('edit_top', 'admin_modules/livestreams');
 
-		$streams_grab = $db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` ORDER BY `date` ASC");
-		$streams_store = $db->fetch_all_rows();
+		$streams_store = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` ORDER BY `date` ASC")->fetch_all();
 
 		foreach ($streams_store as $streams)
 		{
@@ -63,8 +62,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('timezones_list', '');
 
 			$streamer_list = '';
-			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
-			while ($grab_streamers = $db->fetch())
+			$stream_res = $dbl->run("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
+			foreach ($stream_res as $grab_streamers)
 			{
 				$streamer_list .= '<option value="'.$grab_streamers['user_id'].'" selected>'.$grab_streamers['username'].'</option>';
 			}
@@ -124,8 +123,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('submit_top', 'admin_modules/livestreams');
 
-		$streams_grab = $db->sqlquery("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE `accepted` = 0 ORDER BY `date` ASC");
-		$streams_store = $db->fetch_all_rows();
+		$streams_store = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE `accepted` = 0 ORDER BY `date` ASC")->fetch_all();
 
 		foreach ($streams_store as $streams)
 		{
@@ -142,8 +140,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
 
 			$streamer_list = '';
-			$db->sqlquery("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']));
-			while ($grab_streamers = $db->fetch())
+			$stream_res = $dbl->run("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
+			foreach ($stream_res as $grab_streamers)
 			{
 				$streamer_list .= '<option value="'.$grab_streamers['user_id'].'" selected>'.$grab_streamers['username'].'</option>';
 			}
@@ -252,7 +250,7 @@ if (isset($_POST['act']))
 			$community = 1;
 		}
 
-		$db->sqlquery("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url, $_POST['id']));
+		$dbl->run("UPDATE `livestreams` SET `title` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community, $community_name, $stream_url, $_POST['id']));
 		
 		$user_ids = [];
 		if (isset($_POST['user_ids']) && !empty($_POST['user_ids']))
@@ -262,7 +260,7 @@ if (isset($_POST['act']))
 
 		$core->process_livestream_users($_POST['id'], $user_ids);
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'edit_livestream_event', $_POST['id'], core::$date, core::$date));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'edit_livestream_event', $_POST['id'], core::$date, core::$date));
 
 		header("Location: /admin.php?module=livestreams&view=manage&message=edited");
 	}
@@ -270,8 +268,7 @@ if (isset($_POST['act']))
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$db->sqlquery("SELECT `title` FROM `livestreams` WHERE `row_id` = ?", array($_POST['id']));
-			$title = $db->fetch();
+			$title = $dbl->run("SELECT `title` FROM `livestreams` WHERE `row_id` = ?", array($_POST['id']))->fetchOne();
 
 			$return = '';
 			if (isset($_GET['return']) && !empty($_GET['return']))
@@ -279,7 +276,7 @@ if (isset($_POST['act']))
 				$return = $_GET['return'];
 			}
 
-			$core->yes_no('Are you sure you want to delete ' . $title['title'] . ' from the livestream event list?', "admin.php?module=livestreams&id={$_POST['id']}", "Delete");
+			$core->yes_no('Are you sure you want to delete ' . $title . ' from the livestream event list?', "admin.php?module=livestreams&id={$_POST['id']}", "Delete");
 		}
 
 		else if (isset($_POST['no']))
@@ -293,11 +290,11 @@ if (isset($_POST['act']))
 
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("DELETE FROM `livestreams` WHERE `row_id` = ?", array($_GET['id']));
+			$dbl->run("DELETE FROM `livestreams` WHERE `row_id` = ?", array($_GET['id']));
 
-			$db->sqlquery("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_GET['id']));
+			$dbl->run("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_GET['id']));
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'deleted_livestream_event', core::$date, core::$date));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'deleted_livestream_event', core::$date, core::$date));
 
 			header("Location: /admin.php?module=livestreams&view=manage&message=deleted");
 		}
@@ -305,8 +302,7 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'deny_submission')
 	{
-		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
-		$livestream = $db->fetch();
+		$livestream = $dbl->run("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']))->fetch();
 
 		if (!isset($_POST['go']))
 		{
@@ -344,12 +340,12 @@ if (isset($_POST['act']))
 				$mail->sendMail($livestream['email'], $subject, $html_message, $plain_message);
 			}
 
-			$db->sqlquery("DELETE FROM `livestreams` WHERE `row_id` = ?", array($_POST['id']));
+			$dbl->run("DELETE FROM `livestreams` WHERE `row_id` = ?", array($_POST['id']));
 
-			$db->sqlquery("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_POST['id']));
+			$dbl->run("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_POST['id']));
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'denied_livestream_submission', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE type = 'new_livestream_submission' AND `data` = ?", array(core::$date, $livestream['row_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'denied_livestream_submission', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE type = 'new_livestream_submission' AND `data` = ?", array(core::$date, $livestream['row_id']));
 
 			header("Location: /admin.php?module=livestreams&view=submitted&message=denied");
 		}
@@ -375,8 +371,7 @@ if (isset($_POST['act']))
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);
 
-		$db->sqlquery("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']));
-		$livestream = $db->fetch();
+		$livestream = $dbl->run("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']))->fetch();
 
 		$comment_email = $bbcode->email_bbcode($_POST['message']);
 
@@ -396,7 +391,7 @@ if (isset($_POST['act']))
 			$mail->sendMail($livestream['email'], $subject, $html_message, $plain_message);
 		}
 
-		$db->sqlquery("UPDATE `livestreams` SET `accepted` = 1, `title` = ?, `date` = ?, `end_date` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community_name, $stream_url, $_POST['id']));
+		$dbl->run("UPDATE `livestreams` SET `accepted` = 1, `title` = ?, `date` = ?, `end_date` = ?, `streamer_community_name` = ?, `stream_url` = ? WHERE `row_id` = ?", array($title, $date->format('Y-m-d H:i:s'), $end_date->format('Y-m-d H:i:s'), $community_name, $stream_url, $_POST['id']));
 		
 		$user_ids = [];
 		if (isset($_POST['user_ids']) && !empty($_POST['user_ids']))
@@ -406,8 +401,8 @@ if (isset($_POST['act']))
 
 		$core->process_livestream_users($_POST['id'], $user_ids);
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'accepted_livestream_submission', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
-		$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE type = 'new_livestream_submission' AND `data` = ?", array(core::$date, $livestream['row_id']));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'accepted_livestream_submission', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
+		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE type = 'new_livestream_submission' AND `data` = ?", array(core::$date, $livestream['row_id']));
 
 		header("Location: /admin.php?module=livestreams&view=submitted&message=approved");
 	}

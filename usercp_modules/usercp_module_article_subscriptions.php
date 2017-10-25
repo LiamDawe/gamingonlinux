@@ -30,16 +30,15 @@ if (!isset($_GET['go']))
 	$templating->block('main_top', 'usercp_modules/usercp_module_article_subscriptions');
 
 	// count how many there is in total
-	$db->sqlquery("SELECT s.user_id, a.`article_id` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id WHERE s.`user_id` = ?", array($_SESSION['user_id']));
-	$total_subs = $db->num_rows();
+	$total_subs = $dbl->run("SELECT COUNT(a.`article_id`) FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id WHERE s.`user_id` = ?", array($_SESSION['user_id']))->fetchOne();
 
 	// sort out the pagination link
 	$pagination = $core->pagination_link(10, $total_subs, "usercp.php?module=article_subscriptions&", $page);
 
 	// get the articles
-	$db->sqlquery("SELECT a.article_id, a.title, a.date, s.user_id, s.emails, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id LEFT JOIN `users` u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 10", array($_SESSION['user_id'], $core->start));
+	$res_posts = $dbl->run("SELECT a.article_id, a.title, a.date, s.user_id, s.emails, u.`username` FROM `articles` a INNER JOIN `articles_subscriptions` s ON a.article_id = s.article_id LEFT JOIN `users` u ON a.`author_id` = u.`user_id` WHERE s.`user_id`= ? ORDER BY a.`date` DESC LIMIT ?, 10", array($_SESSION['user_id'], $core->start))->fetch_all();
 
-	while ($post = $db->fetch())
+	foreach ($res_posts as $post)
 	{
 		$templating->block('post_row', 'usercp_modules/usercp_module_article_subscriptions');
 
@@ -90,13 +89,13 @@ else if (isset($_GET['go']))
 
 			else if (isset($_POST['yes']))
 			{
-				$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_SESSION['user_id']));
+				$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_SESSION['user_id']));
 				header("Location: /usercp.php?module=article_subscriptions&message=done");
 			}
 		}
 		else
 		{
-			$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['article_id']));
+			$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['article_id']));
 			header("Location: /usercp.php?module=article_subscriptions&message=done");
 		}
 	}
@@ -118,7 +117,7 @@ else if (isset($_GET['go']))
 			{
 				$emails = 1;
 			}
-			$db->sqlquery("UPDATE `articles_subscriptions` SET `emails` = $emails WHERE `article_id` = ? AND `user_id` = ?", array($_POST['article_id'], $_SESSION['user_id']));
+			$dbl->run("UPDATE `articles_subscriptions` SET `emails` = $emails WHERE `article_id` = ? AND `user_id` = ?", array($_POST['article_id'], $_SESSION['user_id']));
 
 			header("Location: /usercp.php?module=article_subscriptions&message=updated");
 		}

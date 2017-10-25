@@ -6,7 +6,7 @@ $templating->load('usercp_modules/bookmarks');
 
 $templating->block('top');
 
-$db->sqlquery("SELECT
+$res = $dbl->run("SELECT
   b.`type`,
   b.`data_id`,
   b.`parent_id`,
@@ -21,11 +21,11 @@ $db->sqlquery("SELECT
   LEFT JOIN `articles` a2 ON c.article_id = a2.article_id
   LEFT JOIN `forum_topics` t ON t.topic_id = b.data_id AND b.type = 'forum_topic'
   LEFT JOIN `forum_topics` t2 ON t2.topic_id = b.data_id AND b.type = 'forum_reply'
-  WHERE b.`user_id` = ?", array($_SESSION['user_id']));
-$total = $db->num_rows();
-if ($total > 0)
+  WHERE b.`user_id` = ?", array($_SESSION['user_id']))->fetch_all();
+
+if ($res)
 {
-  while ($data = $db->fetch())
+  foreach ($res as $data)
   {
     $templating->block('row');
 

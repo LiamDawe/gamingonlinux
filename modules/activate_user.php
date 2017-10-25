@@ -27,15 +27,14 @@ if (!isset($_GET['redo']))
 
 else if (isset($_GET['redo']) && $_SESSION['user_id'] != 0)
 {
-	$db->sqlquery("SELECT `email`, `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-	$get_active = $db->fetch();
+	$get_active = $dbl->run("SELECT `email`, `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 	if ($get_active['activated'] == 0)
 	{
 		// make random registration code
 		$code = sha1(mt_rand(10000,99999).time().$_SESSION['user_id']);
 
-		$db->sqlquery("UPDATE `users` SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `activation_code` = ? WHERE `user_id` = ?", array($code, $_SESSION['user_id']));
 
 		// subject
 		$subject = 'Welcome to GamingOnLinux, activation needed!';

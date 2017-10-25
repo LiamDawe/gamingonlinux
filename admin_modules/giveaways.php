@@ -15,8 +15,8 @@ if (!isset($_GET['manage']))
 {
 	$templating->block('manage_top', 'admin_modules/giveaways');
 
-	$db->sqlquery("SELECT `id`, `game_name` FROM `game_giveaways` ORDER BY `date_created` DESC");
-	while ($current = $db->fetch())
+	$current_res = $dbl->run("SELECT `id`, `game_name` FROM `game_giveaways` ORDER BY `date_created` DESC")->fetch_all();
+	foreach ($current_res as $current)
 	{
 		$templating->block('row', 'admin_modules/giveaways');
 		$templating->set('name', $current['game_name']);
@@ -25,20 +25,18 @@ if (!isset($_GET['manage']))
 }
 else if (isset($_GET['manage']))
 {
-	$db->sqlquery("SELECT `game_name` FROM `game_giveaways` WHERE `id` = ?", array($_GET['manage']));
-	$giveaway = $db->fetch();
+	$giveaway = $dbl->run("SELECT `game_name` FROM `game_giveaways` WHERE `id` = ?", array($_GET['manage']))->fetch();
+
 	$templating->block('key_list_top');
 	$templating->set('name', $giveaway['game_name']);
 
-	$db->sqlquery("SELECT SUM(CASE WHEN claimed = 1 AND game_id = ? THEN 1 ELSE 0 END) AS claimed,
-  SUM(CASE WHEN game_id = ? THEN 1 ELSE 0 END) AS total
-	FROM game_giveaways_keys", array($_GET['manage'], $_GET['manage']));
-	$key_totals = $db->fetch();
+	$key_totals = $dbl->run("SELECT SUM(CASE WHEN claimed = 1 AND game_id = ? THEN 1 ELSE 0 END) AS claimed, SUM(CASE WHEN game_id = ? THEN 1 ELSE 0 END) AS total FROM game_giveaways_keys", array($_GET['manage'], $_GET['manage']))->fetch();
+
 	$templating->set('claimed', $key_totals['claimed']);
 	$templating->set('total', $key_totals['total']);
 
-	$db->sqlquery("SELECT k.`game_key`, k.`claimed`, u.`user_id`, u.`username` FROM `game_giveaways_keys` k LEFT JOIN `users` u ON u.`user_id` = k.`claimed_by_id` WHERE k.`game_id` = ? ORDER BY k.`claimed` DESC", array($_GET['manage']));
-	while ($keys = $db->fetch())
+	$keys_res = $dbl->run("SELECT k.`game_key`, k.`claimed`, u.`user_id`, u.`username` FROM `game_giveaways_keys` k LEFT JOIN `users` u ON u.`user_id` = k.`claimed_by_id` WHERE k.`game_id` = ? ORDER BY k.`claimed` DESC", array($_GET['manage']))->fetch_all();
+	foreach ($keys_res as $keys)
 	{
 		$templating->block('key_row');
 		$templating->set('key', $keys['game_key']);
@@ -63,8 +61,8 @@ if (isset($_POST['act']))
 
 		else
 		{
-			$db->sqlquery("INSERT INTO `game_giveaways` SET `game_name` = ?, `date_created` = ?", array($_POST['name'], core::$date));
-			$new_id = $db->grab_id();
+			$dbl->run("INSERT INTO `game_giveaways` SET `game_name` = ?, `date_created` = ?", array($_POST['name'], core::$date));
+			$new_id = $dbl->new_id();
 
 			// get the keys asked for
 			$list = preg_split('/(\\n|\\r)/', $_POST['list'], -1, PREG_SPLIT_NO_EMPTY);
@@ -72,7 +70,7 @@ if (isset($_POST['act']))
 			foreach ($list as $the_key)
 			{
 				// make the category
-				$db->sqlquery("INSERT INTO `game_giveaways_keys` SET `game_id` = ?, `game_key` = ?", array($new_id, $the_key));
+				$dbl->run("INSERT INTO `game_giveaways_keys` SET `game_id` = ?, `game_key` = ?", array($new_id, $the_key));
 			}
 
 			header("Location: /admin.php?module=giveaways&message=added");

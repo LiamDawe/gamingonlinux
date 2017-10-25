@@ -137,12 +137,12 @@ if ($core->config('forum_posting_open') == 1)
 					$title = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id))->fetch();
 						
 					// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
-					$db->sqlquery("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
-					if ($db->num_rows() == 1)
+					if (!isset($_POST['subscribe']))
 					{
-						if (!isset($_POST['subscribe']))
+						$sub_res = $dbl->run("SELECT `topic_id`, `emails`, `send_email` FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id))->fetch();
+						if ($sub_res)
 						{
-							$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
+							$dbl->run("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $topic_id));
 						}
 					}
 
@@ -160,11 +160,11 @@ if ($core->config('forum_posting_open') == 1)
 
 					// email anyone subscribed which isn't you
 					$users_array = array();
-					$fetch_subs = $db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id));
-					$check_rows = $db->num_rows();
-					if ($check_rows > 0)
+					$fetch_subs = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id))->fetch_all();
+					
+					if ($fetch_subs)
 					{
-						while ($users_fetch = $fetch_subs->fetch())
+						foreach ($fetch_subs as $users_fetch)
 						{
 							if ($users_fetch['user_id'] != $_SESSION['user_id'] && $users_fetch['emails'] == 1)
 							{
@@ -172,7 +172,7 @@ if ($core->config('forum_posting_open') == 1)
 								if (empty($users_fetch['secret_key']))
 								{
 									$secret_key = core::random_id(15);
-									$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `topic_id` = ?", array($secret_key, $users_fetch['user_id'], $topic_id));
+									$dbl->run("UPDATE `forum_topics_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `topic_id` = ?", array($secret_key, $users_fetch['user_id'], $topic_id));
 								}
 								else
 								{
@@ -212,12 +212,11 @@ if ($core->config('forum_posting_open') == 1)
 							}
 
 							// remove anyones send_emails subscription setting if they have it set to email once
-							$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']));
-							$update_sub = $db->fetch();
+							$update_sub = $dbl->run("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']))->fetch();
 
 							if ($update_sub['email_options'] == 2)
 							{
-								$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `send_email` = 0 WHERE `topic_id` = ? AND `user_id` = ?", array($topic_id, $email_user['user_id']));
+								$dbl->run("UPDATE `forum_topics_subscriptions` SET `send_email` = 0 WHERE `topic_id` = ? AND `user_id` = ?", array($topic_id, $email_user['user_id']));
 							}
 						}
 					}
@@ -239,7 +238,7 @@ if ($core->config('forum_posting_open') == 1)
 					// help stop double postings
 					unset($message);
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue_reply'", array($_SESSION['user_id'], core::$date, $post_id));
+					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue_reply'", array($_SESSION['user_id'], core::$date, $post_id));
 					
 					$_SESSION['message'] = 'mod_queue';
 

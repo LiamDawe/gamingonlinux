@@ -42,10 +42,9 @@ if ($user->check_group(1) && $core->config('show_debug') == 1)
 	$timer_end = microtime(true);
 	$time = number_format($timer_end - $timer_start, 3);
 	
-	$total_queries = $db->counter + $dbl->counter;
+	$total_queries = $dbl->counter;
 
 	$debug = "<br />Page generated in {$time} seconds, MySQL queries: {$total_queries}<br />";
-	$debug .= $db->queries;
 	$debug .= $dbl->debug_queries;
 	$debug .= print_r($_SESSION, true);
 	$debug .= 'Stored user details: ' . print_r($user->user_details, true);

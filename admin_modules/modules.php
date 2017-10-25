@@ -144,7 +144,7 @@ else if (isset($_POST['action']))
 		
 		else
 		{
-			$db->sqlquery("DELETE FROM `{$type}modules` WHERE `module_id` = ?", array($_POST['id']));
+			$dbl->run("DELETE FROM `{$type}modules` WHERE `module_id` = ?", array($_POST['id']));
 			
 			$core->message('That module is now deleted! Be sure to delete/disable any block using it or you will encouter errors!');
 		}
@@ -166,7 +166,7 @@ else if (isset($_POST['action']))
 				$sidebar = 1;
 			}
 			
-			$db->sqlquery("UPDATE `{$type}modules` SET `module_file_name` = ?, `module_title` = ?, `module_link` = ?, `show_in_sidebar` = ? WHERE `module_id` = ?", array($_POST['file'], $_POST['title'], $_POST['link'], $sidebar, $_POST['id']));
+			$dbl->run("UPDATE `{$type}modules` SET `module_file_name` = ?, `module_title` = ?, `module_link` = ?, `show_in_sidebar` = ? WHERE `module_id` = ?", array($_POST['file'], $_POST['title'], $_POST['link'], $sidebar, $_POST['id']));
 			
 			$core->message("That module has been edited! <a href=\"admin.php?module=modules&page={$_POST['type']}\">Click here to return.</a>");
 		}		

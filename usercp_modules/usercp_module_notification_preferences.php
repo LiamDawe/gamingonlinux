@@ -37,8 +37,7 @@ if (!isset($_GET['go']))
 	}
 	$templating->set('admin_comment_pref', $admin_comment_pref);
 
-	$db->sqlquery("SELECT `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-	$usercpcp = $db->fetch();
+	$usercpcp = $dbl->run("SELECT `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 	// auto subscribe to replies
 	$subscribe_check = '';
@@ -142,7 +141,7 @@ else if (isset($_GET['go']))
 			$email_on_login = 1;
 		}
 
-		$db->sqlquery("UPDATE `users` SET
+		$dbl->run("UPDATE `users` SET
 			`display_comment_alerts` = ?,
 			`auto_subscribe` = ?,
 			`auto_subscribe_new_article` = ?,

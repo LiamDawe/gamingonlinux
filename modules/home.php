@@ -16,8 +16,8 @@ if (!isset($_GET['view']))
 		
 		$quick_tag_hidden = [];
 		$quick_tag_normal = [];
-		$db->sqlquery("SELECT `category_name` FROM `articles_categorys` WHERE `quick_nav` = 1");
-		while ($get_quick = $db->fetch())
+		$qn_res = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `quick_nav` = 1")->fetch_all();
+		foreach ($qn_res as $get_quick)
 		{
 			$quick_tag_hidden[] = '<li><a href="'.$article_class->tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a></li>';
 			$quick_tag_normal[] = ' <a class="link_button" href="'.$article_class->tag_link($get_quick['category_name']).'">'.$get_quick['category_name'].'</a> ';
@@ -32,10 +32,9 @@ if (!isset($_GET['view']))
 	$page = core::give_page();
 
 	// count how many there is in total
-	$db->sqlquery("SELECT `article_id` FROM `articles` WHERE `active` = 1");
-	$total = $db->num_rows();
+	$total = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 1")->fetchOne();
 
-	if ($total > 0)
+	if ($total)
 	{
 		if ($core->config('pretty_urls') == 1)
 		{
@@ -63,10 +62,8 @@ if (!isset($_GET['view']))
 		$pagination = $core->pagination_link($per_page, $total, $pagination_linky, $page);
 
 		// latest news
-		$db->sqlquery("SELECT a.`article_id`, a.`author_id`, a.`guest_username`, a.`title`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`tagline_image`, a.`show_in_menu`, a.`slug`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`active` = 1 ORDER BY a.`date` DESC LIMIT ?, ?", array($core->start, $per_page));
-		$articles_get = $db->fetch_all_rows();
+		$articles_get = $dbl->run("SELECT a.`article_id`, a.`author_id`, a.`guest_username`, a.`title`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`tagline_image`, a.`show_in_menu`, a.`slug`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`active` = 1 ORDER BY a.`date` DESC LIMIT ?, ?", array($core->start, $per_page))->fetch_all();
 
-		$count_rows = $db->num_rows();
 		$seperator_counter = 0;
 
 		$article_id_array = array();
@@ -78,7 +75,7 @@ if (!isset($_GET['view']))
 		$article_id_sql = implode(', ', $article_id_array);
 
 		// this is required to properly count up the rank for the tags
-		$db->sqlquery("SET @rank=null, @val=null");
+		$dbl->run("SET @rank=null, @val=null");
 
 		$category_tag_sql = "SELECT * FROM (
 			SELECT r.article_id, c.`category_name` , c.`category_id` , @rank := IF( @val = r.article_id, @rank +1, 1 ) AS rank, @val := r.article_id
@@ -89,8 +86,7 @@ if (!isset($_GET['view']))
 			ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
 		) AS a
 		WHERE rank < 5";
-		$db->sqlquery($category_tag_sql);
-		$get_categories = $db->fetch_all_rows();
+		$get_categories = $dbl->run($category_tag_sql)->fetch_all();
 		
 		$templating->load('articles');
 
@@ -122,15 +118,14 @@ if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 	{
 		if (isset($_GET['article_id']) && is_numeric($_GET['article_id']))
 		{
-			$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
-			$featured = $db->fetch();
+			$featured = $dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
 
-			$db->sqlquery("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
+			$dbl->run("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
 			unlink($core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
 
-			$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
+			$dbl->run("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
 
-			$db->sqlquery("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
+			$dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 
 			$_SESSION['message'] = 'unpicked';
 			header("Location: ".$core->config('website_url')."index.php?module=home");

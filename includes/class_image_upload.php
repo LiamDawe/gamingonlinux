@@ -5,19 +5,17 @@ use claviska\SimpleImage;
 
 class image_upload
 {
+	protected $dbl;	
 	public static $return_message;
-	
 	private $core;
-	
 	function __construct($core)
 	{
 		$this->core = $core;
+		$this->dbl = db_mysql::instance();
 	}
 	
 	public function avatar()
 	{
-		global $db;
-
 		if (is_uploaded_file($_FILES['new_image']['tmp_name']))
 		{
 			// this will make sure it is an image file, if it cant get an image size then its not an image
@@ -45,8 +43,7 @@ class image_upload
 			}
 
 			// see if they currently have an avatar set
-			$db->sqlquery("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']));
-			$avatar = $db->fetch();
+			$avatar = $this->dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 			$image_info = getimagesize($_FILES['new_image']['tmp_name']);
 			$image_type = $image_info[2];
@@ -84,7 +81,7 @@ class image_upload
 					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $avatar['avatar']);
 				}
 
-				$db->sqlquery("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
+				$this->dbl->run("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
 				return true;
 			}
 
@@ -106,8 +103,6 @@ class image_upload
 	// 1 = new article, 0 = editing the current image
 	function featured_image($article_id, $new = NULL)
 	{
-		global $db;
-
 		if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 4)
 		{
 			return 'nofile';
@@ -234,25 +229,24 @@ class image_upload
 				if ($new == 0)
 				{
 					// see if there is a current top image
-					$db->sqlquery("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id));
-					$image = $db->fetch();
+					$image = $this->dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id))->fetch();
 
 					// remove old image
 					if (!empty($image['featured_image']))
 					{
 						unlink($this->core->config('path') . 'uploads/carousel/' . $image['featured_image']);
-						$db->sqlquery("UPDATE `editor_picks` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
+						$this->dbl->run("UPDATE `editor_picks` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
 					}
 				}
 
 				// it's a brand new featured image
 				if ($new == 1)
 				{
-					$db->sqlquery("UPDATE `articles` SET `show_in_menu` = 1 WHERE `article_id` = ?", array($article_id));
+					$this->dbl->run("UPDATE `articles` SET `show_in_menu` = 1 WHERE `article_id` = ?", array($article_id));
 
-					$db->sqlquery("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
+					$this->dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
 
-					$db->sqlquery("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?", array($article_id, $imagename));
+					$this->dbl->run("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?", array($article_id, $imagename));
 				}
 
 				return true;

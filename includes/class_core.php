@@ -927,6 +927,7 @@ class core
 					data: [";
 					$data_sets .= implode(',', $data);
 					$data_sets .= "],
+					backgroundColor: '$colour',
 					borderColor: '$colour',
 					borderWidth: 1
 					}";
@@ -940,12 +941,15 @@ class core
 				$javascript = "<script>
 				var ".$graph_name." = document.getElementById('".$graph_name."');
 				var myChart = new Chart.Line(".$graph_name.", {
-				type: 'bar',
+				type: 'line',
 				data: {
 				labels: [".implode(',', $dates)."],
 				datasets: [$data_sets]
 					},
 					options: {
+						legend: {
+							display: true
+						},
 				scales: {
 				yAxes: [{
 					ticks: {

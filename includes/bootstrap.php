@@ -19,4 +19,4 @@ $user = new user($core);
 
 $bbcode = new bbcode($dbl, $core);
 
-$article_class = new article($dbl, $core, $user, $templating, $bbcode);
+$article_class = new article($core, $user, $templating, $bbcode);

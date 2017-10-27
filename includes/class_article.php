@@ -3,15 +3,15 @@ use claviska\SimpleImage;
 
 class article
 {
-	private $database;
+	private $dbl;
 	private $core;
 	private $user;
 	private $templating;
 	private $bbcode;
 	
-	function __construct($database, $core, $user, $templating, $bbcode)
+	function __construct($core, $user, $templating, $bbcode)
 	{
-		$this->database = $database;
+		$this->dbl = db_mysql::instance();
 		$this->core = $core;
 		$this->user = $user;
 		$this->templating = $templating;
@@ -75,7 +75,7 @@ class article
 					unlink($this->core->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image']);
 				}
 
-				$this->database->run("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
+				$this->dbl->run("UPDATE `articles` SET `tagline_image` = '', `gallery_tagline` = {$_SESSION['gallery_tagline_id']} WHERE `article_id` = ?", array($data['article_id']));
 			}
 			else if ($data == NULL || $data['article_id'] == NULL)
 			{
@@ -91,7 +91,7 @@ class article
 		if ($article_id != NULL)
 		{
 			// add in uploaded images from database
-			$article_images = $this->database->run("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
+			$article_images = $this->dbl->run("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
 
 			foreach($article_images as $value)
 			{
@@ -150,7 +150,7 @@ class article
 		if (isset($article_id) && is_numeric($article_id))
 		{
 			// delete any existing categories that aren't in the final list for publishing
-			$current_categories = $this->database->run("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id))->fetch_all();
+			$current_categories = $this->dbl->run("SELECT `ref_id`, `article_id`, `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id))->fetch_all();
 
 			if (!empty($current_categories))
 			{
@@ -158,12 +158,12 @@ class article
 				{
 					if (!in_array($current_category['category_id'], $_POST['categories']))
 					{
-						$this->database->run("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
+						$this->dbl->run("DELETE FROM `article_category_reference` WHERE `ref_id` = ?", array($current_category['ref_id']));
 					}
 				}
 			}
 			// get fresh list of categories, and insert any that don't exist
-			$current_categories = $this->database->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id))->fetch_all(PDO::FETCH_COLUMN, 0);
+			$current_categories = $this->dbl->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article_id))->fetch_all(PDO::FETCH_COLUMN, 0);
 
 			if (isset($_POST['categories']) && !empty($_POST['categories']))
 			{
@@ -171,7 +171,7 @@ class article
 				{
 					if (!in_array($category, $current_categories))
 					{
-						$this->database->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
+						$this->dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", array($article_id, $category));
 					}
 				}
 			}
@@ -180,14 +180,14 @@ class article
 
 	function delete_article($article)
 	{
-		$this->database->run("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
-		$this->database->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
-		$this->database->run("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
-		$this->database->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
-		$this->database->run("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
+		$this->dbl->run("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
+		$this->dbl->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
+		$this->dbl->run("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
+		$this->dbl->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
+		$this->dbl->run("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
     
-		$this->database->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
-		$this->database->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article['article_id'], 'deleted_article', core::$date, core::$date));
+		$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
+		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article['article_id'], 'deleted_article', core::$date, core::$date));
 
 		// if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
 		if ($article['author_id'] != 1844)
@@ -200,13 +200,13 @@ class article
 		}
 
 		// find any uploaded images, and remove them
-		$res = $this->database->run("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
+		$res = $this->dbl->run("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
 		foreach ($res as $image_search)
 		{
 			unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $image_search['filename']);
 		}
 
-		$this->database->run("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
+		$this->dbl->run("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
 	}
 
 	function display_tagline_image($article = NULL)
@@ -269,7 +269,7 @@ class article
 
 		if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
 		{
-			$check_article = $this->database->run("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
+			$check_article = $this->dbl->run("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 		}
 
 		$title = strip_tags($_POST['title']);
@@ -295,11 +295,11 @@ class article
 		if (isset($_SESSION['conflict_checked']) && is_array($_SESSION['conflict_checked']))
 		{
 			$in  = str_repeat('?,', count($_SESSION['conflict_checked']) - 1) . '?';
-			$article_res = $this->database->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ? AND `article_id` NOT IN ($in)", array_merge([$_SESSION['article_timer']], $_SESSION['conflict_checked']))->fetch_all();
+			$article_res = $this->dbl->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ? AND `article_id` NOT IN ($in)", array_merge([$_SESSION['article_timer']], $_SESSION['conflict_checked']))->fetch_all();
 		}
 		else
 		{
-			$article_res = $this->database->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ?", array($_SESSION['article_timer']))->fetch_all();
+			$article_res = $this->dbl->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ?", array($_SESSION['article_timer']))->fetch_all();
 		}
 		if ($article_res)
 		{
@@ -469,7 +469,7 @@ class article
 	{
 		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		{
-			$sub_info = $this->database->run("SELECT `user_id`, `article_id`, `secret_key` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id))->fetch();
+			$sub_info = $this->dbl->run("SELECT `user_id`, `article_id`, `secret_key` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id))->fetch();
 			// there's no sub, so make one now
 			if (!$sub_info)
 			{
@@ -477,7 +477,7 @@ class article
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$get_email_type = $this->dbl->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 					
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
@@ -489,7 +489,7 @@ class article
 				// for unsubscribe link in emails
 				$secret_key = core::random_id(15);
 
-				$this->database->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $sql_emails, $sql_emails, $secret_key));
+				$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $sql_emails, $sql_emails, $secret_key));
 			}
 			else
 			{
@@ -507,7 +507,7 @@ class article
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
-					$get_email_type = $this->database->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$get_email_type = $this->dbl->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 					
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
@@ -515,7 +515,7 @@ class article
 				{
 					$sql_emails = (int) $emails;
 				}
-				$this->database->run("UPDATE `articles_subscriptions` SET `secret_key` = ?, `emails` = ?, `send_email` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $sql_emails, $sql_emails, $_SESSION['user_id'], $article_id));
+				$this->dbl->run("UPDATE `articles_subscriptions` SET `secret_key` = ?, `emails` = ?, `send_email` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $sql_emails, $sql_emails, $_SESSION['user_id'], $article_id));
 			}
 		}
 	}
@@ -524,7 +524,7 @@ class article
 	{
 		if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		{
-			$this->database->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+			$this->dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
 		}
 	}
 
@@ -532,7 +532,7 @@ class article
 	{
 		global $templating, $core;
 
-		$res = $this->database->run("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id))->fetch_all();
+		$res = $this->dbl->run("SELECT u.`username`, u.`user_id`, a.`date`, a.id, a.text FROM `users` u INNER JOIN `article_history` a ON a.user_id = u.user_id WHERE a.article_id = ? ORDER BY a.id DESC LIMIT 10", array($article_id))->fetch_all();
 		$history = '';
 		foreach ($res as $grab_history)
 		{
@@ -597,7 +597,7 @@ class article
 		if (isset($_POST['article_id']))
 		{
 			// check it hasn't been accepted already
-			$check_article = $this->database->run("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']))->fetch();
+			$check_article = $this->dbl->run("SELECT a.`active`, a.`author_id`, a.`guest_username`, a.`guest_email`, u.`username`, u.`email` FROM `articles` a LEFT JOIN `users` u ON u.`user_id` = a.`author_id` WHERE a.`article_id` = ?", array($_POST['article_id']))->fetch();
 			if ($check_article['active'] == 1)
 			{
 				$_SESSION['message'] = 'already_approved';
@@ -648,27 +648,27 @@ class article
 				$author_id = $check_article['author_id'];
 			}
 			
-			$this->database->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
-			$this->database->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
+			$this->dbl->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
+			$this->dbl->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
 				
 			if ($options['type'] != 'draft')
 			{
-				$this->database->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], $options['clear_notification_type']));
+				$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], $options['clear_notification_type']));
 			}
 				
-			$this->database->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
+			$this->dbl->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0 WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
 				
 			// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
 			if ($_SESSION['original_text'] != $checked['text'])
 			{
-				$this->database->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+				$this->dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 			}
 				
 			if ($_SESSION['user_id'] == $author_id)
 			{
 				if (isset($_POST['subscribe']))
 				{
-					$this->database->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $_POST['article_id']));
+					$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $_POST['article_id']));
 				}
 			}
 				
@@ -677,13 +677,13 @@ class article
 		// otherwise make the new article
 		else
 		{
-			$this->database->run("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date));
+			$this->dbl->run("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date));
 				
-			$article_id = $this->database->new_id();
+			$article_id = $this->dbl->new_id();
 				
 			if (isset($_POST['subscribe']))
 			{
-				$this->database->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
+				$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
 			}
 		}
 			
@@ -692,7 +692,7 @@ class article
 		{
 			foreach($_SESSION['uploads'] as $key)
 			{
-				$this->database->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
+				$this->dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
 			}
 		}
 			
@@ -704,9 +704,9 @@ class article
 			$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 		}
 			
-		$this->database->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $options['new_notification_type'], core::$date, core::$date, $article_id));
+		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $options['new_notification_type'], core::$date, core::$date, $article_id));
 			
-		$this->database->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
+		$this->dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
 			
 		unset($_SESSION['original_text']);
 
@@ -718,7 +718,7 @@ class article
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$author_email = $this->database->run("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
+				$author_email = $this->dbl->run("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
 
 				// subject
 				$subject = 'Your article was reviewed and published on GamingOnLinux.com!';
@@ -932,7 +932,7 @@ class article
 		
 		// count how many there is in total
 		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` a WHERE a.`article_id` = ? AND a.`approved` = 1 $blocked_sql";
-		$total_comments = $this->database->run($sql_count, array_merge([$article_info['article']['article_id']], $blocked_ids))->fetchOne();
+		$total_comments = $this->dbl->run($sql_count, array_merge([$article_info['article']['article_id']], $blocked_ids))->fetchOne();
 		
 		$per_page = 15;
 		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
@@ -979,7 +979,7 @@ class article
 			// update their subscriptions if they are reading the last page
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
-				$check_sub = $this->database->run("SELECT `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']))->fetch();
+				$check_sub = $this->dbl->run("SELECT `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']))->fetch();
 				if ($check_sub)
 				{
 					if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
@@ -988,7 +988,7 @@ class article
 						if ($page == $lastpage)
 						{
 							// send them an email on a new comment again
-							$this->database->run("UPDATE `articles_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']));
+							$this->dbl->run("UPDATE `articles_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']));
 						}
 					}
 				}
@@ -1001,7 +1001,7 @@ class article
 				// find out if this user has subscribed to the comments
 				if ($_SESSION['user_id'] != 0)
 				{
-					$book_test = $this->database->run("SELECT `user_id` FROM `articles_subscriptions` WHERE `article_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetchOne();
+					$book_test = $this->dbl->run("SELECT `user_id` FROM `articles_subscriptions` WHERE `article_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetchOne();
 					if ($book_test)
 					{
 						$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$article_info['article']['article_id']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe</span></a>";
@@ -1047,7 +1047,7 @@ class article
 		if ($total_comments > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			// first grab a list of their bookmarks
-			$bookmarks_array = $this->database->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'comment' AND `parent_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
+			$bookmarks_array = $this->dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'comment' AND `parent_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
 		}
 
 		$profile_fields = include dirname ( dirname ( __FILE__ ) ) . '/includes/profile_fields.php';
@@ -1060,7 +1060,7 @@ class article
 		
 		$params = array_merge([(int) $article_info['article']['article_id']], $blocked_ids, [$this->core->start], [$per_page]);
 		
-		$comments_get = $this->database->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 $blocked_sql ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
+		$comments_get = $this->dbl->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 $blocked_sql ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
 		
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
@@ -1078,7 +1078,7 @@ class article
 			$to_replace = implode(',', $sql_replacers);
 						
 			// Total number of likes for the comments
-			$get_likes = $this->database->run("SELECT data_id, COUNT(*) FROM `likes` WHERE `data_id` IN ( $to_replace ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+			$get_likes = $this->dbl->run("SELECT data_id, COUNT(*) FROM `likes` WHERE `data_id` IN ( $to_replace ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 						
 			// this users likes
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
@@ -1089,7 +1089,7 @@ class article
 					$replace[] = $comment_id;
 				}
 
-				$get_user_likes = $this->database->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'comment'", $replace)->fetch_all(PDO::FETCH_COLUMN);
+				$get_user_likes = $this->dbl->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'comment'", $replace)->fetch_all(PDO::FETCH_COLUMN);
 			}
 						
 			// get a list of each users user groups, so we can display their badges
@@ -1364,7 +1364,7 @@ class article
 		// show the category selection box
 		$templating->block('articles_top', 'articles');
 		$options = '';
-		$res = $this->database->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+		$res = $this->dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
 		foreach ($res as $get_cats)
 		{
 			$selected = '';
@@ -1496,11 +1496,11 @@ class article
 				// don't notify the person making this post, if a quote has their own name in it
 				if ($match != $username)
 				{
-					$quoted_user = $this->database->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match))->fetchOne();
+					$quoted_user = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match))->fetchOne();
 					if ($quoted_user)
 					{
-						$this->database->run("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user, $author_id, $article_id, $comment_id));
-						$new_notification_id[$quoted_user] = $this->database->new_id();
+						$this->dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user, $author_id, $article_id, $comment_id));
+						$new_notification_id[$quoted_user] = $this->dbl->new_id();
 					}
 				}
 			}

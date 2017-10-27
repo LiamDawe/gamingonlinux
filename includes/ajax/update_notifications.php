@@ -90,4 +90,5 @@ if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 	
 	echo json_encode(['title_total' => $alerts_counter, 'dropdown_indicator' => $dropdown_indicator, 'admin_badge' => $admin_line, 'normal_notifications' => $new_comments_line, 'pms_badge' => $messages_indicator]);
 }
+$dbl = NULL;
 ?>

@@ -14,6 +14,11 @@ $sql_date = date('Y/m/d H:i:s', $stamp);
 
 $dbl->run("DELETE FROM `livestreams` WHERE `end_date` <= ?", array($sql_date));
 
+/* 
+REMOVE OLD BUNDLES FROM SALES PAGE
+*/
+$dbl->run("DELETE FROM `sales_bundles` WHERE `end_date` < now()");
+
 /*
 REMOVE OLD IP BANS
 */

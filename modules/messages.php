@@ -257,7 +257,7 @@ else
 			$templating->set('text_plain', htmlspecialchars($start['message'], ENT_QUOTES));
 
 			// sort out the avatar
-			$avatar = $user->sort_avatar($start['author_id']);
+			$avatar = $user->sort_avatar($start);
 
 			$templating->set('avatar', $avatar);
 			$templating->set('username', $start['username']);
@@ -344,7 +344,7 @@ else
 				$templating->set('text_plain', htmlspecialchars($replies['message'], ENT_QUOTES));
 
 				// sort out the avatar
-				$avatar = $user->sort_avatar($replies['author_id']);
+				$avatar = $user->sort_avatar($replies);
 
 				$templating->set('avatar', $avatar);
 				$templating->set('username', $replies['username']);

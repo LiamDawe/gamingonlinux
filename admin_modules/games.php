@@ -53,17 +53,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		else
 		{
-			$db->sqlquery("SELECT c.*, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ?", array($_GET['id']));
-			$count = $db->num_rows();
+			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
 
-			if ($count == 0)
+			if (!$game)
 			{
 				$core->message('That ID does not exist!');
 			}
-			else if ($count == 1)
+			else
 			{
-				$game = $db->fetch();
-
 				if (isset($_GET['message']))
 				{
 					if ($_GET['message'] == 'edited')
@@ -220,10 +217,9 @@ if (isset($_POST['act']))
 				die();
 			}
 			
-			$db->sqlquery("SELECT `name` FROM `game_genres` WHERE `id` = ?", array($genre_id));
-			$name = $db->fetch();
+			$name = $dbl->run("SELECT `name` FROM `game_genres` WHERE `id` = ?", array($genre_id))->fetchOne();
 
-			$core->yes_no('Are you sure you want to delete ' . $name['name'] . ' from the game genres list?', "admin.php?module=games&genre_id={$_POST['genre_id']}&return=" . $return, "delete_genre");
+			$core->yes_no('Are you sure you want to delete ' . $name . ' from the game genres list?', "admin.php?module=games&genre_id={$_POST['genre_id']}&return=" . $return, "delete_genre");
 		}
 
 		else if (isset($_POST['no']))
@@ -241,8 +237,8 @@ if (isset($_POST['act']))
 				die();
 			}
 			
-			$db->sqlquery("DELETE FROM `game_genres` WHERE `id` = ?", array($genre_id));
-			$db->sqlquery("DELETE FROM `game_genres_reference` WHERE `genre_id` = ?", array($genre_id));
+			$dbl->run("DELETE FROM `game_genres` WHERE `id` = ?", array($genre_id));
+			$dbl->run("DELETE FROM `game_genres_reference` WHERE `genre_id` = ?", array($genre_id));
 			
 			header("Location: " . $return . '&message=deleted&extra=genre');
 		}
@@ -398,7 +394,7 @@ if (isset($_POST['act']))
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_POST['id']))->fetch();
+			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_POST['id']))->fetchOne();
 
 			$return = '';
 			if (isset($_GET['return']) && !empty($_GET['return']))
@@ -406,7 +402,7 @@ if (isset($_POST['act']))
 				$return = $_GET['return'];
 			}
 
-			$core->yes_no('Are you sure you want to delete ' . $name['name'] . ' from the games database and calendar?', "admin.php?module=games&id={$_POST['id']}&return=" . $return, "Delete");
+			$core->yes_no('Are you sure you want to delete ' . $name . ' from the games database and calendar?', "admin.php?module=games&id={$_POST['id']}&return=" . $return, "Delete");
 		}
 
 		else if (isset($_POST['no']))
@@ -437,12 +433,11 @@ if (isset($_POST['act']))
 
 		else if (isset($_POST['yes']))
 		{
-			$db->sqlquery("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_GET['id']));
-			$name = $db->fetch();
+			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_GET['id']))->fetchOne();
 
 			$db->sqlquery("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $name['name']));
+			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $name));
 
 			if (isset($_GET['return']) && !empty($_GET['return']))
 			{

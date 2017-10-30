@@ -1404,4 +1404,53 @@ jQuery(document).ready(function()
 		$(this).prev().toggle();
 		return false;
 	});	
+	var $gamesMulti = $("#articleGames").select2({
+		selectOnClose: true,
+		width: '100%',
+		ajax: {
+		  url: "/includes/ajax/games_ajax.php",
+		  dataType: 'json',
+		  delay: 250,
+		  data: function (params) {
+			return {
+			  q: params.term // search term
+			};
+		  },
+		  processResults: function (data) {
+			return {
+			  results: $.map(data, function(obj) {
+				return { id: obj.id, text: obj.text };
+			  })
+			};
+		  },
+		  cache: true,
+		},
+		minimumInputLength: 2
+		});
+	  
+	$(".clear-games").on("click", function (e) { e.preventDefault(); $gamesMulti.val(null).trigger("change"); });
+	$("#genres").select2({
+	selectOnClose: true,
+	width: '100%',
+	ajax: {
+    url: "/includes/ajax/game_genres_ajax.php",
+    dataType: 'json',
+    delay: 250,
+    data: function (params) {
+      return {
+        q: params.term // search term
+      };
+    },
+    processResults: function (data) {
+      return {
+        results: $.map(data, function(obj) {
+          return { id: obj.id, text: obj.text };
+        })
+      };
+    },
+    cache: true,
+  },
+  minimumInputLength: 2
+  });
+
 });

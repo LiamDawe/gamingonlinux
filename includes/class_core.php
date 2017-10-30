@@ -540,7 +540,7 @@ class core
 		$templating->set('action_url', $details['action_url']);
 		$templating->set('act', $details['act']);
 
-		if (!isset($details['act2']))
+		if (!isset($details['act_2_name']))
 		{
 			$act2_text = '';
 		}
@@ -1160,5 +1160,58 @@ class core
 			self::$current_module = self::$allowed_modules[$this->config('default_module')];
 		}
 	}
+
+	/* games database */
+	// list the genres for the current game
+	function display_game_genres($game_id = NULL)
+	{
+		// for a specific game
+		if (isset($game_id) && self::is_number($game_id))
+		{
+			// sort out genre tags
+			$genre_list = '';
+			$grab_genres = $this->dbl->run("SELECT g.`id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON r.genre_id = g.id WHERE r.`game_id` = ?", array($game_id))->fetch_all();
+			foreach ($grab_genres as $genres)
+			{
+				$genre_list .= '<option value="'.$genres['id'].'" selected>'.$genres['name'].'</option>';
+			}
+		}
+		return $genre_list;
+	}
+	
+	// for editing a game in the database, adjust what genre's it's linked with
+	function process_game_genres($game_id)
+	{
+		if (isset($game_id) && is_numeric($game_id))
+		{
+			// delete any existing genres that aren't in the final list for publishing
+			$current_genres = $this->dbl->run("SELECT `id`, `game_id`, `genre_id` FROM `game_genres_reference` WHERE `game_id` = ?", array($game_id))->fetch_all();
+			if (!empty($current_genres))
+			{
+				foreach ($current_genres as $current_genre)
+				{
+					if (!in_array($current_genre['genre_id'], $_POST['genre_ids']))
+					{
+						$this->dbl->run("DELETE FROM `game_genres_reference` WHERE `genre_id` = ? AND `game_id` = ?", array($current_genre['genre_id'], $game_id));
+					}
+				}
+			}
+
+			// get fresh list of genres, and insert any that don't exist
+			$current_genres = $this->dbl->run("SELECT `genre_id` FROM `game_genres_reference` WHERE `game_id` = ?", array($game_id))->fetch_all(PDO::FETCH_COLUMN, 0);
+
+			if (isset($_POST['genre_ids']) && !empty($_POST['genre_ids']) && core::is_number($_POST['genre_ids']))
+			{
+				foreach($_POST['genre_ids'] as $genre_id)
+				{
+					if (!in_array($genre_id, $current_genres))
+					{
+						$this->dbl->run("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", array($game_id, $genre_id));
+					}
+				}
+			}
+		}
+	}
+
 }
 ?>

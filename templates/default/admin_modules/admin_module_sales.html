@@ -1,0 +1,43 @@
+[block: add_top]
+<div class="box"><div class="head">Add a new bundle on sale</div></div>
+[/block: add_top]
+
+[block: edit_top]
+<div class="box"><div class="head">Edit existing bundles</div></div>
+[/block: edit_top]
+
+[block: submitted_bundles_top]
+<div class="box"><div class="head">Submitted bundles</div></div>
+[/block: submitted_bundles_top]
+
+[block: item]
+<div class="box">
+	<div class="body group">
+		<form method="post" action="admin.php?module=sales">
+			Name: <input type="text" name="name" value="{:name}" /><br />
+			Total Linux Games: <input type="number" name="total" value="{:total}" /><br />
+			Link: <input type="text" name="link" value="{:link}" /><br />
+			End Date (<strong>UTC Only</strong>): 
+			<input name="end_date" id="datetimepicker_{:id}" type="text" value="{:end_date}" />
+			<script>
+			var timepicker = new Pikaday(
+				{
+					field: document.getElementById('datetimepicker_{:id}'),
+					firstDay: 1,
+					minDate: new Date(2017, 0, 1),
+					maxDate: new Date(2020, 12, 31),
+					yearRange: [2017,2020],
+					showTime: true,
+					autoClose: false,
+					use24hour: false
+				});
+			</script>
+			Store <br />
+			<select name="store">{:stores}</select>
+			<input type="hidden" name="id" value="{:id}" />
+			<input type="hidden" name="return_page" value="{:return_page}" />
+			{:approve} <button name="act" type="submit" value="{:act}">{:button_text}</button> {:remove}
+		</form>
+	</div>
+</div>
+[/block: item]

@@ -793,6 +793,9 @@ select.pagination {
          -o-border-radius: 3px;
             border-radius: 3px;
 }
+.badge a:link, .badge a:visited {
+    color: #ffffff;
+}
 .badge.pale-green {
     background: #5cb85c;
 }
@@ -1698,3 +1701,10 @@ div.gol_twitch .twitch_announce{background-color: #4b367c; color: #fff; font-sty
 .dark div.gol_twitch .twitch_announce{background-color: #4b367c; color: #fff; font-style: italic;}
 div.gol_twitch .twitch_announce a, div.gol_twitch .twitch_announce a:link {color: #ffffff; font-style: normal; text-decoration: underline;}
 div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
+
+/* sales page */
+.bundle-row:hover {background-color: #D2D2D2;}
+.dark .bundle-row:hover {background-color: rgb(32, 42, 53)}
+.sales-options {border-bottom: 1px solid rgb(177, 177, 177);}
+.sales-table{border-spacing: 0px;}
+.dark .sales-table th {color: #eee;} 

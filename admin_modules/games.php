@@ -338,7 +338,6 @@ if (isset($_POST['act']))
 		}
 
 		$date = new DateTime($_POST['date']);
-		$edit_date = core::$sql_date_now;
 
 		$guess = 0;
 		if (isset($_POST['guess']))
@@ -373,11 +372,11 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `edit_date` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $edit_date, $dlc, $base_game, $free_game, $license, $_POST['id']));
+		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $_POST['id']));
 		
 		$core->process_game_genres($_POST['id']);
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 	
 		if (isset($_GET['return']) && !empty($_GET['return']))
 		{
@@ -399,8 +398,7 @@ if (isset($_POST['act']))
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$db->sqlquery("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_POST['id']));
-			$name = $db->fetch();
+			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_POST['id']))->fetch();
 
 			$return = '';
 			if (isset($_GET['return']) && !empty($_GET['return']))

@@ -1708,3 +1708,4 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .sales-options {border-bottom: 1px solid rgb(177, 177, 177);}
 .sales-table{border-spacing: 0px;}
 .dark .sales-table th {color: #eee;} 
+.edit-sale-icon{display: inline-block; background-size: 10px 10px;}

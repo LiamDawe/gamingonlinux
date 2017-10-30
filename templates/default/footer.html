@@ -94,6 +94,28 @@ this.editor.filter.addTransformations([
 	        classes: 'qtip-bootstrap qtip-shadow'
 	    }
 	});
+
+	var sale_search_options = {
+    url: function(phrase) { 
+            return "/includes/ajax/call_sales.php?q=" + phrase + "&format=json";    
+    },
+
+    getValue: "data",
+
+    ajaxSettings: {
+        dataType: "json"
+    },
+    requestDelay: 300,
+	list: {
+		onClickEvent: function() {
+			var replaced = $("#sale-search").val().replace(/ /g, '+');
+			window.location.href = '/sales.php?q=' + replaced;
+			//alert($("#sale-search").val());
+		}	
+	}
+};
+
+$("#sale-search").easyAutocomplete(sale_search_options);
 </script>
 {:ckeditor_js}
 {:editor_js}

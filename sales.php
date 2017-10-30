@@ -130,26 +130,29 @@ $templating->block('top', 'sales');
 // get bundles
 $res_bundle = $dbl->run("SELECT b.`id`, b.`name`, s.`name` as `store_name`, b.`linux_total`, b.`link`, b.`end_date` FROM `sales_bundles` b LEFT JOIN `game_stores` s ON s.id = b.store_id WHERE b.`approved` = 1 ORDER BY b.`end_date` ASC")->fetch_all();
 
-$templating->block('bundles_top', 'sales');
-
-$manage = '';
-if ($user->check_group([1,2,5]))
+if ($res_bundle)
 {
-	$manage = '<span class="fright"><a href="/admin.php?module=sales&view=manage_bundles">Edit Bundles</a></span>';
-}
-$templating->set('manage', $manage);
+	$templating->block('bundles_top', 'sales');
 
-foreach ($res_bundle as $bundle)
-{
-	$templating->block('bundles_row', 'sales');
-	$templating->set('name', $bundle['name']);
-	$templating->set('link', $bundle['link']);
-	$templating->set('store_name', $bundle['store_name']);
-	$templating->set('linux_total', $bundle['linux_total']);
+	$manage = '';
+	if ($user->check_group([1,2,5]))
+	{
+		$manage = '<span class="fright"><a href="/admin.php?module=sales&view=manage_bundles">Edit Bundles</a></span>';
+	}
+	$templating->set('manage', $manage);
 
-	// end timer
-	$countdown = '<noscript>'.$bundle['end_date'].' UTC</noscript><span id="bundle'.$bundle['id'].'"></span><script type="text/javascript">var bundle' . $bundle['id'] . ' = moment.tz("'.$bundle['end_date'].'", "UTC"); $("#bundle'.$bundle['id'].'").countdown(bundle'.$bundle['id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
-	$templating->set('time_left', $countdown);
+	foreach ($res_bundle as $bundle)
+	{
+		$templating->block('bundles_row', 'sales');
+		$templating->set('name', $bundle['name']);
+		$templating->set('link', $bundle['link']);
+		$templating->set('store_name', $bundle['store_name']);
+		$templating->set('linux_total', $bundle['linux_total']);
+
+		// end timer
+		$countdown = '<noscript>'.$bundle['end_date'].' UTC</noscript><span id="bundle'.$bundle['id'].'"></span><script type="text/javascript">var bundle' . $bundle['id'] . ' = moment.tz("'.$bundle['end_date'].'", "UTC"); $("#bundle'.$bundle['id'].'").countdown(bundle'.$bundle['id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+		$templating->set('time_left', $countdown);
+	}
 }
 
 // get normal sales

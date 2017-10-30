@@ -1,0 +1,41 @@
+[block: main]
+<div class="box"><ul class="breadcrumb"><li><a href="/sales.php">Sales Page</a></li><li class="active">Submit sale</li></ul></div>
+<div class="box">
+	<div class="head">Submit a sale!</div>
+</div>
+<div class="box">
+	<div class="body group">
+		<div class="collapse_container">
+			<div class="collapse_header">Add a Bundle, click me</div>
+			<div class="collapse_content">
+				<div class="body group">
+					<form method="post" action="index.php?module=submit_sale">
+						Name: <input type="text" name="name" value="" /><br />
+						Total Linux Games: <input type="number" name="total" value="" /><br />
+						Link: <input type="text" name="link" value="" /><br />
+						End Date (<strong>UTC Only</strong>): 
+						<input name="end_date" id="datetimepicker_bundle" type="text" value="" />
+						<script>
+						var timepicker = new Pikaday(
+							{
+								field: document.getElementById('datetimepicker_bundle'),
+								firstDay: 1,
+								minDate: new Date(2017, 0, 1),
+								maxDate: new Date(2020, 12, 31),
+								yearRange: [2017,2020],
+								showTime: true,
+								autoClose: false,
+								use24hour: false
+							});
+						</script>
+						Store <br />
+						<select name="store">{:stores}</select><br />
+						<em>Are we missing a store? <a href="{:email_link}">Email Us</a> to let us know!</em><br />
+						<button name="act" type="submit" value="add_bundle">Add Bundle</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+[/block: main]

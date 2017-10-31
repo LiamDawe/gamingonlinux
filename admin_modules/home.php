@@ -40,12 +40,17 @@ if (!isset($_GET['view']))
 	{
 		$cron_list = '';
 		$templating->block('crons', 'admin_modules/admin_home');
-		$crons = $dbl->run("SELECT `name`, `last_ran` FROM `crons` ORDER BY `last_ran` ASC")->fetch_all();
+		$crons = $dbl->run("SELECT `name`, `last_ran`, `data` FROM `crons` ORDER BY `last_ran` ASC")->fetch_all();
 		$total_crons = count($crons);
 		$counter = 0;
 		foreach ($crons as $cron)
 		{
-			$cron_list .= '<strong>Name:</strong> ' . $cron['name'] . ' - <strong>Last Ran:</strong> ' . $cron['last_ran'];
+			$data = '';
+			if ($cron['data'] != NULL)
+			{
+				$data = '<strong>Data:</strong> ' . $cron['data'];
+			}
+			$cron_list .= '<strong>Name:</strong> ' . $cron['name'] . ' - <strong>Last Ran:</strong> ' . $cron['last_ran'] . $data;
 			if ($counter < $total_crons)
 			{
 				$cron_list .= '<br />';

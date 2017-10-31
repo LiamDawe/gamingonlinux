@@ -48,7 +48,7 @@ if (!isset($_GET['view']))
 			$data = '';
 			if ($cron['data'] != NULL)
 			{
-				$data = '<strong>Data:</strong> ' . $cron['data'];
+				$data = ' <strong>Data:</strong> ' . $cron['data'];
 			}
 			$cron_list .= '<strong>Name:</strong> ' . $cron['name'] . ' - <strong>Last Ran:</strong> ' . $cron['last_ran'] . $data;
 			if ($counter < $total_crons)

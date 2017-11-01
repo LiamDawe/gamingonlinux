@@ -24,8 +24,8 @@ if (!isset($_GET['aid']))
 
 	$templating->block('submitted_top', 'admin_modules/admin_articles_sections/submitted_articles');
 
-	$db->sqlquery("SELECT a.article_id, a.date_submitted, a.title, a.tagline, a.guest_username, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `submitted_article` = 1 AND `submitted_unapproved` = 1");
-	while ($article = $db->fetch())
+	$article_res = $dbl->run("SELECT a.article_id, a.date_submitted, a.title, a.tagline, a.guest_username, u.username, u.user_id FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE `submitted_article` = 1 AND `submitted_unapproved` = 1")->fetch_all();
+	foreach ($article_res as $article)
 	{
 		$templating->block('submitted_row', 'admin_modules/admin_articles_sections/submitted_articles');
 		$templating->set('url', $core->config('website_url'));
@@ -98,30 +98,24 @@ else if (isset($_GET['aid']))
 	LEFT JOIN `users` u2 ON a.`locked_by` = u2.`user_id`
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 	WHERE `submitted_article` = 1 AND `active` = 0 AND `article_id` = ?";
-	$db->sqlquery($article_sql, array($_GET['aid']));
-
-	$article = $db->fetch();
+	$article = $dbl->run($article_sql, array($_GET['aid']))->fetch();
 
 	if (isset($_GET['unlock']) && $article['locked'] == 1 && $_GET['unlock'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$db->sqlquery("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
+		$dbl->run("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
 
 		$core->message("You have unlocked the article for others to edit!");
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery($article_sql, array($_GET['aid']));
-
-		$article = $db->fetch();
+		$article = $dbl->run($article_sql, array($_GET['aid']))->fetch();
 	}
 
 	if (isset($_GET['lock']) && isset($_GET['lock']) && $_GET['lock'] == 1 && $article['locked'] == 0)
 	{
-		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
+		$dbl->run("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery($article_sql, array($_GET['aid']));
-
-		$article = $db->fetch();
+		$article = $dbl->run($article_sql, array($_GET['aid']))->fetch();
 	}
 
 	if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
@@ -129,9 +123,7 @@ else if (isset($_GET['aid']))
 		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", 1);
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery($article_sql, array($_GET['aid']));
-
-		$article = $db->fetch();
+		$article = $dbl->run($article_sql, array($_GET['aid']))->fetch();
 	}
 
 	$_SESSION['original_text'] = $article['text'];
@@ -209,15 +201,15 @@ else if (isset($_GET['aid']))
 	$templating->set('edit_state_textarea', $edit_state_textarea);
 
 	// get categorys
-	$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
-	while($categories_check = $db->fetch())
+	$cat_res = $dbl->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
+	foreach ($cat_res as $categories_check)
 	{
 		$categories_check_array[] = $categories_check['category_id'];
 	}
 
 	$categorys_list = '';
-	$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
-	while ($categorys = $db->fetch())
+	$allcat_res = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+	foreach ($allcat_res as $categorys)
 	{
 		if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
 		{
@@ -341,13 +333,7 @@ else if (isset($_GET['aid']))
 	$templating->load('admin_modules/admin_module_comments');
 
 	// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
-	$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
-	$sub_exists = $db->num_rows();
-
-	if ($sub_exists == 1)
-	{
-		$check_current_sub = $db->fetch();
-	}
+	$check_current_sub = $dbl->run("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']))->fetch();
 
 	$subscribe_check = '';
 	if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
@@ -384,8 +370,7 @@ if (isset($_POST['act']))
 		else
 		{
 			// get article name for the email and redirect
-			$db->sqlquery("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']), 'articles_full.php');
-			$title = $db->fetch();
+			$title = $dbl->run("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']))->fetch();
 			$title_nice = core::nice_title($title['title']);
 
 			$page = 1;
@@ -398,8 +383,7 @@ if (isset($_POST['act']))
 			$comment = trim($_POST['text']);
 
 			// check for double comment
-			$db->sqlquery("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array($_GET['aid']));
-			$check_comment = $db->fetch();
+			$check_comment = $dbl->run("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array($_GET['aid']))->fetch();
 
 			if ($check_comment['comment_text'] == $comment)
 			{
@@ -421,15 +405,15 @@ if (isset($_POST['act']))
 
 				$article_id = $_GET['aid'];
 
-				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_GET['aid'], $_SESSION['user_id'], core::$date, $comment), 'admin_module_comments.php');
+				$dbl->run("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_GET['aid'], $_SESSION['user_id'], core::$date, $comment), 'admin_module_comments.php');
 
-				$new_comment_id = $db->grab_id();
+				$new_comment_id = $dbl->new_id();
 
 				// check if they are subscribing
 				if (isset($_POST['subscribe']))
 				{
 					// make sure we don't make lots of doubles
-					$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+					$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
 
 					$emails = 0;
 					if (isset($_POST['emails']))
@@ -437,13 +421,13 @@ if (isset($_POST['act']))
 						$emails = 1;
 					}
 
-					$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?", array($_SESSION['user_id'], $article_id, $emails));
+					$dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?", array($_SESSION['user_id'], $article_id, $emails));
 				}
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
+				$users_res = $dbl->run("SELECT s.`user_id`, s.emails, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id))->fetch_all();
 				$users_array = array();
-				while ($users = $db->fetch())
+				foreach ($users_res as $users)
 				{
 					if ($users['user_id'] != $_SESSION['user_id'] && $users['emails'] == 1)
 					{

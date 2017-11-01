@@ -63,7 +63,7 @@ else
 		$pagination = $core->pagination_link(9, $total, "/private-messages/", $page);
 
 		// need to paginate the list
-		$get_pms = $db->sqlquery("SELECT
+		$get_pms = $dbl->run("SELECT
 			i.`conversation_id`,
 			i.`title`,
 			i.`creation_date`,
@@ -86,8 +86,8 @@ else
 		WHERE
 			i.`owner_id` = ? $blocked_sql
 		ORDER BY
-			i.`last_reply_date` DESC LIMIT ?, 9", array_merge([$_SESSION['user_id']], $blocked_ids, [$core->start]));
-		while ($message = $get_pms->fetch())
+			i.`last_reply_date` DESC LIMIT ?, 9", array_merge([$_SESSION['user_id']], $blocked_ids, [$core->start]))->fetch_all();
+		foreach ($get_pms as $message)
 		{
 			$templating->block('message_row');
 
@@ -157,8 +157,7 @@ else
 
 		else
 		{
-			$db->sqlquery("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']));
-			$info = $db->fetch();
+			$info = $dbl->run("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']))->fetch();
 
 			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 			{
@@ -188,14 +187,9 @@ else
 	if (isset($_GET['view']) && $_GET['view'] == 'message')
 	{
 		// check they can access the message
-		$check_id_now = array();
-		$db->sqlquery("SELECT `owner_id` FROM `user_conversations_info` WHERE `conversation_id` = ?", array($_GET['id']));
-		while ($check_ids = $db->fetch())
-		{
-			$check_id_now[] = $check_ids['owner_id'];
-		}
+		$id_check = $dbl->run("SELECT `owner_id` FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_GET['id'], $_SESSION['user_id']))->fetchOne();
 
-		if (!in_array($_SESSION['user_id'], $check_id_now))
+		if (!$id_check)
 		{
 			$core->message('Naughty, that is not your message to view!', 1);
 		}
@@ -205,19 +199,18 @@ else
 			include('includes/profile_fields.php');
 
 			// get usernames of everyone in this conversation
-			$db->sqlquery("SELECT u.`username`, u.`user_id` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.`user_id` = p.`participant_id` WHERE p.`conversation_id` = ?", array($_GET['id']));
+			$people_res = $dbl->run("SELECT u.`username`, u.`user_id` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.`user_id` = p.`participant_id` WHERE p.`conversation_id` = ?", array($_GET['id']))->fetch_all();
 			$p_list = '';
 
-			$count_participants = $db->num_rows();
+			$count_participants = count($people_res);
 
-			while ($participants = $db->fetch())
+			foreach ($people_res as $participants)
 			{
 				$p_list .= "<a href=\"/profiles/{$participants['user_id']}/\">{$participants['username']}</a> ";
 			}
 
 			// count them for pagination
-			$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_messages` WHERE `conversation_id` = ? AND position > 0", array($_GET['id']));
-			$total = $db->num_rows();
+			$total = $dbl->run("SELECT COUNT(`conversation_id`) FROM `user_conversations_messages` WHERE `conversation_id` = ? AND position > 0", array($_GET['id']))->fetchOne();
 
 			// sort out the pagination link
 			$pagination = $core->pagination_link(9, $total, "/private-messages/{$_GET['id']}/", $page);
@@ -245,8 +238,7 @@ else
 				$db_grab_fields .= "u.`{$field['db_field']}`,";
 			}
 
-			$db->sqlquery("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']));
-			$start = $db->fetch();
+			$start = $dbl->run("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']))->fetch();
 
 			$templating->block('view_row', 'private_messages');
 			$templating->set('title', $start['title']);
@@ -430,7 +422,7 @@ else
 				$templating->block('preview', 'private_messages');
 			}
 
-			$db->sqlquery("UPDATE `user_conversations_participants` SET `unread` = 0 WHERE `participant_id` = ? AND `conversation_id` = ?", array($_SESSION['user_id'], $_GET['id']));
+			$dbl->run("UPDATE `user_conversations_participants` SET `unread` = 0 WHERE `participant_id` = ? AND `conversation_id` = ?", array($_SESSION['user_id'], $_GET['id']));
 		}
 	}
 
@@ -454,8 +446,8 @@ else
 					$sql_ids[] = '?';
 				}
 				
-				$db->sqlquery("SELECT `user_id`, `username` FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $_SESSION['mto']);
-				while ($check_to = $db->fetch())
+				$check_res = $dbl->run("SELECT `user_id`, `username` FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $_SESSION['mto'])->fetch_all();
+				foreach ($check_res as $check_to)
 				{
 					$user_to .= '<option value="'.$check_to['user_id'].'" selected>'.$check_to['username'].'</option>';
 				}
@@ -468,8 +460,7 @@ else
 		// if they've click a link to PM someone specific
 		if (isset($_GET['user']))
 		{
-			$db->sqlquery("SELECT `user_id`, `username`, `get_pms` FROM `users` WHERE `user_id` = ?", array($_GET['user']));
-			$user_info = $db->fetch();
+			$user_info = $dbl->run("SELECT `user_id`, `username`, `get_pms` FROM `users` WHERE `user_id` = ?", array($_GET['user']))->fetch();
 
 			// check your ability to send it to them, don't even list them in the send to box if you cannot
 			$can_send = 0;
@@ -545,8 +536,7 @@ else
 		
 		$page = core::give_page();
 		
-		$db->sqlquery("SELECT COUNT(`conversation_id`) as `total` FROM `user_conversations_info` WHERE `owner_id` = ? AND `title` LIKE ?", array($_SESSION['user_id'], '%' . $title . '%'));
-		$total_pms = $db->fetch();
+		$total_pms = $dbl->run("SELECT COUNT(`conversation_id`) FROM `user_conversations_info` WHERE `owner_id` = ? AND `title` LIKE ?", array($_SESSION['user_id'], '%' . $title . '%'))->fetchOne();
 		
 		$per_page = 15;
 		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
@@ -554,9 +544,9 @@ else
 			$per_page = $_SESSION['per-page'];
 		}
 		
-		$pagination = $core->pagination_link($per_page, $total_pms['total'], '/index.php?module=messages&view=search_title&', $page, '&search_title='.$title);
+		$pagination = $core->pagination_link($per_page, $total_pms, '/index.php?module=messages&view=search_title&', $page, '&search_title='.$title);
 		
-		$db->sqlquery("SELECT
+		$search_res = $dbl->run("SELECT
 			i.`conversation_id`,
 			i.`title`,
 			i.`creation_date`,
@@ -581,11 +571,11 @@ else
 		AND 
 			i.`title` LIKE ?
 		ORDER BY
-			i.`last_reply_date` DESC LIMIT ?, ?", array($_SESSION['user_id'], '%' . $title . '%', $core->start, $per_page));
-		$total_found = $db->num_rows();
-		if ($total_found > 0)
+			i.`last_reply_date` DESC LIMIT ?, ?", array($_SESSION['user_id'], '%' . $title . '%', $core->start, $per_page))->fetch_all();
+
+		if ($search_res)
 		{
-			while ($search = $db->fetch())
+			foreach ($search_res as $search)
 			{
 				$templating->block('message_row');
 
@@ -690,10 +680,9 @@ else
 			$sql_ids[] = '?';
 		}
 			
-		$db->sqlquery("SELECT COUNT(`user_id`) as count FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids);
-		$recepients_count = $db->fetch();
+		$recepients_count = $dbl->run("SELECT COUNT(`user_id`) FROM `users` WHERE `user_id` IN (".implode(',', $sql_ids).")", $user_ids)->fetchOne();
 
-		if ($recepients_count['count'] == 0)
+		if ($recepients_count == 0)
 		{
 			$_SESSION['message'] = 'notfound';
 			
@@ -750,22 +739,21 @@ else
 		if (count($can_send_to) > 0)
 		{
 			// make the new message
-			$db->sqlquery("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
+			$dbl->run("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
 
-			$conversation_id = $db->grab_id();
+			$conversation_id = $dbl->new_id();
 
 			// send message to each user
 			foreach ($can_send_to as $user_id)
 			{
 				// make the duplicate message for other participants
-				$db->sqlquery("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));
+				$dbl->run("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $user_id, core::$date, $_SESSION['user_id']));
 
 				// Add all the participants
-				$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
+				$dbl->run("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $user_id));
 
 				// also while we are here, email each user to tell them they have a new convo
-				$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']));
-				$email_data = $db->fetch();
+				$email_data = $dbl->run("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($user_id, $_SESSION['user_id']))->fetch();
 
 				if ($email_data['email_on_pm'] == 1)
 				{
@@ -796,9 +784,9 @@ else
 				}
 			}
 
-			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
+			$dbl->run("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
 
-			$db->sqlquery("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
+			$dbl->run("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
 
 			$_SESSION['message'] = 'pm_sent';
 			if ($core->config('pretty_urls') == 1)
@@ -848,13 +836,11 @@ else
 
 		else
 		{
-			$db->sqlquery("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']));
-			$info = $db->fetch();
+			$info = $dbl->run("SELECT `message`, `author_id` FROM `user_conversations_messages` WHERE `message_id` = ?", array($_GET['message_id']))->fetch();
 
 			if (($_SESSION['user_id'] != 0) && $_SESSION['user_id'] == $info['author_id'] || $user->check_group([1,2]) == true && $_SESSION['user_id'] != 0)
 			{
-
-				$db->sqlquery("UPDATE `user_conversations_messages` SET `message` = ? WHERE `message_id` = ?", array($text, $_GET['message_id']));
+				$dbl->run("UPDATE `user_conversations_messages` SET `message` = ? WHERE `message_id` = ?", array($text, $_GET['message_id']));
 
 				$page = '';
 				if (!empty($_GET['page']) && is_numeric($_GET['page']))
@@ -882,13 +868,13 @@ else
 	if (isset($_POST['act']) && $_POST['act'] == 'Delete')
 	{
 		// check the id exists
-		$db->sqlquery("SELECT `conversation_id` FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
-		if ($db->num_rows() == 1)
+		$check_res = $dbl->run("SELECT `conversation_id` FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']))->fetch();
+		if ($check_res)
 		{
 			// check they are okay with deleting it
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
 			{
-				$templating->set_previous('title', ' - Deleting comment', 1);
+				$templating->set_previous('title', 'Deleting PM', 1);
 				$core->yes_no('Are you sure you want to delete that Personal Messaging thread?', "index.php?module=messages", 'Delete', $_POST['conversation_id'], 'conversation_id');
 			}
 
@@ -899,8 +885,8 @@ else
 
 			else if (isset($_POST['yes']))
 			{
-				$db->sqlquery("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
-				$db->sqlquery("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
+				$dbl->run("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
+				$dbl->run("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
 				
 				$_SESSION['message'] = 'deleted';
 				$_SESSION['message_extra'] = 'private message';
@@ -937,32 +923,29 @@ else
 		else
 		{
 			// find last position
-			$db->sqlquery("SELECT m.`position`, i.title FROM `user_conversations_messages` m INNER JOIN `user_conversations_info` i ON m.conversation_id = i.conversation_id WHERE m.`conversation_id` = ? ORDER BY m.`message_id` DESC LIMIT 1", array($_POST['conversation_id']));
-			$last = $db->fetch();
+			$last = $dbl->run("SELECT m.`position`, i.title FROM `user_conversations_messages` m INNER JOIN `user_conversations_info` i ON m.conversation_id = i.conversation_id WHERE m.`conversation_id` = ? ORDER BY m.`message_id` DESC LIMIT 1", array($_POST['conversation_id']))->fetch();
 
 			$position = $last['position'] + 1;
 
 			// add the new reply
-			$db->sqlquery("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = ?", array($_POST['conversation_id'], $_SESSION['user_id'], core::$date, $text, $position));
-			$post_id = $db->grab_id();
+			$dbl->run("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = ?", array($_POST['conversation_id'], $_SESSION['user_id'], core::$date, $text, $position));
+			$post_id = $dbl->new_id();
 
 			// update conversation info
-			$db->sqlquery("UPDATE `user_conversations_info` SET `replies` = (replies + 1), `last_reply_date` = ?, `last_reply_id` = ? WHERE `conversation_id` = ?", array(core::$date, $_SESSION['user_id'], $_POST['conversation_id']));
+			$dbl->run("UPDATE `user_conversations_info` SET `replies` = (replies + 1), `last_reply_date` = ?, `last_reply_id` = ? WHERE `conversation_id` = ?", array(core::$date, $_SESSION['user_id'], $_POST['conversation_id']));
 
 			// make unread notifications
-			$db->sqlquery("SELECT `participant_id` FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` != ?", array($_POST['conversation_id'], $_SESSION['user_id']));
-			$participants = $db->fetch_all_rows();
+			$participants = $dbl->run("SELECT `participant_id` FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` != ?", array($_POST['conversation_id'], $_SESSION['user_id']))->fetch_all();
 			foreach ($participants as $person)
 			{
 				// check to see if they're blocking you, otherwise, don't notify them of this at all
 				$check = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($person['participant_id'], $_SESSION['user_id']))->fetch();
 				if (!$check)
 				{
-					$db->sqlquery("UPDATE `user_conversations_participants` SET `unread` = 1 WHERE `participant_id` = ? AND `conversation_id` = ?", array($person['participant_id'], $_POST['conversation_id']));
+					$dbl->run("UPDATE `user_conversations_participants` SET `unread` = 1 WHERE `participant_id` = ? AND `conversation_id` = ?", array($person['participant_id'], $_POST['conversation_id']));
 
 					// also while we are here, email each user to tell them they have a new reply
-					$db->sqlquery("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($person['participant_id'], $_SESSION['user_id']));
-					$email_data = $db->fetch();
+					$email_data = $dbl->run("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ? AND `user_id` != ?", array($person['participant_id'], $_SESSION['user_id']))->fetch();
 
 					if ($email_data['email_on_pm'] == 1)
 					{
@@ -992,8 +975,7 @@ else
 				}
 			}
 
-			$db->sqlquery("SELECT `replies` FROM `user_conversations_info` WHERE `conversation_id` = ?", array($_POST['conversation_id']));
-			$get_info = $db->fetch();
+			$get_info = $dbl->run("SELECT `replies` FROM `user_conversations_info` WHERE `conversation_id` = ?", array($_POST['conversation_id']))->fetch();
 
 			$page = 1;
 			if ($get_info['replies'] > 9)

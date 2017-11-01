@@ -112,7 +112,7 @@ if (isset($_POST['act']))
 		}
 
 		// check exists
-		$checker = $dbl->run("SELECT ` FROM `sales_bundles` WHERE `name` = ?", [$name]);
+		$checker = $dbl->run("SELECT 1 FROM `sales_bundles` WHERE `name` = ?", [$name])->fetchOne();
 		if ($checker)
 		{
 			$_SESSION['message'] = 'exists';

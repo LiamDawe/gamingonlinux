@@ -148,7 +148,7 @@ class charts
 		}
 
 		$label_loop_counter = 0;
-		
+
 		// make up the data array of labels for this chart
 		foreach ($get_labels as $label_loop)
 		{
@@ -315,6 +315,36 @@ class charts
 		
 		$this->chart_end_x = $this->chart_bar_start_x + $this->actual_chart_space + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 	}
+
+	function min_max_labels($data, $bar_y)
+	{
+		$return_data = '';
+		// sort out including min/max values
+		$min_max_y = $bar_y + $this->chart_options['min_max_font_size'] + $this->chart_options['min_max_y_padding'];
+		$min_max_x = $this->bars_x_start + $this->chart_options['min_max_x_padding'];
+		$min_max_text = NULL;
+					
+		if ($data['min'] != NULL && $data['min'] > 0)
+		{
+			$min_max_text = 'Min: '.$data['min'];	
+		}
+		if ($data['max'] != NULL && $data['max'] > 0)
+		{
+			// if we already have a min value, add a seperator
+			if ($min_max_text != NULL)
+			{
+				$min_max_text .= ' | ';
+			}
+			$min_max_text .= 'Max: '.$data['max'];
+		}
+					
+		if ($min_max_text != NULL)
+		{
+			$return_data = '<text class="golsvg_minmax" x="'.$min_max_x.'" y="'.$min_max_y.'" font-size="'.$this->chart_options['min_max_font_size'].'">'.$min_max_text.'</text>';
+		}
+
+		return $return_data;
+	}
 	/*
 	$chart_data:
 	- name
@@ -402,7 +432,11 @@ class charts
 			{
 				$this_bar_y = $this_label_y - 18;
 				$bar_width = $label['total']*$this->scale;
-				$this->bars_output_array[] = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$label['name'].' ' . $label['total'] . '</title></rect>';
+				$this_bar_output = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$label['name'].' ' . $label['total'] . '</title></rect>';
+
+				$this_bar_output .= $this->min_max_labels($label, $this_bar_y);
+
+				$this->bars_output_array[] = $this_bar_output;
 				
 				// bar counters and their positions
 				$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
@@ -430,30 +464,7 @@ class charts
 					
 					$this_bar_output = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->data_series[$k]['colour'].'"><title>'.$k.' ' . $data['data'] . '</title></rect>';
 					
-					// sort out including min/max values
-					$min_max_y = $this_bar_y + $this->chart_options['min_max_font_size'] + $this->chart_options['min_max_y_padding'];
-					$min_max_x = $this->bars_x_start + $this->chart_options['min_max_x_padding'];
-					$min_max_text = NULL;
-					
-					if ($data['min'] != NULL && $data['min'] > 0)
-					{
-						$min_max_text = 'Min: '.$data['min'];
-						
-					}
-					if ($data['max'] != NULL && $data['max'] > 0)
-					{
-						// if we already have a min value, add a seperator
-						if ($min_max_text != NULL)
-						{
-							$min_max_text .= ' | ';
-						}
-						$min_max_text .= 'Max: '.$data['max'];
-					}
-					
-					if ($min_max_text != NULL)
-					{
-						$this_bar_output .= '<text class="golsvg_minmax" x="'.$min_max_x.'" y="'.$min_max_y.'" font-size="'.$this->chart_options['min_max_font_size'].'">'.$min_max_text.'</text>';
-					}
+					$this_bar_output .= $this->min_max_labels($data, $this_bar_y);
 					
 					$this->bars_output_array[] = $this_bar_output;
 				
@@ -469,7 +480,6 @@ class charts
 					
 					$this->counter_array[] = '<text class="golsvg_counters" '.$force_counter_colour.' x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data['data'].'</text>';
 
-				
 					$data_series_counter++;
 					$last_bar_y = $this_bar_y;
 				}

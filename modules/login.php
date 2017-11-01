@@ -85,20 +85,20 @@ if (!isset($_POST['action']))
 		$code = $_GET['code'];
 
 		// check its a valid time
-		$db->sqlquery("SELECT `expires` FROM `password_reset` WHERE `user_email` = ?", array($email));
-		$get_time = $db->fetch();
-		if (time() > $get_time['expires'])
-		{
-			// drop any previous requested
-			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
-
-			$core->message("That reset request has expired, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
-		}
+		$get_time = $dbl->run("SELECT `user_email`, `expires` FROM `password_reset` WHERE `user_email` = ? AND `secret_code` = ?", array($email, $code))->fetch();
 
 		// check code and email is valid
-		else if ($db->num_rows($db->sqlquery("SELECT `user_email` FROM `password_reset` WHERE `user_email` = ? AND `secret_code` = ?", array($email, $code))) != 1)
+		if (!$get_time)
 		{
 			$core->message("That is not a correct password reset request, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
+		}
+
+		else if (time() > $get_time['expires'])
+		{
+			// drop any previous requested
+			$dbl->run("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
+
+			$core->message("That reset request has expired, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
 		}
 
 		else
@@ -184,8 +184,8 @@ else if (isset($_POST['action']))
 	else if ($_POST['action'] == 'Send')
 	{
 		// check if user exists
-		$db->sqlquery("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['email']));
-		if ($db->num_rows() == 0)
+		$check_res = $dbl->run("SELECT `email` FROM `users` WHERE `email` = ?", array($_POST['email']))->fetch();
+		if (!$check_res)
 		{
 			header("Location: ".$core->config('website_url')."index.php?module=login&forgot&bademail");
 		}
@@ -195,13 +195,13 @@ else if (isset($_POST['action']))
 			$random_string = core::random_id();
 
 			// drop any previous requested
-			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($_POST['email']));
+			$dbl->run("DELETE FROM `password_reset` WHERE `user_email` = ?", array($_POST['email']));
 
 			// make expiry 7 days from now
 			$next_week = time() + (7 * 24 * 60 * 60);
 
 			// insert number to database with email
-			$db->sqlquery("INSERT INTO `password_reset` SET `user_email` = ?, `secret_code` = ?, `expires` = ?", array($_POST['email'], $random_string, $next_week));
+			$dbl->run("INSERT INTO `password_reset` SET `user_email` = ?, `secret_code` = ?, `expires` = ?", array($_POST['email'], $random_string, $next_week));
 
 			$url_email = rawurlencode($_POST['email']);
 
@@ -230,45 +230,42 @@ else if (isset($_POST['action']))
 		$code = $_GET['code'];
 
 		// check its a valid time
-		$get_time = $db->fetch($db->sqlquery("SELECT `expires` FROM `password_reset` WHERE `user_email` = ?", array($email)));
-		if (time() > $get_time['expires'])
+		$get_time = $dbl->run("SELECT `user_email`, `expires` FROM `password_reset` WHERE `user_email` = ? AND `secret_code` = ?", array($email, $code))->fetch();
+		
+		// check code and email is valid
+		if (!$get_time)
+		{
+			$core->message("That is not a correct password reset request, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
+		}
+		
+		else if (time() > $get_time['expires'])
 		{
 			// drop any previous requested
-			$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
-
-			$core->message("That reset request has expired, you will need to <a href=\"".$core->config('website_url')."/index.php?module=login&forgot\">request a new code!</a>");
+			$dbl->run("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
+		
+			$core->message("That reset request has expired, you will need to <a href=\"/index.php?module=login&forgot\">request a new code!</a>");
 		}
 
 		else
 		{
-			// check code and email is valid
-			$db->sqlquery("SELECT `user_email` FROM `password_reset` WHERE `user_email` = ? AND `secret_code` = ?", array($email, $code));
-			if ($db->num_rows() != 1)
+			// check the passwords match
+			if ($_POST['password'] != $_POST['password_again'])
 			{
-				$core->message("That is not a correct password reset request! <a href=\"".$core->config('website_url')."index.php?module=login\">Go back.</a>");
+				$core->message("The new passwords didn't match! <a href=\"".$core->config('website_url')."index.php?module=login\">Go back.</a>");
 			}
 
+			// change the password
 			else
 			{
-				// check the passwords match
-				if ($_POST['password'] != $_POST['password_again'])
-				{
-					$core->message("The new passwords didn't match! <a href=\"".$core->config('website_url')."index.php?module=login\">Go back.</a>");
-				}
+				$new_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
-				// change the password
-				else
-				{
-					$new_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+				// new password
+				$dbl->run("UPDATE `users` SET `password` = ? WHERE `email` = ?", array($new_password, $email));
 
-					// new password
-					$db->sqlquery("UPDATE `users` SET `password` = ? WHERE `email` = ?", array($new_password, $email));
+				// drop any previous requested
+				$dbl->run("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
 
-					// drop any previous requested
-					$db->sqlquery("DELETE FROM `password_reset` WHERE `user_email` = ?", array($email));
-
-					$core->message("Your password has been updated! <a href=\"".$core->config('website_url')."index.php?module=login\">Click here to now login.</a>");
-				}
+				$core->message("Your password has been updated! <a href=\"".$core->config('website_url')."index.php?module=login\">Click here to now login.</a>");
 			}
 		}
 	}

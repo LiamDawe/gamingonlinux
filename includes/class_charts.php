@@ -316,10 +316,11 @@ class charts
 		$this->chart_end_x = $this->chart_bar_start_x + $this->actual_chart_space + $this->chart_options['label_left_padding'] + $this->chart_options['label_right_padding'];
 	}
 
+	// sort out including min/max values (if any)
 	function min_max_labels($data, $bar_y)
 	{
 		$return_data = '';
-		// sort out including min/max values
+		
 		$min_max_y = $bar_y + $this->chart_options['min_max_font_size'] + $this->chart_options['min_max_y_padding'];
 		$min_max_x = $this->bars_x_start + $this->chart_options['min_max_x_padding'];
 		$min_max_text = NULL;

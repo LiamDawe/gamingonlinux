@@ -5,12 +5,10 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$cat_array = array();
-
 if(isset($_GET['q']))
 {
-	$db->sqlquery("SELECT `id`, `name` FROM `game_genres` WHERE `name` LIKE ? ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'));
-	$get_data = $db->fetch_all_rows();
+	$get_data = $dbl->run("SELECT `id`, `name` FROM `game_genres` WHERE `name` LIKE ? ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();
+
 	// Make sure we have a result
 	if(count($get_data) > 0)
 	{

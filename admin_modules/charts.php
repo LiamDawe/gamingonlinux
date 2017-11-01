@@ -237,11 +237,28 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				// sort the data out for normal charts
 				else
 				{
-					$data_key = $key+1;
-					$data = $_POST['data-'.$data_key];
-					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $data));
-					
-					$core->message("Data $data added!");
+					$data = preg_split('/(\\n|\\r)/', $_POST['data-'.$label_counter], -1, PREG_SPLIT_NO_EMPTY);
+					// put in the data
+					foreach ($data as $dat)
+					{
+						$data_series = explode(',',$dat);
+						
+						$min = NULL;
+						if (isset($data_series[1]) && is_numeric($data_series[1]))
+						{
+							$min = $data_series[1];
+						}
+						
+						$max = NULL;
+						if (isset($data_series[2]) && is_numeric($data_series[2]))
+						{
+							$max = $data_series[2];
+						}
+						
+						$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `min` = ?, `max` = ?", array($new_chart_id, $new_label_id, $data_series[0], $min, $max));
+
+						$core->message("Data $dat added!");
+					}
 				}
 
 				$core->message("Label $label and it's data added!");

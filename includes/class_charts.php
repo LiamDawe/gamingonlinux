@@ -517,15 +517,11 @@ class charts
 	// this is a start to extract the extra needed for stat charts, so they can eventually use the same functions as normal charts
 	function stat_chart_old($last_id)
 	{
-		global $db;
-		
-		$db->sqlquery("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($last_id));
-		$this->chart_info_old = $db->fetch();
+		$this->chart_info_old = $this->database->run("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($last_id))->fetch();
 
 		// set the right labels to the right data (OLD DATA)
 		$labels_old = [];
-		$db->sqlquery("SELECT l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ", array($last_id));
-		$this->get_labels_old = $db->fetch_all_rows();
+		$this->get_labels_old = $this->database->run("SELECT l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ", array($last_id))->fetch_all();
 	}
 	
 	function stat_chart($id, $last_id = '', $custom_options)

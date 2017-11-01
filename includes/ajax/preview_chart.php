@@ -3,8 +3,6 @@ session_start();
 
 define("APP_ROOT", dirname (dirname ( dirname(__FILE__) )));
 
-$db_conf = include APP_ROOT . '/includes/config.php';
-
 require APP_ROOT . "/includes/bootstrap.php";
 
 $charts = new charts($dbl);
@@ -59,6 +57,42 @@ foreach ($_POST['labels'] as $key => $label)
 			$preview_data[$last_id]['min'] = $min;
 			$preview_data[$last_id]['max'] = $max;
 			$preview_data[$last_id]['data_series'] = trim($data_series[1]);
+			
+			unset($min);
+			unset($max);
+		}
+	}
+	else
+	{
+		$data = preg_split('/(\\n|\\r)/', $_POST['data-'.$label_counter], -1, PREG_SPLIT_NO_EMPTY);
+		// put in the data
+		foreach ($data as $dat)
+		{
+			$data_series = explode(',',$dat);
+			
+			$total = $data_series[0] + 0;
+			$total = bcdiv($total, 1, 2);
+						
+			$min = NULL;
+			if (isset($data_series[1]) && is_numeric($data_series[1]))
+			{
+				$min = $data_series[1] + 0;
+				$min = bcdiv($min, 1, 2);
+			}
+						
+			$max = NULL;
+			if (isset($data_series[2]) && is_numeric($data_series[2]))
+			{
+				$max = $data_series[2] + 0;
+				$max = bcdiv($max, 1, 2);
+			}
+			
+			$preview_data[]['name'] = $label;
+			end($preview_data);
+			$last_id=key($preview_data);
+			$preview_data[$last_id]['data'] = $total;
+			$preview_data[$last_id]['min'] = $min;
+			$preview_data[$last_id]['max'] = $max;
 			
 			unset($min);
 			unset($max);

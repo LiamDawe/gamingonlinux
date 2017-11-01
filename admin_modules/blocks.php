@@ -42,15 +42,15 @@ else
 
 			if (!isset($_GET['usercp']))
 			{
-				$get_blocks = $db->sqlquery("SELECT * FROM `blocks` ORDER BY `order` ASC");
+				$get_blocks = $dbl->run("SELECT * FROM `blocks` ORDER BY `order` ASC")->fetch_all();
 			}
 
 			else
 			{
-				$get_blocks = $db->sqlquery("SELECT * FROM `usercp_blocks` ORDER BY `order` ASC");
+				$get_blocks = $dbl->run("SELECT * FROM `usercp_blocks` ORDER BY `order` ASC")->fetch_all();
 			}
 
-			while ($blocks = $db->fetch($get_blocks))
+			foreach ($get_blocks as $blocks)
 			{
 				if ($blocks['block_link'] != NULL)
 				{
@@ -191,13 +191,12 @@ else
 				}
 
 				// get last order
-				$db->sqlquery("SELECT `order` FROM `blocks` ORDER BY `order` DESC LIMIT 1");
-				$get_order = $db->fetch();
+				$get_order = $dbl->run("SELECT `order` FROM `blocks` ORDER BY `order` DESC LIMIT 1")->fetch();
 
 				$new_order = $get_order['order'] + 1;
 
 				// create block
-				$db->sqlquery("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `activated` = ?, `block_custom_content` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ?, `order` = ?", array($_POST['name'], $title, $_POST['link'], $activated, $text, $_POST['style'], $nonpremium, $homepage, $new_order));
+				$dbl->run("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `activated` = ?, `block_custom_content` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ?, `order` = ?", array($_POST['name'], $title, $_POST['link'], $activated, $text, $_POST['style'], $nonpremium, $homepage, $new_order));
 
 				$core->message('You have succesfully made the new block! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=add">Create another block</a>?');
 			}
@@ -227,13 +226,12 @@ else
 				}
 
 				// get last in order to add 1
-				$db->sqlquery("SELECT `order` FROM `{$type}blocks` ORDER BY `order` DESC LIMIT 1");
-				$order = $db->fetch();
+				$order = $dbl->run("SELECT `order` FROM `{$type}blocks` ORDER BY `order` DESC LIMIT 1")->fetch();
 
 				$new_order = $order['order'] + 1;
 
 				// create block
-				$db->sqlquery("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_link` = ?, `activated` = ?, `order` = ?", array($_POST['name'], $type . "block_" . $_POST['file'], $activated, $new_order));
+				$dbl->run("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_link` = ?, `activated` = ?, `order` = ?", array($_POST['name'], $type . "block_" . $_POST['file'], $activated, $new_order));
 
 				$core->message("You have succesfully added the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage&{$_POST['type']}\">Manage blocks</a>?");
 			}
@@ -277,7 +275,7 @@ else
 					}
 
 					// update
-					$db->sqlquery("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_link` = ?, `activated` = ? WHERE `block_id` = ?", array($name, $title, $_POST['link'], $_POST['filename'], $activated, $id));
+					$dbl->run("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_link` = ?, `activated` = ? WHERE `block_id` = ?", array($name, $title, $_POST['link'], $_POST['filename'], $activated, $id));
 
 					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
 				}
@@ -332,7 +330,7 @@ else
 					}
 
 					// update
-					$db->sqlquery("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_custom_content` = ?, `activated` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ? WHERE `block_id` = ?", array($_POST['name'], $title, $_POST['link'], $text, $activated, $_POST['style'], $nonpremium, $homepage, $id));
+					$dbl->run("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_custom_content` = ?, `activated` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ? WHERE `block_id` = ?", array($_POST['name'], $title, $_POST['link'], $text, $activated, $_POST['style'], $nonpremium, $homepage, $id));
 
 					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
 				}
@@ -377,8 +375,8 @@ else
 				else
 				{
 					// check block exists
-					$db->sqlquery("SELECT `block_id` FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id));
-					if ($db->num_rows() != 1)
+					$check_res = $dbl->run("SELECT `block_id` FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id))->fetch();
+					if (!$check_res)
 					{
 						$core->message('That is not a correct id!');
 					}
@@ -386,7 +384,7 @@ else
 					// Delete now
 					else
 					{
-						$db->sqlquery("DELETE FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id));
+						$dbl->run("DELETE FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id));
 
 						$core->message('That block has now been deleted! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=manage">Manage another block</a>?');
 					}

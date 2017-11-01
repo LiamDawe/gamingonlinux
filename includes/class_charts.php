@@ -324,11 +324,11 @@ class charts
 		$min_max_x = $this->bars_x_start + $this->chart_options['min_max_x_padding'];
 		$min_max_text = NULL;
 					
-		if ($data['min'] != NULL && $data['min'] > 0)
+		if (isset($data['min']) && $data['min'] != NULL && $data['min'] > 0)
 		{
 			$min_max_text = 'Min: '.$data['min'];	
 		}
-		if ($data['max'] != NULL && $data['max'] > 0)
+		if (isset($data['max']) && $data['max'] != NULL && $data['max'] > 0)
 		{
 			// if we already have a min value, add a seperator
 			if ($min_max_text != NULL)

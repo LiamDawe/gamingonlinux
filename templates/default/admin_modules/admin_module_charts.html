@@ -62,6 +62,8 @@
 			<input type="text" name="name" value="{:name}"/><br />
 			Chart subtitle:<br />
 			<input type="text" name="sub_title" value="{:sub_title}"/><br />
+			Horizontal Axis Label (bottom of the chart):<br />
+			<input type="text" name="h_label" value="{:h_label}" /><br />
 			<label><input type="checkbox" name="order_by_data" {:data_order_check}> Order by data? (If unchecked, order goes by the labels as they are entered!)</label>
 			<input type="hidden" name="chart_id" value="{:chart_id}" />
 			<button type="submit" name="act" value="edit_chart" formaction="/admin.php?module=charts">Edit Chart</button>

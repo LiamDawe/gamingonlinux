@@ -101,7 +101,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	if ($_GET['view'] == 'edit')
 	{
 		$chart_id = (int) $_GET['id'];
-		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
+		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data`, `h_label` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
 		
 		if ($chart_info)
 		{
@@ -128,6 +128,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('chart_id', $chart_id);
 			$templating->set('name', $chart_info['name']);
 			$templating->set('sub_title', $chart_info['sub_title']);
+			$templating->set('h_label', $chart_info['h_label']);
 		}
 		else
 		{
@@ -345,6 +346,12 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		{
 			$enabled_check = 1;
 		}
+
+		$h_label = NULL;
+		if (isset($_POST['h_label']) && !empty($_POST['h_label']))
+		{
+			$h_label = $_POST['h_label'];
+		}
 		
 		$order_by_data = 0;
 		if (isset($_POST['order_by_data']))
@@ -364,7 +371,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			die();
 		}
 		
-		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ?, `order_by_data` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $order_by_data, $chart_id));
+		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ?, `order_by_data` = ?, `h_label` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $order_by_data, $h_label, $chart_id));
 		
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'chart';

@@ -485,8 +485,7 @@ if (!isset($_GET['go']))
 							{
 								if (!isset($_SESSION['activated']))
 								{
-									$db->sqlquery("SELECT `activated` FROM `users` WHERE `user_id` = ?", array((int) $_SESSION['user_id']));
-									$get_active = $db->fetch();
+									$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array((int) $_SESSION['user_id']))->fetch();
 									$_SESSION['activated'] = $get_active['activated'];
 								}
 
@@ -577,9 +576,8 @@ else if (isset($_GET['go']))
 
 			$correction = core::make_safe($correction, ENT_QUOTES);
 
-			// get article name for the email and redirect
-			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['article_id']));
-			$title = $db->fetch();
+			// get article name for the redirect
+			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['article_id']))->fetch();
 			
 			$article_link = $article_class->get_link($_POST['article_id'], $title['slug']);
 
@@ -593,11 +591,11 @@ else if (isset($_GET['go']))
 				die();
 			}
 
-			$db->sqlquery("INSERT INTO `article_corrections` SET `article_id` = ?, `date` = ?, `user_id` = ?, `correction_comment` = ?", array((int) $_POST['article_id'], core::$date, $_SESSION['user_id'], $correction));
+			$dbl->run("INSERT INTO `article_corrections` SET `article_id` = ?, `date` = ?, `user_id` = ?, `correction_comment` = ?", array((int) $_POST['article_id'], core::$date, $_SESSION['user_id'], $correction));
 
-			$correction_id = $db->grab_id();
+			$correction_id = $dbl->new_id();
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `type` = ?, `data` = ?, `completed` = 0", array((int) $_SESSION['user_id'], core::$date, 'article_correction', $correction_id));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `type` = ?, `data` = ?, `completed` = 0", array((int) $_SESSION['user_id'], core::$date, 'article_correction', $correction_id));
 
 			$_SESSION['message'] = 'tip_sent';
 			header("Location: " . $article_link);
@@ -704,14 +702,10 @@ else if (isset($_GET['go']))
 							
 						$new_comment_id = $dbl->new_id();
 							
-						// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
-						$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article_id));
-						if ($db->num_rows() == 1)
+						// if they aren't keeping a subscription
+						if (!isset($_POST['subscribe']))
 						{
-							if (!isset($_POST['subscribe']))
-							{
-								$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article_id));
-							}
+							$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article_id));
 						}
 
 						if ($approved == 1)
@@ -739,9 +733,8 @@ else if (isset($_GET['go']))
 							- Make an array of anyone who needs an email now
 							- Additionally, send a notification to anyone subscribed
 							*/
-							$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']));
+							$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']))->fetch_all();
 							$users_array = array();
-							$users_to_email = $db->fetch_all_rows();
 							foreach ($users_to_email as $email_user)
 							{
 								// gather list
@@ -751,7 +744,7 @@ else if (isset($_GET['go']))
 									if (empty($email_user['secret_key']))
 									{
 										$secret_key = core::random_id(15);
-										$db->sqlquery("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $email_user['user_id'], $article_id));
+										$dbl->run("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $email_user['user_id'], $article_id));
 									}
 									else
 									{
@@ -768,25 +761,24 @@ else if (isset($_GET['go']))
 								// notify them, if they haven't been quoted and already given one
 								if (!in_array($email_user['username'], $new_notification_id['quoted_usernames']))
 								{
-									$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($article_id, $email_user['user_id']));
-									$check_exists = $db->num_rows();
-									$get_note_info = $db->fetch();
-									if ($check_exists == 0)
+									$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($article_id, $email_user['user_id']))->fetch();
+
+									if (!$get_note_info)
 									{
-										$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
-										$new_notification_id[$email_user['user_id']] = $db->grab_id();
+										$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
+										$new_notification_id[$email_user['user_id']] = $dbl->new_id();
 									}
-									else if ($check_exists == 1)
+									else if ($get_note_info)
 									{
 										// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
 										if ($get_note_info['seen'] == 1)
 										{
-											$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
+											$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
 										}
 										// they haven't seen this note before, so add one to the counter and update the date
 										else if ($get_note_info['seen'] == 0)
 										{
-											$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
+											$dbl->run("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
 										}
 										$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
 									}
@@ -867,8 +859,7 @@ else if (isset($_GET['go']))
 			die();
 		}
 		
-		$db->sqlquery("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
-		$comment = $db->fetch();
+		$comment = $dbl->run("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
 
 		$article_link = $article_class->get_link($comment['article_id'], $comment['slug'], '#comments');
 
@@ -902,20 +893,20 @@ else if (isset($_GET['go']))
 					// this comment was reported as spam but as its now deleted remove the notification
 					if ($comment['spam'] == 1)
 					{
-						$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'reported_comment'", array(core::$date, (int) $_GET['comment_id']));
+						$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'reported_comment'", array(core::$date, (int) $_GET['comment_id']));
 					}
 
-					$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, 'comment_deleted', core::$date, (int) $_GET['comment_id'], $comment['comment_text']));
+					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, 'comment_deleted', core::$date, (int) $_GET['comment_id'], $comment['comment_text']));
 
-					$db->sqlquery("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
-					$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array((int) $_GET['comment_id']));
-					$db->sqlquery("DELETE FROM `likes` WHERE `data_id` = ?", array((int) $_GET['comment_id']));
+					$dbl->run("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
+					$dbl->run("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array((int) $_GET['comment_id']));
+					$dbl->run("DELETE FROM `likes` WHERE `data_id` = ?", array((int) $_GET['comment_id']));
 
 					// update notifications
 
 					// find any notifications caused by the deleted comment
-					$db->sqlquery("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `is_like` = 0 AND `article_id` = ?", array($comment['article_id']));
-					$current_notes = $db->fetch_all_rows();
+					$current_notes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `is_like` = 0 AND `article_id` = ?", array($comment['article_id']))->fetch_all();
+
 					foreach ($current_notes as $this_note)
 					{
 						// if this wasn't the only comment made for that notification
@@ -925,8 +916,7 @@ else if (isset($_GET['go']))
 							if ($this_note['comment_id'] == $_GET['comment_id'])
 							{
 								// find the last available comment
-								$db->sqlquery("SELECT `author_id`, `comment_id`, `time_posted` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `time_posted` DESC LIMIT 1", array($this_note['article_id']));
-								$last_comment = $db->fetch();
+								$last_comment = $dbl->run("SELECT `author_id`, `comment_id`, `time_posted` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `time_posted` DESC LIMIT 1", array($this_note['article_id']))->fetch();
 
 								$seen = '';
 
@@ -940,15 +930,15 @@ else if (isset($_GET['go']))
 									$seen = 1;
 								}
 
-								$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($last_comment['time_posted'], $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
+								$dbl->run("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($last_comment['time_posted'], $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
 							}
 							// no matter what we need to adjust the counter
-							$db->sqlquery("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
+							$dbl->run("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
 						}
 						// it's the only comment they were notified about, so just delete the notification to completely remove it
 						else if ($this_note['total'] == 1)
 						{
-							$db->sqlquery("DELETE FROM `user_notifications` WHERE `id` = ?", array($this_note['id']));
+							$dbl->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($this_note['id']));
 						}
 					}
 
@@ -963,8 +953,7 @@ else if (isset($_GET['go']))
 		$article_class->subscribe($_GET['article_id']);
 
 		// get info for title
-		$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
-		$title = $db->fetch();
+		$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
 		$title = core::nice_title($title['title']);
 
 		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
@@ -975,8 +964,7 @@ else if (isset($_GET['go']))
 		$article_class->unsubscribe($_GET['article_id']);
 
 		// get info for title
-		$db->sqlquery("SELECT `title` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
-		$title = $db->fetch();
+		$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
 		$title = core::nice_title($title['title']);
 
 		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
@@ -989,8 +977,7 @@ else if (isset($_GET['go']))
 			$templating->set_previous('title', 'Reporting a comment', 1);
 
 			// show the comment they are reporting
-			$db->sqlquery("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN `users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']));
-			$comment = $db->fetch();
+			$comment = $dbl->run("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN `users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
 			$templating->block('report', 'articles_full');
 			$templating->set('text', $bbcode->parse_bbcode($comment['comment_text']));
 
@@ -1004,8 +991,7 @@ else if (isset($_GET['go']))
 		else if (isset($_POST['no']))
 		{
 			// get info for title
-			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
-			$title = $db->fetch();
+			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
 			
 			$article_link = $article_class->get_link($_GET['article_id'], $title['slug'], '#comments');
 
@@ -1017,14 +1003,13 @@ else if (isset($_GET['go']))
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
 				// update admin notifications
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], 'reported_comment', core::$date, (int) $_GET['comment_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], 'reported_comment', core::$date, (int) $_GET['comment_id']));
 
-				$db->sqlquery("UPDATE `articles_comments` SET `spam` = 1, `spam_report_by` = ? WHERE `comment_id` = ?", array((int) $_SESSION['user_id'], (int) $_GET['comment_id']));
+				$dbl->run("UPDATE `articles_comments` SET `spam` = 1, `spam_report_by` = ? WHERE `comment_id` = ?", array((int) $_SESSION['user_id'], (int) $_GET['comment_id']));
 			}
 
 			// get info for title
-			$db->sqlquery("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
-			$title = $db->fetch();
+			$title = $dbl->run("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
 			
 			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
 
@@ -1040,8 +1025,7 @@ else if (isset($_GET['go']))
 		if ($user->check_group([1,2]) == true)
 		{
 			// get info for title
-			$db->sqlquery("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
-			$title = $db->fetch();
+			$title = $dbl->run("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
 			
 			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
 
@@ -1054,10 +1038,10 @@ else if (isset($_GET['go']))
 
 			else
 			{
-				$db->sqlquery("UPDATE `articles` SET `comments_open` = 1 WHERE `article_id` = ?", array((int) $_GET['article_id']));
+				$dbl->run("UPDATE `articles` SET `comments_open` = 1 WHERE `article_id` = ?", array((int) $_GET['article_id']));
 			}
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], core::$date, 'opened_comments', core::$date, (int) $_GET['article_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], core::$date, 'opened_comments', core::$date, (int) $_GET['article_id']));
 
 			$_SESSION['message'] = 'comments_opened';
 			header("Location: ".$article_link);
@@ -1075,8 +1059,7 @@ else if (isset($_GET['go']))
 		if ($user->check_group([1,2]) == true)
 		{
 			// get info for title
-			$db->sqlquery("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']));
-			$title = $db->fetch();
+			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
 			
 			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
 
@@ -1089,10 +1072,10 @@ else if (isset($_GET['go']))
 
 			else
 			{
-				$db->sqlquery("UPDATE `articles` SET `comments_open` = 0 WHERE `article_id` = ?", array((int) $_GET['article_id']));
+				$dbl->run("UPDATE `articles` SET `comments_open` = 0 WHERE `article_id` = ?", array((int) $_GET['article_id']));
 			}
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], core::$date, 'closed_comments', core::$date, (int) $_GET['article_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], core::$date, 'closed_comments', core::$date, (int) $_GET['article_id']));
 
 			$_SESSION['message'] = 'comments_closed';
 			header("Location: ".$article_link);

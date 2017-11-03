@@ -9,11 +9,11 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
 	{
-		$topics = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0");
-		$topic_counter = $db->num_rows();
-		if ($topic_counter > 0)
+		$topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0")->fetch_all();
+
+		if ($topics)
 		{
-			while ($results = $topics->fetch())
+			foreach ($topics as $results)
 			{
 				$templating->block('approve_forum', 'admin_modules/mod_queue');
 				$templating->set('mod_type', 'Forum Topic');
@@ -29,12 +29,11 @@ if (isset($_GET['view']))
 			}
 		}
 
-		$replies = $db->sqlquery("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0");
-		$reply_counter = $db->num_rows();
+		$replies = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0")->fetch_all();
 
-		if ($reply_counter > 0)
+		if ($replies)
 		{
-			while ($results = $replies->fetch())
+			foreach ($replies as $results)
 			{
 				$templating->block('approve_forum', 'admin_modules/mod_queue');
 				$templating->set('mod_type', 'Forum Reply');
@@ -88,16 +87,16 @@ if (isset($_POST['action']))
 	{
 		if ($_POST['type'] == 'forum_topic')
 		{
-			$db->sqlquery("SELECT `approved` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
-			$find_approval = $db->fetch();
+			$find_approval = $dbl->run("SELECT `approved` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']))->fetch();
+
 			if ($find_approval['approved'] == 0)
 			{
-				$db->sqlquery("UPDATE `forum_topics` SET `approved` = 1, `creation_date` = ? WHERE `topic_id` = ?", array(core::$date, $_POST['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `approved` = 1, `creation_date` = ? WHERE `topic_id` = ?", array(core::$date, $_POST['topic_id']));
 
-				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
+				$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
 
-				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
+				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
 				$_SESSION['message'] = 'accepted';
 				$_SESSION['message_extra'] = 'post';
@@ -115,27 +114,25 @@ if (isset($_POST['action']))
 
 		else if ($_POST['type'] == 'forum_reply')
 		{
-			$db->sqlquery("SELECT `approved`, `reply_text` FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
-			$find_post = $db->fetch();
+			$find_post = $dbl->run("SELECT `approved`, `reply_text` FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']))->fetch();
 			if ($find_post['approved'] == 0)
 			{
-				$db->sqlquery("UPDATE `forum_replies` SET `approved` = 1, `creation_date` = ? WHERE `post_id` = ?", array(core::$date, $_POST['post_id']));
+				$dbl->run("UPDATE `forum_replies` SET `approved` = 1, `creation_date` = ? WHERE `post_id` = ?", array(core::$date, $_POST['post_id']));
 
-				$db->sqlquery("UPDATE `forum_topics` SET `last_post_date` = ?, `last_post_id` = ?, `replys` = (replys + 1) WHERE `topic_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `last_post_date` = ?, `last_post_id` = ?, `replys` = (replys + 1) WHERE `topic_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id']));
 
-				$db->sqlquery("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
+				$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
 
-				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_reply'", array(core::$date, $_POST['post_id']));
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_reply_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
+				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_reply'", array(core::$date, $_POST['post_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_reply_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
 
 				// get article name for the email and redirect
-				$db->sqlquery("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
-				$topic_info = $db->fetch();
+				$topic_info = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']))->fetch();
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']));
+				$email_res = $dbl->run("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']))->fetch_all();
 				$users_array = array();
-				while ($users = $db->fetch())
+				foreach ($email_res as $users)
 				{
 					if ($users['user_id'] != $_POST['author_id'] && $users['emails'] == 1)
 					{
@@ -145,8 +142,7 @@ if (isset($_POST['action']))
 					}
 				}
 
-				$db->sqlquery("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
-				$author_username = $db->fetch();
+				$author_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
 
 				// send the emails
 				foreach ($users_array as $email_user)
@@ -176,28 +172,26 @@ if (isset($_POST['action']))
 					}
 
 					// remove anyones send_emails subscription setting if they have it set to email once
-					$db->sqlquery("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']));
-					$update_sub = $db->fetch();
+					$update_sub = $dbl->run("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']))->fetch();
 
 					if ($update_sub['email_options'] == 2)
 					{
-						$db->sqlquery("UPDATE `forum_topics_subscriptions` SET `send_email` = 0 WHERE `topic_id` = ? AND `user_id` = ?", array($_POST['topic_id'], $email_user['user_id']));
+						$dbl->run("UPDATE `forum_topics_subscriptions` SET `send_email` = 0 WHERE `topic_id` = ? AND `user_id` = ?", array($_POST['topic_id'], $email_user['user_id']));
 					}
 				}
 
 				// update their post counter
-				$db->sqlquery("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
+				$dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
 
 				// add 1 to their approval rating
-				$db->sqlquery("SELECT `mod_approved` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
-				$user_get = $db->fetch();
+				$user_get = $dbl->run("SELECT `mod_approved` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
 
 				// remove them from the mod queue if we need to
 				if ($user_get['mod_approved'] >= 2)
 				{
-					$db->sqlquery("UPDATE `users` SET `in_mod_queue` = 0 WHERE `user_id` = ?", array($_POST['author_id']));
+					$dbl->run("UPDATE `users` SET `in_mod_queue` = 0 WHERE `user_id` = ?", array($_POST['author_id']));
 				}
-				$db->sqlquery("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
+				$dbl->run("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `forum_posts` = (forum_posts + 1) WHERE `user_id` = ?", array($_POST['author_id']));
 
 				$_SESSION['message'] = 'accepted';
 				$_SESSION['message_extra'] = 'post';
@@ -228,11 +222,11 @@ if (isset($_POST['action']))
 				// remove them from the mod queue if we need to
 				if ($user_get['mod_approved'] >= 2)
 				{
-					$db->sqlquery("UPDATE `users` SET `in_mod_queue` = 0 WHERE `user_id` = ?", [$_POST['author_id']]);
+					$dbl->run("UPDATE `users` SET `in_mod_queue` = 0 WHERE `user_id` = ?", [$_POST['author_id']]);
 				}
 				
 				// update their approved count and comment count
-				$db->sqlquery("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `comment_count` = (comment_count + 1) WHERE `user_id` = ?", [$_POST['author_id']]);
+				$dbl->run("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `comment_count` = (comment_count + 1) WHERE `user_id` = ?", [$_POST['author_id']]);
 
 				$new_notification_id = $article_class->quote_notification($approved['comment_text'], $approved['username'], $_POST['author_id'], $approved['article_id'], $_POST['post_id']);
 				
@@ -240,9 +234,8 @@ if (isset($_POST['action']))
 				- Make an array of anyone who needs an email now
 				- Additionally, send a notification to anyone subscribed
 				*/
-				$db->sqlquery("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($approved['article_id'], $_POST['author_id']));
+				$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($approved['article_id'], $_POST['author_id']))->fetch_all();
 				$users_array = array();
-				$users_to_email = $db->fetch_all_rows();
 				foreach ($users_to_email as $email_user)
 				{
 					// gather list
@@ -252,7 +245,7 @@ if (isset($_POST['action']))
 						if (empty($email_user['secret_key']))
 						{
 							$secret_key = core::random_id(15);
-							$db->sqlquery("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $email_user['user_id'], $approved['article_id']));
+							$dbl->run("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $email_user['user_id'], $approved['article_id']));
 						}
 						else
 						{
@@ -269,25 +262,24 @@ if (isset($_POST['action']))
 					// notify them, if they haven't been quoted and already given one
 					if (!in_array($email_user['username'], $new_notification_id['quoted_usernames']))
 					{
-						$db->sqlquery("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($approved['article_id'], $email_user['user_id']));
-						$check_exists = $db->num_rows();
-						$get_note_info = $db->fetch();
-						if ($check_exists == 0)
+						$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($approved['article_id'], $email_user['user_id']))->fetch();
+
+						if (!$get_note_info)
 						{
-							$db->sqlquery("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'],  $_POST['author_id'], $approved['article_id'], $_POST['post_id']));
-							$new_notification_id[$email_user['user_id']] = $db->grab_id();
+							$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'],  $_POST['author_id'], $approved['article_id'], $_POST['post_id']));
+							$new_notification_id[$email_user['user_id']] = $dbl->new_id();
 						}
-						else if ($check_exists == 1)
+						else if ($get_note_info)
 						{
 							// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
 							if ($get_note_info['seen'] == 1)
 							{
-								$db->sqlquery("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_POST['author_id'], core::$date, $_POST['post_id'], $get_note_info['id']));
+								$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_POST['author_id'], core::$date, $_POST['post_id'], $get_note_info['id']));
 							}
 							// they haven't seen this note before, so add one to the counter and update the date
 							else if ($get_note_info['seen'] == 0)
 							{
-								$db->sqlquery("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
+								$dbl->run("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
 							}
 							$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
 						}
@@ -325,12 +317,12 @@ if (isset($_POST['action']))
 					// remove anyones send_emails subscription setting if they have it set to email once
 					if ($email_user['email_options'] == 2)
 					{
-						$db->sqlquery("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($approved['article_id'], $email_user['user_id']));
+						$dbl->run("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($approved['article_id'], $email_user['user_id']));
 					}
 				}
 				
-				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_comment'", array(core::$date, $_POST['post_id']));
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_comment_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
+				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_comment'", array(core::$date, $_POST['post_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_comment_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
 				
 				$_SESSION['message'] = 'accepted';
 				$_SESSION['message_extra'] = 'comment';
@@ -353,23 +345,23 @@ if (isset($_POST['action']))
 		if ($_POST['type'] == 'forum_topic')
 		{
 			// now we can remove the topic
-			$db->sqlquery("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
-			$db->sqlquery("DELETE FROM `forum_topics_subscriptions` WHERE `topic_id` = ?", array($_POST['topic_id']));
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
+			$dbl->run("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
+			$dbl->run("DELETE FROM `forum_topics_subscriptions` WHERE `topic_id` = ?", array($_POST['topic_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 		}
 		else if ($_POST['type'] == 'forum_reply')
 		{
 			// now we can remove the topic
-			$db->sqlquery("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_reply'", array(core::$date, $_POST['post_id']));
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
+			$dbl->run("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_reply'", array(core::$date, $_POST['post_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 		}
 		else if ($_POST['type'] == 'comment')
 		{
-			$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_POST['post_id']));
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_comment'", array(core::$date, $_POST['post_id']));
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_comment_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
+			$dbl->run("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_POST['post_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_comment'", array(core::$date, $_POST['post_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_comment_removed', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
 		}
 
 		$_SESSION['message'] = 'deleted';
@@ -384,30 +376,29 @@ if (isset($_POST['action']))
 		if ($_POST['type'] == 'forum_topic')
 		{
 			// now we can remove the topic
-			$db->sqlquery("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
+			$dbl->run("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
+			$dbl->runsqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
 		}
 		else if ($_POST['is_topic'] == 'forum_reply')
 		{
 			// now we can remove the topic
-			$db->sqlquery("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_reply'", array(core::$date, $_POST['post_id']));
+			$dbl->run("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_reply'", array(core::$date, $_POST['post_id']));
 		}
 		else if ($_POST['type'] == 'comment')
 		{
-			$db->sqlquery("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_POST['post_id']));
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_comment'", array(core::$date, $_POST['post_id']));
+			$dbl->run("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array($_POST['post_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue_comment'", array(core::$date, $_POST['post_id']));
 		}
 
 		// do the ban as well
-		$db->sqlquery("SELECT `ip` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
-		$get_ip = $db->fetch();
+		$get_ip = $dbl->run("SELECT `ip` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
 
-		$db->sqlquery("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_POST['author_id']));
+		$dbl->run("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_POST['author_id']));
 
-		$db->sqlquery("INSERT INTO `ipbans` SET `ip` = ?", array($get_ip['ip']));
+		$dbl->eun("INSERT INTO `ipbans` SET `ip` = ?", array($get_ip['ip']));
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed_ban', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
+		$dbl->eun("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed_ban', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
 		$_SESSION['message'] = 'deleted';
 		$_SESSION['message_extra'] = 'post';

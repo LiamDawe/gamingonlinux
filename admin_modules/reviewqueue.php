@@ -7,8 +7,8 @@ if (!isset($_GET['aid']))
 {
 	$templating->block('review_top', 'admin_modules/reviewqueue');
 
-	$db->sqlquery("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username, COUNT(c.comment_id) as comments_total FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_comments` c ON c.article_id = a.article_id WHERE a.`admin_review` = 1 GROUP BY a.article_id ");
-	while ($article = $db->fetch())
+	$art_res = $dbl->run("SELECT a.article_id, a.date, a.title, a.tagline, a.guest_username, u.username, COUNT(c.comment_id) as comments_total FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_comments` c ON c.article_id = a.article_id WHERE a.`admin_review` = 1 GROUP BY a.article_id ")->fetch_all();
+	foreach ($art_res as $article)
 	{
 		$templating->block('review_row', 'admin_modules/reviewqueue');
 		$templating->set('url', $core->config('website_url'));
@@ -53,30 +53,24 @@ else
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 	WHERE a.`article_id` = ?";
 
-	$db->sqlquery($query, array($_GET['aid']));
-
-	$article = $db->fetch();
+	$article = $dbl->run($query, array($_GET['aid']))->fetch();
 
 	if (isset($_GET['unlock']) && $article['locked'] == 1 && $_GET['unlock'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$db->sqlquery("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
+		$dbl->run("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
 
 		$core->message("You have unlocked the article for others to edit!");
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery($query, array($_GET['aid']), 'view_articles.php admin review');
-
-		$article = $db->fetch();
+		$article = $dbl->run($query, array($_GET['aid']))->fetch();
 	}
 
 	if ((isset($_GET['lock']) && $_GET['lock'] == 1) && $article['locked'] == 0)
 	{
-		$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
+		$dbl->run("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery($query, array($_GET['aid']), 'view_articles.php admin review');
-
-		$article = $db->fetch();
+		$article = $dbl->run($query, array($_GET['aid']))->fetch();
 	}
 
 	if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
@@ -84,9 +78,7 @@ else
 		$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", 1);
 
 		// we need to re-catch the article info as we have changed lock status
-		$db->sqlquery($query, array($_GET['aid']));
-
-		$article = $db->fetch();
+		$article = $dbl->run($query, array($_GET['aid']))->fetch();
 	}
 
 	$_SESSION['original_text'] = $article['text'];
@@ -155,15 +147,15 @@ else
 	$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.url.'admin.php?module=reviewqueue" enctype="multipart/form-data">');
 
 	// get categorys
-	$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
-	while($categories_check = $db->fetch())
+	$cur_res = $dbl->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
+	foreach ($cur_res as $categories_check)
 	{
 		$categories_check_array[] = $categories_check['category_id'];
 	}
 
 	$categorys_list = '';
-	$db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
-	while ($categorys = $db->fetch())
+	$all_res = $dbl->run("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+	foreach ($all_res as $categorys)
 	{
 		if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
 		{
@@ -229,10 +221,9 @@ else
 	if ($article['author_id'] == $_SESSION['user_id'])
 	{
 		$send_email = '';
-		$db->sqlquery("SELECT `user_id`,`send_email` FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
-		$check_sub = $db->fetch();
+		$check_sub = $dbl->run("SELECT `user_id`,`send_email` FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']))->fetch();
 
-		if ($db->num_rows() == 1)
+		if ($check_sub)
 		{
 			if ($check_sub['send_email'] == 1)
 			{
@@ -269,13 +260,7 @@ else
 	$templating->load('admin_modules/admin_module_comments');
 
 	// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
-	$db->sqlquery("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']));
-	$sub_exists = $db->num_rows();
-
-	if ($sub_exists == 1)
-	{
-		$check_current_sub = $db->fetch();
-	}
+	$check_current_sub = $dbl->run("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']))->fetch();
 
 	$subscribe_check = '';
 	if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
@@ -320,13 +305,13 @@ if (isset($_POST['act']))
 
 			$article_class->gallery_tagline($checked);
 
-			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
+			$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `locked` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
 			{
 				foreach($_SESSION['uploads'] as $key)
 				{
-					$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
+					$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
 				}
 			}
 
@@ -338,7 +323,7 @@ if (isset($_POST['act']))
 			}
 
 			// update history
-			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+			$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 			$article_class->reset_sessions();
@@ -347,8 +332,7 @@ if (isset($_POST['act']))
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$db->sqlquery("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']));
-				$author_email = $db->fetch();
+				$author_email = $dbl->run("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
 
 				// subject
 				$subject = 'Your article was reviewed and edited on GamingOnLinux';

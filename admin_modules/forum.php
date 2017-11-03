@@ -24,17 +24,17 @@ if (isset($_GET['view']))
 		$templating->block('forum_add');
 		$options = '';
 
-		$db->sqlquery("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 1 ORDER BY `order`");
+		$dis_res = $dbl->run("SELECT `forum_id`, `name` FROM `forums` WHERE `is_category` = 1 ORDER BY `order`")->fetch_all();
 
-		while ($display = $db->fetch())
+		foreach ($dis_res as $display)
 		{
 			$options .= "<option value=\"{$display['forum_id']}\">{$display['name']}</option>";
 		}
 
 		$templating->set('options', $options);
 
-		$db->sqlquery("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_id` DESC");
-		while ($groups = $db->fetch())
+		$gres = $dbl->run("SELECT `group_id`, `group_name` FROM `user_groups` ORDER BY `group_id` DESC")->fetch_all();
+		foreach ($gres as $groups)
 		{
 			$templating->block('forum_groups');
 			$templating->set('group_id', $groups['group_id']);
@@ -66,7 +66,7 @@ if (isset($_GET['view']))
 		ORDER BY
 			category.order, forum.order";
 
-		$query_forums = $db->sqlquery($sql);
+		$query_forums = $dbl->run($sql)->fetch_all();
 
 		// start the ids at 0
 		$current_category_id = 0;
@@ -75,7 +75,7 @@ if (isset($_GET['view']))
 		$forum_array = array();
 
 		// set the forum array so we can use it later and so we don't have to loop it just yet :)
-		while ( $row = $db->fetch($query_forums) )
+		foreach ($query_forums as  $row)
 		{
 			// make an array of categorys
 			if ($current_category_id != $row['CategoryId'])
@@ -133,19 +133,18 @@ if (isset($_GET['view']))
 		{
 			$templating->block('permissions_top');
 
-			$db->sqlquery("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_GET['forum_id']));
-			$name = $db->fetch();
+			$name = $dbl->run("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_GET['forum_id']))->fetch();
 
 			$templating->set('forum_name', $name['name']);
 
-			$db->sqlquery("SELECT
+			$g_res = $dbl->run("SELECT
 				g.*,
 				p.*
 			FROM
 				`user_groups` g INNER JOIN `forum_permissions` p ON g.group_id = p.group_id
 			WHERE
-				p.forum_id = ? AND g.group_id = p.group_id", array($_GET['forum_id']));
-			while ($groups = $db->fetch())
+				p.forum_id = ? AND g.group_id = p.group_id", array($_GET['forum_id']))->fetch_all();
+			foreach ($g_res as $groups)
 			{
 				// check if they can view the forum
 				$view = '';
@@ -243,8 +242,8 @@ if (isset($_GET['view']))
 
 		$templating->block('topic_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1");
-		while ($topic = $db->fetch())
+		$topic_res = $dbl->run("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1")->fetch_all();
+		foreach ($topic_res as $topic)
 		{
 			$templating->block('topic', 'admin_modules/admin_module_forum');
 			$templating->set('topic_title', $topic['topic_title']);
@@ -312,8 +311,8 @@ if (isset($_GET['view']))
 
 		$templating->block('reply_top', 'admin_modules/admin_module_forum');
 
-		$db->sqlquery("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, t.forum_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON p.author_id = u.user_id LEFT JOIN `users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1");
-		while ($topic = $db->fetch())
+		$topic_res = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`reported_by_id`, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, t.topic_title, t.topic_id, t.forum_id, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.avatar_gallery, u.gravatar_email FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON p.author_id = u.user_id LEFT JOIN `users` u2 ON p.reported_by_id = u2.user_id WHERE p.`reported` = 1")->fetch_all();
+		foreach ($topic_res as $topic)
 		{
 			$templating->block('reply', 'admin_modules/admin_module_forum');
 			$templating->set('topic_title', $topic['topic_title']);
@@ -369,8 +368,7 @@ if (isset($_GET['view']))
 	if ($_GET['view'] == 'removetopicreport')
 	{
 		// check its still reported first
-		$db->sqlquery("SELECT `reported` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-		$check = $db->fetch();
+		$check = $dbl->run("SELECT `reported` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 
 		if ($check['reported'] == 0)
 		{
@@ -380,10 +378,10 @@ if (isset($_GET['view']))
 
 		else
 		{
-			$db->sqlquery("UPDATE `forum_topics` SET `reported` = 0 WHERE `topic_id` = ?", array($_GET['topic_id']));
+			$dbl->run("UPDATE `forum_topics` SET `reported` = 0 WHERE `topic_id` = ?", array($_GET['topic_id']));
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_topic_report', $_GET['topic_id']));
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_topic_report', $_GET['topic_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_topic_report', $_GET['topic_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_topic_report', $_GET['topic_id']));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'report';
@@ -394,8 +392,7 @@ if (isset($_GET['view']))
 	if ($_GET['view'] == 'removereplyreport')
 	{
 		// check its still reported first
-		$db->sqlquery("SELECT `reported` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-		$check = $db->fetch();
+		$check = $dbl->run("SELECT `reported` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']))->fetch();
 
 		if ($check['reported'] == 0)
 		{
@@ -405,10 +402,10 @@ if (isset($_GET['view']))
 
 		else
 		{
-			$db->sqlquery("UPDATE `forum_replies` SET `reported` = 0 WHERE `post_id` = ?", array($_GET['post_id']));
+			$dbl->run("UPDATE `forum_replies` SET `reported` = 0 WHERE `post_id` = ?", array($_GET['post_id']));
 
-			$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_reply_report', $_GET['post_id']));
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_reply_report', $_GET['post_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_reply_report', $_GET['post_id']));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_reply_report', $_GET['post_id']));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'report';
@@ -455,21 +452,20 @@ else if (isset($_POST['act']))
 		$category = $_POST['category'];
 
 		// find the last order
-		$db->sqlquery("SELECT `order` FROM `forums` WHERE `is_category` = 0 AND `parent_id` = ? ORDER BY `order` DESC LIMIT 1", array($category));
-		$order = $db->fetch();
+		$order = $dbl->run("SELECT `order` FROM `forums` WHERE `is_category` = 0 AND `parent_id` = ? ORDER BY `order` DESC LIMIT 1", array($category))->fetch();
 
 		// find this forums order, which will be 1 after the last one
 		$order_now = $order['order'] + 1;
 
 		// make the actual forum
-		$db->sqlquery("INSERT INTO `forums` SET `name` = ?, `is_category` = '0', `description` = ?, `parent_id` = ?, `order` = ?", array($name, $description, $category, $order_now));
+		$dbl->run("INSERT INTO `forums` SET `name` = ?, `is_category` = '0', `description` = ?, `parent_id` = ?, `order` = ?", array($name, $description, $category, $order_now));
 
-		$last_id = $db->grab_id();
+		$last_id = $dbl->new_id();
 
 		// Get all IDs and sort them in an array
-		$db->sqlquery("SELECT `group_id` FROM `user_groups`");
+		$g_sort = $dbl->run("SELECT `group_id` FROM `user_groups`")->fetch_all();
 		$index = 0;
-		while ($group = $db->fetch())
+		foreach ($g_sort as $group)
 		{
 			$ids[$index] = $group['group_id'];
 			$index++;
@@ -588,7 +584,7 @@ else if (isset($_POST['act']))
 			}
 
 			// add permissions for this forum
-			$db->sqlquery("INSERT INTO `forum_permissions` SET `forum_id` = ?, `group_id` = ?, `can_view` = ?, `can_topic` = ?, `can_reply` = ?, `can_lock` = ?, `can_sticky` = ?, `can_delete` = ?, `can_delete_own` = ?, `can_avoid_floods` = ?, `can_move` = ?", array($last_id, $ids[$ind], $cv, $ct, $cr, $cl, $cs, $cd, $cdo, $cf, $cm));
+			$dbl->run("INSERT INTO `forum_permissions` SET `forum_id` = ?, `group_id` = ?, `can_view` = ?, `can_topic` = ?, `can_reply` = ?, `can_lock` = ?, `can_sticky` = ?, `can_delete` = ?, `can_delete_own` = ?, `can_avoid_floods` = ?, `can_move` = ?", array($last_id, $ids[$ind], $cv, $ct, $cr, $cl, $cs, $cd, $cdo, $cf, $cm));
 		}
 		$core->message("Forum {$name} added!");
 	}
@@ -606,7 +602,7 @@ else if (isset($_POST['act']))
 
 			else
 			{
-				$db->sqlquery("UPDATE `forums` SET `name` = ?, `order` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['category_id']));
+				$dbl->run("UPDATE `forums` SET `name` = ?, `order` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['category_id']));
 
 				$core->message("Category $name has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
 			}
@@ -617,8 +613,8 @@ else if (isset($_POST['act']))
 			if (isset($_POST['category_id']) && core::is_number($_POST['category_id']))
 			{
 				// check if it has forums
-				$db->sqlquery("SELECT `forum_id` FROM `forums` WHERE `parent_id` = ?", array($_POST['category_id']));
-				if ($db->num_rows() > 0)
+				$check_forums = $dbl->run("SELECT `forum_id` FROM `forums` WHERE `parent_id` = ?", array($_POST['category_id']))->fetch();
+				if ($check_forums)
 				{
 					$core->message('You cannot delete a category that is populated with forums! Delete the forums first, this is a security measure so you don\'t end up deleting lots of forums with posts. <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
 				}
@@ -626,7 +622,7 @@ else if (isset($_POST['act']))
 				// if it has none
 				else
 				{
-					$db->sqlquery("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['category_id']));
+					$dbl->run("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['category_id']));
 
 					$core->message('Category has been deleted! <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
 				}
@@ -648,7 +644,7 @@ else if (isset($_POST['act']))
 
 			else
 			{
-				$db->sqlquery("UPDATE `forums` SET `name` = ?, `order` = ?, `description` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['description'],  $_POST['forum_id']));
+				$dbl->run("UPDATE `forums` SET `name` = ?, `order` = ?, `description` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['description'],  $_POST['forum_id']));
 
 				$core->message("Category $name has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
 			}
@@ -658,9 +654,8 @@ else if (isset($_POST['act']))
 		{
 
 			// check if it has posts
-			$db->sqlquery("SELECT `topic_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['forum_id']));
-			$forum_post_count = $db->num_rows();
-			if ($forum_post_count > 0)
+			$forum_post_check = $dbl->run("SELECT 1 FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['forum_id']))->fetch();
+			if ($forum_post_check)
 			{
 				$core->message('You cannot delete a forum that is populated with topics! Delete or move the topics first, this is a security measure so you don\'t end up deleting forums with posts. <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
 			}
@@ -669,10 +664,10 @@ else if (isset($_POST['act']))
 			else
 			{
 				// delete the forum
-				$db->sqlquery("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']));
+				$dbl->run("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']));
 
 				// remove forum permission rows
-				$db->sqlquery("DELETE FROM `forum_permissions` WHERE `forum_id` = ?", array($_POST['forum_id']));
+				$dbl->run("DELETE FROM `forum_permissions` WHERE `forum_id` = ?", array($_POST['forum_id']));
 
 				$core->message('Forum has been deleted! <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
 			}
@@ -689,9 +684,9 @@ else if (isset($_POST['act']))
 		else
 		{
 			// Get all IDs and sort them in an array
-			$db->sqlquery("SELECT `group_id` FROM `user_groups`");
+			$sort_groups = $dbl->run("SELECT `group_id` FROM `user_groups`")->fetch_all();
 			$index = 0;
-			while ($group = $db->fetch())
+			foreach ($sort_groups as $group)
 			{
 				$ids[$index] = $group['group_id'];
 				$index++;
@@ -810,12 +805,12 @@ else if (isset($_POST['act']))
 				}
 
 				// add permissions for this forum
-				$db->sqlquery("UPDATE `forum_permissions` SET `can_view` = ?, `can_topic` = ?, `can_reply` = ?, `can_lock` = ?, `can_sticky` = ?, `can_delete` = ?, `can_delete_own` = ?, `can_avoid_floods` = ?, `can_move` = ? WHERE `forum_id` = ? AND `group_id` = ?", array($cv, $ct, $cr, $cl, $cs, $cd, $cdo, $cf, $cm, $_POST['forum_id'], $ids[$ind]));
+				$dbl->run("UPDATE `forum_permissions` SET `can_view` = ?, `can_topic` = ?, `can_reply` = ?, `can_lock` = ?, `can_sticky` = ?, `can_delete` = ?, `can_delete_own` = ?, `can_avoid_floods` = ?, `can_move` = ? WHERE `forum_id` = ? AND `group_id` = ?", array($cv, $ct, $cr, $cl, $cs, $cd, $cdo, $cf, $cm, $_POST['forum_id'], $ids[$ind]));
 			}
 
-			$db->sqlquery("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']));
-			$name = $db->fetch();
-			$core->message("Forum permissions for {$name['name']} updated! <a href=\"admin.php?module=forum&view=permissions&forum_id={$_POST['forum_id']}\">Click here to edit again</a>.");
+			$name = $dbl->run("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']))->fetchOne();
+
+			$core->message("Forum permissions for {$name} updated! <a href=\"admin.php?module=forum&view=permissions&forum_id={$_POST['forum_id']}\">Click here to edit again</a>.");
 		}
 	}
 }

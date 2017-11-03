@@ -54,30 +54,24 @@ if (isset($_GET['view']))
 			LEFT JOIN
 			`articles_tagline_gallery` t ON t.id = a.gallery_tagline
 			WHERE `article_id` = ?";
-			$db->sqlquery($article_info_sql, array($_GET['article_id']));
-
-			$article = $db->fetch();
+			$article = $dbl->run($article_info_sql, array($_GET['article_id']))->fetch();
 
 			if (isset($_GET['unlock']) && $article['locked'] == 1 && $_GET['unlock'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 			{
-				$db->sqlquery("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
+				$dbl->run("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
 
 				$core->message("You have unlocked the article for others to edit!");
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery($article_info_sql, array($article_id));
-
-				$article = $db->fetch();
+				$article = $dbl->run($article_info_sql, array($article_id))->fetch();
 			}
 
 			if (isset($_GET['lock']) && $_GET['lock'] == 1 && $article['locked'] == 0)
 			{
-				$db->sqlquery("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
+				$dbl->run("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery($article_info_sql, array($article_id));
-
-				$article = $db->fetch();
+				$article = $dbl->run($article_info_sql, array($article_id))->fetch();
 			}
 
 			if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
@@ -85,9 +79,7 @@ if (isset($_GET['view']))
 				$core->message("This post is now locked while you edit, please click Edit to unlock it once finished.", 1);
 
 				// we need to re-catch the article info as we have changed lock status
-				$db->sqlquery($article_info_sql, array($article_id));
-
-				$article = $db->fetch();
+				$article = $dbl->run($article_info_sql, array($article_id))->fetch();
 			}
 
 			$_SESSION['original_text'] = $article['text'];
@@ -146,15 +138,15 @@ if (isset($_GET['view']))
 			$templating->set('brandnew_check', $brandnew);
 
 			// get categorys
-			$db->sqlquery("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
-			while($categories_check = $db->fetch())
+			$cat_res = $dbl->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
+			foreach ($cat_res as $categories_check)
 			{
 				$categories_check_array[] = $categories_check['category_id'];
 			}
 
 			$categorys_list = '';
-			$db->sqlquery("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC");
-			while ($categorys = $db->fetch())
+			$all_res = $dbl->run("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+			foreach ($all_res as $categorys)
 			{
 				if (isset($_GET['error']))
 				{
@@ -287,8 +279,8 @@ if (isset($_GET['view']))
 			$templating->block('manage_cat_top');
 
 			// list categorys and all option
-			$db->sqlquery("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC");
-			while ($category = $db->fetch())
+			$cat_res = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+			foreach ($cat_res as $category)
 			{
 				$templating->block('manage_cat');
 				$templating->set('category_id', $category['category_id']);
@@ -316,7 +308,7 @@ if (isset($_GET['view']))
 				$active = 0;
 				$paginate_link = "admin.php?module=articles&view=manage&category=inactive&";
 				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
-				$count_query = "SELECT `article_id` FROM `articles` WHERE `active` = 0 AND `admin_review` = 0 AND `draft` = 0 AND `submitted_unapproved` = 0";
+				$count_query = "SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 0 AND `admin_review` = 0 AND `draft` = 0 AND `submitted_unapproved` = 0";
 			}
 
 			else if ($_GET['category'] == 'all')
@@ -324,12 +316,11 @@ if (isset($_GET['view']))
 				$active = 1;
 				$paginate_link = "admin.php?module=articles&view=manage&category=all&";
 				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
-				$count_query = "SELECT `article_id` FROM `articles`";
+				$count_query = "SELECT COUNT(`article_id`) FROM `articles`";
 			}
 
 			// count how many there is in total
-			$db->sqlquery($count_query);
-			$total = $db->num_rows();
+			$total = $dbl->run($count_query)->fetchOne();
 
 			if ($total == 0)
 			{
@@ -341,8 +332,7 @@ if (isset($_GET['view']))
 				// sort out the pagination link
 				$pagination = $core->pagination_link(9, $total, $paginate_link, $page);
 
-				$db->sqlquery($article_query, array($core->start));
-				$article_manage = $db->fetch_all_rows();
+				$article_manage = $dbl->run($article_query, array($core->start))->fetch_all();
 
 				foreach ($article_manage as $article)
 				{
@@ -361,8 +351,8 @@ if (isset($_GET['view']))
 
 					// sort out the categories (tags)
 					$categories_list = '';
-					$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? LIMIT 4", array($article['article_id']));
-					while ($get_categories = $db->fetch())
+					$cat_res = $dbl->run("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? LIMIT 4", array($article['article_id']))->fetch_all();
+					foreach ($cat_res as $get_categories)
 					{
 						$categories_list .= " <a href=\"/articles/category/{$get_categories['category_id']}\"><span class=\"label label-info\">{$get_categories['category_name']}</span></a> ";
 					}
@@ -403,14 +393,12 @@ if (isset($_GET['view']))
 			}
 
 			// count how many there is in total
-			$db->sqlquery("SELECT `article_id` FROM `articles`");
-			$total_pages = $db->num_rows();
+			$total_pages = $dbl->run("SELECT COUNT(`article_id`) FROM `articles`")->fetchOne();
 
 			// sort out the pagination link
 			$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=articles&view=manage&category_id={$_GET['category_id']}&", $page);
 
-			$db->sqlquery("SELECT c.article_id, a.author_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start));
-			$article_get = $db->fetch_all_rows();
+			$article_get = $dbl->run("SELECT c.article_id, a.author_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start))->fetch_all();
 
 			foreach ($article_get as $article)
 			{
@@ -423,8 +411,8 @@ if (isset($_GET['view']))
 
 				// sort out the categories (tags)
 				$categories_list = '';
-				$db->sqlquery("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? LIMIT 4", array($article['article_id']));
-				while ($get_categories = $db->fetch())
+				$cat_res = $dbl->run("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? LIMIT 4", array($article['article_id']))->fetch_all();
+				foreach ($cat_res as $get_categories)
 				{
 					$categories_list .= " <a href=\"/articles/category/{$get_categories['category_id']}\"><span class=\"label label-info\">{$get_categories['category_name']}</span></a> ";
 				}
@@ -503,8 +491,7 @@ else if (isset($_POST['act']))
 		else
 		{
 			// get article name for the email and redirect
-			$db->sqlquery("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']));
-			$title = $db->fetch();
+			$title = $dbl->run("SELECT `title`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_POST['aid']))->fetch();
 			$title_nice = core::nice_title($title['title']);
 
 			$page = 1;
@@ -524,15 +511,15 @@ else if (isset($_POST['act']))
 				$comment = htmlspecialchars($_POST['text'], ENT_QUOTES);
 				$article_id = $_POST['aid'];
 
-				$db->sqlquery("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
+				$dbl->run("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($_POST['aid'], $_SESSION['user_id'], core::$date, $comment));
 
-				$new_comment_id = $db->grab_id();
+				$new_comment_id = $dbl->new_id();
 
 				// check if they are subscribing
 				if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 				{
 					// make sure we don't make lots of doubles
-					$db->sqlquery("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
+					$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article_id));
 
 					$emails = 0;
 					if (isset($_POST['emails']))
@@ -540,13 +527,13 @@ else if (isset($_POST['act']))
 						$emails = 1;
 					}
 
-					$db->sqlquery("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?", array($_SESSION['user_id'], $article_id, $emails));
+					$dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?", array($_SESSION['user_id'], $article_id, $emails));
 				}
 
 				// email anyone subscribed which isn't you
-				$db->sqlquery("SELECT s.`user_id`, s.emails, s.secret_key, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id));
+				$user_res = $dbl->run("SELECT s.`user_id`, s.emails, s.secret_key, u.email, u.username FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE `article_id` = ?", array($article_id))->fetch_all();
 				$users_array = array();
-				while ($users = $db->fetch())
+				foreach ($user_res as $users)
 				{
 					if ($users['user_id'] != $_SESSION['user_id'] && $users['emails'] == 1)
 					{
@@ -619,16 +606,15 @@ else if (isset($_POST['act']))
 			$article_class->gallery_tagline($checked);
 
 			// first check if it was disabled
-			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-			$enabled_check = $db->fetch();
+			$enabled_check = $dbl->run("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
-			$db->sqlquery("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, $_POST['article_id']));
+			$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, $_POST['article_id']));
 
 			if (isset($_SESSION['uploads']))
 			{
 				foreach($_SESSION['uploads'] as $key)
 				{
-					$db->sqlquery("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
+					$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
 				}
 			}			
 
@@ -642,15 +628,15 @@ else if (isset($_POST['act']))
 			// update admin notes if it was disabled
 			if (!isset($_POST['show_article']) && $enabled_check['active'] == 1)
 			{
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'disabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'disabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
 			}
 			if (isset($_POST['show_article']) && $enabled_check['active'] == 0)
 			{
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'enabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'enabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
 			}
 
 			// update history
-			$db->sqlquery("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+			$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 			unset($_SESSION['atitle']);
@@ -705,8 +691,7 @@ else if (isset($_POST['act']))
 
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$db->sqlquery("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
-			$check = $db->fetch();
+			$check = $dbl->run("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
 
 			// anti-cheese deleting the wrong article feature
 			if ($check['active'] == 1)
@@ -732,10 +717,9 @@ else if (isset($_POST['act']))
 			else
 			{
 				// check post exists
-				$db->sqlquery("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image' FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']));
-				$check = $db->fetch();
+				$check = $dbl->run("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image' FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
 
-				if ($db->num_rows() != 1)
+				if (!$check)
 				{
 					$core->message("That is not a correct id! Options: <a href=\"$return_page\">Go back</a>.");
 				}
@@ -812,8 +796,7 @@ else if (isset($_POST['act']))
 
 		else
 		{
-			$db->sqlquery("SELECT `title`,`tagline_image`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']));
-			$article = $db->fetch();
+			$article = $dbl->run("SELECT `title`,`tagline_image`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
 			// remove old image
 			if (!empty($article['tagline_image']))
@@ -822,7 +805,7 @@ else if (isset($_POST['act']))
 				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
 			}
 
-			$db->sqlquery("UPDATE `articles` SET `tagline_image` = '' WHERE `article_id` = ?", array($_POST['article_id']));
+			$dbl->run("UPDATE `articles` SET `tagline_image` = '' WHERE `article_id` = ?", array($_POST['article_id']));
 
 			$core->message("The articles top image has now been deleted from \"{$article['title']}\"! <a href=\"/articles/{$article['slug']}.{$_POST['article_id']}\">Click here to view the article.</a>");
 		}

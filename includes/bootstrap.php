@@ -4,7 +4,6 @@ include(dirname(__FILE__) . '/PHPMailer/PHPMailerAutoload.php');
 
 $db_conf = include dirname(__FILE__) . '/config.php';
 
-$db = new mysql($db_conf['host'], $db_conf['username'], $db_conf['password'], $db_conf['database']);
 $dbl = new db_mysql();
 
 $core = new core();

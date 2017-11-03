@@ -9,8 +9,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	{
 		$templating->block('add_genre');
 		
-		$db->sqlquery("SELECT `id`, `name` FROM `game_genres` ORDER BY `name` ASC");
-		while ($genres = $db->fetch())
+		$res = $dbl->run("SELECT `id`, `name` FROM `game_genres` ORDER BY `name` ASC")->fetch_all();
+		foreach ($res as $genres)
 		{
 			$templating->block('genre_row');
 			$templating->set('name', $genres['name']);
@@ -169,14 +169,14 @@ if (isset($_POST['act']))
 			die();
 		}
 		
-		$db->sqlquery("SELECT `name` FROM `game_genres` WHERE `name` = ?", array($genre));
-		if ($db->num_rows() == 1)
+		$res_test = $dbl->run("SELECT `name` FROM `game_genres` WHERE `name` = ?", array($genre))->fetch();
+		if ($res_test)
 		{
 			header("Location: /admin.php?module=games&view=genres&message=genre_exists");
 			die();	
 		}
 		
-		$db->sqlquery("INSERT INTO `game_genres` SET `name` = ?, `accepted` = 1", array($genre));
+		$dbl->run("INSERT INTO `game_genres` SET `name` = ?, `accepted` = 1", array($genre));
 		
 		header("Location: /admin.php?module=games&view=genres&message=saved&extra=genre");
 		die();
@@ -198,7 +198,7 @@ if (isset($_POST['act']))
 			die();
 		}
 		
-		$db->sqlquery("UPDATE `game_genres` SET `name` = ? WHERE `id` = ?", array($genre, $_POST['genre_id']));
+		$dbl->run("UPDATE `game_genres` SET `name` = ? WHERE `id` = ?", array($genre, $_POST['genre_id']));
 		
 		header("Location: /admin.php?module=games&view=genres&message=edited&extra=genre");
 		die();
@@ -268,11 +268,10 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$db->sqlquery("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']));
-		if ($db->num_rows() == 1)
+		$add_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']))->fetch();
+		if ($add_res)
 		{
-			$get_game = $db->fetch();
-			header("Location: /admin.php?module=games&view=add&message=game_submit_exists&extra={$get_game['id']}");
+			header("Location: /admin.php?module=games&view=add&message=game_submit_exists&extra={$add_res['id']}");
 			exit;
 		}
 
@@ -310,10 +309,10 @@ if (isset($_POST['act']))
 		
 		$description = trim($_POST['text']);
 
-		$db->sqlquery("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license));
-		$new_id = $db->grab_id();
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license));
+		$new_id = $dbl->new_id();
 
-		$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
 
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'game';
@@ -435,9 +434,9 @@ if (isset($_POST['act']))
 		{
 			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_GET['id']))->fetchOne();
 
-			$db->sqlquery("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
+			$dbl->run("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $name));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $name));
 
 			if (isset($_GET['return']) && !empty($_GET['return']))
 			{

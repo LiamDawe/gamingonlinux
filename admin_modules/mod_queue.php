@@ -72,7 +72,7 @@ if (isset($_GET['view']))
 		}
 	}
 
-	if ($reply_counter == 0 && $topic_counter == 0 && !$comments)
+	if (!$topics && !$replies && !$comments)
 	{
 		$core->message("Nothing to approve!");
 	}

@@ -2,7 +2,7 @@
 require dirname(__FILE__) . "/loader.php";
 include(dirname(__FILE__) . '/PHPMailer/PHPMailerAutoload.php');
 
-$db_conf = include dirname(__FILE__) . '/config.php';
+include (dirname(__FILE__) . '/config.php');
 
 $dbl = new db_mysql();
 

@@ -927,6 +927,9 @@ ul.social-networks li > a {
 	overflow: hidden;
 	background: #efefef;
 }
+.dark .support-us-box {
+	background: #222222;
+}
 .support-us-box a {display: block;}
 .support-us-box a:hover {
 	color: #518FD0;

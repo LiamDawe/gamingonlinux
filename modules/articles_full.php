@@ -101,6 +101,7 @@ if (!isset($_GET['go']))
 					$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $comment_page . '#r' . $_GET['comment_id']);
 
 					header("Location: " . $article_link);
+					die();
 				}
 				else
 				{
@@ -108,6 +109,7 @@ if (!isset($_GET['go']))
 					$article_link = $article_class->get_link($article['article_id'], $article['slug']);
 
 					header("Location: " . $article_link);
+					die();
 				}
 			}
 
@@ -599,6 +601,7 @@ else if (isset($_GET['go']))
 
 			$_SESSION['message'] = 'tip_sent';
 			header("Location: " . $article_link);
+			die();
 		}
 
 	}

@@ -108,35 +108,12 @@ class bbcode
 		return preg_replace($pattern, $replace, $string);
 	}
 
-	// replace specific-user quotes, called by quotes()
-	function replace_quotes($matches)
-	{
-		$find_quoted = $this->database->run("SELECT `username`, `user_id` FROM `users` WHERE `username` = ?", [$matches[1]])->fetch();
-		if ($find_quoted)
-		{
-			if ($this->core->config('pretty_urls') == 1)
-			{
-				$profile_link = '/profiles/' . $find_quoted['user_id'];
-			}
-			else
-			{
-				$profile_link = '/index.php?module=profile&user_id=' . $find_quoted['user_id'];
-			}
-			return '<blockquote class="comment_quote"><cite><a href="'.$profile_link.'">'.$matches[1].'</a></cite>'.$matches[2].'</blockquote>';
-		}
-		else
-		{
-			return '<blockquote class="comment_quote"><cite>'.$matches[1].'</cite>'.$matches[2].'</blockquote>';
-		}
-	}
-
 	// find all quotes
 	function quotes($body)
 	{
 		// Quote on its own, do these first so they don't get in the way
 		$pattern = '/\[quote\](?:\s)*(.+?)\[\/quote\]/is';
 		$replace = "<blockquote class=\"comment_quote\"><cite>Quote</cite>$1</blockquote>";
-
 		while(preg_match($pattern, $body))
 		{
 			$body = preg_replace($pattern, $replace, $body);
@@ -144,11 +121,11 @@ class bbcode
 
 		// Quoting an actual person, book or whatever
 		$pattern = '~\[quote=([^]]+)](?:\s)*([^[]*(?:\[(?!/?quote\b)[^[]*)*)\[/quote]~i';
-		do
+		$replace = '<blockquote class="comment_quote"><cite>$1</cite>$2</blockquote>';
+		while(preg_match($pattern, $body))
 		{
-			$body = preg_replace_callback($pattern, function ($matches){return $this->replace_quotes($matches);}, $body, -1, $count);
-		} while ($count);
-
+			$body = preg_replace($pattern, $replace, $body);
+		}
 		return $body;
 	}
 

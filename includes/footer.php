@@ -18,14 +18,6 @@ if ($core->config('forum_rss') == 1)
 }
 $templating->set('forum_rss', $forum_rss);
 
-// notification update checker, only if logged in
-$notification_updates = '';
-if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
-{
-	$notification_updates = $templating->block_store('notification_updates', 'footer');
-}
-$templating->set('notification_updates', $notification_updates);
-
 $ckeditor_js = '';
 if ($core->current_page() == 'admin.php')
 {

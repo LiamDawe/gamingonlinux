@@ -1,11 +1,3 @@
-[block: notification_updates]
-<script type="text/javascript" src="/includes/jscripts/notifications_update.js?v=1.1"></script>
-<script>
-var current_page_title = $(document).find("title").text();
-setInterval ( "update_notifications()", 60000 );
-</script>
-[/block: notification_updates]
-
 [block: ckeditor]
 <script>	
 CKEDITOR.on('instanceCreated', function(e) {
@@ -75,7 +67,6 @@ this.editor.filter.addTransformations([
 		</div>
 	</div>
 </footer>
-{:notification_updates}
 <script src="{:url}includes/jscripts/twitch_checker.js"></script>
 <script>twitch_check("{:twitch_dev_key}", "gamingonlinux"); setInterval ( "twitch_check('{:twitch_dev_key}', 'gamingonlinux')", 60000 );</script>
 <script type="text/javascript" src="{:url}includes/jscripts/jquery.timeago.js"></script>

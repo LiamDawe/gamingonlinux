@@ -377,9 +377,9 @@ if (isset($_POST['action']))
 		{
 			// now we can remove the topic
 			$dbl->run("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
-			$dbl->runsqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'mod_queue'", array(core::$date, $_POST['topic_id']));
 		}
-		else if ($_POST['is_topic'] == 'forum_reply')
+		else if ($_POST['type'] == 'forum_reply')
 		{
 			// now we can remove the topic
 			$dbl->run("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']));
@@ -396,9 +396,9 @@ if (isset($_POST['action']))
 
 		$dbl->run("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_POST['author_id']));
 
-		$dbl->eun("INSERT INTO `ipbans` SET `ip` = ?", array($get_ip['ip']));
+		$dbl->run("INSERT INTO `ipbans` SET `ip` = ?", array($get_ip['ip']));
 
-		$dbl->eun("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed_ban', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_removed_ban', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['topic_id']));
 
 		$_SESSION['message'] = 'deleted';
 		$_SESSION['message_extra'] = 'post';

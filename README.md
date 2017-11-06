@@ -59,8 +59,6 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/jquery.form.min.js (MIT/GPL)
 
-- /includes/E_PDOStatement.php (https://github.com/noahheck/E_PDOStatement APACHE 2) 
-
 - /includes/jscripts/clipboard (https://clipboardjs.com/ MIT)
 
 - /includes/jscripts/jquery.countdown.min.js (http://hilios.github.io/jQuery.countdown/ MIT)

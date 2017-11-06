@@ -138,7 +138,7 @@ class user
 		if ($this->user_details['banned'] == 1 || $ip_banned == 1)
 		{
 			// update their ip in the user table
-			$this->db->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $user_id]);
+			$this->db->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $_SESSION['user_id']]);
 
 			// search the ip list, if it's not on it then add it in
 			$search_ips = $this->db->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();
@@ -153,6 +153,10 @@ class user
 	
 	public function register_session()
 	{
+		if (!isset($_SESSION))
+		{
+			error_log("Session not started in: " . $this->core->current_page());
+		}
 		session_regenerate_id(true);
 		
 		$_SESSION['user_id'] = $this->user_details['user_id'];

@@ -768,7 +768,6 @@ jQuery(document).ready(function()
 			data = JSON.parse(data);
 			if (data.result == 1)
 			{
-				update_notifications();
 				$('#note-' + note_id).find('span').remove();
 				$('#note-' + note_id).fadeOut(500);
 			}

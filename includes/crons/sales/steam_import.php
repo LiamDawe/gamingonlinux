@@ -41,7 +41,8 @@ do
 			foreach($element->find('span.title') as $span)
 			{
 				$title = trim($span->plaintext);
-				$title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title); // remove junk				
+				$title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title); // remove junk		
+				$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
 				$titles[] = $title;
 				echo $span->plaintext . '<br />';
 			}

@@ -6,10 +6,10 @@ class db_mysql extends PDO
 	public $stmt;
 	
 	// the query counter
-	public $counter = 0;
+	public static $counter = 0;
 
 	// store all the queries for debugging
-	public $debug_queries = '';
+	public static $debug_queries = '';
 	
 	public function __construct()
 	{
@@ -39,7 +39,7 @@ class db_mysql extends PDO
 		{
 			$this->stmt = $this->prepare($sql);
 			$this->stmt->execute($data);
-			$this->debug_queries .= '<pre>' . $this->replaced_query($sql, $data) . '</pre>';
+			self::$debug_queries .= '<pre>' . $this->replaced_query($sql, $data) . '</pre>';
 			return $this;
         }
         catch (PDOException $error)
@@ -56,7 +56,7 @@ class db_mysql extends PDO
 	public function fetchOne()
 	{		
 		$this->result = $this->stmt->fetchColumn();
-		$this->counter++;
+		self::$counter++;
 		
 		return $this->result;
 	}
@@ -64,7 +64,7 @@ class db_mysql extends PDO
 	public function fetch($mode = PDO::FETCH_ASSOC)
 	{		
 		$this->result = $this->stmt->fetch($mode);
-		$this->counter++;
+		self::$counter++;
 		
 		return $this->result;
 	}
@@ -72,7 +72,7 @@ class db_mysql extends PDO
 	public function fetch_all($mode = NULL)
 	{		
 		$this->result = $this->stmt->fetchAll($mode);
-		$this->counter++;
+		self::$counter++;
 		
 		return $this->result;
 	}

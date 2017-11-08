@@ -93,13 +93,12 @@ if (!isset($_COOKIE['gol_announce_gol_twitch'])) // if they haven't dissmissed i
 	$templating->block('main', 'twitch_bar');
 }
 
-$count_announcements = $dbl->run("SELECT count(id) as count FROM `announcements`")->fetchOne();
-if ($count_announcements > 0)
+$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+if ($get_announcements)
 {
 	$templating->load('announcements');
 	$templating->block('announcement_top', 'announcements');
-	
-	$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+
 	foreach ($get_announcements as $announcement)
 	{
 		if (!isset($_COOKIE['gol_announce_'.$announcement['id']]))

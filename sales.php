@@ -3,6 +3,8 @@ define("APP_ROOT", dirname(__FILE__));
 
 include(APP_ROOT . '/includes/header.php');
 
+$game_sales = new game_sales($templating, $user, $core);
+
 $templating->set_previous('title', 'Linux game sales', 1);
 $templating->set_previous('meta_description', 'Linux games and bundles on sale', 1);
 
@@ -13,13 +15,11 @@ if (!isset($_COOKIE['gol_announce_gol_twitch'])) // if they haven't dissmissed i
 	$templating->block('main', 'twitch_bar');
 }
 
-$count_announcements = $dbl->run("SELECT count(id) as count FROM `announcements`")->fetchOne();
-if ($count_announcements > 0)
+$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+if ($get_announcements)
 {
 	$templating->load('announcements');
 	$templating->block('announcement_top', 'announcements');
-	
-	$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
 	foreach ($get_announcements as $announcement)
 	{
 		if (!isset($_COOKIE['gol_announce_'.$announcement['id']]))
@@ -155,125 +155,7 @@ if ($res_bundle)
 	}
 }
 
-// get normal sales
-$templating->block('sales_top', 'sales');
-
-$nodlc_checked = '';
-$less5_selected = '';
-$less10_selected = '';
-if (isset($_GET['option']) && is_array($_GET['option']))
-{
-	$options_array = [];
-	$options_link = [];
-	foreach ($_GET['option'] as $option)
-	{
-		if ($option == '5less')
-		{
-			$options_array[] = ' s.`sale_dollars` <= 5 ';
-			$less5_selected = 'selected';
-			$options_link[] = 'option[]=5less';
-		}
-		if ($option == '10less')
-		{
-			$options_array[] = ' s.`sale_dollars` <= 10 ';
-			$less10_selected = 'selected';
-			$options_link[] = 'option[]=10less';
-		}
-		if ($option == 'nodlc')
-		{
-			$options_array[] = ' c.`is_dlc` = 0 ';
-			$nodlc_checked = 'checked';
-			$options_link[] = 'option[]=nodlc';
-		}
-	}
-}
-$templating->set('less5_selected', $less5_selected);
-$templating->set('less10_selected', $less10_selected);
-$templating->set('nodlc_checked', $nodlc_checked);
-
-$where = '';
-if (isset($_GET['q']))
-{
-	$options_sql = '';
-	if (!empty($options_array))
-	{
-		$options_sql = implode(' AND ', $options_array);
-	}
-
-	$search_query = str_replace('+', ' ', $_GET['q']);
-	$where = '%'.$search_query.'%';
-	$sales_res = $dbl->run("SELECT c.id as game_id, c.name, c.is_dlc,s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`name` LIKE ? $options_sql ORDER BY s.`sale_dollars` ASC", [$where])->fetch_all();
-}
-else
-{
-	$options_sql = '';
-	if (!empty($options_array))
-	{
-		$options_sql = ' WHERE ' . implode(' AND ', $options_array);
-	}
-	$sales_res = $dbl->run("SELECT c.id as game_id, c.name, c.is_dlc, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id $options_sql ORDER BY s.`sale_dollars` ASC")->fetch_all();
-}
-
-$sales_total = count($sales_res);
-$templating->set('total', $sales_total);
-
-$sales_merged = [];
-foreach ($sales_res as $sale)
-{
-	$sales_merged[$sale['name']][] = ['game_id' => $sale['game_id'], 'store' => $sale['store_name'], 'sale_dollars' => $sale['sale_dollars'], 'original_dollars' => $sale['original_dollars'], 'link' => $sale['link'], 'is_dlc' => $sale['is_dlc']];
-}
-
-// paging for pagination
-$page = isset($_GET['page'])?intval($_GET['page']-1):0;
-
-$total_rows = count($sales_merged);
-
-//foreach ($sales_merged as $name => $sales)
-foreach (array_slice($sales_merged, $page*50, 50) as $name => $sales)
-{
-	$templating->block('sale_row', 'sales');
-	$templating->set('name', $name);
-
-	$stores_output = '';
-	foreach ($sales as $store)
-	{
-		$edit = '';
-		if ($user->check_group([1,2,5]))
-		{
-			$edit = '<a href="/admin.php?module=games&view=edit&id='.$store['game_id'].'"><span class="icon edit edit-sale-icon"></span></a> ';
-		}
-		$templating->set('edit', $edit);
-		$savings_dollars = '';
-		if ($store['original_dollars'] != 0)
-		{
-			$savings = 1 - ($store['sale_dollars'] / $store['original_dollars']);
-			$savings_dollars = round($savings * 100) . '% off';
-		}
-
-		$dlc = '';
-		if ($store['is_dlc'] == 1)
-		{
-			$dlc = '<span class="badge yellow">DLC</span>';
-		}
-
-		$stores_output .= ' <span class="badge"><a href="'.$store['link'].'">'.$store['store'].' - $'.$store['sale_dollars'] . ' | ' . $savings_dollars . '</a></span> ';
-	}
-	$templating->set('stores', $dlc . $stores_output);
-
-	$templating->set('lowest_price', $sales[0]['sale_dollars']);
-	$templating->set('name_sort', trim(strtolower($name)));
-}
-
-$templating->block('sales_bottom', 'sales');
-
-$link_extra = '';
-if (!empty($options_link) && is_array($options_link))
-{
-	$link_extra = '&' . implode('&', $options_link);
-}
-
-$pagination = $core->pagination_link(50, $total_rows, 'sales.php?', $page + 1, $link_extra);
-$templating->set('pagination', $pagination);
+$game_sales->display_normal();
 
 include(APP_ROOT . '/includes/footer.php');
 ?>

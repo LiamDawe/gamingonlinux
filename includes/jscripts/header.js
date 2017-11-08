@@ -1474,4 +1474,72 @@ jQuery(document).ready(function()
   },
   minimumInputLength: 2
   });
+
+	/* SALES PAGE */
+
+	// pagination ajax
+	$(document).on('click', ".sales-pagination li a", function(e) 
+	{
+		e.preventDefault();
+		var form = $("#sales-filters");
+		var url = "/includes/ajax/sales/display_normal.php";
+		var page = $(this).attr("data-page");
+	  
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'filters': form.serialize(), 'page': page}, 
+			success: function(data)
+			{
+				$(form).removeClass('dirty'); // prevent ays dialogue when leaving
+				$('div.normal-sales').html(data);
+				$('div.normal-sales').highlight();
+				$('div.normal-sales').scrollMinimal();
+				$('#sale-search').easyAutocomplete(sale_search_options); // required so EAC works when loaded dynamically
+			}
+		});
+	});
+
+	// filters form submit ajax
+	$(document).on('click', "#sales-filters-button", function(e)
+	{
+		e.preventDefault();
+		var form = $("#sales-filters");
+		var url = "/includes/ajax/sales/display_normal.php";
+
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'filters': form.serialize()}, 
+			success: function(data)
+			{
+				$(form).removeClass('dirty'); // prevent ays dialogue when leaving
+				$('div.normal-sales').html(data);
+				$('div.normal-sales').highlight();
+				$('#sale-search').easyAutocomplete(sale_search_options); // required so EAC works when loaded dynamically
+			}
+		});
+	});
+
+	$(document).on('click', "#sale-search-form div.eac-item", function(e)
+	{
+		e.preventDefault();
+		var text = $(this).text();
+		var url = "/includes/ajax/sales/display_normal.php";
+
+		console.log(text);
+
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'q': text}, 
+			success: function(data)
+			{
+				$('div.normal-sales').html(data);
+				$('div.normal-sales').highlight();
+				$('#sale-search').easyAutocomplete(sale_search_options); // required so EAC works when loaded dynamically
+			}
+		});		
+	});
+	
 });

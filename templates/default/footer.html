@@ -86,24 +86,22 @@ this.editor.filter.addTransformations([
 	});
 
 	var sale_search_options = {
-    url: function(phrase) { 
-            return "/includes/ajax/call_sales.php?q=" + phrase + "&format=json";    
-    },
+		url: function(phrase) { 
+				return "/includes/ajax/call_sales.php?q=" + phrase + "&format=json";    
+		},
 
-    getValue: "data",
+		getValue: "data",
 
-    ajaxSettings: {
-        dataType: "json"
-    },
-    requestDelay: 300,
-	list: {
-		onClickEvent: function() {
-			var replaced = $("#sale-search").val().replace(/ /g, '+');
-			window.location.href = '/sales.php?q=' + replaced;
-			//alert($("#sale-search").val());
-		}	
-	}
-};
+		ajaxSettings: {
+			dataType: "json"
+		},
+		requestDelay: 300,
+		list: {
+			onClickEvent: function() {
+				var replaced = $("#sale-search").val().replace(/ /g, '+');
+			}	
+		}
+	};
 
 $("#sale-search").easyAutocomplete(sale_search_options);
 </script>

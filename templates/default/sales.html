@@ -22,31 +22,33 @@
 [/block: bundles_bottom]
 
 [block: sales_top]
-		<div class="box">
-			<div class="head">Game Sales - Total: {:total}</div>
-			<div class="body group">
-				<form><input id="sale-search" class="ays-ignore" name="q" type="search" placeholder="Search by title" /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
-			</div>
-			<div class="body group sales-options">Options: <a href="/sales.php">Clear Filters</a> | <form style="display: inline;" method="get">Price: <select style="width: 150px; padding: 5px;" name="option[]"><option></option><option value="5less" {:less5_selected}>$5 and under</option><option value="10less" {:less10_selected}>$10 and under</option></select> <label style="display: inline-block;"><input type="checkbox" name="option[]" value="nodlc" {:nodlc_checked} />No DLC</label> <button type="submit">Go</button></form></div>
-			<table class="sortable sales-table">
-				<thead>
-					<tr><th>Name</th><th>Price Now</th></tr>
-				</thead>
-				<tbody>
+		<div class="normal-sales">
+			<div class="box">
+				<div class="head">Game Sales - Total: {:total}</div>
+				<div class="body group">
+					<form id="sale-search-form"><input id="sale-search" class="ays-ignore" name="q" type="search" placeholder="Search by title" /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
+				</div>
+				<div class="body group sales-options">Options: <a href="/sales.php">Clear Filters</a> | <form id="sales-filters" style="display: inline;" method="get">Price: <select style="width: 150px; padding: 5px;" name="option[]"><option></option><option value="5less" {:less5_selected}>$5 and under</option><option value="10less" {:less10_selected}>$10 and under</option></select> <label style="display: inline-block;"><input type="checkbox" name="option[]" value="nodlc" {:nodlc_checked} />No DLC</label> <button id="sales-filters-button" type="submit">Go</button></form></div>
+				<table class="sortable sales-table">
+					<thead>
+						<tr><th>Name</th><th>Price Now</th></tr>
+					</thead>
+					<tbody>
 [/block: sales_top]
 
 [block: sale_row]
-				<tr class="bundle-row">
-					<td width="40%;" sorttable_customkey="{:name_sort}">{:edit}{:name}</td>
-					<td width="60%;" sorttable_customkey="{:lowest_price}">{:stores}</td>
-				</tr>
+					<tr class="bundle-row">
+						<td width="40%;" sorttable_customkey="{:name_sort}">{:edit}{:name}</td>
+						<td width="60%;" sorttable_customkey="{:lowest_price}">{:stores}</td>
+					</tr>
 [/block: sale_row]
 
 [block: sales_bottom]
-				</tbody>
-			</table>
+					</tbody>
+				</table>
+			</div>
+			{:pagination}
 		</div>
-		{:pagination}
 	</div>
 </div>
 [/block: sales_bottom]

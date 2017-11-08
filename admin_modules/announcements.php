@@ -62,7 +62,7 @@ if (isset($_GET['view']))
 				$module_ids_array = unserialize($announce['modules']);
 				$modules_list = '';
 				$get_modules = $dbl->run("SELECT `nice_title`, `module_id` FROM `modules` ORDER BY `nice_title` ASC")->fetch_all();
-				while ($get_modules as $modules)
+				foreach ($get_modules as $modules)
 				{
 					if (!empty($module_ids_array) && in_array($modules['module_id'], $module_ids_array))
 					{

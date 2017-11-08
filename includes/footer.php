@@ -36,10 +36,17 @@ if ($user->check_group(1) && $core->config('show_debug') == 1)
 	
 	$total_queries = $dbl::$counter;
 
-	$debug = "<br />Page generated in {$time} seconds, MySQL queries: {$total_queries}<br />";
-	$debug .= $dbl::$debug_queries;
+	$debug = "<div class=\"box\"><div class=\"head\">Debug</div>
+	<div class=\"body group\">Page generated in {$time} seconds</div>
+	<div class=\"head\">MySQL queries: {$total_queries}</div>";
+	foreach ($dbl::$debug_queries as $key => $debug_query)
+	{
+		$debug .= '<div class="body group">(' . $key . ') ' . $debug_query . '</div>';
+	}
+	//$debug .= print_r($dbl::$debug_queries, true);
 	$debug .= print_r($_SESSION, true);
 	$debug .= 'Stored user details: ' . print_r($user->user_details, true);
+	$debug .= '</div>';
 }
 $templating->set('debug', $debug);
 

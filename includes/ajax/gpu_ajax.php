@@ -5,8 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$cat_array = array();
-
 if(isset($_GET['q']))
 {
 	$get_data = $dbl->run("SELECT `id`, `name` FROM `gpu_models` WHERE `name` LIKE ? ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();

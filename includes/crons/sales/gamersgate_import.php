@@ -9,7 +9,7 @@ $doc_root = dirname( dirname( dirname( dirname(__FILE__) ) ) );
 require $doc_root . '/includes/loader.php';
 include $doc_root . '/includes/config.php';
 $dbl = new db_mysql();
-$core = new core();
+$core = new core($dbl);
 
 $url = 'http://www.gamersgate.com/feeds/products?filter=linux,offers&dateformat=timestamp&country=usa';
 if (core::file_get_contents_curl($url) == true)

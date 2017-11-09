@@ -32,7 +32,7 @@ class core
 	
 	public static $top_bar_links = [];
 
-	function __construct()
+	function __construct($dbl)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
 		ini_set('session.cookie_httponly', 1);
@@ -41,7 +41,7 @@ class core
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
-		$this->dbl = db_mysql::instance();
+		$this->dbl = $dbl;
 	}
 	
 	// check in_array for a multidimensional array

@@ -9,7 +9,7 @@ define("APP_ROOT", dirname(__FILE__));
 require dirname(__FILE__) . "/includes/loader.php";
 include dirname(__FILE__) . '/includes/config.php';
 $dbl = new db_mysql();
-$core = new core();
+$core = new core($dbl);
 
 if (isset($_GET['id']) && is_numeric($_GET['id']))
 {

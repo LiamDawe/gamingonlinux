@@ -8,7 +8,7 @@ $doc_root = dirname( dirname( dirname( dirname(__FILE__) ) ) );
 require $doc_root . '/includes/loader.php';
 include $doc_root . '/includes/config.php';
 $dbl = new db_mysql();
-$core = new core();
+$core = new core($dbl);
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 

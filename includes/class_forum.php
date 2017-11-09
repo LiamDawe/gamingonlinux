@@ -5,9 +5,9 @@ class forum
 	private $core;
 	private $user;
 	
-	function __construct($core, $user = NULL)
+	function __construct($dbl, $core, $user = NULL)
 	{
-		$this->dbl = db_mysql::instance();
+		$this->dbl = $dbl;
 		$this->core = $core;
 		$this->user = $user;
 	}

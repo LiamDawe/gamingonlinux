@@ -6,7 +6,7 @@ include (dirname(__FILE__) . '/config.php');
 
 $dbl = new db_mysql();
 
-$core = new core();
+$core = new core($dbl);
 define('url', $core->config('website_url'));
 
 $message_map = new message_map();
@@ -14,8 +14,8 @@ $message_map = new message_map();
 // setup the templating, if not logged in default theme, if logged in use selected theme
 $templating = new template($core, $core->config('template'));
 
-$user = new user($core);
+$user = new user($dbl, $core);
 
 $bbcode = new bbcode($dbl, $core);
 
-$article_class = new article($core, $user, $templating, $bbcode);
+$article_class = new article($dbl, $core, $user, $templating, $bbcode);

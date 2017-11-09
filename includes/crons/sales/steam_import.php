@@ -11,7 +11,7 @@ $doc_root = dirname( dirname( dirname( dirname(__FILE__) ) ) );
 require $doc_root . '/includes/loader.php';
 include $doc_root . '/includes/config.php';
 $dbl = new db_mysql();
-$core = new core();
+$core = new core($dbl);
 
 echo "Steam Store importer started on " .date('d-m-Y H:m:s'). "\n";
 

@@ -8,10 +8,10 @@ class image_upload
 	protected $dbl;	
 	public static $return_message;
 	private $core;
-	function __construct($core)
+	function __construct($dbl, $core)
 	{
 		$this->core = $core;
-		$this->dbl = db_mysql::instance();
+		$this->dbl = $dbl;
 	}
 	
 	public function avatar()

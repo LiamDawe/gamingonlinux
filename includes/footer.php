@@ -34,12 +34,12 @@ if ($user->check_group(1) && $core->config('show_debug') == 1)
 	$timer_end = microtime(true);
 	$time = number_format($timer_end - $timer_start, 3);
 	
-	$total_queries = $dbl::$counter;
+	$total_queries = $dbl->counter;
 
 	$debug = "<div class=\"box\"><div class=\"head\">Debug</div>
 	<div class=\"body group\">Page generated in {$time} seconds</div>
 	<div class=\"head\">MySQL queries: {$total_queries}</div>";
-	foreach ($dbl::$debug_queries as $key => $debug_query)
+	foreach ($dbl->debug_queries as $key => $debug_query)
 	{
 		$debug .= '<div class="body group">(' . $key . ') ' . $debug_query . '</div>';
 	}

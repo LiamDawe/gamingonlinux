@@ -1,5 +1,5 @@
 <?php
-$image_upload = new image_upload($core);
+$image_upload = new image_upload($dbl, $core);
 
 $templating->set_previous('title', 'Change your avatar', 1);
 $templating->set_previous('meta_description', 'Here you can change your avatar!', 1);

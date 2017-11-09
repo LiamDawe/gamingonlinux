@@ -3,7 +3,7 @@ define("APP_ROOT", dirname(__FILE__));
 
 include(APP_ROOT . '/includes/header.php');
 
-$game_sales = new game_sales($templating, $user, $core);
+$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 $templating->set_previous('title', 'Linux game sales', 1);
 $templating->set_previous('meta_description', 'Linux games and bundles on sale', 1);

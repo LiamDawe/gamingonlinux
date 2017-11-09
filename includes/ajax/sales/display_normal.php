@@ -5,7 +5,7 @@ define("APP_ROOT", dirname( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$game_sales = new game_sales($templating, $user, $core);
+$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 $filters = NULL;
 if (isset($_GET['filters']))

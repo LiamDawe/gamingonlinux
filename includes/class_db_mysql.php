@@ -1,15 +1,13 @@
 <?php
 class db_mysql extends PDO
-{	
-	protected static $instance;
-
+{
 	public $stmt;
 	
 	// the query counter
-	public static $counter = 0;
+	public $counter = 0;
 
 	// store all the queries for debugging
-	public static $debug_queries = [];
+	public $debug_queries = [];
 	
 	public function __construct()
 	{
@@ -21,16 +19,6 @@ class db_mysql extends PDO
         ];
         parent::__construct("mysql:host=".DB['DB_HOST_NAME'].";dbname=".DB['DB_DATABASE'],DB['DB_USER_NAME'],DB['DB_PASSWORD'], $options);
 	}
-
-    // a classical static method to make it universally available
-    public static function instance()
-    {
-        if (self::$instance === null)
-        {
-            self::$instance = new self;
-        }
-        return self::$instance;
-    }
 	
 	// the most basic query
     public function run($sql, $data = NULL)
@@ -39,8 +27,8 @@ class db_mysql extends PDO
 		{
 			$this->stmt = $this->prepare($sql);
 			$this->stmt->execute($data);
-			self::$debug_queries[] = $this->replaced_query($sql, $data);
-			self::$counter++;
+			$this->debug_queries[] = $this->replaced_query($sql, $data);
+			$this->counter++;
 			return $this;
         }
         catch (PDOException $error)

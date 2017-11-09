@@ -9,9 +9,9 @@ class article
 	private $templating;
 	private $bbcode;
 	
-	function __construct($core, $user, $templating, $bbcode)
+	function __construct($dbl, $core, $user, $templating, $bbcode)
 	{
-		$this->dbl = db_mysql::instance();
+		$this->dbl = $dbl;
 		$this->core = $core;
 		$this->user = $user;
 		$this->templating = $templating;

@@ -5,13 +5,13 @@ HTML is sanatized in files directly, not here
 class bbcode
 {
 	// the required database connection
-	private $database;
+	private $dbl;
 	// the requred core class
 	private $core;
 	
-	function __construct($database, $core)
+	function __construct($dbl, $core)
 	{
-		$this->database = $database;
+		$this->dbl = $dbl;
 		$this->core = $core;
 	}
 	
@@ -21,7 +21,7 @@ class bbcode
 
 		foreach ($matches[1] as $id)
 		{
-			$charts = new charts($this->database);
+			$charts = new charts($this->dbl);
 
 			$body = preg_replace("/\[chart\]($id)\[\/chart\]/is", '<div style="text-align:center; width: 100%;">' . $charts->render(NULL, ['id' => $id]) . '</div>', $body);
 		}
@@ -35,7 +35,7 @@ class bbcode
 		
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$your_key = $this->database->run("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", [$_SESSION['user_id'], $giveaway_id])->fetch();
+			$your_key = $this->dbl->run("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", [$_SESSION['user_id'], $giveaway_id])->fetch();
 
 			// they have a key already
 			if ($your_key['counter'] == 1)
@@ -45,7 +45,7 @@ class bbcode
 			// they do not have a key
 			else if ($your_key['counter'] == 0)
 			{
-				$keys_left = $this->database->run("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", [$giveaway_id])->fetch();
+				$keys_left = $this->dbl->run("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", [$giveaway_id])->fetch();
 
 				if ($keys_left['counter'] == 0)
 				{
@@ -54,13 +54,13 @@ class bbcode
 				else
 				{
 					 // check their registration date is older than one day
-					$reg_fetch = $this->database->run("SELECT `register_date` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+					$reg_fetch = $this->dbl->run("SELECT `register_date` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 					$day_ago = time() - 24 * 3600;
 
 					if ($day_ago > $reg_fetch['register_date'])
 					{
-						$game_info = $this->database->run("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
+						$game_info = $this->dbl->run("SELECT `id`, `game_name`FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
 
 						$key_claim = '<strong>Grab a key</strong> (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
 					}
@@ -524,7 +524,7 @@ class bbcode
 
 				$counter = 0;
 
-				$additionaldb = $this->database->run("SELECT
+				$additionaldb = $this->dbl->run("SELECT
 					p.`desktop_environment`,
 					p.`what_bits`,
 					p.`cpu_vendor`,
@@ -659,7 +659,7 @@ class bbcode
 					$fields_output = "<em>You haven't filled yours in!</em>";
 				}
 
-				$update_info = $this->database->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+				$update_info = $this->dbl->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 				if (!isset($update_info['date_updated']))
 				{

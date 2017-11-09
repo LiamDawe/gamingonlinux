@@ -6,9 +6,9 @@ class game_sales
 	protected $user;
 	protected $core;
 
-	function __construct($templating, $user, $core)
+	function __construct($dbl, $templating, $user, $core)
 	{
-		$this->dbl = db_mysql::instance();
+		$this->dbl = $dbl;
 		$this->templating = $templating;
 		$this->user = $user;
 		$this->core = $core;

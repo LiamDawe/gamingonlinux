@@ -13,11 +13,11 @@ class steam_user
 	private $core;
 	protected $dbl;
 
-	function __construct($user, $core)
+	function __construct($dbl, $user, $core)
 	{
 		$this->user = $user;
 		$this->core = $core;
-		$this->dbl = db_mysql::instance();
+		$this->dbl = $dbl;
 	}
 
 	public function GetPlayerSummaries ($steamid)

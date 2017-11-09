@@ -8,9 +8,9 @@ class check_user
 
 	protected $dbl;
 	
-	function __construct()
+	function __construct($dbl)
 	{
-		$this->dbl = db_mysql::instance();
+		$this->dbl = $dbl;
 	}
 
 	function check_that_id($steam_id, $steam_username)

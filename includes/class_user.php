@@ -15,9 +15,9 @@ class user
 	public $user_groups;
 	public $blocked_users = [];
 	
-	function __construct($core)
+	function __construct($dbl, $core)
 	{
-		$this->db = db_mysql::instance();
+		$this->db = $dbl;
 		$this->core = $core;
 		$this->grab_user_groups();
 		$this->block_list();

@@ -5,10 +5,7 @@ if ($_SESSION['user_id'] > 0 && !isset($_SESSION['activated']))
 	$core->message('You do not have permission to post in this forum! Your account isn\'t activated!');
 }
 else
-{
-	$mod_queue = $user->user_details['in_mod_queue'];
-	$forced_mod_queue = $user->can('forced_mod_queue');
-				
+{				
 	if ($core->config('forum_posting_open') == 1)
 	{
 		$in = str_repeat('?,', count($user->user_groups) - 1) . '?';
@@ -21,6 +18,9 @@ else
 		}
 		else
 		{
+			$mod_queue = $user->user_details['in_mod_queue'];
+			$forced_mod_queue = $user->can('forced_mod_queue');
+			
 			$show_forum_breadcrumb = 0;
 			if (isset($_GET['forum_id']))
 			{

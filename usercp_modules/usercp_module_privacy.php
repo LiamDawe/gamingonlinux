@@ -4,20 +4,23 @@ $templating->set_previous('title', 'Privacy' . $templating->get('title', 1)  , 1
 $templating->load('usercp_modules/privacy');
 $templating->block('main');
 
+// extra details rarely needed, not included in normal user info grabbed when logged in
+$get_details = $dbl->run("SELECT `global_search_visible`, `private_profile`, `get_pms` FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
+
 $search = '';
-if ($user->user_details['global_search_visible'] == 1)
+if ($get_details['global_search_visible'] == 1)
 {
 	$search = 'checked';
 }
 
 $pms = '';
-if ($user->user_details['get_pms'] == 1)
+if ($get_details['get_pms'] == 1)
 {
 	$pms = 'checked';
 }
 
 $private = '';
-if ($user->user_details['private_profile'] == 1)
+if ($get_details['private_profile'] == 1)
 {
 	$private = 'checked';
 }

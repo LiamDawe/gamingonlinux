@@ -33,7 +33,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		if ($_POST['type'] == 'comment')
 		{
 			// see if there's a notification already for it
-			$get_note = $dbl->run("SELECT `owner_id`, `id`, `total` FROM `user_notifications` WHERE `owner_id` = ? AND `is_like` = 1 AND `comment_id` = ?", array($_POST['author_id'], $_POST['comment_id']))->fetch();
+			$get_note = $dbl->run("SELECT `owner_id`, `id`, `total` FROM `user_notifications` WHERE `owner_id` = ? AND `type` = 'liked' AND `comment_id` = ?", array($_POST['author_id'], $_POST['comment_id']))->fetch();
 			if ($get_note)
 			{
 				$dbl->run("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = 0, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $_SESSION['user_id'], $get_note['id']));

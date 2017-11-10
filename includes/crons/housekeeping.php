@@ -97,5 +97,9 @@ if ($total_to_remove > 0)
 $year = 365*24*60*60;
 $dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_date <= (created_date - $year)");
 
+/* REMOVE SEEN USER NOTIFICATIONS OLDER THAN ONE YEAR */
+$year = 365*24*60*60;
+$dbl->run("DELETE FROM `user_notifications` WHERE `seen` = 1 AND seen_date <= (seen_date - $year)");
+
 // update last ran datetime
 $dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);

@@ -50,7 +50,7 @@ class steam_user
 
 				$get_info = $this->GetPlayerSummaries($matches[1]);
 
-				$steam_user = new check_user();
+				$steam_user = new check_user($this->dbl);
 				$userdata = $steam_user->check_that_id($matches[1], $get_info->personaname);
 
 				// linking account via usercp

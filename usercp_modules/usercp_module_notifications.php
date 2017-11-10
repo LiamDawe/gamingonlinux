@@ -40,7 +40,7 @@ if (!isset($_GET['go']))
 			$unread_array = array();
 			$read_array = array();
 			// show the notifications here
-			$res_list = $dbl->run("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.is_like, n.total, n.`type`, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
+			$res_list = $dbl->run("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.total, n.`type`, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
 			foreach ($res_list as $note_list)
 			{
 				if ($note_list['seen'] == 0)

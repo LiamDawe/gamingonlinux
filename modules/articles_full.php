@@ -908,7 +908,7 @@ else if (isset($_GET['go']))
 					// update notifications
 
 					// find any notifications caused by the deleted comment
-					$current_notes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `is_like` = 0 AND `article_id` = ?", array($comment['article_id']))->fetch_all();
+					$current_notes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `type` != 'liked' AND `article_id` = ?", array($comment['article_id']))->fetch_all();
 
 					foreach ($current_notes as $this_note)
 					{

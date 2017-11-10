@@ -93,5 +93,9 @@ if ($total_to_remove > 0)
 	$dbl->run("UPDATE `config` SET `data_value` = (data_value - $total_to_remove) WHERE `data_key` = 'total_featured'");
 }
 
+/* REMOVE COMPLETED ADMIN NOTES OLDER THAN ONE YEAR */
+$year = 365*24*60*60;
+$dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_date <= (created_date - $year)");
+
 // update last ran datetime
 $dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);

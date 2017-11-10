@@ -11,13 +11,45 @@ class db_mysql extends PDO
 	
 	public function __construct()
 	{
-		$options = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false, // allows LIMIT placeholders
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'
-        ];
-        parent::__construct("mysql:host=".DB['DB_HOST_NAME'].";dbname=".DB['DB_DATABASE'],DB['DB_USER_NAME'],DB['DB_PASSWORD'], $options);
+		try
+		{
+			$options = [
+				PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+				PDO::ATTR_EMULATE_PREPARES   => false, // allows LIMIT placeholders
+				PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'
+			];
+			parent::__construct("mysql:host=".DB['DB_HOST_NAME'].";dbname=".DB['DB_DATABASE'],DB['DB_USER_NAME'],DB['DB_PASSWORD'], $options);
+		}
+        catch (PDOException $error)
+        {
+			$trace = $error->getTrace();
+			// if we don't find the mysql server, wait a bit and retry (down for updates? broken?)
+			if ($error->getCode() == '2002')
+			{
+				sleep(45); // give it 45 seconds to come back
+				try
+				{
+					$options = [
+						PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+						PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+						PDO::ATTR_EMULATE_PREPARES   => false, // allows LIMIT placeholders
+						PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'
+					];
+					parent::__construct("mysql:host=".DB['DB_HOST_NAME'].";dbname=".DB['DB_DATABASE'],DB['DB_USER_NAME'],DB['DB_PASSWORD'], $options);
+				}
+				catch (PDOException $error)
+				{
+					error_log('SQL ERROR ' . $error->getMessage());
+					die('SQL Error');					
+				}
+			}
+			else
+			{
+				error_log('SQL ERROR ' . $error->getMessage());
+				die('SQL Error');
+			}
+        }
 	}
 	
 	// the most basic query

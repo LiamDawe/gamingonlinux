@@ -1499,7 +1499,7 @@ class article
 					$quoted_user = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match))->fetchOne();
 					if ($quoted_user)
 					{
-						$this->dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_quote` = 1", array(core::$date, $quoted_user, $author_id, $article_id, $comment_id));
+						$this->dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `type` = 'quoted'", array(core::$date, $quoted_user, $author_id, $article_id, $comment_id));
 						$new_notification_id[$quoted_user] = $this->dbl->new_id();
 					}
 				}

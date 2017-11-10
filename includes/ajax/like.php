@@ -40,9 +40,10 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			}
 			else
 			{
-				$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `is_like` = 1, `total` = 1", array(core::$date, $_POST['author_id'], $_SESSION['user_id'], $_POST['article_id'], $_POST['comment_id']));
+				$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `type` = 'liked', `total` = 1", array(core::$date, $_POST['author_id'], $_SESSION['user_id'], $_POST['article_id'], $_POST['comment_id']));
 			}
 		}
+		// insert the actual "like" row
 		if ($count_notifications == 0)
 		{
 			$dbl->run("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($pinsid, $_SESSION['user_id'], core::$date));
@@ -62,7 +63,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			if ($_POST['type'] == 'comment')
 			{
 				// see if there's any left already for it
-				$current_likes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date` FROM `user_notifications` WHERE `owner_id` = ? AND `is_like` = 1 AND `comment_id` = ?", array($_POST['author_id'], $_POST['comment_id']))->fetch();
+				$current_likes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date` FROM `user_notifications` WHERE `owner_id` = ? AND `type` = 'liked' AND `comment_id` = ?", array($_POST['author_id'], $_POST['comment_id']))->fetch();
 				if ($current_likes['total'] >= 2)
 				{
 					// find the last available like now (second to last row)

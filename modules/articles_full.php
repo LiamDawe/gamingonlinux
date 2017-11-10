@@ -764,11 +764,11 @@ else if (isset($_GET['go']))
 								// notify them, if they haven't been quoted and already given one
 								if (!in_array($email_user['username'], $new_notification_id['quoted_usernames']))
 								{
-									$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `is_like` = 0 AND `is_quote` = 0", array($article_id, $email_user['user_id']))->fetch();
+									$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `type` != 'liked' AND `type` != 'quoted'", array($article_id, $email_user['user_id']))->fetch();
 
 									if (!$get_note_info)
 									{
-										$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
+										$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, type = 'article_comment'", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
 										$new_notification_id[$email_user['user_id']] = $dbl->new_id();
 									}
 									else if ($get_note_info)

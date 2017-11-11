@@ -373,8 +373,6 @@ if (isset($_POST['act']))
 
 		$livestream = $dbl->run("SELECT l.row_id, l.`title`, u.`username`, u.`email` FROM `livestreams` l INNER JOIN `users` u ON l.author_id = u.user_id WHERE l.`row_id` = ?", array($_POST['id']))->fetch();
 
-		$comment_email = $bbcode->email_bbcode($_POST['message']);
-
 		// subject
 		$subject = "Your livestream event submission was approved on GamingOnLinux.com";
 

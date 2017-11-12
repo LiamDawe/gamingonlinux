@@ -138,7 +138,10 @@ class user
 		if ($this->user_details['banned'] == 1 || $ip_banned == 1)
 		{
 			// update their ip in the user table
-			$this->db->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $_SESSION['user_id']]);
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			{
+				$this->db->run("UPDATE `users` SET `ip` = ? WHERE `user_id` = ?", [core::$ip, $_SESSION['user_id']]);
+			}
 
 			// search the ip list, if it's not on it then add it in
 			$search_ips = $this->db->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", [core::$ip])->fetch();

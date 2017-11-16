@@ -61,7 +61,7 @@ class article
 	}
 
 	// if they have set a tagline image from the gallery, remove any existing images
-	public static function gallery_tagline($data = NULL)
+	public function gallery_tagline($data = NULL)
 	{
 		$gallery_tagline_sql = '';
 
@@ -615,7 +615,7 @@ class article
 			$editors_pick = 1;
 		}
 			
-		$gallery_tagline_sql = self::gallery_tagline($checked);
+		$gallery_tagline_sql = $this->gallery_tagline($checked);
 			
 		// an existing article needs cleaning up and updating
 		if (isset($_POST['article_id']) && !empty($_POST['article_id']))

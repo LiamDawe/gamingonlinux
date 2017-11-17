@@ -129,7 +129,7 @@ class game_sales
 					$dlc = '<span class="badge yellow">DLC</span>';
 				}
 
-				$stores_output .= ' <span class="badge"><a href="'.$store['link'].'">'.$store['store'].' - $'.$store['sale_dollars'] . ' | ' . $savings_dollars . '</a></span> ';
+				$stores_output .= ' <span class="badge"><a href="'.$store['link'].'" target="_blank">'.$store['store'].' - $'.$store['sale_dollars'] . ' | ' . $savings_dollars . '</a></span> ';
 			}
 			$this->templating->set('stores', $dlc . $stores_output);
 

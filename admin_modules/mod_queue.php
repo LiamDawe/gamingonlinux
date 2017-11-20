@@ -266,7 +266,7 @@ if (isset($_POST['action']))
 
 						if (!$get_note_info)
 						{
-							$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1", array(core::$date, $email_user['user_id'],  $_POST['author_id'], $approved['article_id'], $_POST['post_id']));
+							$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array(core::$date, $email_user['user_id'],  $_POST['author_id'], $approved['article_id'], $_POST['post_id']));
 							$new_notification_id[$email_user['user_id']] = $dbl->new_id();
 						}
 						else if ($get_note_info)

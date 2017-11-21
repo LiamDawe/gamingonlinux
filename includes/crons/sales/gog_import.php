@@ -11,6 +11,9 @@ include $doc_root . '/includes/config.php';
 $dbl = new db_mysql();
 $core = new core($dbl);
 
+include_once($doc_root . '/includes/image_class/SimpleImage.php');
+use claviska\SimpleImage;
+
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
 $url = 'http://www.gog.com/games/feed?format=json&page=1';
@@ -80,15 +83,21 @@ do {
 			echo "* Original Price: $". $original_price ."\n";
 			echo "* Price Now: $" . $current_price . "\n";*/
 
+			// give it a proper url we can use, gog don't use a properly url, they just put // at the start - really helpful guys
+			$image_clean = str_replace('//', '', $games['img_icon']);
+			$image = 'https://' . $image_clean;
+
+			echo $image . '<br />';
+
 			// ADD IT TO THE GAMES DATABASE
-			$game_list = $dbl->run("SELECT `id`, `also_known_as` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
 
 			if (!$game_list)
 			{
 				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `gog_link` = ?, `on_sale` = 1", array($games['title'], $games['original_release_date'], $website));
 
 				// need to grab it again
-				$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `small_picture` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
 
 				$game_id = $game_list['id'];
 			}
@@ -102,6 +111,19 @@ do {
 				}
 
 				$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($game_id));
+			}
+
+			// if the game list has no picture, grab it and save it
+			if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
+			{
+				$saved_file = $core->config('path') . 'uploads/sales/' . $game_list['id'] . '.jpg';
+				$core->save_image($image, $saved_file);
+
+				// make their image match the sizing of Steam images
+				$img = new SimpleImage();
+				$img->fromFile($saved_file)->resize(120, 45)->toFile($saved_file);
+
+				$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$saved_file, $game_list['id']]);
 			}
 
 			$on_sale[] = $game_id;

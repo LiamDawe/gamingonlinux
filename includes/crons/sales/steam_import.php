@@ -38,14 +38,14 @@ do
 			$link = $element->href;
 			//echo $element->href . '<br />';
 
-			foreach($element->find('span.title') as $span)
-			{
-				$title = trim($span->plaintext);
-				$title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title); // remove junk		
-				$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
-				$titles[] = $title;
-				echo $span->plaintext . '<br />';
-			}
+			$title = trim($element->find('span.title', 0)->plaintext);
+			$title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title); // remove junk		
+			$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
+			$titles[] = $title;
+			echo $title . '<br />';
+
+			$image = $element->find('div.search_capsule img', 0)->src;
+			echo $image . '<br />';
 
 			foreach ($element->find('div.discounted') as $price)
 			{
@@ -69,14 +69,14 @@ do
 				echo 'Price now: ' . $price_now  . '<br />';
 
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `also_known_as` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 			
 				if (!$game_list)
 				{
 					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1", array($title, date('Y-m-d'), $link));
 			
 					// need to grab it again
-					$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+					$game_list = $dbl->run("SELECT `id`,`small_picture` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 			
 					$game_id = $game_list['id'];
 				}
@@ -90,6 +90,14 @@ do
 					}
 			
 					$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($game_id));
+				}
+
+				// if the game list has no picture, grab it and save it
+				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
+				{
+					$saved_file = $core->config('path') . 'uploads/sales/' . $game_list['id'] . '.jpg';
+					$core->save_image($image, $saved_file);
+					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$saved_file, $game_list['id']]);
 				}
 			
 				$on_sale[] = $game_id;

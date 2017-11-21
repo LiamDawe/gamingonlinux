@@ -153,7 +153,24 @@ class core
 		}
 	}
 
+	// quickly grab and save an image
+	function save_image($img,$fullpath){
+		$ch = curl_init ($img);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+		$rawdata=curl_exec($ch);
+		curl_close ($ch);
+		if(file_exists($fullpath)){
+			unlink($fullpath);
+		}
+		$fp = fopen($fullpath,'x');
+		fwrite($fp, $rawdata);
+		fclose($fp); 
+	}
+
 	// secure way of grabbing a remote image, for avatars
+	// checks the dimensions of a linked image
 	function remoteImage($url)
 	{
 		$ch = curl_init ($url);

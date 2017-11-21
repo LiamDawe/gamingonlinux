@@ -31,15 +31,16 @@
 					<small>If you click the name heading or price, it will sort the list for you in the current page!</small></div>
 				<table class="sortable sales-table">
 					<thead>
-						<tr><th>Name</th><th>Price Now</th></tr>
+						<tr><th colspan="2">Name</th><th>Price Now</th></tr>
 					</thead>
 					<tbody>
 [/block: sales_top]
 
 [block: sale_row]
 					<tr class="bundle-row">
+						<td width="10%;"><img src="{:small_pic}" /></td>
 						<td width="40%;" sorttable_customkey="{:name_sort}">{:edit}{:name}</td>
-						<td width="60%;" sorttable_customkey="{:lowest_price}">{:stores}</td>
+						<td width="50%;" sorttable_customkey="{:lowest_price}">{:stores}</td>
 					</tr>
 [/block: sale_row]
 

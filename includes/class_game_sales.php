@@ -76,7 +76,7 @@ class game_sales
 
 			$search_query = str_replace('+', ' ', $_GET['q']);
 			$where = '%'.$search_query.'%';
-			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.name, c.is_dlc,s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`name` LIKE ? $options_sql ORDER BY s.`sale_dollars` ASC", [$where])->fetch_all();
+			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.name, c.is_dlc, c.small_picture, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`name` LIKE ? $options_sql ORDER BY s.`sale_dollars` ASC", [$where])->fetch_all();
 		}
 		else
 		{
@@ -85,13 +85,13 @@ class game_sales
 			{
 				$options_sql = ' WHERE ' . implode(' AND ', $options_array);
 			}
-			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.name, c.is_dlc, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id $options_sql ORDER BY s.`sale_dollars` ASC")->fetch_all();
+			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.name, c.is_dlc, c.small_picture, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id $options_sql ORDER BY s.`sale_dollars` ASC")->fetch_all();
 		}
 
 		$sales_merged = [];
 		foreach ($sales_res as $sale)
 		{
-			$sales_merged[$sale['name']][] = ['game_id' => $sale['game_id'], 'store' => $sale['store_name'], 'sale_dollars' => $sale['sale_dollars'], 'original_dollars' => $sale['original_dollars'], 'link' => $sale['link'], 'is_dlc' => $sale['is_dlc']];
+			$sales_merged[$sale['name']][] = ['game_id' => $sale['game_id'], 'store' => $sale['store_name'], 'sale_dollars' => $sale['sale_dollars'], 'original_dollars' => $sale['original_dollars'], 'link' => $sale['link'], 'is_dlc' => $sale['is_dlc'], 'picture' => $sale['small_picture']];
 		}
 
 		// paging for pagination
@@ -106,6 +106,13 @@ class game_sales
 		{
 			$this->templating->block('sale_row', 'sales');
 			$this->templating->set('name', $name);
+
+			$small_pic = '';
+			if ($sales[0]['picture'] != NULL && $sales[0]['picture'] != '')
+			{
+				$small_pic = $this->core->config('website_url') . 'uploads/sales/' . $sales[0]['game_id'] . '.jpg';
+			}
+			$this->templating->set('small_pic', $small_pic);
 
 			$stores_output = '';
 			foreach ($sales as $store)

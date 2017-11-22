@@ -79,7 +79,7 @@ do
 					if ($game->current_price[0] != $game->full_price[0])
 					{
 
-						echo '<img src="' . $game->storefront_icon .' " alt=""/><br />Link: https://www.humblebundle.com/store/p/' . $game->machine_name . '<br />' .  $game->human_name . ' Current Price: $' . $game->current_price[0]  .  ', Full Price: $' . $game->full_price[0] . '<br />';
+						echo '<img src="' . $game->featured_image_small .' " alt=""/><br />Link: https://www.humblebundle.com/store/p/' . $game->machine_name . '<br />' .  $game->human_name . ' Current Price: $' . $game->current_price[0]  .  ', Full Price: $' . $game->full_price[0] . '<br />';
 
 						$website = 'https://www.humblebundle.com/store/p/' . $game->machine_name;
 					

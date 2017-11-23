@@ -94,9 +94,15 @@ foreach ($array['data'] as $games)
 		}
 	}
 }
+
+$total_on_sale = count($on_sale);
+
 // remove any not found on sale
-$in  = str_repeat('?,', count($on_sale) - 1) . '?';
-$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 2", $on_sale);
+if (isset($total_on_sale) && $total_on_sale > 0)
+{
+	$in  = str_repeat('?,', count($on_sale) - 1) . '?';
+	$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 2", $on_sale);
+}
 
 echo "\n\n";
 echo "End of Fanatical import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

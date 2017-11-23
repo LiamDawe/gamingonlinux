@@ -120,8 +120,13 @@ do
 	$i++;
 } while ($stop == 0);
 
+$total_on_sale = count($on_sale);
+
 // remove any not found on sale
-$in  = str_repeat('?,', count($on_sale) - 1) . '?';
-$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 4", $on_sale);
+if (isset($total_on_sale) && $total_on_sale > 0)
+{
+	$in  = str_repeat('?,', count($on_sale) - 1) . '?';
+	$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 4", $on_sale);
+}
 
 echo "End of Humble Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

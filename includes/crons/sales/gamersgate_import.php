@@ -102,8 +102,13 @@ foreach ($xml->item as $game)
 	echo "\n"; //Just a bit of white space here.
 }
 
+$total_on_sale = count($on_sale);
+
 // remove any not found on sale
-$in  = str_repeat('?,', count($on_sale) - 1) . '?';
-$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 8", $on_sale);
+if (isset($total_on_sale) && $total_on_sale > 0)
+{
+	$in  = str_repeat('?,', count($on_sale) - 1) . '?';
+	$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 8", $on_sale);
+}
 
 echo "End of GamersGate import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

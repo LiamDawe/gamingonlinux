@@ -35,10 +35,7 @@ else
 
 $on_sale = [];
 
-
 $array = json_decode(core::file_get_contents_curl($url), true);
-$count = count($array['games']);
-printf("Page #%d: %d product(s)\n", $page, $count);
 
 // DEBUG: Check whole array
 //print_r($array['data']);

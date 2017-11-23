@@ -1,12 +1,12 @@
 <?php
 // IF THEY CHANGE THE API URL: F12 in chrome -> network tab, find API mentions
-echo "Humble Store importer started on " . date('d-m-Y H:m:s'). "\n";
-
 define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
 require APP_ROOT . '/includes/bootstrap.php';
 
 $game_sales = new game_sales($dbl, $templating, $user, $core);
+
+echo "Humble Store importer started on " . date('d-m-Y H:m:s'). "\n";
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 

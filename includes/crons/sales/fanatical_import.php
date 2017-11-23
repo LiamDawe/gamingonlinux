@@ -1,13 +1,11 @@
 <?php
 error_reporting(-1);
 
-$doc_root = dirname( dirname( dirname( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
-// we dont need the whole bootstrap
-require $doc_root . '/includes/loader.php';
-include $doc_root . '/includes/config.php';
-$dbl = new db_mysql();
-$core = new core($dbl);
+require APP_ROOT . '/includes/bootstrap.php';
+
+$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 echo "Fanatical importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -47,6 +45,8 @@ foreach ($array['data'] as $games)
 		$website = str_replace('https://', '', $games['url']);
 		$current_price =  $games['current_price']['USD'];
 		$original_price = $games['regular_price']['USD'];
+
+		$games['title'] = $game_sales->clean_title($games['title']);
 
 		echo $games['title'] . "\n";
 		echo "* Original Price: $". $original_price ."\n";

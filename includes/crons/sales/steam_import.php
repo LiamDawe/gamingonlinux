@@ -5,13 +5,11 @@
 // http://simplehtmldom.sourceforge.net/
 include('simple_html_dom.php');
 
-$doc_root = dirname( dirname( dirname( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
-// we dont need the whole bootstrap
-require $doc_root . '/includes/loader.php';
-include $doc_root . '/includes/config.php';
-$dbl = new db_mysql();
-$core = new core($dbl);
+require APP_ROOT . '/includes/bootstrap.php';
+
+$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 echo "Steam Store importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -36,10 +34,8 @@ do
 		foreach($get_sales as $element)
 		{
 			$link = $element->href;
-			//echo $element->href . '<br />';
 
-			$title = trim($element->find('span.title', 0)->plaintext);
-			$title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title); // remove junk		
+			$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
 			$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
 			$titles[] = $title;
 			echo $title . '<br />';

@@ -1,13 +1,13 @@
 <?php
 error_reporting(E_ALL);
 
-echo "GamersGate importer started on " .date('d-m-Y H:m:s'). "\n";
-
 define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
 require APP_ROOT . '/includes/bootstrap.php';
 
 $game_sales = new game_sales($dbl, $templating, $user, $core);
+
+echo "GamersGate importer started on " .date('d-m-Y H:m:s'). "\n";
 
 $url = 'http://www.gamersgate.com/feeds/products?filter=linux,offers&dateformat=timestamp&country=usa';
 if (core::file_get_contents_curl($url) == true)

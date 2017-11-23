@@ -1,13 +1,13 @@
 <?php
 error_reporting(-1);
 
-echo "GOG importer started on " .date('d-m-Y H:m:s'). "\n";
-
 define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
 require APP_ROOT . '/includes/bootstrap.php';
 
 $game_sales = new game_sales($dbl, $templating, $user, $core);
+
+echo "GOG importer started on " .date('d-m-Y H:m:s'). "\n";
 
 include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;

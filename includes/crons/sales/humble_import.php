@@ -2,13 +2,12 @@
 // IF THEY CHANGE THE API URL: F12 in chrome -> network tab, find API mentions
 echo "Humble Store importer started on " . date('d-m-Y H:m:s'). "\n";
 
-$doc_root = dirname( dirname( dirname( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
 // we dont need the whole bootstrap
-require $doc_root . '/includes/loader.php';
-include $doc_root . '/includes/config.php';
-$dbl = new db_mysql();
-$core = new core($dbl);
+require APP_ROOT . '/includes/bootstrap.php';
+
+$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
@@ -72,8 +71,7 @@ do
 
 			if ($use_sale == 1)
 			{
-				$sane_name = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $game->human_name); // remove junk	
-				$sane_name = trim($sane_name);
+				$sane_name = $game_sales->clean_title($game->human_name);
 
 				echo $sane_name."\n";
 

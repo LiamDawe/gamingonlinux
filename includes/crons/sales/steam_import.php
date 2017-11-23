@@ -127,7 +127,7 @@ do
 $total_on_sale = count($on_sale);
 
 // remove any not found on sale
-if ($total_on_sale > 0)
+if (isset($total_on_sale) && $total_on_sale > 0)
 {
 	$in  = str_repeat('?,', count($on_sale) - 1) . '?';
 	$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 6", $on_sale);

@@ -14,6 +14,13 @@ class game_sales
 		$this->core = $core;
 	}
 
+	function clean_title($title)
+	{
+		$title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title); // remove junk
+		$title = trim($title); // some stores give a random space
+		return $title;
+	}
+
 	function display_normal($filters = NULL)
 	{
 		// for non-ajax requests

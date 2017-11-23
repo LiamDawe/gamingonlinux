@@ -72,7 +72,9 @@ do
 
 			if ($use_sale == 1)
 			{
-				echo $game->human_name."\n";
+				$sane_name = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $game->human_name); // remove junk	
+
+				echo $sane_name."\n";
 
 				if (isset($game->current_price))
 				{
@@ -84,18 +86,18 @@ do
 						$website = 'https://www.humblebundle.com/store/p/' . $game->machine_name;
 					
 						// ADD IT TO THE GAMES DATABASE
-						$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($game->human_name))->fetch();
+						$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
 			
 						if (!$game_list)
 						{
-							$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `on_sale` = 1", array($game->human_name, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
+							$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `on_sale` = 1", array($sane_name, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
 			
 							// need to grab it again
-							$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($game->human_name))->fetch();
+							$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
 						}
 						else
 						{
-							$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($game->human_name));
+							$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($sane_name));
 						}
 			
 						$on_sale[] = $game_list['id'];
@@ -109,7 +111,7 @@ do
 						
 							$sale_id = $dbl->new_id();
 						
-							echo "\tAdded ".$game->human_name." to the sales DB with id: " . $sale_id . ".\n";
+							echo "\tAdded ".$sane_name." to the sales DB with id: " . $sale_id . ".\n";
 						}
 					}
 				}

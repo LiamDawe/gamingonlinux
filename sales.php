@@ -164,7 +164,7 @@ $game_sales->display_normal();
 $templating->block('filters', 'sales');
 
 // stores
-$stores_res = $dbl->run("SELECT `id`, `name` FROM `game_stores` ORDER BY `name` ASC")->fetch_all();
+$stores_res = $dbl->run("SELECT `id`, `name` FROM `game_stores` WHERE `show_normal_filter` = 1 ORDER BY `name` ASC")->fetch_all();
 $stores_output = '';
 foreach ($stores_res as $store)
 {

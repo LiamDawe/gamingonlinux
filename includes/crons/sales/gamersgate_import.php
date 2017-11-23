@@ -3,13 +3,11 @@ error_reporting(E_ALL);
 
 echo "GamersGate importer started on " .date('d-m-Y H:m:s'). "\n";
 
-$doc_root = dirname( dirname( dirname( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
-// we dont need the whole bootstrap
-require $doc_root . '/includes/loader.php';
-include $doc_root . '/includes/config.php';
-$dbl = new db_mysql();
-$core = new core($dbl);
+require APP_ROOT . '/includes/bootstrap.php';
+
+$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 $url = 'http://www.gamersgate.com/feeds/products?filter=linux,offers&dateformat=timestamp&country=usa';
 if (core::file_get_contents_curl($url) == true)
@@ -46,6 +44,7 @@ foreach ($xml->item as $game)
 	//echo '</pre>';
 
 	$new_title = html_entity_decode($game->title, ENT_QUOTES);
+	$new_title = $game_sales->clean_title($new_title);
 
 	// they are cet (UTC+1), so add one hour, but they also use CEST in summer, not UTC *sigh*
 	/*$date = new DateTime(null, new DateTimeZone('Europe/Stockholm'));
@@ -60,7 +59,7 @@ foreach ($xml->item as $game)
 
 	//for testing output
 	echo 'This is available for Linux!<br />';
-	echo "\n* Starting import of ".$game->title."\n";
+	echo "\n* Starting import of ".$new_title."\n";
 	echo "URL: ", $game->link, "\n";
 	echo "Price: ", $game->price, "\n";
 	echo "Original Price: ", $game->srp, "\n";

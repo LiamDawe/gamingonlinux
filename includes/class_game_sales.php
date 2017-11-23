@@ -32,9 +32,8 @@ class game_sales
 		// get normal sales
 		$this->templating->block('sales_top', 'sales');
 
-		$nodlc_checked = '';
-		$less5_selected = '';
-		$less10_selected = '';
+		$store_ids = [];
+		$stores_sql = '';
 		if (isset($filters_sort) && is_array($filters_sort))
 		{
 			$options_array = [];
@@ -44,26 +43,31 @@ class game_sales
 				if ($option == '5less')
 				{
 					$options_array[] = ' s.`sale_dollars` <= 5 ';
-					$less5_selected = 'selected';
 					$options_link[] = 'option[]=5less';
 				}
 				if ($option == '10less')
 				{
 					$options_array[] = ' s.`sale_dollars` <= 10 ';
-					$less10_selected = 'selected';
 					$options_link[] = 'option[]=10less';
 				}
 				if ($option == 'nodlc')
 				{
 					$options_array[] = ' c.`is_dlc` = 0 ';
-					$nodlc_checked = 'checked';
 					$options_link[] = 'option[]=nodlc';
 				}
 			}
+			
+			if (isset($filters_sort['stores']))
+			{
+				foreach ($filters_sort['stores'] as $store)
+				{
+					$store_ids[] = $store;
+					$options_link[] = 'stores[]=' . $store;
+				}
+				$in  = str_repeat('?,', count($store_ids) - 1) . '?';
+				$stores_sql = ' AND store_id in ('.$in.') ';
+			}
 		}
-		$this->templating->set('less5_selected', $less5_selected);
-		$this->templating->set('less10_selected', $less10_selected);
-		$this->templating->set('nodlc_checked', $nodlc_checked);
 
 		$where = '';
 		if (isset($_GET['q']))
@@ -76,16 +80,17 @@ class game_sales
 
 			$search_query = str_replace('+', ' ', $_GET['q']);
 			$where = '%'.$search_query.'%';
-			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.name, c.is_dlc, c.small_picture, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`name` LIKE ? $options_sql ORDER BY s.`sale_dollars` ASC", [$where])->fetch_all();
+			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND c.`name` LIKE ? $options_sql ORDER BY s.`sale_dollars` ASC", [$where])->fetch_all();
 		}
 		else
 		{
 			$options_sql = '';
 			if (!empty($options_array))
 			{
-				$options_sql = ' WHERE ' . implode(' AND ', $options_array);
+				$options_sql = ' AND ' . implode(' AND ', $options_array);
 			}
-			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.name, c.is_dlc, c.small_picture, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id $options_sql ORDER BY s.`sale_dollars` ASC")->fetch_all();
+			$sales_sql = "SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 $options_sql $stores_sql ORDER BY s.`sale_dollars` ASC";
+			$sales_res = $this->dbl->run($sales_sql, $store_ids)->fetch_all();
 		}
 
 		$sales_merged = [];

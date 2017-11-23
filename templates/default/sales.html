@@ -2,7 +2,11 @@
 <div id="content" class="container group">
 	<div class="col-12">
 		<div class="box">
-			<div class="body group">Welcome to the GamingOnLinux.com Linux game sales page. Something missing? <strong><a href="/index.php?module=submit_sale">Submit one here</a></strong>! Also, if you're registered and logged in, you can also add games to <a href="/usercp.php?module=wishlist">your Wishlist</a> to be notified when we detect a new sale. Please be aware some links may be affiliate links to earn us some money.</div>
+			<div class="body group">
+				Welcome to the GamingOnLinux.com Linux game sales page. Something missing? <strong><a href="/index.php?module=submit_sale">Submit one here</a></strong>! Also, if you're registered and logged in, you can also add games to <a href="/usercp.php?module=wishlist">your Wishlist</a> to be notified when we detect a new sale. Please be aware some links may be affiliate links to earn us some money.<br />
+				<br />
+				We also have a <a href="">list of <strong>free</strong> Linux games</a>!
+			</div>
 		</div>
 [/block: top]
 
@@ -17,18 +21,23 @@
 
 [block: bundles_bottom]
 		</div>
-		
 [/block: bundles_bottom]
 
+[block: top_closing]
+</div>
+<div class="col-9">
+[/block: top_closing]
+
 [block: sales_top]
-		<div class="normal-sales">
+			<div class="normal-sales">
 			<div class="box">
-				<div class="head">Game Sales - Total: {:total}</div>
+				<div class="head">Game Sales - Total with current filters: {:total}</div>
 				<div class="body group">
 					<form id="sale-search-form"><input id="sale-search" class="ays-ignore" name="q" type="search" placeholder="Search by title" /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
 				</div>
-				<div class="body group sales-options">Options: <a href="/sales.php">Clear Filters</a> | <form id="sales-filters" style="display: inline;" method="get">Price: <select style="width: 150px; padding: 5px;" name="option[]"><option></option><option value="5less" {:less5_selected}>$5 and under</option><option value="10less" {:less10_selected}>$10 and under</option></select> <label style="display: inline-block;"><input type="checkbox" name="option[]" value="nodlc" {:nodlc_checked} />No DLC</label> <button id="sales-filters-button" type="submit">Go</button></form><br />
-					<small>If you click the name heading or price, it will sort the list for you in the current page!</small></div>
+				<div class="body group sales-options">
+					<small>If you click the name heading or price, it will sort the list for you in the current page!</small>
+				</div>
 				<table class="sortable sales-table">
 					<thead>
 						<tr><th colspan="2">Name</th><th>Price Now</th></tr>
@@ -51,5 +60,25 @@
 			{:pagination}
 		</div>
 	</div>
-</div>
 [/block: sales_bottom]
+
+[block: filters]
+	<div class="col-3">
+		<form id="sales_filters" method="get">
+		<div class="box">
+			<div class="head">Stores</div>
+			<div class="body group">
+				{:stores_options}
+			</div>
+		</div>
+		<div class="box">
+			<div class="head">Misc</div>
+			<div class="body group">
+				<label><input type="checkbox" name="option[]" value="nodlc" {:nodlc_checked} />No DLC</label>
+				<select style="width: 150px; padding: 5px;" name="option[]"><option value="">Price Options</option><option value="5less">$5 and under</option><option value="10less">$10 and under</option></select>
+			</div>
+		</div>
+		</form>
+	</div>
+</div>
+[/block: filters]

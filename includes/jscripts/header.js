@@ -1481,7 +1481,7 @@ jQuery(document).ready(function()
 	$(document).on('click', ".sales-pagination li a", function(e) 
 	{
 		e.preventDefault();
-		var form = $("#sales-filters");
+		var form = $("#sales_filters");
 		var url = "/includes/ajax/sales/display_normal.php";
 		var page = $(this).attr("data-page");
 	  
@@ -1500,11 +1500,10 @@ jQuery(document).ready(function()
 		});
 	});
 
-	// filters form submit ajax
-	$(document).on('click', "#sales-filters-button", function(e)
+	// sales page filters
+	$(document).on('change', "#sales_filters", function(e)
 	{
-		e.preventDefault();
-		var form = $("#sales-filters");
+		var form = $("#sales_filters");
 		var url = "/includes/ajax/sales/display_normal.php";
 
 		$.ajax({
@@ -1541,5 +1540,4 @@ jQuery(document).ready(function()
 			}
 		});		
 	});
-	
 });

@@ -1502,10 +1502,10 @@ th, td { vertical-align: top; }
 .button_link{
 	background: #f9f9f9;
 	border: 1px solid #dddddd;
-	color: #000 !important;
+	color: #404040 !important;
 	cursor: pointer;
-	float: left;
 	font-weight: 400;
+	font-size: 13px;
 	padding: 7px 14px 9px 14px !important;
 	text-decoration: none;
 	width: auto;

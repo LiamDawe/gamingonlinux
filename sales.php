@@ -153,9 +153,29 @@ if ($res_bundle)
 		$countdown = '<noscript>'.$bundle['end_date'].' UTC</noscript><span id="bundle'.$bundle['id'].'"></span><script type="text/javascript">var bundle' . $bundle['id'] . ' = moment.tz("'.$bundle['end_date'].'", "UTC"); $("#bundle'.$bundle['id'].'").countdown(bundle'.$bundle['id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
 		$templating->set('time_left', $countdown);
 	}
+
+	$templating->block('bundles_bottom', 'sales');
 }
 
+$templating->block('top_closing', 'sales');
+
 $game_sales->display_normal();
+
+$templating->block('filters', 'sales');
+
+// stores
+$stores_res = $dbl->run("SELECT `id`, `name` FROM `game_stores` ORDER BY `name` ASC")->fetch_all();
+$stores_output = '';
+foreach ($stores_res as $store)
+{
+	$checked = '';
+	if (isset($filters_sort['stores']) && in_array($store['id'], $filters_sort['stores']))
+	{
+		$checked = 'checked';
+	}
+	$stores_output .= '<label><input type="checkbox" name="stores[]" value="'.$store['id'].'" '.$checked.'> '.$store['name'].'</label>';
+}
+$templating->set('stores_options', $stores_output);
 
 include(APP_ROOT . '/includes/footer.php');
 ?>

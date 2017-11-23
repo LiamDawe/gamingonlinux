@@ -123,7 +123,7 @@ do {
 				$img = new SimpleImage();
 				$img->fromFile($saved_file)->resize(120, 45)->toFile($saved_file);
 
-				$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$saved_file, $game_list['id']]);
+				$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_list['id'] . '.jpg', $game_list['id']]);
 			}
 
 			$on_sale[] = $game_id;

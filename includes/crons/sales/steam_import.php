@@ -97,7 +97,7 @@ do
 				{
 					$saved_file = $core->config('path') . 'uploads/sales/' . $game_list['id'] . '.jpg';
 					$core->save_image($image, $saved_file);
-					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$saved_file, $game_list['id']]);
+					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_list['id'] . '.jpg', $game_list['id']]);
 				}
 			
 				$on_sale[] = $game_id;

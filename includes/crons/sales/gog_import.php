@@ -79,6 +79,9 @@ do {
 				$games['title'] = 'The ' . $games['title'];
 			}
 
+			$games['title'] = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $games['title']); // remove junk
+			$games['title'] = trim($games['title']);
+
 			/*echo $games['title'] . "\n";
 			echo "* Original Price: $". $original_price ."\n";
 			echo "* Price Now: $" . $current_price . "\n";*/

@@ -73,6 +73,7 @@ do
 			if ($use_sale == 1)
 			{
 				$sane_name = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $game->human_name); // remove junk	
+				$sane_name = trim($sane_name);
 
 				echo $sane_name."\n";
 

@@ -89,7 +89,7 @@ do
 						$game_id = $game_list['also_known_as'];
 					}
 			
-					$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($game_id));
+					$dbl->run("UPDATE `calendar` SET `on_sale` = 1, `steam_link` = ? WHERE `id` = ?", array($link, $game_id));
 				}
 
 				// if the game list has no picture, grab it and save it

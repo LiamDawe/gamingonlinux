@@ -1,7 +1,4 @@
 <?php
-// TODO
-// ?cc=us for dollars, lets get pounds working first eh boyos!
-
 // http://simplehtmldom.sourceforge.net/
 include('simple_html_dom.php');
 
@@ -64,15 +61,19 @@ do
 				echo 'Original price: ' . $original_price . '<br />';
 				echo 'Price now: ' . $price_now  . '<br />';
 
+				$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
+
+				echo 'SteamID: ' . $steam_id;
+
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 			
 				if (!$game_list)
 				{
-					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1", array($title, date('Y-m-d'), $link));
+					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?", array($title, date('Y-m-d'), $link, $steam_id));
 			
 					// need to grab it again
-					$game_list = $dbl->run("SELECT `id`,`small_picture` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+					$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 			
 					$game_id = $game_list['id'];
 				}
@@ -94,6 +95,13 @@ do
 					$saved_file = $core->config('path') . 'uploads/sales/' . $game_list['id'] . '.jpg';
 					$core->save_image($image, $saved_file);
 					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_list['id'] . '.jpg', $game_list['id']]);
+				}
+
+				// if it has no steam_id, give it one
+				if ($game_list['steam_id'] == NULL || $game_list['steam_id'] == '')
+				{
+					$dbl->run("UPDATE `calendar` SET `steam_id` = ? WHERE `id` = ?", [$steam_id, $game_id]);
+					
 				}
 			
 				$on_sale[] = $game_id;

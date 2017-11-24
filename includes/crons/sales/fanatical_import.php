@@ -43,14 +43,22 @@ foreach ($array['data'] as $games)
 	if (in_array('linux', $games['operating_systems']) && $games['discount_percent'] > 0 && substr($games['title'], -6) != 'Bundle')
 	{
 		$website = str_replace('https://', '', $games['url']);
-		$current_price =  $games['current_price']['USD'];
-		$original_price = $games['regular_price']['USD'];
+		$current_price_us =  $games['current_price']['USD'];
+		$original_price_us = $games['regular_price']['USD'];
+		$current_price_uk =  $games['current_price']['GBP'];
+		$original_price_uk = $games['regular_price']['GBP'];
+		$current_price_eu =  $games['current_price']['EUR'];
+		$original_price_eu = $games['regular_price']['EUR'];
 
 		$games['title'] = $game_sales->clean_title($games['title']);
 
 		echo $games['title'] . "\n";
-		echo "* Original Price: $". $original_price ."\n";
-		echo "* Price Now: $" . $current_price . "\n";
+		echo "* Original Price: $". $original_price_us ."\n";
+		echo "* Price Now: $" . $current_price_us . "\n";
+		echo "* Original Price: £". $original_price_uk ."\n";
+		echo "* Price Now: £" . $current_price_uk . "\n";
+		echo "* Original Price: ". $original_price_eu ."€\n";
+		echo "* Price Now: " . $current_price_eu . "€\n";
 
 		$release_date = date('Y-m-d', $games['release_date']);
 
@@ -86,11 +94,18 @@ foreach ($array['data'] as $games)
 		if (!$check_sale)
 		{
 			$share_sale = 'http://www.shareasale.com/r.cfm?u=1644082&b=880704&m=66498&urllink='.$website;
-			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 2, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_id, $current_price, $original_price, $share_sale));
+			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 2, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `sale_pounds` = ?, `original_pounds` = ?, `sale_euro` = ?, `original_euro` = ?, `link` = ?", array($game_id, $current_price_us, $original_price_us, $current_price_uk, $original_price_uk, $current_price_eu, $original_price_eu, $share_sale));
 
 			$sale_id = $dbl->new_id();
 
 			echo "\tAdded ".$games['title']." to the sales DB with id: " . $sale_id . ".\n";
+		}
+		// update it with the current info
+		else
+		{
+			$dbl->run("UPDATE `sales` SET `sale_dollars` = ?, `original_dollars` = ?, `sale_pounds` = ?, `original_pounds` = ?, `sale_euro` = ?, `original_euro` = ? WHERE `game_id` = ? AND `store_id` = 2", [$current_price_us, $original_price_us, $current_price_uk, $original_price_uk, $current_price_eu, $original_price_eu, $game_id]);
+
+			echo "\tUpdated ".$games['title']." with the current prices!\n";
 		}
 	}
 }

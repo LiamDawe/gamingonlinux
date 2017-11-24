@@ -133,7 +133,7 @@ class game_sales
 			$small_pic = '';
 			if ($sales[0]['picture'] != NULL && $sales[0]['picture'] != '')
 			{
-				$small_pic = $this->core->config('website_url') . 'uploads/sales/' . $sales[0]['game_id'] . '.jpg';
+				$small_pic = $this->core->config('website_url') . 'uploads/gamesdb/small/' . $sales[0]['game_id'] . '.jpg';
 			}
 			$this->templating->set('small_pic', $small_pic);
 

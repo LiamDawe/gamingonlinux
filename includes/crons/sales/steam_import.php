@@ -117,7 +117,7 @@ foreach ($currencies as $key => $currency)
 					// if the game list has no picture, grab it and save it
 					if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
 					{
-						$saved_file = $core->config('path') . 'uploads/sales/' . $game_list['id'] . '.jpg';
+						$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
 						$core->save_image($image, $saved_file);
 						$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_list['id'] . '.jpg', $game_list['id']]);
 					}

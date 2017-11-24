@@ -1523,6 +1523,7 @@ jQuery(document).ready(function()
 	$(document).on('click', "#sale-search-form div.eac-item", function(e)
 	{
 		e.preventDefault();
+		var form = $("#sales_filters");
 		var text = $(this).text();
 		var url = "/includes/ajax/sales/display_normal.php";
 
@@ -1531,7 +1532,7 @@ jQuery(document).ready(function()
 		$.ajax({
 			type: "GET",
 			url: url,
-			data: {'q': text}, 
+			data: {'q': text, 'filters': form.serialize()}, 
 			success: function(data)
 			{
 				$('div.normal-sales').html(data);

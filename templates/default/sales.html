@@ -72,10 +72,16 @@
 			</div>
 		</div>
 		<div class="box">
+			<div class="head">Pricing</div>
+			<div class="body group">
+				<select style="width: 150px; padding: 5px;" name="currency"><option value="">Currency</option><option value="us">US Dollars</option><option value="uk">British Pound</option><option value="eu">Euro</option></select>
+				<select style="width: 150px; padding: 5px;" name="option[]"><option value="">Price Options</option><option value="5less">$5 and under</option><option value="10less">$10 and under</option></select>
+			</div>
+		</div>
+		<div class="box">
 			<div class="head">Misc</div>
 			<div class="body group">
 				<label><input type="checkbox" name="option[]" value="nodlc" {:nodlc_checked} />No DLC</label>
-				<select style="width: 150px; padding: 5px;" name="option[]"><option value="">Price Options</option><option value="5less">$5 and under</option><option value="10less">$10 and under</option></select>
 			</div>
 		</div>
 		</form>

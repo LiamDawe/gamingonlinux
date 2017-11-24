@@ -39,8 +39,11 @@ class game_sales
 		// get normal sales
 		$this->templating->block('sales_top', 'sales');
 
+		$currency = ['uk' => ['sign' => '&pound;', 'sign_position' => 'front', 'field' => 'pounds'], 'us' => ['sign' => '&dollar;', 'sign_position' => 'front', 'field' => 'dollars'], 'eu' => ['sign' => '&euro;', 'sign_position' => 'back', 'field' => 'euro']];
+
 		$store_ids = [];
 		$stores_sql = '';
+		$picked_currency = $currency['us'];
 		if (isset($filters_sort) && is_array($filters_sort))
 		{
 			$options_array = [];
@@ -74,7 +77,15 @@ class game_sales
 				$in  = str_repeat('?,', count($store_ids) - 1) . '?';
 				$stores_sql = ' AND store_id in ('.$in.') ';
 			}
+			
+			if (isset($filters_sort['currency']) && array_key_exists($filters_sort['currency'], $currency))
+			{
+				$picked_currency = $currency[$filters_sort['currency']];
+			}
 		}
+
+		$sale_price_field = 'sale_' . $picked_currency['field'];
+		$original_price_field = 'original_' . $picked_currency['field'];
 
 		$where = '';
 		if (isset($_GET['q']))
@@ -87,7 +98,7 @@ class game_sales
 
 			$search_query = str_replace('+', ' ', $_GET['q']);
 			$where = '%'.$search_query.'%';
-			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND c.`name` LIKE ? $options_sql ORDER BY s.`sale_dollars` ASC", [$where])->fetch_all();
+			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`$sale_price_field`, s.$original_price_field, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND c.`name` LIKE ? AND s.`$sale_price_field` IS NOT NULL $options_sql ORDER BY s.`$sale_price_field` ASC", [$where])->fetch_all();
 		}
 		else
 		{
@@ -96,14 +107,14 @@ class game_sales
 			{
 				$options_sql = ' AND ' . implode(' AND ', $options_array);
 			}
-			$sales_sql = "SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`sale_dollars`, s.original_dollars, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 $options_sql $stores_sql ORDER BY s.`sale_dollars` ASC";
+			$sales_sql = "SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`$sale_price_field`, s.$original_price_field, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND s.`$sale_price_field` IS NOT NULL $options_sql $stores_sql ORDER BY s.`$sale_price_field` ASC";
 			$sales_res = $this->dbl->run($sales_sql, $store_ids)->fetch_all();
 		}
 
 		$sales_merged = [];
 		foreach ($sales_res as $sale)
 		{
-			$sales_merged[$sale['name']][] = ['game_id' => $sale['game_id'], 'store' => $sale['store_name'], 'sale_dollars' => $sale['sale_dollars'], 'original_dollars' => $sale['original_dollars'], 'link' => $sale['link'], 'is_dlc' => $sale['is_dlc'], 'picture' => $sale['small_picture']];
+			$sales_merged[$sale['name']][] = ['game_id' => $sale['game_id'], 'store' => $sale['store_name'], 'sale_price' => $sale[$sale_price_field], 'original_price' => $sale[$original_price_field], 'link' => $sale['link'], 'is_dlc' => $sale['is_dlc'], 'picture' => $sale['small_picture']];
 		}
 
 		// paging for pagination
@@ -136,9 +147,9 @@ class game_sales
 				}
 				$this->templating->set('edit', $edit);
 				$savings_dollars = '';
-				if ($store['original_dollars'] != 0)
+				if ($store['original_price'] != 0)
 				{
-					$savings = 1 - ($store['sale_dollars'] / $store['original_dollars']);
+					$savings = 1 - ($store['sale_price'] / $store['original_price']);
 					$savings_dollars = round($savings * 100) . '% off';
 				}
 
@@ -148,11 +159,22 @@ class game_sales
 					$dlc = '<span class="badge yellow">DLC</span>';
 				}
 
-				$stores_output .= ' <span class="badge"><a href="'.$store['link'].'" target="_blank">'.$store['store'].' - $'.$store['sale_dollars'] . ' | ' . $savings_dollars . '</a></span> ';
+				$front_sign = '';
+				$back_sign = '';
+				if ($picked_currency['sign_position'] == 'front')
+				{
+					$front_sign = $picked_currency['sign'];
+				}
+				else if ($picked_currency['sign_position'] == 'back')
+				{
+					$back_sign = $picked_currency['sign'];
+				}
+
+				$stores_output .= ' <span class="badge"><a href="'.$store['link'].'" target="_blank">'.$store['store'].' - ' . $front_sign .$store['sale_price'] . $back_sign . ' | ' . $savings_dollars . '</a></span> ';
 			}
 			$this->templating->set('stores', $dlc . $stores_output);
 
-			$this->templating->set('lowest_price', $sales[0]['sale_dollars']);
+			$this->templating->set('lowest_price', $sales[0]['sale_price']);
 			$this->templating->set('name_sort', trim(strtolower($name)));
 		}
 

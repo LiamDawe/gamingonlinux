@@ -61,7 +61,15 @@ do
 				echo 'Original price: ' . $original_price . '<br />';
 				echo 'Price now: ' . $price_now  . '<br />';
 
-				$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
+				if (strpos($link, '/app/') !== false) 
+				{
+					$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
+				}
+
+				if (strpos($link, '/sub/') !== false) 
+				{
+					$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/sub\/([0-9]*)\/.*~', '$1', $link);
+				}
 
 				echo 'SteamID: ' . $steam_id;
 

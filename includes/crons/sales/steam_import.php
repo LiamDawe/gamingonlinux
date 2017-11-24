@@ -61,6 +61,7 @@ do
 				echo 'Original price: ' . $original_price . '<br />';
 				echo 'Price now: ' . $price_now  . '<br />';
 
+				$bundle = 0;
 				if (strpos($link, '/app/') !== false) 
 				{
 					$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
@@ -68,20 +69,21 @@ do
 
 				if (strpos($link, '/sub/') !== false) 
 				{
+					$bundle = 1;
 					$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/sub\/([0-9]*)\/.*~', '$1', $link);
 				}
 
 				echo 'SteamID: ' . $steam_id;
 
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 			
 				if (!$game_list)
 				{
-					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?", array($title, date('Y-m-d'), $link, $steam_id));
+					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?", array($title, date('Y-m-d'), $link, $steam_id, $bundle));
 			
 					// need to grab it again
-					$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+					$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id`, `bundle` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 			
 					$game_id = $game_list['id'];
 				}
@@ -109,8 +111,13 @@ do
 				if ($game_list['steam_id'] == NULL || $game_list['steam_id'] == '')
 				{
 					$dbl->run("UPDATE `calendar` SET `steam_id` = ? WHERE `id` = ?", [$steam_id, $game_id]);
-					
 				}
+
+				// if we haven't checked if it's a bundle yet
+				if ($game_list['bundle'] == NULL || $game_list['bundle'] == '')
+				{
+					$dbl->run("UPDATE `calendar` SET `bundle` = ? WHERE `id` = ?", [$bundle, $game_id]);
+				}				
 			
 				$on_sale[] = $game_id;
 			

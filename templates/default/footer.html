@@ -103,7 +103,26 @@ this.editor.filter.addTransformations([
 		}
 	};
 
+	var free_search_options = {
+		url: function(phrase) { 
+				return "/includes/ajax/call_free_games.php?q=" + phrase + "&format=json";    
+		},
+
+		getValue: "data",
+
+		ajaxSettings: {
+			dataType: "json"
+		},
+		requestDelay: 300,
+		list: {
+			onClickEvent: function() {
+				var replaced = $("#free-search").val().replace(/ /g, '+');
+			}	
+		}
+	};
+
 $("#sale-search").easyAutocomplete(sale_search_options);
+$("#free-search").easyAutocomplete(free_search_options);
 </script>
 {:ckeditor_js}
 {:editor_js}

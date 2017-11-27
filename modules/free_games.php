@@ -17,7 +17,7 @@ if ($games_res)
 		$small_pic = '';
 		if ($game['small_picture'] != NULL && $game['small_picture'] != '')
 		{
-			$small_pic = $core->config('website_url') . 'uploads/gamesdb/small/' . $game['id'] . '.jpg';
+			$small_pic = $core->config('website_url') . 'uploads/gamesdb/small/' . $game['small_picture'];
 		}
 		$templating->set('small_pic', $small_pic);
 

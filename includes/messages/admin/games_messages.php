@@ -1,8 +1,8 @@
 <?php
 return [
-	"not_authorized" => 
+	"link_needed" => 
 	[
-		"one_link_needed" => 'You need to put in at least one link!',
+		"text" => 'You need to put in at least one link!',
 		"error" => 1
 	]
 ];

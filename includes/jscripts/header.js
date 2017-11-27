@@ -1541,4 +1541,28 @@ jQuery(document).ready(function()
 			}
 		});		
 	});
+
+	/* GAMES DATABASE */
+	$('#small_pic').off('click').on('change', function()
+	{
+		$("#small_pic").ajaxForm({target: '#preview2',
+		beforeSubmit:function()
+		{
+			$("#imageloadstatus2").show();
+			$("#imageloadbutton2").hide();
+		},
+		success:function()
+		{
+        	$("#imageloadstatus2").hide();
+        	$("#imageloadbutton2").show();
+			resetFormElement($('#photoimg2'));
+		},
+		error:function()
+		{
+			$("#imageloadstatus2").hide();
+  			$("#imageloadbutton2").show();
+			resetFormElement($('#photoimg2'));
+		}
+    }).submit();
+	});
 });

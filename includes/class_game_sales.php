@@ -21,6 +21,67 @@ class game_sales
 		return $title;
 	}
 
+	// move previously uploaded tagline image to correct directory
+	function move_small($game_id, $file)
+	{
+		$types = array('jpg', 'png', 'gif');
+		$full_file_big = $this->core->config('path') . "uploads/gamesdb/small/temp/" . $file;
+
+		if (!file_exists($full_file_big))
+		{
+			$this->error_message = "Could not find temp image to load? $full_file_big";
+			return false;
+		}
+
+		else
+		{
+			$image_info = getimagesize($full_file_big);
+			$image_type = $image_info[2];
+			$file_ext = '';
+			if( $image_type == IMAGETYPE_JPEG )
+			{
+				$file_ext = 'jpg';
+			}
+
+			else if( $image_type == IMAGETYPE_GIF )
+			{
+				$file_ext = 'gif';
+			}
+
+			else if( $image_type == IMAGETYPE_PNG )
+			{
+				$file_ext = 'png';
+			}
+
+			// give the image a random file name
+			$imagename = rand() . 'id' . $game_id . 'gol.' . $file_ext;
+
+			// the actual image
+			$source = $full_file_big;
+
+			// where to upload to
+			$target = $this->core->config('path') . "uploads/gamesdb/small/" . $imagename;
+
+			if (rename($source, $target))
+			{
+				$image = $this->dbl->run("SELECT `small_picture` FROM `calendar` WHERE `id` = ?", array($game_id))->fetch();
+
+				// remove old image
+				if (isset($image))
+				{
+					if (!empty($image['small_picture']))
+					{
+						unlink($this->core->config('path') . 'uploads/gamesdb/small/' . $image['small_picture']);
+					}
+				}
+
+				$this->dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$imagename, $game_id]);
+				
+				return true;
+			}
+		}
+	}
+
 	function display_normal($filters = NULL)
 	{
 		// for non-ajax requests
@@ -133,7 +194,7 @@ class game_sales
 			$small_pic = '';
 			if ($sales[0]['picture'] != NULL && $sales[0]['picture'] != '')
 			{
-				$small_pic = $this->core->config('website_url') . 'uploads/gamesdb/small/' . $sales[0]['game_id'] . '.jpg';
+				$small_pic = $this->core->config('website_url') . 'uploads/gamesdb/small/' . $sales[0]['picture'];
 			}
 			$this->templating->set('small_pic', $small_pic);
 

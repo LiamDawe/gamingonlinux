@@ -46,7 +46,18 @@
 [/block: edit_top]
 
 [block: item]
+			<script src="includes/jscripts/jquery.form.min.js"></script>
 			<div class="body group">
+				<form id="small_pic" method="post" enctype="multipart/form-data" action='includes/ajax/gamesdb/ajax_small_pic.php' style="clear:both">
+					Small pic to show in lists 120x45.<br />
+					<div id='imageloadstatus2' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
+					<div id='imageloadbutton2'>
+					<input type="file" name="photos2" id="photoimg2" multiple="true" {:edit_state}/>
+					</div>
+				</form>
+				<div id='preview2'>
+					{:small_pic}
+				</div><br />
 				<form method="post" action="admin.php?module=games">
 					<em>Games have to have at least one link at a minimum!</em><br />
 					<br />

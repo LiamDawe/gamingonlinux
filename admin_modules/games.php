@@ -1,4 +1,6 @@
 <?php
+$games_database = new game_sales($dbl, $templating, $user, $core);
+
 $templating->load('admin_modules/games');
 
 $licenses = array('', 'Closed Source', 'GPL', 'BSD', 'MIT');
@@ -61,16 +63,9 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
-				if (isset($_GET['message']))
+				if (!isset($message_map::$error) || $message_map::$error == 0)
 				{
-					if ($_GET['message'] == 'edited')
-					{
-						$core->message('Game edit completed!');
-					}
-					if ($_GET['message'] == 'missing')
-					{
-						$core->message('Please fill a name, a release date and one link at a minimum!', 1);
-					}
+					$_SESSION['gamesdb_image_rand'] = rand();
 				}
 
 				$templating->set_previous('meta_description', 'Editing: '.$game['name'], 1);
@@ -92,6 +87,12 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				{
 					$templating->set($store . '_link', $game[$store . '_link']);
 				}
+				$small_pic = '';
+				if ($game['small_picture'] != NULL && $game['small_picture'] != '')
+				{
+					$small_pic = '<img src="/uploads/gamesdb/small/'.$game['small_picture'].'" alt="" />';
+				}
+				$templating->set('small_pic', $small_pic);
 
 				$templating->set('id', $game['id']);
 				$templating->set('name', $game['name']);
@@ -322,13 +323,29 @@ if (isset($_POST['act']))
 	{
 		if (empty($_POST['id']) || !is_numeric($_POST['id']))
 		{
-			header("Location: /admin.php?module=games&view=manage&message=missing_id");
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game';
+			header("Location: /admin.php?module=games&view=manage");
 			die();
 		}
 
-		if (empty($_POST['name']) || empty($_POST['date']) || (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link']) && empty($_POST['itch_link'])))
+		$name = $_POST['name'];
+		$date = $_POST['date'];
+		$empty_check = core::mempty(compact('name', 'date'));
+		if ($empty_check !== true)
 		{
-			header("Location: /admin.php?module=games&view=edit&message=missing&id=" . $_POST['id']);
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $empty_check;
+
+			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id']);
+			die();
+		}
+
+		if (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link']) && empty($_POST['itch_link']))
+		{
+			$_SESSION['message'] = 'link_needed';
+
+			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id']);
 			die();
 		}
 
@@ -371,22 +388,33 @@ if (isset($_POST['act']))
 		
 		$core->process_game_genres($_POST['id']);
 
+		if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
+		{
+			$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
+		}
+
 		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 	
 		if (isset($_GET['return']) && !empty($_GET['return']))
 		{
 			if ($_GET['return'] == 'calendar')
 			{
-				header("Location: /index.php?module=calendar&message=edited");
+				$_SESSION['message'] = 'edited';
+				$_SESSION['message_extra'] = 'game';
+				header("Location: /index.php?module=calendar");
 			}
 			if ($_GET['return'] == 'game')
 			{
-				header("Location: /index.php?module=game&game-id=" . $_POST['id'] . '&message=edited');
+				$_SESSION['message'] = 'edited';
+				$_SESSION['message_extra'] = 'game';
+				header("Location: /index.php?module=game&game-id=" . $_POST['id']);
 			}
 		}
 		else
 		{
-			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id'] . '&message=edited');
+			$_SESSION['message'] = 'edited';
+			$_SESSION['message_extra'] = 'game';
+			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id']);
 		}
 	}
 	if ($_POST['act'] == 'Delete')

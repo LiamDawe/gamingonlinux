@@ -1,4 +1,6 @@
 <?php
+$game_sales = new game_sales($dbl, $templating, $user, $core);
+
 $templating->set_previous('title', 'Free Linux games', 1);
 $templating->set_previous('meta_description', 'Free Linux games', 1);
 
@@ -6,7 +8,18 @@ $templating->load('free_games');
 
 $templating->block('head', 'free_games');
 
-$games_res = $dbl->run("SELECT `id`, `name`, `link`, `gog_link`, `steam_link`, `itch_link`, `license`, `small_picture` FROM `calendar` WHERE `free_game` = 1 ORDER BY `name` ASC")->fetch_all();
+$game_sales->display_free();
+
+// paging for pagination
+/*
+$page = isset($_GET['page'])?intval($_GET['page']-1):0;
+
+$total_rows = $dbl->run("SELECT COUNT(id) FROM `calendar` WHERE `free_game` = 1 ORDER BY `name` ASC")->fetchOne();
+
+$link_extra = '';
+$pagination = $core->pagination_link(50, $total_rows, '/index.php?module=free_games&', $page + 1, $link_extra);
+
+$games_res = $dbl->run("SELECT `id`, `name`, `link`, `gog_link`, `steam_link`, `itch_link`, `license`, `small_picture`, `trailer` FROM `calendar` WHERE `free_game` = 1 ORDER BY `name` ASC LIMIT {$core->start}, 50")->fetch_all();
 
 if ($games_res)
 {
@@ -17,8 +30,14 @@ if ($games_res)
 		$small_pic = '';
 		if ($game['small_picture'] != NULL && $game['small_picture'] != '')
 		{
-			$small_pic = $core->config('website_url') . 'uploads/gamesdb/small/' . $game['small_picture'];
+			$small_pic = '<img src="' . $core->config('website_url') . 'uploads/gamesdb/small/' . $game['small_picture'] . '" alt="" />';
 		}
+
+		if ($game['trailer'] != NULL && $game['trailer'] != '')
+		{
+			$small_pic = '<a data-fancybox href="'.$game['trailer'].'">' . $small_pic . '</a>';
+		}
+
 		$templating->set('small_pic', $small_pic);
 
 		$edit = '';
@@ -55,3 +74,8 @@ else
 }
 
 $templating->block('bottom', 'free_games');
+if ($pagination != '')
+{
+	$pagination = '<div class="free-games-pagination">'.$pagination.'</div>';
+}
+$templating->set('pagination', $pagination);*/

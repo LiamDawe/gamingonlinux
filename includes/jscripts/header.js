@@ -1565,4 +1565,27 @@ jQuery(document).ready(function()
 		}
     }).submit();
 	});
+
+	/* free games page */
+
+	// pagination ajax
+	$(document).on('click', ".free-games-pagination li a", function(e) 
+	{
+		e.preventDefault();
+		var url = "/includes/ajax/gamesdb/display_free.php";
+		var page = $(this).attr("data-page");
+	  
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'page': page}, 
+			success: function(data)
+			{
+				$('div.free-list').html(data);
+				$('div.free-list').highlight();
+				$('div.free-list').scrollMinimal();
+				$('#free-search').easyAutocomplete(free_search_options); // required so EAC works when loaded dynamically
+			}
+		});
+	});
 });

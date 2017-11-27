@@ -7,16 +7,19 @@
 		<form id="free-search-form"><input id="free-search" class="ays-ignore" name="q" type="search" placeholder="Search for a free game by title..." /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
 	</div>
 	<div class="head">Games List</div>
+[/block: head]
+
+[block: list_top]
+	<div class="free-list">
 	<table class="sales-table">
 		<thead>
 			<tr><th colspan="2">Name</th><th>Links</th><th>License</th></tr>
 		</thead>
-		<tbody>
-[/block: head]
+[/block: list_top]
 
 [block: row]
 		<tr class="bundle-row">
-			<td width="15%;"><img src="{:small_pic}" /></td>
+			<td width="15%;">{:small_pic}</td>
 			<td width="40%;">{:edit}{:name}</td>
 			<td width="40%;">{:links}</td>
 			<td width="5%;">{:license}</td>
@@ -26,6 +29,8 @@
 [block: bottom]
 		</tbody>
 	</table>
-	<small>Are we missing a free game? <a href="/index.php?module=email_us">Send us a tip!</a></small>
+	{:pagination}
+	<div class="body group"><small>Are we missing a free game? <a href="/index.php?module=email_us">Send us a tip!</a></small></div>
+	</div>
 </div>
 [/block: bottom]

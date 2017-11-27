@@ -82,6 +82,82 @@ class game_sales
 		}
 	}
 
+	function display_free($filters = NULL)
+	{
+		$this->templating->load('free_games');
+
+		$this->templating->block('list_top', 'free_games');
+
+		// paging for pagination
+		$page = isset($_GET['page'])?intval($_GET['page']-1):0;
+
+		$total_rows = $this->dbl->run("SELECT COUNT(id) FROM `calendar` WHERE `free_game` = 1 ORDER BY `name` ASC")->fetchOne();
+
+		$link_extra = '';
+		$pagination = $this->core->pagination_link(50, $total_rows, '/index.php?module=free_games&', $page + 1, $link_extra);
+
+		$games_res = $this->dbl->run("SELECT `id`, `name`, `link`, `gog_link`, `steam_link`, `itch_link`, `license`, `small_picture`, `trailer` FROM `calendar` WHERE `free_game` = 1 ORDER BY `name` ASC LIMIT {$this->core->start}, 50")->fetch_all();
+
+		if ($games_res)
+		{
+			foreach ($games_res as $game)
+			{
+				$this->templating->block('row', 'free_games');
+
+				$small_pic = '';
+				if ($game['small_picture'] != NULL && $game['small_picture'] != '')
+				{
+					$small_pic = '<img src="' . $this->core->config('website_url') . 'uploads/gamesdb/small/' . $game['small_picture'] . '" alt="" />';
+				}
+
+				if ($game['trailer'] != NULL && $game['trailer'] != '')
+				{
+					$small_pic = '<a data-fancybox href="'.$game['trailer'].'">' . $small_pic . '</a>';
+				}
+
+				$this->templating->set('small_pic', $small_pic);
+
+				$edit = '';
+				if ($this->user->check_group([1,2,5]))
+				{
+					$edit = '<a href="/admin.php?module=games&view=edit&id='.$game['id'].'"><span class="icon edit edit-sale-icon"></span></a> ';
+				}
+				$this->templating->set('edit', $edit);
+
+				$this->templating->set('name', $game['name']);
+
+				$links = [];
+				$stores = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];
+				foreach ($stores as $type => $name)
+				{
+					if (isset($game[$type]) && !empty($game[$type]))
+					{
+						$links[] = '<a href="'.$game[$type].'">'.$name.'</a>';
+					}
+				}
+				$this->templating->set('links', implode(', ', $links));
+
+				$license = '';
+				if (isset($game['license']) && $game['license'] != '')
+				{
+					$license = $game['license'];
+				}
+				$this->templating->set('license', $license);
+			}
+		}
+		else
+		{
+			$this->core->message("We aren't listing any free games at the moment, come back soon!");
+		}
+
+		$this->templating->block('bottom', 'free_games');
+		if ($pagination != '')
+		{
+			$pagination = '<div class="free-games-pagination">'.$pagination.'</div>';
+		}
+		$this->templating->set('pagination', $pagination);
+	}
+
 	function display_normal($filters = NULL)
 	{
 		// for non-ajax requests

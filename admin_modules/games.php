@@ -30,7 +30,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game', 'trailer', 'trailer_link');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');
@@ -97,6 +97,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set('id', $game['id']);
 				$templating->set('name', $game['name']);
 				$templating->set('link', $game['link']);
+				$templating->set('trailer', $game['trailer']);
+
+				$trailer_link = '';
+				if ($game['trailer'] != NULL && $game['trailer'] != '')
+				{
+					$trailer_link = '<a href="'.$game['trailer'].'" target="_blank">Trailer Link</a>';
+				}
+				$templating->set('trailer_link', $trailer_link);
 
 				$date = new DateTime($game['date']);
 				$templating->set('date', $date->format('d-m-Y'));
@@ -307,10 +315,16 @@ if (isset($_POST['act']))
 		{
 			$license = $_POST['license'];
 		}
+
+		$trailer = NULL;
+		if (!empty(trim($_POST['trailer'])))
+		{
+			$trailer = $_POST['trailer'];
+		}
 		
 		$description = trim($_POST['text']);
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license));
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?, `trailer` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer));
 		$new_id = $dbl->new_id();
 
 		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
@@ -381,10 +395,16 @@ if (isset($_POST['act']))
 			$license = $_POST['license'];
 		}
 
+		$trailer = NULL;
+		if (!empty(trim($_POST['trailer'])))
+		{
+			$trailer = $_POST['trailer'];
+		}
+
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $_POST['id']));
+		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?, `trailer` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $_POST['id']));
 		
 		$core->process_game_genres($_POST['id']);
 

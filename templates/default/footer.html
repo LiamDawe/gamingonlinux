@@ -87,7 +87,7 @@ this.editor.filter.addTransformations([
 
 	var sale_search_options = {
 		url: function(phrase) { 
-				return "/includes/ajax/call_sales.php?q=" + phrase + "&format=json";    
+				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&sales&format=json";    
 		},
 
 		getValue: "data",
@@ -105,7 +105,7 @@ this.editor.filter.addTransformations([
 
 	var free_search_options = {
 		url: function(phrase) { 
-				return "/includes/ajax/call_free_games.php?q=" + phrase + "&format=json";    
+				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&free&format=json";    
 		},
 
 		getValue: "data",

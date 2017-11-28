@@ -91,12 +91,12 @@ class game_sales
 		// paging for pagination
 		$page = isset($_GET['page'])?intval($_GET['page']-1):0;
 
-		$total_rows = $this->dbl->run("SELECT COUNT(id) FROM `calendar` WHERE `free_game` = 1 ORDER BY `name` ASC")->fetchOne();
+		$total_rows = $this->dbl->run("SELECT COUNT(id) FROM `calendar` WHERE `free_game` = 1 AND `also_known_as` IS NULL ORDER BY `name` ASC")->fetchOne();
 
 		$link_extra = '';
 		$pagination = $this->core->pagination_link(50, $total_rows, '/index.php?module=free_games&', $page + 1, $link_extra);
 
-		$games_res = $this->dbl->run("SELECT `id`, `name`, `link`, `gog_link`, `steam_link`, `itch_link`, `license`, `small_picture`, `trailer` FROM `calendar` WHERE `free_game` = 1 ORDER BY `name` ASC LIMIT {$this->core->start}, 50")->fetch_all();
+		$games_res = $this->dbl->run("SELECT `id`, `name`, `link`, `gog_link`, `steam_link`, `itch_link`, `license`, `small_picture`, `trailer` FROM `calendar` WHERE `free_game` = 1 AND `also_known_as` IS NULL ORDER BY `name` ASC LIMIT {$this->core->start}, 50")->fetch_all();
 
 		if ($games_res)
 		{

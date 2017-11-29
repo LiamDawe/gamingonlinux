@@ -22,11 +22,11 @@
 					<div class="box">
 							<div class="body group">
 								<form method="post">
-									Title: <em>Keep it as short as possible and to the point, if it isn't in English, please put a shorthand language in brackets like (GER)</em><input type="text" name="title" /><br />
+									Title: <em>Keep it as short as possible and to the point, if it isn't in English, please put a shorthand language in brackets like (GER)</em><input type="text" name="title" value="{:title}" /><br />
 									Select your timezone (we will convert this to UTC for you):<br />
 									{:timezones_list}
 									Start Date: <br />
-									<input name="date" id="datetimepicker1" type="text" />
+									<input name="date" id="datetimepicker1" type="text" value="{:date}" />
 									<script>
 									var timepicker = new Pikaday(
 										{
@@ -40,7 +40,7 @@
 											use24hour: false
 										});</script>
 										End Date: <br />
-										<input name="end_date" id="datetimepickere2" type="text"/>
+										<input name="end_date" id="datetimepickere2" type="text" value="{:end_date}" />
 										<script>
 										var timepicker = new Pikaday(
 											{
@@ -56,7 +56,7 @@
 									Streamer: <em>Enter the usernames of who is presenting it (accepts multiple people)</em><br />
 									<select tabindex="-1" multiple="" name="user_ids[]" class="call_usernames" style="width:300px" class="populate select2-offscreen"></select><br />
 									Enter if not listed (if not registered on GOL): <input type="text" name="community_name" /><br />
-									Your livestream url <input type="text" name="stream_url" />
+									Your livestream url <input type="text" name="stream_url" value="{:stream_url}" />
 								</div>
 							</div>
 							<button formaction="index.php?module=livestreams" name="act" value="submit" type="submit">Submit for review</button>

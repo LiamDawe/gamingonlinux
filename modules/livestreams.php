@@ -21,6 +21,25 @@ if (!isset($_POST['act']))
 		$templating->block('submit', 'livestreams');
 		$timezones = core::timezone_list($user_timezone);
 		$templating->set('timezones_list', $timezones);
+
+		// if they have done it before set title, text and tagline
+		if (isset($message_map::$error) && $message_map::$error == 1)
+		{
+			$templating->set('title', $_SESSION['e_title']);
+			$templating->set('community_name', $_SESSION['e_community_name']);
+			$templating->set('stream_url', $_SESSION['e_stream_url']);
+			$templating->set('date', $_SESSION['e_date']);
+			$templating->set('end_date', $_SESSION['e_end_date']);
+		}
+
+		else
+		{
+			$templating->set('title', '');
+			$templating->set('tagline', '');
+			$templating->set('stream_url', '');
+			$templating->set('date', '');
+			$templating->set('end_date', '');
+		}
 	}
 
 	$grab_streams = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC")->fetch_all();
@@ -124,6 +143,23 @@ if (isset($_POST['act']))
 				$_SESSION['message_extra'] = $empty_check;
 				header("Location: /index.php?module=livestreams");
 				die();
+			}
+
+			// check their time first
+			$check_start = strtotime($start_time);
+			$check_end = strtotime($end_time);
+
+			if ($check_end <= $check_start)
+			{
+				$_SESSION['e_title'] = $title;
+				$_SESSION['e_community_name'] = $community_name;
+				$_SESSION['e_stream_url'] = $stream_url;
+				$_SESSION['e_date'] = $_POST['date'];
+				$_SESSION['e_end_date'] = $_POST['end_date'];
+
+				$_SESSION['message'] = 'ends_before_start';
+				header("Location: /index.php?module=livestreams");
+				die();				
 			}
 			
 			// ask them to check their time before continuing

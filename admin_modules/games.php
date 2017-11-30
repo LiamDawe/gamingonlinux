@@ -22,6 +22,11 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	
 	if ($_GET['view'] == 'add')
 	{
+		if (!isset($message_map::$error) || $message_map::$error == 0)
+		{
+			$_SESSION['gamesdb_image_rand'] = rand();
+		}
+
 		$templating->set_previous('meta_description', 'Adding a new game', 1);
 		$templating->set_previous('title', 'Adding a game to the database', 1);
 
@@ -292,6 +297,7 @@ if (isset($_POST['act']))
 		if (!empty($date))
 		{
 			$date = new DateTime($date);
+			$date = $date->format('Y-m-d');
 		}
 		else
 		{
@@ -334,8 +340,15 @@ if (isset($_POST['act']))
 			$trailer = $_POST['trailer'];
 		}
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?, `trailer` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer));
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?, `trailer` = ?", array($name, $description, $date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer));
 		$new_id = $dbl->new_id();
+
+		$core->process_game_genres($new_id);
+
+		if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
+		{
+			$games_database->move_small($new_id, $_SESSION['gamesdb_smallpic']['image_name']);
+		}
 
 		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
 

@@ -96,7 +96,7 @@ return [
 	[
 		"text" => "That game already exists! You can find it <a href=\"/index.php?module=game&game-id=%d\">by clicking here.</a>",
 		"additions" => 1,
-		"error" => 1
+		"error" => 2
 	],
 	"reported" => 
 	[

@@ -1712,3 +1712,11 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .sales-table{border-spacing: 0px;}
 .dark .sales-table th {color: #eee;} 
 .edit-sale-icon{display: inline-block; background-size: 10px 10px;}
+
+/* free games page */
+.table-stripes-tbody {border-collapse: collapse;}
+.table-stripes-tbody tbody:nth-child(even) {background: #e5e5e5}
+.table-stripes-tbody tbody:nth-child(odd) {background: #FFF}
+.dark .table-stripes-tbody tbody:nth-child(even) {background: #333}
+.dark .table-stripes-tbody tbody:nth-child(odd) {background: #3f3f3f}
+.td-free-games-tags {padding-top: 0px;}

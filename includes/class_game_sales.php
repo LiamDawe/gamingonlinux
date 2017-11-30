@@ -100,6 +100,16 @@ class game_sales
 
 		if ($games_res)
 		{
+			// first grab a list of all the genres for each game, so we only do one query instead of one for each
+			$genre_ids = [];
+			foreach ($games_res as $set)
+			{
+				$genre_ids[] = $set['id'];
+			}
+			$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
+			$genre_tag_sql = "SELECT r.`game_id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON g.id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, g.name";
+			$genre_res = $this->dbl->run($genre_tag_sql, $genre_ids)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+
 			foreach ($games_res as $game)
 			{
 				$this->templating->block('row', 'free_games');
@@ -143,6 +153,21 @@ class game_sales
 					$license = $game['license'];
 				}
 				$this->templating->set('license', $license);
+
+				$genre_output = '';
+				$genre_list = [];
+				if (isset($genre_res[$game['id']]))
+				{
+					$genre_output = $this->templating->block_store('genres');
+					foreach ($genre_res[$game['id']] as $k => $name)
+					{
+						$genre_list[] = "<span class=\"badge\">{$name}</span>";
+					}
+
+					$genre_output = $this->templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list)));					
+				}
+	
+				$this->templating->set('genre_list', $genre_output);
 			}
 		}
 		else

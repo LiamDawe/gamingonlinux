@@ -30,7 +30,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game', 'trailer', 'trailer_link');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game', 'trailer', 'trailer_link','small_pic');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');
@@ -256,6 +256,7 @@ if (isset($_POST['act']))
 	if ($_POST['act'] == 'Add')
 	{
 		$name = trim($_POST['name']);
+		$description = trim($_POST['text']);
 		$date = trim($_POST['date']);
 		$link = trim($_POST['link']);
 		$steam_link = trim($_POST['steam_link']);
@@ -263,10 +264,12 @@ if (isset($_POST['act']))
 		$itch_link = trim($_POST['itch_link']);
 		
 		// make sure its not empty
-		$empty_check = core::mempty(compact('name', 'date'));
+		$empty_check = core::mempty(compact('name', 'description'));
 		if ($empty_check !== true)
 		{
-			header("Location: /admin.php?module=games&view=add&message=empty&extra=".$empty_check);
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $empty_check;
+			header("Location: /admin.php?module=games&view=add");
 			die();
 		}
 		
@@ -280,11 +283,20 @@ if (isset($_POST['act']))
 		$add_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']))->fetch();
 		if ($add_res)
 		{
-			header("Location: /admin.php?module=games&view=add&message=game_submit_exists&extra={$add_res['id']}");
+			$_SESSION['message'] = 'game_add_exists';
+			$_SESSION['message_extra'] = $add_res['id'];
+			header("Location: /admin.php?module=games&view=add");
 			exit;
 		}
 
-		$date = new DateTime($_POST['date']);
+		if (!empty($date))
+		{
+			$date = new DateTime($date);
+		}
+		else
+		{
+			$date = NULL;
+		}
 
 		$guess = 0;
 		if (isset($_POST['guess']))
@@ -321,8 +333,6 @@ if (isset($_POST['act']))
 		{
 			$trailer = $_POST['trailer'];
 		}
-		
-		$description = trim($_POST['text']);
 
 		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `license` = ?, `trailer` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer));
 		$new_id = $dbl->new_id();

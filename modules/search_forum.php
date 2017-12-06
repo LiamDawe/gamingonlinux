@@ -28,14 +28,6 @@ foreach ($res as $forum_list)
 }
 $templating->set('forum_list_search', $options);
 
-$strict_check = '';
-if (isset($_GET['strict']))
-{
-	$strict_check = 'checked';
-}
-
-$templating->set('strict_check', $strict_check);
-
 $search_text = '';
 if (isset($_GET['q']))
 {
@@ -44,41 +36,23 @@ if (isset($_GET['q']))
 }
 $templating->set('search_text', $search_text);
 
+$search_array = array(explode(" ", $search_text));
+$search_through = '';
+foreach ($search_array[0] as $item)
+{
+	$item = str_replace("%","\%", $item);
+	$search_through .= '%'.$item.'%';
+}
+
 if (isset($search_text) && !empty($search_text))
 {
-	if (!isset($_GET['strict']))
-	{
-		// do the search query
-		$found_search = $dbl->run("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
-		FROM `forum_topics` t
-		LEFT JOIN `users` u ON t.author_id = u.user_id
-		WHERE MATCH (
-		t.`topic_title`
-		)
-		AGAINST (
-		? IN BOOLEAN MODE
-		) $search_sql AND t.approved = 1
-		ORDER BY t.creation_date DESC
-		LIMIT 0 , 30", array($search_text))->fetch_all();
-	}
-
-	else
-	{
-		$search_text = preg_replace("/\w+/", '+\0*', $search_text);
-
-		// do the search query
-		$found_search = $dbl->run("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
-		FROM `forum_topics` t
-		LEFT JOIN `users` u ON t.author_id = u.user_id
-		WHERE MATCH (
-		t.`topic_title`
-		)
-		AGAINST (
-		? IN BOOLEAN MODE
-		) $search_sql AND t.approved = 1
-		ORDER BY t.creation_date DESC
-		LIMIT 0 , 30", array($search_text))->fetch_all();
-	}
+	// do the search query
+	$found_search = $dbl->run("SELECT t.topic_id, t.`topic_title` , t.author_id, t.`creation_date` , u.username
+	FROM `forum_topics` t
+	LEFT JOIN `users` u ON t.author_id = u.user_id
+	WHERE t.`topic_title` LIKE ? $search_sql AND t.approved = 1
+	ORDER BY t.creation_date DESC
+	LIMIT 0 , 30", array($search_through))->fetch_all();
 
 	if ($found_search)
 	{

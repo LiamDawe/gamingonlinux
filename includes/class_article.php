@@ -617,31 +617,13 @@ class article
 			
 		$gallery_tagline_sql = $this->gallery_tagline($checked);
 			
-		// an existing article needs cleaning up and updating
+		// an existing article (submitted/review/draft)
 		if (isset($_POST['article_id']) && !empty($_POST['article_id']))
 		{
 			// this is for user submissions, if we are submitting it as ourselves, to auto thank them for the submission
 			if (isset($_POST['submit_as_self']))
 			{
 				$author_id = $_SESSION['user_id'];
-				$submission_date = '';
-
-				if (!empty($check_article['username']))
-				{
-					$submitted_by_user = $check_article['username'];
-				}
-
-				else if (!empty($check_article['guest_username']))
-				{
-					$submitted_by_user = $check_article['guest_username'];
-				}
-
-				else
-				{
-					$submitted_by_user = "a guest submitter";
-				}
-
-				$checked['text'] = $checked['text'] . "\r\n\r\n<em>Thanks to " . $submitted_by_user . ' for letting us know!</em>';
 			}
 			else
 			{

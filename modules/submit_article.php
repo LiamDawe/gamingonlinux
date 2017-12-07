@@ -63,7 +63,7 @@ if (isset($_GET['view']))
         {
             $guest_fields = $templating->block_store('guest_fields', 'submit_article');
             $guest_fields = $templating->store_replace($guest_fields, array('guest_username' => $guest_username, 'guest_email' => $guest_email));
-        }
+		}
 
         // if they have done it before set text and tagline
         $title = '';
@@ -81,7 +81,14 @@ if (isset($_GET['view']))
         $templating->block('submit', 'submit_article');
         $templating->set('url', $core->config('website_url'));
         $templating->set('guest_fields', $guest_fields);
-        $templating->set('title', $title);
+		$templating->set('title', $title);
+		
+		$email_link = '/index.php?module=email_us';
+		if ($core->config('pretty_urls') == 1)
+		{
+			$email_link = '/email-us/';
+		}
+		$templating->set('email_link', $email_link);
 
         $tagline_pic = '';
         if (isset($_GET['error']) && isset($_SESSION) && isset($_SESSION['uploads_tagline']))

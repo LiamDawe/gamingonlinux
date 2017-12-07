@@ -19,7 +19,7 @@ if ($core->config('forum_rss') == 1)
 $templating->set('forum_rss', $forum_rss);
 
 $ckeditor_js = '';
-if ($core->current_page() == 'admin.php')
+if ($core->current_page() == 'admin.php' || (isset($_GET['module']) && $_GET['module'] == 'submit_article'))
 {
 	$ckeditor_js = $templating->block_store('ckeditor', 'footer');
 }

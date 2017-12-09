@@ -55,20 +55,29 @@ do
 
 			echo 'SteamID: ' . $steam_id . "\n";
 
+			$clean_release_date = NULL;
 			$release_date_raw = $element->find('div.search_released', 0)->plaintext;
+			echo 'Raw release date: ' . $release_date_raw . "\n";
+			$trimmed_date = trim($release_date_raw);	
+			$remove_comma = str_replace(',', '', $trimmed_date);
+			$parsed_release_date = strtotime($remove_comma);
+			// so we can get rid of items that only have the year nice and simple
+			$length = strlen($remove_comma);
+			$parsed_release_date = date("Y-m-d", $parsed_release_date);
+			$has_day = DateTime::createFromFormat('F Y', $remove_comma);
 			
-			$convert_release_date = DateTime::createFromFormat('j M, Y', $release_date_raw);
-			$clean_release_date = $convert_release_date->format('Y-m-d');
-			
-			echo 'Raw release: ' . $release_date_raw . "\n";
-			echo 'Clean release: ' . $clean_release_date . "\n";
+			if ($parsed_release_date != '1970-01-01' && $length != 4 && $has_day == FALSE)
+			{
+				$clean_release_date = $parsed_release_date;
+				echo 'Cleaned release date: ' . $clean_release_date . "\n";
+			}
 
 			// ADD IT TO THE GAMES DATABASE
 			$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 				
 			if (!$game_list)
 			{
-				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `free_game` = 1, `steam_id` = ?, `bundle` = ?", array($title, $clean_release_date, $link, $steam_id, $bundle));
+				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `free_game` = 1, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $clean_release_date, $link, $steam_id, $bundle));
 
 				$new_games[] = $game_id;
 				

@@ -75,13 +75,13 @@ do
 				if (!$game_list)
 				{
 					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $clean_release_date, $link, $steam_id, $bundle));
-
-					$new_games[] = $game_id;
 					
 					// need to grab it again
 					$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 					
 					$game_id = $game_list['id'];
+
+					$new_games[] = $game_id;
 				}
 				else
 				{

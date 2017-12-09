@@ -60,23 +60,46 @@
 	</div>
 </div>
 <div class="box">
-[/block: picker]
-
-[block: head]
 	<div class="head">
 		<span class="badge"><a href="/index.php?module=calendar&year={:prev_year}&month={:prev}">&lt; Prev</a></span> {:month} <span class="badge"><a href="/index.php?module=calendar&year={:next_year}&month={:next}">Next &gt;</a></span> <a href="/index.php?module=calendar&today">Jump to today</a>
 	</div>
+</div>
+[/block: picker]
+
+[block: head]
+<div class="box">
+	<table class="sales-table calendar-table">
+		<thead>
+			<tr><th colspan="2">Name</th><th>Links</th></tr>
+		</thead>
 [/block: head]
 
 [block: day]
 	{:today_anchor}
-	<div {:today_css} class="subhead">{:group_date} {:today_text}</div>
+	<tbody><tr {:today_css} class="calendar-day"><td colspan="3" width="100%">{:group_date} {:today_text}</td></tr></tbody>
+	<tbody class="calendar-items">
 [/block: day]
 
 [block: item]
-	<div class="body group">{:best_guess} {:name} ({:links}) {:edit} {:dlc}</div>
+		<tr>
+			<td width="15%;">{:small_pic}</td>
+			<td width="45%;">{:edit}{:best_guess} {:name} {:dlc}</td>
+			<td width="40%;">{:links}</td>
+		</tr>
+		{:genre_list}
 [/block: item]
 
+[block: genres]
+<tr>
+	<td class="td-free-games-tags" colspan="4"><small>{:genre_list}</small></td>
+</tr>	
+[/block: genres]
+
+[block: day_end]
+	</tbody>
+[/block: day_end]
+
 [block: bottom]
+	</table>
 </div>
 [/block: bottom]

@@ -1720,3 +1720,14 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .dark .table-stripes-tbody tbody:nth-child(even) {background: #333}
 .dark .table-stripes-tbody tbody:nth-child(odd) {background: #3f3f3f}
 .td-free-games-tags {padding-top: 0px;}
+
+/* calendar */
+.calendar-table {border-collapse: collapse;}
+.calendar-day {background: rgb(190, 190, 190); text-align: center;}
+#calendar_today {background: rgb(117, 193, 255); font-weight: bold;}
+.calendar-items tr {border-bottom: 1px solid rgb(190, 190, 190);}
+.calendar-items tr:last-child {border-bottom: 0;}
+.calendar-items tr:nth-child(even) {background: #e5e5e5}
+.calendar-items tr:nth-child(odd) {background: #FFF}
+.dark .calendar-items tr:nth-child(even) {background: #333}
+.dark .calendar-items tr:nth-child(odd) {background: #3f3f3f}

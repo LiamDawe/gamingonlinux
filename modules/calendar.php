@@ -89,8 +89,6 @@ foreach ($months_array as $key => $what_month)
 }
 $templating->set('month_options', $month_options);
 
-$templating->block('head', 'calendar');
-
 $prev_month = $month - 1;
 $next_month = $month + 1;
 $prev_year = $year;
@@ -114,14 +112,36 @@ $templating->set('prev_year', $prev_year);
 $templating->set('next_year', $next_year);
 
 // count how many there is
-$dbl->run("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL");
-$counter = $dbl->fetch();
+$counter = $dbl->run("SELECT COUNT(id) FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL")->fetchOne();
 
-$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
+$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter . ')');
 
-$dbl->run("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc`, `link`,`gog_link`,`steam_link`,`itch_link` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL ORDER BY `date` ASC, `name` ASC");
-while ($listing = $dbl->fetch())
+$get_listings = $dbl->run("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc`, `link`, `gog_link`, `steam_link`, `itch_link`, `small_picture` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL AND (link != '' OR gog_link != '' OR steam_link != '' OR itch_link != '') ORDER BY `date` ASC, `name` ASC")->fetch_all();
+
+// first grab a list of all the genres for each game, so we only do one query instead of one for each
+$genre_ids = [];
+foreach ($get_listings as $set)
 {
+	$genre_ids[] = $set['id'];
+}
+$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
+$genre_tag_sql = "SELECT r.`game_id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON g.id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, g.name";
+$genre_res = $dbl->run($genre_tag_sql, $genre_ids)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+
+$templating->block('head', 'calendar');
+
+$last_date = NULL;
+$current_date = NULL;
+
+foreach ($get_listings as $listing)
+{
+	$current_date = $listing['date'];
+
+	if (isset($last_date) && $current_date != $last_date)
+	{
+		$templating->block('day_end', 'calendar');
+	}
+
     if (!isset($last_date) || $last_date !== $listing['date']) 
     {
         $templating->block('day', 'calendar');
@@ -135,7 +155,7 @@ while ($listing = $dbl->fetch())
         {
 			$today_anchor = '<a class="anchor" id="today"></a>';
 			$today_css = 'id="calendar_today"';
-			$today_text = '<span class="badge green">Releasing Today!</span> ';
+			$today_text = '<span class="badge">Releasing Today!</span> ';
 		}
 		$templating->set('today_anchor', $today_anchor);
 		$templating->set('today_css', $today_css);
@@ -145,6 +165,14 @@ while ($listing = $dbl->fetch())
 	$get_date = date_parse($listing['date']);
 
 	$templating->block('item', 'calendar');
+
+	$small_pic = '';
+	if ($listing['small_picture'] != NULL && $listing['small_picture'] != '')
+	{
+		$small_pic = '<img src="' . $core->config('website_url') . 'uploads/gamesdb/small/' . $listing['small_picture'] . '" alt="" />';
+	}
+	$templating->set('small_pic', $small_pic);
+
 	$best_guess = '';
 	if ($listing['best_guess'] == 1)
 	{
@@ -158,7 +186,7 @@ while ($listing = $dbl->fetch())
 	}
 	$templating->set('dlc', $dlc);
 
-	$game_name = '<a href="/index.php?module=game&amp;game-id='.$listing['id'].'">'.$listing['name'].'</a>';
+	$game_name = $listing['name'];
 
 	$templating->set('name', $game_name);
 	
@@ -184,21 +212,36 @@ while ($listing = $dbl->fetch())
 	$edit = '';
 	if ($user->check_group([1,2,5]))
 	{
-		$edit = ' - <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar">Edit</a>';
+		$edit = ' <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar"><span class="icon edit edit-sale-icon"></span></a>';
 	}
 	$templating->set('edit', $edit);
 	
 	$last_date = $listing['date'];
+
+	$genre_output = '';
+	$genre_list = [];
+	if (isset($genre_res[$listing['id']]))
+	{
+		$genre_output = $templating->block_store('genres', 'calendar');
+		foreach ($genre_res[$listing['id']] as $k => $name)
+		{
+			$genre_list[] = "<span class=\"badge\">{$name}</span>";
+		}
+
+		$genre_output = $templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list)));					
+	}
+
+	$templating->set('genre_list', $genre_output);
 }
 
-$templating->block('head', 'calendar');
+$templating->block('bottom', 'calendar');
+
+$templating->block('picker', 'calendar');
 $templating->set('prev', $prev_month);
 $templating->set('next', $next_month);
 $templating->set('prev_year', $prev_year);
 $templating->set('next_year', $next_year);
-$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter['count'] . ')');
-
-$templating->block('bottom', 'calendar');
+$templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter . ')');
 
 if (isset($_POST['act']))
 {

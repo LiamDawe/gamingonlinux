@@ -1,8 +1,8 @@
 <?php
-// http://simplehtmldom.sourceforge.net/
-include('../sales/simple_html_dom.php');
-
 define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
+
+// http://simplehtmldom.sourceforge.net/
+include(APP_ROOT . '/includes/crons/sales/simple_html_dom.php');
 
 require APP_ROOT . '/includes/bootstrap.php';
 

@@ -47,13 +47,22 @@ foreach ($currencies as $key => $currency)
 				$image = $element->find('div.search_capsule img', 0)->src;
 				echo $image . "\n";
 
+				$clean_release_date = NULL;
 				$release_date_raw = $element->find('div.search_released', 0)->plaintext;
-
-				$convert_release_date = DateTime::createFromFormat('j M, Y', $release_date_raw);
-				$clean_release_date = $convert_release_date->format('Y-m-d');
-
-				echo 'Raw release: ' . $release_date_raw . "\n";
-				echo 'Clean release: ' . $clean_release_date . "\n";
+				echo 'Raw release date: ' . $release_date_raw . "\n";
+				$trimmed_date = trim($release_date_raw);	
+				$remove_comma = str_replace(',', '', $trimmed_date);
+				$parsed_release_date = strtotime($remove_comma);
+				// so we can get rid of items that only have the year nice and simple
+				$length = strlen($remove_comma);
+				$parsed_release_date = date("Y-m-d", $parsed_release_date);
+				$has_day = DateTime::createFromFormat('F Y', $remove_comma);
+				
+				if ($parsed_release_date != '1970-01-01' && $length != 4 && $has_day == FALSE)
+				{
+					$clean_release_date = $parsed_release_date;
+					echo 'Cleaned release date: ' . $clean_release_date . "\n";
+				}
 
 				foreach ($element->find('div.discounted') as $price)
 				{
@@ -103,7 +112,7 @@ foreach ($currencies as $key => $currency)
 				
 					if (!$game_list)
 					{
-						$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?", array($title, $clean_release_date, $link, $steam_id, $bundle));
+						$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $clean_release_date, $link, $steam_id, $bundle));
 				
 						// need to grab it again
 						$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
@@ -143,10 +152,10 @@ foreach ($currencies as $key => $currency)
 					}
 
 					// if it has no date
-					if ($game_list['date'] == NULL || $game_list['date'] == '')
-					{
+					//if ($game_list['date'] == NULL || $game_list['date'] == '')
+					//{
 						$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", [$clean_release_date, $game_id]);
-					}
+					//}
 				
 					if (!in_array($game_id, $on_sale))
 					{

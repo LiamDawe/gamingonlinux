@@ -47,6 +47,14 @@ foreach ($currencies as $key => $currency)
 				$image = $element->find('div.search_capsule img', 0)->src;
 				echo $image . "\n";
 
+				$release_date_raw = $element->find('div.search_released', 0)->plaintext;
+
+				$convert_release_date = DateTime::createFromFormat('j M, Y', $release_date_raw);
+				$clean_release_date = $convert_release_date->format('Y-m-d');
+
+				echo 'Raw release: ' . $release_date_raw . "\n";
+				echo 'Clean release: ' . $clean_release_date . "\n";
+
 				foreach ($element->find('div.discounted') as $price)
 				{
 					//var_dump($price->plaintext);
@@ -91,14 +99,14 @@ foreach ($currencies as $key => $currency)
 					echo 'SteamID: ' . $steam_id . "\n";
 
 					// ADD IT TO THE GAMES DATABASE
-					$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+					$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 				
 					if (!$game_list)
 					{
-						$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?", array($title, date('Y-m-d'), $link, $steam_id, $bundle));
+						$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?", array($title, $clean_release_date, $link, $steam_id, $bundle));
 				
 						// need to grab it again
-						$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id`, `bundle` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+						$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 				
 						$game_id = $game_list['id'];
 					}
@@ -132,7 +140,13 @@ foreach ($currencies as $key => $currency)
 					if ($game_list['bundle'] == NULL || $game_list['bundle'] == '')
 					{
 						$dbl->run("UPDATE `calendar` SET `bundle` = ? WHERE `id` = ?", [$bundle, $game_id]);
-					}				
+					}
+
+					// if it has no date
+					if ($game_list['date'] == NULL || $game_list['date'] == '')
+					{
+						$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", [$clean_release_date, $game_id]);
+					}
 				
 					if (!in_array($game_id, $on_sale))
 					{

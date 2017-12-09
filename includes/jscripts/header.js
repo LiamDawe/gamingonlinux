@@ -862,7 +862,6 @@ jQuery(document).ready(function()
 		$.post('/includes/ajax/claim_key.php', { 'giveaway_id':giveaway_id },
 		function(data)
 		{
-			console.log(data.result);
 			if (data.result == 1)
 			{
 				$('#key-area').text("Here's your key: " + data.key);
@@ -1527,8 +1526,6 @@ jQuery(document).ready(function()
 		var text = $(this).text();
 		var url = "/includes/ajax/sales/display_normal.php";
 
-		console.log(text);
-
 		$.ajax({
 			type: "GET",
 			url: url,
@@ -1543,6 +1540,8 @@ jQuery(document).ready(function()
 	});
 
 	/* GAMES DATABASE */
+
+	// uploading a small pic
 	$('#small_pic').off('click').on('change', function()
 	{
 		$("#small_pic").ajaxForm({target: '#preview2',
@@ -1587,5 +1586,24 @@ jQuery(document).ready(function()
 				$('#free-search').easyAutocomplete(free_search_options); // required so EAC works when loaded dynamically
 			}
 		});
+	});
+
+	$(document).on('click', "#free-search-form div.eac-item", function(e)
+	{
+		e.preventDefault();
+		var text = $(this).text();
+		var url = "/includes/ajax/gamesdb/display_free.php";
+
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'q': text}, 
+			success: function(data)
+			{
+				$('div.free-list').html(data);
+				$('div.free-list').highlight();
+				$('#free-search').easyAutocomplete(free_search_options); // required so EAC works when loaded dynamically
+			}
+		});		
 	});
 });

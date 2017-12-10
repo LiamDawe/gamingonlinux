@@ -8,6 +8,13 @@ $templating->block('top');
 $templating->load('forum_search');
 $templating->block('small');
 
+$groups_in = str_repeat('?,', count($user->user_groups) - 1) . '?';
+
+// get the forum ids this user is actually allowed to view
+$forum_ids = $dbl->run("SELECT p.`forum_id` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all(PDO::FETCH_COLUMN);
+
+$forum_id_in  = str_repeat('?,', count($forum_ids) - 1) . '?';
+
 $sql = "
 SELECT
 	category.forum_id as CategoryId,
@@ -33,10 +40,12 @@ LEFT JOIN
 	`forum_topics` topic ON topic.topic_id = forum.last_post_topic_id
 WHERE
 	category.is_category = 1
+AND
+	forum.forum_id IN (".$forum_id_in.")
 ORDER BY
 	category.order, forum.order";
 
-$forum_rows = $dbl->run($sql)->fetch_all();
+$forum_rows = $dbl->run($sql, $forum_ids)->fetch_all();
 
 // start the ids at 0
 $current_category_id = 0;
@@ -149,7 +158,7 @@ $templating->set('this_template', $core->config('website_url') . '/templates/' .
 
 // lastest posts block below forums
 $forum_posts = '';
-$grab_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC limit 7")->fetch_all();
+$grab_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 AND forum_id IN (".$forum_id_in.") ORDER BY `last_post_date` DESC limit 7", $forum_ids)->fetch_all();
 if ($grab_topics)
 {
 	foreach ($grab_topics as $topics)

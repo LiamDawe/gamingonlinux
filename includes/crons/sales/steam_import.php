@@ -152,10 +152,10 @@ foreach ($currencies as $key => $currency)
 					}
 
 					// if it has no date
-					//if ($game_list['date'] == NULL || $game_list['date'] == '')
-					//{
+					if ($game_list['date'] == NULL || $game_list['date'] == '')
+					{
 						$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", [$clean_release_date, $game_id]);
-					//}
+					}
 				
 					if (!in_array($game_id, $on_sale))
 					{

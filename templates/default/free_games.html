@@ -1,45 +1,72 @@
-[block: head]
-<div class="box">
-	<div class="body group">Welcome to the GamingOnLinux free games list! This page is currently in BETA. We are currently tracking <strong>{:total}</strong> free games! Looking for Linux games on sale, or games currently 100% off? Check out the <a href="/sales.php">Sales Page</a>! This page is for games that are permanently free.</div>
-</div>
-<div class="box">
-	<div class="body group">
-		<form id="free-search-form" action="/index.php?module=free_games"><input type="hidden" name="module" value="free_games" /><input id="free-search" class="ays-ignore" name="q" type="search" placeholder="Search for a free game by title..." /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
+[block: top]
+<div id="content" class="container group">
+	<div class="col-12">
+		<div class="box">
+			<div class="body group">
+				Welcome to the GamingOnLinux free games list! This page is currently in BETA. We are currently tracking <strong>{:total}</strong> free games! Looking for Linux games on sale, or games currently 100% off? Check out the <a href="/sales.php">Sales Page</a>! This page is for games that are permanently free. We also have a <a href="https://shop.spreadshirt.co.uk/gamingonlinux/?noCache=true">Merch Store</a>, for awesome Linux swag!
+			</div>
+		</div>
+		<div class="box">
+			<div class="body group">
+				<form id="free-search-form" action="/free_games.php"><input id="free-search" class="ays-ignore" name="q" type="search" placeholder="Search for a free game by title..." /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
+			</div>
+		</div>
 	</div>
-	<div class="head">Games List</div>
-	<div class="body group"><small>If it has a trailer, click the little icon to see it.</small></div>
-[/block: head]
+	<div class="col-9">
+[/block: top]
 
 [block: list_top]
-	<div class="free-list">
-	<table class="sales-table table-stripes-tbody">
-		<thead>
-			<tr><th colspan="2">Name</th><th>Links</th><th>License</th></tr>
-		</thead>
+		<div class="free-list">
+		<div class="head">Games List - Total with current filters: {:filter_total}</div>
+		<div class="body group"><small>If it has a trailer, click the little icon to see it.</small></div>
+			<table class="sales-table table-stripes-tbody">
+			<thead>
+				<tr><th colspan="2">Name</th><th>Links</th><th>License</th></tr>
+			</thead>
 [/block: list_top]
 
 [block: row]
-		<tbody>
-		<tr>
-			<td width="15%;">{:small_pic}</td>
-			<td width="40%;">{:edit}{:name}</td>
-			<td width="40%;">{:links}</td>
-			<td width="5%;">{:license}</td>
-		</tr>
-		{:genre_list}
-		</tbody>
+			<tbody>
+			<tr>
+				<td width="15%;">{:small_pic}</td>
+				<td width="40%;">{:edit}{:name}</td>
+				<td width="40%;">{:links}</td>
+				<td width="5%;">{:license}</td>
+			</tr>
+			{:genre_list}
+			</tbody>
 [/block: row]
 
 [block: genres]
-		<tr>
-			<td class="td-free-games-tags" colspan="4"><small>{:genre_list}</small></td>
-		</tr>	
+			<tr>
+				<td class="td-free-games-tags" colspan="4"><small>{:genre_list}</small></td>
+			</tr>	
 [/block: genres]
 
 [block: bottom]
-	</table>
-	{:pagination}
-	<div class="body group"><small>Are we missing a free game? <a href="/index.php?module=email_us">Send us a tip!</a></small></div>
+			</table>
+			{:pagination}
+			<div class="body group"><small>Are we missing a free game? <a href="/index.php?module=email_us">Send us a tip!</a></small></div>
+		</div>
 	</div>
-</div>
 [/block: bottom]
+
+[block: filters]
+<div class="col-3">
+	<form id="game_filters" name="free" method="get">
+	<div class="box">
+		<div class="head">Genres - <a href="/free_games.php">&#10005; Clear all filters</a></div>
+		<div class="body group">
+			{:genres_output}
+		</div>
+	</div>
+	<div class="box">
+		<div class="head">License</div>
+		<div class="body group">
+			{:licenses_output}
+		</div>
+	</div>
+	</form>
+</div>
+</div>
+[/block: filters]

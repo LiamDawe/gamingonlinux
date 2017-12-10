@@ -1480,7 +1480,7 @@ jQuery(document).ready(function()
 	$(document).on('click', ".sales-pagination li a", function(e) 
 	{
 		e.preventDefault();
-		var form = $("#sales_filters");
+		var form = $("#game_filters");
 		var url = "/includes/ajax/sales/display_normal.php";
 		var page = $(this).attr("data-page");
 	  
@@ -1499,11 +1499,22 @@ jQuery(document).ready(function()
 		});
 	});
 
-	// sales page filters
-	$(document).on('change', "#sales_filters", function(e)
+	// sales & free games page filters
+	$(document).on('change', "#game_filters", function(e)
 	{
-		var form = $("#sales_filters");
-		var url = "/includes/ajax/sales/display_normal.php";
+		var form = $("#game_filters");
+
+		var formName = form.attr('name');
+		if (formName == 'free')
+		{
+			var url = "/includes/ajax/gamesdb/display_free.php";
+			var list_update = 'free-list';
+		}
+		else if (formName == 'sales')
+		{
+			var url = "/includes/ajax/sales/display_normal.php";
+			var list_update = 'normal-sales';
+		}
 
 		$.ajax({
 			type: "GET",
@@ -1512,8 +1523,8 @@ jQuery(document).ready(function()
 			success: function(data)
 			{
 				$(form).removeClass('dirty'); // prevent ays dialogue when leaving
-				$('div.normal-sales').html(data);
-				$('div.normal-sales').highlight();
+				$('div.'+list_update).html(data);
+				$('div.'+list_update).highlight();
 				$('#sale-search').easyAutocomplete(sale_search_options); // required so EAC works when loaded dynamically
 			}
 		});
@@ -1571,13 +1582,14 @@ jQuery(document).ready(function()
 	$(document).on('click', ".free-games-pagination li a", function(e) 
 	{
 		e.preventDefault();
+		var form = $("#game_filters");
 		var url = "/includes/ajax/gamesdb/display_free.php";
 		var page = $(this).attr("data-page");
 	  
 		$.ajax({
 			type: "GET",
 			url: url,
-			data: {'page': page}, 
+			data: {'page': page, 'filters': form.serialize()}, 
 			success: function(data)
 			{
 				$('div.free-list').html(data);

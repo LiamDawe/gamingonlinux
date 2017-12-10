@@ -31,7 +31,9 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^home/?$ /index.php?module=home [N]
 
-  RewriteRule ^free-games/?$ /index.php?module=free_games [N]
+  RewriteRule ^free-games/?$ /free_games.php [N]
+  
+  RewriteRule ^calendar/?$ /index.php?module=calendar [N]
   
   RewriteRule ^sales/?$ /sales.php [N]
   

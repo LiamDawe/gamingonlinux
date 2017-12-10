@@ -99,6 +99,7 @@ if ($core->config('pretty_urls') == 1)
 	$contact_link = '/contact-us/';
 	$submit_a = '/submit-article/';
 	$sales_link = '/sales/';
+	$free_link = '/free-games/';
 	if ($user->check_group([1,2,5]))
 	{
 		$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
@@ -112,6 +113,7 @@ else
 	$contact_link = $core->config('website_url') . 'index.php?module=contact';
 	$submit_a = $core->config('website_url') . 'index.php?module=submit_article&view=Submit';
 	$sales_link = $core->config('website_url') . 'sales.php';
+	$free_link = $core->config('website_url') . 'free_games.php';
 	if ($user->check_group([1,2,5]))
 	{
 		$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
@@ -124,6 +126,7 @@ $templating->set('contact_link', $contact_link);
 $templating->set('submit_a', $submit_a);
 $templating->set('submit_e', $submit_e);
 $templating->set('sales_link', $sales_link);
+$templating->set('free_link', $free_link);
 
 // sort out user box
 if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESSION['user_id'])))

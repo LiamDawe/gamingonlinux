@@ -88,6 +88,47 @@ class game_sales
 
 		$this->templating->block('list_top', 'free_games');
 
+		// for non-ajax requests
+		if (isset($_GET['option']) && is_array($_GET['option']) && $filters == NULL)
+		{
+			$filters_sort = ['option' => $_GET['option']];
+		}
+		else if ($filters)
+		{
+			$filters_sort = array();
+			parse_str($filters, $filters_sort);
+		}
+
+		$genre_ids = [];
+		$licenses = [];
+		$options_sql = '';
+		$genre_join = '';
+		if (isset($filters_sort) && is_array($filters_sort))
+		{
+			if (isset($filters_sort['genres']))
+			{
+				foreach ($filters_sort['genres'] as $genre)
+				{
+					$genre_ids[] = $genre;
+					$options_link[] = 'genres[]=' . $genre;
+				}
+				$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
+				$options_sql .= ' AND r.genre_id IN ('.$in.') ';
+				$genre_join = ' INNER JOIN `game_genres_reference` r ON r.game_id = c.id ';
+			}
+
+			if (isset($filters_sort['licenses']))
+			{
+				foreach ($filters_sort['licenses'] as $license)
+				{
+					$licenses[] = $license;
+					$options_link[] = 'licenses[]=' . $license;
+				}
+				$in  = str_repeat('?,', count($licenses) - 1) . '?';
+				$options_sql .= ' AND c.license IN ('.$in.') ';
+			}
+		}
+
 		// paging for pagination
 		$page = isset($_GET['page'])?intval($_GET['page']-1):0;
 
@@ -98,20 +139,23 @@ class game_sales
 		{
 			$search_query = str_replace('+', ' ', $_GET['q']);
 			$where = '%'.$search_query.'%';
-			$sql_where = ' `name` LIKE ? AND ';
+			$sql_where = ' c.`name` LIKE ? AND ';
 
 			$total_rows = $this->dbl->run("SELECT COUNT(id) FROM `calendar` WHERE $sql_where `free_game` = 1 AND `also_known_as` IS NULL ORDER BY `name` ASC", [$where])->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/index.php?module=free_games&', $page + 1, $link_extra);	
+			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page + 1, $link_extra);	
 
-			$games_res = $this->dbl->run("SELECT `id`, `name`, `link`, `gog_link`, `steam_link`, `itch_link`, `license`, `small_picture`, `trailer` FROM `calendar` WHERE $sql_where `free_game` = 1 AND `also_known_as` IS NULL ORDER BY `name` ASC LIMIT {$this->core->start}, 50", [$where])->fetch_all();
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL $options_sql ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", [$where])->fetch_all();
 		}
 		else
 		{
-			$total_rows = $this->dbl->run("SELECT COUNT(id) FROM `calendar` WHERE `free_game` = 1 AND `also_known_as` IS NULL ORDER BY `name` ASC")->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/index.php?module=free_games&', $page + 1, $link_extra);	
-			$games_res = $this->dbl->run("SELECT `id`, `name`, `link`, `gog_link`, `steam_link`, `itch_link`, `license`, `small_picture`, `trailer` FROM `calendar` WHERE `free_game` = 1 AND `also_known_as` IS NULL ORDER BY `name` ASC LIMIT {$this->core->start}, 50")->fetch_all();
-			
+			$merged_arrays = array_merge($genre_ids, $licenses);
+			$total_rows = $this->dbl->run("SELECT COUNT(c.id) FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL $options_sql ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
+			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page + 1, $link_extra);
+
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL $options_sql ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
 		}
+
+		$this->templating->set('filter_total', $total_rows);
 
 		if ($games_res)
 		{
@@ -187,7 +231,7 @@ class game_sales
 		}
 		else
 		{
-			$this->core->message("We aren't listing any free games at the moment, come back soon!");
+			$this->core->message("We aren't finding any free games at the moment, try a different filtering option? Or come back soon!");
 		}
 
 		$this->templating->block('bottom', 'free_games');

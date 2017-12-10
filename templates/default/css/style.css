@@ -147,6 +147,16 @@ margin-bottom: -3px;
    border-left: 4px solid transparent;
    content: "";
  }
+ .caret-right {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	vertical-align: middle;
+    border-bottom: 4px solid transparent;
+    border-top: 4px solid transparent;
+    border-left: 4px solid #999;
+	content: "";
+}
  .dropdown {
      position: relative;
  }
@@ -1704,6 +1714,9 @@ div.gol_twitch .twitch_announce{background-color: #4b367c; color: #fff; font-sty
 .dark div.gol_twitch .twitch_announce{background-color: #4b367c; color: #fff; font-style: italic;}
 div.gol_twitch .twitch_announce a, div.gol_twitch .twitch_announce a:link {color: #ffffff; font-style: normal; text-decoration: underline;}
 div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
+
+/* GAMES DB */
+.filter-link {color: #000; font-weight: bold; cursor: pointer;}
 
 /* sales page */
 .bundle-row:hover {background-color: #D2D2D2;}

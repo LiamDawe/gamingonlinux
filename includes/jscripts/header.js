@@ -1552,6 +1552,17 @@ jQuery(document).ready(function()
 
 	/* GAMES DATABASE */
 
+	// filters show/hide
+	$(document).on('click', ".filter-title .filter-link", function()
+	{
+		$header = $(this);
+		//getting the next element
+		$content = $header.closest('.filter-box').find('.filter-content');
+		//open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+		$content.slideToggle(500);
+		$header.closest('.filter-box').find('span').toggleClass("caret-down caret-right");
+	});
+
 	// uploading a small pic
 	$('#small_pic').off('click').on('change', function()
 	{

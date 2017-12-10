@@ -55,15 +55,16 @@
 <div class="col-3">
 	<form id="game_filters" name="free" method="get">
 	<div class="box">
-		<div class="head">Genres - <a href="/free_games.php">&#10005; Clear all filters</a></div>
+		<div class="head">Filters <a href="/free_games.php">&#10005; Clear all filters</a></div>
 		<div class="body group">
-			{:genres_output}
-		</div>
-	</div>
-	<div class="box">
-		<div class="head">License</div>
-		<div class="body group">
-			{:licenses_output}
+			<div class="filter-box">
+				<div class="filter-title"><a class="filter-link"><span class="caret-down"></span> Genres</a></div>
+				<div class="filter-content">{:genres_output}</div>
+			</div>
+			<div class="filter-box">
+				<div class="filter-title"><a class="filter-link"><span class="caret-down"></span> License</a></div>
+				<div class="filter-content">{:licenses_output}</div>
+			</div>
 		</div>
 	</div>
 	</form>

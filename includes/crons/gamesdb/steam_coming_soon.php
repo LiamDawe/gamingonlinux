@@ -92,7 +92,7 @@ do
 						$game_id = $game_list['also_known_as'];
 					}
 					
-					$dbl->run("UPDATE `calendar` SET `steam_link` = ? WHERE `id` = ?", array($link, $game_id));
+					$dbl->run("UPDATE `calendar` SET `steam_link` = ?, `date` = ? WHERE `id` = ?", array($link, $clean_release_date, $game_id));
 				}
 
 				// if the game list has no picture, grab it and save it
@@ -107,12 +107,6 @@ do
 				if ($game_list['steam_id'] == NULL || $game_list['steam_id'] == '')
 				{
 					$dbl->run("UPDATE `calendar` SET `steam_id` = ? WHERE `id` = ?", [$steam_id, $game_id]);
-				}
-				
-				// if it has no date
-				if ($game_list['date'] == NULL || $game_list['date'] == '')
-				{
-					$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", [$clean_release_date, $game_id]);
 				}
 			}
 		}

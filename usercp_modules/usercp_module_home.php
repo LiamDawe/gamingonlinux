@@ -4,23 +4,6 @@ $templating->load('usercp_modules/usercp_module_home');
 
 include('includes/profile_fields.php');
 
-if (isset($_GET['message']))
-{
-	if ($_GET['message'] == 'youtube-missing')
-	{
-		$core->message('That is not a correct Youtube URL format, please use a correct URL like: https://www.youtube.com/gamingonlinux', 1);
-	}
-	if ($_GET['message'] == 'twitch-missing')
-	{
-		$core->message('That is not a correct Twitch URL format, please use a correct URL like: http://www.twitch.tv/gamingonlinux', 1);
-	}
-}
-
-if (isset($_GET['updated']))
-{
-	$core->message('You have updated your profile!');
-}
-
 if (!isset($_POST['act']))
 {
 	$db_grab_fields = '';
@@ -73,6 +56,10 @@ if (!isset($_POST['act']))
 		}
 
 		$templating->set('theme_options', $theme_options);
+	}
+	else
+	{
+		$templating->block('no_premium', 'usercp_modules/usercp_module_home');
 	}
 
 	$templating->block('main', 'usercp_modules/usercp_module_home');
@@ -334,14 +321,16 @@ else if (isset($_POST['act']))
 			// tell them to do it properly
 			if ($field['db_field'] == 'youtube' && (!empty($_POST['youtube']) && strpos($_POST['youtube'], "youtube.com") === false))
 			{
-				header("Location: " . $core->config('website_url') . "usercp.php?module=home&message=youtube-missing");
+				$_SESSION['message'] = 'youtube-missing';
+				header("Location: " . $core->config('website_url') . "usercp.php?module=home");
 				die();
 			}
 
 			// tell them to do it properly
 			if ($field['db_field'] == 'twitch' && (!empty($_POST['twitch']) && strpos($_POST['twitch'], "twitch.tv") === false))
 			{
-				header("Location: " . $core->config('website_url') . "usercp.php?module=home&message=twitch-missing");
+				$_SESSION['message'] = 'twitch-missing';
+				header("Location: " . $core->config('website_url') . "usercp.php?module=home");
 				die();
 			}
 
@@ -361,7 +350,8 @@ else if (isset($_POST['act']))
 			}
 		}
 
-		header("Location: " . $core->config('website_url') . "usercp.php?module=home&updated");
+		$_SESSION['message'] = 'profile_updated';
+		header("Location: " . $core->config('website_url') . "usercp.php?module=home");
 	}
 
 	// need to add in a check in here to doubly be sure they are a premium person

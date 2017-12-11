@@ -36,7 +36,7 @@ $templating->set_previous('meta_description', 'GamingOnLinux.com maintained list
 $templating->load('calendar');
 
 // count how many there is due this month
-$dbl->run("SELECT COUNT(id) as count FROM `calendar` WHERE YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1 AND `also_known_as` IS NULL");
+$dbl->run("SELECT COUNT(id) as count FROM `calendar` WHERE `date` != '' AND `date` IS NOT NULL AND YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE()) AND DAY(date) > DAY(CURDATE()) AND `approved` = 1 AND `also_known_as` IS NULL");
 $counter = $dbl->fetch();
 
 $templating->block('top');
@@ -112,11 +112,11 @@ $templating->set('prev_year', $prev_year);
 $templating->set('next_year', $next_year);
 
 // count how many there is
-$counter = $dbl->run("SELECT COUNT(id) FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL")->fetchOne();
+$counter = $dbl->run("SELECT COUNT(id) FROM `calendar` WHERE `date` != '' AND `date` IS NOT NULL AND YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL")->fetchOne();
 
 $templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter . ')');
 
-$get_listings = $dbl->run("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc`, `link`, `gog_link`, `steam_link`, `itch_link`, `small_picture` FROM `calendar` WHERE YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL AND (link != '' OR gog_link != '' OR steam_link != '' OR itch_link != '') ORDER BY `date` ASC, `name` ASC")->fetch_all();
+$get_listings = $dbl->run("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc`, `link`, `gog_link`, `steam_link`, `itch_link`, `small_picture` FROM `calendar` WHERE `date` != '' AND `date` IS NOT NULL AND YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL AND (link != '' OR gog_link != '' OR steam_link != '' OR itch_link != '') ORDER BY `date` ASC, `name` ASC")->fetch_all();
 
 // first grab a list of all the genres for each game, so we only do one query instead of one for each
 $genre_ids = [];

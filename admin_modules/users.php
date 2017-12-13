@@ -59,8 +59,12 @@ else
 
 		if ($_GET['view'] == 'premium')
 		{
-			$search_res = $dbl->run("SELECT `user_id`, `username` FROM `users` WHERE `user_group` IN (6,7) OR `secondary_user_group` IN (6,7) AND user_group NOT IN (1,2)")->fetch_all();
+			$search_res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 6 ORDER BY u.`username` ASC")->fetch_all();
+
+			$total = count($search_res);
 			$templating->block('premium_row_top');
+			$templating->set('total', $total);
+
 			foreach ($search_res as $search)
 			{
 				$templating->block('premium_row','admin_modules/users');

@@ -22,7 +22,7 @@ if (isset($_GET['view']))
 		}
 
 		$category_list = '';
-		$cats = $db->sqlquery("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
+		$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
 		foreach( $cats as $category )
 		{
 			$category_list .= '<option value="' . $category['category_id'] . '">' . $category['category_name'] . '</option>';
@@ -59,7 +59,7 @@ if (isset($_GET['view']))
 		{
 			$templating->block('manage_category', 'admin_modules/admin_module_goty');
 
-			$cats = $db->sqlquery("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
+			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
 			foreach( $cats as $category )
 			{
 				$templating->block('category_manage_row', 'admin_modules/admin_module_goty');
@@ -71,11 +71,11 @@ if (isset($_GET['view']))
 		{
 			$templating->block('manage_top', 'admin_modules/admin_module_goty');
 
-			$get_games = $db->sqlquery("SELECT `game`, `id`, `category_id` FROM `goty_games` WHERE `accepted` = 1 AND `category_id` = ? ORDER BY `game` ASC", array($_GET['id']));
+			$get_games = $dbl->run("SELECT `game`, `id`, `category_id` FROM `goty_games` WHERE `accepted` = 1 AND `category_id` = ? ORDER BY `game` ASC", array($_GET['id']));
 			foreach ($get_games as $games)
 			{
 				$category_list = '';
-				$cats = $db->sqlquery("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
+				$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
 				foreach( $cats as $category )
 				{
 					$selected = '';
@@ -127,7 +127,7 @@ if (isset($_GET['view']))
 		{
 			$templating->block('category_top', 'admin_modules/admin_module_goty');
 
-			$cats = $db->sqlquery("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
+			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
 			foreach ($cats as $cat)
 			{
 				$templating->block('category_row', 'admin_modules/admin_module_goty');
@@ -139,8 +139,7 @@ if (isset($_GET['view']))
 		}
 		if (isset($_GET['category_id']))
 		{
-			$db->sqlquery("SELECT `category_name` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']));
-			$cat = $db->fetch();
+			$cat = $dbl->run("SELECT `category_name` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']))->fetch();
 
 			$templating->block('game_list', 'admin_modules/admin_module_goty');
 			$templating->set('name', $cat['category_name']);
@@ -152,7 +151,7 @@ if (isset($_GET['view']))
 			$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
 			$graph->colours = $colours;
 
-			$db->sqlquery("SELECT `id`, `game`, `votes` FROM `goty_games` WHERE `accepted` = 1  AND `category_id` = ? ORDER BY `votes` DESC LIMIT 10", array($_GET['category_id']));
+			$dbl->run("SELECT `id`, `game`, `votes` FROM `goty_games` WHERE `accepted` = 1  AND `category_id` = ? ORDER BY `votes` DESC LIMIT 10", array($_GET['category_id']));
 			$games_top = $db->fetch_all_rows();
 
 			foreach ($games_top as $label_loop)
@@ -195,8 +194,8 @@ if (isset($_GET['view']))
 
 		$templating->block('submitted_top', 'admin_modules/admin_module_goty');
 
-		$db->sqlquery("SELECT g.`game`, g.`id`, c.`category_name`, g.`category_id` FROM `goty_games` g LEFT JOIN `goty_category` c ON c.category_id = g.category_id WHERE `accepted` = 0");
-		while ($games = $db->fetch())
+		$get_games = $dbl->run("SELECT g.`game`, g.`id`, c.`category_name`, g.`category_id` FROM `goty_games` g LEFT JOIN `goty_category` c ON c.category_id = g.category_id WHERE `accepted` = 0")->fetch_all();
+		foreach ($get_games as $games)
 		{
 			$templating->block('submitted_row', 'admin_modules/admin_module_goty');
 			$templating->set('game_name', $games['game']);
@@ -215,12 +214,12 @@ if (isset($_POST['act']))
 		if (!empty($_POST['name']))
 		{
 			// check if it exists
-			$db->sqlquery("SELECT `game` FROM `goty_games` WHERE `game` = ? AND `category_id` = ?", array($_POST['name'], $_POST['category']));
+			$check = $dbl->run("SELECT `game` FROM `goty_games` WHERE `game` = ? AND `category_id` = ?", array($_POST['name'], $_POST['category']))->fetch();
 
 			// add it
-			if ($db->num_rows() != 1)
+			if (!$check)
 			{
-				$db->sqlquery("INSERT INTO `goty_games` SET `game` = ?, `accepted` = 1, `category_id` = ?", array($_POST['name'], $_POST['category']));
+				$dbl->run("INSERT INTO `goty_games` SET `game` = ?, `accepted` = 1, `category_id` = ?", array($_POST['name'], $_POST['category']));
 				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=add&message=added");
 			}
 
@@ -240,12 +239,12 @@ if (isset($_POST['act']))
 		if (!empty($_POST['id']))
 		{
 			// check if it exists
-			$db->sqlquery("SELECT `id` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+			$dbl->run("SELECT `id` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 
 			// delete it
 			if ($db->num_rows() == 1)
 			{
-				$db->sqlquery("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+				$dbl->run("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=deleted");
 			}
 
@@ -265,12 +264,12 @@ if (isset($_POST['act']))
 		if (!empty($_POST['game']))
 		{
 			// check if it exists
-			$db->sqlquery("SELECT `game` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+			$dbl->run("SELECT `game` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 
 			// complete the edit
 			if ($db->num_rows() == 1)
 			{
-				$db->sqlquery("UPDATE `goty_games` SET `game` = ?, `category_id` = ? WHERE `id` = ?", array($_POST['game'], $_POST['category'], $_POST['id']));
+				$dbl->run("UPDATE `goty_games` SET `game` = ?, `category_id` = ? WHERE `id` = ?", array($_POST['game'], $_POST['category'], $_POST['id']));
 				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=edited");
 			}
 
@@ -290,14 +289,14 @@ if (isset($_POST['act']))
 		if (!empty($_POST['id']))
 		{
 			// check if it exists
-			$db->sqlquery("SELECT `game` FROM `goty_games` WHERE `accepted` = 1 AND `id` = ?", array($_POST['id']));
+			$dbl->run("SELECT `game` FROM `goty_games` WHERE `accepted` = 1 AND `id` = ?", array($_POST['id']));
 
 			// add it
 			if ($db->num_rows() != 1)
 			{
-				$db->sqlquery("UPDATE `goty_games` SET `game` = ?, `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_POST['name'], $_SESSION['user_id'], $_POST['id']));
-				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+				$dbl->run("UPDATE `goty_games` SET `game` = ?, `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_POST['name'], $_SESSION['user_id'], $_POST['id']));
+				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=added");
 			}
 
@@ -317,14 +316,14 @@ if (isset($_POST['act']))
 		if (!empty($_POST['id']))
 		{
 			// check if it exists
-			$db->sqlquery("SELECT `id` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+			$dbl->run("SELECT `id` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 
 			// remove it
 			if ($db->num_rows() == 1)
 			{
-				$db->sqlquery("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
-				$db->sqlquery("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
-				$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_denied_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+				$dbl->run("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_denied_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=deleted");
 			}
 
@@ -352,8 +351,8 @@ if (isset($_POST['act']))
 			$voting = 1;
 		}
 
-		$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_games_open'", array($games));
-		$db->sqlquery("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_voting_open'", array($voting));
+		$dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_games_open'", array($games));
+		$dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_voting_open'", array($voting));
 
 		header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=config");
 	}
@@ -362,26 +361,26 @@ if (isset($_POST['act']))
 	{
 		if ($core->config('goty_finished') == 0)
 		{
-			$db->sqlquery("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_games_open'");
-			$db->sqlquery("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_voting_open'");
-			$db->sqlquery("UPDATE `config` SET `data_value` = 1 WHERE `data_key` = 'goty_finished'");
+			$dbl->run("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_games_open'");
+			$dbl->run("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_voting_open'");
+			$dbl->run("UPDATE `config` SET `data_value` = 1 WHERE `data_key` = 'goty_finished'");
 
-			$db->sqlquery("INSERT INTO `admin_notifications` SET `user_id` = ?, type = 'goty_finished', `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, type = 'goty_finished', `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
 
 			// make the chart for each category
-			$result = $db->sqlquery("SELECT `category_name`, `category_id` FROM `goty_category` ORDER BY `category_id` ASC");
+			$result = $dbl->run("SELECT `category_name`, `category_id` FROM `goty_category` ORDER BY `category_id` ASC");
 			foreach ($result as $category)
 			{
-				$db->sqlquery("INSERT INTO `charts` SET `name` = ?, `h_label` = ?, `owner` = ?", array($category['category_name'], 'Total Votes' , $_SESSION['user_id']));
+				$dbl->run("INSERT INTO `charts` SET `name` = ?, `h_label` = ?, `owner` = ?", array($category['category_name'], 'Total Votes' , $_SESSION['user_id']));
 				$chart_key = $db->grab_id();
 
-				$games = $db->sqlquery("SELECT `game`, `votes` FROM `goty_games` WHERE `category_id` = ? ORDER BY `votes` DESC LIMIT 10", array($category['category_id']));
+				$games = $dbl->run("SELECT `game`, `votes` FROM `goty_games` WHERE `category_id` = ? ORDER BY `votes` DESC LIMIT 10", array($category['category_id']));
 				foreach ($games as $game)
 				{
-					$db->sqlquery("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($chart_key, $game['game']));
+					$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($chart_key, $game['game']));
 					$game_key = $db->grab_id();
 
-					$db->sqlquery("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($chart_key, $game_key, $game['votes']));
+					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($chart_key, $game_key, $game['votes']));
 				}
 			}
 

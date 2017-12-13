@@ -8,7 +8,7 @@ $templating->set('config_support_us_text', $core->config('support_us_text'));
 
 $templating->block('supporter_plus_top');
 // supporter plus level
-$res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 9 ORDER BY RAND() DESC LIMIT 9")->fetch_all();
+$res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 9 ORDER BY u.`username` ASC")->fetch_all();
 foreach ($res as $rowuser)
 {
 	$templating->block('supporter_plus_row');
@@ -22,14 +22,14 @@ foreach ($res as $rowuser)
 	$supporter_link = '';
 	if (!empty($rowuser['supporter_link']))
 	{
-		$supporter_link = " | <a href=\"{$rowuser['supporter_link']}\">{$rowuser['supporter_link']}</a>";
+		$supporter_link = " | <a href=\"{$rowuser['supporter_link']}\">Website</a>";
 	}
 	$templating->set('supporter_link', $supporter_link);
 }
 
 $templating->block('supporter_top');
 // get supporter list Sorted by last login
-$res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 6 ORDER BY RAND() DESC LIMIT 9")->fetch_all();
+$res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 6 ORDER BY u.`username` ASC")->fetch_all();
 foreach ($res as $rowuser)
 {
 	$templating->block('supporter_row');
@@ -43,7 +43,9 @@ foreach ($res as $rowuser)
 	$supporter_link = '';
 	if (!empty($rowuser['supporter_link']))
 	{
-		$supporter_link = " | <a href=\"{$rowuser['supporter_link']}\">{$rowuser['supporter_link']}</a>";
+		$supporter_link = " | <a href=\"{$rowuser['supporter_link']}\">Website</a>";
 	}
 	$templating->set('supporter_link', $supporter_link);
 }
+
+$templating->block('bottom', 'support_us');

@@ -14,27 +14,38 @@
 	<div class="head">Supporters+</div>
 	<div class="body group">A list of supporters on <a href="https://www.patreon.com/liamdawe">Patreon</a> or <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P85ZZX9W8HFMW">Paypal</a> subbing at least $7 a month to support GamingOnLinux</div>
 </div>
+<div class="box">
+	<div style="overflow:auto;width:100%;height:400px;">
+		<div class="body group flex-columns">
 [/block: supporter_plus_top]
 
 [block: supporter_plus_row]
-<div class="box">
-	<div class="body group">
-		<img src="{:avatar}" height="20" width="20" alt="" /> <a href="/profiles/{:user_id}">{:username}</a> {:supporter_link}		
-	</div>
-</div>
+			<div class="flex-column-item">
+				<img src="{:avatar}" height="20" width="20" alt="" /> <a href="/profiles/{:user_id}">{:username}</a> {:supporter_link}
+			</div>		
 [/block: supporter_plus_row]
 
 [block: supporter_top]
+		</div>
+	</div>
+</div>
 <div class="box">
 	<div class="head">Supporters!</div>
-    <div class="body group">A random selection of nine supporters below the higher level, we have too many to display at once now!</div>
+    <div class="body group">Everyone supporting us with at least $4 a month</div>
 </div>
+<div class="box">
+	<div style="overflow:auto;width:100%;height:400px;">
+		<div class="body group flex-columns">
 [/block: supporter_top]
 
 [block: supporter_row]
-<div class="box">
-	<div class="body group">
-		<img src="{:avatar}" height="20" width="20" alt="" /> <a href="/profiles/{:user_id}">{:username}</a> {:supporter_link}
+			<div class="flex-column-item">
+				<img src="{:avatar}" height="20" width="20" alt="" /> <a href="/profiles/{:user_id}">{:username}</a> {:supporter_link}
+			</div>	
+[/block: supporter_row]
+
+[block: bottom]
+		</div>
 	</div>
 </div>
-[/block: supporter_row]
+[/block: bottom]

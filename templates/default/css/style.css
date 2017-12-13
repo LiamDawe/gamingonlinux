@@ -927,22 +927,18 @@ ul.social-networks li > a {
 }
 
 /* Support us page */
-.masonry-support-us .block {
-	display: inline-block;
-	margin: 0 0 1.5em;
-	width: 100%;
+.flex-columns  {
+	display: flex;
+	flex-wrap: wrap;
+	margin-left: -10px;
+	margin-top: -10px;
 }
-.support-us-box {
-	text-align: center;
-	overflow: hidden;
-	background: #efefef;
-}
-.dark .support-us-box {
-	background: #222222;
-}
-.support-us-box a {display: block;}
-.support-us-box a:hover {
-	color: #518FD0;
+.flex-columns .flex-column-item {
+	flex: 1 0 250px;
+	box-sizing: border-box;
+	padding: 10px;
+	margin-left: 10px;
+	margin-top: 10px;
 }
 
 /* Forum */

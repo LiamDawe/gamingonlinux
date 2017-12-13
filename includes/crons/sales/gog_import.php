@@ -55,7 +55,7 @@ do {
 
 		if ($games['linux_compatible'] == 1 && $games['discount_raw'] > 0)
 		{
-			$website = $games['short_link'];
+			$website = $games['short_link'] . '/?pp=b2a10a6c3dcadb10c8ffd734c1bab896d55cf0ec';
 			$image = $games['img_cover'];
 			$current_price =  $games['price_raw']/100; //LoL what, ['price_raw'] is the discounted price
 			$original_price = round( $games['price_raw'] / (100 - $games['discount']), 2);  //Looks like ['discount'] is a % discount

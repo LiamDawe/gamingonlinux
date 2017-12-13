@@ -42,6 +42,32 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 
 	echo 'User <strong>' . $username . '</strong> created with password: ' . $_POST['password'];
 }
+
+if (isset($_POST['act']) && $_POST['act'] == 'reg_user_random')
+{
+	// tool for making a bunch of random user accounts
+	for ($i = 1; $i <= $_POST['total_users']; $i++) 
+	{
+		$names = ['Bob', 'Howard', 'Samsai', 'John', 'Liam', 'Sin', 'James', 'Arthur', 'Marco', 'Edwin', 'Jeremy', 'Corbyn'];
+		$username = $names[array_rand($names)] . ' ' . $names[array_rand($names)];
+		$email = core::make_safe($_POST['email']);
+		$password = rand(0,100).time();
+	
+		$safe_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+	
+		$user_query = "INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `register_date` = ?, `theme` = 'default', `activated` = 1";
+	
+		$dbl->run($user_query, array($username, $safe_password, $email, $email, core::$date));
+	
+		$new_user_id = $dbl->new_id();
+		foreach ($_POST['user_groups'] as $key => $group)
+		{
+			$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$new_user_id, $group]);
+		}
+	
+		echo 'User <strong>' . $username . '</strong> created with password: ' . $password;
+	}
+}
 ?>
 <html lang="en">
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
@@ -63,6 +89,23 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 	<strong>User Groups</strong><br />
 	<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen"></select><br />
 	<button type="submit" name="act" value="reg_user">Create user</button>
+	<p>Or, you can make a bunch of random users all at once to test a feature:</p>
+	<form method="post" action="make_user.php">
+	<p><strong>Number of users</strong></p>
+	<select name="total_users">
+	<?php
+		for ($i=1; $i<=100; $i++)
+		{
+	?>
+		<option value="<?php echo $i;?>"><?php echo $i;?></option>
+	<?php
+		}
+	?>
+	</select>	
+	<p><strong>User Groups</strong></p>
+	<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen"></select><br />
+	<button type="submit" name="act" value="reg_user_random">Create random users</button>		
+	</form>
 </div>
 </form>
 </body>

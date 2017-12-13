@@ -9,7 +9,7 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
 	{
-		$topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0")->fetch_all();
+		$topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username`, u.`mod_approved` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0")->fetch_all();
 
 		if ($topics)
 		{
@@ -19,6 +19,7 @@ if (isset($_GET['view']))
 				$templating->set('mod_type', 'Forum Topic');
 				$templating->set('username', $results['username']);
 				$templating->set('topic_id', $results['topic_id']);
+				$templating->set('total', $results['mod_approved']);
 				$templating->set('post_id', '');
 				$templating->set('type', 'forum_topic');
 				$templating->set('title', $results['topic_title']);
@@ -29,7 +30,7 @@ if (isset($_GET['view']))
 			}
 		}
 
-		$replies = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0")->fetch_all();
+		$replies = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username`, u.`mod_approved` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0")->fetch_all();
 
 		if ($replies)
 		{
@@ -39,6 +40,7 @@ if (isset($_GET['view']))
 				$templating->set('mod_type', 'Forum Reply');
 				$templating->set('username', $results['username']);
 				$templating->set('topic_id', $results['topic_id']);
+				$templating->set('total', $results['mod_approved']);
 				$templating->set('post_id', $results['post_id']);
 				$templating->set('type', 'forum_reply');
 				$templating->set('title', '<a href="/index.php?module=viewtopic&topic_id='.$results['topic_id'].'">'.$results['topic_title'].'</a>');
@@ -49,7 +51,7 @@ if (isset($_GET['view']))
 			}
 		}
 		
-		$comments = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, c.`comment_id`, c.`comment_text`, c.`author_id`, c.`time_posted`, u.`username` FROM `articles_comments` c INNER JOIN `articles` a ON a.`article_id` = c.`article_id` INNER JOIN `users` u ON c.`author_id` = u.`user_id` WHERE c.`approved` = 0")->fetch_all();
+		$comments = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, c.`comment_id`, c.`comment_text`, c.`author_id`, c.`time_posted`, u.`username`, u.`mod_approved` FROM `articles_comments` c INNER JOIN `articles` a ON a.`article_id` = c.`article_id` INNER JOIN `users` u ON c.`author_id` = u.`user_id` WHERE c.`approved` = 0")->fetch_all();
 
 		if ($comments)
 		{
@@ -61,6 +63,7 @@ if (isset($_GET['view']))
 				$templating->set('mod_type', 'Article Comment');
 				$templating->set('username', $comment['username']);
 				$templating->set('topic_id', '');
+				$templating->set('total', $comment['mod_approved']);
 				$templating->set('post_id', $comment['comment_id']);
 				$templating->set('type', 'comment');
 				$templating->set('title', '<a href="'.$article_link.'">'.$comment['title'].'</a>');

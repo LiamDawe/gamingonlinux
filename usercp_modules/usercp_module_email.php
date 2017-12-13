@@ -1,9 +1,10 @@
 <?php
-$grab_email = $dbl->run("SELECT `email`, `username` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+$grab_email = $dbl->run("SELECT `email`, `username`, `supporter_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 $templating->load('usercp_modules/usercp_module_email');
 $templating->block('main');
 $templating->set('current_email', $grab_email['email']);
+$templating->set('supporter_email', $grab_email['supporter_email']);
 
 if (isset($_POST['Update']))
 {
@@ -79,6 +80,37 @@ if (isset($_POST['Update']))
 
 	$_SESSION['message'] = 'saved';
 	$_SESSION['message_extra'] = 'email address';
+	// redirect and tell them it's done
+	header("Location: /usercp.php?module=email");
+}
+
+if (isset($_POST['supporter_update']))
+{
+	if (empty($_POST['supporter_email']))
+	{
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'supporter email';
+		header("Location: /usercp.php?module=email");
+		die();
+	}
+	
+	$new_email = trim($_POST['supporter_email']);
+
+	// update to the new email address
+	$dbl->run("UPDATE `users` SET `supporter_email` = ? WHERE `user_id` = ?", array($new_email, $_SESSION['user_id']));
+
+	$_SESSION['message'] = 'saved';
+	$_SESSION['message_extra'] = 'supporter email address';
+	// redirect and tell them it's done
+	header("Location: /usercp.php?module=email");
+}
+
+if (isset($_POST['remove_supporter_email']))
+{
+	$dbl->run("UPDATE `users` SET `supporter_email` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
+
+	$_SESSION['message'] = 'deleted';
+	$_SESSION['message_extra'] = 'supporter email address';
 	// redirect and tell them it's done
 	header("Location: /usercp.php?module=email");
 }

@@ -4,11 +4,21 @@
 	<div class="body group">
 	<form method="post" action="/usercp.php?module=email" role="form">
 	Current Email: {:current_email}<br />
-	New Email: <input type="text" name="new_email" /><br />
+	New Email: <input class="ays-ignore" type="text" name="new_email" /><br />
 	Enter your password to confirm it's you doing this:<br />
-	<input type="password" name="password" /><br />
+	<input type="password" class="ays-ignore" name="password" /><br />
 	<input type="submit" name="Update" value="Update" />
 	</form>
+	</div>
+</div>
+<div class="box">
+	<div class="head">Supporter email</div>
+	<div class="body group">
+		<form method="post" action="/usercp.php?module=email" role="form">
+			If your email on sites like Patreon and Paypal is different to your email here, this helps us match up your accounts to correctly give you Supporter status! This is never shown anywhere!
+			<input type="email" class="ays-ignore" name="supporter_email" value="{:supporter_email}" /></p>
+			<button type="submit" name="supporter_update" value="supporter_update">Update</button> <button type="submit" name="remove_supporter_email" value="remove_supporter_email">Remove</button>
+		</form>
 	</div>
 </div>
 [/block: main]

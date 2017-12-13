@@ -192,10 +192,14 @@ class article
 		// if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
 		if ($article['author_id'] != 1844)
 		{
-			if (!empty($article['tagline_image']))
+			if (isset($article['tagline_image']))
 			{
-				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
-				unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
+				$tagline_image = trim($article['tagline_image']); // ensure we don't pick up random spaces
+				if (!empty($tagline_image) && $tagline_image != '')
+				{
+					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
+					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
+				}
 			}
 		}
 

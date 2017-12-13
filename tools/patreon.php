@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 if (isset($_POST['go']))
 {
 	$file_dir = dirname( dirname(__FILE__) );
@@ -57,7 +59,7 @@ if (isset($_POST['go']))
 				$their_groups = $user->post_group_list([$user_info['user_id']]);
 				if (!in_array(6, $their_groups[$user_info['user_id']]))
 				{
-					echo $user_info['username'] . ' ' . $line[2] . '<pre>';
+					echo 'Username: ' . $user_info['username'] . ' ' . $line[2] . ' | Pledge: '. $pledge .'<pre>';
 					print_r($their_groups);
 					echo '</pre>';
 					
@@ -65,8 +67,23 @@ if (isset($_POST['go']))
 					
 					echo "\nGiven Supporter status\n\n";
 				}
+				if ($pledge >= 7)
+				{
+					$their_groups = $user->post_group_list([$user_info['user_id']]);
+					if (!in_array(9, $their_groups[$user_info['user_id']]))
+					{
+						echo 'Username: ' . $user_info['username'] . ' ' . $line[2] . ' | Pledge: '. $pledge .'<pre>';
+						print_r($their_groups);
+						echo '</pre>';
+						
+						$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 9", [$user_info['user_id']]);
+						
+						echo "\nGiven Supporter Plus status\n\n";
+					}
+				}
 			}
 		}
+		unset($pledge); // don't let them accidentally add up
 	}
 }
 ?>

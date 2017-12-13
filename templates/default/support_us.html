@@ -1,35 +1,40 @@
 [block: main]
-			<!-- support us page -->
-        		<div class="box">
-					<div class="body group">
-                        {:config_support_us_text}
-					</div>
-				</div>
+<div class="box">
+	<div class="body group">
+       {:config_support_us_text}
+	</div>
+</div>
+<div class="box">
+	<div class="subhead">A big thank you to all those listed below, whatever level of support you give us&mdash;thank you! You're all important to us!</div>
+</div>
 [/block: main]
 
-[block: list_top]
-				<div class="box">
-					<div class="head">Supporters!</div>
-          <div class="body group">A random selection of nine supporters, we have too many to display at once now!</div>
-				</div>
-[/block: list_top]
+[block: supporter_plus_top]
+<div class="box">
+	<div class="head">Supporters+</div>
+	<div class="body group">A list of supporters on <a href="https://www.patreon.com/liamdawe">Patreon</a> or <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P85ZZX9W8HFMW">Paypal</a> subbing at least $7 a month to support GamingOnLinux</div>
+</div>
+[/block: supporter_plus_top]
 
-[block: list_row_start]
-				<div class="masonry-support-us">
+[block: supporter_plus_row]
+<div class="box">
+	<div class="body group">
+		<img src="{:avatar}" height="20" width="20" alt="" /> <a href="/profiles/{:user_id}">{:username}</a> {:supporter_link}		
+	</div>
+</div>
+[/block: supporter_plus_row]
 
-[/block: list_row_start]
+[block: supporter_top]
+<div class="box">
+	<div class="head">Supporters!</div>
+    <div class="body group">A random selection of nine supporters below the higher level, we have too many to display at once now!</div>
+</div>
+[/block: supporter_top]
 
-[block: list_row_end]
-				</div>
-[/block: list_row_end]
-
-[block: person]
-				<div class="block">
-					<div class="support-us-box body group">
-						<a href="/profiles/{:user_id}">
-						<img src="{:avatarurl}" height="125" width="125" alt="{:username}"><br />
-						{:username}</a> <br />
-						{:supporter_link}
-					</div>
-				</div>
-[/block: person]
+[block: supporter_row]
+<div class="box">
+	<div class="body group">
+		<img src="{:avatar}" height="20" width="20" alt="" /> <a href="/profiles/{:user_id}">{:username}</a> {:supporter_link}
+	</div>
+</div>
+[/block: supporter_row]

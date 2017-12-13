@@ -74,9 +74,13 @@ else
 		$templating->set('facebook_page', $core->config('facebook_page'));
 		$templating->set('gplus_page', $core->config('gplus_page'));
 		$templating->set('youtube_channel', $core->config('youtube_channel'));
-		
+
 		// THEMING
 		$templating->set('template', $core->config('template'));
+
+		$core->article_editor(['content' => $core->config('support_us_text')]);
+
+		$templating->block('bottom', 'admin_modules/config');
 	}
 
 	// We have been asked to edit the config
@@ -161,6 +165,8 @@ else
 			
 			// THEMING
 			$core->set_config($_POST['template'], 'template');
+
+			$core->set_config($_POST['text'], 'support_us_text');
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';

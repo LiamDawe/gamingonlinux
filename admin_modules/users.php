@@ -35,15 +35,23 @@ else
 					}
 					if (isset($email) && !empty($email))
 					{
-						$search_res = $dbl->run("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `email` LIKE ?", array('%'.$email.'%'))->fetch();
+						$search_res = $dbl->run("SELECT `user_id`, `username`, `banned`,`email` FROM `users` WHERE `email` LIKE ?", array('%'.$email.'%'))->fetch_all();
 					}
+
 					$templating->block('search_row_top', 'admin_modules/users');
-					foreach ($search_res as $search)
+					if ($search_res)
 					{
-						$templating->block('search_row','admin_modules/users');
-						$templating->set('username', $search['username']);
-						$templating->set('user_id', $search['user_id']);
-						$templating->set('email', $search['email']);
+						foreach ($search_res as $found_user)
+						{
+							$templating->block('search_row','admin_modules/users');
+							$templating->set('username', $found_user['username']);
+							$templating->set('user_id', $found_user['user_id']);
+							$templating->set('email', $found_user['email']);
+						}
+					}
+					else
+					{
+						$core->message('No matching users found, sorry!');
 					}
 				}
 			}

@@ -1187,10 +1187,10 @@ class core
 		{
 			// sort out genre tags
 			$genre_list = '';
-			$grab_genres = $this->dbl->run("SELECT g.`id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON r.genre_id = g.id WHERE r.`game_id` = ?", array($game_id))->fetch_all();
+			$grab_genres = $this->dbl->run("SELECT g.`category_id`, g.category_name FROM `game_genres_reference` r INNER JOIN `articles_categorys` g ON r.genre_id = g.category_id WHERE r.`game_id` = ?", array($game_id))->fetch_all();
 			foreach ($grab_genres as $genres)
 			{
-				$genre_list .= '<option value="'.$genres['id'].'" selected>'.$genres['name'].'</option>';
+				$genre_list .= '<option value="'.$genres['category_id'].'" selected>'.$genres['category_name'].'</option>';
 			}
 		}
 		return $genre_list;

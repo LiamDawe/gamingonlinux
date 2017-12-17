@@ -114,7 +114,7 @@ class game_sales
 				}
 				$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
 				$options_sql .= ' AND r.genre_id IN ('.$in.') ';
-				$genre_join = ' INNER JOIN `game_genres_reference` r ON r.game_id = c.id ';
+				$genre_join = ' INNER JOIN `game_genres_reference` r ON r.game_id = c.`category_id` ';
 			}
 
 			if (isset($filters_sort['licenses']))
@@ -168,7 +168,7 @@ class game_sales
 				$genre_ids[] = $set['id'];
 			}
 			$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
-			$genre_tag_sql = "SELECT r.`game_id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON g.id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, g.name";
+			$genre_tag_sql = "SELECT r.`game_id`, c.`category_name` AS `name` FROM `game_genres_reference` r INNER JOIN `articles_categorys` c ON c.category_id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, `name`";
 			$genre_res = $this->dbl->run($genre_tag_sql, $genre_ids)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 
 			foreach ($games_res as $game)

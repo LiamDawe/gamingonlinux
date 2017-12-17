@@ -1431,7 +1431,7 @@ jQuery(document).ready(function()
 	selectOnClose: true,
 	width: '100%',
 	ajax: {
-    url: "/includes/ajax/game_genres_ajax.php",
+    url: "/includes/ajax/gamesdb/game_genres_ajax.php",
     dataType: 'json',
     delay: 250,
     data: function (params) {

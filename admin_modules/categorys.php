@@ -14,12 +14,19 @@ if (!isset($_POST['act']))
 	$templating->block('add_category', 'admin_modules/admin_module_categorys');
 
 	// get the current categorys
-	$category_get = $dbl->run("SELECT `category_name`, `category_id` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
+	$category_get = $dbl->run("SELECT `category_name`, `category_id`, `is_genre` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
 	foreach ($category_get as $category)
 	{
 		$templating->block('category_row', 'admin_modules/admin_module_categorys');
 		$templating->set('category_name', $category['category_name']);
 		$templating->set('category_id', $category['category_id']);
+
+		$genre_check = '';
+		if ($category['is_genre'] == 1)
+		{
+			$genre_check = 'checked';
+		}
+		$templating->set('genre_check', $genre_check);
 	}
 }
 
@@ -36,7 +43,13 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$checker = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_name` = ?", [$_POST['category_name']])->fetch();
 			if (!$checker)
 			{
-				$dbl->run("INSERT INTO `articles_categorys` SET `category_name` = ?", [$_POST['category_name']]);
+				$genre_check = 0;
+				if (isset($_POST['is_genre']))
+				{
+					$genre_check = 1;
+				}
+
+				$dbl->run("INSERT INTO `articles_categorys` SET `category_name` = ?, `is_genre` = ?", [$_POST['category_name'], $genre_check]);
 
 				header("Location: admin.php?module=categorys&message=added");
 			}
@@ -58,9 +71,17 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		}
 		else
 		{
-			$dbl->run("UPDATE `articles_categorys` SET `category_name` = ? WHERE `category_id` = ?", array($_POST['category_name'], $_POST['category_id']));
+			$genre_check = 0;
+			if (isset($_POST['is_genre']))
+			{
+				$genre_check = 1;
+			}
 
-			$core->message("Category {$_POST['category_name']} has been updated! <a href=\"admin.php?module=categorys\">Click here to edit more</a> or <a href=\"index.php\">click here to go to the site home</a>.");
+			$dbl->run("UPDATE `articles_categorys` SET `category_name` = ?, `is_genre` = ? WHERE `category_id` = ?", array($_POST['category_name'], $genre_check, $_POST['category_id']));
+
+			$_SESSION['message'] = 'edited';
+			$_SESSION['message_extra'] = 'category';
+			header("Location: /admin.php?module=categorys");
 		}
 	}
 
@@ -93,7 +114,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				{
 					$dbl->run("DELETE FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']));
 
-					$core->message('That category has now been deleted');
+					$_SESSION['message'] = 'deleted';
+					$_SESSION['message_extra'] = 'category';
+					header("Location: /admin.php?module=categorys");
 				}
 			}
 		}

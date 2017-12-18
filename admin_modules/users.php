@@ -241,11 +241,24 @@ else
 			{
 				$_SESSION['message'] = 'empty';
 				$_SESSION['message_extra'] = $empty_check;
-				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
+				header("Location: admin.php?module=users&view=edituser&user_id=" . $_GET['user_id']);
 			}
 
 			else
 			{
+				// check username isn't taken IF they are changing it
+				$current_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", [$_GET['user_id']])->fetchOne();
+				if ($username != $current_username)
+				{
+					$check_username = $dbl->run("SELECT `username` FROM `users` WHERE `username` = ?", [$username])->fetchOne();
+					if ($check_username)
+					{
+						$_SESSION['message'] = 'username_exists';
+						header("Location: admin.php?module=users&view=edituser&user_id=" . $_GET['user_id']);
+						die();
+					}
+				}
+
 				$expires = 0;
 				if (isset($_POST['expires']))
 				{

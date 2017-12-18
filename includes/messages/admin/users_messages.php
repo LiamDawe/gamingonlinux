@@ -19,6 +19,11 @@ return [
 	"ip_ban" =>
 	[
 		"text" => 'That IP has now been banned!'
+	],
+	"username_exists" =>
+	[
+		"text" => 'That username could not be changed, another user already has it!',
+		"error" => 1
 	]
 ];
 ?>

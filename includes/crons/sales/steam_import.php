@@ -22,7 +22,8 @@ foreach ($currencies as $key => $currency)
 	$page = 1;
 	$stop = 0;
 
-	$url = "http://store.steampowered.com/search/results?os=linux&specials=1&snr=1_7_7_204_7&cc=".$key."&page=";
+	// only SteamOS/Linux (Games/DLC/Hardware/Bundles) NOT videos/movies
+	$url = "http://store.steampowered.com/search/results?category1=998%2C994%2C21%2C993%2C996&os=linux&specials=1&cc=".$key."&page=";
 
 	do
 	{
@@ -41,7 +42,8 @@ foreach ($currencies as $key => $currency)
 				$link = $element->href;
 
 				$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
-				$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
+				$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database
+				$stripped_title = $game_sales->stripped_title($title);
 				echo $title . "\n";
 
 				$image = $element->find('div.search_capsule img', 0)->src;
@@ -108,14 +110,15 @@ foreach ($currencies as $key => $currency)
 					echo 'SteamID: ' . $steam_id . "\n";
 
 					// ADD IT TO THE GAMES DATABASE
-					$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+					$select_sql = "SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle`, `date`, `stripped_name` FROM `calendar` WHERE `name` = ?";
+					$game_list = $dbl->run($select_sql, array($title))->fetch();
 				
 					if (!$game_list)
 					{
-						$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $clean_release_date, $link, $steam_id, $bundle));
+						$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $stripped_title, $clean_release_date, $link, $steam_id, $bundle));
 				
 						// need to grab it again
-						$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+						$game_list = $dbl->run($select_sql, array($title))->fetch();
 				
 						$game_id = $game_list['id'];
 					}
@@ -155,6 +158,12 @@ foreach ($currencies as $key => $currency)
 					if ($game_list['date'] == NULL || $game_list['date'] == '')
 					{
 						$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", [$clean_release_date, $game_id]);
+					}
+
+					// if the name hasn't been stripped for comparisons yet (older data)
+					if ($game_list['stripped_name'] == NULL || $game_list['stripped_name'] == '')
+					{
+						$dbl->run("UPDATE `calendar` SET `stripped_name` = ? WHERE `id` = ?", [$stripped_title, $game_id]);
 					}
 				
 					if (!in_array($game_id, $on_sale))

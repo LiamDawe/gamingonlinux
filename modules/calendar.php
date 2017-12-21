@@ -125,7 +125,7 @@ foreach ($get_listings as $set)
 	$genre_ids[] = $set['id'];
 }
 $in  = str_repeat('?,', count($genre_ids) - 1) . '?';
-$genre_tag_sql = "SELECT r.`game_id`, g.name FROM `game_genres_reference` r INNER JOIN `game_genres` g ON g.id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, g.name";
+$genre_tag_sql = "SELECT r.`game_id`, c.category_name FROM `game_genres_reference` r INNER JOIN `articles_categorys` c ON c.category_id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, c.category_name";
 $genre_res = $dbl->run($genre_tag_sql, $genre_ids)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 
 $templating->block('head', 'calendar');

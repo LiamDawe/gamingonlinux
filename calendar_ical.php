@@ -22,15 +22,11 @@ function escapeString($string) {
 
 $output = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nVERSION:2.0\r\nPRODID:-//Gaming On Linux//Release Calendar//EN\r\n";
 
-$items = $dbl->run("SELECT `id`, `date`, `name`, `link`, `best_guess`, `edit_date` FROM `calendar` WHERE YEAR(date) = $year AND `approved` = 1 ORDER BY `date` ASC")->fetch_all();
+$items = $dbl->run("SELECT `id`, `date`, `name`, `link`, `best_guess` FROM `calendar` WHERE YEAR(date) = $year AND `approved` = 1 ORDER BY `date` ASC")->fetch_all();
 
 // loop over events
 foreach ($items as $item)
 {
-	if (empty($item['edit_date']))
-	{
-		$item['edit_date'] = date("Y-m-d");
-	}
 	$url = '';
 	if (!empty($item['link']))
 	{
@@ -46,7 +42,7 @@ foreach ($items as $item)
 		$name = $name . ' (Best Guess)';
 	}
 
-	$output .="BEGIN:VEVENT\r\nSUMMARY:GOL > " . $name . "\r\nUID:{$item['id']}\r\n" . $url . "DTSTART;VALUE=DATE:" . date('Ymd', strtotime($item['date'])) . "\r\n" . 'DTEND;VALUE=DATE:' . date('Ymd', strtotime($item['date'] . '+ 1 day')) . "\r\nLAST-MODIFIED:" . date(DATE_ICAL, strtotime($item['edit_date'])) . "\r\nEND:VEVENT\r\n";
+	$output .="BEGIN:VEVENT\r\nSUMMARY:GOL > " . $name . "\r\nUID:{$item['id']}\r\n" . $url . "DTSTART;VALUE=DATE:" . date('Ymd', strtotime($item['date'])) . "\r\n" . 'DTEND;VALUE=DATE:' . date('Ymd', strtotime($item['date'] . '+ 1 day')) . "\r\nLAST-MODIFIED:" . date(DATE_ICAL, strtotime(date("Y-m-d"))) . "\r\nEND:VEVENT\r\n";
 }
 
 // close calendar

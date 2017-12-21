@@ -14,11 +14,23 @@ class game_sales
 		$this->core = $core;
 	}
 
+	// this will remove needless junk for the proper display title of a game
 	function clean_title($title)
 	{
 		$title = preg_replace("/(™|®|©|&trade;|&reg;|&copy;|&#8482;|&#174;|&#169;)/", "", $title); // remove junk
 		$title = trim($title); // some stores give a random space
 		return $title;
+	}
+
+	/* return a basic string, with no special characters and no spaces
+	gives us an absolute bare-bones name to compare different stores sales like "This: This" and "This - This"
+	*/
+	function stripped_title($string)
+	{
+		$string = str_replace(' ', '', $string); // Replaces all spaces with hyphens.
+		$string = trim($string);
+		$string = strtolower($string);
+		return preg_replace('/[^A-Za-z0-9]/', '', $string); // Removes special chars.
 	}
 
 	// move previously uploaded tagline image to correct directory
@@ -215,19 +227,21 @@ class game_sales
 				}
 				$this->templating->set('license', $license);
 
-				$genre_output = '';
+				$genre_output = $this->templating->block_store('genres');
 				$genre_list = [];
 				if (isset($genre_res[$game['id']]))
-				{
-					$genre_output = $this->templating->block_store('genres');
+				{	
 					foreach ($genre_res[$game['id']] as $k => $name)
 					{
 						$genre_list[] = "<span class=\"badge\">{$name}</span>";
 					}
-
-					$genre_output = $this->templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list)));					
 				}
-	
+				$suggest_link = NULL;
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 1)
+				{
+					$suggest_link .= '<a href="/index.php?module=games&view=suggest_tags&id='.$game['id'].'">Suggest Tags</a>';
+				}
+				$genre_output = $this->templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list), 'suggest_link' => $suggest_link));
 				$this->templating->set('genre_list', $genre_output);
 			}
 		}

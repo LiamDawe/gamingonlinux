@@ -94,4 +94,6 @@ else
 	$dbl->run("DELETE FROM `sales` WHERE `store_id` = 9", $on_sale); // delete any left, since they only do one at a time
 }
 
+$dbl->run("DELETE FROM `sales` WHERE `store_id` = 9 AND `end_date` < NOW()", $on_sale);
+
 echo "End of Chrono.gg Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

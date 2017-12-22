@@ -35,9 +35,6 @@ $on_sale = [];
 
 $array = json_decode(core::file_get_contents_curl($url), true);
 
-// DEBUG: Check whole array
-//print_r($array['data']);
-
 foreach ($array['data'] as $games)
 {
 	if (in_array('linux', $games['operating_systems']) && $games['discount_percent'] > 0 && substr($games['title'], -6) != 'Bundle')

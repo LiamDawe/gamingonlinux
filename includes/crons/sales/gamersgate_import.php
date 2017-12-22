@@ -42,8 +42,14 @@ foreach ($xml->item as $game)
 	//echo '<pre>';
 	//print_r($game);
 	//echo '</pre>';
-
+	
 	$new_title = html_entity_decode($game->title, ENT_QUOTES);
+
+	// they stick (Mac & Linux) or just "(Mac)" in some titles, remove it, that's not the actual name
+	$new_title = str_replace("(Mac & Linux)", '', $new_title);
+	$new_title = str_replace("(Mac)", '', $new_title);
+	
+	$stripped_title = $game_sales->stripped_title($new_title);
 	$new_title = $game_sales->clean_title($new_title);
 
 	// they are cet (UTC+1), so add one hour, but they also use CEST in summer, not UTC *sigh*
@@ -69,29 +75,33 @@ foreach ($xml->item as $game)
 
 	if ($game->price != "-" && $game->price > 0)
 	{
-		// ADD IT TO THE GAMES DATABASE
-		$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($new_title))->fetch();
+		// first check it exists based on the normal name
+		$game_id = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($new_title))->fetchOne();
 			
-		if (!$game_list)
+		if (!$game_id)
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `on_sale` = 1", array($new_title, date('Y-m-d'))); // they don't give the release date, just add in today's date, we can fix manually later if/when we need to
-			
-			// need to grab it again
-			$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($new_title))->fetch();
-		}
-		else
-		{
-			$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($game_list['id']));
-		}
-			
-		$on_sale[] = $game_list['id'];
-			
-		$check_sale = $dbl->run("SELECT 1 FROM `sales` WHERE `game_id` = ? AND `store_id` = 8", array($game_list['id']))->fetch();
+			// not found, checked the stripped name
+			$game_list_stripped = $dbl->run("SELECT `id` FROM `calendar` WHERE `stripped_name` = ?", array($stripped_title))->fetchOne();
+			if (!$game_list_stripped)
+			{
+				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `on_sale` = 1", array($new_title, $stripped_title, date('Y-m-d'))); // they don't give the release date, just add in today's date, we can fix manually later if/when we need to
 
-		// all checks out - insert into database here
+				$game_id = $dbl->new_id();
+			}
+			else
+			{
+				$game_id = $game_list_stripped;
+			}
+		}
+			
+		$on_sale[] = $game_id;
+			
+		$check_sale = $dbl->run("SELECT 1 FROM `sales` WHERE `game_id` = ? AND `store_id` = 8", array($game_id))->fetch();
+
+		// all sorted out - insert into the sales database
 		if (!$check_sale)
 		{
-			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 8, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_list['id'], $game->price, $game->srp, $game->link));
+			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 8, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_id, $game->price, $game->srp, $game->link));
 			
 			$sale_id = $dbl->new_id();
 			

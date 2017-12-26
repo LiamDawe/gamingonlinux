@@ -893,7 +893,7 @@ jQuery(document).ready(function()
 		var button = $(this);
 		var category_id = $(this).data('category-id');
 		var game_id = $(this).data('game-id');
-		$.post('/includes/ajax/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
+		$.post('/includes/ajax/goty/goty_vote.php', {'category_id':category_id, 'game_id':game_id},
 		function(data)
 		{
 			if (data.result == 1)

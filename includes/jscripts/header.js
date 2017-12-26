@@ -1427,7 +1427,7 @@ jQuery(document).ready(function()
 		});
 	  
 	$(".clear-games").on("click", function (e) { e.preventDefault(); $gamesMulti.val(null).trigger("change"); });
-	$("#genres").select2({
+	$(".genres_picker").select2({
 	selectOnClose: true,
 	width: '100%',
 	ajax: {

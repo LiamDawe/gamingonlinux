@@ -1180,17 +1180,24 @@ class core
 
 	/* games database */
 	// list the genres for the current game
-	function display_game_genres($game_id = NULL)
+	function display_game_genres($game_id = NULL, $in_list = TRUE)
 	{
 		// for a specific game
 		if (isset($game_id) && self::is_number($game_id))
 		{
 			// sort out genre tags
-			$genre_list = '';
+			$genre_list = NULL;
 			$grab_genres = $this->dbl->run("SELECT g.`category_id`, g.category_name FROM `game_genres_reference` r INNER JOIN `articles_categorys` g ON r.genre_id = g.category_id WHERE r.`game_id` = ?", array($game_id))->fetch_all();
 			foreach ($grab_genres as $genres)
 			{
-				$genre_list .= '<option value="'.$genres['category_id'].'" selected>'.$genres['category_name'].'</option>';
+				if ($in_list == TRUE)
+				{
+					$genre_list .= '<option value="'.$genres['category_id'].'" selected>'.$genres['category_name'].'</option>';
+				}
+				else
+				{
+					$genre_list[] = $genres['category_name'];
+				}
 			}
 		}
 		return $genre_list;

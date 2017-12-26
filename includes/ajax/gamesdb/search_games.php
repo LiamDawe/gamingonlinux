@@ -19,6 +19,10 @@ if(isset($_GET['q']))
 	{
 		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `free_game` = 1 ORDER BY `name` ASC";		
 	}
+	if (isset($_GET['all']))
+	{
+		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL ORDER BY `name` ASC";	
+	}
 
 	$get_data = $dbl->run($sql, [$game_search])->fetch_all();
 

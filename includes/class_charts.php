@@ -166,7 +166,10 @@ class charts
 				{
 					$this->labels[$last_id]['max'] = $label_loop['max'] + 0; // + 0 to remove extra needless zeros
 				}
-				$this->labels[$last_id]['colour'] = $label_loop['colour'];
+				if (isset($label_loop['colour']))
+				{
+					$this->labels[$last_id]['colour'] = $label_loop['colour'];
+				}
 			}
 			else
 			{

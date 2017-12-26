@@ -17,6 +17,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->set_previous('meta_description', 'Adding a new game', 1);
 		$templating->set_previous('title', 'Adding a game to the database', 1);
 
+		$templating->block('quick_links');
+
 		$templating->block('add_top', 'admin_modules/games');
 
 		$templating->block('item', 'admin_modules/games');
@@ -39,8 +41,46 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('add_bottom', 'admin_modules/games');
 	}
+	if ($_GET['view'] == 'tag_suggestions')
+	{
+		$templating->block('quick_links');
+
+		$game_res = $dbl->run("SELECT g.id, g.name, c.`category_name`, c.category_id FROM calendar g INNER JOIN `game_genres_suggestions` s ON s.game_id = g.id INNER JOIN `articles_categorys` c ON s.genre_id = c.category_id GROUP BY g.`id`, c.category_id")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
+
+		if ($game_res)
+		{
+			foreach ($game_res as $id => $tags)
+			{
+				$templating->block('suggest_tags');
+				$templating->set('name', $tags[0]['name']);
+				$templating->set('id', $id);
+
+				$current_genres = 'None!';
+				$get_genres = $core->display_game_genres($id, false);
+				if (is_array($get_genres))
+				{
+					$current_genres = implode(', ', $get_genres);
+				}
+				$templating->set('current_genres', $current_genres);
+
+				$suggested_list = '';
+				foreach ($tags as $tag)
+				{
+					$suggested_list .= '<option value="'.$tag['category_id'].'" selected>'.$tag['category_name'].'</option>';
+				}
+				$templating->set('suggested_list', $suggested_list);
+				$templating->set('time', core::$date);
+			}
+		}
+		else
+		{
+			$core->message('No current suggestions!');
+		}
+	}
 	if ($_GET['view'] == 'edit')
 	{
+		$templating->block('quick_links');
+
 		if (!isset($_GET['id']) || !is_numeric($_GET['id']))
 		{
 			$core->message('Not ID set, you shouldn\'t be here!');
@@ -256,6 +296,69 @@ if (isset($_POST['act']))
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'game';
 		header("Location: /admin.php?module=games&view=add");
+	}
+	if ($_POST['act'] == 'approve_tags')
+	{
+		if (empty($_POST['id']) || !is_numeric($_POST['id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game';
+			header("Location: /admin.php?module=games&view=tag_suggestions");
+			die();
+		}
+
+		if (isset($_POST['genre_ids']) && !empty($_POST['genre_ids']))
+		{
+			$to_remove = [];
+			// find the difference between the accepted tags and the last submitted items we saw
+			$suggestions_seen = $dbl->run("SELECT `genre_id` FROM `game_genres_suggestions` WHERE `suggested_time` <= ?", [$_POST['current_time']])->fetch_all(PDO::FETCH_COLUMN, 0);
+
+			foreach ($suggestions_seen as $suggest)
+			{
+				if (!in_array($suggest, $_POST['genre_ids']))
+				{
+					$to_remove[] = $suggest;
+				}
+			}
+			if (!empty($to_remove))
+			{
+				$in  = str_repeat('?,', count($to_remove) - 1) . '?';
+				$merged_array = array_merge([$_POST['id']], $to_remove);
+				$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` IN ($in)", $merged_array);
+			}
+
+			foreach ($_POST['genre_ids'] as $genre_id)
+			{
+				$dbl->run("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", [$_POST['id'], $genre_id]);
+				$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` = ?", [$_POST['id'], $genre_id]);
+			}
+
+			$_SESSION['message'] = 'tags_approved';
+			header("Location: /admin.php?module=games&view=tag_suggestions");
+		}
+		else
+		{
+			header("Location: /admin.php?module=games&view=tag_suggestions");
+		}
+	}
+	if ($_POST['act'] == 'deny_tags')
+	{
+		if (empty($_POST['id']) || !is_numeric($_POST['id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game';
+			header("Location: /admin.php?module=games&view=tag_suggestions");
+			die();
+		}
+
+		$merged_array = array_merge([$_POST['id']], $_POST['genre_ids']);
+
+		$in  = str_repeat('?,', count($_POST['genre_ids']) - 1) . '?';
+
+		$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` IN ($in)", $merged_array);
+
+		$_SESSION['message'] = 'tags_denied';
+		header("Location: /admin.php?module=games&view=tag_suggestions");
 	}
 	if ($_POST['act'] == 'Edit')
 	{

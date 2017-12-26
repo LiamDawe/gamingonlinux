@@ -33,6 +33,27 @@ class game_sales
 		return preg_replace('/[^A-Za-z0-9]/', '', $string); // Removes special chars.
 	}
 
+	// this needs cleaning up
+	function steam_release_date($data)
+	{
+		$clean_release_date = NULL;
+		$release_date_raw = $element->find('div.search_released', 0)->plaintext;
+		echo 'Raw release date: ' . $release_date_raw . "\n";
+		$trimmed_date = trim($release_date_raw);	
+		$remove_comma = str_replace(',', '', $trimmed_date);
+		$parsed_release_date = strtotime($remove_comma);
+		// so we can get rid of items that only have the year nice and simple
+		$length = strlen($remove_comma);
+		$parsed_release_date = date("Y-m-d", $parsed_release_date);
+		$has_day = DateTime::createFromFormat('F Y', $remove_comma);
+			
+		if ($parsed_release_date != '1970-01-01' && $length != 4 && $has_day == FALSE)
+		{
+			return $clean_release_date = $parsed_release_date;
+		}
+		return null;
+	}
+
 	// move previously uploaded tagline image to correct directory
 	function move_small($game_id, $file)
 	{

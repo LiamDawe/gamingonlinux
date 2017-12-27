@@ -64,7 +64,7 @@ foreach ($array['data'] as $games)
 
 		if (!$game_list)
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `on_sale` = 1", array($games['title'], $release_date));
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `on_sale` = 1, `approved` = 1", array($games['title'], $release_date));
 
 			// need to grab it again
 			$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();

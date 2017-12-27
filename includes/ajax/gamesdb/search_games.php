@@ -21,7 +21,7 @@ if(isset($_GET['q']))
 	}
 	if (isset($_GET['type']) && $_GET['type'] == 'all')
 	{
-		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL AND `is_application` = 0 ORDER BY `name` ASC";	
+		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL ORDER BY `name` ASC";	
 	}
 
 	$get_data = $dbl->run($sql, [$game_search])->fetch_all();

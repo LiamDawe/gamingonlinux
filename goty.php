@@ -119,7 +119,7 @@ if (isset($_POST['act']))
 					$dbl->run("DELETE FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_POST['category_id'], $_SESSION['user_id']));
 
 					$_SESSION['message'] = 'goty_vote_deleted';
-					header("Location: /goty.php?category_id=".$_POST['category_id']);
+					header("Location: /goty.php?module=category&category_id=".$_POST['category_id']);
 				}
 			}
 		}

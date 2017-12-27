@@ -2,7 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 
-define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 

@@ -900,17 +900,17 @@ jQuery(document).ready(function()
 			{
 				$(button).html('Vote Saved!');
 				$(button).addClass("vote_done");
-				$.fancybox.open({type:"inline", href:"#wrap"})
+				$.fancybox.open({src:'#wrap',type:'inline'})
 			}
 			else if (data.result == 2)
 			{
-				document.getElementById("wrap_text").innerHTML = "Sorry, but voting is closed!";
-				$.fancybox.open({type:"inline", href:"#wrap"})
+				document.getElementById("wrap").innerHTML = "Sorry, but voting is closed!";
+				$.fancybox.open({src:'#wrap',type:'inline'})
 			}
 			else if (data.result == 3)
 			{
-				document.getElementById("wrap_text").innerHTML = "Sorry, but you have already voted in this category!";
-				$.fancybox.open({type:"inline", href:"#wrap"})
+				document.getElementById("wrap").innerHTML = "Sorry, but you have already voted in this category!";
+				$.fancybox.open({src:'#wrap',type:'inline'})
 			}
 			else
 			{
@@ -1460,6 +1460,30 @@ jQuery(document).ready(function()
     data: function (params) {
       return {
         q: params.term // search term
+      };
+    },
+    processResults: function (data) {
+      return {
+        results: $.map(data, function(obj) {
+          return { id: obj.id, text: obj.text };
+        })
+      };
+    },
+    cache: true,
+  },
+  minimumInputLength: 2
+  });
+
+  $(".game_picker").select2({
+	selectOnClose: true,
+	width: '100%',
+	ajax: {
+    url: "/includes/ajax/games_ajax.php",
+    dataType: 'json',
+    delay: 250,
+    data: function (params) {
+      return {
+		q: params.term // search term
       };
     },
     processResults: function (data) {

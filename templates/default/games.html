@@ -1,0 +1,28 @@
+[block: quick_links]
+<div class="box">
+	<ul class="breadcrumb">
+		<li class="active">Quick Links</li>
+		<li><a href="/sales.php">Home</a></li>
+		<li><a href="/sales.php">Sales Page</a></li>
+		<li><a href="/free_games.php">Free Games Page</a></li>
+	</ul>
+</div>
+[/block: quick_links]
+
+[block: suggest_tags]
+<script src="includes/jscripts/jquery.form.min.js"></script>
+<div class="box">
+	<div class="head">
+		Suggest tags for {:name}
+	</div>
+	<div class="body group">
+		<form method="post">
+			<strong>Current tags:</strong> {:current_genres}<br />
+			<strong>Suggest more:</strong><br />
+			<select tabindex="-1" multiple="" name="genre_ids[]" class="populate select2-offscreen genres_picker"></select><br />
+			<input type="hidden" name="id" value="{:id}" />
+			<button formaction="index.php?module=games" name="act" value="suggest_tags" type="submit">Suggest tags</button>
+		</form>
+	</div>
+</div>
+[/block: suggest_tags]

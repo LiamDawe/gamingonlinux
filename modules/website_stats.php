@@ -145,4 +145,15 @@ foreach ($query_liked as $top_liked)
 	$liked_list .= '<li><a href="'.$article_class->get_link($top_liked['article_id'], $top_liked['title']).'">'.$top_liked['title'].'</a> ('.number_format($top_liked['total_likes']).')</li>';
 }
 $templating->set('article_list', $liked_list);
+
+// a yearly total of articles, not including the bot account
+$templating->block('yearly_articles');
+
+$charts = new charts($dbl);
+
+$year_list = '';
+$preview_data = [];
+$yearly = $dbl->run("SELECT YEAR(FROM_UNIXTIME(`date`)) as `name`, COUNT(*) as `data` FROM `articles` WHERE `active` = 1 AND `author_id` != 1844 GROUP BY YEAR(FROM_UNIXTIME(`date`))")->fetch_all();
+$yearly_chart = $charts->render(NULL, ['name' => 'Articles per year', 'grouped' => 0, 'data' => $yearly, 'h_label' => 'Total Posted']);
+$templating->set('year_chart', $yearly_chart);
 ?>

@@ -60,7 +60,7 @@ if (isset($_POST['act']))
 			if (!empty($_POST['game_id']))
 			{
 				// check if it exists
-				$check = $dbl->run("SELECT `game_id` FROM `goty_games` WHERE `game_id` = ? AND `category_id` = ?", array($_POST['game_id'], $_POST['category']))->fetchOne();
+				$check = $dbl->run("SELECT 1 FROM `goty_games` WHERE `game_id` = ? AND `category_id` = ?", array($_POST['game_id'], $_POST['category']))->fetchOne();
 
 				// add it
 				if (!$check)

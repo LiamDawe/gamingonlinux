@@ -15,7 +15,7 @@
 	</div>
 	<div class="body group">
 		<form method="post" action="admin.php?module=games&view=search">
-			Game Name: <input type="text" name="name"  /><br />
+			Game Name: <input id="all-games-search" type="text" name="q" value="{:search_text}" /><br />
 			<button formaction="admin.php?module=games&view=search" name="search" value="Search" type="submit">Search</button>
 		</form>
 	</div>

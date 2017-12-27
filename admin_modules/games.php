@@ -6,7 +6,42 @@ $templating->load('admin_modules/games');
 $licenses = array('', 'Closed Source', 'GPL', 'BSD', 'MIT');
 
 if (isset($_GET['view']) && !isset($_POST['act']))
-{	
+{
+	if ($_GET['view'] == 'search')
+	{
+		$templating->set_previous('meta_description', 'Search the entire games database', 1);
+		$templating->set_previous('title', 'Searching the entire games database', 1);
+		
+		$templating->block('search');
+		$search_text = '';
+		if (isset($_POST['q']) && !empty($_POST['q']))
+		{
+			$search_text = trim($_POST['q']);
+		}
+		$templating->set('search_text', $search_text);
+
+		if (isset($_POST['q']) && !empty($_POST['q']))
+		{
+			$text_sql = '%'.$search_text.'%';
+			$find_items = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ?", [$text_sql])->fetch_all();		
+			if ($find_items)
+			{
+				$templating->block('search_result_top');
+				foreach ($find_items as $item)
+				{
+					$templating->block('search_items');
+					$templating->set('name', $item['name']);
+					$templating->set('id', $item['id']);
+				}
+				$templating->block('search_result_bottom');
+			}
+			else
+			{
+				$core->message('Nothing found matching that name!');
+			}		
+		}
+
+	}
 	if ($_GET['view'] == 'add')
 	{
 		if (!isset($message_map::$error) || $message_map::$error == 0)

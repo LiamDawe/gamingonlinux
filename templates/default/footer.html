@@ -87,7 +87,7 @@ this.editor.filter.addTransformations([
 
 	var sale_search_options = {
 		url: function(phrase) { 
-				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&sales&format=json";    
+				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&type=sales&format=json";    
 		},
 
 		getValue: "data",
@@ -105,7 +105,25 @@ this.editor.filter.addTransformations([
 
 	var free_search_options = {
 		url: function(phrase) { 
-				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&free&format=json";    
+				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&type=free&format=json";    
+		},
+
+		getValue: "data",
+
+		ajaxSettings: {
+			dataType: "json"
+		},
+		requestDelay: 300,
+		list: {
+			onClickEvent: function() {
+				var replaced = $("#free-search").val().replace(/ /g, '+');
+			}	
+		}
+	};
+
+	var all_search_options = {
+		url: function(phrase) { 
+				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&type=all&format=json";    
 		},
 
 		getValue: "data",
@@ -123,6 +141,7 @@ this.editor.filter.addTransformations([
 
 $("#sale-search").easyAutocomplete(sale_search_options);
 $("#free-search").easyAutocomplete(free_search_options);
+$("#all-games-search").easyAutocomplete(all_search_options);
 </script>
 {:ckeditor_js}
 {:editor_js}

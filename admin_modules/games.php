@@ -351,6 +351,7 @@ if (isset($_POST['act']))
 			// find the difference between the accepted tags and the last submitted items we saw
 			$suggestions_seen = $dbl->run("SELECT `genre_id` FROM `game_genres_suggestions` WHERE `suggested_time` <= ?", [$_POST['current_time']])->fetch_all(PDO::FETCH_COLUMN, 0);
 
+			// remove suggested tags we have hit the little x on when approving, to remove them and approve what was left
 			foreach ($suggestions_seen as $suggest)
 			{
 				if (!in_array($suggest, $_POST['genre_ids']))
@@ -367,7 +368,14 @@ if (isset($_POST['act']))
 
 			foreach ($_POST['genre_ids'] as $genre_id)
 			{
-				$dbl->run("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", [$_POST['id'], $genre_id]);
+				// ensure it isn't already tagged (perhaps an editor recently added it manually?)
+				$check_exists = $dbl->run("SELECT `id` FROM `game_genres_reference` WHERE `game_id` = ? AND `genre_id` = ?", [$_POST['id'], $genre_id])->fetchOne();
+				if (!$check_exists)
+				{
+					$dbl->run("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", [$_POST['id'], $genre_id]);
+				}
+				
+				// no matter what, if we actually approved it, or silently ignored it (due to the above) - remove the suggestion
 				$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` = ?", [$_POST['id'], $genre_id]);
 			}
 

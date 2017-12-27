@@ -2,6 +2,7 @@
 <div class="box">
 		<ul class="breadcrumb">
 			<li class="active">Quick Links</li>
+			<li><a href="/admin.php?module=games&view=search">Search</a></li>
 			<li><a href="/sales.php">Sales Page</a></li>
 			<li><a href="/free_games.php">Free Games Page</a></li>
 		</ul>
@@ -149,7 +150,8 @@
 			<select tabindex="-1" multiple="" name="genre_ids[]" class="populate select2-offscreen genres_picker">{:suggested_list}</select><br />
 			<input type="hidden" name="id" value="{:id}" />
 			<input type="hidden" name="current_time" value="{:time}" />
-			<button formaction="admin.php?module=games" name="act" value="approve_tags" type="submit">Approve tags</button> <button formaction="admin.php?module=games" name="act" value="deny_tags" type="submit">Deny tags</button>
+			<input type="hidden" name="suggested_by_id" value="{:suggested_by_id}" />
+			<button formaction="admin.php?module=games" name="act" value="approve_tags" type="submit">Approve tags</button> <button formaction="admin.php?module=games" name="act" value="deny_tags" type="submit">Deny all tags</button>
 		</form>
 	</div>
 </div>

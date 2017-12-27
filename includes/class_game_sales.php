@@ -258,7 +258,7 @@ class game_sales
 					}
 				}
 				$suggest_link = NULL;
-				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 1)
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
 					$suggest_link .= '<a href="/index.php?module=games&view=suggest_tags&id='.$game['id'].'">Suggest Tags</a>';
 				}

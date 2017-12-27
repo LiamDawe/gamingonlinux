@@ -11,6 +11,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	{
 		$templating->set_previous('meta_description', 'Search the entire games database', 1);
 		$templating->set_previous('title', 'Searching the entire games database', 1);
+
+		$templating->block('quick_links');
 		
 		$templating->block('search');
 		$search_text = '';
@@ -80,7 +82,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	{
 		$templating->block('quick_links');
 
-		$game_res = $dbl->run("SELECT g.id, g.name, c.`category_name`, c.category_id FROM calendar g INNER JOIN `game_genres_suggestions` s ON s.game_id = g.id INNER JOIN `articles_categorys` c ON s.genre_id = c.category_id GROUP BY g.`id`, c.category_id")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
+		$game_res = $dbl->run("SELECT g.id, g.name, c.`category_name`, c.category_id, s.`suggested_by_id` FROM calendar g INNER JOIN `game_genres_suggestions` s ON s.game_id = g.id INNER JOIN `articles_categorys` c ON s.genre_id = c.category_id GROUP BY s.suggested_by_id, g.`id`, c.category_id")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
 
 		if ($game_res)
 		{
@@ -105,6 +107,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('suggested_list', $suggested_list);
 				$templating->set('time', core::$date);
+				$templating->set('suggested_by_id', $tags[0]['suggested_by_id']);
 			}
 		}
 		else
@@ -368,6 +371,11 @@ if (isset($_POST['act']))
 				$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` = ?", [$_POST['id'], $genre_id]);
 			}
 
+			// now set the admin notification as read, for anyone who submitted tags up until we saw them on this item
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_game_genre_suggestion' AND `data` = ? AND `created_date` <= ?", array(core::$date, $_POST['id'], $_POST['current_time']));
+
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = 'approved_gametag_submission', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+
 			$_SESSION['message'] = 'tags_approved';
 			header("Location: /admin.php?module=games&view=tag_suggestions");
 		}
@@ -386,11 +394,13 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$merged_array = array_merge([$_POST['id']], $_POST['genre_ids']);
+		// delete all suggested tags for this game, that were suggested up until we saw them (so we don't deny submissions we haven't seen since coming here)
+		$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `suggested_time` <= ?", [$_POST['id'], $_POST['current_time']]);
 
-		$in  = str_repeat('?,', count($_POST['genre_ids']) - 1) . '?';
+		// now set the admin notification as read, for anyone who submitted tags up until we saw them on this item
+		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_game_genre_suggestion' AND `data` = ? AND `created_date` <= ?", array(core::$date, $_POST['id'], $_POST['current_time']));
 
-		$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` IN ($in)", $merged_array);
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = 'denied_gametag_submission', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 
 		$_SESSION['message'] = 'tags_denied';
 		header("Location: /admin.php?module=games&view=tag_suggestions");

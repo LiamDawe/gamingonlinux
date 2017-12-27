@@ -176,18 +176,18 @@ class game_sales
 
 			$merged_arrays = array_merge([$where], $genre_ids, $licenses);
 
-			$total_rows = $this->dbl->run("SELECT COUNT(Distinct id) FROM `calendar` c WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL ORDER BY c.`name` ASC", [$where])->fetchOne();
+			$total_rows = $this->dbl->run("SELECT COUNT(Distinct id) FROM `calendar` c WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL AND `is_application` = 0 ORDER BY c.`name` ASC", [$where])->fetchOne();
 			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page + 1, $link_extra);	
 
-			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL AND `is_application` = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
 		}
 		else
 		{
 			$merged_arrays = array_merge($genre_ids, $licenses);
-			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL $options_sql  ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
+			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL AND `is_application` = 0 $options_sql  ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
 			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page + 1, $link_extra);
 
-			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL AND `is_application` = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
 		}
 
 		$this->templating->set('filter_total', $total_rows);

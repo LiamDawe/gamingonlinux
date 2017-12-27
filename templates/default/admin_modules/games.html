@@ -66,7 +66,9 @@
 					<em>Games have to have at least one link at a minimum!</em><br />
 					<br />
 					Game Name: <input type="text" name="name" value="{:name}" /><br />
-					<label>Free game? <em>Tick if this game is free/free to play</em> <input type="checkbox" name="free_game" {:free_check}/></label>
+					<label>Free (as in money)? <em>Tick if this is free/free to play</em> <input type="checkbox" name="free" {:free_check}/></label>
+					<label>Is an application? <input type="checkbox" name="application" {:app_check}/></label>
+					<label>Is an emulator? <input type="checkbox" name="emulator" {:emulator}/></label>
 					License <select name="license">{:license_options}</select><br />
 					Official website:<br />
 					<input type="text" name="link" value="{:link}" /><br />

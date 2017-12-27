@@ -38,6 +38,17 @@ if (isset($_GET['view']))
 			$core->message("This is not the page you're looking for!");
 		}
 	}
+	if ($_GET['view'] == 'submit_item')
+	{
+		$templating->block('submit_item');
+		$licenses = $dbl->run("SELECT `license_name` FROM `item_licenses` ORDER BY `license_name` ASC")->fetch_all();
+		$license_options = '';
+		foreach ($licenses as $license)
+		{
+			$license_options .= '<option value="'.$license['license_name'].'">'.$license['license_name'].'</option>';
+		}
+		$templating->set('license_options', $license_options);
+	}
 }
 
 if (isset($_POST['act']))
@@ -81,5 +92,85 @@ if (isset($_POST['act']))
 				$core->message("This is not the page you're looking for!");
 			}
 		}
+	}
+	if ($_POST['act'] == 'submit_item')
+	{
+		$name = trim($_POST['name']);
+		$link = trim($_POST['link']);
+		$steam_link = trim($_POST['steam_link']);
+		$gog_link = trim($_POST['gog_link']);
+		$itch_link = trim($_POST['itch_link']);
+		
+		// make sure its not empty
+		$empty_check = core::mempty(compact('name'));
+		if ($empty_check !== true)
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $empty_check;
+			header("Location: /index.php?module=items_database&view=submit_item");
+			die();
+		}
+		
+		if (empty($link) && empty($steam_link) && empty($gog_link) && empty($itch_link))
+		{
+			$_SESSION['message'] = 'one_link_needed';
+			header("Location: /index.php?module=items_database&view=submit_item");
+			die();
+		}
+
+		$add_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']))->fetch();
+		if ($add_res)
+		{
+			$_SESSION['message'] = 'item_submit_exists';
+			header("Location: /index.php?module=items_database&view=submit_item");
+			exit;
+		}
+
+		$dlc = 0;
+		if (isset($_POST['dlc']))
+		{
+			$dlc = 1;
+		}
+
+		$free = 0;
+		if (isset($_POST['free']))
+		{
+			$free = 1;
+		}
+
+		$application = 0;
+		if (isset($_POST['application']))
+		{
+			$application = 1;
+		}
+
+		$emulator = 0;
+		if (isset($_POST['emulator']))
+		{
+			$emulator = 1;
+		}
+
+		$base_game = NULL;
+		if (isset($_POST['game']) && is_numeric($_POST['game']))
+		{
+			$base_game = $_POST['game'];
+		}
+
+		$license = NULL;
+		if (!empty($_POST['license']))
+		{
+			$license = $_POST['license'];
+		}
+
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 0, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?", array($name, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free, $application, $emulator, $license));
+		$new_id = $dbl->new_id();
+
+		$core->process_game_genres($new_id);
+
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = 'item_database_addition', `created_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, $new_id));
+
+		$_SESSION['message'] = 'item_submitted';
+		$_SESSION['message_extra'] = $name;
+		header("Location: /index.php?module=items_database&view=submit_item");		
 	}
 }

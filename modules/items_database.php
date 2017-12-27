@@ -1,8 +1,8 @@
 <?php
-$templating->set_previous('title', 'Linux Games List', 1);
-$templating->set_previous('meta_description', 'Linux Games List', 1);
+$templating->set_previous('title', 'Linux Games & Software List', 1);
+$templating->set_previous('meta_description', 'Linux Games & Software List', 1);
 
-$templating->load('games');
+$templating->load('items_database');
 $templating->block('quick_links');
 
 if (!isset($_GET['view']) && !isset($_POST['act']))

@@ -260,7 +260,7 @@ class game_sales
 				$suggest_link = NULL;
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
-					$suggest_link .= '<a href="/index.php?module=games&view=suggest_tags&id='.$game['id'].'">Suggest Tags</a>';
+					$suggest_link .= '<a href="/index.php?module=items_database&view=suggest_tags&id='.$game['id'].'">Suggest Tags</a>';
 				}
 				$genre_output = $this->templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list), 'suggest_link' => $suggest_link));
 				$this->templating->set('genre_list', $genre_output);

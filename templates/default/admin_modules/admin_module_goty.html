@@ -13,8 +13,8 @@
 [block: submitted_row]
 <div class="box"><div class="body group">
 <form method="post" action="{:url}goty.php&game_id={:id}">
-<input type="text" name="name" value="{:game_name}" />
-<span class="gotycategory"><a href="/goty.php?category_id={:category_id}">{:category_name}</a></span>
+<strong>Name:</strong> {:game_name}<br />
+<strong>Category:</strong> <a href="/goty.php?module=category&amp;category_id={:category_id}">{:category_name}</a>
 <div class="gotyadminbuttons fright">
 	<button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="accept" class="fnone">Accept Game For Voting</button>
 	<button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="deny" class="fnone">Deny Game For Voting</button>
@@ -41,12 +41,15 @@
 [/block: manage_top]
 
 [block: manage_row]
-<div class="box"><div class="body group">
-<form method="post" action="{:url}goty.php&game_id={:id}">
-<input type="text" value="{:game_name}" name="game" /> Category: <select name="category">{:options}</select> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="edit" class="fnone">Edit</button> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="delete" class="fnone">Delete</button>
-<input type="hidden" name="id" value="{:id}" />
-</form>
-</div></div>
+<div class="box">
+	<div class="body group">
+		<form method="post" action="{:url}goty.php&game_id={:id}">
+			<strong>Name:</strong> {:game_name} <br />
+			Category: <select name="category">{:options}</select> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="edit" class="fnone">Edit</button> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="delete" class="fnone">Delete</button>
+			<input type="hidden" name="id" value="{:id}" />
+		</form>
+	</div>
+</div>
 [/block: manage_row]
 
 [block: config]

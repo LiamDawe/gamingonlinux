@@ -41,14 +41,6 @@ if (isset($_GET['view']))
 			{
 				$core->message('That game already exists in our GOTY list!');
 			}
-			if ($_GET['message'] == 'edited')
-			{
-				$core->message('You have edited that game!');
-			}
-			if ($_GET['message'] == 'deleted')
-			{
-				$core->message('Your have deleted that game!');
-			}
 			if ($_GET['message'] == 'empty')
 			{
 				$core->message('Your can\'t add a game with no name!');
@@ -71,11 +63,13 @@ if (isset($_GET['view']))
 		{
 			$templating->block('manage_top', 'admin_modules/admin_module_goty');
 
-			$get_games = $dbl->run("SELECT `game`, `id`, `category_id` FROM `goty_games` WHERE `accepted` = 1 AND `category_id` = ? ORDER BY `game` ASC", array($_GET['id']));
+			$get_games = $dbl->run("SELECT c.`name`, g.`id`, g.`category_id` FROM `goty_games` g INNER JOIN `calendar` c ON c.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['id']))->fetch_all();
+			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
+
 			foreach ($get_games as $games)
 			{
 				$category_list = '';
-				$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
+				
 				foreach( $cats as $category )
 				{
 					$selected = '';
@@ -86,7 +80,7 @@ if (isset($_GET['view']))
 					$category_list .= '<option value="' . $category['category_id'] . '" ' . $selected . '>' . $category['category_name'] . '</option>';
 				}
 				$templating->block('manage_row', 'admin_modules/admin_module_goty');
-				$templating->set('game_name', $games['game']);
+				$templating->set('game_name', $games['name']);
 				$templating->set('url', $core->config('website_url'));
 				$templating->set('id', $games['id']);
 				$templating->set('options', $category_list);
@@ -171,34 +165,13 @@ if (isset($_GET['view']))
 
 	if ($_GET['view'] == 'submitted')
 	{
-
-		if (isset($_GET['message']))
-		{
-			if ($_GET['message'] == 'added')
-			{
-				$core->message('You have added that game to the list!');
-			}
-			if ($_GET['message'] == 'exists')
-			{
-				$core->message('That game already exists in our GOTY list!');
-			}
-			if ($_GET['message'] == 'nope')
-			{
-				$core->message('That game doesn\'t exist in our GOTY list!');
-			}
-			if ($_GET['message'] == 'deleted')
-			{
-				$core->message('You gave denied that game being listed in the GOTY awards!');
-			}
-		}
-
 		$templating->block('submitted_top', 'admin_modules/admin_module_goty');
 
-		$get_games = $dbl->run("SELECT g.`game`, g.`id`, c.`category_name`, g.`category_id` FROM `goty_games` g LEFT JOIN `goty_category` c ON c.category_id = g.category_id WHERE `accepted` = 0")->fetch_all();
+		$get_games = $dbl->run("SELECT g.`id`, c.`category_name`, g.`category_id`, cl.`name` FROM `goty_games` g INNER JOIN `calendar` cl ON cl.id = g.game_id LEFT JOIN `goty_category` c ON c.category_id = g.category_id WHERE g.`accepted` = 0")->fetch_all();
 		foreach ($get_games as $games)
 		{
 			$templating->block('submitted_row', 'admin_modules/admin_module_goty');
-			$templating->set('game_name', $games['game']);
+			$templating->set('game_name', $games['name']);
 			$templating->set('category_name', $games['category_name']);
 			$templating->set('category_id', $games['category_id']);
 			$templating->set('url', $core->config('website_url'));
@@ -236,41 +209,45 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'delete')
 	{
-		if (!empty($_POST['id']))
+		if (isset($_POST['id']))
 		{
 			// check if it exists
-			$dbl->run("SELECT `id` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+			$check = $dbl->run("SELECT `id` FROM `goty_games` WHERE `id` = ?", array($_POST['id']))->fetchOne();
 
 			// delete it
-			if ($db->num_rows() == 1)
+			if ($check)
 			{
 				$dbl->run("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=deleted");
+
+				$_SESSION['message'] = 'deleted';
+				$_SESSION['message_extra'] = 'GOTY game';
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage");
 			}
 
 			else
 			{
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=nope");
+				$_SESSION['message'] = 'none_found';
+				$_SESSION['message_extra'] = 'submissions with that ID';
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage");
 			}
-		}
-		else
-		{
-			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=empty");
 		}
 	}
 
 	if ($_POST['act'] == 'edit')
 	{
-		if (!empty($_POST['game']))
+		if (isset($_POST['id']))
 		{
 			// check if it exists
-			$dbl->run("SELECT `game` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+			$check = $dbl->run("SELECT 1 FROM `goty_games` WHERE `id` = ?", array($_POST['id']))->fetchOne();
 
 			// complete the edit
-			if ($db->num_rows() == 1)
+			if ($check)
 			{
-				$dbl->run("UPDATE `goty_games` SET `game` = ?, `category_id` = ? WHERE `id` = ?", array($_POST['game'], $_POST['category'], $_POST['id']));
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=edited");
+				$dbl->run("UPDATE `goty_games` SET `category_id` = ? WHERE `id` = ?", array($_POST['category'], $_POST['id']));
+
+				$_SESSION['message'] = 'saved';
+				$_SESSION['message_extra'] = 'game\'s goty category';
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage");
 			}
 
 			else
@@ -280,60 +257,68 @@ if (isset($_POST['act']))
 		}
 		else
 		{
-			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&message=empty");
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game id';
+			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage");
 		}
 	}
 
 	if ($_POST['act'] == 'accept')
 	{
-		if (!empty($_POST['id']))
+		if (isset($_POST['id']))
 		{
 			// check if it exists
-			$dbl->run("SELECT `game` FROM `goty_games` WHERE `accepted` = 1 AND `id` = ?", array($_POST['id']));
+			$check = $dbl->run("SELECT 1 FROM `goty_games` WHERE `accepted` = 1 AND `id` = ?", array($_POST['id']));
 
 			// add it
-			if ($db->num_rows() != 1)
+			if ($check)
 			{
-				$dbl->run("UPDATE `goty_games` SET `game` = ?, `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_POST['name'], $_SESSION['user_id'], $_POST['id']));
+				$dbl->run("UPDATE `goty_games` SET `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_SESSION['user_id'], $_POST['id']));
 				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
 				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=added");
-			}
 
-			else
-			{
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=exists");
+				$_SESSION['message'] = 'accepted';
+				$_SESSION['message_extra'] = 'GOTY game submission';
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
 			}
 		}
 		else
 		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game id';
 			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
 		}
 	}
 
 	if ($_POST['act'] == 'deny')
 	{
-		if (!empty($_POST['id']))
+		if (isset($_POST['id']))
 		{
 			// check if it exists
-			$dbl->run("SELECT `id` FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
+			$check = $dbl->run("SELECT 1 FROM `goty_games` WHERE `id` = ?", array($_POST['id']))->fetchOne();
 
 			// remove it
-			if ($db->num_rows() == 1)
+			if ($check)
 			{
 				$dbl->run("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
 				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_denied_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=deleted");
-			}
 
+				$_SESSION['message'] = 'deleted';
+				$_SESSION['message_extra'] = 'GOTY game submission';
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
+			}
 			else
 			{
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted&message=nope");
+				$_SESSION['message'] = 'none_found';
+				$_SESSION['message_extra'] = 'submissions with that ID';
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
 			}
 		}
 		else
 		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game id';
 			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
 		}
 	}
@@ -384,6 +369,7 @@ if (isset($_POST['act']))
 				}
 			}
 
+			$_SESSION['message'] = 'goty_ended';
 			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=config");
 		}
 	}

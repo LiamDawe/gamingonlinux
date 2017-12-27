@@ -18,6 +18,10 @@ return [
 	"tags_approved" =>
 	[
 		"text" => "Those tags have now been approved!"
+	],
+	"submit_approved" => 
+	[
+		"text" => "You have approved that item for inclusion in the database!"
 	]
 ];
 ?>

@@ -36,7 +36,7 @@ if (isset($_SESSION['message']))
 
 if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0))
 {
-	$templating->block('login');
+	$templating->block('login', 'goty');
 }
 
 $goty_modules = ['home', 'category', 'top10', 'direct'];

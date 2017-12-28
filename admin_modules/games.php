@@ -247,6 +247,150 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 		}
 	}
+	if ($_GET['view'] == 'submitted_list')
+	{
+		$templating->block('submitted_list_top');
+		$submitted_list = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `approved` = 0")->fetch_all();
+		foreach ($submitted_list as $row)
+		{
+			$templating->block('submitted_row');
+			$templating->set('name', $row['name']);
+			$templating->set('id', $row['id']);
+		}
+	}
+	if ($_GET['view'] == 'submitted_item')
+	{
+		$templating->block('quick_links');
+
+		$templating->block('submitted_list_top');
+
+		if (!isset($_GET['id']) || !is_numeric($_GET['id']))
+		{
+			$core->message('Not ID set, you shouldn\'t be here!');
+		}
+		else
+		{
+			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
+
+			if (!$game)
+			{
+				$core->message('That ID does not exist!');
+			}
+			else
+			{
+				if (!isset($message_map::$error) || $message_map::$error == 0)
+				{
+					$_SESSION['gamesdb_image_rand'] = rand();
+				}
+
+				$templating->set_previous('meta_description', 'Editing: '.$game['name'], 1);
+				$templating->set_previous('title', 'Editing: ' . $game['name'], 1);
+
+				$templating->block('submitted_top', 'admin_modules/games');
+				$templating->set('id', $game['id']);
+
+				$templating->block('item', 'admin_modules/games');
+
+				$return = '';
+				if (isset($_GET['return']))
+				{
+					$return = $_GET['return'];
+				}
+
+				$stores = array('steam', 'gog', 'itch');
+				foreach ($stores as $store)
+				{
+					$templating->set($store . '_link', $game[$store . '_link']);
+				}
+				$small_pic = '';
+				if ($game['small_picture'] != NULL && $game['small_picture'] != '')
+				{
+					$small_pic = '<img src="/uploads/gamesdb/small/'.$game['small_picture'].'" alt="" />';
+				}
+				$templating->set('small_pic', $small_pic);
+
+				$templating->set('id', $game['id']);
+				$templating->set('name', $game['name']);
+				$templating->set('link', $game['link']);
+				$templating->set('trailer', $game['trailer']);
+
+				$trailer_link = '';
+				if ($game['trailer'] != NULL && $game['trailer'] != '')
+				{
+					$trailer_link = '<a href="'.$game['trailer'].'" target="_blank">Trailer Link</a>';
+				}
+				$templating->set('trailer_link', $trailer_link);
+
+				$date = new DateTime($game['date']);
+				$templating->set('date', $date->format('d-m-Y'));
+
+				$guess = '';
+				if ($game['best_guess'] == 1)
+				{
+					$guess = 'checked';
+				}
+				$templating->set('guess_check', $guess);
+
+				$dlc_check = '';
+				if ($game['is_dlc'] == 1)
+				{
+					$dlc_check = 'checked';
+				}
+				$templating->set('dlc_check', $dlc_check);
+
+				$free_check = '';
+				if ($game['free_game'] == 1)
+				{
+					$free_check = 'checked';
+				}
+				$templating->set('free_check', $free_check);
+
+				$app_check = '';
+				if ($game['is_application'] == 1)
+				{
+					$app_check = 'checked';
+				}
+				$templating->set('app_check', $app_check);
+
+				$emulator_cheeck = '';
+				if ($game['is_emulator'] == 1)
+				{
+					$emulator_cheeck = 'checked';
+				}
+				$templating->set('emulator_cheeck', $emulator_cheeck);
+
+				$license_options = '';
+				foreach ($licenses as $license)
+				{
+					$selected = '';
+					if ($game['license'] == $license)
+					{
+						$selected = 'selected';
+					}
+					$license_options .= '<option value="' . $license . '" '.$selected.'>'.$license.'</option>';
+				}
+				$templating->set('license_options', $license_options);
+
+				$base_game = '';
+				if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
+				{
+					$base_game = '<option value="'.$game['base_game_id'].'" selected>'.$game['base_game_name'].'</option>';
+				}
+				$templating->set('base_game', $base_game);
+				
+				// sort out genre tags
+				$genre_list = $core->display_game_genres($game['id']);
+				$templating->set('genre_list', $genre_list);
+
+				$text = $game['description'];
+
+				$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'game_text']);
+
+				$templating->block('submitted_bottom', 'admin_modules/games');
+				$templating->set('id', $game['id']);
+			}
+		}		
+	}
 }
 
 if (isset($_POST['act']))
@@ -555,6 +699,166 @@ if (isset($_POST['act']))
 			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id']);
 		}
 	}
+	if ($_POST['act'] == 'Approve')
+	{
+		if (empty($_POST['id']) || !is_numeric($_POST['id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game';
+			header("Location: /admin.php?module=games&view=submitted_list");
+			die();
+		}
+
+		$name = $_POST['name'];
+		$empty_check = core::mempty(compact('name'));
+		if ($empty_check !== true)
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $empty_check;
+
+			header("Location: /admin.php?module=games&view=submitted_item&id=" . $_POST['id']);
+			die();
+		}
+
+		if (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link']) && empty($_POST['itch_link']))
+		{
+			$_SESSION['message'] = 'link_needed';
+
+			header("Location: /admin.php?module=games&view=submitted_item&id=" . $_POST['id']);
+			die();
+		}
+
+		$sql_date = NULL;
+		$date = trim($_POST['date']);
+		if (!empty($date))
+		{
+			$date = new DateTime($_POST['date']);
+			$sql_date = $date->format('Y-m-d');
+		}
+
+		$guess = 0;
+		if (isset($_POST['guess']))
+		{
+			$guess = 1;
+		}
+
+		$dlc = 0;
+		if (isset($_POST['dlc']))
+		{
+			$dlc = 1;
+		}
+
+		$free_game = 0;
+		if (isset($_POST['free']))
+		{
+			$free_game = 1;
+		}
+
+		$application = 0;
+		if (isset($_POST['application']))
+		{
+			$application = 1;
+		}
+
+		$emulator = 0;
+		if (isset($_POST['emulator']))
+		{
+			$emulator = 1;
+		}
+
+		$base_game = NULL;
+		if (isset($_POST['game']) && is_numeric($_POST['game']))
+		{
+			$base_game = $_POST['game'];
+		}
+
+		$license = NULL;
+		if (!empty($_POST['license']))
+		{
+			$license = $_POST['license'];
+		}
+
+		$trailer = NULL;
+		if (!empty(trim($_POST['trailer'])))
+		{
+			$trailer = $_POST['trailer'];
+		}
+
+		$name = trim($_POST['name']);
+		$description = trim($_POST['text']);
+
+		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?, `trailer` = ?, `approved` = 1 WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $application, $emulator, $license, $trailer, $_POST['id']));
+		
+		$core->process_game_genres($_POST['id']);
+
+		if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
+		{
+			$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
+		}
+
+		// update the original notification to clear it
+		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'item_database_addition'", [core::$date, $_POST['id']]);
+
+		// note who approved this item for the database
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'item_database_approved', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+	
+		$_SESSION['message'] = 'submit_approved';
+		header("Location: /admin.php?module=games&view=submitted_list");
+	}
+	if ($_POST['act'] == 'Deny')
+	{
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_POST['id']))->fetchOne();
+
+			$core->yes_no('Are you sure you want to deny ' . $name . ' from being included in the games and software database?', "admin.php?module=games&id={$_POST['id']}", "Deny");
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: /admin.php?module=games&view=submitted_list");
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$info = $dbl->run("SELECT `name`, `small_picture` FROM `calendar` WHERE `id` = ?", array($_GET['id']))->fetch();
+
+			// delete any image attached to it
+			if (!empty($info['small_picture']))
+			{
+				$filename_remove = $core->config('path') . "uploads/gamesdb/small/" . $info['small_picture'];
+				if (file_exists($filename_remove))
+				{
+					unlink($filename_remove);
+				}
+			}
+
+			if (isset($_SESSION['gamesdb_smallpic']))
+			{
+				$filename_remove = $core->config('path') . "uploads/gamesdb/small/temp/" . $_SESSION['gamesdb_smallpic']['image_name'];
+				if (file_exists($filename_remove))
+				{
+					unlink($filename_remove);
+				}
+				unset($_SESSION['gamesdb_smallpic']);
+			}
+
+			$dbl->run("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
+
+			// delete any tags attached to it
+			$dbl->run("DELETE FROM `game_genres_reference` WHERE `game_id` = ?", [$_GET['id']]);
+
+			// update the original notification to clear it
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'item_database_addition'", [core::$date, $_GET['id']]);
+
+			// note who denied this item for the database
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'item_database_denied', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $info['name']));
+
+			header("Location: /admin.php?module=games&view=submitted_list");
+			die();
+		}
+	}
 	if ($_POST['act'] == 'Delete')
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
@@ -598,11 +902,34 @@ if (isset($_POST['act']))
 
 		else if (isset($_POST['yes']))
 		{
-			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_GET['id']))->fetchOne();
+			$info = $dbl->run("SELECT `name`, `small_picture` FROM `calendar` WHERE `id` = ?", array($_GET['id']))->fetch();
+
+			// delete any image attached to it
+			if (!empty($info['small_picture']))
+			{
+				$filename_remove = $core->config('path') . "uploads/gamesdb/small/" . $info['small_picture'];
+				if (file_exists($filename_remove))
+				{
+					unlink($filename_remove);
+				}
+			}
+
+			if (isset($_SESSION['gamesdb_smallpic']))
+			{
+				$filename_remove = $core->config('path') . "uploads/gamesdb/small/temp/" . $_SESSION['gamesdb_smallpic']['image_name'];
+				if (file_exists($filename_remove))
+				{
+					unlink($filename_remove);
+				}
+				unset($_SESSION['gamesdb_smallpic']);
+			}
 
 			$dbl->run("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $name));
+			// delete any tags attached to it
+			$dbl->run("DELETE FROM `game_genres_reference` WHERE `game_id` = ?", [$_GET['id']]);
+
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $info['name']));
 
 			if (isset($_GET['return']) && !empty($_GET['return']))
 			{

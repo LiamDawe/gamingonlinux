@@ -17,6 +17,16 @@ if (!empty($cat['description']))
 	$templating->set('category_description', $cat['description']);
 }
 
+$item_table = '';
+if ($_GET['category_id'] == 16)
+{
+	$item_table = 'developers';
+}
+else
+{
+	$item_table = 'calendar';
+}
+
 // if finished, show top 3 games from this category
 if ($core->config('goty_finished') == 1)
 {
@@ -24,7 +34,7 @@ if ($core->config('goty_finished') == 1)
 	$templating->set('category_id', $_GET['category_id']);
 	$templating->set('category_name', $cat['category_name']);
 
-	$games_top = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `calendar` c WHERE g.`accepted` = 1  AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 3", array($_GET['category_id']))->fetch_all();
+	$games_top = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `$item_table` c WHERE g.`accepted` = 1  AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 3", array($_GET['category_id']))->fetch_all();
 
 	foreach ($games_top as $game)
 	{
@@ -105,18 +115,18 @@ if (isset($_GET['filter']))
 			header("Location: /goty.php?module=category&category_id=".$_GET['category_id']);
 			die();
 		}
-		$games_get = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `calendar` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? AND c.`name` LIKE ? ORDER BY c.`name` ASC", array($_GET['category_id'], $_GET['filter'] . '%'))->fetch_all();
+		$games_get = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `$item_table` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? AND c.`name` LIKE ? ORDER BY c.`name` ASC", array($_GET['category_id'], $_GET['filter'] . '%'))->fetch_all();
 	}
 
 	else
 	{
-		$games_get = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `calendar` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? AND c.`name` <= '@' OR c.`name` >= '{' ORDER BY c.`name` ASC", array($_GET['category_id']))->fetch_all();
+		$games_get = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `$item_table` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? AND c.`name` <= '@' OR c.`name` >= '{' ORDER BY c.`name` ASC", array($_GET['category_id']))->fetch_all();
 	}
 }
 
 else
 {
-	$games_get = $dbl->run("SELECT g.`id`, c.`name`, g.`votes` FROM `goty_games` g INNER JOIN `calendar` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['category_id']))->fetch_all();
+	$games_get = $dbl->run("SELECT g.`id`, c.`name`, g.`votes` FROM `goty_games` g INNER JOIN `$item_table` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['category_id']))->fetch_all();
 }
 if ($games_get)
 {

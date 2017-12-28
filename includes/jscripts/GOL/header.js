@@ -1474,30 +1474,6 @@ jQuery(document).ready(function()
   minimumInputLength: 2
   });
 
-  $(".game_picker").select2({
-	selectOnClose: true,
-	width: '100%',
-	ajax: {
-    url: "/includes/ajax/games_ajax.php",
-    dataType: 'json',
-    delay: 250,
-    data: function (params) {
-      return {
-		q: params.term // search term
-      };
-    },
-    processResults: function (data) {
-      return {
-        results: $.map(data, function(obj) {
-          return { id: obj.id, text: obj.text };
-        })
-      };
-    },
-    cache: true,
-  },
-  minimumInputLength: 2
-  });
-
 	/* SALES PAGE */
 
 	// pagination ajax
@@ -1652,5 +1628,51 @@ jQuery(document).ready(function()
 				$('#free-search').easyAutocomplete(free_search_options); // required so EAC works when loaded dynamically
 			}
 		});		
+	});
+
+	/* GOTY Page */
+
+	var picker_url = 'games';
+
+	$(".game_picker").select2({
+	  selectOnClose: true,
+	  width: '100%',
+	  ajax: {
+		  url: function() {
+			  if (picker_url == 'games') 
+			  {
+				return "/includes/ajax/games_ajax.php"
+			  } 
+			  else if (picker_url == 'devs') 
+			  {
+				return '/includes/ajax/gamesdb/search_devs.php'
+			  }
+			},
+	  dataType: 'json',
+	  delay: 250,
+	  data: function (params) {
+		return {
+		  q: params.term // search term
+		};
+	  },
+	  processResults: function (data) {
+		return {
+		  results: $.map(data, function(obj) {
+			return { id: obj.id, text: obj.text };
+		  })
+		};
+	  },
+	  cache: true,
+	},
+	minimumInputLength: 2
+	});
+  
+	// Change game picker url when game porter category is picked
+	$(document).on('change', ".goty_category_picker", function(e)
+	{
+		if ($(this).val() == 16)
+		{
+			picker_url = 'devs';
+		}
 	});
 });

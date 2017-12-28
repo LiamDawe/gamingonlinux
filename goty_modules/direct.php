@@ -16,9 +16,19 @@ if (!isset($_GET['category_id']) || isset($_GET['category_id']) && !core::is_num
 	die();
 }
 
+$item_table = '';
+if ($_GET['category_id'] == 16)
+{
+	$item_table = 'developers';
+}
+else
+{
+	$item_table = 'calendar';
+}
+
 $templating->load('/goty_modules/direct');
 
-$game = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, g.`category_id`, c.`category_name`, c.`description`, n.`name` FROM `goty_games` g INNER JOIN `calendar` n ON g.game_id = n.id LEFT JOIN `goty_category` c ON g.category_id = c.category_id WHERE g.`accepted` = 1 AND g.`id` = ?", array($_GET['game_id']))->fetch();
+$game = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, g.`category_id`, c.`category_name`, c.`description`, n.`name` FROM `goty_games` g INNER JOIN `$item_table` n ON g.game_id = n.id LEFT JOIN `goty_category` c ON g.category_id = c.category_id WHERE g.`accepted` = 1 AND g.`id` = ?", array($_GET['game_id']))->fetch();
 
 $templating->block('direct_top', '/goty_modules/direct');
 $templating->set('category_id', $game['category_id']);

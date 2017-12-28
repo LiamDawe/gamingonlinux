@@ -138,26 +138,13 @@ if (isset($_GET['view']))
 			$templating->block('game_list', 'admin_modules/admin_module_goty');
 			$templating->set('name', $cat['category_name']);
 
-			require_once('./includes/SVGGraph/SVGGraph.php');
-			$labels = array();
-			$settings = array('auto_fit'=>true, 'pad_left' => 5, 'svg_class' => 'svggraph', 'minimum_units_y' => 1, 'grid_left' => 10, 'axis_text_position_v' => 'inside');
-			$graph = new SVGGraph(400, 300, $settings);
-			$colours = array(array('rgb(151,187,205):0.90','rgb(113,140,153):'), array('rgb(152,125,113):0.90','rgb(114,93,84)'));
-			$graph->colours = $colours;
+			$games_top = $dbl->run("SELECT coalesce(cl.name, d.name) name, g.`votes` as data FROM `goty_games` g left outer join `calendar` cl ON cl.id = g.game_id and g.category_id != 16 left outer join `developers` d ON d.id = g.game_id and g.category_id = 16 WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
 
-			$dbl->run("SELECT `id`, `game`, `votes` FROM `goty_games` WHERE `accepted` = 1  AND `category_id` = ? ORDER BY `votes` DESC LIMIT 10", array($_GET['category_id']));
-			$games_top = $db->fetch_all_rows();
-
-			foreach ($games_top as $label_loop)
-			{
-				$labels[$label_loop['game']] = $label_loop['votes'];
-			}
-
-			$graph->Values($labels);
-			$get_graph = '<div style="width: 80%; height: 50%; margin: 0 auto; position: relative;">' . $graph->Fetch('HorizontalBarGraph', false) . '</div>';
+			$charts = new charts($dbl);
+			$top_chart = $charts->render(NULL, ['name' => $cat['category_name'], 'grouped' => 0, 'data' => $games_top, 'h_label' => 'Total Votes']);
 
 			$templating->block('topchart', 'admin_modules/admin_module_goty');
-			$templating->set('chart', $get_graph);
+			$templating->set('chart', $top_chart);
 
 			$templating->block('games_bottom', 'admin_modules/admin_module_goty');
 		}

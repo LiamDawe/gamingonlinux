@@ -268,18 +268,26 @@ if (isset($_POST['act']))
 		if (isset($_POST['id']))
 		{
 			// check if it exists
-			$check = $dbl->run("SELECT 1 FROM `goty_games` WHERE `accepted` = 1 AND `id` = ?", array($_POST['id']));
+			$check = $dbl->run("SELECT `accepted` FROM `goty_games` WHERE `id` = ?", array($_POST['id']))->fetch();
 
 			// add it
 			if ($check)
 			{
-				$dbl->run("UPDATE `goty_games` SET `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_SESSION['user_id'], $_POST['id']));
-				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+				if ($check['accepted'] == 1)
+				{
+					$_SESSION['message'] = 'already_accepted';
+					header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
+				}
+				else
+				{
+					$dbl->run("UPDATE `goty_games` SET `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_SESSION['user_id'], $_POST['id']));
+					$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
+					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 
-				$_SESSION['message'] = 'accepted';
-				$_SESSION['message_extra'] = 'GOTY game submission';
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
+					$_SESSION['message'] = 'accepted';
+					$_SESSION['message_extra'] = 'GOTY game submission';
+					header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=submitted");
+				}
 			}
 		}
 		else

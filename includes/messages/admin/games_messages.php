@@ -22,6 +22,20 @@ return [
 	"submit_approved" => 
 	[
 		"text" => "You have approved that item for inclusion in the database!"
+	],
+	"dev_approve_exists" =>
+	[
+		"text" => "It seems that developer/publisher is already approved in the database! Someone may have gotten there first, or if you edited the name as it was wrong, the correct spelling may exist already (in that case delete it, but be sure first).",
+		"error" => 1
+	],
+	"dev_denied" =>
+	[
+		"text" => "You have denied that developer/publisher from being included in the database!"
+	],
+	"dev_doesnt_exist" =>
+	[
+		"text" => "Sorry, couldn't find that item. Someone must have gotten there first!",
+		"error" => 1
 	]
 ];
 ?>

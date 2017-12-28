@@ -168,7 +168,7 @@
 
 [block: submitted_row]
 <div class="box">
-	<div class="body group"><a href="/admin.php?module=games&amp;view=submitted_item&amp;id={:id}">{:name}</a></div>
+	<div class="body group"><strong>{:type}</strong>: <a href="/admin.php?module=games&amp;view={:view}&amp;id={:id}">{:name}</a></div>
 </div>
 [/block: submitted_row]
 
@@ -184,3 +184,19 @@
 </div>
 </div>
 [/block: submitted_bottom]
+
+[block: submit_developer]
+<div class="box">
+	<div class="head">Reviewing a developer/publisher submission</div>
+	<div class="subhead">Required</div>
+	<div class="body group">
+		<form method="post" action="/admin.php?module=games">
+			Name: <input type="text" name="name" value="{:name}" />
+	</div>
+	<div class="subhead">Not Required</div>
+	<div class="body group">
+			Official website: <input type="text" name="link" value="{:link}" /><br />
+	</div>
+	<div class="body group"><input type="hidden" name="id" value="{:id}" /><button formaction="/admin.php?module=games" name="act" value="approve_dev">Approve</button><button formaction="/admin.php?module=games" name="act" value="deny_dev">Deny</button></form></div>
+</div>
+[/block: submit_developer]

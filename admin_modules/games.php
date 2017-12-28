@@ -249,13 +249,46 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	}
 	if ($_GET['view'] == 'submitted_list')
 	{
+		$templating->block('quick_links');
+
 		$templating->block('submitted_list_top');
 		$submitted_list = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `approved` = 0")->fetch_all();
 		foreach ($submitted_list as $row)
 		{
 			$templating->block('submitted_row');
+			$templating->set('type', 'Game/Software');
+			$templating->set('view', 'submitted_item');
 			$templating->set('name', $row['name']);
 			$templating->set('id', $row['id']);
+		}
+
+		$submitted_list = $dbl->run("SELECT `id`, `name` FROM `developers` WHERE `approved` = 0")->fetch_all();
+		foreach ($submitted_list as $row)
+		{
+			$templating->block('submitted_row');
+			$templating->set('type', 'Developer/Publisher');
+			$templating->set('view', 'submitted_dev');
+			$templating->set('name', $row['name']);
+			$templating->set('id', $row['id']);
+		}
+	}
+	if ($_GET['view'] == 'submitted_dev')
+	{
+		$templating->block('quick_links');
+
+		$templating->block('submitted_list_top');
+
+		if (!isset($_GET['id']) || !is_numeric($_GET['id']))
+		{
+			$core->message('Not ID set, you shouldn\'t be here!');
+		}
+		else
+		{
+			$templating->block('submit_developer');
+			$info = $dbl->run("SELECT `id`, `name`, `website` FROM `developers` WHERE `id` = ?", [$_GET['id']])->fetch();
+			$templating->set('name', $info['name']);
+			$templating->set('link', $info['website']);
+			$templating->set('id', $info['id']);
 		}
 	}
 	if ($_GET['view'] == 'submitted_item')
@@ -857,6 +890,87 @@ if (isset($_POST['act']))
 
 			header("Location: /admin.php?module=games&view=submitted_list");
 			die();
+		}
+	}
+	if ($_POST['act'] == 'approve_dev')
+	{
+		if (empty($_POST['id']) || !is_numeric($_POST['id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game';
+			header("Location: /admin.php?module=games&view=submitted_list");
+			die();
+		}
+
+		// make sure its not empty
+		$name = trim($_POST['name']);
+		if (empty($name))
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'developer/publisher name';
+			header("Location: /admin.php?module=games&view=submitted_list");
+			die();
+		}
+		
+		$link = trim($_POST['link']);
+
+		$add_res = $dbl->run("SELECT `name` FROM `developers` WHERE `name` = ? AND `approved` = 1", array($name))->fetch();
+		if ($add_res)
+		{
+			$_SESSION['message'] = 'dev_approve_exists';
+			header("Location: /admin.php?module=games&view=submitted_list");
+			die();
+		}
+
+		$dbl->run("UPDATE `developers` SET `approved` = 1, `name` = ?, `website` = ? WHERE `id` = ?", [$name, $link, $_POST['id']]);
+
+		// update original notification
+		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'dev_database_addition' AND `data` = ?", array(core::$date, $_POST['id']));
+
+		// make new notification for who did this
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'dev_database_approve', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id'], $name));		
+
+		$_SESSION['message'] = 'submit_approved';
+		header("Location: /admin.php?module=games&view=submitted_list");
+	}
+	if ($_POST['act'] == 'deny_dev')
+	{
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$name = $dbl->run("SELECT `name` FROM `developers` WHERE `id` = ?", array($_POST['id']))->fetchOne();
+
+			$core->yes_no('Are you sure you want to deny ' . $name . ' from being included in the developer/publisher database?', "admin.php?module=games&id={$_POST['id']}", "deny_dev");
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: /admin.php?module=games&view=submitted_list");
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$info = $dbl->run("SELECT `name` FROM `developers` WHERE `id` = ?", array($_GET['id']))->fetch();
+			if ($info)
+			{
+				$dbl->run("DELETE FROM `developers` WHERE `id` = ?", array($_GET['id']));
+
+				// update original notification
+				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'dev_database_addition' AND `data` = ?", array(core::$date, $_GET['id']));
+
+				// make new notification for who did this
+				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'dev_database_denied', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $info['name']));		
+
+				$_SESSION['message'] = 'dev_denied';
+				header("Location: /admin.php?module=games&view=submitted_list");
+				die();
+			}
+			else
+			{
+				$_SESSION['message'] = 'dev_doesnt_exist';
+				header("Location: /admin.php?module=games&view=submitted_list");
+				die();				
+			}
 		}
 	}
 	if ($_POST['act'] == 'Delete')

@@ -179,7 +179,7 @@ if (isset($_GET['user_id']))
 {
 	if (!isset($_SESSION['activated']) && $_SESSION['user_id'] != 0)
 	{
-		$get_active = $dbl->run("SELECT `activated` FROM `".$dbl->table_prefix."users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+		$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 		$_SESSION['activated'] = $get_active['activated'];
 	}
 }

@@ -60,7 +60,7 @@ if (isset($_POST['act']))
 			if (!empty($_POST['game_id']))
 			{
 				// check if it exists
-				$check = $dbl->run("SELECT 1 FROM `goty_games` WHERE `game_id` = ? AND `category_id` = ?", array($_POST['game_id'], $_POST['category']))->fetchOne();
+				$check = $dbl->run("SELECT `accepted` FROM `goty_games` WHERE `game_id` = ? AND `category_id` = ?", array($_POST['game_id'], $_POST['category']))->fetch();
 
 				// add it
 				if (!$check)
@@ -87,9 +87,15 @@ if (isset($_POST['act']))
 					}
 				}
 
-				else
+				else if ($check['accepted'] == 1)
 				{
 					$_SESSION['message'] = 'game_exists';
+					header("Location: " . $core->config('website_url') . "goty.php");
+				}
+
+				else if ($check['accepted'] == 0)
+				{
+					$_SESSION['message'] = 'game_exists_not_approved';
 					header("Location: " . $core->config('website_url') . "goty.php");
 				}
 			}

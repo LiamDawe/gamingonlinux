@@ -213,7 +213,14 @@ class charts
 			// work out the percentage value of each label based on total answers against each labels data
 			foreach ($this->labels as $key => $label)
 			{
-				$this->labels[$key]['percent'] = round(($label['total'] / $total_counter) * 100, 2);
+				if ($label['total'] > 0)
+				{
+					$this->labels[$key]['percent'] = round(($label['total'] / $total_counter) * 100, 2);
+				}
+				else
+				{
+					$this->labels[$key]['percent'] = 0;
+				}
 			}
 		}
 		

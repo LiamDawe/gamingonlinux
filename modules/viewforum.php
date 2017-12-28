@@ -145,6 +145,8 @@ else
 		}
 		$templating->block('post_row', 'viewforum');
 
+		$templating->set('profile_link', $profile_link);
+
 		// sort out user icon
 		$avatar = $user->sort_avatar($post);
 		$templating->set('avatar', $avatar);

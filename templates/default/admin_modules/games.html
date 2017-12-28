@@ -158,3 +158,29 @@
 	</div>
 </div>
 [/block: suggest_tags]
+
+[block: submitted_list_top]
+<div class="box">
+	<div class="head">Submitted games &amp; software for our database</div>
+	<div class="body group">These are used in our free games page, sales page, goty submissions and more! Please ensure the name is accurate, it's the most important thing. If you're unsure, leave it and ask. You can <a href="/admin.php?module=games&view=search">search the entire DB here</a>.</div>
+</div>
+[/block: submitted_list_top]
+
+[block: submitted_row]
+<div class="box">
+	<div class="body group"><a href="/admin.php?module=games&amp;view=submitted_item&amp;id={:id}">{:name}</a></div>
+</div>
+[/block: submitted_row]
+
+[block: submitted_top]
+<script src="includes/jscripts/jquery.form.min.js"></script>
+<div class="box">
+[/block: submitted_top]
+
+[block: submitted_bottom]
+<button formaction="admin.php?module=games" name="act" value="Approve" type="submit">Approve</button> <button formaction="admin.php?module=games" name="act" value="Deny" type="submit">Deny</button>
+<input type="hidden" name="id" value="{:id}" />
+</form>
+</div>
+</div>
+[/block: submitted_bottom]

@@ -12,6 +12,14 @@ if (!isset($_GET['view']) && !isset($_POST['act']))
 
 if (isset($_GET['view']))
 {
+	if ($_GET['view'] == 'submit')
+	{
+		$templating->block('submit_picker');
+	}
+	if ($_GET['view'] == 'submit_dev')
+	{
+		$templating->block('submit_developer');
+	}
 	if ($_GET['view'] == 'suggest_tags')
 	{
 		if (isset($_GET['id']))
@@ -172,5 +180,36 @@ if (isset($_POST['act']))
 		$_SESSION['message'] = 'item_submitted';
 		$_SESSION['message_extra'] = $name;
 		header("Location: /index.php?module=items_database&view=submit_item");		
+	}
+
+	if ($_POST['act'] == 'submit_dev')
+	{
+		// make sure its not empty
+		$name = trim($_POST['name']);
+		if (empty($name))
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'developer/publisher name';
+			header("Location: /index.php?module=items_database&view=submit_dev");
+			die();
+		}
+		
+		$link = trim($_POST['link']);
+
+		$add_res = $dbl->run("SELECT `name` FROM `developers` WHERE `name` = ?", array($name))->fetch();
+		if ($add_res)
+		{
+			$_SESSION['message'] = 'dev_submit_exists';
+			header("Location: /index.php?module=items_database&view=submit_dev");
+			die();
+		}
+
+		$dbl->run("INSERT INTO `developers` SET `name` = ?, `website` = ?, `approved` = 0", [$name, $link]);
+
+		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = 'dev_database_addition', `created_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, $new_id));
+
+		$_SESSION['message'] = 'dev_submitted';
+		$_SESSION['message_extra'] = $name;
+		header("Location: /index.php?module=items_database&view=submit_dev");			
 	}
 }

@@ -27,6 +27,19 @@
 </div>
 [/block: suggest_tags]
 
+[block: submit_picker]
+<div class="box">
+		<div class="head">Submit an item to our database</div>
+		<div class="subhead">Please pick what you're submitting</div>
+		<div class="body group">
+			<ul>
+				<li><a href="/index.php?module=items_database&amp;view=submit_item">A game or other software</a></li>
+				<li><a href="/index.php?module=items_database&amp;view=submit_dev">A developer or publisher</a></li>
+			</ul>
+		</div>
+</div>
+[/block: submit_picker]
+
 [block: submit_item]
 <script src="includes/jscripts/jquery.form.min.js"></script>
 <div class="box">
@@ -63,3 +76,20 @@
 	</form></div>
 </div>
 [/block: submit_item]
+
+[block: submit_developer]
+<div class="box">
+	<div class="head">Submit an developer/publisher to our database</div>
+	<div class="body group">Are we missing a developer/publisher? Submit them to our database here!</div>
+	<div class="head">Required</div>
+	<div class="body group">
+		<form method="post" action="/index.php?module=items_database">
+			Name: <input type="text" name="name" />
+	</div>
+	<div class="head">Not Required</div>
+	<div class="body group">
+			Official website: <input type="text" name="link" /><br />
+	</div>
+	<div class="body group"><button formaction="/index.php?module=items_database" name="act" value="submit_dev">Submit</button></form></div>
+</div>
+[/block: submit_developer]

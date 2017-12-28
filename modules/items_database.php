@@ -206,6 +206,8 @@ if (isset($_POST['act']))
 
 		$dbl->run("INSERT INTO `developers` SET `name` = ?, `website` = ?, `approved` = 0", [$name, $link]);
 
+		$new_id = $dbl->new_id();
+
 		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = 'dev_database_addition', `created_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, $new_id));
 
 		$_SESSION['message'] = 'dev_submitted';

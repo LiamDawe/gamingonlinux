@@ -229,6 +229,7 @@ class game_sales
 				$this->templating->set('edit', $edit);
 
 				$this->templating->set('name', $game['name']);
+				$this->templating->set('id', $game['id']);
 
 				$links = [];
 				$stores = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];

@@ -29,7 +29,7 @@
 			<tbody>
 			<tr>
 				<td width="15%;">{:small_pic}</td>
-				<td width="40%;">{:edit}{:name}</td>
+				<td width="40%;">{:edit}<a href="/index.php?module=items_database&amp;view=item&amp;id={:id}">{:name}</a></td>
 				<td width="40%;">{:links}</td>
 				<td width="5%;">{:license}</td>
 			</tr>
@@ -50,7 +50,7 @@
 [/block: bottom]
 
 [block: filters]
-	<div class="box"><div class="body group"><small>Are we missing a free game? <a href="/index.php?module=email_us">Send us a tip!</a></small></div></div>
+	<div class="box"><div class="body group"><small>Are we missing a free game? You can <a href="/index.php?module=items_database&amp;view=submit_item">submit it yourself</a>, or <a href="/index.php?module=email_us">send us a tip!</a></small></div></div>
 </div>
 <div class="col-3">
 	<form id="game_filters" name="free" method="get">

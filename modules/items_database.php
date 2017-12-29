@@ -23,11 +23,16 @@ if (isset($_GET['view']))
 		}
 		
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
 			$templating->set_previous('title', $get_item['name'], 1);
+
+			if ($get_item['supports_linux'] == 0)
+			{
+				$core->message("This item does not currently support Linux! It's here in case it ever does, or it may be included in a GOTY Award category for some form of port wishlist (you get the idea). If it shows up in any of our lists, please let us know (it shouldn't!).", 2);
+			}
 
 			$templating->block('item_view_top', 'items_database');
 			$templating->set('name', $get_item['name']);
@@ -128,7 +133,7 @@ if (isset($_GET['view']))
 			$description = '';
 			if (!empty($get_item['description']) && $get_item['description'] != NULL)
 			{
-				$description = '<br /><strong>About this game</strong>:<br />' . $get_item['description'] . '<br /><br />';
+				$description = '<br /><strong>About this game</strong>:<br />' . $get_item['description'];
 			}
 			$templating->set('description', $description);
 
@@ -382,6 +387,12 @@ if (isset($_POST['act']))
 			exit;
 		}
 
+		$supports_linux = 0;
+		if (isset($_POST['supports_linux']))
+		{
+			$supports_linux = 1;
+		}
+
 		$dlc = 0;
 		if (isset($_POST['dlc']))
 		{
@@ -418,7 +429,7 @@ if (isset($_POST['act']))
 			$license = $_POST['license'];
 		}
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 0, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?", array($name, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $dlc, $base_game, $free, $application, $emulator, $license));
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 0, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?, `supports_linux` = ?", array($name, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $dlc, $base_game, $free, $application, $emulator, $license, $supports_linux));
 		$new_id = $dbl->new_id();
 
 		$core->process_game_genres($new_id);

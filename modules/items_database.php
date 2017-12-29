@@ -173,6 +173,48 @@ if (isset($_GET['view']))
 				$templating->set('games', implode(', ', $same_games));
 			}
 
+			// see if it's on sale
+			$sales_res = $dbl->run("SELECT s.`link`, s.`sale_dollars`, s.`original_dollars`, s.`sale_pounds`, s.`original_pounds`, s.`sale_euro`, s.`original_euro`, st.`name` as `store_name` FROM `sales` s INNER JOIN `game_stores` st ON s.store_id = st.id WHERE s.accepted = 1 AND s.game_id = ?", [$get_item['id']])->fetch_all();
+			if ($sales_res)
+			{
+				$templating->block('sales', 'items_database');
+				$sales_list = '';
+				$currencies = ['dollars', 'pounds', 'euro'];
+				foreach ($sales_res as $sale)
+				{
+					$currency_list = [];
+					foreach ($currencies as $currency)
+					{
+						$savings = '';
+						if ($sale['sale_'.$currency] != NULL)
+						{
+							if ($sale['original_'.$currency] != 0)
+							{
+								$savings = 1 - ($sale['sale_'.$currency] / $sale['original_'.$currency]);
+								$savings = round($savings * 100) . '% off';
+							}
+							$front_sign = NULL;
+							$back_sign = NULL;
+							if ($currency == 'dollars')
+							{
+								$front_sign = '&dollar;';
+							}
+							else if ($currency == 'euro')
+							{
+								$back_sign = '&euro;';
+							}
+							else if ($currency == 'pounds')
+							{
+								$front_sign = '&pound;';
+							}
+							$currency_list[] = '<span class="badge">'. $front_sign . $sale['sale_'.$currency] . $back_sign . ' ' . $savings . '</span>';
+						}
+					}
+					$sales_list .= '<li><a href="' . $sale['link'] . '">'.$sale['store_name'].'</a> - '.implode(' ', $currency_list).'</li>';
+				}
+				$templating->set('sales_list', $sales_list);
+			}
+
 			$get_item['name'] = trim($get_item['name']);
 			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC", array($get_item['name']))->fetch_all();
 			if ($articles_res)

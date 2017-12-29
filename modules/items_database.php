@@ -12,6 +12,212 @@ if (!isset($_GET['view']) && !isset($_POST['act']))
 
 if (isset($_GET['view']))
 {
+	if ($_GET['view'] == 'item')
+	{
+		if (!core::is_number($_GET['id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'item id';
+			header("Location: /index.php");
+			die();
+		}
+		
+		// make sure it exists
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		if ($get_item)
+		{
+			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
+			$templating->set_previous('title', $get_item['name'], 1);
+
+			$templating->block('item_view_top', 'items_database');
+			$templating->set('name', $get_item['name']);
+
+			$dlc = '';
+			if ($get_item['is_dlc'] == 1)
+			{
+				$dlc = '<span class="badge yellow">DLC</span>';
+			}
+			$templating->set('dlc', $dlc);
+
+			$edit_link = '';
+			if ($user->check_group([1,2,5]))
+			{
+				$edit_link = '<a class="fright" href="/admin.php?module=games&amp;view=edit&amp;id=' . $get_item['id'] . '&return=view_item">Edit</a>';
+			}
+			$templating->set('edit-link', $edit_link);
+
+			if ($get_item['base_game_id'] != NULL && $get_item['base_game_id'] != 0)
+			{
+				$templating->block('base_game', 'items_database');
+				$templating->set('base_game_id', $get_item['base_game_id']);
+				$templating->set('base_game_name', $get_item['base_game_name']);
+			}
+
+			$templating->block('main-info', 'items_database');
+
+			// extra info box
+			$extra = 0; // don't show it if nothing is filled
+			$extra_info = '';
+
+			// sort out price
+			$price = '';
+			if ($get_item['free_game'] == 1)
+			{
+				$price = 'Free';
+			}
+			if (!empty($price))
+			{
+				$price = '<li>Price: ' . $price . '</li>';
+				$extra++;
+			}
+
+			// sort out license
+			$license = '';
+			if (!empty($get_item['license']) || $get_item['license'] != NULL)
+			{
+				$license = $get_item['license'];
+			}
+			if (!empty($license))
+			{
+				$license = '<li>License: ' . $license . '</li>';
+				$extra++;
+			}
+
+			// sort out genres
+			$genres_output = '';
+			$genres_res = $dbl->run("SELECT g.`category_name`, g.`category_id` FROM `articles_categorys` g INNER JOIN `game_genres_reference` r ON r.genre_id = g.category_id WHERE r.`game_id` = ?", array($get_item['id']))->fetch_all();
+			foreach ($genres_res as $genre)
+			{
+				$genres_output[] = $genre['category_name'];
+			}
+			
+			if (!empty($genres_output))
+			{
+				$genres_output = 'Genres: <ul class="database_extra">' . implode(', ', $genres_output) . '</ul>';
+				$extra++;
+			}
+			
+			if ($extra > 0)
+			{
+				$extra_info = $templating->block_store('extra', 'items_database');
+				$extra_info = $templating->store_replace($extra_info, array('price' => $price, 'license' => $license, 'genres' => $genres_output));
+			}
+			$templating->set('extra_info', $extra_info);
+
+			$date = '';
+			if (!empty($get_item['date']))
+			{
+				$date = $get_item['date'];
+			}
+			$templating->set('release-date', $date);
+
+			$unreleased = '';
+			if (isset($date) && !empty($date) && $date > date('Y-m-d'))
+			{
+				$unreleased = '<span class="badge blue">Unreleased!</span>';
+			}
+			$templating->set('unreleased', $unreleased);
+
+			$best_guess = '';
+			if ($get_item['best_guess'] == 1)
+			{
+				$best_guess = '<span class="badge blue">Best Guess Date!</span>';
+			}
+			$templating->set('best_guess', $best_guess);
+
+			$description = '';
+			if (!empty($get_item['description']) && $get_item['description'] != NULL)
+			{
+				$description = '<br /><strong>About this game</strong>:<br />' . $get_item['description'] . '<br /><br />';
+			}
+			$templating->set('description', $description);
+
+			$official_link = '';
+			if (!empty($get_item['link']))
+			{
+				$official_link = '<li><a href="' . $get_item['link'] . '">Official Website</a></li>';
+			}
+			$templating->set('official_link', $official_link);
+
+			$gog_link = '';
+			if (!empty($get_item['gog_link']))
+			{
+				$gog_link = '<li><a href="' . $get_item['gog_link'] . '">GOG Store</a></li>';
+			}
+			$templating->set('gog_link', $gog_link);
+
+			$steam_link = '';
+			if (!empty($get_item['steam_link']))
+			{
+				$steam_link = '<li><a href="' . $get_item['steam_link'] . '">Steam Store</a></li>';
+			}
+			$templating->set('steam_link', $steam_link);
+
+			$itch_link = '';
+			if (!empty($get_item['itch_link']))
+			{
+				$itch_link = '<li><a href="' . $get_item['itch_link'] . '">itch.io Store</a></li>';
+			}
+			$templating->set('itch_link', $itch_link);
+
+			// find any associations
+			$get_associations = $dbl->run("SELECT `name` FROM `calendar` WHERE `also_known_as` = ?", array($get_item['id']))->fetch_all();
+			$same_games = array();
+			if ($get_associations)
+			{
+				$templating->block('associations');
+				while ($associations = $get_associations->fetch())
+				{
+					$same_games[] = $associations['name'];
+				}
+				$templating->set('games', implode(', ', $same_games));
+			}
+
+			$get_item['name'] = trim($get_item['name']);
+			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC", array($get_item['name']))->fetch_all();
+			if ($articles_res)
+			{
+				$article_list = '';
+				$templating->block('articles', 'items_database');
+				foreach ($articles_res as $articles)
+				{
+					if (core::config('pretty_urls') == 1)
+					{
+						$article_link = "/articles/" . $articles['slug'] . '.' . $articles['article_id'];
+					}
+					else
+					{
+						$article_link = url . 'index.php?module=articles_full&amp;aid=' . $articles['article_id'] . '&amp;title=' . $articles['slug'];
+					}
+
+					if ($articles['author_id'] == 0)
+					{
+						$username = $articles['guest_username'];
+					}
+
+					else
+					{
+						$username = "<a href=\"/profiles/{$articles['author_id']}\">" . $articles['username'] . '</a>';
+					}
+
+					$article_list .= '<li><a href="' . $article_link . '">'.$articles['title'].'</a> by '.$username.'</li>';
+				}
+				$templating->set('articles', $article_list);
+			}
+
+			if ($user->check_group([1,2,5]))
+			{
+				$templating->block('main_info_bottom', 'items_database');
+				$templating->set('edit-link', $edit_link);
+			}
+		}
+		else
+		{
+			$templating->set_previous('meta_description', 'Game does not exist - GamingOnLinux Linux games database,', 1);
+			$templating->set_previous('title', 'Game does not exist - GamingOnLinux Linux games database', 1);
+			$core->message("That game id does not exist!", NULL, 1);
+		}
+	}
 	if ($_GET['view'] == 'submit')
 	{
 		$templating->block('submit_picker');
@@ -25,11 +231,11 @@ if (isset($_GET['view']))
 		if (isset($_GET['id']))
 		{
 			// check exists and grab info
-			$game_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `id` = ?", [$_GET['id']])->fetch();
-			if ($game_res)
+			$get_item_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `id` = ?", [$_GET['id']])->fetch();
+			if ($get_item_res)
 			{
 				$templating->block('suggest_tags');
-				$templating->set('name', $game_res['name']);
+				$templating->set('name', $get_item_res['name']);
 				$templating->set('id', $_GET['id']);
 
 				$current_genres = 'None!';
@@ -66,8 +272,8 @@ if (isset($_POST['act']))
 		if (isset($_POST['id']))
 		{
 			// check exists and grab info
-			$game_res = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", [$_POST['id']])->fetch();
-			if ($game_res)
+			$get_item_res = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", [$_POST['id']])->fetch();
+			if ($get_item_res)
 			{
 				// get fresh list of suggestions, and insert any that don't exist
 				$current_suggestions = $dbl->run("SELECT `genre_id` FROM `game_genres_suggestions` WHERE `game_id` = ?", array($_POST['id']))->fetch_all(PDO::FETCH_COLUMN, 0);
@@ -93,7 +299,7 @@ if (isset($_POST['act']))
 					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_game_genre_suggestion', core::$date, $_POST['id']));
 				}
 
-				$core->message('Your tag suggestions for ' . $game_res['name'] . ' have been submitted! Thank you!');
+				$core->message('Your tag suggestions for ' . $get_item_res['name'] . ' have been submitted! Thank you!');
 			}
 			else
 			{

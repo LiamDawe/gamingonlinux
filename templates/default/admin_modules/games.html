@@ -29,7 +29,7 @@
 
 [block: search_items]
 <div class="body group">
-{:name} - <a href="admin.php?module=games&view=edit&id={:id}">Edit</a>
+{:name} - <a href="admin.php?module=games&view=edit&id={:id}">Edit</a> - <a href="/index.php?module=items_database&amp;view=item&amp;id={:id}">View live</a>
 </div>
 [/block: search_items]
 
@@ -45,7 +45,7 @@
 <script src="includes/jscripts/jquery.form.min.js"></script>
 <div class="box">
 	<div class="head">
-		Edit the game
+		Edit the game - <a href="/index.php?module=items_database&amp;view=item&amp;id={:id}">View live</a>
 	</div>
 [/block: edit_top]
 

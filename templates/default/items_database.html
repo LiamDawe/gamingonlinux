@@ -93,3 +93,48 @@
 	<div class="body group"><button formaction="/index.php?module=items_database" name="act" value="submit_dev">Submit</button></form></div>
 </div>
 [/block: submit_developer]
+
+[block: item_view_top]
+<div class="box"><div class="head">{:dlc} {:name} {:edit-link}</div></div>
+[/block: item_view_top]
+
+[block: base_game]
+<div class="box"><div class="body group">This is a DLC for <a href="/index.php?module=game&game-id={:base_game_id}">{:base_game_name}</a></div></div>
+[/block: base_game]
+
+[block: main-info]
+<div class="box">
+  <div class="body group" style="position: relative;">
+    {:extra_info}
+    <strong>Release Date</strong>: {:release-date} {:unreleased} {:best_guess}<br />
+    <strong>External Links</strong>: <ul class="database_stores">{:official_link}{:gog_link}{:steam_link}{:itch_link}</ul><br />
+    {:description}
+  </div>
+</div>
+[/block: main-info]
+
+[block: dlc]
+<div class="box">
+	<div class="head">DLC</div>
+	<div class="body group">{:dlc_names}</div>
+</div>
+[/block: dlc]
+
+[block: extra]
+<div class="database-extra"><ul>{:price}{:license}</ul>{:genres}</div>
+[/block: extra]
+
+[block: associations]
+<div class="box"><div class="body group">Also known as: {:games}</div></div>
+[/block: associations]
+
+[block: main_info_bottom]
+<div class="box"><div class="body group">{:edit-link}</div></div>
+[/block: main_info_bottom]
+
+[block: articles]
+<div class="box">
+  <div class="head">GOL Articles</div>
+  <div class="body list"><ul>{:articles}</ul></div>
+</div>
+[/block: articles]

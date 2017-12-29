@@ -718,11 +718,11 @@ if (isset($_POST['act']))
 				$_SESSION['message_extra'] = 'game';
 				header("Location: /index.php?module=calendar");
 			}
-			if ($_GET['return'] == 'game')
+			if ($_GET['return'] == 'view_item')
 			{
 				$_SESSION['message'] = 'edited';
 				$_SESSION['message_extra'] = 'game';
-				header("Location: /index.php?module=game&game-id=" . $_POST['id']);
+				header("Location: /index.php?module=items_database&view=item&id=" . $_POST['id']);
 			}
 		}
 		else

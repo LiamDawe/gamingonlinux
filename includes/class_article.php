@@ -962,12 +962,16 @@ class article
 		
 		if (isset($article_info['type']) && $article_info['type'] != 'admin')
 		{
-			// update their subscriptions if they are reading the last page
+			$subscribe_link = '';
+			$close_comments_link = '';
+
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
+				// they're logged in, so let's see if they're subscribed to the article
 				$check_sub = $this->dbl->run("SELECT `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']))->fetch();
 				if ($check_sub)
 				{
+					// update their subscriptions if they are reading the last page
 					if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
 					{
 						// they have read all new comments (or we think they have since they are on the last page)
@@ -977,26 +981,13 @@ class article
 							$this->dbl->run("UPDATE `articles_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], (int) $article_info['article']['article_id']));
 						}
 					}
+					// they're subscribed, so set the quick link to unsubscribe
+					$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$article_info['article']['article_id']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe</span></a>";
 				}
-			}
-
-			$subscribe_link = '';
-			$close_comments_link = '';
-			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
-			{
-				// find out if this user has subscribed to the comments
-				if ($_SESSION['user_id'] != 0)
+				// they're not subscribed, so set the quick link to subscribe
+				else
 				{
-					$book_test = $this->dbl->run("SELECT `user_id` FROM `articles_subscriptions` WHERE `article_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetchOne();
-					if ($book_test)
-					{
-						$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$article_info['article']['article_id']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe</span></a>";
-					}
-
-					else
-					{
-						$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"subscribe\" data-article-id=\"{$article_info['article']['article_id']}\" href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Subscribe</span></a>";
-					}
+					$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"subscribe\" data-article-id=\"{$article_info['article']['article_id']}\" href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$article_info['article']['article_id']}\" class=\"white-link\"><span class=\"link_button\">Subscribe</span></a>";
 				}
 
 				if ($this->user->check_group([1,2]) == true)
@@ -1030,9 +1021,9 @@ class article
 		/* DISPLAY THE COMMENTS */
 		//
 
+		// first grab a list of their bookmarks
 		if ($total_comments > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			// first grab a list of their bookmarks
 			$bookmarks_array = $this->dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'comment' AND `parent_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
 		}
 

@@ -134,7 +134,7 @@ $game_sales->display_free();
 $templating->block('filters', 'free_games');
 
 // stores
-$genres_res = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `is_genre` = 1 ORDER BY `category_name` ASC")->fetch_all();
+$genres_res = $dbl->run("SELECT COUNT(g.id) as `total`, c.`category_id`, c.`category_name` FROM `articles_categorys` c LEFT JOIN `game_genres_reference` g ON c.category_id = g.genre_id WHERE c.`is_genre` = 1 GROUP BY c.category_id HAVING `total` > 0 ORDER BY c.`category_name` ASC")->fetch_all();
 $genres_output = '';
 foreach ($genres_res as $genre)
 {
@@ -143,7 +143,12 @@ foreach ($genres_res as $genre)
 	{
 		$checked = 'checked';
 	}
-	$genres_output .= '<label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].'</label>';
+	$total = '';
+	if ($genre['total'] > 0)
+	{
+		$total = ' <small>('.$genre['total'].')</small>';
+	}
+	$genres_output .= '<label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label>';
 }
 $templating->set('genres_output', $genres_output);
 

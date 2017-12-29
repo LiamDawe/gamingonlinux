@@ -508,31 +508,34 @@ class charts
 	
 	function ticks($max_data, $biggest_label)
 	{
-		// bottom axis data divisions
-		$this->ticks_total = $this->chart_options['ticks_total'];
-
-		// as we want integer values for ticks, make sure ticks_total is not too large for max_data
-		if ($max_data < $this->ticks_total)
+		if ($max_data > 0)
 		{
-			$this->ticks_total = ceil($max_data);
-		}
+			// bottom axis data divisions
+			$this->ticks_total = $this->chart_options['ticks_total'];
 
-		// get the smallest integer divisible by ticks_total that is larger than $max_data
-		$max_tick = ceil($max_data);
-		if ($max_tick % $this->ticks_total !== 0)
-		{
-			while ($max_tick % $this->ticks_total !== 0)
+			// as we want integer values for ticks, make sure ticks_total is not too large for max_data
+			if ($max_data < $this->ticks_total)
 			{
-				$max_tick += 1;
+				$this->ticks_total = ceil($max_data);
 			}
+
+			// get the smallest integer divisible by ticks_total that is larger than $max_data
+			$max_tick = ceil($max_data);
+			if ($max_tick % $this->ticks_total !== 0)
+			{
+				while ($max_tick % $this->ticks_total !== 0)
+				{
+					$max_tick += 1;
+				}
+			}
+			
+			// scale is the space between the starting axis line and the last tick
+			$this->scale = $this->actual_chart_space / $max_tick;
+
+			$this->value_per_tick = $max_tick / $this->ticks_total;
+
+			$this->tick_spacing = $this->value_per_tick * $this->scale;
 		}
-		
-		// scale is the space between the starting axis line and the last tick
-		$this->scale = $this->actual_chart_space / $max_tick;
-
-		$this->value_per_tick = $max_tick / $this->ticks_total;
-
-		$this->tick_spacing = $this->value_per_tick * $this->scale;
 	}
 	
 	// this is a start to extract the extra needed for stat charts, so they can eventually use the same functions as normal charts

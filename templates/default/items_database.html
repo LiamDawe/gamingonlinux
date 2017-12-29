@@ -96,7 +96,7 @@
 [/block: submit_developer]
 
 [block: item_view_top]
-<div class="box"><div class="head">{:dlc} {:name} {:edit-link}</div></div>
+<div class="box"><div class="head">{:free_item} {:dlc} {:name} {:edit-link}</div></div>
 [/block: item_view_top]
 
 [block: base_game]
@@ -105,12 +105,19 @@
 
 [block: main-info]
 <div class="box">
-  <div class="body group" style="position: relative;">
-    {:extra_info}
-    <strong>Release Date</strong>: {:release-date} {:unreleased} {:best_guess}<br />
-    <strong>External Links</strong>: <ul class="database_stores">{:official_link}{:gog_link}{:steam_link}{:itch_link}</ul><br />
-    {:description}
-  </div>
+	<div class="database-extra">
+		<ul>
+			<li><strong>Release Date</strong></li>
+			{:release-date}
+			{:license}
+			<li><strong>External Links</strong></li>
+			{:external_links}	
+			{:genres}
+		</ul>
+	</div>
+	<div class="body group">
+		{:description}
+	</div>
 </div>
 [/block: main-info]
 
@@ -120,10 +127,6 @@
 	<div class="body group">{:dlc_names}</div>
 </div>
 [/block: dlc]
-
-[block: extra]
-<div class="database-extra"><ul>{:price}{:license}</ul>{:genres}</div>
-[/block: extra]
 
 [block: associations]
 <div class="box"><div class="body group">Also known as: {:games}</div></div>

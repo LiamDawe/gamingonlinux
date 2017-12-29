@@ -37,6 +37,14 @@ if (isset($_GET['view']))
 			$templating->block('item_view_top', 'items_database');
 			$templating->set('name', $get_item['name']);
 
+			// sort out price
+			$free_item = '';
+			if ($get_item['free_game'] == 1)
+			{
+				$free_item = '<span class="badge blue">FREE</span>';
+			}
+			$templating->set('free_item', $free_item);
+
 			$dlc = '';
 			if ($get_item['is_dlc'] == 1)
 			{
@@ -60,21 +68,23 @@ if (isset($_GET['view']))
 
 			$templating->block('main-info', 'items_database');
 
-			// extra info box
-			$extra = 0; // don't show it if nothing is filled
-			$extra_info = '';
-
-			// sort out price
-			$price = '';
-			if ($get_item['free_game'] == 1)
+			// parse the release date, with any info tags about it
+			$date = '';
+			if (!empty($get_item['date']))
 			{
-				$price = 'Free';
+				$unreleased = '';
+				if ($get_item['date'] > date('Y-m-d'))
+				{
+					$unreleased = '<span class="badge blue">Unreleased!</span>';
+				}
+				$best_guess = '';
+				if ($get_item['best_guess'] == 1)
+				{
+					$best_guess = '<span class="badge blue">Best Guess Date!</span>';
+				}
+				$date = '<li>' . $get_item['date'] . ' ' . $best_guess . $unreleased . '</li>';
 			}
-			if (!empty($price))
-			{
-				$price = '<li>Price: ' . $price . '</li>';
-				$extra++;
-			}
+			$templating->set('release-date', $date);
 
 			// sort out license
 			$license = '';
@@ -84,86 +94,50 @@ if (isset($_GET['view']))
 			}
 			if (!empty($license))
 			{
-				$license = '<li>License: ' . $license . '</li>';
-				$extra++;
+				$license = '<li><strong>License</strong></li><li>' . $license . '</li>';
 			}
+			$templating->set('license', $license);
+
+			// sort out the external links we have for it
+			$external_links = '';
+			$links_array = [];
+			$link_types = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];
+			foreach ($link_types as $key => $text)
+			{
+				if (!empty($get_item[$key]))
+				{
+					$links_array[] = '<a href="'.$get_item[$key].'">'.$text.'</a>';
+				}
+			}
+
+			if (!empty($links_array))
+			{
+				$external_links = implode(', ', $links_array);
+			}
+			$templating->set('external_links', $external_links);
 
 			// sort out genres
 			$genres_output = '';
+			$genres_array = [];
 			$genres_res = $dbl->run("SELECT g.`category_name`, g.`category_id` FROM `articles_categorys` g INNER JOIN `game_genres_reference` r ON r.genre_id = g.category_id WHERE r.`game_id` = ?", array($get_item['id']))->fetch_all();
-			foreach ($genres_res as $genre)
+			if ($genres_res)
 			{
-				$genres_output[] = $genre['category_name'];
+				$genres_output = '<li><strong>Genres</strong></li><li>';
+				foreach ($genres_res as $genre)
+				{
+					$genres_array[] = $genre['category_name'];
+				}
+				$genres_output .= implode(', ', $genres_array);
+				$genres_output .= '</li>';
 			}
-			
-			if (!empty($genres_output))
-			{
-				$genres_output = 'Genres: <ul class="database_extra">' . implode(', ', $genres_output) . '</ul>';
-				$extra++;
-			}
-			
-			if ($extra > 0)
-			{
-				$extra_info = $templating->block_store('extra', 'items_database');
-				$extra_info = $templating->store_replace($extra_info, array('price' => $price, 'license' => $license, 'genres' => $genres_output));
-			}
-			$templating->set('extra_info', $extra_info);
-
-			$date = '';
-			if (!empty($get_item['date']))
-			{
-				$date = $get_item['date'];
-			}
-			$templating->set('release-date', $date);
-
-			$unreleased = '';
-			if (isset($date) && !empty($date) && $date > date('Y-m-d'))
-			{
-				$unreleased = '<span class="badge blue">Unreleased!</span>';
-			}
-			$templating->set('unreleased', $unreleased);
-
-			$best_guess = '';
-			if ($get_item['best_guess'] == 1)
-			{
-				$best_guess = '<span class="badge blue">Best Guess Date!</span>';
-			}
-			$templating->set('best_guess', $best_guess);
+			$templating->set('genres', $genres_output);			
 
 			$description = '';
 			if (!empty($get_item['description']) && $get_item['description'] != NULL)
 			{
-				$description = '<br /><strong>About this game</strong>:<br />' . $get_item['description'];
+				$description = '<strong>About this game</strong>:<br />' . $get_item['description'];
 			}
 			$templating->set('description', $description);
-
-			$official_link = '';
-			if (!empty($get_item['link']))
-			{
-				$official_link = '<li><a href="' . $get_item['link'] . '">Official Website</a></li>';
-			}
-			$templating->set('official_link', $official_link);
-
-			$gog_link = '';
-			if (!empty($get_item['gog_link']))
-			{
-				$gog_link = '<li><a href="' . $get_item['gog_link'] . '">GOG Store</a></li>';
-			}
-			$templating->set('gog_link', $gog_link);
-
-			$steam_link = '';
-			if (!empty($get_item['steam_link']))
-			{
-				$steam_link = '<li><a href="' . $get_item['steam_link'] . '">Steam Store</a></li>';
-			}
-			$templating->set('steam_link', $steam_link);
-
-			$itch_link = '';
-			if (!empty($get_item['itch_link']))
-			{
-				$itch_link = '<li><a href="' . $get_item['itch_link'] . '">itch.io Store</a></li>';
-			}
-			$templating->set('itch_link', $itch_link);
 
 			// find any associations
 			$get_associations = $dbl->run("SELECT `name` FROM `calendar` WHERE `also_known_as` = ?", array($get_item['id']))->fetch_all();

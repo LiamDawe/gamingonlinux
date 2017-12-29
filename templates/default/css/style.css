@@ -1325,6 +1325,14 @@ ul.social-networks li > a {
 .dark .select2-selection__rendered {
 color: #fff !important;
 }
+
+/* ITEMS DATABASE */
+.database_stores li {display: inline;}
+.database-extra{float: right; background-color: #D7D7D7; padding: 10px; width: 250px; box-sizing: border-box;}
+.database-extra ul {display: inline;list-style-type: none; padding: 0; margin: 0;}
+.database-extra ul li {padding: 0px;}
+.dark .database-extra{background-color: #515151;}
+
 /* Responsive CSS */
 @media only screen and (min-width: 700px) {
     .masonry {
@@ -1470,6 +1478,7 @@ color: #fff !important;
 	.comment .comment-body {
 		margin-left: 7px;
 	}
+	.database-extra {width: 100%; clear: both; max-width: 100%;}
 }
 /* MOBILE PORTRAIT */
 @media only screen and (max-width: 320px)
@@ -1544,16 +1553,6 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .dark .select2-selection {background-color: #515151 !important}
 .dark .select2-selection__choice {background-color: #515151 !important}
 .dark .select2-results {background-color: #515151 !important}
-
-.database_stores{display: inline;list-style-type: none; padding: 0; margin: 0;}
-.database_stores li + li:before {
-    content: ", ";
-}
-.database_stores li {display: inline;}
-.database-extra{position: absolute; top: 0; right:0; background-color: #D7D7D7; padding: 5px; max-width: 300px;}
-.database-extra ul {display: inline;list-style-type: none; padding: 0; margin: 0;}
-.database-extra ul li {padding: 0px;}
-.dark .database-extra{background-color: #515151;}
 .patreon {
 	margin-top: 14px;
 	line-height: 30px;

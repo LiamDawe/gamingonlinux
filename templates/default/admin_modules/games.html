@@ -61,15 +61,13 @@
 				</form>
 				<div id='preview2'>
 					{:small_pic}
-				</div><br />
+				</div>
+			</div>
+			<div class="subhead">Required</div>
+			<div class="body group">
 				<form method="post" action="admin.php?module=games">
-					<em>Games have to have at least one link at a minimum!</em><br />
-					<br />
 					Game Name: <input type="text" name="name" value="{:name}" /><br />
-					<label>Free (as in money)? <em>Tick if this is free/free to play</em> <input type="checkbox" name="free" {:free_check}/></label>
-					<label>Is an application? <input type="checkbox" name="application" {:app_check}/></label>
-					<label>Is an emulator? <input type="checkbox" name="emulator" {:emulator}/></label>
-					License <select name="license">{:license_options}</select><br />
+					<em>Games have to have <strong>at least one</strong> link at a minimum!</em><br />
 					Official website:<br />
 					<input type="text" name="link" value="{:link}" /><br />
 					Trailer<br />
@@ -80,6 +78,13 @@
 					<input type="text" name="gog_link" value="{:gog_link}" /><br />
 					itch.io Link:<br />
 					<input type="text" name="itch_link" value="{:itch_link}" /><br />
+			</div>
+			<div class="subhead">Not Required</div>
+			<div class="body group">
+					<label><input type="checkbox" name="free" {:free_check}/> Free (as in money)? <em>Tick if this is free/free to play</em></label>
+					<label><input type="checkbox" name="application" {:app_check}/> Is an application?</label>
+					<label><input type="checkbox" name="emulator" {:emulator}/> Is an emulator?</label>
+					License <select name="license">{:license_options}</select><br />
 					Release Date: <br />
 					<input name="date" id="datepicker" type="text" value="{:date} "/>
 					<script>

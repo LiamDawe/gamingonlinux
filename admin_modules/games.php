@@ -439,7 +439,7 @@ if (isset($_POST['act']))
 		$itch_link = trim($_POST['itch_link']);
 		
 		// make sure its not empty
-		$empty_check = core::mempty(compact('name', 'description'));
+		$empty_check = core::mempty(compact('name'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';
@@ -628,7 +628,7 @@ if (isset($_POST['act']))
 
 		$name = $_POST['name'];
 		$date = $_POST['date'];
-		$empty_check = core::mempty(compact('name', 'date'));
+		$empty_check = core::mempty(compact('name'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';

@@ -64,5 +64,14 @@ $profile_fields['twitch']['base_link_required'] = 0;
 $profile_fields['twitch']['link'] = 1;
 $profile_fields['twitch']['image'] = NULL;
 
+$profile_fields['mastodon']['name'] = 'Mastodon:';
+$profile_fields['mastodon']['description'] = 'Enter your Mastodon profile, like this: https://mastodon.social/@gamingonlinux';
+$profile_fields['mastodon']['db_field'] = 'mastodon';
+$profile_fields['mastodon']['span'] = '<span class="inline icon mastodon">mastodon</span>';
+$profile_fields['mastodon']['base_link'] = NULL;
+$profile_fields['mastodon']['base_link_required'] = 0;
+$profile_fields['mastodon']['link'] = 1;
+$profile_fields['mastodon']['image'] = NULL;
+
 return $profile_fields;
 ?>

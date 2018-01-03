@@ -145,7 +145,7 @@ if (isset($_GET['view']))
 			if ($get_associations)
 			{
 				$templating->block('associations');
-				while ($associations = $get_associations->fetch())
+				foreach ($get_associations as $associations)
 				{
 					$same_games[] = $associations['name'];
 				}

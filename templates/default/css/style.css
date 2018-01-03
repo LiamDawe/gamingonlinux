@@ -1018,6 +1018,9 @@ ul.social-networks li > a {
 .icon.twitch {
     background-image: url('../images/social/twitch.svg');
 }
+.icon.mastodon {
+    background-image: url('../images/social/mastodon.svg');
+}
 .icon.steam {
     background-image: url('../images/social/steam.svg');
 }

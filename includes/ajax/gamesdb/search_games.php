@@ -17,7 +17,7 @@ if(isset($_GET['q']))
 	}
 	if (isset($_GET['type']) && $_GET['type'] == 'free')
 	{
-		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `free_game` = 1 AND `is_application` = 0 ORDER BY `name` ASC";		
+		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `free_game` = 1 AND `is_application` = 0 AND `is_emulator` = 0 ORDER BY `name` ASC";		
 	}
 	if (isset($_GET['type']) && $_GET['type'] == 'all')
 	{

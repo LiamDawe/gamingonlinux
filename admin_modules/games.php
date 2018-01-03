@@ -3,8 +3,6 @@ $games_database = new game_sales($dbl, $templating, $user, $core);
 
 $templating->load('admin_modules/games');
 
-$licenses = array('', 'Closed Source', 'GPL', 'LGPL', 'BSD', 'MIT');
-
 if (isset($_GET['view']) && !isset($_POST['act']))
 {
 	if ($_GET['view'] == 'search')
@@ -75,10 +73,11 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		$templating->set('type_options', $type_options);
 
+		$licenses = $dbl->run("SELECT `license_name` FROM `item_licenses` ORDER BY `license_name` ASC")->fetch_all();
 		$license_options = '';
 		foreach ($licenses as $license)
 		{
-			$license_options .= '<option value="' . $license . '">'.$license.'</option>';
+			$license_options .= '<option value="'.$license['license_name'].'">'.$license['license_name'].'</option>';
 		}
 		$templating->set('license_options', $license_options);
 
@@ -228,6 +227,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('free_check', $free_check);
 
+				$licenses = $dbl->run("SELECT `license_name` FROM `item_licenses` ORDER BY `license_name` ASC")->fetch_all();
 				$license_options = '';
 				foreach ($licenses as $license)
 				{
@@ -236,7 +236,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					{
 						$selected = 'selected';
 					}
-					$license_options .= '<option value="' . $license . '" '.$selected.'>'.$license.'</option>';
+					$license_options .= '<option value="'.$license['license_name'].'" '.$selected.'>'.$license['license_name'].'</option>';
 				}
 				$templating->set('license_options', $license_options);
 
@@ -417,6 +417,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('free_check', $free_check);
 
+				$licenses = $dbl->run("SELECT `license_name` FROM `item_licenses` ORDER BY `license_name` ASC")->fetch_all();
 				$license_options = '';
 				foreach ($licenses as $license)
 				{
@@ -425,7 +426,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					{
 						$selected = 'selected';
 					}
-					$license_options .= '<option value="' . $license . '" '.$selected.'>'.$license.'</option>';
+					$license_options .= '<option value="'.$license['license_name'].'" '.$selected.'>'.$license['license_name'].'</option>';
 				}
 				$templating->set('license_options', $license_options);
 

@@ -88,7 +88,7 @@
 			<div class="subhead">Not Required</div>
 			<div class="body group">
 					<label><input type="checkbox" name="free" {:free_check}/> Free (as in money)? <em>Tick if this is free/free to play</em></label>
-					License <select name="license">{:license_options}</select><br />
+					License <select name="license"><option value=""></option>{:license_options}</select><br />
 					Release Date: <br />
 					<input name="date" id="datepicker" type="text" value="{:date} "/>
 					<script>

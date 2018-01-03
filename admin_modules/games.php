@@ -361,8 +361,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('trailer_link', $trailer_link);
 
-				$date = new DateTime($game['date']);
-				$templating->set('date', $date->format('d-m-Y'));
+				$date = '';
+				if (isset($game['date']) && !empty($game['date']))
+				{
+					$date = new DateTime($game['date']);
+					$date = $date->format('d-m-Y');
+				}
+				$templating->set('date', $date);
 
 				$supports_linux = '';
 				if ($game['supports_linux'] == 1)

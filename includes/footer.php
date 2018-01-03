@@ -50,14 +50,6 @@ if ($user->check_group(1) && $core->config('show_debug') == 1)
 }
 $templating->set('debug', $debug);
 
-// user stat trending charts
-$svg_js = '';
-if (!empty(core::$user_graphs_js) || isset(core::$user_graphs_js))
-{
-	$svg_js = core::$user_graphs_js;
-}
-$templating->set('user_graph_js', $svg_js);
-
 // editor js
 $editor_js = '';
 if (!empty(core::$editor_js) || isset(core::$editor_js))
@@ -66,9 +58,17 @@ if (!empty(core::$editor_js) || isset(core::$editor_js))
 }
 $templating->set('editor_js', $editor_js);
 
+// user stat trending charts
+$svg_js = '';
+if (!empty(core::$user_chart_js) || isset(core::$user_chart_js))
+{
+	$svg_js = core::$user_chart_js;
+}
+$templating->set('user_chart_js', $svg_js);
+
+
 echo $templating->output();
 
 // close the mysql connection
-$db = null;
 $dbl = NULL;
 ?>

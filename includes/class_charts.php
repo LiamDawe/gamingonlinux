@@ -2,7 +2,7 @@
 class charts
 {
 	// the required db connection
-	private $database;
+	private $dbl;
 	
 	private $chart_info;
 	private $labels_raw_data;
@@ -39,9 +39,9 @@ class charts
 	private $chart_info_old;
 	private $y_axis_outline_y_start = 0;
 	
-	function __construct($database)
+	function __construct($dbl)
 	{
-		$this->database = $database;
+		$this->dbl = $dbl;
 	}
 	
 	function setup($custom_options = NULL)
@@ -101,11 +101,11 @@ class charts
 	{
 		if ($type == 'normal')
 		{
-			$get_chart = $this->database->run("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped`, `enabled`, `order_by_data` FROM `charts` WHERE `id` = ?", [$chart_id]);
+			$get_chart = $this->dbl->run("SELECT `id`, `name`, `sub_title`, `h_label`, `grouped`, `enabled`, `order_by_data` FROM `charts` WHERE `id` = ?", [$chart_id]);
 		}
 		if ($type == 'stat_chart')
 		{
-			$get_chart = $this->database->run("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `enabled` FROM `user_stats_charts` WHERE `id` = ?", [$chart_id]);
+			$get_chart = $this->dbl->run("SELECT `name`, `sub_title`, `h_label`, `generated_date`, `total_answers`, `enabled` FROM `user_stats_charts` WHERE `id` = ?", [$chart_id]);
 		}
 		$this->chart_info = $get_chart->fetch();
 		
@@ -128,11 +128,11 @@ class charts
 					$order_by = 'ORDER BY d.`data` DESC';
 				}
 				// set the right labels to the right data
-				$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`min`, d.`max`, d.`data_series` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? $order_by", array($chart_data['id']))->fetch_all();
+				$this->labels_raw_data = $this->dbl->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data`, d.`min`, d.`max`, d.`data_series` FROM `charts_labels` l LEFT JOIN `charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? $order_by", array($chart_data['id']))->fetch_all();
 			}
 			else if ($type == 'stat_chart')
 			{
-				$this->labels_raw_data = $this->database->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` DESC", array($chart_data['id']))->fetch_all();			
+				$this->labels_raw_data = $this->dbl->run("SELECT l.`label_id`, l.`name`, l.`colour`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ORDER BY d.`data` DESC", array($chart_data['id']))->fetch_all();			
 			}
 		}
 		else
@@ -541,11 +541,11 @@ class charts
 	// this is a start to extract the extra needed for stat charts, so they can eventually use the same functions as normal charts
 	function stat_chart_old($last_id)
 	{
-		$this->chart_info_old = $this->database->run("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($last_id))->fetch();
+		$this->chart_info_old = $this->dbl->run("SELECT `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `id` = ?", array($last_id))->fetch();
 
 		// set the right labels to the right data (OLD DATA)
 		$labels_old = [];
-		$this->get_labels_old = $this->database->run("SELECT l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ", array($last_id))->fetch_all();
+		$this->get_labels_old = $this->dbl->run("SELECT l.`label_id`, l.`name`, d.`data` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id WHERE l.`chart_id` = ? ", array($last_id))->fetch_all();
 	}
 	
 	function stat_chart($id, $last_id = '', $custom_options)
@@ -829,6 +829,168 @@ class charts
 		</svg>';
 		
 		return $get_graph;	
+	}
+
+	function trends_charts($name, $order = '')
+	{
+		$dates = array();
+		$chart_ids = array();
+		$labels = array();
+
+		// get each chart along with the date they were generated to make the axis
+		$get_charts = $this->dbl->run("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ?", array($name))->fetch_all();
+		if ($get_charts)
+		{
+			foreach ($get_charts as $chart_info)
+			{
+				if ($chart_info['total_answers'] > 0)
+				{
+					$chart_ids[] = $chart_info['id'];
+
+					$make_time = strtotime($chart_info['generated_date']);
+					$dates[] = "'".date("M-Y", $make_time) . "'";
+				}
+			}
+
+			$chart_ids_sql = implode(',', $chart_ids);
+
+			if (count($chart_ids) > 0)
+			{
+				// get the names of all the labels
+				$get_labels = $this->dbl->run("SELECT DISTINCT(`name`) FROM `user_stats_charts_labels` WHERE `chart_id` IN ($chart_ids_sql)")->fetch_all();
+
+				// how many data points in total we need for each label
+				$total_points = count($dates);
+
+				// only grab the top 10 labels, so graphs don't get messy with tons of labels
+				$top_10_labels = array_slice($get_labels, 0, 10);
+				if ($name == 'RAM' || $name == 'Resolution')
+				{
+					uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
+				}
+				foreach ($top_10_labels as $key => $sort_labels)
+				{
+					$get_data = $this->dbl->run("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id` LIMIT 10")->fetch_all();
+
+					$total_data = count($get_data);
+
+					// calculate how many data points are missing
+					$missing_data = $total_points - $total_data;
+
+					$label_add = '';
+					if ($name == 'RAM')
+					{
+						$label_add = 'GB';
+					}
+
+					// adjust the data points for this label if it started late (not enough data points), so the data point starts at the right place
+					for ($data_counter = 0; $data_counter < $missing_data; $data_counter++)
+					{
+						$labels[$sort_labels['name'] . $label_add][] = 0;
+					}
+					// add in the actual data we do have for this label
+					foreach ($get_data as $data)
+					{
+						$percent = round(($data['data'] / $data['total_answers']) * 100, 2);
+						$labels[$data['name'] . $label_add][] = $percent;
+					}
+				}
+
+				$colours = array(
+				'#a6cee3',
+				'#1f78b4',
+				'#b2df8a',
+				'#33a02c',
+				'#fb9a99',
+				'#e31a1c',
+				'#fdbf6f',
+				'#ff7f00',
+				'#cab2d6',
+				'#6a3d9a'
+				);
+
+				$graph_name = str_replace(' ', '', $name); // Replaces all spaces with hyphens.
+				$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
+
+				$get_graph['graph'] = '<canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
+
+				$total_array = count($labels);
+
+				$data_sets = '';
+				$counter = 0;
+				foreach ($labels as $key => $data)
+				{
+					$colour = $colours[$counter];
+					if ($key == 'Intel')
+					{
+						$colour = "#1f78b4";
+					}
+					if ($key == 'AMD' || $key == 'Proprietary')
+					{
+						$colour = "#e31a1c";
+					}
+					if ($key == 'Nvidia' || $key == 'Open Source')
+					{
+						$colour = "#33a02c";
+					}
+
+					$data_sets .= "{
+					label: '".$key."',
+					fill: false,
+					data: [";
+					$data_sets .= implode(',', $data);
+					$data_sets .= "],
+					backgroundColor: '$colour',
+					borderColor: '$colour',
+					borderWidth: 1
+					}";
+					$counter++;
+					if ($counter != $total_array)
+					{
+						$data_sets .= ',';
+					}
+				}
+
+				core::$user_chart_js .= "<script>
+				var ".$graph_name." = document.getElementById('".$graph_name."');
+				var Chart".$graph_name." = new Chart.Line(".$graph_name.", {
+				type: 'line',
+				data: {
+				labels: [".implode(',', $dates)."],
+				datasets: [$data_sets]
+					},
+					options: {
+						legend: {
+							display: true
+						},
+				scales: {
+				yAxes: [{
+					ticks: {
+					beginAtZero:true
+					},
+								scaleLabel: {
+							display: true,
+							labelString: 'Percentage of users'
+						}
+				}]
+				},
+						tooltips:
+						{
+							callbacks: {
+								label: function(tooltipItem, data) {
+					var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+									var label = data.datasets[tooltipItem.datasetIndex].label;
+					return label + ' ' + value + '%';
+						}
+						},
+						},
+				}
+				});
+				</script>";
+
+				return $get_graph;
+			}
+		}
 	}
 }
 ?>

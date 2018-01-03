@@ -67,6 +67,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set($make_empty, '');
 		}
 
+		$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
+		$type_options = '';
+		foreach ($types as $value => $text)
+		{
+			$type_options .= '<option value="'.$value.'">'.$text.'</option>';
+		}
+		$templating->set('type_options', $type_options);
+
 		$license_options = '';
 		foreach ($licenses as $license)
 		{
@@ -186,6 +194,19 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('supports_linux', $supports_linux);
 
+				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
+				$type_options = '';
+				foreach ($types as $value => $text)
+				{
+					$selected = '';
+					if ($game[$value] == 1)
+					{
+						$selected = 'selected';
+					}
+					$type_options .= '<option value="'.$value.'" '.$selected.'>'.$text.'</option>';
+				}
+				$templating->set('type_options', $type_options);
+
 				$guess = '';
 				if ($game['best_guess'] == 1)
 				{
@@ -206,20 +227,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$free_check = 'checked';
 				}
 				$templating->set('free_check', $free_check);
-
-				$app_check = '';
-				if ($game['is_application'] == 1)
-				{
-					$app_check = 'checked';
-				}
-				$templating->set('app_check', $app_check);
-
-				$emulator_cheeck = '';
-				if ($game['is_emulator'] == 1)
-				{
-					$emulator_cheeck = 'checked';
-				}
-				$templating->set('emulator_cheeck', $emulator_cheeck);
 
 				$license_options = '';
 				foreach ($licenses as $license)
@@ -376,6 +383,19 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('supports_linux', $supports_linux);
 
+				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
+				$type_options = '';
+				foreach ($types as $value => $text)
+				{
+					$selected = '';
+					if ($game[$value] == 1)
+					{
+						$selected = 'selected';
+					}
+					$type_options .= '<option value="'.$value.'" '.$selected.'>'.$text.'</option>';
+				}
+				$templating->set('type_options', $type_options);
+
 				$guess = '';
 				if ($game['best_guess'] == 1)
 				{
@@ -396,20 +416,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$free_check = 'checked';
 				}
 				$templating->set('free_check', $free_check);
-
-				$app_check = '';
-				if ($game['is_application'] == 1)
-				{
-					$app_check = 'checked';
-				}
-				$templating->set('app_check', $app_check);
-
-				$emulator_cheeck = '';
-				if ($game['is_emulator'] == 1)
-				{
-					$emulator_cheeck = 'checked';
-				}
-				$templating->set('emulator_cheeck', $emulator_cheeck);
 
 				$license_options = '';
 				foreach ($licenses as $license)
@@ -517,16 +523,17 @@ if (isset($_POST['act']))
 			$free_game = 1;
 		}
 
-		$application = 0;
-		if (isset($_POST['application']))
+		$types = ['is_game', 'is_application', 'is_emulator'];
+		$sql_type = '';
+		if (!in_array($_POST['type'], $types))
 		{
-			$application = 1;
+			$_SESSION['message'] = 'no_item_type';
+			header("Location: /index.php?module=items_database&view=submit_item");
+			die();
 		}
-
-		$emulator = 0;
-		if (isset($_POST['emulator']))
+		else
 		{
-			$emulator = 1;
+			$sql_type = '`'.$_POST['type'].'` = 1, ';
 		}
 
 		$base_game = NULL;
@@ -547,7 +554,7 @@ if (isset($_POST['act']))
 			$trailer = $_POST['trailer'];
 		}
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?, `trailer` = ?, `supports_linux` = ?", array($name, $description, $date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $application, $emulator, $license, $trailer, $supports_linux));
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ?", array($name, $description, $date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux));
 		$new_id = $dbl->new_id();
 
 		$core->process_game_genres($new_id);
@@ -697,16 +704,17 @@ if (isset($_POST['act']))
 			$free_game = 1;
 		}
 
-		$application = 0;
-		if (isset($_POST['application']))
+		$types = ['is_game', 'is_application', 'is_emulator'];
+		$sql_type = '';
+		if (!in_array($_POST['type'], $types))
 		{
-			$application = 1;
+			$_SESSION['message'] = 'no_item_type';
+			header("Location: /admin.php?module=games&view=edit&id=".$_POST['id']);
+			die();
 		}
-
-		$emulator = 0;
-		if (isset($_POST['emulator']))
+		else
 		{
-			$emulator = 1;
+			$sql_type = '`'.$_POST['type'].'` = 1, ';
 		}
 
 		$base_game = NULL;
@@ -730,7 +738,7 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?, `trailer` = ?, `supports_linux` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $application, $emulator, $license, $trailer, $supports_linux, $_POST['id']));
+		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $_POST['id']));
 		
 		$core->process_game_genres($_POST['id']);
 
@@ -818,16 +826,17 @@ if (isset($_POST['act']))
 			$free_game = 1;
 		}
 
-		$application = 0;
-		if (isset($_POST['application']))
+		$types = ['is_game', 'is_application', 'is_emulator'];
+		$sql_type = '';
+		if (!in_array($_POST['type'], $types))
 		{
-			$application = 1;
+			$_SESSION['message'] = 'no_item_type';
+			header("Location: /index.php?module=items_database&view=submit_item");
+			die();
 		}
-
-		$emulator = 0;
-		if (isset($_POST['emulator']))
+		else
 		{
-			$emulator = 1;
+			$sql_type = '`'.$_POST['type'].'` = 1, ';
 		}
 
 		$base_game = NULL;
@@ -851,7 +860,7 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?, `trailer` = ?, `approved` = 1 WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $application, $emulator, $license, $trailer, $_POST['id']));
+		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `approved` = 1 WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $_POST['id']));
 		
 		$core->process_game_genres($_POST['id']);
 

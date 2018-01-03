@@ -59,12 +59,17 @@
 			itch.io Link:<br />
 			<input type="text" name="itch_link" /><br />
 			<label><input type="checkbox" name="supports_linux" checked/> Does it currently support Linux? <em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label>
+			What is it?<br />
+			<select name="type">
+				<option value=""></option>
+				<option value="is_game">Game</option>
+				<option value="is_emulator">Emulator</option>
+				<option value="is_application">Misc Software or Application</option>
+			</select>
 	</div>
 	<div class="head">Not Required</div>
 	<div class="body group">
 		<label><input type="checkbox" name="free" /> Free (as in money)? <em>Tick if this is free/free to play</em></label>
-		<label><input type="checkbox" name="application" /> Is an application?</label>
-		<label><input type="checkbox" name="emulator"/> Is an emulator?</label>
 		<label><input type="checkbox" name="dlc" /> DLC <em>Tick if this is a DLC</em></label>
 		Base game name <em>If it's a DLC, what game is it for?</em><br />
 		<select tabindex="-1" name="game" id="articleGames" style="width:300px" class="populate select2-offscreen"><option value="0">None</option></select><br />

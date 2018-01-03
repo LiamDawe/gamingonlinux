@@ -24,6 +24,11 @@ return [
 	[
 		"text" => "You have sent in %s for us to review for inclusion in our database! Thank you.",
 		"additions" => 1
+	],
+	"no_item_type" =>
+	[
+		"text" => "You didn't select the type of item you're submitting!",
+		"error" => 1
 	]
 ];
 ?>

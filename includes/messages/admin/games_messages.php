@@ -36,6 +36,11 @@ return [
 	[
 		"text" => "Sorry, couldn't find that item. Someone must have gotten there first!",
 		"error" => 1
+	],
+	"no_item_type" =>
+	[
+		"text" => "You didn't select the type of item you're submitting!",
+		"error" => 1
 	]
 ];
 ?>

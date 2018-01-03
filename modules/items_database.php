@@ -338,6 +338,19 @@ if (isset($_POST['act']))
 			header("Location: /index.php?module=items_database&view=submit_item");
 			die();
 		}
+
+		$types = ['is_game', 'is_application', 'is_emulator'];
+		$sql_type = '';
+		if (!in_array($_POST['type'], $types))
+		{
+			$_SESSION['message'] = 'no_item_type';
+			header("Location: /index.php?module=items_database&view=submit_item");
+			die();
+		}
+		else
+		{
+			$sql_type = '`'.$_POST['type'].'` = 1, ';
+		}
 		
 		if (empty($link) && empty($steam_link) && empty($gog_link) && empty($itch_link))
 		{
@@ -360,28 +373,16 @@ if (isset($_POST['act']))
 			$supports_linux = 1;
 		}
 
-		$dlc = 0;
-		if (isset($_POST['dlc']))
-		{
-			$dlc = 1;
-		}
-
 		$free = 0;
 		if (isset($_POST['free']))
 		{
 			$free = 1;
 		}
 
-		$application = 0;
-		if (isset($_POST['application']))
+		$dlc = 0;
+		if (isset($_POST['dlc']))
 		{
-			$application = 1;
-		}
-
-		$emulator = 0;
-		if (isset($_POST['emulator']))
-		{
-			$emulator = 1;
+			$dlc = 1;
 		}
 
 		$base_game = NULL;
@@ -396,7 +397,7 @@ if (isset($_POST['act']))
 			$license = $_POST['license'];
 		}
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 0, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, `is_application` = ?, `is_emulator` = ?, `license` = ?, `supports_linux` = ?", array($name, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $dlc, $base_game, $free, $application, $emulator, $license, $supports_linux));
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 0, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `supports_linux` = ?", array($name, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $dlc, $base_game, $free, $license, $supports_linux));
 		$new_id = $dbl->new_id();
 
 		$core->process_game_genres($new_id);

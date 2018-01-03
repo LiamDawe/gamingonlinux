@@ -10,7 +10,7 @@ if ($core->config('goty_voting_open') == 1 && $core->config('goty_finished') == 
 
 else if ($core->config('goty_voting_open') == 0 && $core->config('goty_games_open') == 1 && $core->config('goty_finished') == 0)
 {
-	$voting_text = '<br /><br />Voting opens once we have allowed enough time for people to add game nominations.';
+	$voting_text = '<br /><br />Voting opens once we have allowed enough time for people to add game nominations. To nominate a game, please go to the category.';
 }
 
 else if ($core->config('goty_finished') == 1)
@@ -19,21 +19,9 @@ else if ($core->config('goty_finished') == 1)
 }
 $templating->set('voting_text', $voting_text);
 
-$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
-if ($core->config('goty_games_open') == 1)
-{
-	$category_list = '';
-				
-	foreach( $cats as $category )
-	{
-		$category_list .= '<option value="' . $category['category_id'] . '">' . $category['category_name'] . '</option>';
-	}
-	$templating->block('add', 'goty');
-	$templating->set('options', $category_list);
-}
-
 $templating->block('category_top', 'goty');
 
+$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
 foreach ($cats as $cat)
 {
 	$templating->block('category_row', 'goty');

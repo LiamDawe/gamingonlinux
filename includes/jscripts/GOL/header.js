@@ -1590,11 +1590,11 @@ jQuery(document).ready(function()
 	  width: '100%',
 	  ajax: {
 		  url: function() {
-			  if (picker_url == 'games') 
+			  if ($(this).data('picker') == 'games') 
 			  {
 				return "/includes/ajax/games_ajax.php"
 			  } 
-			  else if (picker_url == 'devs') 
+			  else if ($(this).data('picker') == 'devs') 
 			  {
 				return '/includes/ajax/gamesdb/search_devs.php'
 			  }
@@ -1616,14 +1616,5 @@ jQuery(document).ready(function()
 	  cache: true,
 	},
 	minimumInputLength: 2
-	});
-  
-	// Change game picker url when game porter category is picked
-	$(document).on('change', ".goty_category_picker", function(e)
-	{
-		if ($(this).val() == 16)
-		{
-			picker_url = 'devs';
-		}
 	});
 });

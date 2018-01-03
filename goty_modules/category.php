@@ -17,6 +17,18 @@ if (!empty($cat['description']))
 	$templating->set('category_description', $cat['description']);
 }
 
+if ($core->config('goty_games_open') == 1)
+{
+	$templating->block('add', 'goty');
+	$picker = 'games';
+	if ($_GET['category_id'] == 16)
+	{
+		$picker = 'devs';
+	}
+	$templating->set('picker', $picker);
+	$templating->set('category', $_GET['category_id']);
+}
+
 $item_table = '';
 if ($_GET['category_id'] == 16)
 {

@@ -64,7 +64,7 @@ foreach ($array['data'] as $games)
 
 		if (!$game_list)
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `on_sale` = 1, `approved` = 1", array($games['title'], $release_date));
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `approved` = 1", array($games['title'], $release_date));
 
 			// need to grab it again
 			$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
@@ -79,8 +79,6 @@ foreach ($array['data'] as $games)
 			{
 				$game_id = $game_list['also_known_as'];
 			}
-
-			$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($game_id));
 		}
 
 		$on_sale[] = $game_id;

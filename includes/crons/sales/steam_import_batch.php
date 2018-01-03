@@ -126,7 +126,7 @@ do
 				
 				if (!$game_list)
 				{
-					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `on_sale` = 1, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $stripped_title, $clean_release_date, $link, $steam_id, $bundle));
+					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $stripped_title, $clean_release_date, $link, $steam_id, $bundle));
 				
 					// need to grab it again
 					$game_list = $dbl->run($select_sql, array($title))->fetch();
@@ -142,7 +142,7 @@ do
 						$game_id = $game_list['also_known_as'];
 					}
 				
-					$dbl->run("UPDATE `calendar` SET `on_sale` = 1, `steam_link` = ? WHERE `id` = ?", array($link, $game_id));
+					$dbl->run("UPDATE `calendar` SET `steam_link` = ? WHERE `id` = ?", array($link, $game_id));
 				}
 
 				// if the game list has no picture, grab it and save it

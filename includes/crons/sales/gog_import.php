@@ -94,7 +94,7 @@ do {
 
 			if (!$game_list)
 			{
-				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `gog_link` = ?, `on_sale` = 1, `approved` = 1", array($games['title'], $games['original_release_date'], $website));
+				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `gog_link` = ?, `approved` = 1", array($games['title'], $games['original_release_date'], $website));
 
 				// need to grab it again
 				$game_list = $dbl->run("SELECT `id`, `small_picture` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
@@ -109,8 +109,6 @@ do {
 				{
 					$game_id = $game_list['also_known_as'];
 				}
-
-				$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($game_id));
 			}
 
 			// if the game list has no picture, grab it and save it

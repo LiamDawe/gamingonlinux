@@ -84,7 +84,7 @@ foreach ($xml->item as $game)
 			$game_list_stripped = $dbl->run("SELECT `id` FROM `calendar` WHERE `stripped_name` = ?", array($stripped_title))->fetchOne();
 			if (!$game_list_stripped)
 			{
-				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `on_sale` = 1, `approved` = 1", array($new_title, $stripped_title, date('Y-m-d'))); // they don't give the release date, just add in today's date, we can fix manually later if/when we need to
+				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `approved` = 1", array($new_title, $stripped_title, date('Y-m-d'))); // they don't give the release date, just add in today's date, we can fix manually later if/when we need to
 
 				$game_id = $dbl->new_id();
 			}

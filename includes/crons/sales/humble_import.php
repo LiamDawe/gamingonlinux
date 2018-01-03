@@ -88,14 +88,10 @@ do
 			
 						if (!$game_list)
 						{
-							$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `on_sale` = 1, `approved` = 1", array($sane_name, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
+							$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `approved` = 1", array($sane_name, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
 			
 							// need to grab it again
 							$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
-						}
-						else
-						{
-							$dbl->run("UPDATE `calendar` SET `on_sale` = 1 WHERE `id` = ?", array($sane_name));
 						}
 			
 						$on_sale[] = $game_list['id'];

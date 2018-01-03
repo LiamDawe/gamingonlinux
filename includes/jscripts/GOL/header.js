@@ -215,40 +215,6 @@ jQuery(document).ready(function()
       }
   };
 
-  // detect if there's a # in the url
-  if(window.location.hash)
-  {
-	var hash = window.location.hash.substring(1);
-	
-    var current_module = getUrlParameter('module');
-    // if it isn't set, it's likely we're using apache rewrite urls, check there too
-    if (typeof current_module === 'undefined')
-    {
-		to_check = {"users/statistics": 'statistics'};
-		$.each(to_check, function(index, value) 
-		{
-			if (window.location.href.indexOf(index) > -1)
-			{
-				var current_module = value;
-			}
-		});
-    }
-    
-    // if it's the stats page, show them the stats they want
-    if (typeof current_module !== 'undefined' && current_module == 'statistics')
-    {
-      if (hash == 'trends')
-      {
-        $("#trends").show();
-        $("#monthly").hide();
-      }
-      else if (hash == 'monthly')
-      {
-        $("#trends").hide();
-        $("#monthly").show();
-      }
-    }
-  }
 	$(".remove_announce").on('click', function(event)
 	{
 		event.preventDefault();
@@ -264,21 +230,6 @@ jQuery(document).ready(function()
 		setCookie("gol_announce_" + announce_id, "set", expiry_days);
 		
 		$(this).closest(".announce").hide();
-	});
-
-	$("#trends_link").on('click', function(event)
-	{
-		event.preventDefault();
-		document.location.hash = "#trends";
-		$("#trends").show();
-		$("#monthly").hide();
-	});
-	$("#monthly_link").on('click', function(event)
-	{
-		event.preventDefault();
-		document.location.hash = "#monthly";
-		$("#trends").hide();
-		$("#monthly").show();
 	});
   
   // navbar toggle menu

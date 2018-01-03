@@ -202,14 +202,7 @@ if (isset($_GET['view']))
 				$templating->block('articles', 'items_database');
 				foreach ($articles_res as $articles)
 				{
-					if (core::config('pretty_urls') == 1)
-					{
-						$article_link = "/articles/" . $articles['slug'] . '.' . $articles['article_id'];
-					}
-					else
-					{
-						$article_link = url . 'index.php?module=articles_full&amp;aid=' . $articles['article_id'] . '&amp;title=' . $articles['slug'];
-					}
+					$article_link = $article_class->get_link($articles['article_id'], $articles['slug']);
 
 					if ($articles['author_id'] == 0)
 					{

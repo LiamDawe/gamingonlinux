@@ -1,5 +1,6 @@
 <?php
 error_reporting(-1);
+ini_set('memory_limit', '-1'); // their JSON is soooo fucking large with no paging
 
 define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
@@ -12,7 +13,9 @@ echo "Fanatical importer started on " .date('d-m-Y H:m:s'). "\n";
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
 $url = 'https://api.fanatical.com/api/feed?cc=US&auth=gamingonlinux';
-if (core::file_get_contents_curl($url) == true)
+$get_data = core::file_get_contents_curl($url);
+
+if ($get_data)
 {
 	// magic
 }
@@ -33,7 +36,7 @@ else
 
 $on_sale = [];
 
-$array = json_decode(core::file_get_contents_curl($url), true);
+$array = json_decode($get_data, true);
 
 foreach ($array['data'] as $games)
 {

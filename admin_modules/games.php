@@ -529,7 +529,7 @@ if (isset($_POST['act']))
 		if (!in_array($_POST['type'], $types))
 		{
 			$_SESSION['message'] = 'no_item_type';
-			header("Location: /index.php?module=items_database&view=submit_item");
+			header("Location: /admin.php?module=games&view=add");
 			die();
 		}
 		else

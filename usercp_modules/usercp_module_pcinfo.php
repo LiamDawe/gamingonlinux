@@ -216,6 +216,7 @@ if (!isset($_POST['act']))
 		"2560x1440",
 		"2560x1600",
 		"3440x1440",
+		"3840x1600",
 		"3840x2160");
 	foreach ($resolution_options as $res)
 	{

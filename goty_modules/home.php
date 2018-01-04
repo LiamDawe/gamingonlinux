@@ -3,23 +3,28 @@ $templating->block('top', 'goty');
 $templating->set('total_votes', $core->config('goty_total_votes'));
 
 $voting_text = '';
+$category_status_text = '';
 if ($core->config('goty_voting_open') == 1 && $core->config('goty_finished') == 0)
 {
 	$voting_text = '<br /><br />Voting is now open!';
+	$category_status_text = 'vote now!';
 }
 
 else if ($core->config('goty_voting_open') == 0 && $core->config('goty_games_open') == 1 && $core->config('goty_finished') == 0)
 {
 	$voting_text = '<br /><br />Voting opens once we have allowed enough time for people to add game nominations. To nominate a game, please go to the category.';
+	$category_status_text = 'nominate a game for when voting opens!';
 }
 
 else if ($core->config('goty_finished') == 1)
 {
 	$voting_text = '<br /><br />Voting is currently closed!';
+	$category_status_text = 'view the results!';
 }
 $templating->set('voting_text', $voting_text);
 
 $templating->block('category_top', 'goty');
+$templating->set('category_status_text', $category_status_text);
 
 $cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
 foreach ($cats as $cat)

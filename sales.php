@@ -171,16 +171,23 @@ $game_sales->display_normal();
 $templating->block('filters', 'sales');
 
 // stores
-$stores_res = $dbl->run("SELECT `id`, `name` FROM `game_stores` WHERE `show_normal_filter` = 1 ORDER BY `name` ASC")->fetch_all();
+$stores_res = $dbl->run("SELECT COUNT(g.id) as `total`, c.`id`, c.`name` FROM `game_stores` c LEFT JOIN `sales` g ON c.id = g.store_id WHERE c.`show_normal_filter` = 1 GROUP BY c.id HAVING `total` > 0 ORDER BY c.`name` ASC")->fetch_all();
 $stores_output = '';
-foreach ($stores_res as $store)
+if ($stores_res)
 {
-	$checked = '';
-	if (isset($filters_sort['stores']) && in_array($store['id'], $filters_sort['stores']))
+	foreach ($stores_res as $store)
 	{
-		$checked = 'checked';
+		$checked = '';
+		if (isset($filters_sort['stores']) && in_array($store['id'], $filters_sort['stores']))
+		{
+			$checked = 'checked';
+		}
+		$stores_output .= '<label><input type="checkbox" name="stores[]" value="'.$store['id'].'" '.$checked.'> '.$store['name'].' <small>('.$store['total'].')</small></label>';
 	}
-	$stores_output .= '<label><input type="checkbox" name="stores[]" value="'.$store['id'].'" '.$checked.'> '.$store['name'].'</label>';
+}
+else
+{
+	$stores_output = 'No sales found!';
 }
 $templating->set('stores_options', $stores_output);
 

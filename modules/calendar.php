@@ -117,124 +117,131 @@ $counter = $dbl->run("SELECT COUNT(id) FROM `calendar` WHERE `date` != '' AND `d
 $templating->set('month', $months_array[$month] . ' ' . $year . ' (Total: ' . $counter . ')');
 
 $get_listings = $dbl->run("SELECT `id`, `date`, `name`, `best_guess`, `is_dlc`, `link`, `gog_link`, `steam_link`, `itch_link`, `small_picture` FROM `calendar` WHERE `date` != '' AND `date` IS NOT NULL AND YEAR(date) = $year AND MONTH(date) = $month AND `approved` = 1 AND `also_known_as` IS NULL AND (link != '' OR gog_link != '' OR steam_link != '' OR itch_link != '') ORDER BY `date` ASC, `name` ASC")->fetch_all();
-
-// first grab a list of all the genres for each game, so we only do one query instead of one for each
-$genre_ids = [];
-foreach ($get_listings as $set)
+if ($get_listings)
 {
-	$genre_ids[] = $set['id'];
-}
-$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
-$genre_tag_sql = "SELECT r.`game_id`, c.category_name FROM `game_genres_reference` r INNER JOIN `articles_categorys` c ON c.category_id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, c.category_name";
-$genre_res = $dbl->run($genre_tag_sql, $genre_ids)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
-
-$templating->block('head', 'calendar');
-
-$last_date = NULL;
-$current_date = NULL;
-
-foreach ($get_listings as $listing)
-{
-	$current_date = $listing['date'];
-
-	if (isset($last_date) && $current_date != $last_date)
+	// first grab a list of all the genres for each game, so we only do one query instead of one for each
+	$genre_ids = [];
+	foreach ($get_listings as $set)
 	{
-		$templating->block('day_end', 'calendar');
+		$genre_ids[] = $set['id'];
 	}
+	$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
+	$genre_tag_sql = "SELECT r.`game_id`, c.category_name FROM `game_genres_reference` r INNER JOIN `articles_categorys` c ON c.category_id = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, c.category_name";
+	$genre_res = $dbl->run($genre_tag_sql, $genre_ids)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 
-    if (!isset($last_date) || $last_date !== $listing['date']) 
-    {
-        $templating->block('day', 'calendar');
-        $templating->set('group_date', $listing['date']);
-        
-		// if the date is today
-		$today_anchor = '';
-		$today_css = '';
-		$today_text = '';
-        if ($listing['date'] == date('Y-m-d'))
-        {
-			$today_anchor = '<a class="anchor" id="today"></a>';
-			$today_css = 'id="calendar_today"';
-			$today_text = '<span class="badge">Releasing Today!</span> ';
-		}
-		$templating->set('today_anchor', $today_anchor);
-		$templating->set('today_css', $today_css);
-		$templating->set('today_text', $today_text);
-	}
-    
-	$get_date = date_parse($listing['date']);
+	$templating->block('head', 'calendar');
 
-	$templating->block('item', 'calendar');
+	$last_date = NULL;
+	$current_date = NULL;
 
-	$small_pic = '';
-	if ($listing['small_picture'] != NULL && $listing['small_picture'] != '')
+	foreach ($get_listings as $listing)
 	{
-		$small_pic = '<img src="' . $core->config('website_url') . 'uploads/gamesdb/small/' . $listing['small_picture'] . '" alt="" />';
-	}
-	$templating->set('small_pic', $small_pic);
+		$current_date = $listing['date'];
 
-	$best_guess = '';
-	if ($listing['best_guess'] == 1)
-	{
-		$best_guess = '<span class="tooltip-top badge blue" title="We haven\'t been given an exact date!">Best Guess</span>';
-	}
-	$templating->set('best_guess', $best_guess);
-	$dlc = '';
-	if ($listing['is_dlc'] == 1)
-	{
-		$dlc = '<span class="badge yellow">DLC</span>';
-	}
-	$templating->set('dlc', $dlc);
-
-	$game_name = $listing['name'];
-
-	$templating->set('name', $game_name);
-	
-	$links = [];
-	if (!empty($listing['link']) && $listing['link'] != NULL)
-	{
-		$links[] = '<a href="'.$listing['link'].'">Official Site</a>';
-	}
-	if (!empty($listing['gog_link']) && $listing['gog_link'] != NULL)
-	{
-		$links[] = '<a href="'.$listing['gog_link'].'">GOG</a>';
-	}
-	if (!empty($listing['steam_link']) && $listing['steam_link'] != NULL)
-	{
-		$links[] = '<a href="'.$listing['steam_link'].'">Steam</a>';
-	}
-	if (!empty($listing['itch_link']) && $listing['itch_link'] != NULL)
-	{
-		$links[] = '<a href="'.$listing['itch_link'].'">itch.io</a>';
-	}
-	$templating->set('links', implode(' - ', $links));
-		
-	$edit = '';
-	if ($user->check_group([1,2,5]))
-	{
-		$edit = ' <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar"><span class="icon edit edit-sale-icon"></span></a>';
-	}
-	$templating->set('edit', $edit);
-	
-	$last_date = $listing['date'];
-
-	$genre_output = '';
-	$genre_list = [];
-	if (isset($genre_res[$listing['id']]))
-	{
-		$genre_output = $templating->block_store('genres', 'calendar');
-		foreach ($genre_res[$listing['id']] as $k => $name)
+		if (isset($last_date) && $current_date != $last_date)
 		{
-			$genre_list[] = "<span class=\"badge\">{$name}</span>";
+			$templating->block('day_end', 'calendar');
 		}
 
-		$genre_output = $templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list)));					
+		if (!isset($last_date) || $last_date !== $listing['date']) 
+		{
+			$templating->block('day', 'calendar');
+			$templating->set('group_date', $listing['date']);
+			
+			// if the date is today
+			$today_anchor = '';
+			$today_css = '';
+			$today_text = '';
+			if ($listing['date'] == date('Y-m-d'))
+			{
+				$today_anchor = '<a class="anchor" id="today"></a>';
+				$today_css = 'id="calendar_today"';
+				$today_text = '<span class="badge">Releasing Today!</span> ';
+			}
+			$templating->set('today_anchor', $today_anchor);
+			$templating->set('today_css', $today_css);
+			$templating->set('today_text', $today_text);
+		}
+		
+		$get_date = date_parse($listing['date']);
+
+		$templating->block('item', 'calendar');
+
+		$small_pic = '';
+		if ($listing['small_picture'] != NULL && $listing['small_picture'] != '')
+		{
+			$small_pic = '<img src="' . $core->config('website_url') . 'uploads/gamesdb/small/' . $listing['small_picture'] . '" alt="" />';
+		}
+		$templating->set('small_pic', $small_pic);
+
+		$best_guess = '';
+		if ($listing['best_guess'] == 1)
+		{
+			$best_guess = '<span class="tooltip-top badge blue" title="We haven\'t been given an exact date!">Best Guess</span>';
+		}
+		$templating->set('best_guess', $best_guess);
+		$dlc = '';
+		if ($listing['is_dlc'] == 1)
+		{
+			$dlc = '<span class="badge yellow">DLC</span>';
+		}
+		$templating->set('dlc', $dlc);
+
+		$game_name = $listing['name'];
+
+		$templating->set('name', $game_name);
+		
+		$links = [];
+		if (!empty($listing['link']) && $listing['link'] != NULL)
+		{
+			$links[] = '<a href="'.$listing['link'].'">Official Site</a>';
+		}
+		if (!empty($listing['gog_link']) && $listing['gog_link'] != NULL)
+		{
+			$links[] = '<a href="'.$listing['gog_link'].'">GOG</a>';
+		}
+		if (!empty($listing['steam_link']) && $listing['steam_link'] != NULL)
+		{
+			$links[] = '<a href="'.$listing['steam_link'].'">Steam</a>';
+		}
+		if (!empty($listing['itch_link']) && $listing['itch_link'] != NULL)
+		{
+			$links[] = '<a href="'.$listing['itch_link'].'">itch.io</a>';
+		}
+		$templating->set('links', implode(' - ', $links));
+			
+		$edit = '';
+		if ($user->check_group([1,2,5]))
+		{
+			$edit = ' <a href="/admin.php?module=games&view=edit&id='.$listing['id'].'&return=calendar"><span class="icon edit edit-sale-icon"></span></a>';
+		}
+		$templating->set('edit', $edit);
+		
+		$last_date = $listing['date'];
+
+		$genre_output = '';
+		$genre_list = [];
+		if (isset($genre_res[$listing['id']]))
+		{
+			$genre_output = $templating->block_store('genres', 'calendar');
+			foreach ($genre_res[$listing['id']] as $k => $name)
+			{
+				$genre_list[] = "<span class=\"badge\">{$name}</span>";
+			}
+
+			$genre_output = $templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list)));					
+		}
+
+		$templating->set('genre_list', $genre_output);
 	}
 
-	$templating->set('genre_list', $genre_output);
-}
 
-$templating->block('bottom', 'calendar');
+	$templating->block('bottom', 'calendar');
+}
+else
+{
+	$core->message('Terribly sorry, but we found nothing with that date!');
+}
 
 $templating->block('picker', 'calendar');
 $templating->set('prev', $prev_month);

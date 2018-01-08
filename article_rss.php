@@ -44,7 +44,15 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeElement('lastBuildDate', $last_date);
 
 	$xml->startElement('atom:link');
-	$xml->writeAttribute('href', $core->config('website_url') . 'article_rss.php');
+	if (!isset($_GET['mini']))
+	{
+		$xml->writeAttribute('href', $core->config('website_url') . 'article_rss.php');
+	}
+	else
+	{
+		$xml->writeAttribute('href', $core->config('website_url') . 'article_rss.php?mini');
+	}
+	
 	$xml->writeAttribute('rel', 'self');
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();
@@ -104,32 +112,35 @@ if ($core->config('articles_rss') == 1)
 			$xml->endElement();
 			$tag_list[] = $get_categories['category_name'];
 		}
-		
-		$tagline_bbcode = '';
-		$bbcode_tagline_gallery = 0;
-		if (!empty($line['tagline_image']))
+		// if they want the full text
+		if (!isset($_GET['mini']))
 		{
-			$tagline_bbcode  = $line['tagline_image'];
-		}
-		if (!empty($line['gallery_tagline']))
-		{
-			$tagline_bbcode = $line['gallery_tagline_filename'];
-			$bbcode_tagline_gallery = 1;
-		}
+			$tagline_bbcode = '';
+			$bbcode_tagline_gallery = 0;
+			if (!empty($line['tagline_image']))
+			{
+				$tagline_bbcode  = $line['tagline_image'];
+			}
+			if (!empty($line['gallery_tagline']))
+			{
+				$tagline_bbcode = $line['gallery_tagline_filename'];
+				$bbcode_tagline_gallery = 1;
+			}
 
-		// for viewing the tagline, not the whole article
-		if (isset($_GET['tagline']) && $_GET['tagline'] == 1)
-		{
-			$text = $line['tagline'];
+			// for viewing the tagline, not the whole article
+			if (isset($_GET['tagline']) && $_GET['tagline'] == 1)
+			{
+				$text = $line['tagline'];
+			}
+			else
+			{
+				$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
+			}
+			
+			$xml->startElement('description');
+			$xml->writeCData('<p>Tags: ' . implode(', ', $tag_list) . '</p><p>' . $text . '</p>');
+			$xml->endElement();
 		}
-		else
-		{
-			$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
-		}
-		
-		$xml->startElement('description');
-		$xml->writeCData('<p>Tags: ' . implode(', ', $tag_list) . '</p><p>' . $text . '</p>');
-		$xml->endElement();
 		
 		$date = date("D, d M Y H:i:s O", $line['date']);
 		$xml->writeElement('pubDate', $date);

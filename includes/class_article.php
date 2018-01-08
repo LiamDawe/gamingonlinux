@@ -955,8 +955,23 @@ class article
 		// sort out the pagination link
 		$pagination = $this->core->pagination_link($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
 		$pagination_head = $this->core->head_pagination($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
+
+		$comments_top_text = '';
+		if ($total_comments > 0)
+		{
+			$comments_top_text = number_format($total_comments) . ' comment';
+			if ($total_comments > 1)
+			{
+				$comments_top_text .= 's';
+			}
+		}
+		else
+		{
+			$comments_top_text = 'No comments yet!';
+		}
 		
 		$this->templating->block('comments_top', 'articles_full');
+		$this->templating->set('comments_top_text', $comments_top_text);
 		$this->templating->set('pagination_head', $pagination_head);
 		$this->templating->set('pagination', $pagination);
 		

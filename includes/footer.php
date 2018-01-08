@@ -7,14 +7,15 @@ $templating->set('year', date('Y'));
 $article_rss = '';
 if ($core->config('articles_rss') == 1)
 {
-	$article_rss = '<li><a href="'.$core->config('website_url').'article_rss.php" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/rss-website.svg" width="30" height="30" /></a></li>';
+	$article_rss = '<li><a title="Full article RSS" class="tooltip-top" href="'.$core->config('website_url').'article_rss.php" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/rss-website.svg" width="30" height="30" /></a></li>
+	<li><a title="Article title RSS" class="tooltip-top" href="'.$core->config('website_url').'article_rss.php?mini" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/rss-website.svg" width="30" height="30" /></a></li>';
 }
 $templating->set('article_rss', $article_rss);
 
 $forum_rss = '';
 if ($core->config('forum_rss') == 1)
 {
-	$forum_rss = '<li><a href="'.$core->config('website_url').'forum_rss.php" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/rss-forum.svg" width="30" height="30" /></a></li>';
+	$forum_rss = '<li><a title="Forum RSS" class="tooltip-top" href="'.$core->config('website_url').'forum_rss.php" target="_blank"><img alt src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/white/rss-forum.svg" width="30" height="30" /></a></li>';
 }
 $templating->set('forum_rss', $forum_rss);
 

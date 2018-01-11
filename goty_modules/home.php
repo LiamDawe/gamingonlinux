@@ -7,19 +7,21 @@ $category_status_text = '';
 if ($core->config('goty_voting_open') == 1 && $core->config('goty_finished') == 0)
 {
 	$voting_text = '<br /><br />Voting is now open!';
-	$category_status_text = 'vote now!';
+	$category_status_text = ' and vote now!';
 }
-
 else if ($core->config('goty_voting_open') == 0 && $core->config('goty_games_open') == 1 && $core->config('goty_finished') == 0)
 {
 	$voting_text = '<br /><br />Voting opens once we have allowed enough time for people to add game nominations. To nominate a game, please go to the category.';
-	$category_status_text = 'nominate a game for when voting opens!';
+	$category_status_text = ' and nominate a game for when voting opens!';
 }
-
 else if ($core->config('goty_finished') == 1)
 {
 	$voting_text = '<br /><br />Voting is currently closed!';
-	$category_status_text = 'view the results!';
+	$category_status_text = ' and view the results!';
+}
+else if ($core->config('goty_finished') == 0 && $core->config('goty_voting_open') == 0)
+{
+
 }
 $templating->set('voting_text', $voting_text);
 

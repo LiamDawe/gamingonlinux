@@ -29,36 +29,39 @@ if (!isset($_GET['ip_id']))
 	/* get any spam reported comments in a paginated list here */
 	$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=comment_reports", $page);
 
-	$comments = $dbl->run("SELECT a.*, t.title, u.username, u.user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.register_date, u2.username as reported_by_username FROM `articles_comments` a INNER JOIN `articles` t ON a.article_id = t.article_id LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` u2 on a.spam_report_by = u2.user_id WHERE a.spam = 1 ORDER BY a.`comment_id` ASC LIMIT ?, 9", array($core->start))->fetch_all();
-	if ($comments)
+	$comments_res = $dbl->run("SELECT a.*, t.title, u.username, u.user_group, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.register_date, u2.username as reported_by_username FROM `articles_comments` a INNER JOIN `articles` t ON a.article_id = t.article_id LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` u2 on a.spam_report_by = u2.user_id WHERE a.spam = 1 ORDER BY a.`comment_id` ASC LIMIT ?, 9", array($core->start))->fetch_all();
+	if ($comments_res)
 	{
-		// make date human readable
-		$date = $core->human_date($comments['time_posted']);
-
-		if ($comments['author_id'] == 0)
+		foreach ($comments_res as $comments)
 		{
-			$username = $comments['guest_username'];
-		}
-		else
-		{
-			$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
-		}
+			// make date human readable
+			$date = $core->human_date($comments['time_posted']);
 
-		// sort out the avatar
-		$comment_avatar = $user->sort_avatar($comments['author_id']);
+			if ($comments['author_id'] == 0)
+			{
+				$username = $comments['guest_username'];
+			}
+			else
+			{
+				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
+			}
 
-		$templating->block('article_comments', 'admin_modules/comment_reports');
-		$templating->set('user_id', $comments['author_id']);
-		$templating->set('username', $username);
-		$templating->set('date', $date);
-		$templating->set('text', $bbcode->parse_bbcode($comments['comment_text']));
-		$templating->set('reported_by', "<a href=\"/profiles/{$comments['spam_report_by']}\">{$comments['reported_by_username']}</a>");
-		$templating->set('comment_id', $comments['comment_id']);
-		$templating->set('article_title', $comments['title']);
-		$templating->set('article_link', core::nice_title($comments['title']) . '.' . $comments['article_id']);
-		$badges = user::user_badges($comments, 1);
-		$templating->set('badges', implode(' ', $badges));
+			// sort out the avatar
+			$comment_avatar = $user->sort_avatar($comments['author_id']);
+
+			$templating->block('article_comments', 'admin_modules/comment_reports');
+			$templating->set('user_id', $comments['author_id']);
+			$templating->set('username', $username);
+			$templating->set('date', $date);
+			$templating->set('text', $bbcode->parse_bbcode($comments['comment_text']));
+			$templating->set('reported_by', "<a href=\"/profiles/{$comments['spam_report_by']}\">{$comments['reported_by_username']}</a>");
+			$templating->set('comment_id', $comments['comment_id']);
+			$templating->set('article_title', $comments['title']);
+			$templating->set('article_link', core::nice_title($comments['title']) . '.' . $comments['article_id']);
+			$badges = user::user_badges($comments, 1);
+			$templating->set('badges', implode(' ', $badges));
 		}
+	}
 
 	$templating->block('comment_reports_bottom', 'admin_modules/comment_reports');
 	$templating->set('pagination', $pagination);

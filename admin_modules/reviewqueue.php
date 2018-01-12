@@ -263,7 +263,7 @@ else
 	$check_current_sub = $dbl->run("SELECT `article_id`, `emails`, `send_email` FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']))->fetch();
 
 	$subscribe_check = '';
-	if ($_SESSION['auto_subscribe'] == 1 || $sub_exists == 1)
+	if ($check_current_sub || $_SESSION['auto_subscribe'] == 1)
 	{
 		$subscribe_check = 'checked';
 	}

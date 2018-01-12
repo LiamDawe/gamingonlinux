@@ -19,6 +19,11 @@ return [
 	[
 		"text" => "The password did not match the password confirmation, please try again!",
 		"error" => 1
+	],
+	"captcha_nope" =>
+	[
+		"text" => "You didn't fill out the captcha! You must do this, as it helps us prevent bots. If you don't see a captcha, a plugin may be blocking it!",
+		"error" => 1
 	]
 ];
 ?>

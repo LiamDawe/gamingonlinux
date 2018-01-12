@@ -132,12 +132,18 @@ if ($core->config('allow_registrations') == 1)
 
 		if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1)
 		{
-			$recaptcha=$_POST['g-recaptcha-response'];
-			$google_url="https://www.google.com/recaptcha/api/siteverify";
-			$ip=core::$ip;
-			$url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
-			$res=getCurlData($url);
-			$res= json_decode($res, true);
+			if (!isset($_POST['g-recaptcha-response']))
+			{
+				$_SESSION['message'] = 'captcha_nope';
+				header("Location: /index.php?module=register");
+				die();
+			}
+			$recaptcha = $_POST['g-recaptcha-response'];
+			$google_url = "https://www.google.com/recaptcha/api/siteverify";
+			$ip = core::$ip;
+			$url = $google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
+			$res = getCurlData($url);
+			$res = json_decode($res, true);
 		}
 
 		if ($core->config('captcha_disabled') == 1 || ($core->config('captcha_disabled') == 0 && ($core->config('register_captcha') == 1 && $res['success']) || $core->config('register_captcha') == 0))
@@ -230,8 +236,9 @@ if ($core->config('allow_registrations') == 1)
 		// Check the score to determine what to do.
 		else if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1 && !$res['success'])
 		{
-			// Add code to process the form.
-			$core->message("You need to complete the captcha to prove you are human and not a bot! <a href=\"index.php?module=register\">Click here to try again</a>.", 1);
+			$_SESSION['message'] = 'captcha_nope';
+			header("Location: /index.php?module=register");
+			die();
 		}
 	}
 }

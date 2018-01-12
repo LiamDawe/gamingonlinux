@@ -158,8 +158,7 @@ if (isset($_POST['action']))
 	else if ($_POST['action'] == 'Delete')
 	{
 		// remove any old avatar if one was uploaded
-		$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch;
-		
+		$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 		if ($avatar['avatar_uploaded'] == 1)
 		{

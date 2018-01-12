@@ -268,7 +268,7 @@ class charts
 					$text = $label['name'];
 				}
 			}
-			$get_label_length = $this->text_size($text, $this->chart_options['label_font_size'], 0.6, 'UTF-8');
+			$get_label_length = $this->text_size($text, $this->chart_options['label_font_size'], 0.5, 'UTF-8');
 			$label_lengths[] = $get_label_length;
 		}
 		rsort($label_lengths);

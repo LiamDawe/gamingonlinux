@@ -348,19 +348,19 @@ if (isset($_POST['act']))
 			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, type = 'goty_finished', `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
 
 			// make the chart for each category
-			$result = $dbl->run("SELECT `category_name`, `category_id` FROM `goty_category` ORDER BY `category_id` ASC");
+			$result = $dbl->run("SELECT `category_name`, `category_id` FROM `goty_category` ORDER BY `category_id` ASC")->fetch_all();
 			foreach ($result as $category)
 			{
 				$dbl->run("INSERT INTO `charts` SET `name` = ?, `h_label` = ?, `owner` = ?", array($category['category_name'], 'Total Votes' , $_SESSION['user_id']));
-				$chart_key = $db->grab_id();
+				$chart_key = $dbl->new_id();
 
-				$games = $dbl->run("SELECT `game`, `votes` FROM `goty_games` WHERE `category_id` = ? ORDER BY `votes` DESC LIMIT 10", array($category['category_id']));
+				$games = $dbl->run("SELECT coalesce(cl.name, d.name) name, g.`votes` as data FROM `goty_games` g left outer join `calendar` cl ON cl.id = g.game_id and g.category_id != 16 left outer join `developers` d ON d.id = g.game_id and g.category_id = 16 WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($category['category_id']))->fetch_all();
 				foreach ($games as $game)
 				{
-					$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($chart_key, $game['game']));
-					$game_key = $db->grab_id();
+					$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($chart_key, $game['name']));
+					$game_key = $dbl->new_id();
 
-					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($chart_key, $game_key, $game['votes']));
+					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($chart_key, $game_key, $game['data']));
 				}
 			}
 

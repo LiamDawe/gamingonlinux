@@ -23,7 +23,8 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	$article_class->process_categories($article_id);
 
 	// force subscribe, so they don't lose editors comments
-	$dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
+	$secret_key = core::random_id(15);
+	$dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $secret_key));
 
 	// upload tagline image
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

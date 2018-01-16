@@ -1004,7 +1004,7 @@ jQuery(document).ready(function()
 			type: "POST",
 			url: url,
 			dataType:"json",
-			data: form.serialize(), 
+			data: form.serialize() + '&type=add_plan', 
 			success: function(data)
 			{
 				if (data['result'] == 'done')

@@ -159,7 +159,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		if (move_uploaded_file($source, $target))
 		{
 			// replace any existing just-uploaded image
-			if (isset($_SESSION['gamesdb_smallpic']))
+			if (isset($_SESSION['gamesdb_smallpic']) && file_exists($core->config('path') . "uploads/gamesdb/small/temp/" . $_SESSION['gamesdb_smallpic']['image_name']))
 			{
 				unlink($core->config('path') . "uploads/gamesdb/small/temp/" . $_SESSION['gamesdb_smallpic']['image_name']);
 			}

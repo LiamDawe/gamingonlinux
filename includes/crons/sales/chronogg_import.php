@@ -57,7 +57,7 @@ if (!empty($game))
 			
 		if (!$game_list)
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `approved` = 1", array($sane_name, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `approved` = 1", array($sane_name));
 			
 			// need to grab it again
 			$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
@@ -81,13 +81,13 @@ if (!empty($game))
 
 	if ($use_sale == 0)
 	{
-		$dbl->run("DELETE FROM `sales` WHERE `store_id` = 9", $on_sale); // delete any left, since they only do one at a time
+		$dbl->run("DELETE FROM `sales` WHERE `store_id` = 9"); // delete any left, since they only do one at a time
 	}
 }
 
 else
 {
-	$dbl->run("DELETE FROM `sales` WHERE `store_id` = 9", $on_sale); // delete any left, since they only do one at a time
+	$dbl->run("DELETE FROM `sales` WHERE `store_id` = 9"); // delete any left, since they only do one at a time
 }
 
 $dbl->run("DELETE FROM `sales` WHERE `store_id` = 9 AND `end_date` < NOW()");

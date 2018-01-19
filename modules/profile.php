@@ -48,14 +48,14 @@ if (isset($_GET['user_id']))
 					{
 						if ($profile['banned'] == 1)
 						{
-							$core->message("You are viewing a banned users profile!", NULL, 2);
+							$core->message("You are viewing a banned users profile!", 2);
 						}
 
 						$templating->set_previous('meta_description', "Viewing {$profile['username']} profile on GamingOnLinux.com", 1);
 
 						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 						{
-							$templating->block('top');
+							$templating->block('top', 'profile');
 
 							$user_action_links = [];
 

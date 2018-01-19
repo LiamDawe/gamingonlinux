@@ -42,12 +42,27 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			if ($size < (MAX_SIZE))
 			{
 				// main image
-				$image_name = rand().time().'gol'.$_SESSION['user_id'].'.'.$ext;
+				$new_image_name = rand().time().'gol'.$_SESSION['user_id'];
+				$image_name = $new_image_name.'.'.$ext;
 				$main_newname = $uploaddir.$image_name; //Check / delete file it exists
+
+				$main_url = $core->config('website_url') . 'uploads/articles/article_images/' . $image_name;
+				$thumb_url = $core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $image_name;
 
 				// thumbs
 				$thumb_newname = $thumbs_dir.$image_name;
 				$img->fromFile($_FILES['photos']['tmp_name'][$name])->resize(350, null)->toFile($thumb_newname);
+
+				// if it's a gif, we need a static version to switch to a gif
+				$gif_static_button = '';
+				if ($ext == 'gif')
+				{
+					$static_pic = $uploaddir.$new_image_name.'_static.jpg';
+					$img->fromFile($_FILES['photos']['tmp_name'][$name])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($static_pic, 'image/jpeg');
+
+					$static_url = $core->config('website_url') . 'uploads/articles/article_images/'.$new_image_name.'_static.jpg';
+					$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
+				}			
 				
 				if (move_uploaded_file($_FILES['photos']['tmp_name'][$name], $main_newname))
 				{
@@ -56,7 +71,8 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					{
 						$article_id = $_POST['article_id'];
 					}
-					$new_image = $dbl->run("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?", [$image_name, $_SESSION['user_id'], core::$date, $article_id]);
+
+					$new_image = $dbl->run("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?, `filetype` = ?", [$image_name, $_SESSION['user_id'], core::$date, $article_id, $ext]);
 					$image_id = $new_image->new_id();
 
 					// if they aren't adding the image to an existing article, store it in the session
@@ -67,13 +83,10 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						$_SESSION['uploads'][$image_id]['image_rand'] = $_SESSION['image_rand'];
 					}
 
-					$main_url = $core->config('website_url') . 'uploads/articles/article_images/' . $image_name;
-					$thumb_url = $core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $image_name;
-
 					echo '<div class="box">
 					<div class="body group">
 					<div id="'.$image_id.'"><img src="' . $thumb_url . '" class="imgList"><br />
-					URL: <input id="img' . $image_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $image_id . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $image_id . '" class="trash">Delete image</button>
+					URL: <input id="img' . $image_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $image_id . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $image_id . '" class="trash">Delete image</button>
 					</div>
 					</div>
 					</div>';

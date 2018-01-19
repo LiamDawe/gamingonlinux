@@ -1273,6 +1273,14 @@ jQuery(document).ready(function()
 		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+big_image+'" data-fancybox="images"><img src="'+thumbnail+'" /></a></p>');
 	});
 
+	// static image for a gif
+	$(document).on('click', ".uploads .add_static_button", function(e) 
+	{
+		var actual_gif = $(this).data('url-gif');
+		var static_image = $(this).data('url-static');
+		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+actual_gif+'" class="img_anim" target="_blank"><img src="'+static_image+'" /></a></p>');
+	});
+
 	// approving submitted article as yourself (if you re-wrote large portions)
 	$(document).on('click', "#self-submit", function(e) 
 	{
@@ -1616,5 +1624,28 @@ jQuery(document).ready(function()
 	  cache: true,
 	},
 	minimumInputLength: 2
+	});
+
+	var static_suffix = "_static.jpg";
+	var gif_suffix = ".gif";
+	$(document).on('click', ".img_anim", function(e)
+	{
+		e.preventDefault();
+
+		var actual_gif = $(this).attr("href");
+		var image = $(this).find('img:first-child');
+		var image_src = $(this).find('img:first-child').attr("src");
+
+		// if it's static, turn it to a gif
+		if (image_src.indexOf('jpg') !== -1)
+		{
+			image.attr("src", image_src.replace(static_suffix, gif_suffix));
+		}
+		// if it's a gif, turn it static
+		else
+		{
+			image.attr("src", image_src.replace(gif_suffix, static_suffix));
+		}	  
+		
 	});
 });

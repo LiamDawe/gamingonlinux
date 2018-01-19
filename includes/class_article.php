@@ -91,7 +91,7 @@ class article
 		if ($article_id != NULL)
 		{
 			// add in uploaded images from database
-			$article_images = $this->dbl->run("SELECT `filename`,`id` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
+			$article_images = $this->dbl->run("SELECT `filename`,`id`,`filetype` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
 
 			foreach($article_images as $value)
 			{
@@ -100,6 +100,14 @@ class article
 				
 				$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $value['filename'];
 				$thumb_path = APP_ROOT . '/uploads/articles/article_images/thumbs/' . $value['filename'];
+
+				$gif_static_button = '';
+				if ($value['filetype'] == 'gif')
+				{
+					$static_filename = str_replace('.gif', '_static.jpg', $value['filename']);
+					$static_url = $this->core->config('website_url') . 'uploads/articles/article_images/' . $static_filename;
+					$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
+				}
 								        
 				// for old uploads where no thumbnail was made, make one
 				if (!file_exists($thumb_path) && file_exists($main_path))
@@ -113,7 +121,7 @@ class article
 				$previously_uploaded .= '<div class="box">
 				<div class="body group">
 				<div id="'.$value['id'].'"><img src="' . $thumb_url . '" class="imgList"><br />
-				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $value['id'] . '" class="trash">Delete image</button>
+				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $value['id'] . '" class="trash">Delete image</button>
 				</div>
 				</div>
 				</div>';

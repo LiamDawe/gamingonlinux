@@ -1639,7 +1639,22 @@ jQuery(document).ready(function()
 		// if it's static, turn it to a gif
 		if (image_src.indexOf('jpg') !== -1)
 		{
-			image.attr("src", image_src.replace(static_suffix, gif_suffix));
+			image.css({ opacity: 0.3 });
+			var $overlay = $('<div class="gif-loader"></div>');
+			$overlay.css({
+				position: "relative",
+				display: "inline-block",
+				width: image.width(),
+				height: image.height(),
+				backgroundPosition: "center center",
+				backgroundImage: "url(/templates/default/images/bigloader.gif)",
+				backgroundRepeat: "no-repeat"
+			});
+			image.wrap($overlay);
+			$('<img src="'+ actual_gif +'">').on('load', function()
+			{
+				image.closest(".gif-loader").replaceWith('<img src="'+actual_gif+'" />');
+			});
 		}
 		// if it's a gif, turn it static
 		else

@@ -95,17 +95,17 @@ class article
 
 			foreach($article_images as $value)
 			{
-				$main_url = $this->core->config('website_url') . 'uploads/articles/article_images/' . $value['filename'];
-				$main_path = APP_ROOT . '/uploads/articles/article_images/' . $value['filename'];
+				$main_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $value['filename'];
+				$main_path = APP_ROOT . '/uploads/articles/article_media/' . $value['filename'];
 				
-				$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $value['filename'];
-				$thumb_path = APP_ROOT . '/uploads/articles/article_images/thumbs/' . $value['filename'];
+				$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
+				$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
 
 				$gif_static_button = '';
 				if ($value['filetype'] == 'gif')
 				{
 					$static_filename = str_replace('.gif', '_static.jpg', $value['filename']);
-					$static_url = $this->core->config('website_url') . 'uploads/articles/article_images/' . $static_filename;
+					$static_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $static_filename;
 					$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
 				}
 								        
@@ -136,8 +136,8 @@ class article
 				{
 					if ($key['image_rand'] == $_SESSION['image_rand'])
 					{
-						$main_url = $this->core->config('website_url') . 'uploads/articles/article_images/' . $key['image_name'];
-						$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $key['image_name'];
+						$main_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $key['image_name'];
+						$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $key['image_name'];
 						
 						$previously_uploaded .= '<div class="box uploads">
 						<div class="body group">
@@ -215,7 +215,7 @@ class article
 		$res = $this->dbl->run("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
 		foreach ($res as $image_search)
 		{
-			unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_images/' . $image_search['filename']);
+			unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_media/' . $image_search['filename']);
 		}
 
 		$this->dbl->run("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));

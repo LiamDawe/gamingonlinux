@@ -24,15 +24,15 @@ function getExtension($str)
          return $ext;
 }
 
-$valid_formats = array("jpg", "png", "gif", "jpeg", "svg");
+$valid_formats = array("jpg", "png", "gif", "jpeg", "svg", 'mp4', 'webm');
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 {
-	$uploaddir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/articles/article_images/";
-	$thumbs_dir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/articles/article_images/thumbs/";
-	foreach ($_FILES['photos']['name'] as $name => $value)
+	$uploaddir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/articles/article_media/";
+	$thumbs_dir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/articles/article_media/thumbs/";
+	foreach ($_FILES['media']['name'] as $name => $value)
 	{
-		$filename = stripslashes($_FILES['photos']['name'][$name]);
-		$size=filesize($_FILES['photos']['tmp_name'][$name]);
+		$filename = stripslashes($_FILES['media']['name'][$name]);
+		$size=filesize($_FILES['media']['tmp_name'][$name]);
 		//get the extension of the file in a lower case format
 		$ext = getExtension($filename);
 		$ext = strtolower($ext);
@@ -46,25 +46,25 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				$image_name = $new_image_name.'.'.$ext;
 				$main_newname = $uploaddir.$image_name; //Check / delete file it exists
 
-				$main_url = $core->config('website_url') . 'uploads/articles/article_images/' . $image_name;
-				$thumb_url = $core->config('website_url') . 'uploads/articles/article_images/thumbs/' . $image_name;
+				$main_url = $core->config('website_url') . 'uploads/articles/article_media/' . $image_name;
+				$thumb_url = $core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $image_name;
 
 				// thumbs
 				$thumb_newname = $thumbs_dir.$image_name;
-				$img->fromFile($_FILES['photos']['tmp_name'][$name])->resize(350, null)->toFile($thumb_newname);
+				$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(350, null)->toFile($thumb_newname);
 
 				// if it's a gif, we need a static version to switch to a gif
 				$gif_static_button = '';
 				if ($ext == 'gif')
 				{
 					$static_pic = $uploaddir.$new_image_name.'_static.jpg';
-					$img->fromFile($_FILES['photos']['tmp_name'][$name])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($static_pic, 'image/jpeg');
+					$img->fromFile($_FILES['media']['tmp_name'][$name])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($static_pic, 'image/jpeg');
 
-					$static_url = $core->config('website_url') . 'uploads/articles/article_images/'.$new_image_name.'_static.jpg';
+					$static_url = $core->config('website_url') . 'uploads/articles/article_media/'.$new_image_name.'_static.jpg';
 					$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
 				}			
 				
-				if (move_uploaded_file($_FILES['photos']['tmp_name'][$name], $main_newname))
+				if (move_uploaded_file($_FILES['media']['tmp_name'][$name], $main_newname))
 				{
 					$article_id = 0;
 					if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))

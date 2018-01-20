@@ -15,12 +15,12 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 	$result = $dbl->run($qry2, array($_POST['image_id']));
 	if(isset($result))
 	{
-		if(unlink(APP_ROOT . '/uploads/articles/article_images/' . $grabber['filename']) && unlink(APP_ROOT . '/uploads/articles/article_images/thumbs/' . $grabber['filename']))
+		if(unlink(APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename']) && unlink(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']))
 		{
 			if ($grabber['filetype'] == 'gif')
 			{
 				$static_filename = str_replace('.gif', '_static.jpg', $grabber['filename']);
-				unlink(APP_ROOT . '/uploads/articles/article_images/' . $static_filename);
+				unlink(APP_ROOT . '/uploads/articles/article_media/' . $static_filename);
 			}
 			unset($_SESSION['uploads'][$grabber['id']]);
 			echo "YES";

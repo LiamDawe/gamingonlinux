@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 

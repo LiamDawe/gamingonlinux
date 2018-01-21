@@ -11,15 +11,16 @@ CKEDITOR.plugins.add( 'html5video', {
              *  - div-s with text-align,float,margin-left,margin-right inline style rules and required ckeditor-html5-video class.
              *  - video tags with src, controls, width and height attributes.
              */
-            allowedContent: 'div[data-responsive](!ckeditor-html5-video){text-align,float,margin-left,margin-right}; video[src,controls,autoplay,width, height]{max-width,height};',
-            requiredContent: 'div(ckeditor-html5-video); video[src,controls];',
+            allowedContent: 'div[data-responsive](!ckeditor-html5-video){text-align,float,margin-left,margin-right}; video[src,controls,autoplay,width,height,loop]{max-width,height};',
+            requiredContent: 'div(ckeditor-html5-video); video[src,controls,loop];',
             upcast: function( element ) {
                 return element.name === 'div' && element.hasClass( 'ckeditor-html5-video' );
             },
             dialog: 'html5video',
             init: function() {
                 var src = '';
-                var autoplay = '';
+				var autoplay = '';
+				var loop = '';
                 var align = this.element.getStyle( 'text-align' );
 
                 var width = '';
@@ -31,7 +32,8 @@ CKEDITOR.plugins.add( 'html5video', {
                     src = this.element.getChild( 0 ).getAttribute( 'src' );
                     width = this.element.getChild( 0 ).getAttribute( 'width' );
                     height = this.element.getChild( 0 ).getAttribute( 'height' );
-                    autoplay = this.element.getChild( 0 ).getAttribute( 'autoplay' );
+					autoplay = this.element.getChild( 0 ).getAttribute( 'autoplay' );
+					loop = this.element.getChild( 0 ).getAttribute( 'loop' );
 										responsive = this.element.getAttribute( 'data-responsive' );
                 }
 
@@ -54,6 +56,10 @@ CKEDITOR.plugins.add( 'html5video', {
 
                     if ( autoplay ) {
                         this.setData( 'autoplay', 'yes' );
+					}
+					
+                    if ( loop ) {
+                        this.setData( 'loop', 'yes' );
                     }
 										
                     if ( responsive ) {
@@ -110,6 +116,11 @@ CKEDITOR.plugins.add( 'html5video', {
                         this.element.getChild( 0 ).setAttribute( 'autoplay', 'autoplay' );
                     } else {
                         this.element.getChild( 0 ).removeAttribute( 'autoplay' );
+					}
+                    if ( this.data.loop === 'yes' ) {
+                        this.element.getChild( 0 ).setAttribute( 'loop' );
+                    } else {
+                        this.element.getChild( 0 ).removeAttribute( 'loop' );
                     }
                 }
             }

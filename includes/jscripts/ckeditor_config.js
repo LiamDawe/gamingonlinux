@@ -54,6 +54,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.extraPlugins = 'widgetselection';
 	config.extraPlugins = 'lineutils';
 	config.extraPlugins = 'html5audio';
+	config.extraPlugins = 'html5video';
 	
 	config.linkShowTargetTab = false
 };

@@ -1262,7 +1262,15 @@ jQuery(document).ready(function()
 	$(document).on('click', ".uploads .add_button", function(e) 
 	{
 		var text = $(this).data('url');
-		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+text+'" data-fancybox="images"><img src="'+text+'" /></a></p>');
+		var type = $(this).data('type');
+		if (type == 'video')
+		{
+			CKEDITOR.instances.ckeditor_gol.insertHtml('<div class="ckeditor-html5-video" style="text-align: center;"><video controls="controls" src="'+text+'">&nbsp;</video></div>');
+		}
+		else
+		{
+			CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+text+'" data-fancybox="images"><img src="'+text+'" /></a></p>');
+		}
 	});
 	
 	// thumbnail insertion

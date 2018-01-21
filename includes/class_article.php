@@ -97,31 +97,45 @@ class article
 			{
 				$main_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $value['filename'];
 				$main_path = APP_ROOT . '/uploads/articles/article_media/' . $value['filename'];
-				
-				$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
-				$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
-
 				$gif_static_button = '';
-				if ($value['filetype'] == 'gif')
+				$thumbnail_button = '';
+				$data_type = '';
+
+				if ($value['filetype'] != 'mp4' && $value['filetype'] != 'webm')
 				{
-					$static_filename = str_replace('.gif', '_static.jpg', $value['filename']);
-					$static_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $static_filename;
-					$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
+					$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
+					$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
+	
+					if ($value['filetype'] == 'gif')
+					{
+						$static_filename = str_replace('.gif', '_static.jpg', $value['filename']);
+						$static_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $static_filename;
+						$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
+					}
+											
+					// for old uploads where no thumbnail was made, make one
+					if (!file_exists($thumb_path) && file_exists($main_path))
+					{
+						include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
+						
+						$img = new SimpleImage();
+						$img->fromFile($main_path)->resize(350, null)->toFile($thumb_path);					
+					}
+					$thumbnail_button = '<button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button>';
+
+					$preview_file = '<img src="' . $thumb_url . '" class="imgList"><br />';
+					$data_type = 'image';
 				}
-								        
-				// for old uploads where no thumbnail was made, make one
-				if (!file_exists($thumb_path) && file_exists($main_path))
+				else
 				{
-					include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
-					
-					$img = new SimpleImage();
-					$img->fromFile($main_path)->resize(350, null)->toFile($thumb_path);					
+					$preview_file = '<video width="100%" src="'.$main_url.'" controls></video>';
+					$data_type = 'video';
 				}
         
 				$previously_uploaded .= '<div class="box">
 				<div class="body group">
-				<div id="'.$value['id'].'"><img src="' . $thumb_url . '" class="imgList"><br />
-				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $value['id'] . '" class="trash">Delete image</button>
+				<div id="'.$value['id'].'">'.$preview_file.'
+				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" class="add_button">Insert</button> '.$thumbnail_button.' <button id="' . $value['id'] . '" class="trash">Delete Media</button>
 				</div>
 				</div>
 				</div>';

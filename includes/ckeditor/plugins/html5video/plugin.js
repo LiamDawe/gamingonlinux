@@ -1,6 +1,6 @@
 CKEDITOR.plugins.add( 'html5video', {
     requires: 'widget',
-    lang: 'de,en,eu,es,ru,uk,fr',
+    lang: 'en',
     icons: 'html5video',
     init: function( editor ) {
         editor.widgets.add( 'html5video', {
@@ -118,7 +118,7 @@ CKEDITOR.plugins.add( 'html5video', {
                         this.element.getChild( 0 ).removeAttribute( 'autoplay' );
 					}
                     if ( this.data.loop === 'yes' ) {
-                        this.element.getChild( 0 ).setAttribute( 'loop' );
+                        this.element.getChild( 0 ).setAttribute( 'loop', 'loop' );
                     } else {
                         this.element.getChild( 0 ).removeAttribute( 'loop' );
                     }

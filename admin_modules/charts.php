@@ -109,8 +109,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			
 			$templating->block('chart', 'admin_modules/admin_module_charts');
 			$templating->set('chart_name', $chart_info['name']);
-			
-			$templating->set('chart', $charts->render(NULL, ['id' => $chart_id]));
+
+			$templating->set('chart', $charts->render(NULL, ['id' => $chart_id]) . $charts->render(['filetype' => 'png'], ['id' => $chart_id]));
 			
 			$enabled_check = '';
 			if ($chart_info['enabled'] == 1)

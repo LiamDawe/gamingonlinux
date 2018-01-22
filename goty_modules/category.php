@@ -46,27 +46,27 @@ if ($core->config('goty_finished') == 1)
 	$templating->set('category_id', $_GET['category_id']);
 	$templating->set('category_name', $cat['category_name']);
 
-	$games_top = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `$item_table` c WHERE g.`accepted` = 1  AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 3", array($_GET['category_id']))->fetch_all();
+	$games_top = $dbl->run("SELECT coalesce(cl.name, d.name) name, g.`votes` as data, g.`id` FROM `goty_games` g left outer join `calendar` cl ON cl.id = g.game_id and g.category_id != 16 left outer join `developers` d ON d.id = g.game_id and g.category_id = 16 WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 3", array($_GET['category_id']))->fetch_all();
+
+	// work out the games total %
+	$category_total_votes = 0;
+	$total_res = $dbl->run("SELECT `votes` FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']))->fetch_all();
+	foreach ($total_res as $total)
+	{
+		$category_total_votes = $category_total_votes + $total['votes'];
+	}
 
 	foreach ($games_top as $game)
 	{
 		$templating->block('top_row', 'goty');
 		$templating->set('category_id', $_GET['category_id']);
 		$templating->set('game_name', $game['name']);
-		$templating->set('game_counter', $game['votes']);
+		$templating->set('game_counter', $game['data']);
 		$templating->set('game_id', $game['id']);
 		$templating->set('url', $core->config('website_url'));
 		$templating->set('vote_button', '');
 
-		// work out the games total %
-		$total = $dbl->run("SELECT `votes` FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']))->fetch_all();
-
-		$total_votes = 0;
-		foreach ($total as $votes)
-		{
-			$total_votes = $total_votes + $votes['votes'];
-		}
-		$total_perc = round($game['votes'] / $total_votes * 100);
+		$total_perc = round($game['data'] / $category_total_votes * 100);
 
 		$leaderboard = 'Leaderboard: <div style="background:#CCCCCC; border:1px solid #666666;"><div style="padding-left: 5px; background: #28B8C0; width:'.$total_perc.'%;">'.$total_perc.'%</div></div>';
 

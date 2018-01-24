@@ -810,7 +810,10 @@ else if (isset($_POST['act']))
 
 			$name = $dbl->run("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']))->fetchOne();
 
-			$core->message("Forum permissions for {$name} updated! <a href=\"admin.php?module=forum&view=permissions&forum_id={$_POST['forum_id']}\">Click here to edit again</a>.");
+			$_SESSION['message'] = 'permissions_updated';
+			$_SESSION['message_extra'] = $name;
+			header("Location: /admin.php?module=forum&view=permissions&forum_id=".$_POST['forum_id']);
+			die();
 		}
 	}
 }

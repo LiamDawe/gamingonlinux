@@ -7,7 +7,7 @@ return [
 	"permissions_updated" =>
 	[
 		"text" => "Forum permissions for %s updated!",
-		"additional" => 1
+		"additions" => 1
 	]
 ];
 ?>

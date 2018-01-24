@@ -5,8 +5,6 @@ define("APP_ROOT", dirname (dirname ( dirname(__FILE__) )));
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-$charts = new charts($dbl);
-
 $preview_data = [];
 
 $grouped = 0;
@@ -110,4 +108,8 @@ if (isset($_POST['order_by_data']))
 	});
 }
 
+$charts = new charts($dbl);
+
 echo $charts->render(NULL, ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data, 'h_label' => $_POST['h_label']]);
+
+echo $charts->render(['filetype' => 'png'], ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data, 'h_label' => $_POST['h_label']]);

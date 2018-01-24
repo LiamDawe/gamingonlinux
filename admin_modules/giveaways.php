@@ -9,10 +9,10 @@ if (isset($_GET['message']))
 	}
 }
 
-$templating->block('giveaway_add', 'admin_modules/giveaways');
-
 if (!isset($_GET['manage']))
 {
+	$templating->block('giveaway_add', 'admin_modules/giveaways');
+
 	$templating->block('manage_top', 'admin_modules/giveaways');
 
 	$current_res = $dbl->run("SELECT `id`, `game_name` FROM `game_giveaways` ORDER BY `date_created` DESC")->fetch_all();
@@ -27,6 +27,8 @@ else if (isset($_GET['manage']))
 {
 	$giveaway = $dbl->run("SELECT `game_name` FROM `game_giveaways` WHERE `id` = ?", array($_GET['manage']))->fetch();
 
+	$templating->block('breadcrumb');
+	$templating->set('name', $giveaway['game_name']);
 	$templating->block('key_list_top');
 	$templating->set('name', $giveaway['game_name']);
 
@@ -34,6 +36,7 @@ else if (isset($_GET['manage']))
 
 	$templating->set('claimed', $key_totals['claimed']);
 	$templating->set('total', $key_totals['total']);
+	$templating->set('id', $_GET['manage']);
 
 	$keys_res = $dbl->run("SELECT k.`game_key`, k.`claimed`, u.`user_id`, u.`username` FROM `game_giveaways_keys` k LEFT JOIN `users` u ON u.`user_id` = k.`claimed_by_id` WHERE k.`game_id` = ? ORDER BY k.`claimed` DESC", array($_GET['manage']))->fetch_all();
 	foreach ($keys_res as $keys)
@@ -54,9 +57,15 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
-		if (empty($_POST['list']))
+		$name = trim($_POST['name']);
+		$list = $_POST['list'];
+		$check_empty = core::mempty(compact('name', 'list'));
+		if ($check_empty !== true)
 		{
-			$core->message('You must enter at least one key!');
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $check_empty;
+			header("Location: /admin.php?module=giveaways");
+			die();
 		}
 
 		else
@@ -73,8 +82,33 @@ if (isset($_POST['act']))
 				$dbl->run("INSERT INTO `game_giveaways_keys` SET `game_id` = ?, `game_key` = ?", array($new_id, $the_key));
 			}
 
-			header("Location: /admin.php?module=giveaways&message=added");
+			$_SESSION['message'] = 'saved';
+			$_SESSION['message_extra'] = 'giveaway';
+			header("Location: /admin.php?module=giveaways");
+			die();
 		}
+	}
+	if ($_POST['act'] == 'add_more')
+	{
+		if (empty($_POST['list']))
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'key list';
+			header("Location: /admin.php?module=giveaways&manage=".$_POST['id']);
+			die();
+		}
+		// get the keys asked for
+		$list = preg_split('/(\\n|\\r)/', $_POST['list'], -1, PREG_SPLIT_NO_EMPTY);
+
+		foreach ($list as $the_key)
+		{
+			// make the category
+			$dbl->run("INSERT INTO `game_giveaways_keys` SET `game_id` = ?, `game_key` = ?", array($_POST['id'], $the_key));
+		}		
+
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'key list';
+		header("Location: /admin.php?module=giveaways&manage=".$_POST['id']);
 	}
 }
 ?>

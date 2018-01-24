@@ -12,8 +12,17 @@
 </div>
 [/block: giveaway_add]
 
+[block: breadcrumb]
+<div class="box">
+	<ul class="breadcrumb">
+		<li><a href="/admin.php?module=giveaways">Back to giveaway list</a></li>
+		<li class="active">{:name}</li>
+	</ul>
+</div>
+[/block: breadcrumb]
+
 [block: manage_top]
-<div class="box"><div class="head">Manage current giveaways NOT FINISHED</div></div>
+<div class="box"><div class="head">Manage current giveaways</div></div>
 [/block: manage_top]
 
 [block: row]
@@ -25,7 +34,18 @@
 	<div class="head">Managing keys for "{:name}"</div>
 	<div class="body group">Claimed: {:claimed}/{:total}</div>
 </div>
-<div class="box"><div class="head">Key list</div></div>
+<div class="box">
+	<div class="head">Add more keys!</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=giveaways">
+			Game keys, put each one on a new line.<br />
+			<textarea name="list" cols="100" rows="10"></textarea><br />
+			<input type="hidden" name="id" value="{:id}" />
+			<button type="submit" name="act" value="add_more">Add</button>
+		</form>
+	</div>
+</div>
+<div class="box"><div class="head">Current key list</div></div>
 [/block: key_list_top]
 
 [block: key_row]

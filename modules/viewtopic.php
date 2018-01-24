@@ -653,8 +653,12 @@ else
 
 				if ($options_count > 0)
 				{
-					$options_form .= "<form method=\"post\" action=\"/index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}&forum_id={$topic['forum_id']}&author_id={$topic['author_id']}\"><strong>Standalone Moderator Options</strong><br />
-					<select name=\"moderator_options\"><option value=\"\"></option>" . $options . "</select><br /><input type=\"submit\" name=\"act\" value=\"Go\" class=\"button\" /></form>";
+					$options_form .= '<form method="post" action="/index.php?module=viewtopic&topic_id='.$_GET['topic_id'].'"><strong>Standalone Moderator Options</strong><br />
+					<select name="moderator_options"><option value=""></option>' . $options . '</select><br />
+					<button type="submit" name="act" value="Go">Go</button>
+					<input type="hidden" name="forum_id" value="'.$topic['forum_id'].'" />
+					<input type="hidden" name="author_id" value="'.$topic['author_id'].'" />
+					</form>';
 					$templating->block('options', 'viewtopic');
 					$templating->set('standalone_moderator_options', $options_form);
 				}
@@ -867,144 +871,203 @@ else
 	else if (isset($_POST['act']) && $_POST['act'] == 'Go')
 	{
 		$mod_sql = '';
-		if (!empty($_POST['moderator_options']) && $user->check_group([1,2]) == true)
+		$parray = $forum_class->forum_permissions($_POST['forum_id']);
+		if (!empty($_POST['moderator_options']))
 		{
 			if ($_POST['moderator_options'] == 'Move')
 			{
-				if (!isset($_POST['new_forum']))
+				if ($parray['can_move'] == 1)
 				{
-					$templating->block('move');
-
-					$options = '';
-					$res = $dbl->run("SELECT `forum_id`, `name` FROM `forums` WHERE `forum_id` <> ? AND `is_category` = 0", array($_GET['forum_id']))->fetch_all();
-					foreach ($res as $forums)
+					if (!isset($_POST['new_forum']))
 					{
-						$options .= "<option value=\"{$forums['forum_id']}\">{$forums['name']}</option>";
+						$templating->block('move');
+
+						$options = '';
+						$res = $dbl->run("SELECT `forum_id`, `name` FROM `forums` WHERE `forum_id` <> ? AND `is_category` = 0", array($_POST['forum_id']))->fetch_all();
+						foreach ($res as $forums)
+						{
+							$options .= "<option value=\"{$forums['forum_id']}\">{$forums['name']}</option>";
+						}
+
+						$templating->set('options', $options);
+						$templating->set('topic_id', $_GET['topic_id']);
+						$templating->set('old_forum_id', $_POST['forum_id']);
+						$templating->set('author_id', $_POST['author_id']);
 					}
 
-					$templating->set('options', $options);
-					$templating->set('topic_id', $_GET['topic_id']);
-					$templating->set('old_forum_id', $_GET['forum_id']);
-					$templating->set('author_id', $_GET['author_id']);
-				}
+					else
+					{
+						// count all the posts
+						$total_count = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
+						$total_count = $total_count + 1;
 
+						// remove count from current forum
+						$dbl->run("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $_POST['old_forum_id']));
+
+						// add to new forum
+						$dbl->run("UPDATE `forums` SET `posts` = (posts + ?) WHERE `forum_id` = ?", array($total_count, $_POST['new_forum']));
+
+						// update the topic
+						$dbl->run("UPDATE `forum_topics` SET `forum_id` = ? WHERE `topic_id` = ?", array($_POST['new_forum'], $_GET['topic_id']));
+
+						// finally check if this is the latest topic we are moving to update the latest topic info for the previous forum
+						$last_post = $dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
+
+						// if it is then we need to get the *now* newest topic and update the forums info
+						if ($last_post['last_post_topic_id'] == $_GET['topic_id'])
+						{
+							$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
+
+							$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['old_forum_id']));
+						}
+
+						// now we need to check if the topic being moved is newer than the new forums last post and update if needed
+						$last_post_new = $dbl->run("SELECT `last_post_time` FROM `forums` WHERE `forum_id` = ?", array($_POST['new_forum']))->fetch();
+
+						$last_post_topic = $dbl->run("SELECT `last_post_date` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
+
+						//
+						if ($last_post_topic['last_post_date'] > $last_post_new['last_post_time'])
+						{
+							$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
+
+							$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['new_forum']));
+						}
+
+						// add to editor tracking
+						$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?, `type` = 'moved_forum_topic'", array($_SESSION['user_id'], core::$date, core::$date, $new_comment_id));
+
+						$core->message("The topic has been moved! Options: <a href=\"index.php?module=viewforum&amp;forum_id={$_POST['new_forum']}\">View Forum</a> or <a href=\"index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}\">View Topic</a>");
+					}
+				}
 				else
 				{
-					// count all the posts
-					$total_count = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
-					$total_count = $total_count + 1;
-
-					// remove count from current forum
-					$dbl->run("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $_POST['old_forum_id']));
-
-					// add to new forum
-					$dbl->run("UPDATE `forums` SET `posts` = (posts + ?) WHERE `forum_id` = ?", array($total_count, $_POST['new_forum']));
-
-					// update the topic
-					$dbl->run("UPDATE `forum_topics` SET `forum_id` = ? WHERE `topic_id` = ?", array($_POST['new_forum'], $_GET['topic_id']));
-
-					// finally check if this is the latest topic we are moving to update the latest topic info for the previous forum
-					$last_post = $dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
-
-					// if it is then we need to get the *now* newest topic and update the forums info
-					if ($last_post['last_post_topic_id'] == $_GET['topic_id'])
-					{
-						$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
-
-						$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['old_forum_id']));
-					}
-
-					// now we need to check if the topic being moved is newer than the new forums last post and update if needed
-					$last_post_new = $dbl->run("SELECT `last_post_time` FROM `forums` WHERE `forum_id` = ?", array($_POST['new_forum']))->fetch();
-
-					$last_post_topic = $dbl->run("SELECT `last_post_date` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
-
-					//
-					if ($last_post_topic['last_post_date'] > $last_post_new['last_post_time'])
-					{
-						$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
-
-						$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['new_forum']));
-					}
-
-					// add to editor tracking
-					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?, `type` = 'moved_forum_topic'", array($_SESSION['user_id'], core::$date, core::$date, $new_comment_id));
-
-					$core->message("The topic has been moved! Options: <a href=\"index.php?module=viewforum&amp;forum_id={$_POST['new_forum']}\">View Forum</a> or <a href=\"index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}\">View Topic</a>");
+					$topic_link = $forum_class->get_link($_GET['topic_id']);
+					$_SESSION['message'] = 'no_permission_mod';
+					header("Location: " . $topic_link);
+					die();
 				}
 			}
 
 			else
 			{
+				$proceed = 0;
 				if ($_POST['moderator_options'] == 'sticky')
 				{
-					$mod_sql = '`is_sticky` = 1';
-					$action = 'Stuck';
-					$sql_type = 'stuck_forum_topic';
+					if ($parray['can_sticky'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_sticky` = 1';
+						$action = 'Stuck';
+						$sql_type = 'stuck_forum_topic';
+					}
 				}
 
 				if ($_POST['moderator_options'] == 'unsticky')
 				{
-					$mod_sql = '`is_sticky` = 0';
-					$action = 'Unstuck';
-					$sql_type = 'unstuck_forum_topic';
+					if ($parray['can_sticky'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_sticky` = 0';
+						$action = 'Unstuck';
+						$sql_type = 'unstuck_forum_topic';
+					}
 				}
 
 				if ($_POST['moderator_options'] == 'lock')
 				{
-					$mod_sql = '`is_locked` = 1';
-					$action = 'Locked';
-					$sql_type = 'locked_forum_topic';
+					if ($parray['can_lock'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_locked` = 1';
+						$action = 'Locked';
+						$sql_type = 'locked_forum_topic';
+					}
 				}
 
 				if ($_POST['moderator_options'] == 'unlock')
 				{
-					$mod_sql = '`is_locked` = 0';
-					$action = 'Unlocked';
-					$sql_type = 'unlocked_forum_topic';
+					if ($parray['can_lock'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_locked` = 0';
+						$action = 'Unlocked';
+						$sql_type = 'unlocked_forum_topic';
+					}
 				}
 
 				if ($_POST['moderator_options'] == 'bothunlock')
 				{
-					$mod_sql = '`is_locked` = 0,`is_sticky` = 1';
-					$action = 'Unlocked and Stuck';
-					$sql_type = 'unlocked_stuck_forum_topic';
+					if ($parray['can_lock'] == 1 && $parray['can_sticky'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_locked` = 0,`is_sticky` = 1';
+						$action = 'Unlocked and Stuck';
+						$sql_type = 'unlocked_stuck_forum_topic';
+					}
 				}
 
 				if ($_POST['moderator_options'] == 'bothunsticky')
 				{
-					$mod_sql = '`is_locked` = 1,`is_sticky` = 0';
-					$action = 'Locked and Unstuck';
-					$sql_type = 'locked_unstuck_forum_topic';
+					if ($parray['can_lock'] == 1 && $parray['can_sticky'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_locked` = 1,`is_sticky` = 0';
+						$action = 'Locked and Unstuck';
+						$sql_type = 'locked_unstuck_forum_topic';
+					}
 				}
 
 				if ($_POST['moderator_options'] == 'bothundo')
 				{
-					$mod_sql = '`is_locked` = 0,`is_sticky` = 0';
-					$action = 'Unlocked and Unstuck';
-					$sql_type = 'unlocked_unstuck_forum_topic';
+					if ($parray['can_lock'] == 1 && $parray['can_sticky'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_locked` = 0,`is_sticky` = 0';
+						$action = 'Unlocked and Unstuck';
+						$sql_type = 'unlocked_unstuck_forum_topic';
+					}
 				}
 
 				if ($_POST['moderator_options'] == 'both')
 				{
-					$mod_sql = '`is_locked` = 1,`is_sticky` = 1';
-					$action = 'Locked and Stuck';
-					$sql_type = 'locked_stuck_forum_topic';
+					if ($parray['can_lock'] == 1 && $parray['can_sticky'] == 1)
+					{
+						$proceed = 1;
+						$mod_sql = '`is_locked` = 1,`is_sticky` = 1';
+						$action = 'Locked and Stuck';
+						$sql_type = 'locked_stuck_forum_topic';
+					}
 				}
 
-				// do the lock/stick action
-				$dbl->run("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
+				if ($proceed == 1)
+				{
+					// do the lock/stick action
+					$dbl->run("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
 
-				// add to editor tracking
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `created_date` = ?, `completed` = 1, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $sql_type, core::$date, core::$date, $_GET['topic_id']));
+					// add to editor tracking
+					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `created_date` = ?, `completed` = 1, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $sql_type, core::$date, core::$date, $_GET['topic_id']));
 
-				$core->message("You have {$action} the topic! <a href=\"/forum/topic/{$_GET['topic_id']}\">Click here to return.</a>");
+					$_SESSION['message'] = 'mod_action_done';
+					$_SESSION['message_extra'] = $action;	
+				}
+				else
+				{
+					$_SESSION['message'] = 'no_permission_mod';				
+				}
+				
+				$topic_link = $forum_class->get_link($_GET['topic_id']);
+				header("Location: " . $topic_link);
+				die();
 			}
 		}
 
-		else if (!empty($_POST['moderator_options']))
+		else if (empty($_POST['moderator_options']))
 		{
-			$core->message('You must select an action to perform if you wish to do one!');
+			$topic_link = $forum_class->get_link($_GET['topic_id']);
+			$_SESSION['message'] = 'no_mod_option_picked';
+			header("Location: " . $topic_link);
+			die();
 		}
 	}
 }

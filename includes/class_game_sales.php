@@ -445,7 +445,7 @@ class game_sales
 			$link_extra = '&' . implode('&', $options_link);
 		}
 
-		$pagination = $this->core->pagination_link(50, $total_rows, 'sales.php?', $page + 1, $link_extra);
+		$pagination = $this->core->pagination_link(50, $total_rows, '/sales.php?', $page + 1, $link_extra);
 
 		if ($pagination != '')
 		{

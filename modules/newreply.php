@@ -7,7 +7,7 @@ if ($core->config('forum_posting_open') == 1)
 	$forum_id = (int) $_GET['forum_id'];
 	$topic_id = (int) $_GET['topic_id'];
 
-	$forum_class->forum_permissions($forum_id);
+	$parray = $forum_class->forum_permissions($forum_id);
 
 	$name = $dbl->run("SELECT t.`topic_title`, t.`replys`, t.`is_locked`, t.`is_sticky`, f.`name`, f.`forum_id` FROM `forum_topics` t JOIN `forums` f ON t.`forum_id` = f.`forum_id` WHERE topic_id = ?", array($topic_id))->fetch();
 

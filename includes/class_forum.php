@@ -85,7 +85,7 @@ class forum
 			die();
 		}
 
-		$this->forum_permissions($_GET['forum_id']);
+		$parray = $this->forum_permissions($_GET['forum_id']);
 		if ($parray['can_delete'] == 0 || !isset($parray['can_delete']))
 		{
 			header('Location: ' . $return_page_no);
@@ -198,7 +198,7 @@ class forum
 			die();
 		}
 
-		$this->forum_permissions($_GET['forum_id']);
+		$parray = $this->forum_permissions($_GET['forum_id']);
 		if ($parray['can_delete'] == 0 || !isset($parray['can_delete']))
 		{
 			header('Location: ' . $return_page_no);
@@ -288,11 +288,10 @@ class forum
 		}
 		return $this->core->config('website_url') . $link;
 	}
+
 	// check user forum permissions
 	function forum_permissions($forum_id)
 	{
-		global $parray;
-
 		$group_ids = $this->user->get_user_groups();
 		
 		// placeholder for forum id, then for user groups
@@ -345,6 +344,8 @@ class forum
 				}
 			}
 		}
+
+		return $parray;
 	}
 }
 ?>

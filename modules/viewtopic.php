@@ -83,7 +83,7 @@ else
 			$templating->set_previous('title', "Viewing topic {$topic['topic_title']}", 1);
 			$templating->set_previous('meta_description', $rest . ' - Forum post on GamingOnLinux.com', 1);
 
-			$forum_class->forum_permissions($topic['forum_id']);
+			$parray = $forum_class->forum_permissions($topic['forum_id']);
 
 			// are we even allow to view this forum?
 			if($parray['can_view'] == 0)
@@ -344,7 +344,7 @@ else
 
 					// sort out delete link if it's allowed
 					$delete_link = '';
-					if ($user->check_group([1,2]) == true)
+					if ($parray['can_delete'] == 1)
 					{
 						$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletetopic&topic_id=' . $topic['topic_id'] . '&forum_id='. $topic['forum_id'] . '&author_id=' . $topic['author_id'] . '"><span class="icon delete"></span></a>';
 					}
@@ -483,7 +483,7 @@ else
 
 						// sort out delete link if it's allowed
 						$delete_link = '';
-						if ($user->check_group([1,2]) == true)
+						if ($parray['can_delete'] == 1)
 						{
 							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
 						}

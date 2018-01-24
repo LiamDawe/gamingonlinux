@@ -24,7 +24,7 @@ else
 			$show_forum_breadcrumb = 0;
 			if (isset($_GET['forum_id']))
 			{
-				$forum_class->forum_permissions($_GET['forum_id']);
+				$parray = $forum_class->forum_permissions($_GET['forum_id']);
 				if ($parray['can_topic'] == 0)
 				{
 					$core->message('You do not have permission to post in that selected forum (you shouldn\'t even be able to get here with that forum id set), but you can post in others!', 1);

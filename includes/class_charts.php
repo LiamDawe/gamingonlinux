@@ -38,6 +38,8 @@ class charts
 	private $get_labels_old;
 	private $chart_info_old;
 	private $y_axis_outline_y_start = 0;
+	private $image; // for pngs
+	private $bar_spacing = 5;
 	
 	function __construct($dbl)
 	{
@@ -61,6 +63,7 @@ class charts
 		
 		$this->chart_options['title_color'] = '';
 		
+		$this->chart_options['filetype'] = 'svg';
 		$this->chart_options['chart_width'] = 600;
 		$this->chart_options['title_background_height'] = 25;
 		$this->chart_options['bar_thickness'] = 30;
@@ -79,6 +82,9 @@ class charts
 		$this->chart_options['min_max_font_size'] = 11;
 		$this->chart_options['min_max_y_padding'] = 2;
 		$this->chart_options['min_max_x_padding'] = 2;
+		$this->chart_options['tick_png_font_size'] = 2;
+		$this->chart_options['horizontal_label_font_size'] = 2;
+		$this->chart_options['save'] = 0;
 		
 		$this->chart_options['special_colours'] = [
 		'OpenGL' => '#a6cee3',
@@ -93,8 +99,13 @@ class charts
 				$this->chart_options[$option] = $value;
 			}
 		}
-		
-		$this->label_y_start = $this->chart_options['title_background_height'] * 2;
+		if ($this->chart_options['filetype'] == 'svg')
+		{
+			$this->label_y_start = $this->chart_options['title_background_height'] * 2;
+		}
+
+		$this->tick_font_space = imagefontheight($this->chart_options['tick_png_font_size']);
+		$this->horizontal_label_font_space = imagefontheight($this->chart_options['horizontal_label_font_size']);
 	}
 	
 	function get_chart($chart_id, $type = 'normal')
@@ -154,7 +165,7 @@ class charts
 		{
 			if ($this->chart_info['grouped'] == 0)
 			{
-				$this->labels[]['name'] = $label_loop['name'];
+				$this->labels[]['name'] = trim($label_loop['name']);
 				end($this->labels);
 				$last_id=key($this->labels);
 				$this->labels[$last_id]['total'] = $label_loop['data'] + 0; // + 0 to remove extra needless zeros
@@ -243,6 +254,7 @@ class charts
 		self::get_biggest_label($this->labels);
 	}
 	
+	// getting text size for SVG
 	function text_size($text, $font_size, $font_adjust, $encoding)
 	{
 		$height = $font_size;
@@ -268,19 +280,33 @@ class charts
 					$text = $label['name'];
 				}
 			}
-			$get_label_length = $this->text_size($text, $this->chart_options['label_font_size'], 0.6, 'UTF-8');
+			if ($this->chart_options['filetype'] == 'svg')
+			{
+				$get_label_length = $this->text_size($text, $this->chart_options['label_font_size'], 0.6, 'UTF-8');
+			}
+			else if ($this->chart_options['filetype'] == 'png' || $this->chart_options['filetype'] == 'jpg')
+			{
+				$get_label_length = [imagefontwidth(3) * strlen($text)];
+			}
 			$label_lengths[] = $get_label_length;
 		}
 		rsort($label_lengths);
 		
-		$this->biggest_label = array_slice($label_lengths[0], 0, 1);
+		$this->biggest_label = array_slice($label_lengths[0], 0, 1)[0];
 	}
 	
 	function biggest_series_label($series)
 	{
 		foreach ($series as $key => $text)
 		{
-			$get_series_length = $this->text_size($text['name'], $this->chart_options['label_font_size'], 0.6, 'UTF-8');
+			if ($this->chart_options['filetype'] == 'svg')
+			{
+				$get_series_length = $this->text_size($text['name'], $this->chart_options['label_font_size'], 0.6, 'UTF-8');
+			}
+			else if ($this->chart_options['filetype'] == 'png' || $this->chart_options['filetype'] == 'jpg')
+			{
+				$get_series_length = [imagefontwidth(3) * strlen($text['name'])];
+			}
 			$series_lengths[] = $get_series_length;
 		}
 		rsort($series_lengths);
@@ -290,7 +316,7 @@ class charts
 	
 	function chart_sizing()
 	{
-		$this->actual_chart_space = $this->chart_options['chart_width'] - $this->biggest_label[0] - $this->chart_options['padding_right'];
+		$this->actual_chart_space = $this->chart_options['chart_width'] - $this->biggest_label - $this->chart_options['padding_right'];
 		
 		// if we have a grouped graph, adjust actual space to accomodate series legend
 		if ($this->chart_info['grouped'] == 1)
@@ -301,12 +327,19 @@ class charts
 		}
 		
 		// the actual bars and everything else start after the label
-		$this->chart_bar_start_x = $this->biggest_label[0];
+		$this->chart_bar_start_x = $this->biggest_label;
 		
 		// non-grouped graph, need it here due to stat charts
 		if ($this->chart_info['grouped'] == 0)
 		{
-			$this->chart_height = $this->label_y_start + $this->total_bars * $this->label_y_increment + $this->chart_options['padding_bottom'];
+			if ($this->chart_options['filetype'] == 'svg')
+			{
+				$this->chart_height = $this->label_y_start + $this->total_bars * $this->label_y_increment + $this->chart_options['padding_bottom'];
+			}
+			if ($this->chart_options['filetype'] == 'png' || $this->chart_options['filetype'] == 'jpg')
+			{
+				$this->chart_height = $this->chart_options['title_background_height'] + ($this->total_bars * $this->chart_options['bar_thickness']) + (($this->total_bars - 1) * $this->bar_spacing) + $this->tick_font_space + $this->bar_spacing;
+			}
 		}
 		
 		if (isset($this->chart_info['sub_title']) && $this->chart_info['sub_title'] != NULL && !empty($this->chart_info['sub_title']))
@@ -316,6 +349,12 @@ class charts
 				$this->chart_height = $this->chart_height + $this->chart_options['subtitle_font_size'];
 			}
 			$this->label_y_start = $this->label_y_start + 18;
+		}
+
+		// if we have a horizontal label, we need to make space for it first
+		if (isset($this->chart_info['h_label']) && $this->chart_info['h_label'] != NULL && !empty($this->chart_info['h_label']))
+		{
+			$this->chart_height = $this->chart_height + $this->horizontal_label_font_space;
 		}
 		
 		$this->y_axis_outline_y_start = $this->label_y_start - 18;
@@ -392,7 +431,12 @@ class charts
 		self::chart_sizing();
 		
 		// bottom axis data divisions
-		self::ticks($this->max_data, $this->biggest_label[0]);
+		self::ticks($this->max_data, $this->biggest_label);
+	
+		if ($this->chart_options['filetype'] == 'png' || $this->chart_options['filetype'] == 'jpg')
+		{
+			return $this->build_image();
+		}
 		
 		$last_label_y = 0;
 		$label_counter = 0;
@@ -422,9 +466,8 @@ class charts
 				}
 			}
 			
-			$label_x_position = $this->chart_bar_start_x + $this->chart_options['label_left_padding'];
-			
 			// labels
+			$label_x_position = $this->chart_bar_start_x + $this->chart_options['label_left_padding'];
 			if ($this->chart_info['grouped'] == 0)
 			{
 				$this->labels_output_array[] = '<text x="'.$label_x_position.'" y="'.$this_label_y.'" text-anchor="end"><title>'.$label['name'].' ' . $label['total'] . '</title>'.$label['name'].'</text>';
@@ -443,17 +486,20 @@ class charts
 			{
 				$this_bar_y = $this_label_y - 18;
 				$bar_width = $label['total']*$this->scale;
-				$this_bar_output = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$label['name'].' ' . $label['total'] . '</title></rect>';
+				if ($this->chart_options['filetype'] == 'svg')
+				{
+					$this_bar_output = '<rect x="'.$this->bars_x_start.'" y="'.$this_bar_y.'" height="'.$this->chart_options['bar_thickness'].'" width="'.$bar_width.'" fill="'.$this->chart_options['colours'][$label_counter].'"><title>'.$label['name'].' ' . $label['total'] . '</title></rect>';
 
-				$this_bar_output .= $this->min_max_labels($label, $this_bar_y);
+					$this_bar_output .= $this->min_max_labels($label, $this_bar_y);
 
-				$this->bars_output_array[] = $this_bar_output;
-				
-				// bar counters and their positions
-				$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
-				$this_counter_y = $this_bar_y + 21;
-				
-				$this->counter_array[] = '<text class="golsvg_counters" x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$label['total'].'</text>';
+					$this->bars_output_array[] = $this_bar_output;
+					
+					// bar counters and their positions
+					$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
+					$this_counter_y = $this_bar_y + 21;
+					
+					$this->counter_array[] = '<text class="golsvg_counters" x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$label['total'].'</text>';
+				}
 			}
 			else
 			{
@@ -503,7 +549,10 @@ class charts
 		{
 			$this->chart_height = $last_bar_y + $this->chart_options['padding_bottom'] + $this->chart_options['bar_thickness'] + $this->chart_options['title_background_height'];
 		}
-		return $this->build_svg();
+		if ($this->chart_options['filetype'] == 'svg')
+		{
+			return $this->build_svg();
+		}
 	}
 	
 	function ticks($max_data, $biggest_label)
@@ -639,7 +688,7 @@ class charts
 			
 		self::chart_sizing();
 		
-		self::ticks($max_data, $this->biggest_label[0]);
+		self::ticks($max_data, $this->biggest_label);
 		
 		$last_label_y = 0;
 		$label_counter = 0;
@@ -725,7 +774,7 @@ class charts
 			$legend_start_x = $this->chart_options['chart_width'] - $this->biggest_series - 14;
 			$legend_start_y = $this->label_y_start;
 			
-			$get_graph .= '<!-- legend --><g font-size="'.$this->chart_options['label_font_size'].'" font-family="monospace">';
+			$get_graph .= '<!-- legend --><g font-size="'.$this->chart_options['label_font_size'].'" font-family="Arial, Helvetica, sans-serif">';
 			
 			$series_legend_loop = 0;
 			ksort($this->data_series);
@@ -799,7 +848,7 @@ class charts
 		
 		$get_graph .= '
 		<!-- labels -->
-		<g font-size="'.$this->chart_options['label_font_size'].'" font-family="monospace" fill="#000000">';
+		<g font-size="'.$this->chart_options['label_font_size'].'" font-family="Arial, Helvetica, sans-serif" fill="#000000">';
 
 		$get_graph .= implode('', $this->labels_output_array);
 
@@ -827,8 +876,249 @@ class charts
 		<!-- bottom axis label -->
 		<text x="285" y="'.$this->y_axis_label_y.'" font-size="15" fill="#000000" text-anchor="middle">'.$h_label.'</text>
 		</svg>';
+
+		unset($this->labels);
 		
 		return $get_graph;	
+	}
+
+	function build_image()
+	{
+		// if we have a horizontal label, we need to make space for it first
+		if (isset($this->chart_info['h_label']))
+		{
+			$h_label = $this->chart_info['h_label'];
+		}
+
+		// setup the basic image
+		$this->image = imagecreatetruecolor($this->chart_options['chart_width'],$this->chart_height);
+		$background_colour = imagecolorallocate($this->image, 242, 242, 242);
+		imagefill($this->image, 0, 0, $background_colour);
+
+		$text_colour = imagecolorallocate($this->image,0,0,0);
+
+		// border
+		$outline_colour = imagecolorallocate($this->image, 0, 0, 0);
+		imagerectangle($this->image, 0, 0, $this->chart_options['chart_width']-1, $this->chart_height-1, $outline_colour);
+
+		// if this is a grouped chart, we need a legend to identify the colours
+		if ($this->chart_info['grouped'] == 1)
+		{
+			$legend_start_x = $this->chart_options['chart_width'] - $this->biggest_series;
+			$legend_start_y = $this->label_y_start;
+			
+			$series_legend_loop = 0;
+			ksort($this->data_series);
+			foreach ($this->data_series as $key => $series)
+			{
+				// setup label vertical positions
+				if ($series_legend_loop == 0)
+				{
+					$this_legend_y = $legend_start_y;
+				}
+				else
+				{
+					$this_legend_y = $legend_last_y + $this->chart_options['label_font_size'];
+				}
+				$this_text_y = $this_legend_y + 10;
+				
+				// setup legend x (horizontal) positioning
+				$this_legend_text_x = $legend_start_x + 13;
+
+				// the series label text
+				imagestring ($this->image,3,$legend_start_x-2, $this_legend_y,$series['name'],$text_colour);
+				
+				// get the RBG colour for the series label box
+				list($r, $g, $b) = sscanf($series['colour'], "#%02x%02x%02x");
+				$series_box_bg = imagecolorallocate($this->image,$r,$g,$b);
+				// the series coloured label box
+				imagefilledrectangle($this->image, $legend_start_x-20, $this_legend_y+10, $legend_start_x-10, $this_legend_y, $series_box_bg);
+				
+				$legend_last_y = $this_legend_y;
+				$series_legend_loop++;
+			}
+		}
+
+		// top title box
+		$title_box_bg = imagecolorallocate($this->image,34,34,34);
+		imagefilledrectangle($this->image, 0,0,$this->chart_options['chart_width'],$this->chart_options['title_background_height'],$title_box_bg);
+
+		$actual_chart_y_start = $this->chart_options['title_background_height'] + $this->bar_spacing;
+
+		// centered top title
+		$title_colour = imagecolorallocate($this->image,255,255,255);
+		$title_width = imagefontwidth(4) * strlen($this->chart_info['name']);
+		imagestring ($this->image,5,($this->chart_options['chart_width']/2)-($title_width/2), 5,$this->chart_info['name'],$title_colour);
+
+		// centered top subtitle
+		if (isset($this->chart_info['sub_title']) && $this->chart_info['sub_title'] != NULL)
+		{
+			$subtitle_colour = imagecolorallocate($this->image,0,0,0);
+			$title_width = imagefontwidth(4) * strlen($this->chart_info['sub_title']);
+			$subtitle_height = imagefontheight(4);
+			imagestring ($this->image,4,($this->chart_options['chart_width']/2)-($title_width/2), $this->chart_options['title_background_height']+5,$this->chart_info['sub_title'],$subtitle_colour);
+
+			$actual_chart_y_start = $this->chart_options['title_background_height'] + $subtitle_height + 5;
+		}
+
+		$label_font_height = imagefontheight(3);
+		$actual_chart_y_end = $actual_chart_y_start + ($this->total_bars * $this->chart_options['bar_thickness']) + (($this->total_bars - 1) * $this->bar_spacing);
+
+		// render tick numbers and graph division tick lines
+		$tick_line_colour = imagecolorallocate($this->image, 204, 204, 204);
+		$tick_counter_colour = imagecolorallocate($this->image, 0, 0, 0);
+		$tick_x_start = $this->outlines_x;
+		$current_value = $this->value_per_tick;
+		for ($i = 0; $i <= $this->ticks_total; $i++)
+		{
+			if ($i == 0)
+			{
+				$tick_x_position = $tick_x_start;
+				$current_value = 0;
+			}
+			else
+			{
+				$tick_x_position = $tick_x_position + $this->tick_spacing;
+				$current_value = $current_value + $this->value_per_tick;
+			}
+			imagestring($this->image, $this->chart_options['tick_png_font_size'], $tick_x_position, $actual_chart_y_end, $current_value, $tick_counter_colour);
+				
+			// graph counter strokes, don't make the zero stroke as it covers up the graph line
+			if ($i > 0)
+			{
+				imageline($this->image, $tick_x_position, $actual_chart_y_start, $tick_x_position,$actual_chart_y_end, $tick_line_colour);
+			}
+		}
+
+		// axis outlines
+		imageline($this->image, $tick_x_start, $actual_chart_y_start, $tick_x_start, $actual_chart_y_end, $tick_line_colour);
+		imageline($this->image, $tick_x_start, $actual_chart_y_end, $this->actual_chart_space+$tick_x_start, $actual_chart_y_end, $tick_line_colour);
+
+		$label_counter = 0;
+		$last_bar_y = 0;
+		
+		$last_label_name = '';
+		
+		// sort labels, bars, bar counters and more
+		foreach ($this->labels as $k => $label)
+		{
+			// setup label vertical positions
+			if ($label_counter == 0)
+			{
+				$this_bar_y = $actual_chart_y_start;
+			}
+			else
+			{
+				$this_bar_y = $last_bar_y + $this->chart_options['bar_thickness'] + $this->bar_spacing;
+			}
+			// setup bar positions and array of items
+			if ($this->chart_info['grouped'] == 0)
+			{
+				$bar_width = $label['total']*$this->scale;
+
+				// bars
+				list($r, $g, $b) = sscanf($this->chart_options['colours'][$label_counter], "#%02x%02x%02x");
+				$bar_background = imagecolorallocate($this->image,$r,$g,$b);
+				$bar_outline_colour = imagecolorallocate($this->image, 117, 117, 117);		
+				imagefilledrectangle($this->image, $this->bars_x_start, $this_bar_y, $this->bars_x_start+$bar_width, $this_bar_y+$this->chart_options['bar_thickness'],$bar_background);
+				imagerectangle($this->image, $this->bars_x_start, $this_bar_y, $this->bars_x_start+$bar_width, $this_bar_y+$this->chart_options['bar_thickness'], $bar_outline_colour);
+
+				// bar counters and their positions
+				$this_counter_x = $this->bars_x_start+$bar_width+$this->chart_options['bar_counter_left_padding'];
+				$this_counter_y = $this_bar_y + ($this->chart_options['bar_thickness'] / 4);
+
+				imagestring($this->image, 3, $this_counter_x, $this_counter_y, $label['total'], $text_colour);
+
+				// labels
+				$label_x_position = $this->chart_options['label_left_padding'] + ($this->biggest_label - (imagefontwidth(3) * strlen($label['name'])));
+				$this_label_y = $this_bar_y + ($this->chart_options['bar_thickness'] / 4);
+				imagestring($this->image, 3, $label_x_position, $this_label_y, $label['name'], $text_colour);
+			}
+			else if ($this->chart_info['grouped'] == 1)
+			{
+				$data_series_counter = 0;
+				
+				foreach ($label as $k => $data)
+				{
+					// setup label vertical positions
+					if ($data_series_counter > 0)
+					{
+						$this_bar_y = $last_bar_y + $this->chart_options['bar_thickness'] + 2;
+					}
+					
+					$bar_width = $data['data']*$this->scale;
+					
+					// bars
+					list($r, $g, $b) = sscanf($this->data_series[$k]['colour'], "#%02x%02x%02x");
+					$bar_background = imagecolorallocate($this->image,$r,$g,$b);
+					$bar_outline_colour = imagecolorallocate($this->image, 117, 117, 117);		
+					imagefilledrectangle($this->image, $this->bars_x_start, $this_bar_y, $this->bars_x_start+$bar_width, $this_bar_y+$this->chart_options['bar_thickness'],$bar_background);
+					imagerectangle($this->image, $this->bars_x_start, $this_bar_y, $this->bars_x_start+$bar_width, $this_bar_y+$this->chart_options['bar_thickness'], $bar_outline_colour);
+
+					// bar counters and their positions
+					$this_counter_x = $this->bars_x_start+$bar_width+$this->chart_options['bar_counter_left_padding'];
+					$this_counter_y = $this_bar_y + ($this->chart_options['bar_thickness'] / 4);
+
+					imagestring($this->image, 3, $this_counter_x, $this_counter_y, $data['data'], $text_colour);
+
+					// labels
+					$label_x_position = $this->chart_options['label_left_padding'] + ($this->biggest_label - (imagefontwidth(3) * strlen($k)));
+					$this_label_y = $this_bar_y + ($this->chart_options['bar_thickness'] / 4);
+					imagestring($this->image, 3, $label_x_position, $this_label_y, $k, $text_colour);
+
+					$data_series_counter++;
+					$last_bar_y = $this_bar_y;
+				}
+			}
+			$last_bar_y = $this_bar_y;
+			$label_counter++;
+		}
+
+		if (isset($h_label))
+		{
+			$h_label_width = imagefontwidth(3) * strlen($h_label);
+
+			imagestring($this->image, 3, ($this->chart_options['chart_width']/2)-($h_label_width/2), $actual_chart_y_end+$label_font_height, $h_label, $text_colour);
+		}
+		if ($this->chart_options['save'] == 0)
+		{
+			// make temp image to show, grab base64 to show it and delete the temp image
+			$id = uniqid();
+			
+			if ($this->chart_options['filetype'] == 'png')
+			{
+				$file="chart_temp".$id.".png";
+				imagepng($this->image, $file, 0);
+			}
+			else if ($this->chart_options['filetype'] == 'jpg')
+			{
+				$file="chart_temp".$id.".jpg";
+				imagepng($this->image, $file, 0);				
+			}
+			
+			imagedestroy($this->image);
+			$src = base64_encode(file_get_contents($file));
+			unlink($file);
+
+			return '<img style="display: block;margin: 0 auto;" src="data:image/png;charset=utf-8;base64,'.$src.'" />';
+		}
+		else if ($this->chart_options['save'] == 1)
+		{
+			if (!isset($this->chart_options['save_folder']))
+			{
+				$this->chart_options['save_folder'] = '/';
+			}
+			if ($this->chart_options['filetype'] == 'png')
+			{
+				imagepng($this->image, $this->chart_options['save_folder'] . $this->chart_options['filename'] . '.png', 0);	
+			}
+			else if ($this->chart_options['filetype'] == 'jpg')
+			{
+				imagepng($this->image, $this->chart_options['save_folder'] . $this->chart_options['filename'] . '.jpg', 0);			
+			}
+			
+			imagedestroy($this->image);
+		}
 	}
 
 	function trends_charts($name, $order = '')

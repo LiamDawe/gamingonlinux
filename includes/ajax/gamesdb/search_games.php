@@ -7,7 +7,7 @@ define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-if(isset($_GET['q']))
+if(isset($_GET['q']) && isset($_GET['type']))
 {
 	$game_search = '%' . $_GET['q'] . '%';
 

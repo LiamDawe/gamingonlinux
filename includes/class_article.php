@@ -1365,7 +1365,7 @@ class article
 		$this->templating->block('bottom', 'articles_full');
 		$this->templating->set('pagination', $pagination);
 		
-		if (isset($article_info['type']) && $article_info['type'] != 'admin')
+		if (isset($article_info['type']) && $article_info['type'] != 'admin' && $this->user->check_group([6,9]) === false)
 		{
 			$this->templating->block('patreon_comments', 'articles_full');
 		}

@@ -14,14 +14,15 @@ $res = $dbl->run("SELECT
   a2.`title` as `comment_title`,
   a.`slug`,
   t.topic_title,
-  t2.topic_title as reply_title
+  t2.topic_title as reply_title,
+  coalesce(c.time_posted, a.date, t.creation_date, t2.creation_date) date
   FROM `user_bookmarks` b
   LEFT JOIN `articles` a ON b.`data_id` = a.`article_id` AND b.type ='article'
   LEFT JOIN `articles_comments` c ON c.comment_id = b.data_id AND b.type ='comment'
   LEFT JOIN `articles` a2 ON c.article_id = a2.article_id
   LEFT JOIN `forum_topics` t ON t.topic_id = b.data_id AND b.type = 'forum_topic'
   LEFT JOIN `forum_topics` t2 ON t2.topic_id = b.data_id AND b.type = 'forum_reply'
-  WHERE b.`user_id` = ?", array($_SESSION['user_id']))->fetch_all();
+  WHERE b.`user_id` = ? ORDER BY `date` DESC", array($_SESSION['user_id']))->fetch_all();
 
 if ($res)
 {

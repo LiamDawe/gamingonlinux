@@ -49,7 +49,7 @@ foreach ($all_comments as $comments)
 
 	if ($core->config('pretty_urls') == 1)
 	{
-		$profile_link = "/profiles/" . $_GET['user_id'];
+		$profile_link = "/profiles/" . $comments['author_id'];
 	}
 	else 
 	{

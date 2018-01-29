@@ -2,73 +2,84 @@
 $templating->set_previous('title', 'Latest Comments', 1);
 $templating->set_previous('meta_description', 'The latest article comments on GamingOnLinux', 1);
 
-// main menu block
 $templating->load('comments_latest');
-$templating->block('list');
+
+// count how many there is in total
+$total = $dbl->run("SELECT COUNT(c.`comment_id`) FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`approved` = 1 AND a.active = 1")->fetchOne();
+
+$page = core::give_page();
+
+if ($core->config('pretty_urls') == 1)
+{
+	$pagination_linky = "/latest-comments/";
+}
+else
+{
+	$pagination_linky = "index.php?module=comments_latest&amp;";
+}
+
+// sort out the pagination link
+$pagination = $core->pagination_link(30, $total, $core->config('website_url') . $pagination_linky, $page);
+
+// get top of comments section
+$templating->block('more_comments');
 
 $comment_posts = '';
-$res = $dbl->run("SELECT 
-	comment_id, 
-	c.`article_id`, 
-	c.`time_posted`, 
-	c.`comment_text`, 
-	c.guest_username, 
-	a.`title`, 
-	a.`slug`,
-	a.comment_count, 
-	a.active, 
-	u.username, 
-	u.user_id 
-FROM 
-	`articles_comments` c 
-INNER JOIN 
-	`articles` a ON c.article_id = a.article_id 
-LEFT JOIN 
-	`users` u ON u.user_id = c.author_id 
-WHERE 
-	a.active = 1 AND c.`approved` = 1 ORDER BY `comment_id` DESC limit 20")->fetch_all();
-foreach ($res as $comments)
+$all_comments = $dbl->run("SELECT comment_id, c.author_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`approved` = 1 AND a.active = 1 ORDER BY c.`comment_id` DESC LIMIT ?, 30", array($core->start))->fetch_all();
+					
+// make an array of all comment ids to search for likes (instead of one query per comment for likes)
+$like_array = [];
+$sql_replacers = [];
+foreach ($all_comments as $id_loop)
+{
+	$like_array[] = $id_loop['comment_id'];
+	$sql_replacers[] = '?';
+}
+
+if (!empty($sql_replacers))
+{
+	// Total number of likes for the comments
+	$get_likes = $dbl->run("SELECT data_id, COUNT(*) FROM likes WHERE data_id IN ( ".implode(',', $sql_replacers)." ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+}
+					
+foreach ($all_comments as $comments)
 {
 	$date = $core->human_date($comments['time_posted']);
-
-	// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
-	$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
-	$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
-
-	//Warp sentenses at 150 char-ish. So it only get's cut at a whole word
-	//Now don't go and use the keyword "<!WRAP!>" in any comment please. It will break this thing
-	$text = wordwrap($bbcode->remove_bbcode($text), 150, "<!WRAP!>", true);
-	if (strpos($text, "<!WRAP!>") !== FALSE) // Sometimes it's possible the comment was shorter then 150 char, it doesn't include the keyword then
-	{
-		$text = substr($text, 0, strpos($text, "<!WRAP!>"));
-	}
-	$text = $text . '&hellip;'; //Use actual ellipsis char
 	$title = $comments['title'];
 
-	$page = 1;
-	if ($comments['comment_count'] > $_SESSION['per-page'])
+	if ($core->config('pretty_urls') == 1)
 	{
-		$page = ceil($comments['comment_count']/$_SESSION['per-page']);
+		$profile_link = "/profiles/" . $_GET['user_id'];
 	}
-
-	if (isset($comments['guest_username']) && !empty($comments['guest_username']))
+	else 
 	{
-		$username = $comments['guest_username'];
-	}
-	else
-	{
-		$username = "<a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a>";
+		$profile_link = "/index.php?module=profile&amp;user_id=" . $comments['author_id'];
 	}
 	
-	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#r' . $comments['comment_id']);
+	$templating->set('profile_link', $profile_link);
+						
+	// sort out the likes
+	$likes = NULL;
+	if (isset($get_likes[$comments['comment_id']]))
+	{
+		$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
+	}
+						
+	$view_comment_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+	$view_article_link = $article_class->get_link($comments['article_id'], $comments['slug']);
+	$view_comments_full_link = $article_class->get_link($comments['article_id'], $comments['slug'], '#comments');
 
-	$machine_time = date("Y-m-d\TH:i:s", $comments['time_posted']) . 'Z';	
+	$comment_text = $bbcode->parse_bbcode($comments['comment_text']);
 
-	$comment_posts .= '<li class="list-group-item">
-	<a href="'.$article_link.'">'.$title.'</a><br />
-	'.$text.'<br />
-	<small>by '.$username.' <time class="timeago" datetime="'.$machine_time.'">'.$date.'</time></small>
-	</li>';
+	$comment_posts .= "<div class=\"box\"><div class=\"body group\">
+	<strong><a href=\"".$view_comment_link."\">{$title}</a></strong><br />
+	<small>{$date}" . $likes ."</small><br />
+	<hr />
+	<div>".$comment_text."</div>
+	<hr />
+	<div><a href=\"".$view_comment_link."\">View this comment</a> - <a href=\"".$view_article_link."\">View article</a> - <a href=\"".$view_comments_full_link."\">View full comments</a></div>
+	</div></div>";
 }
 
 $templating->set('comment_posts', $comment_posts);
+$templating->set('pagination', $pagination);

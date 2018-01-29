@@ -1,13 +1,7 @@
-[block: list]
-				<div class="box">
-					<div class="head">Latest 20 Comments</div>
-				</div>
-				
-				<div class="box">
-					<div class="body list">
-						<ul>
-							{:comment_posts}
-						</ul>
-					</div>
-				</div>
-[/block: list]
+[block: more_comments]
+<div class="box">
+	<div class="head">Latest Comments</div>
+</div>
+{:comment_posts}
+{:pagination}
+[/block: more_comments]

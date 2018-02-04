@@ -18,6 +18,20 @@ else
 {
 	$this_template = $core->config('website_url') . 'templates/' . $core->config('template');
 
+	// update the time the last read this forum for forum icons on normal category forum view
+	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+	{
+		$check = $dbl->run("SELECT `last_read` FROM `user_forum_read` WHERE `user_id` = ? AND `forum_id` = ?", array($_SESSION['user_id'], $_GET['forum_id']))->fetchOne();
+		if ($check)
+		{
+			$dbl->run("UPDATE `user_forum_read` SET `last_read` = ? WHERE `user_id` = ? AND `forum_id` = ?", array(core::$date, $_SESSION['user_id'], $_GET['forum_id']));
+		}
+		else
+		{
+			$dbl->run("INSERT INTO `user_forum_read` SET `last_read` = ?, `user_id` = ?, `forum_id` = ?", array(core::$date, $_SESSION['user_id'], $_GET['forum_id']));
+		}
+	}
+
 	// paging for pagination
 	$page = core::give_page();
 

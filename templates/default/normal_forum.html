@@ -14,7 +14,7 @@
 
 [block: forum_row]
 	<tr>
-		<td width="60px" id="forum-post"><img src="{:this_template}/images/forum_icon.png" alt="icon" /></td>
+		<td width="60px" id="forum-post"><img src="{:this_template}/images/{:forum_icon}" alt="icon" /></td>
 		<td width="425px" id="forum-post"><a href="{:forum_link}" class="strong">{:forum_name}</a><br />
 		{:forum_description}<br />
 		Posts: {:forum_posts}</td>
@@ -31,6 +31,11 @@
 [/block: category_bottom]
 
 [block: latest]
+				<div class="box">
+					<div class="body group">
+						<img src="/templates/default/images/forum_icon_read.png"> No new posts since last visit <img src="/templates/default/images/forum_icon.png"> New posts since last visit!
+					</div>
+				</div>
 				<div class="box">
 					<div class="head">Latest posts <a href="/forum_rss.php"><img src="{:this_template}/images/social/white/rss.svg" alt="" class="fright" width="23px"></a></div>
 				</div>

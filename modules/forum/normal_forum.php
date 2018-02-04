@@ -16,6 +16,12 @@ if ($forum_ids)
 {
 	$forum_id_in  = str_repeat('?,', count($forum_ids) - 1) . '?';
 
+	// check if they've read it
+	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+	{
+		$last_read = $dbl->run("SELECT `forum_id`, `last_read` FROM `user_forum_read` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+	}
+
 	$sql = "
 	SELECT
 		category.forum_id as CategoryId,
@@ -93,7 +99,22 @@ if ($forum_ids)
 			if ($forum['parent'] == $category['id'])
 			{
 				$templating->block('forum_row', 'normal_forum');
-				$templating->set('this_template', $core->config('website_url') . '/templates/' . $core->config('template'));
+				$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
+
+				// get the correct forum icon
+				$forum_icon = 'forum_icon.png';
+				if (isset($last_read))
+				{
+					if (isset($last_read[$forum['id']][0]) && $last_read[$forum['id']][0] >= $forum['last_post_time'])
+					{
+						$forum_icon = 'forum_icon_read.png';
+					}
+					else
+					{
+						$forum_icon = 'forum_icon.png';
+					}
+				}
+				$templating->set('forum_icon', $forum_icon);
 
 				if ($core->config('pretty_urls') == 1)
 				{

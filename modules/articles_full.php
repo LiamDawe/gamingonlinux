@@ -302,7 +302,15 @@ if (!isset($_GET['go']))
 					$pages_array = explode('<*PAGE*>', $article['text']);
 					$article_page_count = count($pages_array);
 					$pages_array = array_combine(range(1, count($pages_array)), $pages_array);
-					$article_body = $pages_array[$article_page];
+					if ($article_page <= $article_page_count)
+					{
+						$article_body = $pages_array[$article_page];
+					}
+					else
+					{
+						$article_body = $pages_array[1];
+						$article_page = 1;
+					}
 				}
 				else
 				{

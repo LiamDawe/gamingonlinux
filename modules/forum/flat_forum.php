@@ -103,9 +103,10 @@ SELECT
 	t.`creation_date`,
 	t.`replys`,
 	t.`last_post_date`,
-	t.`last_post_id`,
 	t.`is_locked`,
 	t.`has_poll`,
+	t.`last_post_id`,
+	t.last_post_user_id,
 	f.name as forum_name,
 	u.`username`,
 	u.`avatar`, 
@@ -121,7 +122,7 @@ INNER JOIN
 INNER JOIN
 	`users` u ON t.author_id = u.user_id
 LEFT JOIN
-	`users` u2 ON t.last_post_id = u2.user_id
+	`users` u2 ON t.last_post_user_id = u2.user_id
 WHERE
 	t.`approved` = 1
 AND
@@ -138,44 +139,23 @@ foreach ($get_topics as $topics)
 
 	$last_date = $core->human_date($topics['last_post_date']);
 	$templating->set('tzdate', date('c',$topics['last_post_date']) );
-
-	$post_count = $topics['replys'];
-	// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-	if ($post_count <= $_SESSION['per-page'])
-	{
-		// it will be the first page
-		$postPage = 1;
-		$postNumber = 1;
-	}
-
-	// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-	if ($post_count >= $_SESSION['per-page'])
-	{
-		$rows_per_page = $_SESSION['per-page'];
-
-		// page we are going to
-		$postPage = ceil($post_count / $rows_per_page);
-
-		// the post we are going to
-		$postNumber = (($post_count - 1) % $rows_per_page) + 1;
-	}
 	
 	$avatar = $user->sort_avatar($topics);
 
 	if ($core->config('pretty_urls') == 1)
 	{
-		$link = "/forum/topic/{$topics['topic_id']}";
-		$last_link = "/forum/topic/{$topics['topic_id']}?page={$postPage}";
 		$profile_link = "/profiles/{$topics['author_id']}";
+		$profile_last_link = "/profiles/{$topics['last_post_user_id']}";
 		$forum_link = '/forum/' . $topics['forum_id'];
 	}
 	else
 	{
-		$link = "/index.php?module=viewtopic&topic_id={$topics['topic_id']}";
-		$last_link = "/index.php?module=viewtopic&topic_id={$topics['topic_id']}&page={$postPage}";
 		$profile_link = "/index.php?module=profile&user_id={$topics['author_id']}";
+		$profile_last_link = "/index.php?module=profile&user_id={$topics['last_post_user_id']}";
 		$forum_link = '/index.php?module=viewforum&forum_id=' . $topics['forum_id'];
 	}
+
+	$link = $forum_class->get_link($topics['topic_id']);
 	
 	$locked = '';
 	if ($topics['is_locked'] == 1)
@@ -191,8 +171,10 @@ foreach ($get_topics as $topics)
 	$templating->set('title', $poll_title . $topics['topic_title']);
 	$templating->set('link', $link);
 	$replies = '';
+	$last_link = $link;
 	if ($topics['replys'] > 0)
 	{
+		$last_link = $forum_class->get_link($topics['topic_id'], 'post_id=' . $topics['last_post_id']);
 		$replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" onerror="'.$this_template.'/images/comments/replies.png" alt=""> ' . $topics['replys'];
 	}
 	$templating->set('replies', $replies);
@@ -200,6 +182,7 @@ foreach ($get_topics as $topics)
 	$templating->set('username', $topics['username']);
 	$templating->set('last_link', $last_link);
 	$templating->set('last_username', $topics['username_last']);
+	$templating->set('profile_last_link', $profile_last_link);
 	$templating->set('last_date', $last_date);
 	$templating->set('forum_name', $topics['forum_name']);
 	$templating->set('forum_link', $forum_link);

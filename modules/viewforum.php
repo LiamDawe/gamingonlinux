@@ -105,7 +105,7 @@ else
 		u2.`user_id` as `user_id_last`
 		FROM `forum_topics` t
 		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
-		LEFT JOIN `users` u2 ON t.`last_post_id` = u2.`user_id`
+		LEFT JOIN `users` u2 ON t.`last_post_user_id` = u2.`user_id`
 		WHERE t.`forum_id`= ? AND t.`approved` = 1 ' . $blocked_sql . '
 		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, ' . $per_page, array_merge([$_GET['forum_id']], $blocked_ids, [$core->start]))->fetch_all();
 	foreach ($all_posts as $post)

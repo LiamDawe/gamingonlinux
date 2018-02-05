@@ -64,12 +64,19 @@ if(isset($_POST))
 				$tagline = $article['tagline'];
 				$text = $article['text'];
 			}
-			// locked for editing, use the post content
-			else
+			// locked for editing, locked by *you*
+			else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 			{
 				$title = strip_tags($_POST['title']);
 				$tagline = $_POST['tagline'];
 				$text = $_POST['text'];
+			}
+			// locked for editing, by someone else
+			else if ($article['locked'] == 1 && $article['locked_by'] != $_SESSION['user_id'])
+			{
+				$title = $article['title'];
+				$tagline = $article['tagline'];
+				$text = $article['text'];				
 			}
 		}
 	}

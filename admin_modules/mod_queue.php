@@ -122,7 +122,7 @@ if (isset($_POST['action']))
 			{
 				$dbl->run("UPDATE `forum_replies` SET `approved` = 1, `creation_date` = ? WHERE `post_id` = ?", array(core::$date, $_POST['post_id']));
 
-				$dbl->run("UPDATE `forum_topics` SET `last_post_date` = ?, `last_post_id` = ?, `replys` = (replys + 1) WHERE `topic_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `last_post_date` = ?, `last_post_user_id` = ?, `replys` = (replys + 1), `last_post_id` = ? WHERE `topic_id` = ?", array(core::$date, $_POST['author_id'], $_POST['post_id'], $_POST['topic_id']));
 
 				$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
 

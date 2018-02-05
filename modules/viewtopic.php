@@ -434,6 +434,7 @@ else
 					$post_link = $forum_class->get_link($_GET['topic_id'], 'page=' . $comment_page . '#r' . $_GET['post_id']);
 
 					header("Location: " . $post_link);
+					die();
 				}
 
 				if ($total_replies > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)

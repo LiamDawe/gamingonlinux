@@ -171,9 +171,9 @@ class forum
 			// if it is then we need to get the *now* newest topic and update the forums info
 			if ($last_post == $_GET['topic_id'])
 			{
-				$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($_GET['forum_id']))->fetch();
+				$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($_GET['forum_id']))->fetch();
 
-				$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_GET['forum_id']));
+				$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $_GET['forum_id']));
 			}
 
 			$_SESSION['message'] = 'deleted';
@@ -245,7 +245,7 @@ class forum
 			// update the topics info, get the newest last post and update the topics last info with that ones
 			$topic_info = $this->dbl->run("SELECT `creation_date`, `author_id`, `guest_username` FROM `forum_replies` WHERE `topic_id` = ? ORDER BY `post_id` DESC LIMIT 1", array($_GET['topic_id']))->fetch();
 
-			$this->dbl->run("UPDATE `forum_topics` SET `replys` = (replys - 1), `last_post_date` = ?, `last_post_id` = ? WHERE `topic_id` = ?", array($topic_info['creation_date'], $topic_info['author_id'], $_GET['topic_id']));
+			$this->dbl->run("UPDATE `forum_topics` SET `replys` = (replys - 1), `last_post_date` = ?, `last_post_user_id` = ? WHERE `topic_id` = ?", array($topic_info['creation_date'], $topic_info['author_id'], $_GET['topic_id']));
 
 			// finally check if this is the latest topic we are deleting to update the latest topic info for the forum
 			$last_post = $this->dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($post_info['forum_id']))->fetchOne();
@@ -253,9 +253,9 @@ class forum
 			// if it is then we need to get the *now* newest topic and update the forums info
 			if ($last_post == $_GET['topic_id'])
 			{
-				$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($post_info['forum_id']))->fetch();
+				$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($post_info['forum_id']))->fetch();
 
-				$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $post_info['forum_id']));
+				$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $post_info['forum_id']));
 			}
 			
 			$_SESSION['message'] = 'deleted';

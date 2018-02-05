@@ -212,8 +212,9 @@ else
 		{
 			$date = $core->human_date($post['last_post_date']);
 			$tzdate = date('c',$post['last_post_date']);
+			$last_post_link = $forum_class->get_link($post['topic_id'], 'post_id='.$post['last_post_id']);
 			$last_post = 'Latest by <a href="/profiles/'.$post['user_id_last'].'">'.$post['username_last'].'</a><br />
-			<abbr title="'.$tzdate.'" class="timeago">'.$date.'</abbr>';
+			<a href="'.$last_post_link.'"><abbr title="'.$tzdate.'" class="timeago">'.$date.'</abbr></a>';
 		}
 
 		$templating->set('last_post', $last_post);

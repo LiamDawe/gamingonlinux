@@ -131,7 +131,7 @@ if ($core->config('forum_posting_open') == 1)
 					$dbl->run("UPDATE `forums` SET `posts` = (posts + 1), `last_post_user_id` = ?, `last_post_time` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($author, core::$date, $topic_id, $forum_id));
 
 					// update topic reply count and last post info
-					$dbl->run("UPDATE `forum_topics` SET `replys` = (replys + 1), `last_post_date` = ?, $mod_sql `last_post_id` = ? WHERE `topic_id` = ?", array(core::$date, $author, $topic_id));
+					$dbl->run("UPDATE `forum_topics` SET `replys` = (replys + 1), `last_post_date` = ?, $mod_sql `last_post_user_id` = ?, `last_post_id` = ? WHERE `topic_id` = ?", array(core::$date, $author, $post_id, $topic_id));
 
 					// get article name for the email and redirect
 					$title = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id))->fetch();

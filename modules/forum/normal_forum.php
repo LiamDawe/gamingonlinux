@@ -31,12 +31,13 @@ if ($forum_ids)
 		forum.parent_id as ForumParent,
 		forum.description as ForumDescription,
 		forum.posts as ForumPosts,
-		forum.last_post_user_id as Forum_last_post_id,
+		forum.last_post_user_id as Forum_last_post_user_id,
 		forum.last_post_time,
 		forum.last_post_topic_id,
 		users.username,
 		topic.topic_title,
-		topic.replys
+		topic.replys,
+		topic.last_post_id
 	FROM
 		`forums` category
 	LEFT JOIN
@@ -79,12 +80,13 @@ if ($forum_ids)
 			$forum_array[$row['ForumId']]['name'] = $row['ForumName'];
 			$forum_array[$row['ForumId']]['description'] = $row['ForumDescription'];
 			$forum_array[$row['ForumId']]['posts'] = $row['ForumPosts'];
-			$forum_array[$row['ForumId']]['last_post_id'] = $row['Forum_last_post_id'];
+			$forum_array[$row['ForumId']]['last_post_user_id'] = $row['Forum_last_post_user_id'];
 			$forum_array[$row['ForumId']]['last_post_username'] = $row['username'];
 			$forum_array[$row['ForumId']]['last_post_time'] = $row['last_post_time'];
 			$forum_array[$row['ForumId']]['last_post_topic_id'] = $row['last_post_topic_id'];
 			$forum_array[$row['ForumId']]['topic_title'] = $row['topic_title'];
 			$forum_array[$row['ForumId']]['topic_replies'] = $row['replys'];
+			$forum_array[$row['ForumId']]['last_post_id'] = $row['last_post_id'];
 		}
 	}
 
@@ -134,37 +136,19 @@ if ($forum_ids)
 				$last_post_time = 'Never';
 				if (!empty($forum['last_post_username']))
 				{
-					$post_count = $forum['topic_replies'];
-					// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-					if ($post_count <= $_SESSION['per-page'])
+					$last_post_link = '';
+					if ($forum['topic_replies'] == 0)
 					{
-						// it will be the first page
-						$postPage = 1;
-						$postNumber = 1;
+						$last_post_link = $forum_class->get_link($forum['last_post_topic_id']);
 					}
-
-					// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-					if ($post_count >= $_SESSION['per-page'])
+					else if ($forum['topic_replies'] > 0)
 					{
-						$rows_per_page = $_SESSION['per-page'];
-
-						// page we are going to
-						$postPage = ceil($post_count / $rows_per_page);
-
-						// the post we are going to
-						$postNumber = (($post_count - 1) % $rows_per_page) + 1;
+						$last_post_link = $forum_class->get_link($forum['last_post_topic_id'], 'post_id=' . $forum['last_post_id']);
+						
 					}
+					$last_title = '<a href="'.$last_post_link.'">'.$forum['topic_title'].'</a>';
 
-					if ($core->config('pretty_urls') == 1)
-					{
-						$last_title = "<a href=\"/forum/topic/{$forum['last_post_topic_id']}?page={$postPage}\">{$forum['topic_title']}</a>";
-					}
-					else {
-						$last_title = "<a href=\"index.php?module=viewtopic&amp;topic_id={$forum['last_post_topic_id']}&amp;page={$postPage}\">{$forum['topic_title']}</a>";
-					}
-
-
-					$last_username = "<a href=\"/profiles/{$forum['last_post_id']}\">{$forum['last_post_username']}</a>";
+					$last_username = "<a href=\"/profiles/{$forum['last_post_user_id']}\">{$forum['last_post_username']}</a>";
 					$last_post_time = $core->human_date($forum['last_post_time']);
 				}
 				$templating->set('last_post_title', $last_title);

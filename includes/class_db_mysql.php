@@ -66,7 +66,7 @@ class db_mysql extends PDO
         catch (PDOException $error)
         {
 			$trace = $error->getTrace();
-			error_log('SQL ERROR ' . $error->getMessage());
+			error_log('SQL ERROR ' . $error->getMessage() . "\n" . 'Full SQL: ' . $sql);
 			die('SQL Error');
         }
     }

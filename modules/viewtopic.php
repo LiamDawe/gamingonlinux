@@ -453,8 +453,6 @@ else
 
 					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start))->fetch_all();
 
-					// NEED TO ACTUALLY DOUBLE CHECK THERE IS SOME HERE
-
 					if ($get_replies)
 					{
 						// make an array of all user ids to grab user groups for badge displaying

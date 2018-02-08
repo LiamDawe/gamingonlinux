@@ -374,6 +374,11 @@ else
 					$avatar = $user->sort_avatar($topic);
 					$templating->set('avatar', $avatar);
 
+					if ($_SESSION['user_id'] == 1)
+					{
+						echo $topic['author_id'];
+					}
+
 					$their_groups = $user->post_group_list([$topic['author_id']]);
 					$topic['user_groups'] = $their_groups[$topic['author_id']];
 					$badges = user::user_badges($topic, 1);
@@ -452,129 +457,134 @@ else
 					}
 
 					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start))->fetch_all();
-					
-					// make an array of all user ids to grab user groups for badge displaying
-					$user_ids = [];
-					foreach ($get_replies as $id_loop)
+
+					// NEED TO ACTUALLY DOUBLE CHECK THERE IS SOME HERE
+
+					if ($get_replies)
 					{
-						$user_ids[] = (int) $id_loop['author_id'];
-					}
-					$reply_user_groups = $user->post_group_list($user_ids);
+						// make an array of all user ids to grab user groups for badge displaying
+						$user_ids = [];
+						foreach ($get_replies as $id_loop)
+						{
+							$user_ids[] = (int) $id_loop['author_id'];
+						}
+						$reply_user_groups = $user->post_group_list($user_ids);
 					
-					foreach ($get_replies as $post)
-					{
-						$templating->block('reply', 'viewtopic');
-						
-						$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
-						$templating->set('permalink', $permalink);
-
-						$reply_date = $core->human_date($post['creation_date']);
-						$templating->set('tzdate', date('c',$post['creation_date']) ); // timeago
-						$templating->set('reply_date', $reply_date);
-
-						$templating->set('page', $page);
-
-						// sort out edit link if its allowed
-						$edit_link = '';
-						if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
+						foreach ($get_replies as $post)
 						{
-							$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . $core->config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
-						}
-						$templating->set('edit_link', $edit_link);
+							$templating->block('reply', 'viewtopic');
+							
+							$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
+							$templating->set('permalink', $permalink);
 
-						// sort out delete link if it's allowed
-						$delete_link = '';
-						if ($parray['can_delete'] == 1)
-						{
-							$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
-						}
-						$templating->set('delete_link', $delete_link);
+							$reply_date = $core->human_date($post['creation_date']);
+							$templating->set('tzdate', date('c',$post['creation_date']) ); // timeago
+							$templating->set('reply_date', $reply_date);
 
-						if ($post['author_id'] != 0)
-						{
-							$username = "<a href=\"/profiles/{$post['author_id']}\">{$post['username']}</a>";
-						}
-						else
-						{
-							$username = 'Guest';
-						}
+							$templating->set('page', $page);
 
-						$into_username = '';
-						if (!empty($post['distro']) && $post['distro'] != 'Not Listed')
-						{
-							$into_username .= '<img title="' . $post['distro'] . '" class="distro tooltip-top"  alt="" src="' . $core->config('website_url') . 'templates/'.$core->config('template').'/images/distros/' . $post['distro'] . '.svg" />';
-						}
-
-						$cake_bit = $user->cake_day($post['register_date'], $post['username']);
-						$templating->set('cake_icon', $cake_bit);
-
-						$pc_info = '';
-						if (isset($post['pc_info_public']) && $post['pc_info_public'] == 1)
-						{
-							if ($post['pc_info_filled'] == 1)
+							// sort out edit link if its allowed
+							$edit_link = '';
+							if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 							{
-								$pc_info = '<a class="computer_deets" data-fancybox data-type="ajax" href="javascript;;" data-src="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$post['author_id'].'">View PC info</a>';
+								$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . $core->config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
 							}
-						}
-						$templating->set('user_info_extra', $pc_info);
+							$templating->set('edit_link', $edit_link);
 
-						$templating->set('username', $into_username . $username);
-
-						$avatar = $user->sort_avatar($post);
-						$templating->set('avatar', $avatar);
-
-						// if we have some user groups for that user
-						if (array_key_exists($post['author_id'], $reply_user_groups))
-						{
-							$post['user_groups'] = $reply_user_groups[$post['author_id']];
-							$badges = user::user_badges($post, 1);
-							$templating->set('badges', implode(' ', $badges));
-						}
-						// otherwise guest account or their account was removed, as we didn't get any groups for it
-						else
-						{
-							$templating->set('badges', '');
-						}
-
-						$profile_fields_output = user::user_profile_icons($profile_fields, $post);
-
-						$templating->set('profile_fields', $profile_fields_output);
-
-
-						$templating->set('post_id', $post['post_id']);
-						$templating->set('topic_id', $_GET['topic_id']);
-
-						$user_options = '';
-						$bookmark_reply = '';
-						if ($_SESSION['user_id'] != 0)
-						{
-							$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\"><span class=\"icon quote\">Quote</span></a></li>";
-							// sort bookmark icon out
-							if (in_array($post['post_id'], $bookmarks_array))
+							// sort out delete link if it's allowed
+							$delete_link = '';
+							if ($parray['can_delete'] == 1)
 							{
-								$bookmark_reply = '<li><a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="forum_reply" data-id="'.$post['post_id'].'" data-parent-id="'.$_GET['topic_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a></li>';
+								$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
+							}
+							$templating->set('delete_link', $delete_link);
+
+							if ($post['author_id'] != 0)
+							{
+								$username = "<a href=\"/profiles/{$post['author_id']}\">{$post['username']}</a>";
 							}
 							else
 							{
-								$bookmark_reply = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="forum_reply" data-id="'.$post['post_id'].'" data-parent-id="'.$_GET['topic_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
+								$username = 'Guest';
 							}
-						}
-						$templating->set('user_options', $user_options);
-						$templating->set('bookmark', $bookmark_reply);
 
-						if ($core->config('pretty_urls') == 1)
-						{
-							$post_link = '/forum/topic/' . $_GET['topic_id'] . '/post_id=' . $post['post_id'];
-						}
-						else
-						{
-							$post_link = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'] . '&post_id=' . $post['post_id'];;
+							$into_username = '';
+							if (!empty($post['distro']) && $post['distro'] != 'Not Listed')
+							{
+								$into_username .= '<img title="' . $post['distro'] . '" class="distro tooltip-top"  alt="" src="' . $core->config('website_url') . 'templates/'.$core->config('template').'/images/distros/' . $post['distro'] . '.svg" />';
+							}
 
-						}
-						$templating->set('post_link', $post_link);
+							$cake_bit = $user->cake_day($post['register_date'], $post['username']);
+							$templating->set('cake_icon', $cake_bit);
 
-						$reply_count++;
-						$templating->set('post_text', $bbcode->parse_bbcode($post['reply_text'], 0));
+							$pc_info = '';
+							if (isset($post['pc_info_public']) && $post['pc_info_public'] == 1)
+							{
+								if ($post['pc_info_filled'] == 1)
+								{
+									$pc_info = '<a class="computer_deets" data-fancybox data-type="ajax" href="javascript;;" data-src="'.$core->config('website_url').'includes/ajax/call_profile.php?user_id='.$post['author_id'].'">View PC info</a>';
+								}
+							}
+							$templating->set('user_info_extra', $pc_info);
+
+							$templating->set('username', $into_username . $username);
+
+							$avatar = $user->sort_avatar($post);
+							$templating->set('avatar', $avatar);
+
+							// if we have some user groups for that user
+							if (array_key_exists($post['author_id'], $reply_user_groups))
+							{
+								$post['user_groups'] = $reply_user_groups[$post['author_id']];
+								$badges = user::user_badges($post, 1);
+								$templating->set('badges', implode(' ', $badges));
+							}
+							// otherwise guest account or their account was removed, as we didn't get any groups for it
+							else
+							{
+								$templating->set('badges', '');
+							}
+
+							$profile_fields_output = user::user_profile_icons($profile_fields, $post);
+
+							$templating->set('profile_fields', $profile_fields_output);
+
+
+							$templating->set('post_id', $post['post_id']);
+							$templating->set('topic_id', $_GET['topic_id']);
+
+							$user_options = '';
+							$bookmark_reply = '';
+							if ($_SESSION['user_id'] != 0)
+							{
+								$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\"><span class=\"icon quote\">Quote</span></a></li>";
+								// sort bookmark icon out
+								if (in_array($post['post_id'], $bookmarks_array))
+								{
+									$bookmark_reply = '<li><a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="forum_reply" data-id="'.$post['post_id'].'" data-parent-id="'.$_GET['topic_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a></li>';
+								}
+								else
+								{
+									$bookmark_reply = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="forum_reply" data-id="'.$post['post_id'].'" data-parent-id="'.$_GET['topic_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
+								}
+							}
+							$templating->set('user_options', $user_options);
+							$templating->set('bookmark', $bookmark_reply);
+
+							if ($core->config('pretty_urls') == 1)
+							{
+								$post_link = '/forum/topic/' . $_GET['topic_id'] . '/post_id=' . $post['post_id'];
+							}
+							else
+							{
+								$post_link = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'] . '&post_id=' . $post['post_id'];;
+
+							}
+							$templating->set('post_link', $post_link);
+
+							$reply_count++;
+							$templating->set('post_text', $bbcode->parse_bbcode($post['reply_text'], 0));
+						}
 					}
 				}
 

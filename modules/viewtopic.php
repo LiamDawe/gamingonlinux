@@ -374,11 +374,6 @@ else
 					$avatar = $user->sort_avatar($topic);
 					$templating->set('avatar', $avatar);
 
-					if ($_SESSION['user_id'] == 1)
-					{
-						echo $topic['author_id'];
-					}
-
 					$their_groups = $user->post_group_list([$topic['author_id']]);
 					$topic['user_groups'] = $their_groups[$topic['author_id']];
 					$badges = user::user_badges($topic, 1);

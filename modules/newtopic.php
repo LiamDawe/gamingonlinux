@@ -55,8 +55,6 @@ else
 			{
 				$templating->load('newtopic');
 
-				$name = $dbl->run("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetch();
-
 				$title = '';
 				$text = '';
 	
@@ -90,6 +88,7 @@ else
 					{
 						$forum_url = '/index.php?module=viewforum&forum_id=' . $_GET['forum_id'];
 					}
+					$name = $dbl->run("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetch();
 					$crumbs = '<li><a href="'.$forum_url.'">'.$name['name'].'</a></li>';
 				}
 				$templating->set('crumbs', $crumbs);

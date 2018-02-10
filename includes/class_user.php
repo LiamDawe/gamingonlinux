@@ -394,6 +394,7 @@ class user
 		die();
 	}
 	
+	// get a list of this users user groups, store it so we can access it as many times as required without hitting the DB constantly
 	function get_user_groups()
 	{
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
@@ -432,6 +433,7 @@ class user
 		return false;
 	}
 
+	// helper function to display the correct avatar, for the given user data
 	public function sort_avatar($data)
 	{
 		$your_theme = $this->user_details['theme'];

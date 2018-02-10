@@ -19,6 +19,7 @@ class article
 	}
 	
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
+	// TO DO: Use an array of $_SESSION['article']['blah'] and just remove that, would much much cleaer
 	function reset_sessions()
 	{
 		$_SESSION['image_rand'] = rand();

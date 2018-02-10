@@ -51,7 +51,6 @@ else
 {
 	if (!isset($message_map::$error) || $message_map::$error == 0)
 	{
-		$_SESSION['image_rand'] = rand();
 		$article_class->reset_sessions();
 	}
 
@@ -79,7 +78,6 @@ else
 	$templating->set('article_id', $article['article_id']);
 
 	// get the edit row
-
 	$templating->block('full_editor', 'admin_modules/article_form');
 	$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 

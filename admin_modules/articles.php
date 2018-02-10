@@ -14,8 +14,6 @@ if (isset($_GET['view']))
 		$templating->set_previous('title', 'Edit article' . $templating->get('title', 1)  , 1);
 		if (!isset($message_map::$error) || $message_map::$error == 0)
 		{
-			$_SESSION['image_rand'] = rand();
-
 			$article_class->reset_sessions();
 		}
 		$article_id = $_GET['article_id'];

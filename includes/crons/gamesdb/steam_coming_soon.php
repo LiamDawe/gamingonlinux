@@ -59,12 +59,13 @@ do
 				{
 					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1, `stripped_name` = ?", array($title, $clean_release_date, $link, $bundle, $stripped_title));
 					
-					// need to grab it again
-					$game_list = $dbl->run("SELECT `id`,`small_picture`, `bundle`, `date`, `steam_link`, `stripped_name` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
-					
-					$game_id = $game_list['id'];
+					$new_id = $dbl->new_id();
 
-					$new_games[] = $game_id;
+					$new_games[] = $new_id;
+	
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $new_id . '.jpg';
+					$core->save_image($image, $saved_file);
+					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$new_id . '.jpg', $new_id]);
 				}
 				else
 				{
@@ -76,40 +77,40 @@ do
 					}
 					
 					$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", array($clean_release_date, $game_id));
-				}
 
-				// update rows as needed that are empty
-				$update = 0;
-				$sql_updates = array();
-				$sql_data = array();
-				if ($game_list['steam_link'] == NULL || $game_list['steam_link'] == '')
-				{
-					$update = 1;
-					$sql_updates[] = '`steam_link` = ?';
-					$sql_data[] = $link;
-				}
+					// update rows as needed that are empty
+					$update = 0;
+					$sql_updates = array();
+					$sql_data = array();
+					if ($game_list['steam_link'] == NULL || $game_list['steam_link'] == '')
+					{
+						$update = 1;
+						$sql_updates[] = '`steam_link` = ?';
+						$sql_data[] = $link;
+					}
 
-				if ($game_list['stripped_name'] == NULL || $game_list['stripped_name'] == '')
-				{
-					$update = 1;
-					$sql_updates[] = '`stripped_name` = ?';
-					$sql_data[] = $stripped_title;
-				}
+					if ($game_list['stripped_name'] == NULL || $game_list['stripped_name'] == '')
+					{
+						$update = 1;
+						$sql_updates[] = '`stripped_name` = ?';
+						$sql_data[] = $stripped_title;
+					}
 
-				// if the game list has no picture, grab it and save it
-				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
-				{
-					$update = 1;
-					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
-					$core->save_image($image, $saved_file);
-					$sql_updates[] = '`small_picture` = ?';
-					$sql_data[] = $game_list['id'] . '.jpg';
-				}
+					// if the game list has no picture, grab it and save it
+					if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
+					{
+						$update = 1;
+						$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
+						$core->save_image($image, $saved_file);
+						$sql_updates[] = '`small_picture` = ?';
+						$sql_data[] = $game_list['id'] . '.jpg';
+					}
 
-				if ($update == 1)
-				{
-					$sql_data[] = $game_id;
-					$dbl->run("UPDATE `calendar` SET " . implode(', ', $sql_updates) . " WHERE `id` = ?", $sql_data);
+					if ($update == 1)
+					{
+						$sql_data[] = $game_id;
+						$dbl->run("UPDATE `calendar` SET " . implode(', ', $sql_updates) . " WHERE `id` = ?", $sql_data);
+					}
 				}
 			}
 		}

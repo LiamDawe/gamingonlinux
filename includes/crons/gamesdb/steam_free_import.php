@@ -6,10 +6,9 @@ include(APP_ROOT . '/includes/crons/sales/simple_html_dom.php');
 
 require APP_ROOT . '/includes/bootstrap.php';
 
-$game_sales = new game_sales($dbl, $templating, $user, $core);
+require APP_ROOT . '/includes/cron_helpers.php';
 
 echo "Steam Free Games Store importer started on " .date('d-m-Y H:m:s'). "\n";
-
 
 $new_games = [];
 
@@ -34,57 +33,37 @@ do
 		{
 			$link = $element->href;
 
-			$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
-			$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
+			$title = clean_title($element->find('span.title', 0)->plaintext);	
+			$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database
+			$stripped_title = stripped_title($title);	
 			echo $title . "\n";
 
 			$image = $element->find('div.search_capsule img', 0)->src;
 			echo $image . "\n";
 
 			$bundle = 0;
-			if (strpos($link, '/app/') !== false) 
-			{
-				$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
-			}
-
 			if (strpos($link, '/sub/') !== false) 
 			{
 				$bundle = 1;
-				$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/sub\/([0-9]*)\/.*~', '$1', $link);
 			}
 
-			echo 'SteamID: ' . $steam_id . "\n";
-
-			$clean_release_date = NULL;
 			$release_date_raw = $element->find('div.search_released', 0)->plaintext;
-			echo 'Raw release date: ' . $release_date_raw . "\n";
-			$trimmed_date = trim($release_date_raw);	
-			$remove_comma = str_replace(',', '', $trimmed_date);
-			$parsed_release_date = strtotime($remove_comma);
-			// so we can get rid of items that only have the year nice and simple
-			$length = strlen($remove_comma);
-			$parsed_release_date = date("Y-m-d", $parsed_release_date);
-			$has_day = DateTime::createFromFormat('F Y', $remove_comma);
-			
-			if ($parsed_release_date != '1970-01-01' && $length != 4 && $has_day == FALSE)
-			{
-				$clean_release_date = $parsed_release_date;
-				echo 'Cleaned release date: ' . $clean_release_date . "\n";
-			}
+			$clean_release_date = steam_release_date($release_date_raw);
 
 			// ADD IT TO THE GAMES DATABASE
-			$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `bundle`, `date`, `steam_link`, `stripped_name`, `free_game` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 				
 			if (!$game_list)
 			{
-				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `free_game` = 1, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $clean_release_date, $link, $steam_id, $bundle));
+				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `free_game` = 1, `bundle` = ?, `approved` = 1, `stripped_name` = ?", array($title, $clean_release_date, $link, $bundle, $stripped_title));
+				
+				$new_id = $dbl->new_id();
 
-				$new_games[] = $game_id;
-				
-				// need to grab it again
-				$game_list = $dbl->run("SELECT `id`,`small_picture`, `steam_id`, `bundle`, `date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
-				
-				$game_id = $game_list['id'];
+				$new_games[] = $new_id;
+
+				$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $new_id . '.jpg';
+				$core->save_image($image, $saved_file);
+				$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$new_id . '.jpg', $new_id]);
 			}
 			else
 			{
@@ -94,34 +73,56 @@ do
 				{
 					$game_id = $game_list['also_known_as'];
 				}
+
+				// update rows as needed that are empty
+				$update = 0;
+				$sql_updates = array();
+				$sql_data = array();
+				if ($game_list['steam_link'] == NULL || $game_list['steam_link'] == '')
+				{
+					$update = 1;
+					$sql_updates[] = '`steam_link` = ?';
+					$sql_data[] = $link;
+				}
+
+				// if the game list has no picture, grab it and save it
+				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
+				{
+					$update = 1;
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
+					$core->save_image($image, $saved_file);
+					$sql_updates[] = '`small_picture` = ?';
+					$sql_data[] = $game_list['id'] . '.jpg';
+				}
+
+				// if we haven't checked if it's a bundle yet
+				if ($game_list['bundle'] == NULL || $game_list['bundle'] == '')
+				{
+					$update = 1;
+					$sql_updates[] = '`bundle` = ?';
+					$sql_data[] = $bundle;
+				}
 				
-				$dbl->run("UPDATE `calendar` SET `steam_link` = ?, `free_game` = 1 WHERE `id` = ?", array($link, $game_id));
-			}
+				// if it has no date
+				if ($game_list['date'] == NULL || $game_list['date'] == '')
+				{
+					$update = 1;
+					$sql_updates[] = '`date` = ?';
+					$sql_data[] = $clean_release_date;
+				}
 
-			// if the game list has no picture, grab it and save it
-			if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
-			{
-				$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
-				$core->save_image($image, $saved_file);
-				$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_list['id'] . '.jpg', $game_list['id']]);
-			}
+				// if it has no date
+				if ($game_list['free_game'] == NULL || $game_list['free_game'] == 0)
+				{
+					$update = 1;
+					$sql_updates[] = '`free_game` = 1';
+				}
 
-			// if it has no steam_id, give it one
-			if ($game_list['steam_id'] == NULL || $game_list['steam_id'] == '')
-			{
-				$dbl->run("UPDATE `calendar` SET `steam_id` = ? WHERE `id` = ?", [$steam_id, $game_id]);
-			}
-
-			// if we haven't checked if it's a bundle yet
-			if ($game_list['bundle'] == NULL || $game_list['bundle'] == '')
-			{
-				$dbl->run("UPDATE `calendar` SET `bundle` = ? WHERE `id` = ?", [$bundle, $game_id]);
-			}
-			
-			// if it has no date
-			if ($game_list['date'] == NULL || $game_list['date'] == '')
-			{
-				$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", [$clean_release_date, $game_id]);
+				if ($update == 1)
+				{
+					$sql_data[] = $game_id;
+					$dbl->run("UPDATE `calendar` SET " . implode(', ', $sql_updates) . " WHERE `id` = ?", $sql_data);
+				}
 			}
 		}
 	}

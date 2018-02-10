@@ -6,7 +6,7 @@ include(APP_ROOT . '/includes/crons/sales/simple_html_dom.php');
 
 require APP_ROOT . '/includes/bootstrap.php';
 
-$game_sales = new game_sales($dbl, $templating, $user, $core);
+require APP_ROOT . '/includes/cron_helpers.php';
 
 echo "Steam Games Coming Soon Store importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -33,8 +33,9 @@ do
 		{
 			$link = $element->href;
 
-			$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
-			$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
+			$title = clean_title($element->find('span.title', 0)->plaintext);	
+			$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database
+			$stripped_title = stripped_title($title);	
 			echo $title . "\n";
 
 			$image = $element->find('div.search_capsule img', 0)->src;
@@ -46,30 +47,20 @@ do
 				$bundle = 1;
 			}
 
-			$clean_release_date = NULL;
 			$release_date_raw = $element->find('div.search_released', 0)->plaintext;
-			echo 'Raw release date: ' . $release_date_raw . "\n";
-			$trimmed_date = trim($release_date_raw);	
-			$remove_comma = str_replace(',', '', $trimmed_date);
-			$parsed_release_date = strtotime($remove_comma);
-			// so we can get rid of items that only have the year nice and simple
-			$length = strlen($remove_comma);
-			$parsed_release_date = date("Y-m-d", $parsed_release_date);
-			$has_day = DateTime::createFromFormat('F Y', $remove_comma);
+			$clean_release_date = steam_release_date($release_date_raw);
 			
-			if ($parsed_release_date != '1970-01-01' && $length != 4 && $has_day == FALSE)
+			if ($clean_release_date != NULL)
 			{
-				$clean_release_date = $parsed_release_date;
-
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `bundle`, `date`, `steam_link` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `bundle`, `date`, `steam_link`, `stripped_name` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 					
 				if (!$game_list)
 				{
-					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1", array($title, $clean_release_date, $link, $bundle));
+					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1, `stripped_name` = ?", array($title, $clean_release_date, $link, $bundle, $stripped_title));
 					
 					// need to grab it again
-					$game_list = $dbl->run("SELECT `id`,`small_picture`, `bundle`, `date`, `steam_link` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+					$game_list = $dbl->run("SELECT `id`,`small_picture`, `bundle`, `date`, `steam_link`, `stripped_name` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 					
 					$game_id = $game_list['id'];
 
@@ -87,6 +78,7 @@ do
 					$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", array($clean_release_date, $game_id));
 				}
 
+				// update rows as needed that are empty
 				$update = 0;
 				$sql_updates = array();
 				$sql_data = array();
@@ -95,6 +87,13 @@ do
 					$update = 1;
 					$sql_updates[] = '`steam_link` = ?';
 					$sql_data[] = $link;
+				}
+
+				if ($game_list['stripped_name'] == NULL || $game_list['stripped_name'] == '')
+				{
+					$update = 1;
+					$sql_updates[] = '`stripped_name` = ?';
+					$sql_data[] = $stripped_title;
 				}
 
 				// if the game list has no picture, grab it and save it

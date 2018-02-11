@@ -248,8 +248,7 @@ class game_sales
 					$license = $game['license'];
 				}
 				$this->templating->set('license', $license);
-
-				$genre_output = $this->templating->block_store('genres');
+				
 				$genre_list = [];
 				if (isset($genre_res[$game['id']]))
 				{	
@@ -258,13 +257,20 @@ class game_sales
 						$genre_list[] = "<span class=\"badge\">{$name}</span>";
 					}
 				}
-				$suggest_link = NULL;
+				$suggest_link = '';
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
 					$suggest_link .= '<a href="/index.php?module=items_database&view=suggest_tags&id='.$game['id'].'">Suggest Tags</a>';
 				}
-				$genre_output = $this->templating->store_replace($genre_output, array('genre_list' => 'Tags: ' . implode(' ', $genre_list), 'suggest_link' => $suggest_link));
+
+				$genre_output = 'None';
+				if (!empty($genre_list))
+				{
+					$genre_output = implode(' ', $genre_list);
+				}
+
 				$this->templating->set('genre_list', $genre_output);
+				$this->templating->set('suggest_link', $suggest_link);
 			}
 		}
 		else

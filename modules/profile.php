@@ -170,8 +170,18 @@ if (isset($_GET['user_id']))
 						// additional profile info
 						if ($profile['pc_info_public'] == 1)
 						{
+							if ($core->config('pretty_urls') == 1)
+							{
+								$profile_link = '/profiles/' . $_GET['user_id'];
+							}
+							else
+							{
+								$profile_link = '/index.php?module=profile&user_id=' . $_GET['user_id'];
+							}
+
 							$templating->block('additional', 'profile');
 							$templating->set('username', $profile['username']);
+							$templating->set('profile_link', $profile_link);
 
 							$fields_output = '';
 							$pc_info = $user->display_pc_info($profile['user_id'], $profile['distro']);

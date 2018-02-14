@@ -60,7 +60,7 @@ do
 
 				$new_id = $dbl->new_id();
 
-				$new_games[] = $new_id;
+				$new_games[] = array('release_date' => $clean_release_date, 'name' => $title, 'link' => $link);
 
 				$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $new_id . '.jpg';
 				$core->save_image($image, $saved_file);
@@ -136,8 +136,27 @@ do
 $total_updated = count($updated_list);
 $total_added = count($new_games);
 
-echo 'Total updated: ' . $total_updated . ". Total new: ".$total_added.". Last page: ". $page . "\n";
+if ($total_added > 0)
+{
+	$email_output = array();
+	foreach ($new_games as $new)
+	{
+		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Title: ' . $new['title'] . ' | Link: ' . $new['link'];
+	}
 
-//$dbl->run("UPDATE `crons` SET `last_ran` = ?, `data` = ? WHERE `name` = 'steam_sales'", [core::$sql_date_now, $total_on_sale]);
+	$to = $core->config('contact_email');
+	$subject = 'GOL Steam New';
+
+	// To send HTML mail, the Content-type header must be set
+	$headers  = 'MIME-Version: 1.0' . "\r\n";
+	$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+	$headers .= "From: GOL - New Steam Games <noreply@gamingonlinux.com>\r\n";
+
+	$content = implode('<br />', $email_output);
+
+	mail($to, $subject, $content, $headers);
+}
+
+echo 'Total updated: ' . $total_updated . ". Total new: ".$total_added.". Last page: ". $page . "\n";
 
 echo "End of Steam Games Updater Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

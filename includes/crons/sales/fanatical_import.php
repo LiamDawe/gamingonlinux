@@ -53,7 +53,7 @@ do
 		{
 			if (in_array('linux', $games['operating_systems']) && $games['discount_percent'] > 0 && substr($games['title'], -6) != 'Bundle')
 			{
-				$website = str_replace('https://', '', $games['url']);
+				$website = $games['url'];
 				$current_price_us =  $games['current_price']['USD'];
 				$original_price_us = $games['regular_price']['USD'];
 				$current_price_uk =  $games['current_price']['GBP'];
@@ -102,8 +102,7 @@ do
 				// if it does exist, make sure it's not from Fanatical already
 				if (!$check_sale)
 				{
-					$share_sale = 'http://www.shareasale.com/r.cfm?u=1644082&b=880704&m=66498&urllink='.$website;
-					$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 2, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `sale_pounds` = ?, `original_pounds` = ?, `sale_euro` = ?, `original_euro` = ?, `link` = ?", array($game_id, $current_price_us, $original_price_us, $current_price_uk, $original_price_uk, $current_price_eu, $original_price_eu, $share_sale));
+					$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 2, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `sale_pounds` = ?, `original_pounds` = ?, `sale_euro` = ?, `original_euro` = ?, `link` = ?", array($game_id, $current_price_us, $original_price_us, $current_price_uk, $original_price_uk, $current_price_eu, $original_price_eu, $website));
 
 					$sale_id = $dbl->new_id();
 

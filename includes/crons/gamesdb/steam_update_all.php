@@ -141,7 +141,7 @@ if ($total_added > 0)
 	$email_output = array();
 	foreach ($new_games as $new)
 	{
-		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Title: ' . $new['title'] . ' | Link: ' . $new['link'];
+		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: ' . $new['link'];
 	}
 
 	$to = $core->config('contact_email');

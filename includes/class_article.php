@@ -326,6 +326,10 @@ class article
 		}
 		else
 		{
+			if (!isset($_SESSION['article_timer']))
+			{
+				error_log('Article timer not set: ' . $_SERVER['REQUEST_URI']);
+			}
 			$article_res = $this->dbl->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ?", array($_SESSION['article_timer']))->fetch_all();
 		}
 		if ($article_res)

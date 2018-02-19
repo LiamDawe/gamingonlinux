@@ -5,7 +5,7 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-if(isset($_POST))
+if(isset($_POST) && isset($_POST['type']))
 {
 	if ($_POST['type'] == 'article_comment')
 	{

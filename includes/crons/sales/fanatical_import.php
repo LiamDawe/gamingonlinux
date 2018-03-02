@@ -12,7 +12,7 @@ echo "Fanatical importer started on " .date('d-m-Y H:m:s'). "\n";
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
 
-$url = 'https://api.fanatical.com/api/feed?cc=US&auth=gamingonlinux&page=1';
+$url = 'https://api.fanatical.com/api/feed?cc=US&auth=gamingonlinux';
 $get_data = core::file_get_contents_curl($url);
 
 if ($get_data)

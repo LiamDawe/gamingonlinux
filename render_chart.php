@@ -11,7 +11,8 @@ if (!core::is_number($_GET['id']))
 {
 	die('That was not a correct chart ID.');
 }
-else
+
+if (isset($_GET['type']))
 {
 	$id = (int) $_GET['id'];
 	header('Content-type: image/svg+xml');
@@ -40,4 +41,8 @@ else
 		$options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC', 'title_colour' => '#FFFFFF', 'counter_colour' => '#000000'];
 		echo $charts->stat_chart($id, NULL, $options)['graph'];
 	}
+}
+else
+{
+	die('No type set!');
 }

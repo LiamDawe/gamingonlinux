@@ -36,16 +36,14 @@ $templating->set('category_links', $articles_categorys);
 $top_article_query = "SELECT `article_id`, `title` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY) AND `views` > ? AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4";
 
 // setup a cache
-$mem = new Memcached();
-$mem->addServer("127.0.0.1", 11211);
 $querykey = "KEY" . md5($top_article_query . serialize($core->config('hot-article-viewcount')));
 
-$fetch_top = $mem->get($querykey); // check cache
+$fetch_top = core::$mem->get($querykey); // check cache
 
 if (!$fetch_top) // there's no cache
 {
 	$fetch_top = $dbl->run($top_article_query, array($core->config('hot-article-viewcount')))->fetch_all();
-	$mem->set($querykey, $fetch_top, 21600); // cache for six hours
+	core::$mem->set($querykey, $fetch_top, 21600); // cache for six hours
 }
 
 $hot_articles = '';

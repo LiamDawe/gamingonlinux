@@ -45,7 +45,7 @@ $fetch_top = $mem->get($querykey); // check cache
 if (!$fetch_top) // there's no cache
 {
 	$fetch_top = $dbl->run($top_article_query, array($core->config('hot-article-viewcount')))->fetch_all();
-	$mem->set($querykey, $fetch_top, 86400); // cache for one day
+	$mem->set($querykey, $fetch_top, 21600); // cache for six hours
 }
 
 $hot_articles = '';

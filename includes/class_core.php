@@ -44,8 +44,11 @@ class core
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
 		$this->dbl = $dbl;
-		core::$mem = new Memcached();
-		core::$mem->addServer("127.0.0.1", 11211);
+		core::$mem = new Memcached('gol');
+		if ( !core::$mem->getServerList() ) 
+		{
+			core::$mem->addServer("127.0.0.1", 11211);
+		}
 	}
 	
 	// check in_array for a multidimensional array

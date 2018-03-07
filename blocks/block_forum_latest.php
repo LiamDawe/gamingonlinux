@@ -11,8 +11,22 @@ if (isset($_SESSION['per-page']))
 
 $groups_in = str_repeat('?,', count($user->user_groups) - 1) . '?';
 
-// get the forum ids this user is actually allowed to view
-$forum_ids = $dbl->run("SELECT p.`forum_id` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all(PDO::FETCH_COLUMN);
+$forum_sql = "SELECT p.`forum_id` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC";
+
+// setup a cache
+$mem = new Memcached();
+$mem->addServer("127.0.0.1", 11211);
+$querykey = "KEY" . md5($forum_sql . serialize($user->user_groups));
+
+$forum_ids = $mem->get($querykey); // check cache
+
+if (!$forum_ids) // there's no cache
+{
+	// get the forum ids this user is actually allowed to view
+	$forum_ids = $dbl->run($forum_sql, $user->user_groups)->fetch_all(PDO::FETCH_COLUMN);
+	$mem->set($querykey, $forum_ids, 21600); // cache for six hours
+}
+
 if ($forum_ids)
 {
 	$forum_id_in  = str_repeat('?,', count($forum_ids) - 1) . '?';

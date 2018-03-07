@@ -7,6 +7,8 @@ class template
 	// the current template folder, simple enough
 	public $template;
 
+	public $cache_folder;
+
 	/*
 	The files we are working with.
 	Set as an array as some blocks in different files may have the same name and the parser would always use the first one found (not always the right one).
@@ -44,6 +46,7 @@ class template
 		}
 
 		$this->template = $this->core->config('path') . "templates/{$template_folder}";
+		$this->cache_folder = $this->core->config('path') . 'cache/' . $template_folder;
 	}
 
 	public function load($file)
@@ -68,6 +71,10 @@ class template
 		if ($file == NULL)
 		{
 			$file = $this->last_file;
+		}
+		else if (!isset($this->files[$file]))
+		{
+			$this->load($file);
 		}
 
 		// assign this block a number
@@ -165,15 +172,27 @@ class template
 
 	}
 
+	public function get_cache($filename)
+	{
+		$this->merged[$filename] = file_get_contents($this->cache_folder . "/{$filename}.html");
+	}
+
 	// everything else is done, so show us the page
 	public function output()
 	{
 		$this->do_tags();
 
+		$this->final_output = '';
+
 		foreach ($this->merged as $block)
 		{
 			$this->final_output .= $block;
 		}
+
+		$this->last_file = '';
+		$this->values = array();
+		$this->files = array();
+		$this->merged = array();
 
 		// the final template all put together
 		return $this->final_output;

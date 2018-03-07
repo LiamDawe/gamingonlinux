@@ -4,14 +4,13 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 
 // define the path and name of cached file
 $cachefile = 'cache/' . $core->config('template') . '/website_stats.html';
-// define how long we want to keep the file in seconds. I set mine to 5 hours.
-$cachetime = 18000;
-// Check if the cached file is still fresh. If it is, serve it up and exit.
+$cachetime = 18000; // 5 hour cache
+// Check if the cached file is still fresh. If it is, just pull it in and that's it done
 if (file_exists($cachefile) && time() - $cachetime < filemtime($cachefile)) 
 {
 	$templating->get_cache('website_stats');
 }
-else
+else // otherwise generate the page and make a cache from it
 {
 	echo $templating->output();
 

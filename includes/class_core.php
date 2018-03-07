@@ -32,6 +32,8 @@ class core
 	
 	public static $top_bar_links = [];
 
+	public static $mem;
+
 	function __construct($dbl)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
@@ -42,6 +44,8 @@ class core
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
 		$this->dbl = $dbl;
+		core::$mem = new Memcached();
+		core::$mem->addServer("127.0.0.1", 11211);
 	}
 	
 	// check in_array for a multidimensional array
@@ -219,18 +223,14 @@ class core
 	// grab a config key
 	public function config($key)
 	{
-		if (empty(self::$config))
+		if (($get_config = core::$mem->get('CONFIG_'.$key)) === false) // there's no cache
 		{
-			// get config
-			$get_config = $this->dbl->run("SELECT `data_key`, `data_value` FROM config")->fetch_all();
-			foreach ($get_config as $config_set)
-			{
-				self::$config[$config_set['data_key']] = $config_set['data_value'];
-			}
+			$get_config = $this->dbl->run("SELECT `data_value` FROM config WHERE `data_key` = ?", array($key))->fetchOne();
+			core::$mem->set('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
 		}
 
 		// return the requested key with the value in place
-		return self::$config[$key];
+		return $get_config;
 	}
 
 	// update a single config var
@@ -239,7 +239,7 @@ class core
 		$this->dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
 
 		// invalidate the cache
-		self::$config = array();
+		core::$mem->set('CONFIG_'.$key, $value); // no expiry as config hardly ever changes
 	}
 
 	function get_client_ip()

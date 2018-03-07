@@ -34,19 +34,12 @@ if (!isset($_GET['go']))
 				a.`author_id`,
 				a.`active`,
 				a.`guest_username`,
-				a.`views`,
 				a.`tagline_image`,
 				a.`gallery_tagline`,
 				a.`comment_count`,
 				t.`filename` as `gallery_tagline_filename`,
 				a.`comments_open`,
 				u.`username`,
-				u.`avatar`,
-				u.`avatar_gravatar`,
-				u.`gravatar_email`,
-				u.`avatar_uploaded`,
-				u.`avatar_gallery`,
-				u.`article_bio`,
 				u.`twitter_on_profile`
 				FROM `articles` a
 				LEFT JOIN
@@ -273,9 +266,6 @@ if (!isset($_GET['go']))
 
 				$templating->set('date', $date);
 				$templating->set('machine_time', $published_date_meta);
-
-				$templating->set('article_views', $article['views']);
-
 				$templating->set('article_meta', "<meta itemprop=\"image\" content=\"$article_meta_image\" /> <script>var postdate=new Date('".date('c', $article['date'])."')</script>");
 
 				$tagline_bbcode = '';

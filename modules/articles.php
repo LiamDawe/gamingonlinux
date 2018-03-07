@@ -192,6 +192,12 @@ if (isset($view))
 			{
 				$article_id_array[] = $article['article_id'];
 			}
+
+			if (empty($article_id_array))
+			{
+				error_log('Article IDs empty: ' . $_SERVER['REQUEST_URI']);
+			}
+
 			$article_id_sql = implode(', ', $article_id_array);
 
 			// this is required to properly count up the rank for the tags

@@ -95,10 +95,14 @@ if (!isset($_COOKIE['gol_announce_gol_twitch'])) // if they haven't dissmissed i
 }
 
 /* announcement bars */
-if (($get_announcements = core::$mem->get('index_announcements')) === false) // there's no cache
+$query = "SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC";
+$querykey = "KEY" . md5($query);
+
+$get_announcements = core::$mem->get($querykey);
+if (!$get_announcements)
 {
-	$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
-	core::$mem->set('index_announcements', $blocks, 86400); // 1 day expiry, as we don't change them often
+	$get_announcements = $dbl->run($query)->fetch_all();
+	core::$mem->set($querykey, $get_announcements, 600);
 }
 
 if ($get_announcements)

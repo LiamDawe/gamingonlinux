@@ -49,56 +49,71 @@ if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 
 	$counter = 0;
 
-	foreach($charts_list as $chart)
+	if (isset($_POST['picker']) && is_numeric($_POST['picker']))
 	{
-		if (isset($_POST['picker']) && is_numeric($_POST['picker']))
-		{
-			$grouping_id = core::make_safe($_POST['picker']);
-		}
-		else
-		{
-			$grouping_id = $dbl->run("SELECT grouping_id FROM user_stats_grouping ORDER BY `grouping_id` DESC LIMIT 1")->fetchOne();
-		}
+		$grouping_id = core::make_safe($_POST['picker']);
+	}
+	else
+	{
+		$grouping_id = $dbl->run("SELECT grouping_id FROM user_stats_grouping ORDER BY `grouping_id` DESC LIMIT 1")->fetchOne();
+	}
 
-		$get_chart_id = $dbl->run("SELECT `id`, `grouping_id`,`name`, `h_label`, `total_answers` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $grouping_id))->fetch();
+	// Check if the cached file is still fresh. If it is, just pull it in and that's it done
+	if ($filecache->check_cache('user_statistics_'.$grouping_id, 86400)) // 1 day cache
+	{
+		$templating->get_cache('user_statistics_'.$grouping_id);
+	}
+	else
+	{
+		echo $templating->output();
 		
-		if ($get_chart_id['total_answers'] > 0)
+		$filecache->init();
+
+		foreach($charts_list as $chart)
 		{
-			$previous_group = $dbl->run("SELECT `grouping_id` FROM `user_stats_charts` WHERE `grouping_id` < ? ORDER BY `id` DESC LIMIT 1", array($get_chart_id['grouping_id']))->fetch();
-
-			$get_last_chart_id = $dbl->run("SELECT `id` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $previous_group['grouping_id']))->fetchOne();
-		
-			$charts = new charts($dbl);
-		
-			$options = ['padding_right' => 70, 'show_top_10' => 1];
-
-			if (isset($get_chart_id['id']))
+			$get_chart_id = $dbl->run("SELECT `id`, `grouping_id`,`name`, `h_label`, `total_answers` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $grouping_id))->fetch();
+			
+			if ($get_chart_id['total_answers'] > 0)
 			{
-				$grab_chart = $charts->stat_chart($get_chart_id['id'], $get_last_chart_id, $options);
+				$previous_group = $dbl->run("SELECT `grouping_id` FROM `user_stats_charts` WHERE `grouping_id` < ? ORDER BY `id` DESC LIMIT 1", array($get_chart_id['grouping_id']))->fetch();
 
-				// only do this once
-				if ($counter == 0)
-				{
-					$templating->block('info');
-					$templating->set('date', $grab_chart['date']);
-				}
+				$get_last_chart_id = $dbl->run("SELECT `id` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $previous_group['grouping_id']))->fetchOne();
+			
+				$charts = new charts($dbl);
+			
+				$options = ['padding_right' => 70, 'show_top_10' => 1];
 
-				$templating->block('chart_section');
-				$templating->set('title', $chart['name']);
-				$templating->set('graph', $grab_chart['graph']);
-				$download_link = '';
-				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				if (isset($get_chart_id['id']))
 				{
-					$download_link = '<div style="text-align: center;"><em>Download Graph: (<a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats&download">SVG</a>)</em> | <a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats">Graph Link</a></div>';
+					$grab_chart = $charts->stat_chart($get_chart_id['id'], $get_last_chart_id, $options);
+
+					// only do this once
+					if ($counter == 0)
+					{
+						$templating->block('info', 'statistics');
+						$templating->set('date', $grab_chart['date']);
+					}
+
+					$templating->block('chart_section', 'statistics');
+					$templating->set('title', $chart['name']);
+					$templating->set('graph', $grab_chart['graph']);
+					$download_link = '';
+					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+					{
+						$download_link = '<div style="text-align: center;"><em>Download Graph: (<a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats&download">SVG</a>)</em> | <a href="/render_chart.php?id='.$get_chart_id['id'].'&type=stats">Graph Link</a></div>';
+					}
+					$templating->set('download_link', $download_link);
+					$templating->set('total_users', $grab_chart['total_users_answered']);
+					$templating->set('full_info', $grab_chart['full_info']);
+					$counter++;
 				}
-				$templating->set('download_link', $download_link);
-				$templating->set('total_users', $grab_chart['total_users_answered']);
-				$templating->set('full_info', $grab_chart['full_info']);
-				$counter++;
 			}
 		}
+			$templating->block('monthly_bottom', 'statistics');
+		
+		echo $templating->output();
+		$filecache->write('user_statistics_'.$grouping_id);
 	}
-	$templating->block('monthly_bottom');
 }
 if (isset($_GET['view']) && $_GET['view'] == 'trends')
 {

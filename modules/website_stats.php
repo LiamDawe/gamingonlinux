@@ -2,11 +2,7 @@
 $templating->set_previous('title', 'Website stats', 1);
 $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux website', 1);
 
-// define the path and name of cached file
-$cachefile = 'cache/' . $core->config('template') . '/website_stats.html';
-$cachetime = 18000; // 5 hour cache
-// Check if the cached file is still fresh. If it is, just pull it in and that's it done
-if (file_exists($cachefile) && time() - $cachetime < filemtime($cachefile)) 
+if ($filecache->check_cache('website_stats', 3600))
 {
 	$templating->get_cache('website_stats');
 }
@@ -14,7 +10,8 @@ else // otherwise generate the page and make a cache from it
 {
 	echo $templating->output();
 
-	ob_start();
+	$filecache->init();
+
 	$templating->load('website_stats');
 
 	$templating->block('top');
@@ -171,11 +168,7 @@ else // otherwise generate the page and make a cache from it
 	$templating->set('year_chart', $yearly_chart);
 
 	echo $templating->output();
-	// We're done! Save the cached content to a file
-	$fp = fopen($cachefile, 'w');
-	fwrite($fp, ob_get_contents());
-	fclose($fp);
-	// finally send browser output
-	ob_end_flush();
+
+	$filecache->write('website_stats');
 }
 ?>

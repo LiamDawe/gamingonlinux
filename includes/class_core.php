@@ -34,6 +34,8 @@ class core
 
 	public static $mem;
 
+	public static $redis;
+
 	function __construct($dbl)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
@@ -44,11 +46,8 @@ class core
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
 		$this->dbl = $dbl;
-		core::$mem = new Memcached('gol');
-		if ( !core::$mem->getServerList() ) 
-		{
-			core::$mem->addServer("127.0.0.1", 11211);
-		}
+		core::$redis = new Redis();
+		core::$redis->connect('127.0.0.1', 6379);
 	}
 	
 	// check in_array for a multidimensional array
@@ -226,10 +225,10 @@ class core
 	// grab a config key
 	public function config($key)
 	{
-		if (($get_config = core::$mem->get('CONFIG_'.$key)) === false) // there's no cache
+		if (($get_config = core::$redis->get('CONFIG_'.$key)) === false) // there's no cache
 		{
 			$get_config = $this->dbl->run("SELECT `data_value` FROM config WHERE `data_key` = ?", array($key))->fetchOne();
-			core::$mem->set('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
+			core::$redis->set('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
 		}
 
 		// return the requested key with the value in place
@@ -242,7 +241,7 @@ class core
 		$this->dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
 
 		// invalidate the cache
-		core::$mem->set('CONFIG_'.$key, $value); // no expiry as config hardly ever changes
+		core::$redis->set('CONFIG_'.$key, $value); // no expiry as config hardly ever changes
 	}
 
 	function get_client_ip()

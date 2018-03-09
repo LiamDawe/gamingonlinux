@@ -95,10 +95,11 @@ if (!isset($_COOKIE['gol_announce_gol_twitch'])) // if they haven't dissmissed i
 }
 
 /* announcement bars */
-if (($get_announcements = core::$mem->get('index_announcements')) === false) // there's no cache
+$get_announcements = unserialize(core::$redis->get('index_announcements'));
+if ($get_announcements === false || $get_announcements === null) // there's no cache
 {
 	$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
-	core::$mem->set('index_announcements', $get_announcements, 600);
+	core::$redis->set('index_announcements', serialize($get_announcements), 600);
 }
 
 if ($get_announcements)
@@ -231,10 +232,10 @@ $templating->block('left_end', 'mainpage');
 $templating->block('right', 'mainpage');
 
 /* get the blocks */
-if (($blocks = core::$mem->get('index_blocks')) === false) // there's no cache
+if (($blocks = unserialize(core::$redis->get('index_blocks'))) === false) // there's no cache
 {
 	$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
-	core::$mem->set('index_blocks', $blocks); // no expiry as shown blocks hardly ever changes
+	core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 }
 
 foreach ($blocks as $block)

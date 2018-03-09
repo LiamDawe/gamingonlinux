@@ -18,13 +18,13 @@ if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 
 if (core::$current_module['module_file_name'] == 'home')
 {
-	$count_total = $dbl->run("SELECT COUNT(a.active) FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> ''")->fetchOne();
+	$total_featured = $core->config('total_featured');
 
-	if ($count_total == 1)
+	if ($total_featured == 1)
 	{
 		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> ''")->fetch();
 	}
-	if ($count_total > 1)
+	if ($total_featured > 1)
 	{
 		if (!isset($_SESSION['last_featured_id']))
 		{
@@ -42,7 +42,7 @@ if (core::$current_module['module_file_name'] == 'home')
 		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
 
-	if ($count_total >= 1)
+	if ($total_featured >= 1)
 	{
 		$templating->block('featured', 'mainpage');
 		$templating->set('title', $featured['title']);

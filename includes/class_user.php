@@ -50,7 +50,6 @@ class user
 			if ($this->stay_logged_in() == false) // make a guest session if they aren't saved
 			{
 				$_SESSION['user_id'] = 0;
-				$_SESSION['username'] = 'Guest'; // not even sure why I set this
 				$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 				$_SESSION['articles-per-page'] = 15;
 				$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gravatar' => 0, 'avatar_gallery' => NULL];
@@ -761,7 +760,6 @@ class user
 	{
 		$this->db->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC");		
 		self::$user_group_list = $this->db->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
-
 	}
 	
 	// the actual user badge sorting, which gives the expected output of user badges for comments, forum posts etc

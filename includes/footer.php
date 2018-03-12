@@ -26,8 +26,6 @@ if ($core->current_page() == 'admin.php' || (isset($_GET['module']) && $_GET['mo
 }
 $templating->set('ckeditor_js', $ckeditor_js);
 
-$templating->set('twitch_dev_key', $core->config('twitch_dev_key'));
-
 // info for admins to see execution time and mysql queries per page
 $debug = '';
 if ($user->check_group(1) && $core->config('show_debug') == 1)

@@ -1,14 +1,18 @@
-function twitch_check(twitch_key, channel)
+function twitch_check()
 {
-	$.getJSON("https://api.twitch.tv/kraken/streams?client_id="+twitch_key+"&channel="+channel, function(t) 
+	$.getJSON("/includes/crons/goltwitchcheck.json", function(t) 
 	{
-		if (t["streams"].length > 0)
+		if (t["data"].length > 0 && t["data"][0].type == 'live')
 		{
-			//console.log(a["streams"][0].game);
-			if (t["streams"][0].game.length > 0)
+			if (t["game_name"].length > 0)
 			{
-				$( ".twitch_game" ).html('Playing: ' + t["streams"][0].game);
+				$( ".twitch_game" ).html('Title: ' + t["game_name"]);
 			}
+			else if (t["data"][0].title.length > 0)
+			{
+				$( ".twitch_game" ).html('Title: ' + t["data"][0].title);
+			}
+			
 			$( ".gol_twitch" ).show();
 		}
 	});

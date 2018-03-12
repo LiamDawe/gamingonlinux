@@ -1,6 +1,7 @@
 function twitch_check()
 {
-	$.getJSON("/includes/crons/goltwitchcheck.json", function(t) 
+	var json_file = "/includes/crons/goltwitchcheck.json";
+	$.getJSON(json_file, function(t) 
 	{
 		if (t["data"].length > 0 && t["data"][0].type == 'live')
 		{
@@ -15,5 +16,5 @@ function twitch_check()
 			
 			$( ".gol_twitch" ).show();
 		}
-	});
+	})
 } 

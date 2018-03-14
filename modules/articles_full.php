@@ -382,21 +382,26 @@ if (!isset($_GET['go']))
 				{
 					$like_text = "Like";
 					$like_class = "like";
-					if ($_SESSION['user_id'] != 0)
+					$they_liked = 0;
+					// Checks current login user liked this status or not
+					if ($total_alikes > 0) // no point checking if they've liked it, if there's no likes
 					{
-						// Checks current login user liked this status or not
 						$numlikes = $dbl->run("SELECT 1 FROM `article_likes` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article['article_id']))->fetchOne();
 
 						if ($numlikes)
 						{
-							$like_text = "Unlike";
-							$like_class = "unlike";
+							$they_liked = 1;
 						}
-						else
-						{
-							$like_text = "Like";
-							$like_class = "like";
-						}
+					}
+					if ($they_liked == 1)
+					{
+						$like_text = "Unlike";
+						$like_class = "unlike";
+					}
+					else
+					{
+						$like_text = "Like";
+						$like_class = "like";
 					}
 
 					// don't let them like their own post

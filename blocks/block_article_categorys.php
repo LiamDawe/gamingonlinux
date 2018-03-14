@@ -39,7 +39,7 @@ $top_article_query = "SELECT `article_id`, `title` FROM `articles` WHERE `date` 
 $querykey = "KEY" . md5($top_article_query . serialize($core->config('hot-article-viewcount')));
 $fetch_top = unserialize(core::$redis->get($querykey)); // check cache
 
-if (!$fetch_top) // there's no cache
+if ($fetch_top === false || $fetch_top === null) // there's no cache
 {
 	$fetch_top = $dbl->run($top_article_query, array($core->config('hot-article-viewcount')))->fetch_all();
 	core::$redis->set($querykey, serialize($fetch_top), 21600); // cache for six hours

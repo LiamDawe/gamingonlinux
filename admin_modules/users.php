@@ -623,6 +623,10 @@ else
 					$dbl->run("INSERT INTO `user_group_permissions_membership` SET `permission_id` = ?, `group_id` = ?", [$permission, $_POST['group_id']]);
 				}
 			}
+
+			// update cache
+			$groups_query = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);		
+			core::$redis->set('user_group_list', serialize($groups_query));	
 			
 			header('Location: admin.php?module=users&view=edit_group&id=' . $_POST['group_id']);
 		}

@@ -57,9 +57,11 @@ class db_mysql extends PDO
     {
 		try
 		{
+			$start = microtime(true);
 			$this->stmt = $this->prepare($sql);
 			$this->stmt->execute($data);
-			$this->debug_queries[] = $this->replaced_query($sql, $data);
+			$end = microtime(true);
+			$this->debug_queries[] = "This query took " . ($end - $start) . " seconds.<br />" . $this->replaced_query($sql, $data);
 			$this->counter++;
 			return $this;
         }

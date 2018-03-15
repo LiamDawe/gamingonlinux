@@ -91,6 +91,9 @@ foreach($featured as $row)
 if ($total_to_remove > 0)
 {
 	$dbl->run("UPDATE `config` SET `data_value` = (data_value - $total_to_remove) WHERE `data_key` = 'total_featured'");
+	// update cache
+	$new_featured_total = $core->config('total_featured') - $total_to_remove;
+	core::$redis->set('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
 }
 
 /* REMOVE COMPLETED ADMIN NOTES OLDER THAN ONE YEAR */

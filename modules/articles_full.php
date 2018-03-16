@@ -30,6 +30,7 @@ if (!isset($_GET['go']))
 				a.`text`,
 				a.`tagline`,
 				a.`date`,
+				a.`views`,
 				a.`date_submitted`,
 				a.`author_id`,
 				a.`active`,
@@ -266,6 +267,7 @@ if (!isset($_GET['go']))
 
 				$templating->set('date', $date);
 				$templating->set('machine_time', $published_date_meta);
+				$templating->set('article_views', $article['views']);
 				$templating->set('article_meta', "<meta itemprop=\"image\" content=\"$article_meta_image\" /> <script>var postdate=new Date('".date('c', $article['date'])."')</script>");
 
 				$tagline_bbcode = '';

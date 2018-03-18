@@ -11,7 +11,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
 	if ($_POST['type'] == 'comment')
 	{
-		$pinsid = $_POST['comment_id'];
+		$item_id = $_POST['comment_id'];
 		$table = 'likes';
 		$field = 'data_id';
 		$type_insert = "`type` = 'comment', ";
@@ -20,14 +20,14 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 	}
 	if ($_POST['type'] == 'article')
 	{
-		$pinsid = $_POST['article_id'];
+		$item_id = $_POST['article_id'];
 		$table = 'article_likes';
 		$field = 'article_id';
 		$type_insert = '';
 		$type_delete = '';
 	}
 
-	$count_notifications = $dbl->run("SELECT COUNT(*) FROM `$table` WHERE `$field` = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']))->fetchOne();
+	$count_notifications = $dbl->run("SELECT COUNT(*) FROM `$table` WHERE `$field` = ? AND user_id = ?", array($item_id, $_SESSION['user_id']))->fetchOne();
 	if($_POST['sta'] == "like")
 	{
 		if ($_POST['type'] == 'comment')
@@ -46,9 +46,17 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		// insert the actual "like" row
 		if ($count_notifications == 0)
 		{
-			$dbl->run("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($pinsid, $_SESSION['user_id'], core::$date));
+			$dbl->run("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($item_id, $_SESSION['user_id'], core::$date));
 			
-			$total_likes = $dbl->run("SELECT COUNT(like_id) FROM `$table` WHERE `$field` = ?", array($pinsid))->fetchOne();
+			if ($_POST['type'] == 'article')
+			{
+				$dbl->run("UPDATE `articles` SET `total_likes` = (total_likes + 1) WHERE `article_id` = ?", array($item_id));
+				$total_likes = $dbl->run("SELECT `total_likes` FROM `articles` WHERE `article_id` = ?", array($item_id));
+			}
+			else
+			{
+				$total_likes = $dbl->run("SELECT COUNT(like_id) FROM `$table` WHERE `$field` = ?", array($item_id))->fetchOne();
+			}
 			
 			echo json_encode(array("result" => 'liked', 'total' => $total_likes));
 			return true;
@@ -88,9 +96,17 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 					$dbl->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($current_likes['id']));
 				}
 			}
-			$dbl->run("DELETE FROM `$table` WHERE $type_delete `$field` = ? AND user_id = ?", array($pinsid, $_SESSION['user_id']));
+			$dbl->run("DELETE FROM `$table` WHERE $type_delete `$field` = ? AND user_id = ?", array($item_id, $_SESSION['user_id']));
 			
-			$total_likes = $dbl->run("SELECT COUNT(like_id) FROM `$table` WHERE `$field` = ?", array($pinsid))->fetchOne();
+			if ($_POST['type'] == 'article')
+			{
+				$dbl->run("UPDATE `articles` SET `total_likes` = (total_likes - 1) WHERE `article_id` = ?", array($item_id));
+				$total_likes = $dbl->run("SELECT `total_likes` FROM `articles` WHERE `article_id` = ?", array($item_id));
+			}
+			else
+			{
+				$total_likes = $dbl->run("SELECT COUNT(like_id) FROM `$table` WHERE `$field` = ?", array($item_id))->fetchOne();
+			}
 			
 			echo json_encode(array("result" => 'unliked', 'total' => $total_likes));
 			return true;

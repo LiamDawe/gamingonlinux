@@ -1079,7 +1079,7 @@ class article
 		
 		$params = array_merge([(int) $article_info['article']['article_id']], $blocked_ids, [$this->core->start], [$per_page]);
 		
-		$comments_get = $this->dbl->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 $blocked_sql ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
+		$comments_get = $this->dbl->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, a.`total_likes`, u.username, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 $blocked_sql ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
 		
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
@@ -1087,19 +1087,20 @@ class article
 		
 		foreach ($comments_get as $id_loop)
 		{
-			$like_array[] = (int) $id_loop['comment_id'];
+			// no point checking for if they've liked a comment, that has no likes
+			if ($id_loop['total_likes'] > 0) 
+			{
+				$like_array[] = (int) $id_loop['comment_id'];
+				$sql_replacers[] = '?';
+			}	
 			$user_ids[] = (int) $id_loop['author_id'];
-			$sql_replacers[] = '?';
 		}
 					
-		if (!empty($sql_replacers))
+		if (!empty($like_array))
 		{
 			$to_replace = implode(',', $sql_replacers);
 						
-			// Total number of likes for the comments
-			$get_likes = $this->dbl->run("SELECT data_id, COUNT(*) FROM `likes` WHERE `data_id` IN ( $to_replace ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
-						
-			// this users likes
+			// get this users likes
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 			{
 				$replace = [$_SESSION['user_id']];
@@ -1110,8 +1111,11 @@ class article
 
 				$get_user_likes = $this->dbl->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'comment'", $replace)->fetch_all(PDO::FETCH_COLUMN);
 			}
-						
-			// get a list of each users user groups, so we can display their badges
+		}
+
+		// get a list of each users user groups, so we can display their badges
+		if (!empty($user_ids))
+		{
 			$comment_user_groups = $this->user->post_group_list($user_ids);
 		}
 		
@@ -1242,24 +1246,18 @@ class article
 
 			$this->templating->set('article_id', $article_info['article']['article_id']);
 			$this->templating->set('comment_id', $comments['comment_id']);
- 						
-			$total_likes = 0;
-			if (isset($get_likes[$comments['comment_id']][0]))
-			{
-				$total_likes = $get_likes[$comments['comment_id']][0];
-			}
 
-			$this->templating->set('total_likes', $total_likes);
+			$this->templating->set('total_likes', $comments['total_likes']);
 
 			$who_likes_link = '';
-			if ($total_likes > 0)
+			if ($comments['total_likes'] > 0)
 			{
 				$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
 			}
 			$this->templating->set('who_likes_link', $who_likes_link);
 			
 			$likes_hidden = '';
-			if ($total_likes == 0)
+			if ($comments['total_likes'] == 0)
 			{
 				$likes_hidden = 'likes_hidden';
 			}
@@ -1306,7 +1304,7 @@ class article
 					$like_class = "like";
 					if ($_SESSION['user_id'] != 0)
 					{								
-						if (in_array($comments['comment_id'], $get_user_likes))
+						if (isset($get_user_likes) && in_array($comments['comment_id'], $get_user_likes))
 						{
 							$like_text = "Unlike";
 							$like_class = "unlike";									

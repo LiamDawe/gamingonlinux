@@ -38,6 +38,7 @@ if (!isset($_GET['go']))
 				a.`tagline_image`,
 				a.`gallery_tagline`,
 				a.`comment_count`,
+				a.`total_likes`,
 				t.`filename` as `gallery_tagline_filename`,
 				a.`comments_open`,
 				u.`username`,
@@ -367,13 +368,12 @@ if (!isset($_GET['go']))
 				}
 				$templating->set('bookmark_link', $bookmark_link);
 
-				// Total number of likes for the article
-				$total_alikes = $dbl->run("SELECT COUNT(article_id) as `total` FROM `article_likes` WHERE `article_id` = ?", array($article['article_id']))->fetchOne();
 
-				$templating->set('total_likes', $total_alikes);
+
+				$templating->set('total_likes', $article['total_likes']);
 
 				$who_likes_alink = '';
-				if ($total_alikes > 0)
+				if ($article['total_likes'] > 0)
 				{
 					$who_likes_alink = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?article_id='.$article['article_id'].'">Who?</a>';
 				}
@@ -386,7 +386,7 @@ if (!isset($_GET['go']))
 					$like_class = "like";
 					$they_liked = 0;
 					// Checks current login user liked this status or not
-					if ($total_alikes > 0) // no point checking if they've liked it, if there's no likes
+					if ($article['total_likes'] > 0) // no point checking if they've liked it, if there's no likes
 					{
 						$numlikes = $dbl->run("SELECT 1 FROM `article_likes` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article['article_id']))->fetchOne();
 

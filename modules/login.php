@@ -177,7 +177,7 @@ else if (isset($_POST['action']))
 		else
 		{
 			$_SESSION['login_error_username'] = $_POST['username'];
-			header("Location: ".$core->config('website_url')."/index.php?module=login");
+			header("Location: ".$core->config('website_url')."index.php?module=login");
 		}
 	}
 

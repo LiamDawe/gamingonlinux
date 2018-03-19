@@ -132,7 +132,7 @@ if (isset($_SESSION['message']))
 
 $templating->load('hidden_steam_games');
 
-$total_hidden = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `is_hidden_steam` = 1 AND `approved` = 1 AND `is_application` = 0 AND `also_known_as` IS NULL")->fetchOne();
+$total_hidden = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `is_hidden_steam` = 1 AND `approved` = 1 AND `is_application` = 0 AND `also_known_as` IS NULL AND `is_dlc` = 0")->fetchOne();
 
 $templating->block('top', 'hidden_steam_games');
 $templating->set('total', $total_hidden);

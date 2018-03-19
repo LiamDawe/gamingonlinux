@@ -1482,6 +1482,11 @@ jQuery(document).ready(function()
 			var url = "/includes/ajax/sales/display_normal.php";
 			var list_update = 'normal-sales';
 		}
+		else if (formName == 'hidden_steam')
+		{
+			var url = "/includes/ajax/gamesdb/display_hidden_steam.php";
+			var list_update = 'free-list';
+		}
 
 		$.ajax({
 			type: "GET",

@@ -1120,13 +1120,15 @@ class article
 		}
 		
 		// check over their permissions now
+		$permission_check = $this->user->can(array('mod_delete_comments', 'mod_edit_comments'));
+
 		$can_delete = 0;
-		if ($this->user->can('mod_delete_comments'))
+		if ($permission_check['mod_delete_comments'] == 1)
 		{
 			$can_delete = 1;
 		}
 		$can_edit = 0;
-		if ($this->user->can('mod_edit_comments'))
+		if ($permission_check['mod_edit_comments'] == 1)
 		{
 			$can_edit = 1;
 		}

@@ -193,6 +193,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('supports_linux', $supports_linux);
 
+				$hidden_steam = '';
+				if ($game['is_hidden_steam'] == 1)
+				{
+					$hidden_steam = 'checked';
+				}
+				$templating->set('hidden_steam', $hidden_steam);
+
 				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
 				$type_options = '';
 				foreach ($types as $value => $text)
@@ -383,6 +390,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('supports_linux', $supports_linux);
 
+				$hidden_steam = '';
+				if ($game['is_hidden_steam'] == 1)
+				{
+					$hidden_steam = 'checked';
+				}
+				$templating->set('hidden_steam', $hidden_steam);
+
 				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
 				$type_options = '';
 				foreach ($types as $value => $text)
@@ -506,6 +520,12 @@ if (isset($_POST['act']))
 			$supports_linux = 1;
 		}
 
+		$hidden_steam = 0;
+		if (isset($_POST['hidden_steam']))
+		{
+			$hidden_steam = 1;
+		}
+
 		$guess = 0;
 		if (isset($_POST['guess']))
 		{
@@ -555,7 +575,7 @@ if (isset($_POST['act']))
 			$trailer = $_POST['trailer'];
 		}
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ?", array($name, $description, $date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux));
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ?, `is_hidden_steam` = ?", array($name, $description, $date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $hidden_steam));
 		$new_id = $dbl->new_id();
 
 		$core->process_game_genres($new_id);
@@ -687,6 +707,12 @@ if (isset($_POST['act']))
 			$supports_linux = 1;
 		}
 
+		$hidden_steam = 0;
+		if (isset($_POST['hidden_steam']))
+		{
+			$hidden_steam = 1;
+		}
+
 		$guess = 0;
 		if (isset($_POST['guess']))
 		{
@@ -739,7 +765,7 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $_POST['id']));
+		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ?, `is_hidden_steam` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $hidden_steam, $_POST['id']));
 		
 		$core->process_game_genres($_POST['id']);
 
@@ -827,6 +853,18 @@ if (isset($_POST['act']))
 			$free_game = 1;
 		}
 
+		$supports_linux = 0;
+		if (isset($_POST['supports_linux']))
+		{
+			$supports_linux = 1;
+		}
+
+		$hidden_steam = 0;
+		if (isset($_POST['hidden_steam']))
+		{
+			$hidden_steam = 1;
+		}
+
 		$types = ['is_game', 'is_application', 'is_emulator'];
 		$sql_type = '';
 		if (!in_array($_POST['type'], $types))
@@ -861,7 +899,7 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 
-		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `approved` = 1 WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $_POST['id']));
+		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `approved` = 1, `supports_linux` = ?, `is_hidden_steam` = ? WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $hidden_steam, $_POST['id']));
 		
 		$core->process_game_genres($_POST['id']);
 

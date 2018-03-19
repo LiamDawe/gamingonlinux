@@ -373,6 +373,12 @@ if (isset($_POST['act']))
 			$supports_linux = 1;
 		}
 
+		$hidden_steam = 0;
+		if (isset($_POST['hidden_steam']))
+		{
+			$hidden_steam = 1;
+		}
+
 		$free = 0;
 		if (isset($_POST['free']))
 		{
@@ -397,7 +403,7 @@ if (isset($_POST['act']))
 			$license = $_POST['license'];
 		}
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 0, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `supports_linux` = ?", array($name, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $dlc, $base_game, $free, $license, $supports_linux));
+		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 0, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `supports_linux` = ?, `is_hidden_steam` = ?", array($name, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $dlc, $base_game, $free, $license, $supports_linux, $hidden_steam));
 		$new_id = $dbl->new_id();
 
 		$core->process_game_genres($new_id);

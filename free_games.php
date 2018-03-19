@@ -134,7 +134,7 @@ $game_sales->display_free();
 $templating->block('filters', 'free_games');
 
 // stores
-$genres_res = $dbl->run("SELECT COUNT(g.id) as `total`, c.`category_id`, c.`category_name` FROM `articles_categorys` c LEFT JOIN `game_genres_reference` g ON c.category_id = g.genre_id WHERE c.`is_genre` = 1 GROUP BY c.category_id HAVING `total` > 0 ORDER BY c.`category_name` ASC")->fetch_all();
+$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id from `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`free_game` = 1 group by cat.category_name, cat.category_id")->fetch_all();
 $genres_output = '';
 foreach ($genres_res as $genre)
 {

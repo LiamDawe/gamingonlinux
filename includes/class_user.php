@@ -225,29 +225,54 @@ class user
 	// check if a user is able to do or not do something
 	function can($do)
 	{
-		// find the requested permission
-		$permission_id = $this->db->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$do])->fetchOne();
-		
-		// find all groups that have that permission
-		$allowed_groups = $this->db->run("SELECT m.`group_id`, g.`group_name` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
-		
-		$check_against = [];
-		
-		foreach ($allowed_groups as $key => $value)
-		{
-			$check_against[] = $value['group_id'];
+		// simplistic true or false check for a single permission type
+		if (!is_array($do))
+		{			
+			// find all groups that have that permission
+			$allowed_groups = $this->db->run("SELECT p.name, m.`group_id` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` INNER JOIN `user_group_permissions` p ON p.id = m.permission_id WHERE p.`name` = ?", [$do])->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+
+			foreach ($this->user_groups as $group)
+			{
+				// at least one group they are has it checked, return true
+				if (in_array($group, $allowed_groups[$do]))
+				{
+					return true;
+				}
+			}
+			// if we didn't find any time the group value = 1, then none of their user groups is allowed
+			return false;
 		}
 
-		foreach ($this->user_groups as $group)
+		// checking multiple permissions at the same time
+		if (is_array($do))
 		{
-			// at least one group they are has it checked, return true
-			if (in_array($group, $check_against))
+			$in  = str_repeat('?,', count($do) - 1) . '?';
+
+			// find all groups that have that permission
+			$allowed_groups = $this->db->run("SELECT p.name, m.`group_id` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` INNER JOIN `user_group_permissions` p ON p.id = m.permission_id WHERE p.`name` IN ( $in )", $do)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+
+			$final = [];
+			// check over their user groups and see if their group is allowed to use the permissions
+			foreach ($this->user_groups as $group)
 			{
-				return true;
+				foreach ($allowed_groups as $key => $checker)
+				{
+					// at least one group they are has it checked, return true
+					if (in_array($group, $checker))
+					{
+						$final[$key] = 1;
+					}
+					else if (!in_array($group, $checker))
+					{
+						if (!isset($final[$key]))
+						{
+							$final[$key] = 0;
+						}
+					}
+				}
 			}
-		}
-		// if we didn't find any time the group value = 1, then none of their user groups is allowed
-		return false;
+			return $final;
+		}		
 	}
 	
 	// check if it's a new device, then set the session up

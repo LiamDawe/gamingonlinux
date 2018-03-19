@@ -23,7 +23,7 @@ if (isset($_GET['view']))
 		}
 		
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
@@ -32,6 +32,11 @@ if (isset($_GET['view']))
 			if ($get_item['supports_linux'] == 0)
 			{
 				$core->message("This item does not currently support Linux! It's here in case it ever does, or it may be included in a GOTY Award category for some form of port wishlist (you get the idea). If it shows up in any of our lists, please let us know (it shouldn't!).", 2);
+			}
+
+			if ($get_item['is_hidden_steam'] == 1)
+			{
+				$core->message("This item is not advertised on Steam as supporting Linux, but it has a Linux version.", 2);
 			}
 
 			$templating->block('item_view_top', 'items_database');

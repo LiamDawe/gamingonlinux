@@ -142,7 +142,7 @@ $game_sales->display_hidden_steam();
 $templating->block('filters', 'hidden_steam_games');
 
 // game genre listing
-$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id from `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`is_hidden_steam` = 1 group by cat.category_name, cat.category_id")->fetch_all();
+$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id from `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`is_hidden_steam` = 1 AND c.`is_dlc` = 0 group by cat.category_name, cat.category_id")->fetch_all();
 $genres_output = '';
 foreach ($genres_res as $genre)
 {

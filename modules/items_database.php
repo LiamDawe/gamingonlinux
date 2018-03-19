@@ -36,7 +36,7 @@ if (isset($_GET['view']))
 
 			if ($get_item['is_hidden_steam'] == 1)
 			{
-				$core->message("This item is not advertised on Steam as supporting Linux, but it has a Linux version.", 2);
+				$core->message("This item is not advertised on Steam as supporting Linux, but it does have a Linux version.", 2);
 			}
 
 			$templating->block('item_view_top', 'items_database');

@@ -59,7 +59,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'guess_guess', 'dlc_check', 'base_game', 'free_game', 'trailer', 'trailer_link','small_pic', 'supports_linux');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');
@@ -186,19 +186,16 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$date = new DateTime($game['date']);
 				$templating->set('date', $date->format('d-m-Y'));
 
-				$supports_linux = '';
-				if ($game['supports_linux'] == 1)
+				$checkboxes_names = ['supports_linux', 'is_hidden_steam', 'best_guess', 'is_dlc', 'free_game'];
+				foreach ($checkboxes_names as $check)
 				{
-					$supports_linux = 'checked';
+					$status = '';
+					if ($game[$check] == 1)
+					{
+						$status = 'checked';
+					}
+					$templating->set($check.'_check', $status);
 				}
-				$templating->set('supports_linux', $supports_linux);
-
-				$hidden_steam = '';
-				if ($game['is_hidden_steam'] == 1)
-				{
-					$hidden_steam = 'checked';
-				}
-				$templating->set('hidden_steam', $hidden_steam);
 
 				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
 				$type_options = '';
@@ -212,27 +209,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$type_options .= '<option value="'.$value.'" '.$selected.'>'.$text.'</option>';
 				}
 				$templating->set('type_options', $type_options);
-
-				$guess = '';
-				if ($game['best_guess'] == 1)
-				{
-					$guess = 'checked';
-				}
-				$templating->set('guess_check', $guess);
-
-				$dlc_check = '';
-				if ($game['is_dlc'] == 1)
-				{
-					$dlc_check = 'checked';
-				}
-				$templating->set('dlc_check', $dlc_check);
-
-				$free_check = '';
-				if ($game['free_game'] == 1)
-				{
-					$free_check = 'checked';
-				}
-				$templating->set('free_check', $free_check);
 
 				$licenses = $dbl->run("SELECT `license_name` FROM `item_licenses` ORDER BY `license_name` ASC")->fetch_all();
 				$license_options = '';
@@ -468,7 +444,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 if (isset($_POST['act']))
 {	
-	if ($_POST['act'] == 'Add')
+	// for the action of adding, editing and approving new items
+	if ($_POST['act'] == 'Add' || $_POST['act'] == 'Edit' || $_POST['act'] == 'Approve')
 	{
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
@@ -477,79 +454,91 @@ if (isset($_POST['act']))
 		$steam_link = trim($_POST['steam_link']);
 		$gog_link = trim($_POST['gog_link']);
 		$itch_link = trim($_POST['itch_link']);
-		
+
+		if ($_POST['act'] == 'Edit' || $_POST['act'] == 'Approve')
+		{
+			if (empty($_POST['id']) || !is_numeric($_POST['id']))
+			{
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message_extra'] = 'game';
+				header("Location: /admin.php?module=games&view=manage");
+				die();
+			}
+		}
+
+		if ($_POST['act'] == 'Add')
+		{
+			$finish_page = '/admin.php?module=games&view=add';
+			$error_page = $finish_page;
+		}
+		if ($_POST['act'] == 'Edit')
+		{
+			$finish_page = '/admin.php?module=games&view=edit&id=' . $_POST['id'];
+			$error_page = $finish_page;
+		}
+		if ($_POST['act'] == 'Approve')
+		{
+			$finish_page = '/admin.php?module=games&view=submitted_list';
+			$error_page = '/admin.php?module=games&view=submitted_item&id=' . $_POST['id'];
+		}
+
 		// make sure its not empty
 		$empty_check = core::mempty(compact('name'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = $empty_check;
-			header("Location: /admin.php?module=games&view=add");
+			header("Location: $error_page");
 			die();
 		}
-		
+
+		if ($_POST['act'] == 'Add')
+		{
+			$add_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($name))->fetch();
+			if ($add_res)
+			{
+				$_SESSION['message'] = 'game_add_exists';
+				$_SESSION['message_extra'] = $add_res['id'];
+				header("Location: $error_page");
+				die();
+			}
+		}
+
 		if (empty($link) && empty($steam_link) && empty($gog_link) && empty($itch_link))
 		{
 			$_SESSION['message'] = 'one_link_needed';
-			header("Location: /admin.php?module=games&view=add");
+			header("Location: $error_page");
 			die();
 		}
 
-		$add_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']))->fetch();
-		if ($add_res)
-		{
-			$_SESSION['message'] = 'game_add_exists';
-			$_SESSION['message_extra'] = $add_res['id'];
-			header("Location: /admin.php?module=games&view=add");
-			exit;
-		}
-
+		$sql_date = NULL;
 		if (!empty($date))
 		{
 			$date = new DateTime($date);
-			$date = $date->format('Y-m-d');
-		}
-		else
-		{
-			$date = NULL;
+			$sql_date = $date->format('Y-m-d');
 		}
 
-		$supports_linux = 0;
-		if (isset($_POST['supports_linux']))
+		$checkboxes_names = ['supports_linux', 'is_hidden_steam', 'best_guess', 'is_dlc', 'free_game'];
+		$checkboxes_sql = [];
+		foreach ($checkboxes_names as $check)
 		{
-			$supports_linux = 1;
+			if (isset($_POST[$check]))
+			{
+				$checkboxes_sql[] = ' `'.$check.'` = 1';
+			}
+			else
+			{
+				$checkboxes_sql[] = ' `'.$check.'` = 0';
+			}
 		}
-
-		$hidden_steam = 0;
-		if (isset($_POST['hidden_steam']))
-		{
-			$hidden_steam = 1;
-		}
-
-		$guess = 0;
-		if (isset($_POST['guess']))
-		{
-			$guess = 1;
-		}
-
-		$dlc = 0;
-		if (isset($_POST['dlc']))
-		{
-			$dlc = 1;
-		}
-
-		$free_game = 0;
-		if (isset($_POST['free']))
-		{
-			$free_game = 1;
-		}
+		$checkboxes_sql_insert = implode(', ', $checkboxes_sql);
 
 		$types = ['is_game', 'is_application', 'is_emulator'];
 		$sql_type = '';
 		if (!in_array($_POST['type'], $types))
 		{
 			$_SESSION['message'] = 'no_item_type';
-			header("Location: /admin.php?module=games&view=add");
+			header("Location: $error_page");
 			die();
 		}
 		else
@@ -575,21 +564,63 @@ if (isset($_POST['act']))
 			$trailer = $_POST['trailer'];
 		}
 
-		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `approved` = 1, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ?, `is_hidden_steam` = ?", array($name, $description, $date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $hidden_steam));
-		$new_id = $dbl->new_id();
-
-		$core->process_game_genres($new_id);
-
-		if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
+		if ($_POST['act'] == 'Add')
 		{
-			$games_database->move_small($new_id, $_SESSION['gamesdb_smallpic']['image_name']);
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer));
+			$new_id = $dbl->new_id();
+	
+			$core->process_game_genres($new_id);
+	
+			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
+			{
+				$games_database->move_small($new_id, $_SESSION['gamesdb_smallpic']['image_name']);
+			}
+	
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
+	
+			$_SESSION['message'] = 'saved';
+			$_SESSION['message_extra'] = 'game';
 		}
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
+		if ($_POST['act'] == 'Edit')
+		{
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $_POST['id']));
+		
+			$core->process_game_genres($_POST['id']);
+	
+			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
+			{
+				$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
+			}
+	
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
 
-		$_SESSION['message'] = 'saved';
-		$_SESSION['message_extra'] = 'game';
-		header("Location: /admin.php?module=games&view=add");
+			$_SESSION['message'] = 'edited';
+			$_SESSION['message_extra'] = 'game';	
+		}
+
+		if ($_POST['act'] == 'Approve')
+		{
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `approved` = 1, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $_POST['id']));
+		
+			$core->process_game_genres($_POST['id']);
+	
+			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
+			{
+				$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
+			}
+	
+			// update the original notification to clear it
+			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'item_database_addition'", [core::$date, $_POST['id']]);
+	
+			// note who approved this item for the database
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'item_database_approved', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+		
+			$_SESSION['message'] = 'submit_approved';	
+		}
+
+		header("Location: $finish_page");
+		die();
 	}
 	if ($_POST['act'] == 'approve_tags')
 	{
@@ -668,254 +699,6 @@ if (isset($_POST['act']))
 
 		$_SESSION['message'] = 'tags_denied';
 		header("Location: /admin.php?module=games&view=tag_suggestions");
-	}
-	if ($_POST['act'] == 'Edit')
-	{
-		if (empty($_POST['id']) || !is_numeric($_POST['id']))
-		{
-			$_SESSION['message'] = 'no_id';
-			$_SESSION['message_extra'] = 'game';
-			header("Location: /admin.php?module=games&view=manage");
-			die();
-		}
-
-		$name = $_POST['name'];
-		$date = $_POST['date'];
-		$empty_check = core::mempty(compact('name'));
-		if ($empty_check !== true)
-		{
-			$_SESSION['message'] = 'empty';
-			$_SESSION['message_extra'] = $empty_check;
-
-			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id']);
-			die();
-		}
-
-		if (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link']) && empty($_POST['itch_link']))
-		{
-			$_SESSION['message'] = 'link_needed';
-
-			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id']);
-			die();
-		}
-
-		$date = new DateTime($_POST['date']);
-
-		$supports_linux = 0;
-		if (isset($_POST['supports_linux']))
-		{
-			$supports_linux = 1;
-		}
-
-		$hidden_steam = 0;
-		if (isset($_POST['hidden_steam']))
-		{
-			$hidden_steam = 1;
-		}
-
-		$guess = 0;
-		if (isset($_POST['guess']))
-		{
-			$guess = 1;
-		}
-
-		$dlc = 0;
-		if (isset($_POST['dlc']))
-		{
-			$dlc = 1;
-		}
-
-		$free_game = 0;
-		if (isset($_POST['free']))
-		{
-			$free_game = 1;
-		}
-
-		$types = ['is_game', 'is_application', 'is_emulator'];
-		$sql_type = '';
-		if (!in_array($_POST['type'], $types))
-		{
-			$_SESSION['message'] = 'no_item_type';
-			header("Location: /admin.php?module=games&view=edit&id=".$_POST['id']);
-			die();
-		}
-		else
-		{
-			$sql_type = '`'.$_POST['type'].'` = 1, ';
-		}
-
-		$base_game = NULL;
-		if (isset($_POST['game']) && is_numeric($_POST['game']))
-		{
-			$base_game = $_POST['game'];
-		}
-
-		$license = NULL;
-		if (!empty($_POST['license']))
-		{
-			$license = $_POST['license'];
-		}
-
-		$trailer = NULL;
-		if (!empty(trim($_POST['trailer'])))
-		{
-			$trailer = $_POST['trailer'];
-		}
-
-		$name = trim($_POST['name']);
-		$description = trim($_POST['text']);
-
-		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `supports_linux` = ?, `is_hidden_steam` = ? WHERE `id` = ?", array($name, $description, $date->format('Y-m-d'), $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $hidden_steam, $_POST['id']));
-		
-		$core->process_game_genres($_POST['id']);
-
-		if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
-		{
-			$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
-		}
-
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
-	
-		if (isset($_GET['return']) && !empty($_GET['return']))
-		{
-			if ($_GET['return'] == 'calendar')
-			{
-				$_SESSION['message'] = 'edited';
-				$_SESSION['message_extra'] = 'game';
-				header("Location: /index.php?module=calendar");
-			}
-			if ($_GET['return'] == 'view_item')
-			{
-				$_SESSION['message'] = 'edited';
-				$_SESSION['message_extra'] = 'game';
-				header("Location: /index.php?module=items_database&view=item&id=" . $_POST['id']);
-			}
-		}
-		else
-		{
-			$_SESSION['message'] = 'edited';
-			$_SESSION['message_extra'] = 'game';
-			header("Location: /admin.php?module=games&view=edit&id=" . $_POST['id']);
-		}
-	}
-	if ($_POST['act'] == 'Approve')
-	{
-		if (empty($_POST['id']) || !is_numeric($_POST['id']))
-		{
-			$_SESSION['message'] = 'no_id';
-			$_SESSION['message_extra'] = 'game';
-			header("Location: /admin.php?module=games&view=submitted_list");
-			die();
-		}
-
-		$name = $_POST['name'];
-		$empty_check = core::mempty(compact('name'));
-		if ($empty_check !== true)
-		{
-			$_SESSION['message'] = 'empty';
-			$_SESSION['message_extra'] = $empty_check;
-
-			header("Location: /admin.php?module=games&view=submitted_item&id=" . $_POST['id']);
-			die();
-		}
-
-		if (empty($_POST['link']) && empty($_POST['steam_link']) && empty($_POST['gog_link']) && empty($_POST['itch_link']))
-		{
-			$_SESSION['message'] = 'link_needed';
-
-			header("Location: /admin.php?module=games&view=submitted_item&id=" . $_POST['id']);
-			die();
-		}
-
-		$sql_date = NULL;
-		$date = trim($_POST['date']);
-		if (!empty($date))
-		{
-			$date = new DateTime($_POST['date']);
-			$sql_date = $date->format('Y-m-d');
-		}
-
-		$guess = 0;
-		if (isset($_POST['guess']))
-		{
-			$guess = 1;
-		}
-
-		$dlc = 0;
-		if (isset($_POST['dlc']))
-		{
-			$dlc = 1;
-		}
-
-		$free_game = 0;
-		if (isset($_POST['free']))
-		{
-			$free_game = 1;
-		}
-
-		$supports_linux = 0;
-		if (isset($_POST['supports_linux']))
-		{
-			$supports_linux = 1;
-		}
-
-		$hidden_steam = 0;
-		if (isset($_POST['hidden_steam']))
-		{
-			$hidden_steam = 1;
-		}
-
-		$types = ['is_game', 'is_application', 'is_emulator'];
-		$sql_type = '';
-		if (!in_array($_POST['type'], $types))
-		{
-			$_SESSION['message'] = 'no_item_type';
-			header("Location: /index.php?module=items_database&view=submit_item");
-			die();
-		}
-		else
-		{
-			$sql_type = '`'.$_POST['type'].'` = 1, ';
-		}
-
-		$base_game = NULL;
-		if (isset($_POST['game']) && is_numeric($_POST['game']))
-		{
-			$base_game = $_POST['game'];
-		}
-
-		$license = NULL;
-		if (!empty($_POST['license']))
-		{
-			$license = $_POST['license'];
-		}
-
-		$trailer = NULL;
-		if (!empty(trim($_POST['trailer'])))
-		{
-			$trailer = $_POST['trailer'];
-		}
-
-		$name = trim($_POST['name']);
-		$description = trim($_POST['text']);
-
-		$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `best_guess` = ?, `is_dlc` = ?, `base_game_id` = ?, `free_game` = ?, $sql_type `license` = ?, `trailer` = ?, `approved` = 1, `supports_linux` = ?, `is_hidden_steam` = ? WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $guess, $dlc, $base_game, $free_game, $license, $trailer, $supports_linux, $hidden_steam, $_POST['id']));
-		
-		$core->process_game_genres($_POST['id']);
-
-		if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
-		{
-			$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
-		}
-
-		// update the original notification to clear it
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'item_database_addition'", [core::$date, $_POST['id']]);
-
-		// note who approved this item for the database
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'item_database_approved', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
-	
-		$_SESSION['message'] = 'submit_approved';
-		header("Location: /admin.php?module=games&view=submitted_list");
 	}
 	if ($_POST['act'] == 'Deny')
 	{

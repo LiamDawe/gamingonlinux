@@ -526,7 +526,7 @@ else
 			{
 				$check_ban = $dbl->run("SELECT `username`, `banned` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
 
-				if ($check_ban['banned'] !== "1")
+				if ($check_ban['banned'] !== 1)
 				{
 					$core->message("This user is not banned. Deleting a users content is only possible if they are banned.");
 				}

@@ -1482,6 +1482,7 @@ color: #fff !important;
 		margin-left: 7px;
 	}
 	.database-extra {width: 100%; clear: both; max-width: 100%;}
+	.chartjs-container{min-height: 200px;}
 }
 /* MOBILE PORTRAIT */
 @media only screen and (max-width: 320px)
@@ -1750,3 +1751,5 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .calendar-items tr:nth-child(odd) {background: #FFF}
 .dark .calendar-items tr:nth-child(even) {background: #333}
 .dark .calendar-items tr:nth-child(odd) {background: #3f3f3f}
+
+.chartjs-container{min-height: 450px;}

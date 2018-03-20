@@ -187,39 +187,9 @@ class user
 	// return a list of group ids that have a particular permission
 	function get_group_ids($permission)
 	{
-		// find the requested permission
-		$permission_id = $this->db->run("SELECT `id` FROM `user_group_permissions` WHERE `name` = ?", [$permission])->fetchOne();
+		$allowed_groups = $this->db->run("SELECT m.`group_id` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` INNER JOIN `user_group_permissions` p ON p.id = m.permission_id WHERE p.`name` = ?", [$permission])->fetch_all(PDO::FETCH_COLUMN);
 		
-		// find all groups that have that permission
-		$allowed_groups = $this->db->run("SELECT m.`group_id`, g.`group_name`,g.`remote_group`, g.`universal` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` WHERE m.`permission_id` = ?", [$permission_id])->fetch_all();
-
-		$return_ids = [];
-		
-		// if we are using local users, remove any remote groups to check permissions on
-		if ($this->core->config('local_users') == 1)
-		{
-			foreach ($allowed_groups as $key => $value)
-			{
-				if ($value['remote_group'] == 1)
-				{
-					unset($allowed_groups[$key]);
-				}
-				else
-				{
-					$return_ids[] = $value['group_id'];
-				}
-			}
-		}
-		// else we are on an install that's using a remote users database, remove their local groups
-		else
-		{
-			foreach ($allowed_groups as $key => $value)
-			{
-				$return_ids[] = $value['group_id'];
-			}			
-		}
-		
-		return $return_ids;
+		return $allowed_groups;
 	}
 	
 	// check if a user is able to do or not do something

@@ -187,7 +187,7 @@ else
 		
 		if ($_GET['view'] == 'edit_group')
 		{
-			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour`, `remote_group` FROM `user_groups` WHERE `group_id` = ?", [$_GET['id']])->fetch();
+			$group = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` WHERE `group_id` = ?", [$_GET['id']])->fetch();
 			
 			$permissions_list = $dbl->run("SELECT `id`, `name` FROM `user_group_permissions` ORDER BY `id` ASC")->fetch_all();
 			
@@ -204,12 +204,6 @@ else
 			$templating->set('badge_check', $show_badge);
 			$templating->set('colour', $group['badge_colour']);
 			$templating->set('badge_text', $group['badge_text']);
-			$remote_group = '';
-			if ($group['remote_group'] == 1)
-			{
-				$remote_group = 'checked';
-			}
-			$templating->set('remote_check', $remote_group);
 			
 			$permission_rows = '';
 			foreach ($permissions_list as $perm)
@@ -597,13 +591,8 @@ else
 			{
 				$show_badge = 1;
 			}
-			$remote = 0;
-			if (isset($_POST['remote_group']))
-			{
-				$remote = 1;
-			}
 			
-			$dbl->run("UPDATE `user_groups` SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ?, `remote_group` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $remote, $_POST['group_id']]);
+			$dbl->run("UPDATE `user_groups` SET `group_name` = ?, `show_badge` = ?, `badge_text` = ?, `badge_colour` = ? WHERE `group_id` = ?", [$_POST['name'], $show_badge, $_POST['badge_text'], $_POST['badge_colour'], $_POST['group_id']]);
 			
 			// user group updating
 			$current_permissions = $dbl->run("SELECT `permission_id` FROM `user_group_permissions_membership` WHERE `group_id` = ?", [$_POST['group_id']])->fetch_all(PDO::FETCH_COLUMN);

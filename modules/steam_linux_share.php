@@ -218,9 +218,6 @@ $templating->set('threesome', $threesome);
 $total_steam_active = 150000000;
 
 $linux_user_total = $total_steam_active/100 * $linux_perc[count($linux_perc)-1];
-$linux_user_total_no_chinese = $total_steam_active/100 * $linux_wo_chinese[count($linux_wo_chinese)-1];
-$linux_user_total_english = $total_steam_active/100 * $linux_eng_only[count($linux_eng_only)-1];
 
 $templating->set('linux_user_total', number_format($linux_user_total));
-$templating->set('linux_user_total_no_chinese', number_format($linux_user_total_no_chinese));
-$templating->set('linux_user_total_english', number_format($linux_user_total_english));
+$templating->set('linux_latest_total', str_replace("'", '', $dates[count($dates) - 1]) . ' - ' . $linux_perc[count($linux_perc)-1] . '%');

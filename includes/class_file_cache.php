@@ -31,7 +31,7 @@ class file_cache
 	// update the cache for this file
 	function write($filename)
 	{
-		// open, but do not truncate
+		// open, but do not truncate leaving data in place for others
 		$fp = fopen($this->folder . $filename . '.html', 'c'); 
 		if ($fp === false) 
 		{
@@ -39,6 +39,8 @@ class file_cache
         }
 		// exclusive lock, but don't block it so others can still read
 		flock($fp, LOCK_EX | LOCK_NB); 
+        // truncate it now we've got our exclusive lock
+		ftruncate($fp, 0);
 		fwrite($fp, ob_get_contents());
 		flock($fp, LOCK_UN); // release lock
 		fclose($fp);

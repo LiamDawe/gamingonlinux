@@ -131,6 +131,7 @@ do
 		}
 	}
 	$page++;
+	echo 'Moving onto page: ' . $page;
 } while ($stop == 0);
 
 $total_updated = count($updated_list);
@@ -141,20 +142,18 @@ if ($total_added > 0)
 	$email_output = array();
 	foreach ($new_games as $new)
 	{
-		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: ' . $new['link'];
+		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: <a href="'.$new['link'].'">' . $new['link'] . '</a>';
 	}
 
 	$to = $core->config('contact_email');
 	$subject = 'GOL Steam New';
 
-	// To send HTML mail, the Content-type header must be set
-	$headers  = 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-	$headers .= "From: GOL - New Steam Games <noreply@gamingonlinux.com>\r\n";
-
-	$content = implode('<br />', $email_output);
-
-	mail($to, $subject, $content, $headers);
+	// Mail it
+	if ($core->config('send_emails') == 1)
+	{
+		$mail = new mailer($core);
+		$mail->sendMail($to, $subject, $html_message);
+	}
 }
 
 echo 'Total updated: ' . $total_updated . ". Total new: ".$total_added.". Last page: ". $page . "\n";

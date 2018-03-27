@@ -145,6 +145,8 @@ if ($total_added > 0)
 		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: <a href="'.$new['link'].'">' . $new['link'] . '</a>';
 	}
 
+	$html_message = implode("<br />", $email_output);
+
 	$to = $core->config('contact_email');
 	$subject = 'GOL Steam New';
 

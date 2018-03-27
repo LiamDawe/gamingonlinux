@@ -81,7 +81,7 @@ do
 
 						echo '<img src="' . $game->featured_image_small .' " alt=""/><br />Link: https://www.humblebundle.com/store/p/' . $game->machine_name . '<br />' .  $game->human_name . ' Current Price: $' . $game->current_price[0]  .  ', Full Price: $' . $game->full_price[0] . '<br />';
 
-						$website = 'https://www.humblebundle.com/store/p/' . $game->machine_name . '/?partner=gamingonlinux';
+						$website = 'https://www.humblebundle.com/store/p/' . $game->machine_name . '?partner=gamingonlinux';
 					
 						// ADD IT TO THE GAMES DATABASE
 						$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();

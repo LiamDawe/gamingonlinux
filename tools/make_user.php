@@ -40,6 +40,14 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 		$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$new_user_id, $group]);
 	}
 
+	// update total users config
+	$dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_users'");
+
+	$new_total = $dbl->run("SELECT `data_value` FROM `config` WHERE `data_key` = 'total_users'")->fetchOne();
+
+	// invalidate the cache
+	core::$redis->set('CONFIG_total_users', $new_total); // no expiry as config hardly ever changes
+
 	echo 'User <strong>' . $username . '</strong> created with password: ' . $_POST['password'];
 }
 
@@ -76,7 +84,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user_random')
 <link rel="stylesheet" type="text/css" href="../includes/jscripts/select2/select2.min.css">
 <script src="../includes/jscripts/jquery-3.2.1.min.js"></script>
 <script src="../includes/jscripts/select2/select2.min.js?v=1"></script>
-<script async type="text/javascript" src="../includes/jscripts/header.js?v=8.7.3"></script>
+<script async type="text/javascript" src="../includes/jscripts/GOL/header.js?v=8.7.3"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/Article">

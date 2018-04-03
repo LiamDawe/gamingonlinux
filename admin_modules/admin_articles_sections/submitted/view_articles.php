@@ -211,7 +211,7 @@ else if (isset($_GET['aid']))
 	$allcat_res = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
 	foreach ($allcat_res as $categorys)
 	{
-		if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
+		if (isset($message_map::$error) && $message_map::$error > 0)
 		{
 			if (isset($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 			{
@@ -271,7 +271,7 @@ else if (isset($_GET['aid']))
 	$templating->set('ip_address', $user_ip);
 
 	// if they have done it before set title, text and tagline
-	if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
+	if (isset($message_map::$error) && $message_map::$error > 0)
 	{
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
@@ -293,7 +293,7 @@ else if (isset($_GET['aid']))
 
 	// if they have done it before set the text
 	$text = $article['text'];
-	if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
+	if (isset($message_map::$error) && $message_map::$error > 0)
 	{
 		$text = $_SESSION['atext'];
 	}

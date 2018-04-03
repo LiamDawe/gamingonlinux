@@ -157,7 +157,7 @@ else
 	$all_res = $dbl->run("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
 	foreach ($all_res as $categorys)
 	{
-		if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
+		if (isset($message_map::$error) && $message_map::$error > 0)
 		{
 			if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 			{
@@ -190,7 +190,7 @@ else
 	$templating->set('username', $article['username']);
 
 	// if they have done it before set title, text and tagline
-	if (isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2)
+	if (isset($message_map::$error) && $message_map::$error > 0)
 	{
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);

@@ -124,8 +124,9 @@ else
 
 	// if they have done it before set title, text and tagline
 	$text = $article['text'];
-	if (isset($message_map::$error) && $message_map::$error == 1)
+	if (isset($message_map::$error) && $message_map::$error > 0)
 	{
+		die('error detected');
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
 		$templating->set('slug', $_SESSION['aslug']);

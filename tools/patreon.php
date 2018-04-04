@@ -32,9 +32,10 @@ if (isset($_POST['go']))
 	{
 		// make it a proper decimal number to compare against
 		$pledge = (float) $line[3];
+		$status = trim($line[5]);
 
 		// if they pledge at least 5 dollars a month
-		if ($pledge >= 4)
+		if ($pledge >= 4 && $status == 'Processed')
 		{
 			$user_info = $dbl->run("SELECT `username`, `user_id` FROM `users` WHERE `email` = ? OR `supporter_email` = ?", array($line[2], $line[2]))->fetch();
 			// it didn't find an account, email them
@@ -96,6 +97,7 @@ if (isset($_POST['go']))
 			}
 		}
 		unset($pledge); // don't let them accidentally add up
+		unset($status);
 	}
 }
 ?>

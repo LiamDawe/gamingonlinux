@@ -225,3 +225,5 @@ else
 $dbl->run("UPDATE `crons` SET `last_ran` = ?, `data_currency` = ? WHERE `name` = 'steam_sales_import'", [core::$sql_date_now, $currency_id]);
 
 echo "End of Steam Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";
+
+$dbl = NULL;

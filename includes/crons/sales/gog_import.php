@@ -155,3 +155,5 @@ if (isset($total_on_sale) && $total_on_sale > 0)
 
 echo "\n\n";
 echo "End of GOG import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";
+
+$dbl = NULL;

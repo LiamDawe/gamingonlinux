@@ -44,6 +44,8 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^admin/?$ /index.php?module=home [N]
 
   RewriteRule ^latest-comments/?$ /index.php?module=comments_latest [N]
+  
+  RewriteRule ^latest-comments/page=([0-9]+)/?$ /index.php?module=comments_latest&page=$1 [N,NC,QSA]
 
   RewriteRule ^home/banned?$ /index.php?module=home&message=banned [N]
 

@@ -388,10 +388,7 @@ class charts
 			$min_max_text .= 'Max: '.$data['max'];
 		}
 					
-		if ($min_max_text != NULL)
-		{
-			$return_data = '<text class="golsvg_minmax" x="'.$min_max_x.'" y="'.$min_max_y.'" font-size="'.$this->chart_options['min_max_font_size'].'">'.$min_max_text.'</text>';
-		}
+		$return_data = '<text class="golsvg_minmax" x="'.$min_max_x.'" y="'.$min_max_y.'" font-size="'.$this->chart_options['min_max_font_size'].'">'.$min_max_text.'</text>';
 
 		return $return_data;
 	}
@@ -1022,6 +1019,27 @@ class charts
 				$bar_outline_colour = imagecolorallocate($this->image, 117, 117, 117);		
 				imagefilledrectangle($this->image, $this->bars_x_start, $this_bar_y, $this->bars_x_start+$bar_width, $this_bar_y+$this->chart_options['bar_thickness'],$bar_background);
 				imagerectangle($this->image, $this->bars_x_start, $this_bar_y, $this->bars_x_start+$bar_width, $this_bar_y+$this->chart_options['bar_thickness'], $bar_outline_colour);
+
+				// min max labels
+				$min_max_y = $this_bar_y + $this->chart_options['min_max_y_padding'];
+				$min_max_x = $this->bars_x_start + $this->chart_options['min_max_x_padding'];
+				$min_max_text = NULL;
+							
+				if (isset($label['min']) && $label['min'] != NULL && $label['min'] > 0)
+				{
+					$min_max_text = 'Min: '.$label['min'];	
+				}
+				if (isset($label['max']) && $label['max'] != NULL && $label['max'] > 0)
+				{
+					// if we already have a min value, add a seperator
+					if ($min_max_text != NULL)
+					{
+						$min_max_text .= ' | ';
+					}
+					$min_max_text .= 'Max: '.$label['max'];
+				}
+
+				imagestring ($this->image,3,$min_max_x, $min_max_y,$min_max_text,$text_colour);
 
 				// bar counters and their positions
 				$this_counter_x = $this->bars_x_start+$bar_width+$this->chart_options['bar_counter_left_padding'];

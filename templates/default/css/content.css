@@ -80,3 +80,6 @@ hr.content_split {
 	background-color: #fff;
 	border-top: 2px dotted #8c8b8b;
 }
+
+.article table {border: 1px solid #2e2e2e;}
+.dark .article table {border: 1px solid #eee;}

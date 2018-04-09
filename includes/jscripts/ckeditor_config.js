@@ -32,7 +32,9 @@ CKEDITOR.editorConfig = function( config ) {
 	
 	config.contentsCss = [ '/templates/default/css/content.css', '/templates/default/css/reset.css' ];
 	
-	config.height = 500; 
+	config.height = 500;
+
+	config.bodyClass = 'article';
 
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';

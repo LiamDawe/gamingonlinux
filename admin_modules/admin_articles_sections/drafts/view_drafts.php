@@ -126,7 +126,6 @@ else
 	$text = $article['text'];
 	if (isset($message_map::$error) && $message_map::$error > 0)
 	{
-		die('error detected');
 		$templating->set('title', htmlentities($_SESSION['atitle'], ENT_QUOTES));
 		$templating->set('tagline', $_SESSION['atagline']);
 		$templating->set('slug', $_SESSION['aslug']);

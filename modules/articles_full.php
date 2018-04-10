@@ -773,7 +773,7 @@ else if (isset($_GET['go']))
 
 									if (!$get_note_info)
 									{
-										$dbl->run("INSERT INTO `user_notifications` SET `last_date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array(core::$sql_date_now, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
+										$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array($email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
 										$new_notification_id[$email_user['user_id']] = $dbl->new_id();
 									}
 									else if ($get_note_info)

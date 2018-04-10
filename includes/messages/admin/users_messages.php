@@ -24,6 +24,11 @@ return [
 	[
 		"text" => 'That username could not be changed, another user already has it!',
 		"error" => 1
+	],
+	"cannot_remove_admin" =>
+	[
+		"text" => "You cannot remove the main admin account!",
+		"error" => 1
 	]
 ];
 ?>

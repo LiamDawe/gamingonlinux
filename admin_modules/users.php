@@ -469,6 +469,13 @@ else
 
 		if ($_POST['act'] == 'delete_user')
 		{
+			if ($_GET['user_id'] == 1)
+			{
+				$_SESSION['message'] = 'cannot_remove_admin';
+				header("Location: /admin.php?module=users&view=edituser&user_id=1");
+				die();
+			}
+
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
 			{
 				$core->yes_no("Are you sure you wish to delete {$_POST['username']}? This CANNOT be undone, and this action is logged!", "admin.php?module=users&user_id={$_GET['user_id']}", 'delete_user');
@@ -481,26 +488,7 @@ else
 
 			else
 			{
-				// remove any old avatar if one was uploaded
-				$deleted_info = $dbl->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
-
-				if ($deleted_info['avatar_uploaded'] == 1)
-				{
-					unlink('uploads/avatars/' . $deleted_info['avatar']);
-				}
-
-				$dbl->run("DELETE FROM `users` WHERE `user_id` = ?", array($_GET['user_id']));
-				$dbl->run("DELETE FROM `user_profile_info` WHERE `user_id` = ?", [$_GET['user_id']]);
-				$dbl->run("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
-				$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($_GET['user_id']));
-				$dbl->run("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($_GET['user_id']));
-				$dbl->run("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($_GET['user_id']));
-				$dbl->run("DELETE FROM `user_notifications` WHERE `owner_id` = ?", [$_GET['user_id']]);
-				$dbl->run("UPDATE `articles_comments` SET `author_id` = 0 WHERE `author_id` = ?", [$_GET['user_id']]);
-				$dbl->run("UPDATE `forum_topics` SET `author_id` = 0 WHERE `author_id` = ?", array($_GET['user_id']));
-				$dbl->run("UPDATE `forum_replies` SET `author_id` = 0 WHERE `author_id` = ?", array($_GET['user_id']));
-				$dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
+				$user->delete_user($_GET['user_id']);
 
 				$_SESSION['message'] = 'deleted';
 				$_SESSION['message_extra'] = 'user account';

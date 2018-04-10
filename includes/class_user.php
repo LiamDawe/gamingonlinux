@@ -351,7 +351,7 @@ class user
 		}
 	}
 
-	function logout($banned = 0)
+	function logout($banned = 0, $redirect = 1)
 	{
 		if (isset($_COOKIE['gol-device']))
 		{
@@ -384,8 +384,11 @@ class user
 			$_SESSION['message'] = 'banned';
 		}
 		
-		header("Location: ".$this->core->config('website_url'));
-		die();
+		if ($redirect == 1)
+		{
+			header("Location: ".$this->core->config('website_url'));
+			die();
+		}
 	}
 	
 	// get a list of this users user groups, store it so we can access it as many times as required without hitting the DB constantly
@@ -846,5 +849,31 @@ class user
 			
 		header("Location: /usercp.php?module=block_list");
 		die();
+	}
+
+	function delete_user($user_id)
+	{
+		// remove any old avatar if one was uploaded
+		$deleted_info = $this->db->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetch();
+
+		if ($deleted_info['avatar_uploaded'] == 1)
+		{
+			unlink('uploads/avatars/' . $deleted_info['avatar']);
+		}
+
+		$this->db->run("DELETE FROM `users` WHERE `user_id` = ?", array($user_id));
+		$this->db->run("DELETE FROM `user_profile_info` WHERE `user_id` = ?", array($user_id));
+		$this->db->run("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ?", array($user_id));
+		$this->db->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ?", array($user_id));
+		$this->db->run("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($user_id));
+		$this->db->run("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($user_id));
+		$this->db->run("DELETE FROM `user_notifications` WHERE `owner_id` = ?", array($user_id));
+		$this->db->run("UPDATE `articles_comments` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
+		$this->db->run("UPDATE `forum_topics` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
+		$this->db->run("UPDATE `forum_replies` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
+		$this->db->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
+		$this->db->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
+
+		session_destroy();
 	}
 }

@@ -1,0 +1,15 @@
+[block: main]
+<div class="box">
+	<div class="head">User account removal</div>
+	<div class="body group">Here you can permanently remove your account. It will not be disabled and hidden, it will be removed. Once done, you're free to register again any time.<br />
+	<br />
+	<strong>This cannot be undone!</strong><br />
+	<br />
+	To remove your account, please enter your current password:
+	<form method="post" action="/usercp.php?module=removeacc">
+		<input type="password" name="password" /><br />
+		<button type="submit" name="act" value="remove_account">Delete My Account</button>
+	</form>
+	</div>
+</div>
+[/block: main]

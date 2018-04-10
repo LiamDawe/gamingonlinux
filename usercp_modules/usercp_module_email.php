@@ -1,4 +1,6 @@
 <?php
+$templating->set_previous('title', 'Change Email' . $templating->get('title', 1)  , 1);
+
 $grab_email = $dbl->run("SELECT `email`, `username`, `supporter_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 $templating->load('usercp_modules/usercp_module_email');

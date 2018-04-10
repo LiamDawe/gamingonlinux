@@ -31,12 +31,12 @@ if(isset($_POST))
 				// they have one, add to the total + set you as the last person
 				if ($check_notes)
 				{
-					$dbl->run("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array(core::$date, $_SESSION['user_id'], $check_notes));
+					$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array(core::$sql_date_now, $_SESSION['user_id'], $check_notes));
 				}
 				// insert notification as there was none
 				else
 				{
-					$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `type` = 'editor_plan', `owner_id` = ?, `notifier_id` = ?, `total` = 1", array(core::$date, $emailer['user_id'], $_SESSION['user_id']));
+					$dbl->run("INSERT INTO `user_notifications` SET `type` = 'editor_plan', `owner_id` = ?, `notifier_id` = ?, `total` = 1", array($emailer['user_id'], $_SESSION['user_id']));
 				}
 			}
 		}
@@ -102,7 +102,7 @@ if(isset($_POST))
 						
 							$older_date = strtotime($last_plan['date_posted']);
 							
-							$dbl->run("UPDATE `user_notifications` SET `date` = ?, `total` = (total - 1), `notifier_id` = ? WHERE `id` = ?", array($older_date, $last_plan['user_id'], $check_notes['id']));
+							$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `total` = (total - 1), `notifier_id` = ? WHERE `id` = ?", array($older_date, $last_plan['user_id'], $check_notes['id']));
 						}
 					}
 				}

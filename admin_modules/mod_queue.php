@@ -269,21 +269,14 @@ if (isset($_POST['action']))
 
 						if (!$get_note_info)
 						{
-							$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array(core::$date, $email_user['user_id'],  $_POST['author_id'], $approved['article_id'], $_POST['post_id']));
+							$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array($email_user['user_id'],  $_POST['author_id'], $approved['article_id'], $_POST['post_id']));
 							$new_notification_id[$email_user['user_id']] = $dbl->new_id();
 						}
 						else if ($get_note_info)
 						{
-							// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
-							if ($get_note_info['seen'] == 1)
-							{
-								$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_POST['author_id'], core::$date, $_POST['post_id'], $get_note_info['id']));
-							}
-							// they haven't seen this note before, so add one to the counter and update the date
-							else if ($get_note_info['seen'] == 0)
-							{
-								$dbl->run("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
-							}
+							// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+							$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = (total + 1), `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_POST['author_id'], core::$sql_date_now, $_POST['post_id'], $get_note_info['id']));
+							
 							$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
 						}
 					}

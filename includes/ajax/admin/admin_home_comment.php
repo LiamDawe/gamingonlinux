@@ -46,7 +46,8 @@ if(isset($_POST))
 				// they have one, add to the total + set you as the last person
 				if ($check_notes)
 				{
-					$dbl->run("UPDATE `user_notifications` SET `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], $check_notes));
+					// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+					$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `seen` = 0, `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array(core::$sql_date_now, $_SESSION['user_id'], $check_notes));
 				}
 				// insert notification as there was none
 				else
@@ -113,7 +114,8 @@ if(isset($_POST))
 				// they have one, add to the total + set you as the last person
 				if ($check_notes)
 				{
-					$dbl->run("UPDATE `user_notifications` SET `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], $check_notes));
+					// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+					$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `seen` = 0, `total` = (total + 1), `notifier_id` = ? WHERE `id` = ?", array(core::$sql_date_now, $_SESSION['user_id'], $check_notes));
 				}
 				// insert notification as there was none
 				else

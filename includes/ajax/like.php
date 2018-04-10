@@ -40,17 +40,17 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			$get_note = $dbl->run("SELECT `owner_id`, `id`, `total` FROM `user_notifications` WHERE `owner_id` = ? AND `type` = 'liked' AND `comment_id` = ?", array($_POST['author_id'], $_POST['comment_id']))->fetch();
 			if ($get_note)
 			{
-				$dbl->run("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = 0, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $_SESSION['user_id'], $get_note['id']));
+				$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = 0, `total` = (total + 1) WHERE `id` = ?", array(core::$sql_date_now, $_SESSION['user_id'], $get_note['id']));
 			}
 			else
 			{
-				$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `type` = 'liked', `total` = 1", array(core::$date, $_POST['author_id'], $_SESSION['user_id'], $_POST['article_id'], $_POST['comment_id']));
+				$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `type` = 'liked', `total` = 1", array($_POST['author_id'], $_SESSION['user_id'], $_POST['article_id'], $_POST['comment_id']));
 			}
 		}
 		// insert the actual "like" row, update counter
 		if ($count_notifications == 0)
 		{
-			$dbl->run("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($item_id, $_SESSION['user_id'], core::$date));
+			$dbl->run("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($item_id, $_SESSION['user_id'], core::$sql_date_now));
 			
 			$dbl->run("UPDATE `$main_table` SET `total_likes` = (total_likes + 1) WHERE `$main_table_id_field` = ?", array($item_id));
 			$total_likes = $dbl->run("SELECT `total_likes` FROM `$main_table` WHERE `$main_table_id_field` = ?", array($item_id))->fetchOne();
@@ -85,7 +85,9 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 						$seen = 1;
 					}
 
-					$dbl->run("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = ?, `total` = (total - 1) WHERE `id` = ?", array($last_like['date'], $last_like['user_id'], $seen, $current_likes['id']));
+					$new_date = date('Y-m-d H:i:s', $last_like['date']); //likes table uses plain int for date format
+
+					$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = ?, `total` = (total - 1) WHERE `id` = ?", array($new_date, $last_like['user_id'], $seen, $current_likes['id']));
 				}
 				// it's the only one, so just delete the notification to completely remove it
 				else if ($current_likes['total'] == 1)

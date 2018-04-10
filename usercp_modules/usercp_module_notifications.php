@@ -31,7 +31,7 @@ if (!isset($_GET['go']))
 	if ($user_comment_alerts == 1)
 	{
 		// count how many there is in total
-		$total_notifications = $dbl->run("SELECT COUNT(`id`) FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `date`", array($_SESSION['user_id']))->fetchOne();
+		$total_notifications = $dbl->run("SELECT COUNT(`id`) FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `last_date`", array($_SESSION['user_id']))->fetchOne();
 
 		if ($total_notifications > 0)
 		{
@@ -40,7 +40,7 @@ if (!isset($_GET['go']))
 			$unread_array = array();
 			$read_array = array();
 			// show the notifications here
-			$res_list = $dbl->run("SELECT n.`id`, n.`date`, n.`article_id`, n.`comment_id`, n.`seen`, n.total, n.`type`, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
+			$res_list = $dbl->run("SELECT n.`id`, n.`last_date`, n.`article_id`, n.`comment_id`, n.`seen`, n.total, n.`type`, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar_gallery, u.avatar, u.avatar_uploaded, a.title FROM `user_notifications` n LEFT JOIN `users` u ON u.user_id = n.notifier_id LEFT JOIN `articles` a ON n.article_id = a.article_id WHERE n.`owner_id` = ? ORDER BY n.seen, n.last_date DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
 			foreach ($res_list as $note_list)
 			{
 				if ($note_list['seen'] == 0)

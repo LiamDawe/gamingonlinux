@@ -773,21 +773,14 @@ else if (isset($_GET['go']))
 
 									if (!$get_note_info)
 									{
-										$dbl->run("INSERT INTO `user_notifications` SET `date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array(core::$date, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
+										$dbl->run("INSERT INTO `user_notifications` SET `last_date` = ?, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array(core::$sql_date_now, $email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
 										$new_notification_id[$email_user['user_id']] = $dbl->new_id();
 									}
 									else if ($get_note_info)
 									{
-										// they have seen this one before, but kept it, so refresh it as if it's literally brand new (don't waste the row id)
-										if ($get_note_info['seen'] == 1)
-										{
-											$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$date, $new_comment_id, $get_note_info['id']));
-										}
-										// they haven't seen this note before, so add one to the counter and update the date
-										else if ($get_note_info['seen'] == 0)
-										{
-											$dbl->run("UPDATE `user_notifications` SET `date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$date, $get_note_info['id']));
-										}
+										// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+										$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$sql_date_now, $new_comment_id, $get_note_info['id']));
+
 										$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
 									}
 								}
@@ -938,7 +931,9 @@ else if (isset($_GET['go']))
 									$seen = 1;
 								}
 
-								$dbl->run("UPDATE `user_notifications` SET `date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($last_comment['time_posted'], $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
+								$new_date = date('Y-m-d H:i:s', $last_comment['time_posted']); // comments use a plain int time format
+
+								$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($new_date, $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
 							}
 							// no matter what we need to adjust the counter
 							$dbl->run("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));

@@ -11,6 +11,12 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'remove_account')
 	{
+		if ($_SESSION['user_id'] == 1)
+		{
+			$_SESSION['message'] = 'cannot_remove_admin';
+			header("Location: /usercp.php?module=removeacc");
+			die();
+		}
 		if (empty($_POST['password']))
 		{
 			$_SESSION['message'] = 'empty';

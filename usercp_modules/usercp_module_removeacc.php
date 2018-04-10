@@ -43,7 +43,7 @@ if (isset($_POST['act']))
 			}
 			
 			$user->delete_user($_SESSION['user_id']);
-			$user->logout();
+			$user->logout(0,0); // not banned, don't redirect
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'user account';

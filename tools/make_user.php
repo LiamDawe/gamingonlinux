@@ -30,9 +30,15 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 	$safe_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 	$email = core::make_safe($_POST['email']);
 
-	$user_query = "INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `register_date` = ?, `theme` = 'default', `activated` = 1";
+	$modqueue = 0;
+	if (isset($_POST['modqueue']))
+	{
+		$modqueue = 1;
+	}
 
-	$dbl->run($user_query, array($username, $safe_password, $email, $email, core::$date));
+	$user_query = "INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `register_date` = ?, `theme` = 'default', `activated` = 1, `in_mod_queue` = ?";
+
+	$dbl->run($user_query, array($username, $safe_password, $email, $email, core::$date, $modqueue));
 
 	$new_user_id = $dbl->new_id();
 	foreach ($_POST['user_groups'] as $key => $group)
@@ -96,6 +102,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user_random')
 	Password: <input type="password" name="password"><br />
 	<strong>User Groups</strong><br />
 	<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen"></select><br />
+	<label>In moderation queue? <input type="checkbox" name="modqueue" /></label><br />
 	<button type="submit" name="act" value="reg_user">Create user</button>
 	<p>Or, you can make a bunch of random users all at once to test a feature:</p>
 	<form method="post" action="make_user.php">

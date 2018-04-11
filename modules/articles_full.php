@@ -855,99 +855,27 @@ else if (isset($_GET['go']))
 	{
 		if (!isset($_GET['comment_id']) || !core::is_number($_GET['comment_id']))
 		{
-			$core->message('Looks like you took a wrong turn!');
+			$core->message('Looks like you took a wrong turn! The ID of the comment was not set, this may be a bug.');
 			include('includes/footer.php');
 			die();
 		}
-		
-		$comment = $dbl->run("SELECT c.`author_id`, c.`comment_text`, c.`spam`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
 
+		$comment = $dbl->run("SELECT a.`slug`, c.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
 		$article_link = $article_class->get_link($comment['article_id'], $comment['slug'], '#comments');
-
-		if ($user->can('mod_delete_comments') == false)
+		
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', ' - Deleting comment', 1);
+			$core->yes_no('Are you sure you want to delete that comment?', url."index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$_GET['comment_id']}");
+		}
+		else if (isset($_POST['no']))
 		{
 			header("Location: ".$article_link);
 		}
-
 		else
 		{
-			if ($comment['author_id'] == 1 && $_SESSION['user_id'] != 1)
-			{
-				header("Location: ".$article_link);
-			}
-
-			else
-			{
-				if (!isset($_POST['yes']) && !isset($_POST['no']))
-				{
-					$templating->set_previous('title', ' - Deleting comment', 1);
-					$core->yes_no('Are you sure you want to delete that comment?', url."index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$_GET['comment_id']}");
-				}
-
-				else if (isset($_POST['no']))
-				{
-					header("Location: ".$article_link);
-				}
-
-				else if (isset($_POST['yes']))
-				{
-					// this comment was reported as spam but as its now deleted remove the notification
-					if ($comment['spam'] == 1)
-					{
-						$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'reported_comment'", array(core::$date, (int) $_GET['comment_id']));
-					}
-
-					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, 'comment_deleted', core::$date, (int) $_GET['comment_id'], $comment['comment_text']));
-
-					$dbl->run("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
-					$dbl->run("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array((int) $_GET['comment_id']));
-					$dbl->run("DELETE FROM `likes` WHERE `data_id` = ?", array((int) $_GET['comment_id']));
-
-					// update notifications
-
-					// find any notifications caused by the deleted comment
-					$current_notes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `type` != 'liked' AND `article_id` = ?", array($comment['article_id']))->fetch_all();
-
-					foreach ($current_notes as $this_note)
-					{
-						// if this wasn't the only comment made for that notification
-						if ($this_note['total'] >= 2)
-						{
-							// if the one deleted is the original comment we were notified about
-							if ($this_note['comment_id'] == $_GET['comment_id'])
-							{
-								// find the last available comment
-								$last_comment = $dbl->run("SELECT `author_id`, `comment_id`, `time_posted` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `time_posted` DESC LIMIT 1", array($this_note['article_id']))->fetch();
-
-								$seen = '';
-
-								// if the last time they saw this notification was before the date of the new last like, they haven't seen it
-								if ($last_comment['time_posted'] > $this_note['seen_date'])
-								{
-									$seen = 0;
-								}
-								else
-								{
-									$seen = 1;
-								}
-
-								$new_date = date('Y-m-d H:i:s', $last_comment['time_posted']); // comments use a plain int time format
-
-								$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($new_date, $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
-							}
-							// no matter what we need to adjust the counter
-							$dbl->run("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
-						}
-						// it's the only comment they were notified about, so just delete the notification to completely remove it
-						else if ($this_note['total'] == 1)
-						{
-							$dbl->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($this_note['id']));
-						}
-					}
-
-					header("Location: ".$article_link);
-				}
-			}
+			$article_class->delete_comment($_GET['comment_id']);
+			header("Location: ".$article_link);
 		}
 	}
 

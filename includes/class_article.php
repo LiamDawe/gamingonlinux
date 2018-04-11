@@ -1331,9 +1331,9 @@ class article
 						$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
 					}
 					
-					if ($can_delete == 1)
+					if ($can_delete == 1 || $_SESSION['user_id'] == $comments['author_id'])
 					{
-						$comment_delete_link = "<li><a class=\"tooltip-top\" title=\"Delete\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
+						$comment_delete_link = "<li><a class=\"tooltip-top delete_comment\" title=\"Delete\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\" data-comment-id=\"{$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 					}
 				}
 				
@@ -1528,6 +1528,83 @@ class article
 		$new_notification_id['quoted_usernames'] = $quoted_usernames;
 		
 		return $new_notification_id;
+	}
+
+	function delete_comment($comment_id)
+	{		
+		$comment = $this->dbl->run("SELECT `author_id`, `comment_text`, `spam`, `article_id` FROM `articles_comments` WHERE `comment_id` = ?", array((int) $comment_id))->fetch();
+
+		if ($comment['author_id'] != $_SESSION['user_id'] && $user->can('mod_delete_comments') == false)
+		{
+			return false;
+		}
+
+		else
+		{
+			if ($comment['author_id'] == 1 && $_SESSION['user_id'] != 1)
+			{
+				return false;
+			}
+
+			else
+			{
+				// this comment was reported as spam but as its now deleted remove the notification
+				if ($comment['spam'] == 1)
+				{
+					$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'reported_comment'", array(core::$date, (int) $comment_id));
+				}
+
+				$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, 'comment_deleted', core::$date, (int) $comment_id, $comment['comment_text']));
+
+				$this->dbl->run("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
+				$this->dbl->run("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array((int) $comment_id));
+				$this->dbl->run("DELETE FROM `likes` WHERE `data_id` = ?", array((int) $comment_id));
+
+				// update notifications
+
+				// find any notifications caused by the deleted comment
+				$current_notes = $this->dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date`, `article_id`, `comment_id` FROM `user_notifications` WHERE `type` != 'liked' AND `article_id` = ?", array($comment['article_id']))->fetch_all();
+
+				foreach ($current_notes as $this_note)
+				{
+					// if this wasn't the only comment made for that notification
+					if ($this_note['total'] >= 2)
+					{
+						// if the one deleted is the original comment we were notified about
+						if ($this_note['comment_id'] == $comment_id)
+						{
+							// find the last available comment
+							$last_comment = $this->dbl->run("SELECT `author_id`, `comment_id`, `time_posted` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `time_posted` DESC LIMIT 1", array($this_note['article_id']))->fetch();
+
+							$seen = '';
+
+							// if the last time they saw this notification was before the date of the new last like, they haven't seen it
+							if ($last_comment['time_posted'] > $this_note['seen_date'])
+							{
+								$seen = 0;
+							}
+							else
+							{
+								$seen = 1;
+							}
+
+							$new_date = date('Y-m-d H:i:s', $last_comment['time_posted']); // comments use a plain int time format
+
+							$this->dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($new_date, $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
+						}
+						// no matter what we need to adjust the counter
+						$dbl->run("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
+					}
+					// it's the only comment they were notified about, so just delete the notification to completely remove it
+					else if ($this_note['total'] == 1)
+					{
+						$this->dbl->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($this_note['id']));
+					}
+				}
+
+				return true;
+			}
+		}		
 	}
 }
 ?>

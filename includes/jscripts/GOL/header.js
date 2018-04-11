@@ -1676,4 +1676,29 @@ jQuery(document).ready(function()
 		}	  
 		
 	});
+
+	// user comment deletion
+	$(document).on('click', '.delete_comment', function(e)
+	{
+		e.preventDefault();
+
+		var comment_id = $(this).attr('data-comment-id');
+
+		if (confirm('Are you sure you wish to delete that comment?')) 
+		{
+			$.post('/includes/ajax/delete_comment.php', { 'comment_id':comment_id },
+			function(data)
+			{
+				if (data.result == "removed")
+				{
+					$('.r49980').fadeOut(500);
+				}
+			});
+		} 
+		else {
+			// Do nothing!
+		}
+
+
+	});
 });

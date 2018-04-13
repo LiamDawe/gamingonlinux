@@ -1,8 +1,9 @@
 [block: top]
 <div class="box">
 	<div class="head">Linux game release calendar, due later this month: {:this_month} {:editor_links}</div>
-	<div class="body group"><img src="/templates/default/images/cal.gif" alt="" /> We have an ical too, <a href="https://www.gamingonlinux.com/calendar_ical.php">copy this url</a>. Link to it in your calendar apps to stay up to date!</div>
-	<div class="body group"><strong>Best Guess FAQ</strong>: It's an educated guess, nothing more.</div>
+	<div class="body group"><img src="/templates/default/images/cal.gif" alt="" /> We have an ical too, <a href="https://www.gamingonlinux.com/calendar_ical.php">copy this url</a>. Link to it in your calendar apps to stay up to date!<br />
+	Some games may already be available on certain stores, we track <strong>Steam</strong> as the main store here since it's the most popular.
+	<br /><strong>Best Guess FAQ</strong>: It's an educated guess, nothing more.</div>
 </div>
 [/block: top]
 
@@ -83,14 +84,12 @@
 [block: item]
 		<tr>
 			<td width="15%;">{:small_pic}</td>
-			<td width="45%;">{:edit}{:best_guess} {:name} {:dlc}{:genre_list}</td>
+			<td width="45%;">{:edit}{:best_guess} {:name} {:dlc}<br />
+			<small>Tags: {:genre_list} {:suggest_link}</small>	
+			</td>
 			<td width="40%;">{:links}</td>
 		</tr>
 [/block: item]
-
-[block: genres]
-<br /><small>{:genre_list}</small>	
-[/block: genres]
 
 [block: day_end]
 	</tbody>

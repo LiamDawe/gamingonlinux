@@ -101,7 +101,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	if ($_GET['view'] == 'edit')
 	{
 		$chart_id = (int) $_GET['id'];
-		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data`, `h_label` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
+		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data`, `h_label`,`counters_inside` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
 		
 		if ($chart_info)
 		{
@@ -117,12 +117,19 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			{
 				$enabled_check = 'checked';
 			}
+
+			$counters_check = '';
+			if ($chart_info['counters_inside'] == 1)
+			{
+				$counters_check = 'checked';
+			}
 			
 			$data_order_check = '';
 			if ($chart_info['order_by_data'] == 1)
 			{
 				$data_order_check = 'checked';
 			}
+			$templating->set('counters_check', $counters_check);
 			$templating->set('data_order_check', $data_order_check);
 			$templating->set('enabled_check', $enabled_check);
 			$templating->set('chart_id', $chart_id);
@@ -352,6 +359,12 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		{
 			$h_label = $_POST['h_label'];
 		}
+
+		$counters_inside = 0;
+		if (isset($_POST['counters_inside']))
+		{
+			$counters_inside = 1;
+		}
 		
 		$order_by_data = 0;
 		if (isset($_POST['order_by_data']))
@@ -371,7 +384,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			die();
 		}
 		
-		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ?, `order_by_data` = ?, `h_label` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $order_by_data, $h_label, $chart_id));
+		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ?, `order_by_data` = ?, `h_label` = ?, `counters_inside` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $order_by_data, $h_label, $counters_inside, $chart_id));
 		
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'chart';

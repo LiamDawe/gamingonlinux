@@ -101,7 +101,10 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	if ($_GET['view'] == 'edit')
 	{
 		$chart_id = (int) $_GET['id'];
-		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data`, `h_label`,`counters_inside` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
+		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data`, `h_label`,`counters_inside`, `grouped` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
+
+		$labels = $dbl->run("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ?", array($chart_id))->fetch_all();
+		$datas = $dbl->run("SELECT `data_id`, `data`, `min`, `max`, `data_series` FROM `charts_data` WHERE `chart_id` = ?", array($chart_id))->fetch_all();
 		
 		if ($chart_info)
 		{
@@ -110,12 +113,18 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->block('chart', 'admin_modules/admin_module_charts');
 			$templating->set('chart_name', $chart_info['name']);
 
-			$templating->set('chart', $charts->render(NULL, ['id' => $chart_id]) . $charts->render(['filetype' => 'png'], ['id' => $chart_id]));
+			$templating->set('chart', $charts->render(['filetype' => 'png'], ['id' => $chart_id]));
 			
 			$enabled_check = '';
 			if ($chart_info['enabled'] == 1)
 			{
 				$enabled_check = 'checked';
+			}
+
+			$grouped_check = '';
+			if ($chart_info['grouped'] == 1)
+			{
+				$grouped_check = 'checked';
 			}
 
 			$counters_check = '';
@@ -132,10 +141,51 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('counters_check', $counters_check);
 			$templating->set('data_order_check', $data_order_check);
 			$templating->set('enabled_check', $enabled_check);
+			$templating->set('grouped_check', $grouped_check);
 			$templating->set('chart_id', $chart_id);
 			$templating->set('name', $chart_info['name']);
 			$templating->set('sub_title', $chart_info['sub_title']);
 			$templating->set('h_label', $chart_info['h_label']);
+
+			$label_list = '';
+			$counter = 1;
+			foreach ($labels as $label)
+			{
+				$label_list .= '<div id="label-'.$counter.'" class="input-field box fleft" style="width: 50%"><span class="addon">Label #'.$counter.':</span><input class="labels" type="text" name="labels['.$label['label_id'].']" value="'.$label['name'].'" /></div><div id="colour-'.$counter.'" class="input-field box fleft" style="width: 50%"><span class="addon">Colour #'.$counter.':</span><input class="colours" type="text" name="colours[]" placeholder="#ffffff" /></div>';
+				$counter++;
+
+				if ($chart_info['grouped'] == 1)
+				{
+					
+				}
+			}
+			$templating->set('labels_list', $label_list);
+
+			if ($chart_info['grouped'] == 0)
+			{
+				$data_list = '';
+				$counter = 1;
+				foreach ($datas as $data)
+				{
+					$data_sorted = $data['data'];
+					if ($data['data_series'] != NULL)
+					{
+						$data_sorted .= ','.$data['data_series'];
+					}
+					if ($data['min'] != NULL)
+					{
+						$data_sorted .= ','.$data['min'];
+					}
+					if ($data['max'] != NULL)
+					{
+						$data_sorted .= ','.$data['max'];
+					}
+					$data_list .= '<div id="data-'.$counter.'" class="box">Data for Label #'.$counter.'<input class="data" name="data['.$data['data_id'].']" value="'.$data_sorted.'"></div>';
+					$counter++;
+				}
+			}
+			$templating->set('data_list', $data_list);
+
 		}
 		else
 		{
@@ -202,7 +252,8 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 			$new_chart_id = $dbl->new_id();
 
-			$label_counter = 1;
+			$label_counter = 0;
+			$label_ids = [];
 			foreach ($_POST['labels'] as $key => $label)
 			{
 				$this_label_colour = NULL;
@@ -214,63 +265,69 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				$label = core::make_safe($label);
 				$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?, `colour` = ?", array($new_chart_id, $label, $this_label_colour));
 				$new_label_id = $dbl->new_id();
+				$label_ids[] = $new_label_id;
 
-				// sort the data out for grouped charts
+				// sort the data out for grouped charts, has to be done with the labels to get them in the right place
 				if (isset($_POST['grouped']))
 				{
-					$data = preg_split('/(\\n|\\r)/', $_POST['data-'.$label_counter], -1, PREG_SPLIT_NO_EMPTY);
+					$data = preg_split('/(\\n|\\r)/', $_POST['data'][$label_counter], -1, PREG_SPLIT_NO_EMPTY);
 					// put in the data
 					foreach ($data as $dat)
 					{
 						$data_series = explode(',',$dat);
-						
+			
+						$total = $data_series[0] + 0;
+						$total = bcdiv($total, 1, 2);
+											
 						$min = NULL;
+						if (isset($data_series[1]) && is_numeric($data_series[1]))
+						{
+							$min = $data_series[1] + 0;
+							$min = bcdiv($min, 1, 2);
+						}
+											
+						$max = NULL;
 						if (isset($data_series[2]) && is_numeric($data_series[2]))
 						{
-							$min = $data_series[2];
-						}
-						
-						$max = NULL;
-						if (isset($data_series[3]) && is_numeric($data_series[3]))
-						{
-							$max = $data_series[3];
+							$max = $data_series[2] + 0;
+							$max = bcdiv($max, 1, 2);
 						}
 						
 						$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `data_series` = ?, `min` = ?, `max` = ?", array($new_chart_id, $new_label_id, $data_series[0], trim($data_series[1]), $min, $max));
 
 						$core->message("Data $dat added!");
 					}
-					
 				}
-				// sort the data out for normal charts
-				else
-				{
-					$data = preg_split('/(\\n|\\r)/', $_POST['data-'.$label_counter], -1, PREG_SPLIT_NO_EMPTY);
-					// put in the data
-					foreach ($data as $dat)
-					{
-						$data_series = explode(',',$dat);
-						
-						$min = NULL;
-						if (isset($data_series[1]) && is_numeric($data_series[1]))
-						{
-							$min = $data_series[1];
-						}
-						
-						$max = NULL;
-						if (isset($data_series[2]) && is_numeric($data_series[2]))
-						{
-							$max = $data_series[2];
-						}
-						
-						$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `min` = ?, `max` = ?", array($new_chart_id, $new_label_id, $data_series[0], $min, $max));
-
-						$core->message("Data $dat added!");
-					}
-				}
-
-				$core->message("Label $label and it's data added!");
+				$core->message("Label $label added!");
 				$label_counter++;
+			}
+
+			// not grouped, so we just enter them directly using the label id's array to help
+			if (!isset($_POST['grouped']))
+			{
+				// put in the data
+				$data_counter = 0;
+				foreach ($_POST['data'] as $dat)
+				{
+					$data_series = explode(',',$dat);
+							
+					$min = NULL;
+					if (isset($data_series[1]) && is_numeric($data_series[1]))
+					{
+						$min = $data_series[1];
+					}
+							
+					$max = NULL;
+					if (isset($data_series[2]) && is_numeric($data_series[2]))
+					{
+						$max = $data_series[2];
+					}
+							
+					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `min` = ?, `max` = ?", array($new_chart_id, $label_ids[$data_counter], $data_series[0], $min, $max));
+
+					$data_counter++;
+					$core->message("Data $dat added!");
+				}
 			}
 
 			$_SESSION['message'] = 'saved';
@@ -385,6 +442,74 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 		}
 		
 		$dbl->run("UPDATE `charts` SET `name` = ?, `enabled` = ?, `sub_title` = ?, `order_by_data` = ?, `h_label` = ?, `counters_inside` = ? WHERE `id` = ?", array($name, $enabled_check, $sub_title, $order_by_data, $h_label, $counters_inside, $chart_id));
+
+		if (isset($_POST['grouped']))
+		{
+			$data_ids = $dbl->run("SELECT `data_id` FROM `charts_data` WHERE `chart_id` = ?", array($chart_id))->fetch_all(PDO::FETCH_COLUMN, 0);
+		}
+
+		foreach ($_POST['labels'] as $label_id => $name)
+		{
+			$dbl->run("UPDATE `charts_labels` SET `name` = ? WHERE `label_id` = ?", array($name, $label_id));
+
+			// sort the data out for grouped charts, has to be done with the labels to get them in the right place
+			if (isset($_POST['grouped']))
+			{
+				$data = preg_split('/(\\n|\\r)/', $_POST['data'][$label_counter], -1, PREG_SPLIT_NO_EMPTY);
+				// put in the data
+				$data_counter = 0;
+				foreach ($data as $dat)
+				{
+					$data_series = explode(',',$dat);
+			
+					$total = $data_series[0] + 0;
+					$total = bcdiv($total, 1, 2);
+											
+					$min = NULL;
+					if (isset($data_series[1]) && is_numeric($data_series[1]))
+					{
+						$min = $data_series[1] + 0;
+						$min = bcdiv($min, 1, 2);
+					}
+											
+					$max = NULL;
+					if (isset($data_series[2]) && is_numeric($data_series[2]))
+					{
+						$max = $data_series[2] + 0;
+						$max = bcdiv($max, 1, 2);
+					}
+
+					echo $data_ids[$data_counter];
+
+					die();
+						
+					$dbl->run("UPDATE `charts_data` SET `data` = ?, `data_series` = ?, `min` = ?, `max` = ? WHERE `data_id` = ?", array($data_series[0], trim($data_series[1]), $min, $max, $data_ids[$data_counter]));
+					$data_counter++;
+				}
+			}
+		}
+
+		if (!isset($_POST['grouped']))
+		{
+			foreach ($_POST['data'] as $data_id => $data)
+			{
+				$data_series = explode(',',$data);
+							
+				$min = NULL;
+				if (isset($data_series[1]) && is_numeric($data_series[1]))
+				{
+					$min = $data_series[1];
+				}
+						
+				$max = NULL;
+				if (isset($data_series[2]) && is_numeric($data_series[2]))
+				{
+					$max = $data_series[2];
+				}
+
+				$dbl->run("UPDATE `charts_data` SET `data` = ?, `min` = ?, `max` = ? WHERE `data_id` = ?", array($data_series[0], $min, $max, $data_id));
+			}
+		}
 		
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'chart';

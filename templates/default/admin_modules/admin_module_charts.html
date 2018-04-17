@@ -20,8 +20,8 @@
 			<button style="float: none" id="add_label" type="button">Add Label</button> <button style="float: none" id="remove_label" type="button">Remove Label</button><br />
 			<div class="group" id="data_container">
 				For data groups: Add the group name and colour after the number like "45,OpenGL":<br />
-				<div id="data-1" class="box">Data for Label #1<input class="data" name="data-1">{:data}</input></div>
-				<div id="data-2" class="box">Data for Label #2<input class="data" name="data-2">{:data}</input></div>
+				<div id="data-1" class="box">Data for Label #1<input class="data" name="data[]" /></div>
+				<div id="data-2" class="box">Data for Label #2<input class="data" name="data[]" /></div>
 			</div>
 			<button type="submit" name="submit" value="Add">Add</button> <button type="button" id="preview_chart" name="preview_chart">Preview Chart</button>
 			<input type="hidden" name="act" value="add_chart" /> 
@@ -57,16 +57,26 @@
 	</div>
 	<div class="head">Edit</div>
 	<div class="body group">
-		<form method="post" formaction="/admin.php?module=charts">
+		<form id="chart_form" method="post" formaction="/admin.php?module=charts">
 			<label><input type="checkbox" name="enabled" {:enabled_check} />Chart enabled and viewable?</label>
 			Chart name:<br />
 			<input type="text" name="name" value="{:name}"/><br />
-			Chart subtitle:<br />
+			Sub title:<br />
 			<input type="text" name="sub_title" value="{:sub_title}"/><br />
+			<label><input type="checkbox" id="chart_grouped" name="grouped" {:grouped_check} /> Grouped chart? (for data comparisons like OpenGL vs Vulkan on different settings</label>
 			Horizontal Axis Label (bottom of the chart):<br />
 			<input type="text" name="h_label" value="{:h_label}" /><br />
 			<label><input type="checkbox" name="counters_inside" {:counters_check}> Total counters inside the bars?</label>
 			<label><input type="checkbox" name="order_by_data" {:data_order_check}> Order by data? (If unchecked, order goes by the labels as they are entered!)</label>
+			Labels <em>Colours left blank if not setting or if grouped chart</em>
+			<div id="label_container">
+				{:labels_list}
+			</div>
+			<button style="float: none" id="add_label" type="button">Add Label</button> <button style="float: none" id="remove_label" type="button">Remove Label</button><br />
+			<div class="group" id="data_container">
+				For data groups: Add the group name and colour after the number like "45,OpenGL":<br />
+				{:data_list}
+			</div>
 			<input type="hidden" name="chart_id" value="{:chart_id}" />
 			<button type="submit" name="act" value="edit_chart" formaction="/admin.php?module=charts">Edit Chart</button>
 		</form>

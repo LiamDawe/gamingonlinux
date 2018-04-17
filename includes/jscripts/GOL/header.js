@@ -1142,11 +1142,11 @@ jQuery(document).ready(function()
 		$('#label_container').append('<div id="label-'+label_inputs+'" class="input-field box fleft" style="width: 50%"><span class="addon">Label #'+label_inputs+':</span><input type="text" class="labels" name="labels[]" placeholder="label '+label_inputs+'" /></div><div id="colour-'+label_inputs+'" class="input-field box fleft" style="width: 50%"><span class="addon">Colour #'+label_inputs+':</span><input class="colours" type="text" name="colours[]" placeholder="#ffffff" /></div>');
 		if ($('#chart_grouped').prop('checked')==true)
 		{ 
-			$('#data_container').append('<div id="data-'+data_inputs+'" class="box">Data for Label #'+data_inputs+'<textarea class="data" name="data-'+data_inputs+'" cols="100" rows="10"></textarea></div>');
+			$('#data_container').append('<div id="data-'+data_inputs+'" class="box">Data for Label #'+data_inputs+'<textarea class="data" name="data[]" cols="100" rows="10"></textarea></div>');
 		}
 		else
 		{
-			$('#data_container').append('<div id="data-'+data_inputs+'" class="box">Data for Label #'+data_inputs+'<input class="data" type="text" name="data-'+data_inputs+'" /></div>');
+			$('#data_container').append('<div id="data-'+data_inputs+'" class="box">Data for Label #'+data_inputs+'<input class="data" type="text" name="data[]" /></div>');
 		}
 	});
 	$(document).on('click', "#remove_label", function() 
@@ -1698,7 +1698,34 @@ jQuery(document).ready(function()
 		else {
 			// Do nothing!
 		}
+	});
 
+	// set the bbcode editor to fullscreen
+	$(document).on('click','#full-screen-bbcode',function() 
+	{
+		var $toggle_bbeditor_div = $(this).closest('div.octus-editor');
+		var space = $(window).height() - $(this).closest('div.styles').height();
 
+		if ($toggle_bbeditor_div.hasClass('fullscreen_editor_div'))
+		{
+		  $($toggle_bbeditor_div).removeClass('fullscreen_editor_div');
+		  $('html, body').css({
+			overflow: 'auto',
+			height: 'auto'
+		});
+		}
+		else
+		{
+		  $($toggle_bbeditor_div).addClass('fullscreen_editor_div');
+
+		  $('html, body').css({
+			overflow: 'hidden',
+			height: '100%'
+			});
+
+			$('.bbcode_editor').css({
+				height: space
+				});
+		}
 	});
 });

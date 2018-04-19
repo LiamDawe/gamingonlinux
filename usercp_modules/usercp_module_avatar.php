@@ -18,10 +18,6 @@ if (isset($_GET['message']))
 	{
 		$core->message("Your avatar has changed to use a gravatar!");
 	}
-	if ($_GET['message'] == 'urldone')
-	{
-		$core->message("Your avatar has changed to use a the url you provided!");
-	}
 	if ($_GET['message'] == 'gallery')
 	{
 		$core->message("You are now using an avatar picked from the gallery!");
@@ -50,53 +46,7 @@ $templating->set('gravatar_email', $user->user_details['gravatar_email']);
 
 if (isset($_POST['action']))
 {
-	if ($_POST['action'] == 'url')
-	{
-		if (empty($_POST['avatar_url']))
-		{
-			$core->message('You didn\'t enter anything into the url box!', 1);
-		}
-
-		// check url is valid
-		else if (core::file_get_contents_curl($_POST['avatar_url']) == false)
-		{
-			$core->message('Could not access the image!', 1);
-		}
-
-		else
-		{
-			// check dimensions
-			$avatar_file_check = $core->remoteImage($_POST['avatar_url']);
-			if ($avatar_file_check == false)
-			{
-				$core->message('Error!');
-			}
-
-			if ($avatar_file_check['w'] > $core->config('avatar_width') || $avatar_file_check['h'] > $core->config('avatar_height'))
-			{
-				header("Location: /usercp.php?module=avatar&message=toobig");
-				die();
-			}
-
-			else
-			{
-				// remove any old avatar if one was uploaded
-				$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-
-				if ($avatar['avatar_uploaded'] == 1)
-				{
-					unlink('uploads/avatars/' . $avatar['avatar']);
-				}
-
-				// change to new avatar
-				$dbl->run("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = NULL WHERE `user_id` = ?", array($_POST['avatar_url'], $_SESSION['user_id']));
-
-				header("Location: /usercp.php?module=avatar&message=urldone");
-			}
-		}
-	}
-
-	else if ($_POST['action'] == 'Upload')
+	if ($_POST['action'] == 'Upload')
 	{
 		if ($image_upload->avatar() == true)
 		{

@@ -174,53 +174,6 @@ class core
 		fwrite($fp, $rawdata);
 		fclose($fp); 
 	}
-
-	// secure way of grabbing a remote image, for avatars
-	// checks the dimensions of a linked image
-	function remoteImage($url)
-	{
-		$ch = curl_init ($url);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
-		curl_setopt($ch, CURLOPT_RANGE, "0-10240");
-
-		$fn = "partial.jpg";
-		$raw = curl_exec($ch);
-		$result = array();
-
-		if(file_exists($fn))
-		{
-			unlink($fn);
-		}
-
-		if ($raw !== false) 
-		{
-			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-			if ($status == 200 || $status == 206) 
-			{
-				$result["w"] = 0;
-				$result["h"] = 0;
-
-				$fp = fopen($fn, 'x');
-				fwrite($fp, $raw);
-				fclose($fp);
-
-				$size = getImageSize($fn);
-
-				if ($size===false) {
-				//  Cannot get file size information
-				} else {
-				//  Return width and height
-					list($result["w"], $result["h"]) = $size;
-				}
-			}
-		}
-
-		curl_close ($ch);
-		return $result;
-	}
 	
 	// grab a config key
 	public function config($key)

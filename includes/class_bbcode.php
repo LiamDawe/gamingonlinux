@@ -222,7 +222,7 @@ class bbcode
 		
 		// limit youtube replacing to the config limit
 		$find_replace = [
-		"/\[youtube\](.+?)\[\/youtube\](\r?\n)?/is" => ["<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>", $this->core->config('limit_youtube')]
+		"/\[youtube\](.+?)\[\/youtube\](\r?\n)?/is" => ["<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube-nocookie.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>", $this->core->config('limit_youtube')]
 		];
 
 		foreach ($find_replace as $find => $replace)

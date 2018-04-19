@@ -412,7 +412,7 @@ class bbcode
 		"<img width=\"$1\" height=\"$2\" src=\"$3\" alt=\"[img]\" />",
 		"<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 		"<span style=\"text-decoration: line-through\">$1</span>",
-		"<iframe width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen>
+		"<iframe width=\"640\" height=\"385\" src=\"https://www.youtube-nocookie.com/embed/$1\" frameborder=\"0\" allowfullscreen>
 		</iframe>",
 		'<ul>$1</ul>',
 		'<li>$1</li>',
@@ -498,7 +498,7 @@ class bbcode
 		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is"
 			=> "<img width=\"$1\" height=\"$2\" src=\"$3\" alt=\"image\" />",
 		"/\[youtube\](.+?)\[\/youtube\]/is"
-			=> "<iframe width=\"640\" height=\"385\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>",
+			=> "<iframe width=\"640\" height=\"385\" src=\"https://www.youtube-nocookie.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>",
 		"/\[spoiler\](.+?)\[\/spoiler\]/is"
 			=> 'SPOILER: View the website if you wish to see it.'
 		];

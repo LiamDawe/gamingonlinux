@@ -386,6 +386,12 @@ else
 					{
 						$dbl->run("DELETE FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id));
 
+						if (!isset($_GET['usercp']))
+						{
+							$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
+							core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
+						}
+
 						$core->message('That block has now been deleted! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=manage">Manage another block</a>?');
 					}
 				}

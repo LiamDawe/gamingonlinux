@@ -460,7 +460,7 @@ class user
 			// either uploaded or linked an avatar
 			else if (!empty($data['avatar']) && $data['avatar_gravatar'] == 0)
 			{
-				$avatar = $data['avatar'];
+				$avatar = $data['avatar']; // for google login avatars
 				if ($data['avatar_uploaded'] == 1)
 				{
 					$avatar = $this->core->config('website_url') . "uploads/avatars/{$data['avatar']}";

@@ -32,9 +32,9 @@ return [
 		"text" => "You have been sent here to due being flagged as a spammer! Please contact us directly if this is false. You should check <a href=\"http://www.stopforumspam.com/\">StopForumSpam</a> to see if your IP is in their database.",
 		"error" => 1
 	],
-	"unpicked" =>
+	"featured_unpicked" =>
 	[
-		"text" => "That article has been removed from the editors pick queue!"
+		"text" => "You have removed the editor pick!"
 	],
 	"picked" =>
 	[

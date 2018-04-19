@@ -140,21 +140,8 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'delete')
 	{
-		$featured = $dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
-		if ($featured)
-		{
-			$dbl->run("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']));
-			unlink($core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
+		$article_class->remove_editor_pick($_POST['article_id']);
 
-			$dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
-
-			$dbl->run("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_POST['article_id']));
-
-			// update cache
-			$new_featured_total = $core->config('total_featured') - 1;
-			core::$redis->set('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
-
-			header("Location: /admin.php?module=featured&view=manage&message=deleted");
-		}
+		header("Location: /admin.php?module=featured&view=manage");
 	}
 }

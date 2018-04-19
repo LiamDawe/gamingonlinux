@@ -1606,5 +1606,28 @@ class article
 			}
 		}		
 	}
+
+	function remove_editor_pick($article_id)
+	{
+		if ($this->user->check_group([1,2,5]))
+		{
+			$featured = $this->dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id))->fetch();
+			if ($featured)
+			{
+				$this->dbl->run("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($article_id));
+				unlink($this->core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
+
+				$this->dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
+
+				$this->dbl->run("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($article_id));
+
+				// update cache
+				$new_featured_total = $this->core->config('total_featured') - 1;
+				core::$redis->set('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
+
+				$_SESSION['message'] = 'featured_unpicked';
+			}
+		}
+	}
 }
 ?>

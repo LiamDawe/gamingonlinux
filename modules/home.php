@@ -122,21 +122,10 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 
 if (isset($_GET['view']) && $_GET['view'] == 'removeeditors')
 {
-	if ($user->check_group([1,2,5]))
+	if (isset($_GET['article_id']) && is_numeric($_GET['article_id']))
 	{
-		if (isset($_GET['article_id']) && is_numeric($_GET['article_id']))
-		{
-			$featured = $dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
+		$article_class->remove_editor_pick($_GET['article_id']);
 
-			$dbl->run("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($_GET['article_id']));
-			unlink($core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
-
-			$dbl->run("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($_GET['article_id']));
-
-			$dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
-
-			$_SESSION['message'] = 'unpicked';
-			header("Location: ".$core->config('website_url')."index.php?module=home");
-		}
+		header("Location: ".$core->config('website_url')."index.php?module=home");
 	}
 }

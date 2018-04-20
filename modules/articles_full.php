@@ -778,8 +778,16 @@ else if (isset($_GET['go']))
 									}
 									else if ($get_note_info)
 									{
-										// they already have one, refresh it as if it's literally brand new (don't waste the row id)
-										$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$sql_date_now, $new_comment_id, $get_note_info['id']));
+										if ($get_note_info['seen'] == 1)
+										{
+											// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+											$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$sql_date_now, $new_comment_id, $get_note_info['id']));
+										}
+										else if ($get_note_info['seen'] == 0)
+										{
+											// they haven't seen the last one yet, so only update the time and date
+											$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$sql_date_now, $get_note_info['id']));
+										}
 
 										$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
 									}

@@ -320,9 +320,9 @@ class user
 	{
  		global $core;
 		
-		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']) && isset($_COOKIE['gol-device']))
+		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']))
 		{
-			$session = $this->db->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ? AND `device-id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session'], $_COOKIE['gol-device']))->fetch();
+			$session = $this->db->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session']))->fetch();
 
 			if ($session)
 			{

@@ -57,6 +57,11 @@ CKEDITOR.editorConfig = function( config ) {
 	config.extraPlugins = 'lineutils';
 	config.extraPlugins = 'html5audio';
 	config.extraPlugins = 'html5video';
+
+	config.youtube_responsive = true;
+	config.youtube_related = false;
+	config.youtube_privacy = true;
+	config.youtube_disabled_fields = ['txtEmbed', 'chkAutoplay','chkResponsive','chkOlderCode','txtWidth','txtHeight','chkRelated','chkPrivacy'];
 	
 	config.linkShowTargetTab = false
 };

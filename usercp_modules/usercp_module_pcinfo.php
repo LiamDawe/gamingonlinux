@@ -2,16 +2,11 @@
 $templating->set_previous('title', 'PC Info' . $templating->get('title', 1)  , 1);
 $templating->load('usercp_modules/usercp_module_pcinfo');
 
-if (isset($_GET['updated']))
-{
-	$core->message('You have updated your profile!');
-}
-
 if (!isset($_POST['act']))
 {
 	$usercpcp = $dbl->run("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();#
 
-	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
+	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
 	$additional = $dbl->run($additional_sql, array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
@@ -41,6 +36,13 @@ if (!isset($_POST['act']))
 		$public_info = 'checked';
 	}
 	$templating->set('public_check', $public_info);
+
+	$include_in_survey = '';
+	if ($additional['include_in_survey'] == 1)
+	{
+		$include_in_survey = 'checked';
+	}
+	$templating->set('include_in_survey_check', $include_in_survey);
 
 	// grab distros
 	$distro_list = '';
@@ -297,10 +299,16 @@ else if (isset($_POST['act']))
 	{
 		$pc_info_filled = 0;
 		$public = 0;
+		$include_in_survey = 0;
 
 		if (isset($_POST['public']))
 		{
 			$public = 1;
+		}
+
+		if (isset($_POST['include_in_survey']))
+		{
+			$include_in_survey = 1;
 		}
 
 		// check if the have set any of their pc info
@@ -350,6 +358,9 @@ else if (isset($_POST['act']))
 		$user_update_sql = "UPDATE `users` SET `distro` = ?, `pc_info_public` = ?, `pc_info_filled` = ? WHERE `user_id` = ?";
 		$dbl->run($user_update_sql, array($_POST['distribution'], $public, $pc_info_filled, $_SESSION['user_id']));
 
-		header("Location: " . $core->config('website_url') . "usercp.php?module=pcinfo&updated");
+		$dbl->run("UPDATE `user_profile_info` SET `include_in_survey` = ? WHERE `user_id` = ?", array($include_in_survey, $_SESSION['user_id']));
+
+		$_SESSION['message'] = 'pc_info_updated';
+		header("Location: " . $core->config('website_url') . "usercp.php?module=pcinfo");
 	}
 }

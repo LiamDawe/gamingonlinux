@@ -204,7 +204,7 @@ if (!isset($_POST['act']))
 
 		else
 		{
-			$twitter_button = '<div class="box"><div class="body group"><a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a></div></div>';
+			$twitter_button = '<div class="box"><div class="body group"><a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a></div></div>';
 		}
 	}
 	$templating->set('twitter_button', $twitter_button);
@@ -224,7 +224,7 @@ if (!isset($_POST['act']))
 
 		else
 		{
-			$steam_button = '<div class="box"><div class="body group"><a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/steam.png" /> </span>Sign in with <b>Steam</b></a></div></div>';
+			$steam_button = '<div class="box"><div class="body group"><a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/steam.png" /> </span>Sign in with <b>Steam</b></a></div></div>';
 		}
 	}
 	$templating->set('steam_button', $steam_button);
@@ -256,7 +256,7 @@ if (!isset($_POST['act']))
 			$service = new Google_Service_Oauth2($client);
 			$authUrl = $client->createAuthUrl();
 				
-			$google_button = '<div class="box"><div class="body group"><a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/social/white/google-plus.png" /> </span>Link your <b>Google</b> account</a></div></div>';
+			$google_button = '<div class="box"><div class="body group"><a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/google-plus.png" /> </span>Link your <b>Google</b> account</a></div></div>';
 				
 		}
 	}

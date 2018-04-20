@@ -157,7 +157,7 @@ foreach ($social_icons as $social)
 			$extra_url = 'https://www.twitter.com/';
 		}
 		
-		$social_output .= '<a class="button small fnone" href="'.$extra_url.$core->config($social['config']).'" target="_blank"><img src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/social/'.$social['icon'].'"></a>';
+		$social_output .= '<a class="button small fnone" href="'.$extra_url.$core->config($social['config']).'" target="_blank"><img src="'.$core->config('website_url').'templates/'.$core->config('template').'/images/network-icons/'.$social['icon'].'"></a>';
 	}
 }
 $templating->set('social_icons', $social_output);

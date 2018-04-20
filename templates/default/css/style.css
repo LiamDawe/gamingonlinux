@@ -1001,28 +1001,28 @@ ul.social-networks li > a {
 	margin-right: 3px;
 }
 .icon.website {
-    background-image: url('../images/social/website.svg');
+    background-image: url('../images/network-icons/website.svg');
 }
 .icon.twitter {
-    background-image: url('../images/social/twitter.svg');
+    background-image: url('../images/network-icons/twitter.svg');
 }
 .icon.google-plus {
-    background-image: url('../images/social/google-plus.svg');
+    background-image: url('../images/network-icons/google-plus.svg');
 }
 .icon.youtube {
-    background-image: url('../images/social/youtube.svg');
+    background-image: url('../images/network-icons/youtube.svg');
 }
 .icon.facebook {
-    background-image: url('../images/social/facebook.svg');
+    background-image: url('../images/network-icons/facebook.svg');
 }
 .icon.twitch {
-    background-image: url('../images/social/twitch.svg');
+    background-image: url('../images/network-icons/twitch.svg');
 }
 .icon.mastodon {
-    background-image: url('../images/social/mastodon.svg');
+    background-image: url('../images/network-icons/mastodon.svg');
 }
 .icon.steam {
-    background-image: url('../images/social/steam.svg');
+    background-image: url('../images/network-icons/steam.svg');
 }
 .icon.flag {
     background-image: url('../images/comments/flag.svg');
@@ -1249,25 +1249,25 @@ ul.social-networks li > a {
 }
 
 .dark .icon.website {
-    background-image: url('../images/social/white/website.svg');
+    background-image: url('../images/network-icons/white/website.svg');
 }
 .dark .icon.twitter {
-    background-image: url('../images/social/white/twitter.svg');
+    background-image: url('../images/network-icons/white/twitter.svg');
 }
 .dark .icon.google-plus {
-    background-image: url('../images/social/white/google-plus.svg');
+    background-image: url('../images/network-icons/white/google-plus.svg');
 }
 .dark .icon.youtube {
-    background-image: url('../images/social/white/youtube.svg');
+    background-image: url('../images/network-icons/white/youtube.svg');
 }
 .dark .icon.facebook {
-    background-image: url('../images/social/white/facebook.svg');
+    background-image: url('../images/network-icons/white/facebook.svg');
 }
 .dark .icon.twitch {
-    background-image: url('../images/social/white/twitch.svg');
+    background-image: url('../images/network-icons/white/twitch.svg');
 }
 .dark .icon.steam {
-    background-image: url('../images/social/white/steam.svg');
+    background-image: url('../images/network-icons/white/steam.svg');
 }
 .dark .icon.flag {
     background-image: url('../images/comments/white/flag.svg');

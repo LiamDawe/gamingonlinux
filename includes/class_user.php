@@ -14,6 +14,8 @@ class user
 	
 	public $user_groups;
 	public $blocked_users = [];
+
+	public $cookie_length = 60*60*24*30; // 30 days
 	
 	function __construct($dbl, $core)
 	{
@@ -92,13 +94,13 @@ class user
 
 					if ($remember_username == 1)
 					{
-						setcookie('remember_username', $username,  time()+60*60*24*30, '/', $this->core->config('cookie_domain'));
+						setcookie('remember_username', $username,  time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
 					}
 
 					if ($stay == 1)
 					{
-						setcookie('gol_stay', $this->user_details['user_id'], time()+31556926, '/', $this->core->config('cookie_domain'));
-						setcookie('gol_session', $generated_session, time()+31556926, '/', $this->core->config('cookie_domain'));
+						setcookie('gol_stay', $this->user_details['user_id'], time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
+						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
 					}
 
 					return true;
@@ -271,20 +273,22 @@ class user
 		// register the new device to their account
 		if ($new_device == 1)
 		{
-			$device_id = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
-			setcookie('gol-device', $device_id, time()+31556926, '/', $this->core->config('cookie_domain'));
-
 			if ($this->user_details['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
+				$device_id = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
+				setcookie('gol-device', $device_id, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
+
 				// send email about new device
 				$html_message = "<p>Hello <strong>" . $this->user_details['username'] . "</strong>,</p>
-				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.</p>
+				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the <a href=\"".$this->core->config('website_url')."\">".$this->core->config('site_title')."</a> website you may want to let the admin know and change your password immediately.</p>
 				<div>
 				<hr>
-				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>";
+				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>
+				<hr>
+				<p>You can turn this notice off any time from your User Control Panel, in the Notification Preferences page.</p>";
 
-				$plain_message = "Hello " . $this->user_details['username'] . ",\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s");
+				$plain_message = "Hello " . $this->user_details['username'] . ",\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "\r\nYou can turn this notice off any time from your User Control Panel, in the Notification Preferences page.";
 
 				$mail = new mailer($this->core);
 				$mail->sendMail($this->user_details['email'], $this->core->config('site_title') . ": New Login Notification", $html_message, $plain_message);

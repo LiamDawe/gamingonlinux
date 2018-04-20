@@ -24,7 +24,7 @@ else
 $labels = array();
 $data = array();
 
-$users = $dbl->run("SELECT u.`distro`, count(*) as 'total', d.`arch-based`, d.`ubuntu-based` FROM `users` u INNER JOIN `distributions` d ON u.distro = d.name WHERE u.`distro` != '' AND u.`distro` != 'Not Listed' AND u.`distro` IS NOT NULL GROUP BY u.`distro`, d.`arch-based`, d.`ubuntu-based` ORDER BY `total` DESC")->fetch_all();
+$users = $dbl->run("SELECT u.`distro`, count(*) as 'total', d.`arch-based`, d.`ubuntu-based` FROM `users` u INNER JOIN `user_profile_info` p ON u.user_id = p.user_id INNER JOIN `distributions` d ON u.distro = d.name WHERE u.`distro` != '' AND u.`distro` != 'Not Listed' AND u.`distro` IS NOT NULL AND p.`include_in_survey` = 1 GROUP BY u.`distro`, d.`arch-based`, d.`ubuntu-based` ORDER BY `total` DESC")->fetch_all();
 
 $dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', 'Linux Distributions (Combined)'));
 $new_chart_id = $dbl->new_id();
@@ -73,27 +73,27 @@ unset($dat);
 
 // this is for all the others that can be generated automatically
 $charts = array (
-array ("name" => "Linux Distributions (Split)", "db_field" => "distro", "table" => 'users'),
-array ("name" => "Desktop Environment", "db_field" => "desktop_environment"),
-array ("name" => "Distro Architecture", "db_field" => "what_bits"),
-array ("name" => "Dual Booting", "db_field" => "dual_boot"),
-array ("name" => "Wine Use", "db_field" => "wine"),
-array ("name" => "CPU Vendor", "db_field" => "cpu_vendor"),
-array ("name" => "GPU Vendor", "db_field" => "gpu_vendor"),
-array ("name" => "GPU Model", "db_field" => "name", "table" => "user_profile_info p INNER JOIN `gpu_models` g ON p.gpu_model = g.id"),
-array ("name" => "GPU Driver", "db_field" => "gpu_driver"),
-array ("name" => "GPU Driver (Nvidia)", "db_field" => "gpu_driver", "gpu_vendor" => "Nvidia"),
-array ("name" => "GPU Driver (AMD)", "db_field" => "gpu_driver", "gpu_vendor" => "AMD"),
-array ("name" => "RAM", "db_field" => "ram_count"),
-array ("name" => "Monitors", "db_field" => "monitor_count"),
-array ("name" => "Resolution", "db_field" => "resolution"),
-array ("name" => "Main Gaming Machine", "db_field" => "gaming_machine_type"),
-array ("name" => "Main Gamepad", "db_field" => "gamepad")
+array ("name" => "Linux Distributions (Split)", "db_field" => "u.distro", "table" => 'users u INNER JOIN user_profile_info p ON u.user_id = p.user_id'),
+array ("name" => "Desktop Environment", "db_field" => "p.desktop_environment"),
+array ("name" => "Distro Architecture", "db_field" => "p.what_bits"),
+array ("name" => "Dual Booting", "db_field" => "p.dual_boot"),
+array ("name" => "Wine Use", "db_field" => "p.wine"),
+array ("name" => "CPU Vendor", "db_field" => "p.cpu_vendor"),
+array ("name" => "GPU Vendor", "db_field" => "p.gpu_vendor"),
+array ("name" => "GPU Model", "db_field" => "g.name", "table" => "user_profile_info p INNER JOIN `gpu_models` g ON p.gpu_model = g.id"),
+array ("name" => "GPU Driver", "db_field" => "p.gpu_driver"),
+array ("name" => "GPU Driver (Nvidia)", "db_field" => "p.gpu_driver", "gpu_vendor" => "Nvidia"),
+array ("name" => "GPU Driver (AMD)", "db_field" => "p.gpu_driver", "gpu_vendor" => "AMD"),
+array ("name" => "RAM", "db_field" => "p.ram_count"),
+array ("name" => "Monitors", "db_field" => "p.monitor_count"),
+array ("name" => "Resolution", "db_field" => "p.resolution"),
+array ("name" => "Main Gaming Machine", "db_field" => "p.gaming_machine_type"),
+array ("name" => "Main Gamepad", "db_field" => "p.gamepad")
 );
 
 foreach ($charts as $chart)
 {
-	$table = 'user_profile_info';
+	$table = 'user_profile_info p';
 	if (isset($chart['table']))
 	{
 		$table = $chart['table'];
@@ -102,10 +102,10 @@ foreach ($charts as $chart)
 	$sql_vendor = '';
 	if (isset($chart['gpu_vendor']))
 	{
-		$sql_vendor = "`gpu_vendor` = '{$chart['gpu_vendor']}' AND";
+		$sql_vendor = "p.`gpu_vendor` = '{$chart['gpu_vendor']}' AND";
 	}
 
-	$users = $dbl->run("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor {$chart['db_field']} != '' AND {$chart['db_field']} != 'Not Listed' AND {$chart['db_field']} IS NOT NULL GROUP BY {$chart['db_field']} ORDER BY `total` DESC")->fetch_all();
+	$users = $dbl->run("SELECT {$chart['db_field']}, count(*) as 'total' FROM $table WHERE $sql_vendor {$chart['db_field']} != '' AND {$chart['db_field']} != 'Not Listed' AND {$chart['db_field']} IS NOT NULL AND p.`include_in_survey` = 1 GROUP BY {$chart['db_field']} ORDER BY `total` DESC")->fetch_all();
 	
 	$labels = array();
 	$data = array();
@@ -115,7 +115,9 @@ foreach ($charts as $chart)
 	
 	foreach ($users as $user)
 	{
-		$labels[] = $user[$chart['db_field']];
+		$proper_field_name = ltrim(strstr($chart['db_field'], '.'), '.'); // remove the p. or u.
+		echo $proper_field_name;
+		$labels[] = $user[$proper_field_name];
 		$data[] = $user['total'];
 	}
 

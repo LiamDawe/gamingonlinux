@@ -22,7 +22,7 @@ class steam_user
 
 	public function GetPlayerSummaries ($steamid)
 	{
-		$response = core::file_get_contents_curl('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' . $this->apikey . '&steamids=' . $steamid);
+		$response = core::file_get_contents_curl('https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' . $this->apikey . '&steamids=' . $steamid);
 		$json = json_decode($response);
 		return $json->response->players[0];
 	}
@@ -33,7 +33,7 @@ class steam_user
 		$openid = new LightOpenID($this->domain);// put your domain
 		if(!$openid->mode)
 		{
-			$openid->identity = 'http://steamcommunity.com/openid';
+			$openid->identity = 'https://steamcommunity.com/openid';
 			$openid->returnUrl = $this->core->config('website_url') . 'index.php?module=login&steam&real_return=' . $this->return_url;
 			header('Location: ' . $openid->authUrl());
 		}
@@ -45,8 +45,7 @@ class steam_user
 		{
 			if($openid->validate())
 			{
-				preg_match("/^http:\/\/steamcommunity\.com\/openid\/id\/(7[0-9]{15,25}+)$/", $openid->identity, $matches); // steamID: $matches[1]
-				setcookie('steamID', $matches[1], time()+(60*60*24*7), '/'); // 1 week
+				preg_match("/^https:\/\/steamcommunity\.com\/openid\/id\/(7[0-9]{15,25}+)$/", $openid->identity, $matches);
 
 				$get_info = $this->GetPlayerSummaries($matches[1]);
 

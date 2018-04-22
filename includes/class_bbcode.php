@@ -485,22 +485,13 @@ class bbcode
 
 		$text = str_replace('[pcinfo]', '', $text);
 
-		$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$1</blockquote>", $text);
-		$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "<blockquote><cite>Quote</cite><br />$2</blockquote>", $text);
-
 		$text = preg_replace("/\[timer=(.+?)](.+?)\[\/timer]/is", ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see the timer ', $text);
 
 		$find_replace = [
 		'/\[users-only\](.+?)\[\/users-only\]/is'
 			=> ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see this bit, this is for logged in users only ',
-		"/\[img\](.+?)\[\/img\]/is"
-			=> "<img src=\"$1\" alt=\"image\" />",
-		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is"
-			=> "<img width=\"$1\" height=\"$2\" src=\"$3\" alt=\"image\" />",
-		"/\[youtube\](.+?)\[\/youtube\]/is"
-			=> "<iframe width=\"640\" height=\"385\" src=\"https://www.youtube-nocookie.com/embed/$1\" frameborder=\"0\" allowfullscreen></iframe>",
-		"/\[spoiler\](.+?)\[\/spoiler\]/is"
-			=> 'SPOILER: View the website if you wish to see it.'
+		"/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is"
+			=> "<a href=\"https://www.youtube.com/watch?v=$1\"><img src=\"https://img.youtube.com/vi/$1/hqdefault.jpg\" alt=\"youtube video thumbnail\"><br />Watch video on YouTube.com</a>"
 		];
 		
 		foreach ($find_replace as $find => $replace)

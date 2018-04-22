@@ -59,7 +59,7 @@ else
 
 		if ($_GET['view'] == 'premium')
 		{
-			$search_res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 6 ORDER BY u.`username` ASC")->fetch_all();
+			$search_res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_uploaded`, u.`avatar_gallery` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 6 ORDER BY u.`username` ASC")->fetch_all();
 
 			$total = count($search_res);
 			$templating->block('premium_row_top');
@@ -453,14 +453,14 @@ else
 		if ($_POST['act'] == 'deleteavatar')
 		{
 			// remove any old avatar if one was uploaded
-			$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
+			$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
 
 			if ($avatar['avatar_uploaded'] == 1)
 			{
 				unlink('uploads/avatars/' . $avatar['avatar']);
 			}
 
-			$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '' WHERE `user_id` = ?", array($_GET['user_id']));
+			$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'avatar';

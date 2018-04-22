@@ -14,10 +14,6 @@ if (isset($_GET['message']))
 	{
 		$core->message("Your avatar has been uploaded!");
 	}
-	if ($_GET['message'] == 'gravatar')
-	{
-		$core->message("Your avatar has changed to use a gravatar!");
-	}
 	if ($_GET['message'] == 'gallery')
 	{
 		$core->message("You are now using an avatar picked from the gallery!");
@@ -42,8 +38,6 @@ foreach ($res_gal as $gallery)
 }
 $templating->set('avatar_gallery', $avatar_gallery);
 
-$templating->set('gravatar_email', $user->user_details['gravatar_email']);
-
 if (isset($_POST['action']))
 {
 	if ($_POST['action'] == 'Upload')
@@ -60,14 +54,9 @@ if (isset($_POST['action']))
 		}
 	}
 
-	else if ($_POST['action'] == 'Gravatar')
+	else if ($_POST['action'] == 'gallery')
 	{
-		if (empty($_POST['gravatar_email']))
-		{
-			$core->message('To use a Gravatar be sure to enter your email for it! Options: <a href="usercp.php?module=avatar">Return to Avatars</a> | <a href="index.php">Homepage</a>');
-		}
-
-		else
+		if (isset($_POST['gallery']))
 		{
 			// remove any old avatar if one was uploaded
 			$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
@@ -77,25 +66,7 @@ if (isset($_POST['action']))
 				unlink('uploads/avatars/' . $avatar['avatar']);
 			}
 
-			$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 1, `gravatar_email` = ?, `avatar_gallery` = NULL WHERE `user_id` = ?", array($_POST['gravatar_email'], $_SESSION['user_id']));
-
-			header("Location: /usercp.php?module=avatar&message=gravatar");
-		}
-	}
-
-	else if ($_POST['action'] == 'gallery')
-	{
-		if (isset($_POST['gallery']))
-		{
-			// remove any old avatar if one was uploaded
-			$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-
-			if ($avatar['avatar_uploaded'] == 1)
-			{
-				unlink('uploads/avatars/' . $avatar['avatar']);
-			}
-
-			$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = ? WHERE `user_id` = ?", array($_POST['gallery'], $_SESSION['user_id']));
+			$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gallery` = ? WHERE `user_id` = ?", array($_POST['gallery'], $_SESSION['user_id']));
 			
 			header("Location: /usercp.php?module=avatar&message=gallery");
 		}
@@ -108,14 +79,14 @@ if (isset($_POST['action']))
 	else if ($_POST['action'] == 'Delete')
 	{
 		// remove any old avatar if one was uploaded
-		$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+		$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 		if ($avatar['avatar_uploaded'] == 1)
 		{
 			unlink('uploads/avatars/' . $avatar['avatar']);
 		}
 
-		$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gallery` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 		header("Location: /usercp.php?module=avatar&message=deleted");
 	}

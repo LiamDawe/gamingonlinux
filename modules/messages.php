@@ -238,7 +238,7 @@ else
 				$db_grab_fields .= "u.`{$field['db_field']}`,";
 			}
 
-			$start = $dbl->run("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`,u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']))->fetch();
+			$start = $dbl->run("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` INNER JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']))->fetch();
 
 			$templating->block('view_row', 'private_messages');
 			$templating->set('title', $start['title']);
@@ -312,7 +312,7 @@ else
 			$templating->set('edit_link', $edit_link);
 
 			// replies
-			$get_replies = $dbl->run("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start))->fetch_all();
+			$get_replies = $dbl->run("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start))->fetch_all();
 			
 			if ($get_replies)
 			{

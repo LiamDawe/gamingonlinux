@@ -110,8 +110,6 @@ SELECT
 	f.name as forum_name,
 	u.`username`,
 	u.`avatar`, 
-	u.`avatar_gravatar`, 
-	u.`gravatar_email`,
 	u.`avatar_uploaded`, 
 	u.`avatar_gallery`,
 	u2.`username` as username_last

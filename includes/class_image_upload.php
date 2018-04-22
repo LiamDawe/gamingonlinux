@@ -81,7 +81,7 @@ class image_upload
 					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $avatar['avatar']);
 				}
 
-				$this->dbl->run("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gravatar` = 0, `gravatar_email` = '', `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
+				$this->dbl->run("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
 				return true;
 			}
 

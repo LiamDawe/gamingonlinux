@@ -24,7 +24,7 @@ if (isset($_GET['user_id']))
 				$db_grab_fields .= "{$field['db_field']},";
 			}
 
-			$profile = $dbl->run("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_gravatar`, `gravatar_email`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `ip`, `game_developer`, `private_profile`, `get_pms` FROM `users` WHERE `user_id` = ?", array($profile_id))->fetch();
+			$profile = $dbl->run("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `ip`, `game_developer`, `private_profile`, `get_pms` FROM `users` WHERE `user_id` = ?", array($profile_id))->fetch();
 			if (!$profile)
 			{
 				$core->message('That person does not exist here!');

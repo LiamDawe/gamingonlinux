@@ -30,13 +30,12 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
 	$templating->set('pagination', $pagination);
 
-	$result = $dbl->run("SELECT a.*, u.user_id, u.username, u.avatar_gravatar, u.gravatar_email, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']))->fetch_all();
+	$result = $dbl->run("SELECT a.*, u.user_id, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `editor_discussion` a INNER JOIN `users` u ON a.user_id = u.user_id ORDER BY a.`id` DESC LIMIT ?,?", array($core->start, $_SESSION['per-page']))->fetch_all();
 	foreach ($result as $commentsall)
 	{
 		$templating->block('commentall', 'admin_modules/admin_module_more_comments');
 
 		// sort out the avatar
-		// either no avatar (gets no avatar from gravatars redirect) or gravatar set
 		$comment_avatar = $user->sort_avatar($commentsall);
 
 		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0);

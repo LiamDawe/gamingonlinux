@@ -19,7 +19,7 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']))
 		$field = 'article_id';
 		$replacer = $field;
 	}
-	$grab_users = $dbl->run("SELECT u.`username`, u.`user_id`, u.`avatar_gravatar`, u.`gravatar_email`, u.`avatar_gallery`, u.`avatar`, u.`avatar_uploaded`, l.like_id FROM `users` u INNER JOIN `$table` l ON u.`user_id` = l.`user_id` WHERE l.`$field` = ? ORDER BY u.`username` ASC LIMIT 50", array($_GET[$replacer]))->fetch_all();
+	$grab_users = $dbl->run("SELECT u.`username`, u.`user_id`, u.`avatar_gallery`, u.`avatar`, u.`avatar_uploaded`, l.like_id FROM `users` u INNER JOIN `$table` l ON u.`user_id` = l.`user_id` WHERE l.`$field` = ? ORDER BY u.`username` ASC LIMIT 50", array($_GET[$replacer]))->fetch_all();
 	if (!$grab_users)
 	{
 		$core->message('That does not exist!');

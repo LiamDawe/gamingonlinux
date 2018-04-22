@@ -97,8 +97,6 @@ else
 		t.*,
 		u.`username`,
 		u.`avatar`,
-		u.`gravatar_email`,
-		u.`avatar_gravatar`,
 		u.`avatar_uploaded`,
 		u.`avatar_gallery`,
 		u2.`username` as `username_last`,

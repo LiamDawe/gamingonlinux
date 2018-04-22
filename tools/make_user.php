@@ -36,9 +36,9 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 		$modqueue = 1;
 	}
 
-	$user_query = "INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `register_date` = ?, `theme` = 'default', `activated` = 1, `in_mod_queue` = ?";
+	$user_query = "INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `register_date` = ?, `theme` = 'default', `activated` = 1, `in_mod_queue` = ?";
 
-	$dbl->run($user_query, array($username, $safe_password, $email, $email, core::$date, $modqueue));
+	$dbl->run($user_query, array($username, $safe_password, $email, core::$date, $modqueue));
 
 	$new_user_id = $dbl->new_id();
 	foreach ($_POST['user_groups'] as $key => $group)
@@ -69,9 +69,9 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user_random')
 	
 		$safe_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 	
-		$user_query = "INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `register_date` = ?, `theme` = 'default', `activated` = 1";
+		$user_query = "INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `register_date` = ?, `theme` = 'default', `activated` = 1";
 	
-		$dbl->run($user_query, array($username, $safe_password, $email, $email, core::$date));
+		$dbl->run($user_query, array($username, $safe_password, $email, core::$date));
 	
 		$new_user_id = $dbl->new_id();
 		foreach ($_POST['user_groups'] as $key => $group)

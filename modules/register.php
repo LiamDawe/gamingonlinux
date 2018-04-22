@@ -188,22 +188,22 @@ if ($core->config('allow_registrations') == 1)
 				// register away
 				if ($_POST['register'] == 'Register')
 				{
-					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, $email, core::$ip, core::$date, core::$date, $code, $timezone));
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `password` = ?, `email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `activation_code` = ?, `timezone` = ?", array($_POST['username'], $safe_password, $email, core::$ip, core::$date, core::$date, $code, $timezone));
 				}
 
 				if ($_POST['register'] == 'twitter')
 				{
-					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $timezone));
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `oauth_provider` = ?, `oauth_uid` = ?, `twitter_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, core::$ip, core::$date, core::$date, $_SESSION['twitter_data']['oauth_provider'], $_SESSION['twitter_data']['uid'], $_SESSION['twitter_data']['twitter_username'], $code, $timezone));
 				}
 
 				if ($_POST['register'] == 'steam')
 				{
-					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $timezone));
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `steam_id` = ?, `steam_username` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, core::$ip, core::$date, core::$date, $_SESSION['steam_id'], $_SESSION['steam_username'], $code, $timezone));
 				}
 					
 				if ($_POST['register'] == 'google')
 				{
-					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `gravatar_email` = ?, `avatar` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, $email, $_SESSION['google_avatar'], core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_email'], $code, $timezone));
+					$do_register = $dbl->run("INSERT INTO `users` SET `username` = ?, `email` = ?, `ip` = ?, `register_date` = ?, `last_login` = ?, `theme` = 'default', `google_email` = ?, `activation_code` = ?, `timezone` = ?", array($_POST['username'], $email, core::$ip, core::$date, core::$date, $_SESSION['google_data']['google_email'], $code, $timezone));
 				}
 
 				$last_id = $dbl->new_id();

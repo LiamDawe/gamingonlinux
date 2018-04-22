@@ -9,7 +9,7 @@ class user
 	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
-	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gravatar`, `gravatar_email`, `avatar_gallery`,
+	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gallery`,
 	`display_comment_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
 	
 	public $user_groups;
@@ -56,7 +56,7 @@ class user
 					$_SESSION['user_id'] = 0;
 					$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 					$_SESSION['articles-per-page'] = 15;
-					$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gravatar' => 0, 'avatar_gallery' => NULL];
+					$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gallery' => NULL];
 				}
 			}
 			
@@ -446,39 +446,21 @@ class user
 		{
 			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar.png";
 		}
+
+		$avatar = $default_avatar;
 		
 		if (!empty($data))
 		{
-			$avatar = '';
-			if ($data['avatar_gravatar'] == 1)
-			{
-				$avatar = 'https://www.gravatar.com/avatar/' . md5( strtolower( trim( $data['gravatar_email'] ) ) ) . '?d='. $default_avatar;
-			}
-
-			else if ($data['avatar_gallery'] != NULL)
+			if ($data['avatar_gallery'] != NULL)
 			{
 				$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$data['avatar_gallery']}.png";
 			}
 
 			// either uploaded or linked an avatar
-			else if (!empty($data['avatar']) && $data['avatar_gravatar'] == 0)
+			else if (!empty($data['avatar']) && $data['avatar_uploaded'] == 1)
 			{
-				$avatar = $data['avatar']; // for google login avatars
-				if ($data['avatar_uploaded'] == 1)
-				{
-					$avatar = $this->core->config('website_url') . "uploads/avatars/{$data['avatar']}";
-				}
+				$avatar = $this->core->config('website_url') . "uploads/avatars/{$data['avatar']}";
 			}
-
-			// else no avatar, then as a fallback use gravatar if they have an email left-over
-			else if (empty($data['avatar']) && $data['avatar_gravatar'] == 0 && $data['avatar_gallery'] == NULL)
-			{
-				$avatar = $default_avatar;
-			}
-		}
-		else
-		{
-			$avatar = $default_avatar;
 		}
 			
 		return $avatar;
@@ -857,7 +839,7 @@ class user
 	function delete_user($user_id)
 	{
 		// remove any old avatar if one was uploaded
-		$deleted_info = $this->db->run("SELECT `avatar`, `avatar_uploaded`, `avatar_gravatar`, `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetch();
+		$deleted_info = $this->db->run("SELECT `avatar`, `avatar_uploaded`, `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetch();
 
 		if ($deleted_info['avatar_uploaded'] == 1)
 		{

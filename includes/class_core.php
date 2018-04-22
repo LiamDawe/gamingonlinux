@@ -615,8 +615,8 @@ class core
 				}
 				
 				// replace the temp filename with the new filename
-				$text = preg_replace('/(<img src=".+temp\/thumbnails\/.+" \/>)/', '<img src="/uploads/articles/tagline_images/thumbnails/'.$imagename.'" />', $text);
-				$text = preg_replace('/<img src=".+temp\/.+" \/>/', '<img src="/uploads/articles/tagline_images/'.$imagename.'" />', $text);
+				$text = preg_replace('/(<img src=".+temp\/thumbnails\/.+" \/>)/', '<img src="'.$this->config('website_url').'uploads/articles/tagline_images/thumbnails/'.$imagename.'" />', $text);
+				$text = preg_replace('/<img src=".+temp\/.+" \/>/', '<img src="'.$this->config('website_url').'uploads/articles/tagline_images/'.$imagename.'" />', $text);
 
 				$this->dbl->run("UPDATE `articles` SET `tagline_image` = ?, `gallery_tagline` = 0, `text` = ? WHERE `article_id` = ?", array($imagename, $text, $article_id));
 				return true;

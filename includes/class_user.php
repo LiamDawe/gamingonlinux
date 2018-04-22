@@ -31,47 +31,48 @@ class user
 	{
 		$logout = 0;
 
-		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		if (!isset($_GET['Logout']))
 		{
-			// we know it's numeric, but doubly be sure and don't allow any html
-			$safe_id = (int) $_SESSION['user_id'];
-
-			// check if they actually have any saved sessions, if they don't then logout to cancel everything
-			// this is also if we need to remove everyone being logged in due to any security issues
-			$session_exists = $this->db->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [$safe_id])->fetch();
-			if (!$session_exists)
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 			{
-				$logout = 1;
+				// we know it's numeric, but doubly be sure and don't allow any html
+				$safe_id = (int) $_SESSION['user_id'];
+
+				// check if they actually have any saved sessions, if they don't then logout to cancel everything
+				// this is also if we need to remove everyone being logged in due to any security issues
+				$session_exists = $this->db->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [$safe_id])->fetch();
+				if (!$session_exists)
+				{
+					$logout = 1;
+				}
+				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
+				
+				$this->check_banned();
 			}
-			$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
+			else
+			{
+				if ($this->stay_logged_in() == false) // make a guest session if they aren't saved
+				{
+					$_SESSION['user_id'] = 0;
+					$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
+					$_SESSION['articles-per-page'] = 15;
+					$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gravatar' => 0, 'avatar_gallery' => NULL];
+				}
+			}
 			
-			$this->check_banned();
-		}
-		else
-		{
-			if ($this->stay_logged_in() == false) // make a guest session if they aren't saved
-			{
-				$_SESSION['user_id'] = 0;
-				$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
-				$_SESSION['articles-per-page'] = 15;
-				$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gravatar' => 0, 'avatar_gallery' => NULL];
-			}
-		}
-		
-		$this->user_groups = $this->get_user_groups();
+			$this->user_groups = $this->get_user_groups();
 
-		if ($logout == 1)
-		{
-			$this->logout();
-			return;
+			if ($logout == 1)
+			{
+				$this->logout();
+				return;
+			}
 		}
 	}
 
 	// normal login form
 	function login($username, $password, $remember_username, $stay)
-	{
-		global $db;
-		
+	{		
 		if (!empty($password))
 		{
 			// check username/email exists first
@@ -155,7 +156,7 @@ class user
 		}
 	}
 	
-	public function register_session()
+	public function register_session($session_id, $device_id)
 	{
 		if (!isset($_SESSION))
 		{
@@ -172,6 +173,8 @@ class user
 		$_SESSION['email_options'] = $this->user_details['email_options'];
 		$_SESSION['auto_subscribe'] = $this->user_details['auto_subscribe'];
 		$_SESSION['auto_subscribe_email'] = $this->user_details['auto_subscribe_email'];
+		$_SESSION['session_id'] = $session_id;
+		$_SESSION['device_id'] = $device_id;
 	}
 
 	function block_list()
@@ -273,10 +276,10 @@ class user
 		// register the new device to their account
 		if ($new_device == 1)
 		{
+			$device_id = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+
 			if ($this->user_details['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
-				$device_id = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-
 				setcookie('gol-device', $device_id, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
 
 				// send email about new device
@@ -312,7 +315,7 @@ class user
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
 		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
 
-		$this->register_session();
+		$this->register_session($generated_session, $device_id);
 	}
 
 	// if they have a stay logged in cookie log them in
@@ -320,7 +323,7 @@ class user
 	{		
 		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']))
 		{
-			$session = $this->db->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session']))->fetch();
+			$session = $this->db->run("SELECT `session_id`, `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session']))->fetch();
 
 			if ($session)
 			{
@@ -332,7 +335,7 @@ class user
 				// update IP address and last login
 				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
-				$this->register_session();
+				$this->register_session($session['session_id'], $session['device-id']);
 
 				return true;
 			}
@@ -354,10 +357,8 @@ class user
 
 	function logout($banned = 0, $redirect = 1)
 	{
-		if (isset($_COOKIE['gol-device']))
-		{
-			$this->db->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `device-id` = ?", [$_SESSION['user_id'], $_COOKIE['gol-device']]);
-		}
+		// remove this specific session from the DB
+		$this->db->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_SESSION['user_id'], $_SESSION['session_id']));
 
 		// remove all session information
 		$_SESSION = array();
@@ -378,6 +379,8 @@ class user
 		setcookie('gol_stay', "",  time()-60, '/');
 		setcookie('gol_session', "",  time()-60, '/');
 		setcookie('gol-device', "",  time()-60, '/');
+
+		$this->user_details = [];
 
 		if ($banned == 1)
 		{

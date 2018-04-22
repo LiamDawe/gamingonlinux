@@ -7,7 +7,7 @@ $timer_start = microtime(true);
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-if (isset($_GET['act']) && $_GET['act'] == 'Logout')
+if (isset($_GET['Logout']))
 {
 	$user->logout();
 }

@@ -1306,7 +1306,7 @@ jQuery(document).ready(function()
 		// Logout confirmation
 		if (confirm('Are you sure you want to logout?')) 
 		{
-			window.location = '/index.php?act=Logout';
+			window.location = '/index.php?Logout';
 		}
 	});
 

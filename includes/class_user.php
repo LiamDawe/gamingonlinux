@@ -317,9 +317,7 @@ class user
 
 	// if they have a stay logged in cookie log them in
 	function stay_logged_in()
-	{
- 		global $core;
-		
+	{		
 		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']))
 		{
 			$session = $this->db->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session']))->fetch();
@@ -343,7 +341,6 @@ class user
 				setcookie('gol_stay', "",  time()-60, '/');
 				setcookie('gol_session', "",  time()-60, '/');
 				setcookie('gol-device', "",  time()-60, '/');
-				setcookie('steamID', '', -1, '/');
 				
 				return false;
 			}
@@ -381,7 +378,6 @@ class user
 		setcookie('gol_stay', "",  time()-60, '/');
 		setcookie('gol_session', "",  time()-60, '/');
 		setcookie('gol-device', "",  time()-60, '/');
-		setcookie('steamID', '', -1, '/');
 
 		if ($banned == 1)
 		{

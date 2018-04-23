@@ -853,6 +853,15 @@ class user
 		$this->db->run("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($user_id));
 		$this->db->run("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($user_id));
 		$this->db->run("DELETE FROM `user_notifications` WHERE `owner_id` = ?", array($user_id));
+		
+		// deal with article likes
+		$article_likes = $dbl->run("SELECT `article_id` FROM `article_likes` WHERE `user_id` = ?", array($user_id))->fetch_all();
+		foreach ($article_likes as $like) // loop over each article, remove a like
+		{
+			$this->db->run("UPDATE `articles` SET `total_likes` = (total_likes - 1) WHERE `article_id` = ?", array($like['article_id']));
+		}
+		$dbl->run("DELETE FROM `article_likes` WHERE `user_id` = ?", array($user_id)); // now remove all their likes
+		
 		$this->db->run("UPDATE `articles_comments` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
 		$this->db->run("UPDATE `forum_topics` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
 		$this->db->run("UPDATE `forum_replies` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));

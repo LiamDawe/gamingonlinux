@@ -27,6 +27,11 @@ $ip_timeout = $core->config('ip_ban_length');
 $dbl->run("DELETE FROM `ipbans` WHERE `ban_date` < NOW() - INTERVAL $ip_timeout DAY");
 
 /*
+Remove IP address from users who haven't logged into the site in 3 months
+*/
+$dbl->run("UPDATE `users` SET `ip` = NULL WHERE `last_login` <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 90 DAY))");
+
+/*
 REMOVE A LOCK ON ARTICLES, WHEN PEOPLE FORGET TO UNLOCK THEM
 */
 $lock_timeout = 1800; // 30 minutes

@@ -226,8 +226,11 @@ jQuery(document).ready(function()
 		{
 			expiry_days = days;
 		}
-		
-		setCookie("gol_announce_" + announce_id, "set", expiry_days);
+
+		if (Cookies.get('cookie_consent') == 'yup')
+		{
+			setCookie("gol_announce_" + announce_id, "set", expiry_days);
+		}
 		
 		$(this).closest(".announce").hide();
 	});
@@ -1728,4 +1731,35 @@ jQuery(document).ready(function()
 				});
 		}
 	});
+
+	/* COOKIE CONSENT BAR AND ACTIONS */
+	/* W.I.P - To be enabled when required, if required
+	// cookie bar
+	if (typeof Cookies.get('cookie_consent') === 'undefined')
+	{
+		// no consent yet, ask for it
+		$('#cookie_warning').show();
+	}
+
+	// deny cookies
+	$(document).on('click','#deny_cookies',function(e)
+	{
+		e.preventDefault();
+		Cookies.set('cookie_consent', 'nope', { expires: 30 });
+		$('#cookie_warning').fadeOut(500);
+	});
+
+	// allow cookies
+	$(document).on('click','#allow_cookies',function(e)
+	{
+		e.preventDefault();
+		Cookies.set('cookie_consent', 'yup', { expires: 30 });
+		$('#cookie_warning').fadeOut(500);
+		// replace any hidden videos
+		$(".hidden-video").each(function( index ) 
+		{
+			var video_id = $(this).attr("data-video-id");
+			$(this).replaceWith('<div class="youtube-embed-wrapper" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden"><iframe allowfullscreen="" frameborder="0" height="360" src="https://www.youtube-nocookie.com/embed/'+video_id+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%" width="640"></iframe></div>');
+		});
+	});*/
 });

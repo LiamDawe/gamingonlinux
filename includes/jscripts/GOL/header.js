@@ -220,7 +220,7 @@ jQuery(document).ready(function()
 		event.preventDefault();
 		var announce_id = $(this).attr("data-announce-id");
 		var days = $(this).attr('data-days');
-		var expiry_days = 60;
+		var expiry_days = 30;
 
 		if (typeof days !== typeof undefined && days !== false) 
 		{

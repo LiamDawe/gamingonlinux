@@ -119,6 +119,9 @@ if (isset($_POST['act']))
 		}
 
 		$dbl->run("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ?", array($text, $_SESSION['user_id'], $user_groups, $_POST['type'], $modules, $dismiss));
+
+		core::$redis->delete('index_announcements');
+
 		header("Location: /admin.php?module=announcements&view=manage&message=saved&extra=announcement");
 	}
 	if ($_POST['act'] == 'edit')
@@ -160,6 +163,9 @@ if (isset($_POST['act']))
 		}
 
 		$dbl->run("UPDATE `announcements` SET `text` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ? WHERE `id` = ?", array($text, $user_groups, $_POST['type'], $modules, $dismiss, $_POST['id']));
+
+		core::$redis->delete('index_announcements');
+
 		$_SESSION['message'] = 'edited';
 		$_SESSION['message_extra'] = 'announcement';
 		header("Location: /admin.php?module=announcements&view=manage");
@@ -178,6 +184,9 @@ if (isset($_POST['act']))
 		else if (isset($_POST['yes']))
 		{
 			$dbl->run("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
+
+			core::$redis->delete('index_announcements');
+
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'announcement';
 			header("Location: /admin.php?module=announcements&view=manage");

@@ -10,7 +10,7 @@ $tagline = "This is your once a month reminder to make sure your PC information 
 $text = "<p>This is your once a month reminder to make sure your PC information is correct on your user profiles. A fresh batch of statistics is generated on the 1st of each month.</p>
 [pcinfo]
 <p>You can see the statistics any time <a href=\"https://www.gamingonlinux.com/users/statistics\">on this page</a>.</p>
-<p>While we don't currently have a drop-off implemented for old/stale data, it will be coming soon. If you want to make sure you're included at any time clicking update without any changes will update the last time you edited them.<br />The drop-off for old data will be done in months, since people aren't likely to change hardware that often.</p>
+<p>PC Info is automatically purged if it hasn't been updated, or if you don't click the link to remain in for 2 years. This way we prevent too much stale data and don't hold onto your data for longer than required.</p>
 <p>If you want your details to actually be included in the monthly survey, be sure to tick the box labelled \"Include your PC details in our Monthly User Statistics?\" and hit the \"Update\" button at the bottom, it's opt-in by default for new users.";
 
 $slug = core::nice_title($title);

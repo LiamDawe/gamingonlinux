@@ -76,6 +76,19 @@ body.dark {
 	font-family: monospace;
 	box-sizing: border-box;
 }
+
+.special_container
+{
+	padding: 5px 10px;
+	background: #eee;
+	border: 1px solid #b4b4b4;
+	text-align: left;
+}
+.dark .special_container
+{
+	color: #ccc;
+	background-color: #383838;
+}
 hr.content_split { 
 	background-color: #fff;
 	border-top: 2px dotted #8c8b8b;

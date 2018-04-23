@@ -100,8 +100,26 @@ if ($total_to_remove > 0)
 $year = 365*24*60*60;
 $dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_date <= (created_date - $year)");
 
-/* REMOVE SEEN USER NOTIFICATIONS OLDER THAN ONE YEAR */
+/* REMOVE SEEN USER NOTIFICATIONS OLDER THAN SIX MONTH */
 $dbl->run("DELETE FROM `user_notifications` WHERE last_date <= (now() - interval 6 month)");
 
 // update last ran datetime
 $dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);
+
+// remove pc info where the user hasn't updated the info for 2 years
+
+$dbl->run("DELETE FROM `user_profile_info` WHERE `date_updated` < DATE_SUB(NOW(),INTERVAL 2 YEAR)");
+
+// remove users who aren't activated after 10 days
+
+$say_bye = $dbl->run("SELECT `user_id` FROM `users` WHERE `register_date` <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 10 DAY)) AND `activated` = 0")->fetch_all();
+$total_users = count($say_bye);
+
+foreach ($say_bye as $remove)
+{
+	$dbl->run("DELETE FROM `users` WHERE `user_id` = ?", array($remove['user_id']));
+	$dbl->run("DELETE FROM `user_profile_info` WHERE `user_id` = ?", array($remove['user_id']));
+	$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ?", array($remove['user_id']));
+}
+$dbl->run("UPDATE `config` SET `data_value` = (data_value - ?) WHERE `data_key` = 'total_users'", array($total_users));
+core::$redis->delete('CONFIG_total_users'); // force new cache

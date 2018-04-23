@@ -1889,3 +1889,28 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
   }
 
 .affiliate_meta{margin-bottom: 0px;}
+
+#cookie_warning {
+	bottom: 0px; 
+	width: 100%; 
+	background: linear-gradient(to bottom, rgba(30,30,30,0.95) 0, rgba(0,0,0,0.95) 100%);
+	display: none;    
+	left: 0;
+    line-height: 1.5;
+    margin: 0;
+	padding: 3px;
+	box-sizing: border-box;
+    position: fixed;
+    width: 100%;
+	z-index: 9999;
+	color: white;
+}
+#cookie_warning a:link, #cookie_warning a:visited, #cookie_warning a:active {
+	color: white;
+    border-bottom: 1px dotted #eee;
+    text-decoration: none;
+}
+span.cookie_action
+{
+	float: right;
+}

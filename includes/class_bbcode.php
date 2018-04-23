@@ -478,6 +478,16 @@ class bbcode
 		return $text;
 	}
 
+	function youtube_privacy($text)
+	{
+		// to be turned on later, as needed, possibly by GDPR
+		/*if (!isset($_COOKIE['cookie_consent']) || isset($_COOKIE['cookie_consent']) && $_COOKIE['cookie_consent'] == 'nope')
+		{
+			$text = preg_replace("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is", "<p style=\"text-align: center;\" class=\"hidden-video\" data-video-id=\"$1\">YouTube videos require cookies, you must accept cookies to view.<a href=\"https://www.youtube.com/watch?v=$1\"><img src=\"https://img.youtube.com/vi/$1/hqdefault.jpg\" alt=\"youtube video thumbnail\"><br />Watch video on YouTube.com</a>.</p>", $text);
+		}*/
+		return $text;
+	}
+
 	// remove bits to make sure RSS validates, and to make sure hidden bits don't become available to all
 	function rss_stripping($text, $tagline_image = NULL, $gallery_tagline = NULL)
 	{
@@ -688,6 +698,8 @@ class bbcode
 				$text = $this->replace_giveaways($text, $match);
 			}
 		}
+
+		$text = $this->youtube_privacy($text);
 
 		$text = $this->do_timers($text);
 		

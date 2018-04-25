@@ -480,10 +480,12 @@ class bbcode
 
 	function youtube_privacy($text)
 	{
-		// to be turned on later, as needed, possibly by GDPR
-		/*if (!isset($_COOKIE['cookie_consent']) || isset($_COOKIE['cookie_consent']) && $_COOKIE['cookie_consent'] == 'nope')
+		/*// to be turned on later, as needed, possibly by GDPR
+		if (!isset($_COOKIE['cookie_consent']) || isset($_COOKIE['cookie_consent']) && $_COOKIE['cookie_consent'] == 'nope')
 		{
-			$text = preg_replace("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is", "<p style=\"text-align: center;\" class=\"hidden-video\" data-video-id=\"$1\">YouTube videos require cookies, you must accept cookies to view.<a href=\"https://www.youtube.com/watch?v=$1\"><img src=\"https://img.youtube.com/vi/$1/hqdefault.jpg\" alt=\"youtube video thumbnail\"><br />Watch video on YouTube.com</a>.</p>", $text);
+			$text = preg_replace("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is", "
+			<div class=\"hidden_video\" data-video-id=\"$1\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept cookies to view.<br />
+			<span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"$1\" href=\"#\">Show Video &amp; Accept Cookies</a></span></div></div>", $text);
 		}*/
 		return $text;
 	}

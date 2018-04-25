@@ -96,9 +96,9 @@ do
 			
 						$on_sale[] = $game_list['id'];
 
-						$check_sale = $dbl->run("SELECT 1 FROM `sales` WHERE `game_id` = ? AND `store_id` = 4", array($game_list['id']))->fetch();
+						$check_sale = $dbl->run("SELECT `id`, `sale_dollars` FROM `sales` WHERE `game_id` = ? AND `store_id` = 4", array($game_list['id']))->fetch();
 						
-						// if it does exist, make sure it's not from GOG already
+						// if it does exist, make sure it's not from HUMBLE already
 						if (!$check_sale)
 						{
 							$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 4, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_list['id'], $game->current_price[0], $game->full_price[0], $website));
@@ -106,6 +106,14 @@ do
 							$sale_id = $dbl->new_id();
 						
 							echo "\tAdded ".$sane_name." to the sales DB with id: " . $sale_id . ".\n";
+						}
+						else
+						{
+							// update the current USD price, if it's wrong
+							if ($check_sale['sale_dollars'] != $game->current_price[0])
+							{
+								$dbl->run("UPDATE `sales` SET `sale_dollars` = ? WHERE `id` = ?", array($game->current_price[0], $check_sale['id']));
+							}
 						}
 					}
 				}

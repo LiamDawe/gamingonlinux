@@ -438,7 +438,11 @@ class charts
 		{
 			$this->chart_info = $chart_data;
 			$this->chart_info['enabled'] = 1;
-			$this->chart_info['counters_inside'] = $chart_data['counters_inside'];
+			$this->chart_info['counters_inside'] = 0;
+			if (isset($chart_data['counters_inside']))
+			{
+				$this->chart_info['counters_inside'] = $chart_data['counters_inside'];
+			}
 		}
 		
 		if ($this->chart_info['enabled'] == 0 && $user->check_group([1,2,5]) == false)

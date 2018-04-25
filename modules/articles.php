@@ -91,6 +91,13 @@ if (isset($view))
 
 		if ($total_items > 0)
 		{
+			$last_page = ceil($total_items/$articles_per_page);
+		
+			if ($page > $last_page)
+			{
+				$page = $last_page;
+			}
+
 			$paging_url = "/index.php?module=articles&view=cat&catid=" . $get_category['category_name'] . '&amp;';
 			
 			// sort out the pagination link
@@ -152,6 +159,13 @@ if (isset($view))
 				$for_url .= 'catid[]=' . $safe_url_id . '&amp;';
 			}
 
+			$last_page = ceil($total_items/$articles_per_page);
+		
+			if ($page > $last_page)
+			{
+				$page = $last_page;
+			}
+
 			$paging_url = "/index.php?module=articles&view=multiple&" . $for_url;
 			
 			// sort out the pagination link
@@ -191,11 +205,6 @@ if (isset($view))
 			foreach ($articles_get as $article)
 			{
 				$article_id_array[] = $article['article_id'];
-			}
-
-			if (empty($article_id_array))
-			{
-				error_log('Article IDs empty: ' . $_SERVER['REQUEST_URI']);
 			}
 
 			$article_id_sql = implode(', ', $article_id_array);

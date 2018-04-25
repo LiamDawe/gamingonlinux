@@ -1704,6 +1704,7 @@ jQuery(document).ready(function()
 	});
 
 	// set the bbcode editor to fullscreen
+	/*
 	$(document).on('click','#full-screen-bbcode',function() 
 	{
 		var $toggle_bbeditor_div = $(this).closest('div.octus-editor');
@@ -1730,11 +1731,12 @@ jQuery(document).ready(function()
 				height: space
 				});
 		}
-	});
+	});*/
 
 	/* COOKIE CONSENT BAR AND ACTIONS */
-	/* W.I.P - To be enabled when required, if required
+	
 	// cookie bar
+	/*
 	if (typeof Cookies.get('cookie_consent') === 'undefined')
 	{
 		// no consent yet, ask for it
@@ -1756,10 +1758,18 @@ jQuery(document).ready(function()
 		Cookies.set('cookie_consent', 'yup', { expires: 30 });
 		$('#cookie_warning').fadeOut(500);
 		// replace any hidden videos
-		$(".hidden-video").each(function( index ) 
+		$(".hidden_video").each(function( index ) 
 		{
 			var video_id = $(this).attr("data-video-id");
 			$(this).replaceWith('<div class="youtube-embed-wrapper" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden"><iframe allowfullscreen="" frameborder="0" height="360" src="https://www.youtube-nocookie.com/embed/'+video_id+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%" width="640"></iframe></div>');
 		});
+	});
+
+	// accepting a single video for viewing
+	$(document).on('click','.accept_video',function(e)
+	{
+		e.preventDefault();
+		var video_id = $(this).attr("data-video-id");
+		$(this).closest('.hidden_video').replaceWith('<div class="youtube-embed-wrapper" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden"><iframe allowfullscreen="" frameborder="0" height="360" src="https://www.youtube-nocookie.com/embed/'+video_id+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%" width="640"></iframe></div>');
 	});*/
 });

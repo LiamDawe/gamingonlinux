@@ -1328,7 +1328,8 @@ jQuery(document).ready(function()
 	var showChar = 600;
 	var moretext = "<em>Click to view long quote </em>";
 	var lesstext = "<em>Click to hide long quote </em>";
-	$('.comment_quote').each(function() 
+	var quote_count = $(".comment_quote").length;
+	$('.comment_quote').each(function(i) 
 	{
 		var actual_text = $(this).text();
 		var content = $(this).outerHTML();
@@ -1346,6 +1347,18 @@ jQuery(document).ready(function()
 			var html = '<span class="morecontent">' + content + '</span><a href="" class="morelink">' + moretext + cite_link + '</a><br />';
 
 			$(this).replaceWith(html);
+		}
+		if (i+1 === quote_count) // this will be executed at the end of the loop
+		{
+			// deal with being linked to a comment, so we can put the window to the correct scroll position, since it will be different due to hidden quotes making the page smaller
+			if(window.location.hash) 
+			{
+				var hash = window.location.hash.substring(1); //Puts hash in variable, and removes the # character
+				if (hash.indexOf("r") >= 0)
+				{
+					$('#'+hash)[0].scrollIntoView();
+				}
+			}
 		}
 	});
 

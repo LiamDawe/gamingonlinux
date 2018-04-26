@@ -437,6 +437,11 @@ class user
 	public function sort_avatar($data)
 	{
 		$your_theme = $this->user_details['theme'];
+
+		if (!isset($this->user_details['theme']))
+		{
+			error_log('No theme set: ' . $_SERVER['REQUEST_URI'] . print_r($this->user_details, true) . print_r($_SESSION, true));
+		}
 		
 		if ($your_theme == 'dark')
 		{
@@ -836,7 +841,7 @@ class user
 		die();
 	}
 
-	function delete_user($user_id)
+	function delete_user($user_id, $options)
 	{
 		// remove any old avatar if one was uploaded
 		$deleted_info = $this->db->run("SELECT `avatar`, `avatar_uploaded`, `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetch();
@@ -846,6 +851,20 @@ class user
 			unlink('uploads/avatars/' . $deleted_info['avatar']);
 		}
 
+		$remove_comments = 0;
+		if (isset($options['remove_comments']))
+		{
+			$remove_comments = 1;
+		}
+
+		$remove_forum_posts = 0;
+		if (isset($options['remove_forum_posts']))
+		{
+			$remove_forum_posts = 1;
+		}
+
+		$this->db->run("INSERT INTO `remove_users` SET `user_id` = ?, `username` = ?, `remove_comments` = ?, `remove_forum_posts` = ?", array($user_id, $deleted_info['username'], $remove_comments, $remove_forum_posts));
+
 		$this->db->run("DELETE FROM `users` WHERE `user_id` = ?", array($user_id));
 		$this->db->run("DELETE FROM `user_profile_info` WHERE `user_id` = ?", array($user_id));
 		$this->db->run("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ?", array($user_id));
@@ -854,18 +873,8 @@ class user
 		$this->db->run("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($user_id));
 		$this->db->run("DELETE FROM `user_notifications` WHERE `owner_id` = ?", array($user_id));
 		
-		// deal with article likes
-		$article_likes = $dbl->run("SELECT `article_id` FROM `article_likes` WHERE `user_id` = ?", array($user_id))->fetch_all();
-		foreach ($article_likes as $like) // loop over each article, remove a like
-		{
-			$this->db->run("UPDATE `articles` SET `total_likes` = (total_likes - 1) WHERE `article_id` = ?", array($like['article_id']));
-		}
-		$dbl->run("DELETE FROM `article_likes` WHERE `user_id` = ?", array($user_id)); // now remove all their likes
-		
-		$this->db->run("UPDATE `articles_comments` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
-		$this->db->run("UPDATE `forum_topics` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
-		$this->db->run("UPDATE `forum_replies` SET `author_id` = 0 WHERE `author_id` = ?", array($user_id));
 		$this->db->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
+
 		$this->db->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
 	}
 }

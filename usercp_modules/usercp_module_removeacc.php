@@ -47,8 +47,20 @@ if (isset($_POST['act']))
 				header("Location: /usercp.php?module=removeacc");
 				die();
 			}
+
+			$remove_comments = 0;
+			if (isset($_POST['remove_comments']))
+			{
+				$remove_comments = 1;
+			}
+
+			$remove_forum_posts = 0;
+			if (isset($_POST['remove_forum']))
+			{
+				$remove_forum_posts = 1;
+			}
 			
-			$user->delete_user($_SESSION['user_id']);
+			$user->delete_user($_SESSION['user_id'], array('remove_comments' => $remove_comments, 'remove_forum_posts' => $remove_forum_posts));
 			$user->logout(0,0); // not banned, don't redirect
 
 			$_SESSION['message'] = 'deleted';

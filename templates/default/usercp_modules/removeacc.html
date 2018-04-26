@@ -8,6 +8,10 @@
 	To remove your account, please enter your current password:
 	<form method="post" action="/usercp.php?module=removeacc">
 		<input type="password" name="password" /><br />
+		<label><input type="checkbox" name="remove_comments" checked/> Remove article comments?</label>
+		<label><input type="checkbox" name="remove_forum" checked/> Remove forum topics and replies?</label><br />
+		If you don't tick those boxes, your posts will show up as a "Guest" account. Removal of them is usually done within 24 hours.<br />
+		We will also remove your username from quoted posts.<br />
 		<button type="submit" name="act" value="remove_account">Delete My Account</button>
 	</form>
 	</div>

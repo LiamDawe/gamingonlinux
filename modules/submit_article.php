@@ -127,7 +127,8 @@ if (isset($_POST['act']))
 	{
         $templating->set_previous('title', 'Submit An Article', 1);
         
-        $title = strip_tags($_POST['title']);
+		$title = strip_tags($_POST['title']);
+		$title = mb_convert_encoding($title, 'UTF-8');
         $text = trim($_POST['text']);
         
         $name = '';

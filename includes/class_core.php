@@ -39,7 +39,6 @@ class core
 	function __construct($dbl)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
-		ini_set('session.cookie_httponly', 1);
 		date_default_timezone_set('UTC');
 		
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));

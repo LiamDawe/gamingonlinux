@@ -1,9 +1,9 @@
 <?php
+$timer_start = microtime(true);
+
 session_start();
 
 error_reporting(-1);
-
-$timer_start = microtime(true);
 
 require APP_ROOT . "/includes/bootstrap.php";
 

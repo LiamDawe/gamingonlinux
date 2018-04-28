@@ -300,6 +300,7 @@ class article
 		}
 
 		$title = strip_tags($_POST['title']);
+		$title = mb_convert_encoding($title, 'UTF-8');
 		$tagline = trim($_POST['tagline']);
 		$text = trim($_POST['text']);
 		$categories = '';

@@ -50,17 +50,22 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 			{
 				die('There was an error getting your user data!');
 			}
+
+			$user->user_details = $userdata;
 		
 			// update IP address and last login
 			$dbl->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $userdata['user_id']));
 
 			$user->check_banned($userdata['user_id']);
 
-			$generated_session = md5(mt_rand()  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+			$generated_session = md5(mt_rand() . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
-			$user->new_login($userdata, $generated_session);
+			$user->new_login($generated_session);
 
-			setcookie('gol_session', $generated_session,  time()+$cookie_length, '/', $core->config('cookie_domain'));
+			if ($userdata['social_stay_cookie'] == 1)
+			{
+				setcookie('gol_session', $generated_session, time()+$cookie_length, '/', $core->config('cookie_domain'));
+			}
 
 			header("Location: " . $core->config('website_url'));
 		}

@@ -10,7 +10,7 @@ class user
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gallery`,
-	`display_comment_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`";
+	`display_comment_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`";
 	
 	public $user_groups;
 	public $blocked_users = [];
@@ -374,8 +374,8 @@ class user
 		
 		session_regenerate_id(true);
 
-		setcookie('gol_session', "",  time()-60, '/');
-		setcookie('gol-device', "",  time()-60, '/');
+		setcookie('gol_session', "", time()-60, '/', $this->core->config('cookie_domain'));
+		setcookie('gol-device', "", time()-60, '/', $this->core->config('cookie_domain'));
 
 		$this->user_details = [];
 

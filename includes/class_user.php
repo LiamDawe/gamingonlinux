@@ -100,7 +100,6 @@ class user
 
 					if ($stay == 1)
 					{
-						setcookie('gol_stay', $this->user_details['user_id'], time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
 						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
 					}
 
@@ -321,14 +320,14 @@ class user
 	// if they have a stay logged in cookie log them in
 	function stay_logged_in()
 	{		
-		if (isset($_COOKIE['gol_stay']) && isset($_COOKIE['gol_session']))
+		if (isset($_COOKIE['gol_session']))
 		{
-			$session = $this->db->run("SELECT `session_id`, `device-id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_COOKIE['gol_stay'], $_COOKIE['gol_session']))->fetch();
+			$session = $this->db->run("SELECT `session_id`, `device-id`, `user_id` FROM `saved_sessions` WHERE `session_id` = ?", array($_COOKIE['gol_session']))->fetch();
 
 			if ($session)
 			{
 				// login then
-				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($_COOKIE['gol_stay']))->fetch();
+				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($session['user_id']))->fetch();
 				
 				$this->check_banned();
 
@@ -341,7 +340,6 @@ class user
 			}
 			else
 			{
-				setcookie('gol_stay', "",  time()-60, '/');
 				setcookie('gol_session', "",  time()-60, '/');
 				setcookie('gol-device', "",  time()-60, '/');
 				
@@ -376,7 +374,6 @@ class user
 		
 		session_regenerate_id(true);
 
-		setcookie('gol_stay', "",  time()-60, '/');
 		setcookie('gol_session', "",  time()-60, '/');
 		setcookie('gol-device', "",  time()-60, '/');
 

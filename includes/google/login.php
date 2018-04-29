@@ -80,7 +80,10 @@ if (isset($_GET['code']))
 
 		$user->new_login($generated_session);
 
-		setcookie('gol_session', $generated_session,  time()+$cookie_length, '/', $core->config('cookie_domain'));
+		if ($userdata['social_stay_cookie'] == 1)
+		{
+			setcookie('gol_session', $generated_session, time()+$cookie_length, '/', $core->config('cookie_domain'));
+		}
 
 		header("Location: /");
 		die();

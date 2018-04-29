@@ -23,6 +23,15 @@ if ($article_list)
 		$email_article_list_plain .= $article['title'] .': ' . $link . "\r\n\r\n";
 	}
 
+	$html_addition = '';
+	$plain_addition = '';
+	$day = date('D', strtotime('-1 day'));
+	if ($day == 'Sat' || $day == 'Sun')
+	{
+		$html_addition = '<p><em>Please be aware we generally post less on weekends as we take a little time off!</em></p>';
+		$plain_addition = 'Please be aware we generally post less on weekends as we take a little time off!' . PHP_EOL . PHP_EOL;
+	}
+
 	foreach ($email_users as $email)
 	{
 		$unsub_link = $core->config('website_url') . 'index.php?module=mailing_list&type=remove_user&key=' . $email['mailing_list_key'] . '&id=' . $email['user_id'];
@@ -32,9 +41,9 @@ if ($article_list)
 
 		// message
 		$html_message = "<p>Hello <strong>{$email['username']}</strong>,</p>
-		<p>Here is your daily news digest from GamingOnLinux!</p>" . $email_article_list . '<p><em>Please be aware we generally post less on weekends as we take a little time off!</em></p><p>You can unsubscribe by <a href="'.$unsub_link.'">clicking here</a>.';
+		<p>Here is your daily news digest from GamingOnLinux!</p>" . $email_article_list . $html_addition . '<p>You can unsubscribe by <a href="'.$unsub_link.'">clicking here</a>.';
 		
-		$plain_message = PHP_EOL."Hello {$email['username']}, here is your daily news digest from GamingOnLinux!" . $email_article_list_plain . PHP_EOL . 'Please be aware we generally post less on weekends as we take a little time off! You can unsubscribe any time go going here: ' . $unsub_link;
+		$plain_message = PHP_EOL."Hello {$email['username']}, here is your daily news digest from GamingOnLinux!" . $email_article_list_plain . PHP_EOL . $plain_addition . 'You can unsubscribe any time go going here: ' . $unsub_link;
 
 		// Mail it
 		if ($core->config('send_emails') == 1)

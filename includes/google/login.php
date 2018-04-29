@@ -15,6 +15,8 @@ $client_id = $core->config('google_login_public');
 $client_secret = $core->config('google_login_secret');
 $redirect_uri = $core->config('website_url') . 'includes/google/login.php';
 
+$cookie_length = 60*60*24*30; // 30 days
+
 /************************************************
   Make an API request on behalf of a user. In
   this case we need to have a valid OAuth 2.0
@@ -78,8 +80,7 @@ if (isset($_GET['code']))
 
 		$user->new_login($generated_session);
 
-		setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', $core->config('cookie_domain'));
-		setcookie('gol_session', $generated_session,  time()+31556926, '/', $core->config('cookie_domain'));
+		setcookie('gol_session', $generated_session,  time()+$cookie_length, '/', $core->config('cookie_domain'));
 
 		header("Location: /");
 		die();

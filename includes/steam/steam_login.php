@@ -13,6 +13,8 @@ class steam_user
 	private $core;
 	protected $dbl;
 
+	public $cookie_length = 60*60*24*30; // 30 days
+
 	function __construct($dbl, $user, $core)
 	{
 		$this->user = $user;
@@ -72,8 +74,7 @@ class steam_user
 
 					$this->user->new_login($generated_session);
 
-					setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', $this->core->config('cookie_domain'));
-					setcookie('gol_session', $generated_session,  time()+31556926, '/', $this->core->config('cookie_domain'));
+					setcookie('gol_session', $generated_session,  time()+$cookie_length, '/', $this->core->config('cookie_domain'));
 					
 					header("Location: {$_GET['real_return']}");
 				}

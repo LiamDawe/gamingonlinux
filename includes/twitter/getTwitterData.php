@@ -11,6 +11,8 @@ include (APP_ROOT . "/includes/twitter/functions.php");
 define('YOUR_CONSUMER_KEY', $core->config('tw_consumer_key'));
 define('YOUR_CONSUMER_SECRET', $core->config('tw_consumer_skey'));
 
+$cookie_length = 60*60*24*30; // 30 days
+
 if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empty($_SESSION['oauth_token_secret']))
 {
 	// We've got everything we need
@@ -58,8 +60,7 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 
 			$user->new_login($userdata, $generated_session);
 
-			setcookie('gol_stay', $userdata['user_id'],  time()+31556926, '/', $core->config('cookie_domain'));
-			setcookie('gol_session', $generated_session,  time()+31556926, '/', $core->config('cookie_domain'));
+			setcookie('gol_session', $generated_session,  time()+$cookie_length, '/', $core->config('cookie_domain'));
 
 			header("Location: " . $core->config('website_url'));
 		}

@@ -70,11 +70,14 @@ class steam_user
 
 					$this->user->check_banned();
 
-					$generated_session = md5(mt_rand  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+					$generated_session = md5(mt_rand() . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 
 					$this->user->new_login($generated_session);
 
-					setcookie('gol_session', $generated_session,  time()+$cookie_length, '/', $this->core->config('cookie_domain'));
+					if ($userdata['social_stay_cookie'] == 1)
+					{
+						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
+					}
 					
 					header("Location: {$_GET['real_return']}");
 				}

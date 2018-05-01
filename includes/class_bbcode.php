@@ -187,8 +187,6 @@ class bbcode
 	{
 		//  get rid of empty BBCode, is there a point in having excess markup?
 		$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
-		
-		$body = $this->logged_in_code($body);
 
 		// Array for tempory storing codeblock contents
 		$codeBlocks = [];
@@ -235,10 +233,6 @@ class bbcode
 		$find_replace = array(
 		"/\[youtube\](.+?)\[\/youtube\]/is" 
 			=> " <a href=\"https://www.youtube.com/watch?v=$1\" target=\"_blank\">View video on youtube.com</a> ",
-		"/\[url\=(.+?)\](.+?)\[\/url\]/is" 
-			=> "<a href=\"$1\" target=\"_blank\">$2</a>",
-		"/\[url\](.+?)\[\/url\]/is" 
-			=> "<a href=\"$1\" target=\"_blank\">$1</a>",
 		"/\[b\](.+?)\[\/b\]/is" 
 			=> "<strong>$1</strong>",
 		"/\[i\](.+?)\[\/i\]/is" 
@@ -251,12 +245,6 @@ class bbcode
 			=> "$2",
 		"/\[font\=(.+?)\](.+?)\[\/font\]/is" 
 			=> "$2",
-		"/\[center\](.+?)\[\/center\](\r?\n)?/is" 
-			=> "<div style=\"text-align:center;\">$1</div>",
-		"/\[right\](.+?)\[\/right\]/is" 
-			=> "<div style=\"text-align:right;\">$1</div>",
-		"/\[left\](.+?)\[\/left\]/is" 
-			=> "<div style=\"text-align:left;\">$1</div>",
 		"/\[img\](.+?)\[\/img\]/is" 
 			=> "<a data-fancybox=\"images\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
 		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" 
@@ -287,10 +275,6 @@ class bbcode
 			=> '<sup>$1</sup>',
 		"/\[spoiler](.+?)\[\/spoiler\](\r?\n)?/is" 
 			=> '<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">$1</div></div></div>',
-		"/\[mp3](.+?)\[\/mp3\]/is" 
-			=> '<audio controls><source src="$1" type="audio/mpeg">Your browser does not support the audio element.</audio>',
-		"/\[ogg](.+?)\[\/ogg\]/is" 
-			=> '<audio controls><source src="$1" type="audio/ogg">Your browser does not support the audio element.</audio>',
 		"/(\[split\])(\s)*/is"
 			=> '<hr class="content_split">'
 		);
@@ -309,36 +293,18 @@ class bbcode
 		$body = str_replace('</ul><br />', '</ul>', $body);
 		$body = str_replace('</li><br />', '</li>', $body);
 
-		// stop adding line breaks to table html
-		$body = str_replace('<tr><br />', '<tr>', $body);
-		$body = str_replace('</th><br />', '</th>', $body);
-		$body = str_replace('</td><br />', '</td>', $body);
-		$body = str_replace('</tr><br />', '</tr>', $body);
-		$body = preg_replace('/\<table (.+?)\>\<br \/\>/is', '<table $1>', $body);
-
 		// Put the code blocks back in
 		foreach ($codeBlocks as $key => $codeblock)
 		{
 			$body = str_replace("!!@codeblock".$key."!!", $codeblock, $body);
 		}
-		
-		// replace charts bbcode with the pretty stuff
-		$body = $this->do_charts($body);
 
 		return $body;
 	}
 
 	function email_bbcode($body)
 	{
-		// turn any url into url bbcode that doesn't have it already - so we can auto link urls- thanks stackoverflow
-		$URLRegex = '/(?:(?<!(\[\/url\]|\[\/url=))(\s|^))'; // No [url]-tag in front and is start of string, or has whitespace in front
-		$URLRegex.= '(';                                    // Start capturing URL
-		$URLRegex.= '(https?|ftps?|ircs?):\/\/';            // Protocol
-		$URLRegex.= '\S+';                                  // Any non-space character
-		$URLRegex.= ')';                                    // Stop capturing URL
-		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
-
-		$body = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $body);
+		$body = $this->parse_links($body);
 
 		// remove the new line after quotes, stop massive spacing
 		$body = str_replace("[/quote]\r\n", '[/quote]', $body);
@@ -367,8 +333,6 @@ class bbcode
 		}
 
 		$find = array(
-		"/\[url\=(.+?)\](.+?)\[\/url\]/is",
-		"/\[url\](.+?)\[\/url\]/is",
 		"/\[b\](.+?)\[\/b\]/is",
 		"/\[i\](.+?)\[\/i\]/is",
 		"/\[u\](.+?)\[\/u\]/is",
@@ -397,8 +361,6 @@ class bbcode
 		);
 
 		$replace = array(
-		"<a href=\"$1\" target=\"_blank\">$2</a>",
-		"<a href=\"$1\" target=\"_blank\">$1</a>",
 		"<strong>$1</strong>",
 		"<em>$1</em>",
 		"<span style=\"text-decoration:underline;\">$1</span>",
@@ -437,10 +399,6 @@ class bbcode
 
 		// stop there being a big gap after a list is finished
 		$body = str_replace('</ul><br />', '</ul>', $body);
-
-		// stop big gaps after embedding a tweet from twitter
-		$body = str_replace('</a></blockquote><br />', '</a></blockquote>', $body);
-		$body = str_replace('</script><br />', '</script>', $body);
 
 		return $body;
 	}

@@ -227,10 +227,10 @@ jQuery(document).ready(function()
 			expiry_days = days;
 		}
 
-		if (Cookies.get('cookie_consent') == 'yup')
-		{
+		//if (Cookies.get('cookie_consent') == 'yup')
+		//{
 			setCookie("gol_announce_" + announce_id, "set", expiry_days);
-		}
+		//}
 		
 		$(this).closest(".announce").hide();
 	});

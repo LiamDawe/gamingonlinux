@@ -30,7 +30,7 @@ if ($forum_ids)
 	$forum_id_in  = str_repeat('?,', count($forum_ids) - 1) . '?';
 
 	$forum_posts = '';
-	$fetch_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 AND `forum_id` IN ($forum_id_in) ORDER BY `last_post_date` DESC limit 5", $forum_ids)->fetch_all();
+	$fetch_topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`last_post_date`, t.`replys`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON u.user_id = t.last_post_user_id WHERE t.`approved` = 1 AND t.`forum_id` IN ($forum_id_in) ORDER BY t.`last_post_date` DESC limit 5", $forum_ids)->fetch_all();
 	foreach ($fetch_topics as $topics)
 	{
 		$date = $core->human_date($topics['last_post_date']);
@@ -77,7 +77,7 @@ if ($forum_ids)
 		}
 
 		$forum_posts .= '<li class="list-group-item"><a href="'. $forum_class->get_link($topics['topic_id'], $link_page) . '">' . $title . '</a><br />
-		<small><time class="timeago" datetime="'.$machine_time.'">' . $date .'</time></small></li>';
+		<small><time class="timeago" datetime="'.$machine_time.'">' . $date .'</time> - ' . $topics['username'] . '</small></li>';
 	}
 }
 else

@@ -7,7 +7,7 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 $charts = new charts($dbl);
 
-if (!core::is_number($_GET['id']))
+if (!isset($_GET['id']) || !core::is_number($_GET['id']))
 {
 	die('That was not a correct chart ID.');
 }

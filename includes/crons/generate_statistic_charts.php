@@ -26,7 +26,7 @@ $data = array();
 
 $users = $dbl->run("SELECT u.`distro`, count(*) as 'total', d.`arch-based`, d.`ubuntu-based` FROM `users` u INNER JOIN `user_profile_info` p ON u.user_id = p.user_id INNER JOIN `distributions` d ON u.distro = d.name WHERE u.`distro` != '' AND u.`distro` != 'Not Listed' AND u.`distro` IS NOT NULL AND p.`include_in_survey` = 1 GROUP BY u.`distro`, d.`arch-based`, d.`ubuntu-based` ORDER BY `total` DESC")->fetch_all();
 
-$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', 'Linux Distributions (Combined)'));
+$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Percentage of users', 'Linux Distributions (Combined)'));
 $new_chart_id = $dbl->new_id();
 
 $arch_total = 0;
@@ -110,7 +110,7 @@ foreach ($charts as $chart)
 	$labels = array();
 	$data = array();
 
-	$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Total Users', $chart['name']));
+	$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Percentage of users', $chart['name']));
 	$new_chart_id = $dbl->new_id();
 	
 	foreach ($users as $user)

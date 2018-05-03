@@ -88,16 +88,7 @@ if ($core->config('articles_rss') == 1)
 
 		// smaller function as found in class_article.php get_link (dont need the entire article class for this!)
 		$nice_title = core::nice_title($line['title']);
-		
-		if ($core->config('pretty_urls') == 1)
-		{
-			$link = 'articles/'.$nice_title.'.'.$line['article_id'];
-		}
-		else
-		{
-			$link = 'index.php?module=articles_full&aid='.$line['article_id'].'&title='.$nice_title;
-		}
-		$article_link = $core->config('website_url') . $link;
+		$article_link = $core->config('website_url') . 'articles/'.$nice_title.'.'.$line['article_id'];
 
 		$xml->writeElement('link', $article_link);
 		$xml->writeElement('guid', $article_link);

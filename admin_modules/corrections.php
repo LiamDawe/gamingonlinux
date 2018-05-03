@@ -38,14 +38,7 @@ if ($res)
 
 		$nice_title = core::nice_title($corrections['title']);
 
-		if ($core->config('pretty_urls') == 1)
-		{
-			$article_link = '/articles/' . $nice_title . '.' . $corrections['article_id'];
-		}
-		else 
-		{
-			$article_link = '/index.php?module=articles_full&aid=' . $corrections['article_id'] . '&title=' . $nice_title;
-		}
+		$article_link = '/articles/' . $nice_title . '.' . $corrections['article_id'];
 
 		$templating->block('row', 'admin_modules/corrections');
 		$templating->set('username', $username);

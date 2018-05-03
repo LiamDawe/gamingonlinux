@@ -148,15 +148,7 @@ if (!isset($_GET['view']))
 		}
 		else
 		{
-			if ($core->config('pretty_urls') == 1)
-			{
-				$username = '<a href="/profiles/'.$tracking['user_id'].'">'.$tracking['username'].'</a>';
-			}
-			else
-			{
-				$username = '<a href="/index.php?module=profile&user_id='.$tracking['user_id'].'">'.$tracking['username'].'</a>';
-			}
-
+			$username = '<a href="/profiles/'.$tracking['user_id'].'">'.$tracking['username'].'</a>';
 		}
 
 		$completed_indicator = '&#10004;';

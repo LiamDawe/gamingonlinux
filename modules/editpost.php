@@ -40,31 +40,14 @@ if (!isset($_POST['act']))
 			$templating->set('page', $_GET['page']);
 			$templating->set('topic_id', $topic['topic_id']);
 			$templating->set('action', 'index.php?module=editpost&amp;topic_id='.$topic['topic_id'].'&reported=' . $reported);
-			if ($core->config('pretty_urls') == 1)
-			{
-				$cancel_action = '/forum/topic/' . $topic['topic_id'];
-			}
-			else
-			{
-				$cancel_action = '/index.php?module=viewtopic&topic_id=' . $topic['topic_id'];
-			}
-			$templating->set('cancel_action', $cancel_action);
+
+			$templating->set('cancel_action', '/forum/topic/' . $topic['topic_id']);
 			$templating->block('preview', 'editpost');
 		}
 		else
 		{
 			$_SESSION['message'] = 'not_authorized';
-			
-			if ($core->config('pretty_urls') == 1)
-			{
-				$redirect = '/forum/topic/' . $topic['topic_id'];
-			}
-			else
-			{
-				$redirect = '/index.php?module=viewtopic&topic_id=' . $topic['topic_id'];
-			}
-			
-			header("Location: $redirect");
+			header("Location: /forum/topic/" . $topic['topic_id']);
 		}
 	}
 
@@ -87,31 +70,13 @@ if (!isset($_POST['act']))
 			$templating->set('page', $_GET['page']);
 			$templating->set('topic_id', $post['topic_id']);
 			$templating->set('action', 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&reported=' . $reported);
-			if ($core->config('pretty_urls') == 1)
-			{
-				$cancel_action = '/forum/topic/' . $post['topic_id'];
-			}
-			else
-			{
-				$cancel_action = '/index.php?module=viewtopic&topic_id=' . $post['topic_id'];
-			}
-			$templating->set('cancel_action', $cancel_action);
+			$templating->set('cancel_action', '/forum/topic/' . $post['topic_id']);
 			$templating->block('preview', 'editpost');
 		}
 		else
 		{
 			$_SESSION['message'] = 'not_authorized';
-			
-			if ($core->config('pretty_urls') == 1)
-			{
-				$redirect = '/forum/topic/' . $post['topic_id'];
-			}
-			else
-			{
-				$redirect = '/index.php?module=viewtopic&topic_id=' . $post['topic_id'];
-			}
-			
-			header("Location: $redirect");
+			header("Location: /forum/topic/" . $post['topic_id']);
 		}
 	}
 }
@@ -151,17 +116,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			else
 			{
 				$_SESSION['message'] = 'not_authorized';
-				
-				if ($core->config('pretty_urls') == 1)
-				{
-					$redirect = '/forum/topic/' . $_GET['topic_id'];
-				}
-				else
-				{
-					$redirect = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
-				}
-				
-				header("Location: $redirect");
+				header("Location: /forum/topic/" . $_GET['topic_id']);
 			}
 		}
 	}
@@ -192,17 +147,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			else
 			{
 				$_SESSION['message'] = 'not_authorized';
-				
-				if ($core->config('pretty_urls') == 1)
-				{
-					$redirect = '/forum/topic/' . $_POST['topic_id'];
-				}
-				else
-				{
-					$redirect = '/index.php?module=viewtopic&topic_id=' . $_POST['topic_id'];
-				}
-				
-				header("Location: $redirect");
+				header("Location: /forum/topic/" . $_POST['topic_id']);
 			}
 		}
 	}

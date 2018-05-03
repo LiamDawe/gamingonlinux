@@ -16,19 +16,10 @@ if(isset($_GET['user_id']))
 	{
 		if ($grab_fields['pc_info_public'] == 1)
 		{
-			if ($core->config('pretty_urls') == 1)
-			{
-				$profile_link = '/profiles/' . $_GET['user_id'];
-			}
-			else
-			{
-				$profile_link = '/index.php?module=profile&user_id=' . $_GET['user_id'];
-			}
-
 			$templating->load('profile');
 			$templating->block('additional');
 			$templating->set('username', $grab_fields['username']);
-			$templating->set('profile_link', $profile_link);
+			$templating->set('profile_link', '/profiles/' . $_GET['user_id']);
 
 			$fields_output = '';
 			$pc_info = $user->display_pc_info($_GET['user_id'], $grab_fields['distro']);
@@ -49,18 +40,8 @@ if(isset($_GET['user_id']))
 			$templating->set('fields', $fields_output);
 
 			$templating->block('view_full');
-
-			if ($core->config('pretty_urls') == 1)
-			{
-				$stats_link = "/users/statistics";
-			}
-			else
-			{
-				$stats_link = "/index.php?module=statistics";
-			}
-			$templating->set('stats_link', $stats_link);
-
-			$templating->set('profile_link', $profile_link);
+			$templating->set('stats_link', "/users/statistics");
+			$templating->set('profile_link', '/profiles/' . $_GET['user_id']);
 
 			$edit_link = '';
 			if (isset($_GET['user_id']))

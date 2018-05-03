@@ -4,15 +4,6 @@ define("TITLE_MAX_LENGTH", 55);
 $templating->load('blocks/block_comments_latest');
 $templating->block('list');
 
-if ($core->config('pretty_urls') == 1)
-{
-	$latest_link = '/latest-comments/';
-}
-else {
-	$latest_link = url . 'index.php?module=comments_latest';
-}
-$templating->set('latest_link', $latest_link);
-
 $comments_per_page = $core->config('default-comments-per-page');
 if (isset($_SESSION['per-page']))
 {

@@ -32,20 +32,11 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']))
 
 		foreach($grab_users as $user_who)
 		{
-			if ($core->config('pretty_urls') == 1)
-			{
-				$profile_link = '/profiles/' . $user_who['user_id'];
-			}
-			else
-			{
-				$profile_link = '/index.php?module=profile&user_id=' . $user_who['user_id'];
-			}
-
 			$avatar = $user->sort_avatar($user_who);
 
 			$templating->block('user_row');
 			$templating->set('username', $user_who['username']);
-			$templating->set('profile_link', $profile_link);
+			$templating->set('profile_link', '/profiles/' . $user_who['user_id']);
 			$templating->set('avatar', $avatar);
 		}
 

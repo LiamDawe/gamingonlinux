@@ -248,15 +248,7 @@ if (isset($_GET['view']))
 			$templating->block('topic', 'admin_modules/admin_module_forum');
 			$templating->set('topic_title', $topic['topic_title']);
 
-			$topic_link = '';
-			if ($core->config('pretty_urls') == 1)
-			{
-				$topic_link = '/forum/topic/' . $topic['topic_id'];
-			}
-			else
-			{
-				$topic_link = '/index.php?module=viewtopic&topic_id=' . $topic['topic_id'];
-			}
+			$topic_link = '/forum/topic/' . $topic['topic_id'];
 			$templating->set('topic_link', $topic_link);
 
 			$topic_date = $core->human_date($topic['creation_date']);
@@ -317,15 +309,7 @@ if (isset($_GET['view']))
 			$templating->block('reply', 'admin_modules/admin_module_forum');
 			$templating->set('topic_title', $topic['topic_title']);
 
-			$topic_link = '';
-			if ($core->config('pretty_urls') == 1)
-			{
-				$topic_link = '/forum/topic/' . $topic['topic_id'];
-			}
-			else
-			{
-				$topic_link = '/index.php?module=viewtopic&topic_id=' . $topic['topic_id'];
-			}
+			$topic_link = '/forum/topic/' . $topic['topic_id'];
 			$templating->set('topic_link', $topic_link);
 
 			$topic_date = $core->human_date($topic['creation_date']);

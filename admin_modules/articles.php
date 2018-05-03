@@ -649,23 +649,14 @@ else if (isset($_POST['act']))
 			unset($_SESSION['original_text']);
 			unset($_SESSION['gallery_tagline_id']);
 			unset($_SESSION['gallery_tagline_rand']);
-
 			
-			
-			if ($core->config('pretty_urls') == 1)
+			if (!isset($_POST['show_block']))
 			{
 				header("Location: /articles/{$checked['slug']}.{$_POST['article_id']}/");
 			}
 			else
 			{
-				if (!isset($_POST['show_block']))
-				{
-					header("Location: " . $core->config('website_url') . "index.php?module=articles_full&aid={$_POST['article_id']}");
-				}
-				else
-				{
-					header("Location: " . $core->config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
-				}
+				header("Location: " . $core->config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
 			}
 		}
 	}

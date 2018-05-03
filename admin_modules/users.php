@@ -89,14 +89,7 @@ else
 
 				$templating->block('edituser', 'admin_modules/users');
 
-				if ($core->config('pretty_urls') == 1)
-				{
-					$profile_link = '/profiles/' . $user_info['user_id'];
-				}
-				else
-				{
-					$profile_link = '/index.php?module=profile&user_id='. $user_info['user_id'];
-				}
+				$profile_link = '/profiles/' . $user_info['user_id'];
 				$templating->set('profile_link', $profile_link);
 
 				$templating->set('user_id', $user_info['user_id']);

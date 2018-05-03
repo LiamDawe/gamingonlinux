@@ -4,14 +4,7 @@ $templating->block('menu');
 
 if (!$user->check_group([1,2,5]))
 {
-	if ($core->config('pretty_urls') == 1)
-	{
-		$submit_link = '/submit-article/';
-	}
-	else 
-	{
-		$submit_link = $core->config('website_url') . 'index.php?module=submit_article&amp;view=Submit';
-	}
+	$submit_link = '/submit-article/';
 }
 
 else if ($user->check_group([1,2,5]))
@@ -53,13 +46,5 @@ foreach ($fetch_top as $top_articles)
 
 $templating->set('top_articles', $hot_articles);
 
-if ($core->config('pretty_urls') == 1)
-{
-	$email_link = "/email-us/";
-}
-else
-{
-	$email_link = $core->config('website_url') . 'index.php?module=email_us';
-}
-
+$email_link = "/email-us/";
 $templating->set('email_us_link', $email_link);

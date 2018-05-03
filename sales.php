@@ -127,13 +127,6 @@ if (isset($_SESSION['message']))
 $templating->load('sales');
 $templating->block('top', 'sales');
 
-$free_games_url = '/index.php?module=free_games';
-if ($core->config('pretty_urls') == 1)
-{
-	$free_games_url = '/free-games/';
-}
-$templating->set('free_games_url', $free_games_url);
-
 // get bundles
 $res_bundle = $dbl->run("SELECT b.`id`, b.`name`, s.`name` as `store_name`, b.`linux_total`, b.`link`, b.`end_date` FROM `sales_bundles` b LEFT JOIN `game_stores` s ON s.id = b.store_id WHERE b.`approved` = 1 ORDER BY b.`end_date` ASC")->fetch_all();
 

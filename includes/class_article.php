@@ -587,38 +587,20 @@ class article
 		$link = '';
 		$nice_title = core::nice_title($title);
 		
-		if ($this->core->config('pretty_urls') == 1)
-		{
-			$link = 'articles/'.$nice_title.'.'.$id;
+		$link = 'articles/'.$nice_title.'.'.$id;
 			
-			if ($additional != NULL)
-			{
-				$link = $link . '/' . $additional;
-			}
-		}
-		else
+		if ($additional != NULL)
 		{
-			$link = 'index.php?module=articles_full&aid='.$id.'&title='.$nice_title;
-			
-			if ($additional != NULL)
-			{
-				$link = $link . '&' . $additional;
-			}
+			$link = $link . '/' . $additional;
 		}
+
 		return $this->core->config('website_url') . $link;
 	}
 	
 	public function tag_link($name)
 	{
 		$name = urlencode($name);
-		if ($this->core->config('pretty_urls') == 1)
-		{
-			$link = 'articles/category/'.$name;
-		}
-		else
-		{
-			$link = 'index.php?module=articles&amp;view=cat&amp;catid='.$name;
-		}
+		$link = 'articles/category/'.$name;
 		return $this->core->config('website_url') . $link;
 	}
 	

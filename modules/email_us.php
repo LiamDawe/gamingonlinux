@@ -23,15 +23,7 @@ if (isset($_POST['act']))
 		$_SESSION['atext'] = $_POST['message'];
 		$_SESSION['message'] = 'empty';
 		$_SESSION['message_extra'] = 'email text';
-
-		if ($core->config('pretty_urls') == 1)
-		{
-			header('Location: /email-us/');
-		}
-		else
-		{
-			header('Location: /index.php?module=email_us');
-		}
+		header('Location: /email-us/');
 	}
 
 	else
@@ -44,15 +36,7 @@ if (isset($_POST['act']))
 				$_SESSION['aemail'] = $_POST['email'];
 				$_SESSION['atext'] = $_POST['message'];
 				$_SESSION['message'] = 'captcha';
-				
-				if ($core->config('pretty_urls') == 1)
-				{
-					header('Location: /email-us/');
-				}
-				else
-				{
-					header('Location: /index.php?module=email_us');
-				}				
+				header('Location: /email-us/');			
 			}
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";
@@ -68,15 +52,7 @@ if (isset($_POST['act']))
 			$_SESSION['aemail'] = $_POST['email'];
 			$_SESSION['atext'] = $_POST['message'];
 			$_SESSION['message'] = 'captcha';
-			
-			if ($core->config('pretty_urls') == 1)
-			{
-				header('Location: /email-us/');
-			}
-			else
-			{
-				header('Location: /index.php?module=email_us');
-			}
+			header('Location: /email-us/');
 		}
 
 		else if (($captcha == 1 && $res['success']) || $captcha == 0)

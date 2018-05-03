@@ -428,19 +428,8 @@ if (!isset($_GET['go']))
 
 				// get the comments if we aren't in preview mode
 				if ($article['active'] == 1)
-				{
-					// cant use the get_link function, as it's a bit dumb when dealing with additions (we don't want an & on the end of pretty urls, for example)
-					// in future that function needs updating to allow different additions for plain and pretty links
-					if ($core->config('pretty_urls') == 1)
-					{
-						$pagination_link = "/articles/$nice_title.{$_GET['aid']}/";
-					}
-					else
-					{
-						$pagination_link = $core->config('website_url') . 'index.php?module=articles_full&amp;aid=' . $_GET['aid'] . '&amp;';
-					}
-					
-					$article_class->display_comments(['article' => $article, 'pagination_link' => $pagination_link, 'type' => 'live_article', 'page' => core::give_page()]);
+				{					
+					$article_class->display_comments(['article' => $article, 'pagination_link' => '/articles/' . $nice_title . '.' . $_GET['aid'] . '/', 'type' => 'live_article', 'page' => core::give_page()]);
 
 					// only show comments box if the comments are turned on for this article
 					if ($core->config('comments_open') == 1)

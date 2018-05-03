@@ -266,26 +266,13 @@ class forum
 	
 	public function get_link($id, $additional = NULL)
 	{
-		$link = '';
-		
-		if ($this->core->config('pretty_urls') == 1)
-		{
-			$link = 'forum/topic/'.$id;
+		$link = 'forum/topic/'.$id;
 			
-			if ($additional != NULL)
-			{
-				$link = $link . '/' . $additional;
-			}
-		}
-		else
+		if ($additional != NULL)
 		{
-			$link = 'index.php?module=viewtopic&topic_id='.$id;
-			
-			if ($additional != NULL)
-			{
-				$link = $link . '&' . $additional;
-			}
+			$link = $link . '/' . $additional;
 		}
+
 		return $this->core->config('website_url') . $link;
 	}
 

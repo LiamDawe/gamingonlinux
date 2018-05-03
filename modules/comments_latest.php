@@ -20,17 +20,8 @@ else
 	// count how many there is in total
 	$total = $dbl->run("SELECT COUNT(c.`comment_id`) FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`approved` = 1 AND a.active = 1")->fetchOne();
 
-	if ($core->config('pretty_urls') == 1)
-	{
-		$pagination_linky = "latest-comments/";
-	}
-	else
-	{
-		$pagination_linky = "index.php?module=comments_latest&amp;";
-	}
-
 	// sort out the pagination link
-	$pagination = $core->pagination_link(30, $total, $core->config('website_url') . $pagination_linky, $page);
+	$pagination = $core->pagination_link(30, $total, $core->config('website_url') . 'latest-comments/', $page);
 
 	// get top of comments section
 	$templating->block('more_comments');
@@ -57,17 +48,8 @@ else
 	{
 		$date = $core->human_date($comments['time_posted']);
 		$title = $comments['title'];
-
-		if ($core->config('pretty_urls') == 1)
-		{
-			$profile_link = "/profiles/" . $comments['author_id'];
-		}
-		else 
-		{
-			$profile_link = "/index.php?module=profile&amp;user_id=" . $comments['author_id'];
-		}
 		
-		$templating->set('profile_link', $profile_link);
+		$templating->set('profile_link', '/profiles/' . $comments['author_id']);
 							
 		// sort out the likes
 		$likes = NULL;

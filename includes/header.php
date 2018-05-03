@@ -91,42 +91,14 @@ $core->load_modules(['db_table' => 'modules']);
 $section_links = implode('', core::$top_bar_links);
 $templating->set('sections_links', $section_links);
 
-// sort the links out
-if ($core->config('pretty_urls') == 1)
+// sort the correct submit article link
+$submit_a = '/submit-article/';
+if ($user->check_group([1,2,5]))
 {
-	$forum_link = '/forum/';
-	$irc_link = '/irc/';
-	$contact_link = '/contact-us/';
-	$submit_a = '/submit-article/';
-	$sales_link = '/sales/';
-	$free_link = '/free-games/';
-	if ($user->check_group([1,2,5]))
-	{
-		$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
-	}
-	$submit_e = '/email-us/';
+	$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
 }
-else 
-{
-	$forum_link = $core->config('website_url') . 'index.php?module=forum';
-	$irc_link = $core->config('website_url') . 'index.php?module=irc';
-	$contact_link = $core->config('website_url') . 'index.php?module=contact';
-	$submit_a = $core->config('website_url') . 'index.php?module=submit_article&view=Submit';
-	$sales_link = $core->config('website_url') . 'sales.php';
-	$free_link = $core->config('website_url') . 'free_games.php';
-	if ($user->check_group([1,2,5]))
-	{
-		$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
-	}
-	$submit_e = $core->config('website_url') . 'index.php?module=email_us';
-}
-$templating->set('forum_link', $forum_link);
-$templating->set('irc_link', $irc_link);
-$templating->set('contact_link', $contact_link);
+
 $templating->set('submit_a', $submit_a);
-$templating->set('submit_e', $submit_e);
-$templating->set('sales_link', $sales_link);
-$templating->set('free_link', $free_link);
 
 // sort out user box
 if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESSION['user_id'])))
@@ -177,16 +149,8 @@ else if ($_SESSION['user_id'] > 0)
 	// for the user menu toggle
 	$user_menu = $templating->block_store('user_menu', 'mainpage');
 
-	if ($core->config('pretty_urls') == 1)
-	{
-		$profile_link = "/profiles/{$_SESSION['user_id']}";
-		$messages_html_link = '/private-messages/';
-	}
-	else
-	{
-		$profile_link = $core->config('website_url') . "index.php?module=profile&user_id={$_SESSION['user_id']}";
-		$messages_html_link = $core->config('website_url') . "index.php?module=messages";
-	}
+	$profile_link = "/profiles/{$_SESSION['user_id']}";
+	$messages_html_link = '/private-messages/';
 	
 	$user_avatar = $user->sort_avatar($user->user_details);
 	$username = $user->user_details['username'];

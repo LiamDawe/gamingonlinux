@@ -929,7 +929,7 @@ class core
 			{
 				// sort out links to be placed in the navbar
 				$section_link = self::config('website_url') . 'index.php?module=' . $modules['module_file_name'];
-				if ($this->config('pretty_urls') == 1 && !empty($modules['nice_link']) && $modules['nice_link'] != NULL)
+				if (!empty($modules['nice_link']) && $modules['nice_link'] != NULL)
 				{
 					$section_link = self::config('website_url') . $modules['nice_link'];
 				}

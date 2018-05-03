@@ -36,18 +36,9 @@ if (isset($_SESSION['activated']))
 $templating->set('new_topic', $new_topic);
 
 $forum_list = '';
-$forum_address = '';
-if ($core->config('pretty_urls') == 1)
-{
-	$forum_address = '/forum/';
-}
-else
-{
-	$forum_address = '/index.php?module=viewforum&forum_id=';
-}
 foreach ($forum_ids as $forum)
 {
-	$forum_list .= '<option value="' . $forum_address . $forum['forum_id'] . '">' . $forum['name'] . '</option>';
+	$forum_list .= '<option value="/forum/' . $forum['forum_id'] . '">' . $forum['name'] . '</option>';
 	$forum_id_list[] = $forum['forum_id'];
 }
 $templating->set('forum_list', $forum_list);
@@ -140,18 +131,9 @@ foreach ($get_topics as $topics)
 	
 	$avatar = $user->sort_avatar($topics);
 
-	if ($core->config('pretty_urls') == 1)
-	{
-		$profile_link = "/profiles/{$topics['author_id']}";
-		$profile_last_link = "/profiles/{$topics['last_post_user_id']}";
-		$forum_link = '/forum/' . $topics['forum_id'];
-	}
-	else
-	{
-		$profile_link = "/index.php?module=profile&user_id={$topics['author_id']}";
-		$profile_last_link = "/index.php?module=profile&user_id={$topics['last_post_user_id']}";
-		$forum_link = '/index.php?module=viewforum&forum_id=' . $topics['forum_id'];
-	}
+	$profile_link = "/profiles/{$topics['author_id']}";
+	$profile_last_link = "/profiles/{$topics['last_post_user_id']}";
+	$forum_link = '/forum/' . $topics['forum_id'];
 
 	$link = $forum_class->get_link($topics['topic_id']);
 	

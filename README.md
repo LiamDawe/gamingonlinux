@@ -4,7 +4,7 @@ The [Gamingonlinux](https://gamingonlinux.com) news site source code. This code 
 
 Please read first: The entire codebase is probably a mess, as it was started years ago and tons needs updating for standards, newer PHP versions etc. It was started as a learning experience for Liam and still is to this day. Remember this before making any smart-arsed comments ;) (helpful pointers, patches and so on highly appreciated!)
 
-If you like what I do please consider [supporting me on Patreon](https://www.patreon.com/liamdawe).
+If you like what I do please consider [Patreon](https://www.patreon.com/liamdawe) or [Liberapay](https://liberapay.com/gamingonlinux/).
 
 ## Security issues
 
@@ -27,6 +27,23 @@ It is also required to have the following php extentions available:
 
 Setup apache, PHP and MySQL to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
 Import the development SQL database from the stripped SQL file `tools/SQL.sql`  
+
+## Apache rewrite
+
+You also need apache rewrite turned on like so:
+```<Directory /mnt/storage/public_html>
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+And also adjust your htaccess "AccessFileName" to ".htaccess.testing" (as this doesn't include www. and secure site stuff you won't have locally), you can do so like this:  
+```<virtualhost>
+    ServerName www.example.local
+    DirectoryRoot /var/www/www.example.local
+    AccessFileName .htaccess.testing
+</virtualhost>
+```
 
 ## User Groups
 

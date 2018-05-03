@@ -1,7 +1,16 @@
 <?php
 if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 {
-	$core->message('You do not have permission to post in this forum! You must be registered and logged in.');
+	$_SESSION['message'] = "no_forum_reply_permission";
+	if ($core->config('pretty_urls') == 1)
+	{
+		$forum_link = $core->config('website_url') . 'forum/';
+	}
+	else
+	{
+		$forum_link = $core->config('website_url') . 'index.php?module=forum';
+	}
+	header("Location: " . $forum_link);
 }
 else
 {

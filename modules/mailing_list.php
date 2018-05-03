@@ -11,39 +11,18 @@ if (isset($_GET['type']))
 			{
 				$dbl->run("UPDATE `mailing_list` SET `activated` = 1, `activated_date` = ? WHERE `id` = ?", array(core::$sql_date_now, $_GET['id']));
 				$_SESSION['message'] = 'mail_list_subbed';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header('Location: '.$core->config('website_url').'mailinglist');
-				}
-				else
-				{
-					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-				}				
+				header('Location: '.$core->config('website_url').'mailinglist');		
 			}
 			else
 			{
 				$_SESSION['message'] = 'no_key_match';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header('Location: '.$core->config('website_url').'mailinglist');
-				}
-				else
-				{
-					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-				}
+				header('Location: '.$core->config('website_url').'mailinglist');
 			}
 		}
 		else
 		{
 			$_SESSION['message'] = 'keys_missing';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header('Location: '.$core->config('website_url').'mailinglist');
-			}
-			else
-			{
-				header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-			}
+			header('Location: '.$core->config('website_url').'mailinglist');
 		}
 	}
 	
@@ -67,39 +46,18 @@ if (isset($_GET['type']))
 				{
 					$dbl->run("DELETE FROM `mailing_list` WHERE `id` = ?", array($_GET['id']));
 					$_SESSION['message'] = 'mail_list_unsubbed';
-					if ($core->config('pretty_urls') == 1)
-					{
-						header('Location: '.$core->config('website_url').'mailinglist');
-					}
-					else
-					{
-						header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-					}				
+					header('Location: '.$core->config('website_url').'mailinglist');			
 				}
 				else
 				{
 					$_SESSION['message'] = 'no_key_match';
-					if ($core->config('pretty_urls') == 1)
-					{
-						header('Location: '.$core->config('website_url').'mailinglist');
-					}
-					else
-					{
-						header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-					}
+					header('Location: '.$core->config('website_url').'mailinglist');
 				}
 			}
 			else
 			{
 				$_SESSION['message'] = 'keys_missing';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header('Location: '.$core->config('website_url').'mailinglist');
-				}
-				else
-				{
-					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-				}
+				header('Location: '.$core->config('website_url').'mailinglist');
 			}		
 		}
 	}
@@ -124,39 +82,18 @@ if (isset($_GET['type']))
 				{
 					$dbl->run("UPDATE `users` SET `email_articles` = NULL WHERE `user_id` = ?", array($_GET['id']));
 					$_SESSION['message'] = 'mail_list_unsubbed';
-					if ($core->config('pretty_urls') == 1)
-					{
-						header('Location: '.$core->config('website_url').'mailinglist');
-					}
-					else
-					{
-						header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-					}				
+					header('Location: '.$core->config('website_url').'mailinglist');			
 				}
 				else
 				{
 					$_SESSION['message'] = 'no_key_match';
-					if ($core->config('pretty_urls') == 1)
-					{
-						header('Location: '.$core->config('website_url').'mailinglist');
-					}
-					else
-					{
-						header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-					}
+					header('Location: '.$core->config('website_url').'mailinglist');
 				}
 			}
 			else
 			{
 				$_SESSION['message'] = 'keys_missing';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header('Location: '.$core->config('website_url').'mailinglist');
-				}
-				else
-				{
-					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-				}
+				header('Location: '.$core->config('website_url').'mailinglist');
 			}		
 		}
 	}
@@ -204,14 +141,8 @@ if (!isset($_GET['type']))
 			$dbl->run("UPDATE `users` SET `email_articles` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
 			
 			$_SESSION['message'] = 'mail_list_unsubbed';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header('Location: '.$core->config('website_url').'mailinglist');
-			}
-			else
-			{
-				header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-			}
+			header('Location: '.$core->config('website_url').'mailinglist');
+			die();
 		}
 		
 		if ($_POST['act'] == 'user_sub')
@@ -220,14 +151,8 @@ if (!isset($_GET['type']))
 			$dbl->run("UPDATE `users` SET `email_articles` = 'daily', `mailing_list_key` = ? WHERE `user_id` = ?", array($activation_key, $_SESSION['user_id']));
 			
 			$_SESSION['message'] = 'mail_list_subbed';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header('Location: '.$core->config('website_url').'mailinglist');
-			}
-			else
-			{
-				header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-			}
+			header('Location: '.$core->config('website_url').'mailinglist');
+			die();
 		}
 		
 		if ($_POST['act'] == 'guest_sub')
@@ -237,27 +162,13 @@ if (!isset($_GET['type']))
 			{
 				$_SESSION['message'] = 'empty';
 				$_SESSION['message_extra'] = 'email';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header('Location: '.$core->config('website_url').'mailinglist');
-				}
-				else
-				{
-					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-				}
+				header('Location: '.$core->config('website_url').'mailinglist');
 				die();
 			}
 			if (!filter_var($email, FILTER_VALIDATE_EMAIL))
 			{
 				$_SESSION['message'] = 'email_wrong';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header('Location: '.$core->config('website_url').'mailinglist');
-				}
-				else
-				{
-					header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-				}
+				header('Location: '.$core->config('website_url').'mailinglist');
 				die();
 			}
 			else
@@ -290,26 +201,14 @@ if (!isset($_GET['type']))
 					}
 					
 					$_SESSION['message'] = 'mail_list_subbed_guest';
-					if ($core->config('pretty_urls') == 1)
-					{
-						header('Location: '.$core->config('website_url').'mailinglist');
-					}
-					else
-					{
-						header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-					}
+					header('Location: '.$core->config('website_url').'mailinglist');
+					die();
 				}
 				else
 				{
 					$_SESSION['message'] = 'email_exists';
-					if ($core->config('pretty_urls') == 1)
-					{
-						header('Location: '.$core->config('website_url').'mailinglist');
-					}
-					else
-					{
-						header('Location: '.$core->config('website_url').'index.php?module=mailing_list');			
-					}				
+					header('Location: '.$core->config('website_url').'mailinglist');
+					die();		
 				}
 			}
 		}

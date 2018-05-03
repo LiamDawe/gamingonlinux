@@ -2,15 +2,7 @@
 if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 {
 	$_SESSION['message'] = "no_forum_reply_permission";
-	if ($core->config('pretty_urls') == 1)
-	{
-		$forum_link = $core->config('website_url') . 'forum/';
-	}
-	else
-	{
-		$forum_link = $core->config('website_url') . 'index.php?module=forum';
-	}
-	header("Location: " . $forum_link);
+	header("Location: /forum/");
 }
 else
 {
@@ -47,15 +39,7 @@ else
 				{
 					$_SESSION['message'] = 'locked';
 					$_SESSION['message_extra'] = 'forum post';
-					if ($core->config('pretty_urls') == 1)
-					{
-						$redirect = '/forum/topic/'.$topic_id.'/';
-					}
-					else
-					{
-						$redirect = '/index.php?module=viewtopic&topic_id='.$topic_id;
-					}
-					header("Location: ".$redirect."");
+					header("Location: /forum/topic/".$topic_id.'/');
 					die();
 				}
 
@@ -69,15 +53,7 @@ else
 				{
 					$_SESSION['message'] = 'empty';
 					$_SESSION['message_extra'] = 'text';
-					if ($core->config('pretty_urls') == 1)
-					{
-						$redirect = '/forum/topic/'.$topic_id;
-					}
-					else
-					{
-						$redirect = '/index.php?module=viewtopic&topic_id='.$topic_id;
-					}
-					header("Location: ".$redirect."");
+					header("Location: /forum/topic/".$topic_id);
 					die();
 				}
 
@@ -238,14 +214,8 @@ else
 						// help stop double postings
 						unset($message);
 
-						if ($core->config('pretty_urls') == 1)
-						{
-							header("Location: /forum/topic/{$topic_id}/post_id={$post_id}");
-						}
-						else
-						{
-							header("Location: " . $core->config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}&post_id={$post_id}");
-						}
+						header("Location: /forum/topic/{$topic_id}/post_id={$post_id}");
+						die();
 					}
 
 					if ($approved == 0)

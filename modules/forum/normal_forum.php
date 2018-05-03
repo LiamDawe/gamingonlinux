@@ -117,16 +117,7 @@ if ($forum_ids)
 					}
 				}
 				$templating->set('forum_icon', $forum_icon);
-
-				if ($core->config('pretty_urls') == 1)
-				{
-					$forum_link = "/forum/" . $forum['id'] . '/';
-				}
-				else {
-					$forum_link = $core->config('website_url') . 'index.php?module=viewforum&amp;forum_id=' . $forum['id'];
-				}
-				$templating->set('forum_link', $forum_link);
-
+				$templating->set('forum_link', '/forum/' . $forum['id'] . '/');
 				$templating->set('forum_name', $forum['name']);
 				$templating->set('forum_description', $forum['description']);
 				$templating->set('forum_posts', $forum['posts']);

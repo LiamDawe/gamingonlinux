@@ -5,14 +5,7 @@ $core->check_ip_from_stopforumspam(core::$ip);
 $templating->set_previous('title', 'Register', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com register page', 1);
 
-if ($core->config('pretty_urls') == 1)
-{
-	$redirect = '/register/';
-}
-else
-{
-	$redirect = '/index.php?module=register&';
-}
+$redirect = '/register/';
 
 require_once("includes/curl_data.php");
 

@@ -163,16 +163,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 			$templating->block('author_top');
 			$templating->set('username', $username);
-
-			if ($core->config('pretty_urls') == 1)
-			{
-				$profile_link = $core->config('website_url') . 'profiles/' . $found_search[0]['author_id'];
-			}
-			else
-			{
-				$profile_link = $core->config('website_url') . 'index.php?module=profile&user_id=' . $found_search[0]['author_id'];
-			}
-			$templating->set('profile_link', $profile_link);
+			$templating->set('profile_link', $core->config('website_url') . 'profiles/' . $found_search[0]['author_id']);
 
 			// loop through results
 			foreach ($found_search as $found)
@@ -218,16 +209,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 			$templating->block('author_top');
 			$templating->set('username', $username);
-
-			if ($core->config('pretty_urls') == 1)
-			{
-				$profile_link = $core->config('website_url') . 'profiles/' . $_GET['author_id'];
-			}
-			else
-			{
-				$profile_link = $core->config('website_url') . 'index.php?module=profile&user_id=' . $_GET['author_id'];
-			}
-			$templating->set('profile_link', $profile_link);
+			$templating->set('profile_link', $core->config('website_url') . 'profiles/' . $_GET['author_id']);
 
 			$core->message('They have posted no articles!');
 		}

@@ -11,31 +11,15 @@ else
 	if (isset($_GET['view']) && $_GET['view'] == 'deletetopic')
 	{
 		$return = "/index.php?module=viewforum&forum_id=" . $_GET['forum_id'];
-		if ($core->config('pretty_urls') == 1)
-		{
-			$return_no = '/forum/topic/' . $_GET['topic_id'];
-		}
-		else
-		{
-			$return_no = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
-		}
 			
-		$forum_class->delete_topic($return, $return_no, "/index.php?module=viewtopic&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
+		$forum_class->delete_topic($return, '/forum/topic/' . $_GET['topic_id'], "/index.php?module=viewtopic&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
 	}
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
 	{
 		$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
-		if ($core->config('pretty_urls') == 1)
-		{
-			$return_no = '/forum/topic/' . $_GET['topic_id'];
-		}
-		else
-		{
-			$return_no = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'];
-		}
 			
-		$forum_class->delete_reply($return, $return_no, "/index.php?module=viewtopic&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
+		$forum_class->delete_reply($return, '/forum/topic/' . $_GET['topic_id'], "/index.php?module=viewtopic&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
 	}
 
 	else if (!isset($_POST['act']) && !isset($_GET['go']) && !isset($_GET['view']))
@@ -172,15 +156,7 @@ else
 				$templating->set('forum_name', $topic['forum_name']);
 				$templating->set('subscribe_link', $subscribe_link);
 
-				if ($core->config('pretty_urls') == 1)
-				{
-					$forum_index = '/forum/';
-				}
-				else
-				{
-					$forum_index = '/index.php?module=forum';
-				}
-				$templating->set('forum_index', $forum_index);
+				$templating->set('forum_index', '/forum/');
 
 				// check notices
 				$notices = array();
@@ -562,16 +538,7 @@ else
 							$templating->set('user_options', $user_options);
 							$templating->set('bookmark', $bookmark_reply);
 
-							if ($core->config('pretty_urls') == 1)
-							{
-								$post_link = '/forum/topic/' . $_GET['topic_id'] . '/post_id=' . $post['post_id'];
-							}
-							else
-							{
-								$post_link = '/index.php?module=viewtopic&topic_id=' . $_GET['topic_id'] . '&post_id=' . $post['post_id'];;
-
-							}
-							$templating->set('post_link', $post_link);
+							$templating->set('post_link', '/forum/topic/' . $_GET['topic_id'] . '/post_id=' . $post['post_id']);
 
 							$reply_count++;
 							$templating->set('post_text', $bbcode->parse_bbcode($post['reply_text'], 0));

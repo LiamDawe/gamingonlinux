@@ -82,13 +82,6 @@ if (isset($_GET['view']))
         $templating->set('url', $core->config('website_url'));
         $templating->set('guest_fields', $guest_fields);
 		$templating->set('title', $title);
-		
-		$email_link = '/index.php?module=email_us';
-		if ($core->config('pretty_urls') == 1)
-		{
-			$email_link = '/email-us/';
-		}
-		$templating->set('email_link', $email_link);
 
         $tagline_pic = '';
         if (isset($_GET['error']) && isset($_SESSION) && isset($_SESSION['uploads_tagline']))
@@ -143,14 +136,7 @@ if (isset($_POST['act']))
 			$guest_email = core::make_safe($_POST['email']);
         }
         
-		if ($core->config('pretty_urls') == 1)
-		{
-			$redirect = '/submit-article/';
-		}
-		else
-		{
-			$redirect = '/index.php?module=submit_article&view=Submit&';
-		}
+		$redirect = '/submit-article/';
 
         if ($_SESSION['user_id'] == 0 && empty($_POST['email']))
         {

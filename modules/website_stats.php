@@ -84,14 +84,7 @@ else // otherwise generate the page and make a cache from it
 	$templating->set('last_month', $last_month);
 	$templating->set('now_date', $now_date);
 
-	if ($core->config('pretty_urls') == 1)
-	{
-		$profile_url = '/profiles/';
-	}
-	else
-	{
-		$profile_url = '/index.php?module=profile&user_id=';
-	}
+	$profile_url = '/profiles/';
 
 	$counter = 0;
 

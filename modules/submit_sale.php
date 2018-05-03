@@ -22,16 +22,6 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('stores', $store_options);
 
-	if ($core->config('pretty_urls') == 0)
-	{
-		$email_link = '/index.php?module=email_us';
-	}
-	else if ($core->config('pretty_urls') == 1)
-	{
-		$email_link = '/email-us/';
-	}
-	$templating->set('email_link', $email_link);
-
 	// add a normal sale
 }
 

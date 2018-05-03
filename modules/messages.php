@@ -26,16 +26,8 @@ else
 	{
 		$templating->block('top');
 
-		if ($core->config('pretty_urls') == 1)
-		{
-			$compose_link = $core->config('website_url') . 'private-messages/compose/';
-			$view_all = $core->config('website_url') . 'private-messages/';
-		}
-		else 
-		{
-			$compose_link = $core->config('website_url') . "index.php?module=messages&view=compose";
-			$view_all = $core->config('website_url') . 'index.php?module=messages';
-		}
+		$compose_link = $core->config('website_url') . 'private-messages/compose/';
+		$view_all = $core->config('website_url') . 'private-messages/';
 		$templating->set('compose_link', $compose_link);
 		$templating->set('view_all', $view_all);
 		
@@ -91,15 +83,7 @@ else
 		{
 			$templating->block('message_row');
 
-			if ($core->config('pretty_urls') == 1)
-			{
-				$pm_url = "/private-messages/{$message['conversation_id']}/";
-			}
-			else 
-			{
-				$pm_url = $core->config('website_url') . "index.php?module=messages&view=message&id={$message['conversation_id']}";
-			}
-
+			$pm_url = "/private-messages/{$message['conversation_id']}/";
 			$templating->set('pm_url', $pm_url);
 
 			$unread = '';
@@ -127,15 +111,7 @@ else
 		if ($total > 0)
 		{
 			$templating->block('bottom');
-			if ($core->config('pretty_urls') == 1)
-			{
-				$compose_link = '/private-messages/compose/';
-			}
-			else 
-			{
-				$compose_link = $core->config('website_url') . 'index.php?module=messages&view=compose';
-			}
-			$templating->set('compose_link', $compose_link);
+			$templating->set('compose_link', '/private-messages/compose/');
 
 			$templating->block('pagination');
 			$templating->set('pagination', $pagination);
@@ -218,15 +194,7 @@ else
 			$templating->block('view_top', 'private_messages');
 			$templating->set('pagination', $pagination);
 
-			if ($core->config('pretty_urls') == 1)
-			{
-				$message_list_link = '/private-messages/';
-			}
-			else
-			{
-				$message_list_link = '/index.php?module=messages';
-			}
-
+			$message_list_link = '/private-messages/';
 			$templating->set('message_list_link', $message_list_link);
 
 			$templating->set('conversation_list', $p_list);
@@ -515,16 +483,8 @@ else
 	{
 		$templating->block('top');
 		
-		if ($core->config('pretty_urls') == 1)
-		{
-			$compose_link = $core->config('website_url') . 'private-messages/compose/';
-			$view_all = $core->config('website_url') . 'private-messages/';
-		}
-		else 
-		{
-			$compose_link = $core->config('website_url') . "index.php?module=messages&view=compose";
-			$view_all = $core->config('website_url') . 'index.php?module=messages';
-		}
+		$compose_link = $core->config('website_url') . 'private-messages/compose/';
+		$view_all = $core->config('website_url') . 'private-messages/';
 		$templating->set('compose_link', $compose_link);
 		$templating->set('view_all', $view_all);
 		
@@ -579,15 +539,7 @@ else
 			{
 				$templating->block('message_row');
 
-				if ($core->config('pretty_urls') == 1)
-				{
-					$pm_url = "/private-messages/{$search['conversation_id']}/";
-				}
-				else 
-				{
-					$pm_url = $core->config('website_url') . "index.php?module=messages&view=message&id={$search['conversation_id']}";
-				}
-
+				$pm_url = "/private-messages/{$search['conversation_id']}/";
 				$templating->set('pm_url', $pm_url);
 
 				$unread = '';
@@ -642,32 +594,16 @@ else
 
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = $check_empty;
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location: " . $core->config('website_url') . 'private-messages/compose/');
-				die();
-			}
-			else
-			{
-				header("Location: " . $core->config('website_url') . 'index.php?module=messages&view=compose');
-				die();
-			}
+			header("Location: " . $core->config('website_url') . 'private-messages/compose/');
+			die();
 		}
 		
 		if(!is_array($_POST['user_ids']) || !core::is_number($_POST['user_ids']))
 		{
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = 'usernames';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location: " . $core->config('website_url') . 'private-messages/compose/');
-				die();
-			}
-			else
-			{
-				header("Location: " . $core->config('website_url') . 'index.php?module=messages&view=compose');
-				die();
-			}	
+			header("Location: " . $core->config('website_url') . 'private-messages/compose/');
+			die();	
 		}
 
 		// first be sure they exist, even though we searched to find them originally, just be sure
@@ -685,17 +621,8 @@ else
 		if ($recepients_count == 0)
 		{
 			$_SESSION['message'] = 'notfound';
-			
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location:" . $core->config('website_url') . "private-messages/compose/");
-				die();
-			}
-			else
-			{
-				header("Location: " . $core->config('website_url') . "index.php?module=messages&view=compose");
-				die();
-			}
+			header("Location:" . $core->config('website_url') . "private-messages/compose/");
+			die();
 		}
 		
 		// make sure they're allow to send it to at least one person
@@ -789,26 +716,15 @@ else
 			$dbl->run("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
 
 			$_SESSION['message'] = 'pm_sent';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location: /private-messages/");
-			}
-			else 
-			{
-				header("Location: " . $core->config('website_url') . 'index.php?module=messages');
-			}
+			header("Location: /private-messages/");
+			die();
+
 		}
 		else
 		{
 			$_SESSION['message'] = 'cannot_send_pm';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location: /private-messages/");
-			}
-			else 
-			{
-				header("Location: " . $core->config('website_url') . 'index.php?module=messages');
-			}			
+			header("Location: /private-messages/");
+			die();
 		}
 	}
 
@@ -848,14 +764,8 @@ else
 					$page = "page={$_GET['page']}";
 				}
 
-				if ($core->config('pretty_urls') == 1)
-				{
-					header("Location: /private-messages/{$_GET['conversation_id']}/$page");
-				}
-				else
-				{
-					header("Location: " . $core->config('website_url') . "index.php?module=messages&view=message&id={$_GET['conversation_id']}&page=$page");
-				}
+				header("Location: /private-messages/{$_GET['conversation_id']}/$page");
+				die();
 			}
 
 			else
@@ -985,14 +895,8 @@ else
 			
 			$_SESSION['message'] = 'pm_sent';
 
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location: /private-messages/{$_POST['conversation_id']}/page=$page");
-			}
-			else
-			{
-				header("Location: " . $core->config('website_url') . "index.php?module=messages&view=message&id={$_POST['conversation_id']}&page=$page#$post_id");
-			}
+			header("Location: /private-messages/{$_POST['conversation_id']}/page=$page");
+			die();
 		}
 	}
 }

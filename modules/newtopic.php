@@ -41,14 +41,8 @@ else
 			if ($user_post_count > 5)
 			{
 				$_SESSION['message'] = 'toomany';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header("Location: /forum/");
-				}
-				else
-				{
-					header("Location: /index.php?module=forum");
-				}
+				header("Location: /forum/");
+				die();
 			}
 
 			else if (!isset($_POST['act']))
@@ -65,31 +59,13 @@ else
 				}
 
 				$templating->block('main', 'newtopic');
-
-				$forum_index = '';
-				if ($core->config('pretty_urls') == 1)
-				{
-					$forum_index = '/forum/';
-				}
-				else
-				{
-					$forum_index = '/index.php?module=forum';
-				}
-				$templating->set('forum_index', $forum_index);
+				$templating->set('forum_index', '/forum/');
 
 				$crumbs = '';
 				if ($show_forum_breadcrumb == 1)
 				{
-					if ($core->config('pretty_urls') == 1)
-					{
-						$forum_url = '/forum/' . $_GET['forum_id'] . '/';
-					}
-					else
-					{
-						$forum_url = '/index.php?module=viewforum&forum_id=' . $_GET['forum_id'];
-					}
 					$name = $dbl->run("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetch();
-					$crumbs = '<li><a href="'.$forum_url.'">'.$name['name'].'</a></li>';
+					$crumbs = '<li><a href="/forum/' . $_GET['forum_id'] . '/">'.$name['name'].'</a></li>';
 				}
 				$templating->set('crumbs', $crumbs);
 
@@ -298,14 +274,8 @@ else
 							unset($_SESSION['atitle']);
 							unset($_SESSION['atext']);
 
-							if ($core->config('pretty_urls') == 1)
-							{
-								header("Location: /forum/topic/{$topic_id}");
-							}
-							else
-							{
-								header("Location: " . $core->config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
-							}
+							header("Location: /forum/topic/{$topic_id}");
+							die();
 						}
 
 						else if ($approved == 0)

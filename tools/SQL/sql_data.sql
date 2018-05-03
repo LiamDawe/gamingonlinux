@@ -358,7 +358,6 @@ INSERT INTO `config` (`id`, `data_key`, `data_value`) VALUES
 (25, 'carousel_image_height', '300'),
 (28, 'send_emails', '1'),
 (29, 'rules', ''),
-(30, 'pretty_urls', '0'),
 (31, 'path', '/some/path'),
 (34, 'goty_games_open', '0'),
 (35, 'goty_voting_open', '0'),

@@ -52,15 +52,6 @@ if (!isset($_GET['go']))
 					$icon = 'envelope-open';
 				}
 
-				if ($core->config('pretty_urls') == 1)
-				{
-					$profile_link = '/profiles/' . $note_list['user_id'];
-				}
-				else
-				{
-					$profile_link = '/index.php?module=profile&user_id=' . $note_list['user_id'];
-				}
-
 				if (!empty($note_list['username']))
 				{
 					$username = $note_list['username'];
@@ -98,7 +89,7 @@ if (!isset($_GET['go']))
 					$title = 'the admin area';
 				}
 
-				$note_row = $templating->store_replace($note_row, array('id' => $note_list['id'], 'icon' => $icon, 'title' => $note_list['title'], 'link' => $link, 'avatar' => $avatar, 'username' => $username, 'profile_link' => $profile_link, 'action_text' => $notification_types[$note_list['type']]['text'], 'title' => $title, 'additional_comments' => $additional_comments, 'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
+				$note_row = $templating->store_replace($note_row, array('id' => $note_list['id'], 'icon' => $icon, 'title' => $note_list['title'], 'link' => $link, 'avatar' => $avatar, 'username' => $username, 'profile_link' => '/profiles/' . $note_list['user_id'], 'action_text' => $notification_types[$note_list['type']]['text'], 'title' => $title, 'additional_comments' => $additional_comments, 'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 
 				if ($note_list['seen'] == 0)
 				{

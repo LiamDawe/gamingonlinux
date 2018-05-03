@@ -79,14 +79,7 @@ if (!isset($_POST['act']))
 			$grab_streamers = $dbl->run("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
 			foreach ($grab_streamers as $streamer)
 			{
-				if ($core->config('pretty_urls') == 1)
-				{
-					$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
-				}
-				else
-				{
-					$streamer_list[] = '<a href="/index.php?module=profile&user_id=' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
-				}
+				$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
 			}
 
 			if (!empty($streamer_list))

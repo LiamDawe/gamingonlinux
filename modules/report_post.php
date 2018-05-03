@@ -19,14 +19,7 @@ if (isset($_GET['view']))
 		{
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'topic';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location: /forum/topic/{$_GET['topic_id']}/");
-			}
-			else
-			{
-				header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-			}
+			header("Location: /forum/topic/{$_GET['topic_id']}/");
 			die();
 		}
 
@@ -56,14 +49,7 @@ if (isset($_GET['view']))
 		{
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'post';
-			if ($core->config('pretty_urls') == 1)
-			{
-				header("Location: /forum/topic/{$_GET['topic_id']}/");
-			}
-			else
-			{
-				header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-			}
+			header("Location: /forum/topic/{$_GET['topic_id']}/");
 			die();
 		}
 
@@ -92,14 +78,7 @@ if (isset($_POST['act']))
 		{
 			if (isset($_POST['no']))
 			{
-				if ($core->config('pretty_urls') == 1)
-				{
-					header("Location: /forum/topic/{$_GET['topic_id']}/");
-				}
-				else
-				{
-					header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-				}
+				header("Location: /forum/topic/{$_GET['topic_id']}/");
 				die();
 			}
 			else if (isset($_POST['yes']))
@@ -112,14 +91,7 @@ if (isset($_POST['act']))
 
 				$_SESSION['message'] = 'reported';
 				$_SESSION['message_extra'] = 'topic';
-				if ($core->config('pretty_urls') == 1)
-				{
-					header("Location: /forum/topic/{$_GET['topic_id']}/");
-				}
-				else
-				{
-					header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-				}
+				header("Location: /forum/topic/{$_GET['topic_id']}/");
 			}
 		}
 	}
@@ -135,14 +107,7 @@ if (isset($_POST['act']))
 		{
 			if (isset($_POST['no']))
 			{
-				if ($core->config('pretty_urls') == 1)
-				{
-					header("Location: /forum/topic/{$_GET['topic_id']}/");
-				}
-				else
-				{
-					header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-				}
+				header("Location: /forum/topic/{$_GET['topic_id']}/");
 				die();
 			}
 			else if (isset($_POST['yes']))
@@ -156,14 +121,7 @@ if (isset($_POST['act']))
 				$_SESSION['message'] = 'reported';
 				$_SESSION['message_extra'] = 'post';
 				
-				if ($core->config('pretty_urls') == 1)
-				{
-					header("Location: /forum/topic/{$_GET['topic_id']}/");
-				}
-				else
-				{
-					header("Location: /index.php?module=viewtopic&topic_id=" . $_GET['topic_id']);
-				}
+				header("Location: /forum/topic/{$_GET['topic_id']}/");
 			}
 		}
 	}

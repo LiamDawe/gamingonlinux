@@ -170,18 +170,9 @@ if (isset($_GET['user_id']))
 						// additional profile info
 						if ($profile['pc_info_public'] == 1)
 						{
-							if ($core->config('pretty_urls') == 1)
-							{
-								$profile_link = '/profiles/' . $_GET['user_id'];
-							}
-							else
-							{
-								$profile_link = '/index.php?module=profile&user_id=' . $_GET['user_id'];
-							}
-
 							$templating->block('additional', 'profile');
 							$templating->set('username', $profile['username']);
-							$templating->set('profile_link', $profile_link);
+							$templating->set('profile_link', '/profiles/' . $_GET['user_id']);
 
 							$fields_output = '';
 							$pc_info = $user->display_pc_info($profile['user_id'], $profile['distro']);
@@ -257,15 +248,7 @@ if (isset($_GET['user_id']))
 
 							if ($total_comments >= 5)
 							{
-								if ($core->config('pretty_urls') == 1)
-								{
-									$more_comments_href = "/profiles/".$_GET['user_id']."/comments/";
-								}
-								else
-								{
-									$more_comments_href = "index.php?module=profile&amp;view=more-comments&amp;user_id=".$_GET['user_id'];
-								}
-								$view_more_comments = '<li class="list-group-item"><a href="'.$more_comments_href.'">View more comments</a></li>';
+								$view_more_comments = '<li class="list-group-item"><a href="/profiles/'.$_GET['user_id'].'/comments/">View more comments</a></li>';
 							}
 						}
 
@@ -313,33 +296,13 @@ if (isset($_GET['user_id']))
 					
 					$page = core::give_page();
 
-					if ($core->config('pretty_urls') == 1)
-					{
-						$pagination_linky = "profiles/".$_GET['user_id']."/comments/";
-					}
-					else
-					{
-						$pagination_linky = "index.php?module=profile&amp;view=more-comments&amp;user_id=".$_GET['user_id']."&amp;";
-					}
-
-
 					// sort out the pagination link
-					$pagination = $core->pagination_link(10, $total, $core->config('website_url')  . $pagination_linky, $page);
+					$pagination = $core->pagination_link(10, $total, $core->config('website_url')  . "profiles/".$_GET['user_id']."/comments/", $page);
 
 					// get top of comments section
 					$templating->block('more_comments');
 					$templating->set('username', $get_username);
-
-					if ($core->config('pretty_urls') == 1)
-					{
-						$profile_link = "/profiles/" . $_GET['user_id'];
-					}
-					else 
-					{
-						$profile_link = url . "index.php?module=profile&amp;user_id=" . $_GET['user_id'];
-					}
-
-					$templating->set('profile_link', $profile_link);
+					$templating->set('profile_link', "/profiles/" . $_GET['user_id']);
 
 					$comment_posts = '';
 					$all_comments = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start))->fetch_all();

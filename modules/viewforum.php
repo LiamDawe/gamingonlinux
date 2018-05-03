@@ -113,14 +113,7 @@ else
 		$rows_per_page = $_SESSION['per-page'];
 		$lastpage = ceil($post['replys']/$rows_per_page);
 
-		if ($core->config('pretty_urls') == 1)
-		{
-			$profile_link = "/profiles/{$post['author_id']}";
-		}
-		else
-		{
-			$profile_link = "/index.php?module=profile&user_id={$post['author_id']}";
-		}
+		$profile_link = "/profiles/{$post['author_id']}";
 
 		// sort out the per-topic pagination shown beside the post title
 		if ($post['replys'] > $rows_per_page)

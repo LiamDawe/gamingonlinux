@@ -26,75 +26,60 @@ $res = $dbl->run("SELECT
 
 if ($res)
 {
-  foreach ($res as $data)
-  {
-    $templating->block('row');
+	foreach ($res as $data)
+	{
+		$templating->block('row');
 
-    $link = '';
-    $title = '';
-    $type = '';
-    $data_type = '';
+		$link = '';
+		$title = '';
+		$type = '';
+		$data_type = '';
 
-    // article bookmarks
-    if ($data['type'] == 'article')
-    {
-      $data_type = 'article';
-      $type = 'Article: ';
-      $title = $data['article_title'];
-      if ($core->config('pretty_urls') == 1)
-      {
-        $link = '/articles/' . $data['slug'] . '.' . $data['data_id'];
-      }
-      else
-      {
-        $link = '/index.php?module=articles_full&aid=' . $data['data_id'] . '&title=' . $data['slug'];
-      }
-    }
+		// article bookmarks
+		if ($data['type'] == 'article')
+		{
+			$data_type = 'article';
+			$type = 'Article: ';
+			$title = $data['article_title'];
+        	$link = '/articles/' . $data['slug'] . '.' . $data['data_id'];
+		}
 
-    // comment bookmarks
-    if ($data['type'] == 'comment')
-    {
-      $data_type = 'comment';
-      $type = 'Comment: ';
-      $title = $data['comment_title'];
-      $link = '/index.php?module=articles_full&aid=' . $data['parent_id'] . '&comment_id=' . $data['data_id'];
-    }
+		// comment bookmarks
+    	if ($data['type'] == 'comment')
+    	{
+			$data_type = 'comment';
+			$type = 'Comment: ';
+			$title = $data['comment_title'];
+			$link = '/index.php?module=articles_full&aid=' . $data['parent_id'] . '&comment_id=' . $data['data_id'];
+    	}
 
-    // forum topic bookmarks
-    if ($data['type'] == 'forum_topic')
-    {
-      $data_type = 'forum_topic';
-      $type = 'Forum Topic: ';
-      $title = $data['topic_title'];
-      if ($core->config('pretty_urls') == 1)
-      {
-        $link = '/forum/topic/' . $data['data_id'];
-      }
-      else
-      {
-        $link = '/index.php?module=viewtopic&topic_id=' . $data['data_id'];
-      }
+		// forum topic bookmarks
+		if ($data['type'] == 'forum_topic')
+		{
+			$data_type = 'forum_topic';
+			$type = 'Forum Topic: ';
+			$title = $data['topic_title'];
+			$link = '/forum/topic/' . $data['data_id'];
+		}
 
-    }
+		// forum reply bookmarks
+		if ($data['type'] == 'forum_reply')
+		{
+			$data_type = 'forum_reply';
+			$type = 'Forum Post: ';
+			$title = $data['reply_title'];
+			$link = '/index.php?module=viewtopic&topic_id=' . $data['parent_id'] . '&post_id=' . $data['data_id'];
+		}
 
-    // forum reply bookmarks
-    if ($data['type'] == 'forum_reply')
-    {
-      $data_type = 'forum_reply';
-      $type = 'Forum Post: ';
-      $title = $data['reply_title'];
-      $link = '/index.php?module=viewtopic&topic_id=' . $data['parent_id'] . '&post_id=' . $data['data_id'];
-    }
-
-    $templating->set('type', $type);
-    $templating->set('title', $title);
-    $templating->set('link', $link);
-    $templating->set('data_type', $data_type);
-    $templating->set('id', $data['data_id']);
-  }
+		$templating->set('type', $type);
+		$templating->set('title', $title);
+		$templating->set('link', $link);
+		$templating->set('data_type', $data_type);
+		$templating->set('id', $data['data_id']);
+	}
 }
 else
 {
-  $core->message('You don\'t have anything bookmarked!');
+	$core->message('You don\'t have anything bookmarked!');
 }
 ?>

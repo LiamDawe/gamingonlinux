@@ -31,6 +31,7 @@ Import the development SQL database from the stripped SQL file `tools/SQL.sql`
 ## Apache rewrite
 
 You also need apache rewrite turned on like so:  
+
 ```<Directory /mnt/storage/public_html>
     Options Indexes FollowSymLinks MultiViews
     AllowOverride All
@@ -39,6 +40,7 @@ You also need apache rewrite turned on like so:
 ```
 
 And also adjust your htaccess "AccessFileName" to ".htaccess.testing" (as this doesn't include www. and secure site stuff you won't have locally), you can do so like this:  
+
 ```<virtualhost>
     ServerName www.example.local
     DirectoryRoot /var/www/www.example.local

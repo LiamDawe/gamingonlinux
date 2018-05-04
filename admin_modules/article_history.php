@@ -13,6 +13,6 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
 	$date = $core->human_date($article['date']);
 	$templating->set('date', $date);
 
-	$text = $bbcode->parse_bbcode($article['text']);
+	$text = $bbcode->article_bbcode($article['text']);
 	$templating->set('text', $text);
 }

@@ -149,7 +149,7 @@ if ($res_bundle)
 		$templating->set('store_name', $bundle['store_name']);
 
 		$total = '';
-		if ($bundle['total'] != NULL && $bundle['total'] > 0)
+		if ($bundle['linux_total'] != NULL && $bundle['linux_total'] > 0)
 		{
 			$total = '| Linux total: ' . $bundle['linux_total'];
 		}

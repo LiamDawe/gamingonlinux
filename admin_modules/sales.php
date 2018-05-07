@@ -102,7 +102,7 @@ if (isset($_POST['act']))
 		$link = trim($_POST['link']);
 		$end_date = trim($_POST['end_date']);
 
-		$empty_check = core::mempty(compact('name','total','link','end_date'));
+		$empty_check = core::mempty(compact('name','link','end_date'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';
@@ -119,6 +119,11 @@ if (isset($_POST['act']))
 			$_SESSION['message_extra'] = 'bundle';
 			header("Location: /admin.php?module=sales&view=manage_bundles");
 			die();
+		}
+
+		if (!isset($total) || $total == 0)
+		{
+			$total = NULL;
 		}
 
 		$dbl->run("INSERT INTO `sales_bundles` SET `name` = ?, `linux_total` = ?, `link` = ?, `end_date` = ?, `store_id` = ?, `approved` = 1", [$name, $total, $link, $end_date, $_POST['store']]);
@@ -139,13 +144,18 @@ if (isset($_POST['act']))
 		$end_date = trim($_POST['end_date']);
 		$id = trim($_POST['id']);
 
-		$empty_check = core::mempty(compact('name','total','link','end_date'));
+		$empty_check = core::mempty(compact('name','link','end_date'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = $empty;
 			header("Location: /admin.php?module=sales&view=manage_bundles");
 			die();
+		}
+
+		if (!isset($total) || $total == 0)
+		{
+			$total = NULL;
 		}
 
 		$dbl->run("UPDATE `sales_bundles` SET `name` = ?, `linux_total` = ?, `link` = ?, `end_date` = ?, `store_id` = ? WHERE `id` = ?", [$name, $total, $link, $end_date, $_POST['store'], $id]);

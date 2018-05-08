@@ -157,10 +157,6 @@ class user
 	
 	public function register_session($session_id, $device_id)
 	{
-		if (!isset($_SESSION))
-		{
-			error_log("Session not started in: " . $this->core->current_page());
-		}
 		session_regenerate_id(true);
 		
 		$_SESSION['user_id'] = $this->user_details['user_id'];
@@ -433,11 +429,10 @@ class user
 	// helper function to display the correct avatar, for the given user data
 	public function sort_avatar($data)
 	{
-		$your_theme = $this->user_details['theme'];
-
-		if (!isset($this->user_details['theme']))
+		$your_theme = 'default';
+		if (isset($this->user_details['theme']))
 		{
-			error_log('No theme set: ' . $_SERVER['REQUEST_URI'] . print_r($this->user_details, true) . print_r($_SESSION, true));
+			$your_theme = $this->user_details['theme']; // should always be set, but somehow sometimes it isn't *shrugs* couldn't figure out why
 		}
 		
 		if ($your_theme == 'dark')

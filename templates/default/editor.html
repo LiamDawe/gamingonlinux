@@ -1,5 +1,5 @@
 [block: editor]
-<a id="{:anchor_name}"></a><strong>Make sure your post follows our rules, <a href="{:url}index.php?module=rules" target="_blank">click here for them</a>.  Also be sure to check out the <a href="{:url}index.php?module=guidelines" target="_blank">Article Guide</a> for guidelines on what to include in articles.</strong><br />
+<a id="{:anchor_name}"></a><strong>Make sure your post follows our rules, <a href="{:url}index.php?module=rules" target="_blank">click here for them</a>.</strong><br />
 	<div id="bar_{:editor_id}" class="octus-editor group">
         	<div class="styles group">
 			    <ul>
@@ -11,7 +11,6 @@
 			    <ul>
 				<li data-tag="img">img</li>
 				<li data-tag="url">url</li>
-				<li id="youtube-bbcode" data-tag="youtube" data-limit="{:limit_youtube}">YouTube</li>
 				<!-- <li id="full-screen-bbcode">Full Screen</li> not finished -->
 			    </ul>
 			    <ul>
@@ -52,3 +51,25 @@
 			</div>
 	</div>
 [/block: editor]
+
+[block: simple_editor]
+<div class="simple_ajax_editor" style="border-width: 1px;
+border-style: solid;
+border-color: rgb(135, 138, 140);
+border-image: initial;
+border-radius: 4px;
+background: rgb(255, 255, 255);">
+	<textarea style="min-height: 122px; border: none; border-style: none; outline: none;" name="{:name}" class="bbcode_editor" rows="3" cols="17" {:ays_ignore} id="{:editor_id}">{:content}</textarea>
+	<div style="position: sticky;
+    bottom: 0px;
+    z-index: 1;
+    opacity: 1;
+    background-color: rgb(246, 247, 248);
+    display: flex;
+    flex-direction: row-reverse;
+    -webkit-box-align: center;
+    align-items: center;
+    height: 36px;
+    border-radius: 0px 0px 4px 4px;">{:buttons}</div>
+</div>
+[/block: simple_editor]

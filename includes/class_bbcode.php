@@ -150,6 +150,27 @@ class bbcode
 
 		return $body;
 	}
+
+	function parse_images($text)
+	{
+		// for the image proxy, images with a link to somewhere else - do this first so it doesn't conflict		
+		$text = preg_replace_callback("~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i",
+		function($matches)
+		{
+			return "<a href=\"".$matches[1]."\" target=\"_blank\"><img itemprop=\"image\" src=\"/includes/image_proxy.php?url=".urlencode($matches[2])."\" class=\"img-responsive\" alt=\"image\" /></a>";
+		},
+		$text);
+
+		// for the image proxy, basic images
+		$text = preg_replace_callback("/\[img\](.+?)\[\/img\]/is",
+		function($matches)
+		{
+			return "<a data-fancybox=\"images\" rel=\"group\" href=\"/includes/image_proxy.php?url=".urlencode($matches[1])."\"><img itemprop=\"image\" src=\"/includes/image_proxy.php?url=".urlencode($matches[1])."\" class=\"img-responsive\" alt=\"image\" /></a>";
+		},
+		$text);
+		
+		return $text;
+	}
 	
 	function parse_links($text)
 	{
@@ -161,12 +182,6 @@ class bbcode
 		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
 
 		$text = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $text);
-
-		$find = '~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i'; // don't even remember what this one was checking for exactly?
-
-		$replace = '<a href="$1" target="_blank"><img src="$2" alt="image" /></a>';
-
-		$text = preg_replace($find, $replace, $text);
 
 		$find = array(
 		"/\[url\=(.+?)\](.+?)\[\/url\]/is",
@@ -203,6 +218,8 @@ class bbcode
 			},
 			$body);
 
+		$body = $this->parse_images($body);
+
 		$body = $this->parse_links($body);
 
 		// remove extra new lines, caused by editors adding a new line after bbcode elements for easier reading when editing
@@ -218,7 +235,7 @@ class bbcode
 
 		$body = preg_replace($find_lines, $replace_lines, $body);
 
-		$body = $this->quotes($body);
+		$body = $this->quotes($body);		
 
 		$find_replace = array(
 		"/\[b\](.+?)\[\/b\]/is" 
@@ -233,10 +250,6 @@ class bbcode
 			=> "$2",
 		"/\[font\=(.+?)\](.+?)\[\/font\]/is" 
 			=> "$2",
-		"/\[img\](.+?)\[\/img\]/is" 
-			=> "<a data-fancybox=\"images\" rel=\"group\" href=\"$1\"><img itemprop=\"image\" src=\"$1\" class=\"img-responsive\" alt=\"image\" /></a>",
-		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is" 
-			=> "<a class=\"fancybox\" rel=\"group\" href=\"$3\"><img itemprop=\"image\" width=\"$1\" height=\"$2\" src=\"$3\" class=\"img-responsive\" alt=\"image\" /></a>",
 		"/\[email\](.+?)\[\/email\]/is" 
 			=> "<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 		'/\[list\](.*?)\[\/list\]/is' 
@@ -331,7 +344,6 @@ class bbcode
 		"/\[right\](.+?)\[\/right\]/is",
 		"/\[left\](.+?)\[\/left\]/is",
 		"/\[img\](.+?)\[\/img\]/is",
-		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
 		"/\[email\](.+?)\[\/email\]/is",
 		"/\[s\](.+?)\[\/s\]/is",
 		'/\[list\](.*?)\[\/list\]/is',

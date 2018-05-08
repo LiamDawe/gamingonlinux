@@ -26,6 +26,8 @@ Options +SymLinksifOwnerMatch
   RewriteCond %{SCRIPT_FILENAME} !-d
 
   RewriteCond %{SCRIPT_FILENAME} !-f
+  
+  RewriteRule ^image_prox/([%\w\.-_]*)$ /includes/image_proxy.php?url=$1 [N,NC]
 
   RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
 

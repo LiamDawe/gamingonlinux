@@ -1928,3 +1928,9 @@ span.cookie_action
 	background-repeat: no-repeat;
 	background-position: center; 
 }
+
+.uploads
+{
+	max-height: 500px;
+	overflow: auto;
+}

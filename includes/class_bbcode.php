@@ -217,22 +217,10 @@ class bbcode
 		);
 
 		$body = preg_replace($find_lines, $replace_lines, $body);
-		
-		// limit youtube replacing to the config limit
-		$find_replace = [
-		"/\[youtube\](.+?)\[\/youtube\](\r?\n)?/is" => ["<div class=\"video-container\"><iframe class=\"youtube-player\" width=\"550\" height=\"385\" src=\"https://www.youtube-nocookie.com/embed/$1\" data-youtube-id=\"$1\" frameborder=\"0\" allowfullscreen></iframe></div>", $this->core->config('limit_youtube')]
-		];
-
-		foreach ($find_replace as $find => $replace)
-		{
-			$body = preg_replace($find, $replace[0], $body, intval($replace[1]));
-		}
 
 		$body = $this->quotes($body);
 
 		$find_replace = array(
-		"/\[youtube\](.+?)\[\/youtube\]/is" 
-			=> " <a href=\"https://www.youtube.com/watch?v=$1\" target=\"_blank\">View video on youtube.com</a> ",
 		"/\[b\](.+?)\[\/b\]/is" 
 			=> "<strong>$1</strong>",
 		"/\[i\](.+?)\[\/i\]/is" 
@@ -346,7 +334,6 @@ class bbcode
 		"/\[img=([0-9]+)x([0-9]+)\](.+?)\[\/img\]/is",
 		"/\[email\](.+?)\[\/email\]/is",
 		"/\[s\](.+?)\[\/s\]/is",
-		"/\[youtube\](.+?)\[\/youtube\]/is",
 		'/\[list\](.*?)\[\/list\]/is',
 		'/\[\*\](.*?)(\n|\r\n?)/is',
 		'/\[ul\]/is',
@@ -374,8 +361,6 @@ class bbcode
 		"<img width=\"$1\" height=\"$2\" src=\"$3\" alt=\"[img]\" />",
 		"<a href=\"mailto:$1\" target=\"_blank\">$1</a>",
 		"<span style=\"text-decoration: line-through\">$1</span>",
-		"<iframe width=\"640\" height=\"385\" src=\"https://www.youtube-nocookie.com/embed/$1\" frameborder=\"0\" allowfullscreen>
-		</iframe>",
 		'<ul>$1</ul>',
 		'<li>$1</li>',
 		'<ul>',

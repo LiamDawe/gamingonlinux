@@ -435,12 +435,17 @@ class bbcode
 
 	function youtube_privacy($text)
 	{
-		/*// to be turned on later, as needed, possibly by GDPR
+		/*
+		// to be turned on later, as needed, possibly by GDPR
 		if (!isset($_COOKIE['cookie_consent']) || isset($_COOKIE['cookie_consent']) && $_COOKIE['cookie_consent'] == 'nope')
 		{
-			$text = preg_replace("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is", "
-			<div class=\"hidden_video\" data-video-id=\"$1\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept cookies to view.<br />
-			<span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"$1\" href=\"#\">Show Video &amp; Accept Cookies</a></span></div></div>", $text);
+			// for the image proxy, basic images
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is",
+			function($matches)
+			{
+				return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"/includes/image_proxy.php?url=" . urlencode("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . "\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept cookies to view.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show Video &amp; Accept Cookies</a></span></div></div>";
+			},
+			$text);
 		}*/
 		return $text;
 	}

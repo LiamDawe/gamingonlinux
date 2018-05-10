@@ -910,6 +910,34 @@ jQuery(document).ready(function()
 		});
 	});
 
+	/* Ajax comment editing */
+	var current_comment_text = {};
+	$(document).on('click', ".edit_comment_link", function(e)
+	{
+		e.preventDefault();
+		var comment_id = $(this).attr("data-comment-id");
+		var url = "/includes/ajax/edit_comment.php";
+		current_comment_text[comment_id] = $("#text_"+comment_id)[0].outerHTML;
+
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'comment_id': comment_id}, 
+			success: function(data)
+			{
+				$("#text_"+comment_id).replaceWith(data);
+			}
+		});		
+	});
+
+	$(document).on('click', "#cancel_comment_edit", function(e)
+	{
+		e.preventDefault();
+		var comment_id = $(this).attr("data-comment-id");
+		$(this).next('.preview_pm').remove(); // not working, need to remove any attached preview box
+		$(this).closest('.simple_ajax_editor').replaceWith(current_comment_text[comment_id]);
+	});
+
 	$(document).on('click', ".gallery_item", function() 
 	{
 		var filename = $(this).data('filename');
@@ -919,7 +947,7 @@ jQuery(document).ready(function()
 		$.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id, 'filename':filename });
 	});
 
-	$('#preview_text_button').click(function()
+	$(document).on('click', "#preview_text_button", function() 
 	{
 		var text = $('.bbcode_editor').val();
 		$('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text}, function() {
@@ -1776,7 +1804,7 @@ jQuery(document).ready(function()
 			var video_id = $(this).attr("data-video-id");
 			$(this).replaceWith('<div class="youtube-embed-wrapper" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden"><iframe allowfullscreen="" frameborder="0" height="360" src="https://www.youtube-nocookie.com/embed/'+video_id+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%" width="640"></iframe></div>');
 		});
-	});
+	});*/
 
 	// accepting a single video for viewing
 	$(document).on('click','.accept_video',function(e)
@@ -1784,5 +1812,19 @@ jQuery(document).ready(function()
 		e.preventDefault();
 		var video_id = $(this).attr("data-video-id");
 		$(this).closest('.hidden_video').replaceWith('<div class="youtube-embed-wrapper" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden"><iframe allowfullscreen="" frameborder="0" height="360" src="https://www.youtube-nocookie.com/embed/'+video_id+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%" width="640"></iframe></div>');
-	});*/
+	});
+
+	/* cookie preferences page */
+	$(document).on('click','#youtube-cookie-slider',function(e)
+	{
+		if (this.checked) 
+		{
+			Cookies.set('gol_youtube_consent', 'yup', { expires: 30 });
+		}
+		else
+		{
+			$("#youtube-cookie-slider").prop('checked', false);
+			Cookies.set('gol_youtube_consent', 'nope', { expires: 30 });			
+		}
+	});
 });

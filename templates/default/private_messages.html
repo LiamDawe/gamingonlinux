@@ -136,6 +136,17 @@
 </form>
 [/block: reply_bottom]
 
+[block: bottom_delete]
+<form method="post">
+<div class="box">
+	<div class="body group">
+		<button formaction="/index.php?module=messages" type="submit" name="act" value="Delete">Delete Message</button>
+		<input type="hidden" name="conversation_id" value="{:conversation_id}" />
+	</div>
+</div>
+</form>
+[/block: bottom_delete]
+
 [block: preview]
 <div class="preview_pm">
 	<div class="box">

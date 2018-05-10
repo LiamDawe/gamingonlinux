@@ -389,6 +389,12 @@ else
 
 				$templating->block('preview', 'private_messages');
 			}
+			// only them left, let them delete it
+			else
+			{
+				$templating->block('bottom_delete', 'private_messages');
+				$templating->set('conversation_id', $start['conversation_id']);				
+			}
 
 			$dbl->run("UPDATE `user_conversations_participants` SET `unread` = 0 WHERE `participant_id` = ? AND `conversation_id` = ?", array($_SESSION['user_id'], $_GET['id']));
 		}
@@ -797,6 +803,13 @@ else
 			{
 				$dbl->run("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
 				$dbl->run("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
+
+				// check if there's no one left in the conversation, remove it entirely
+				$people_left = $dbl->run("SELECT COUNT(*) FROM `user_conversations_participants` WHERE `conversation_id` = ?", array($_POST['conversation_id']))->fetchOne();
+				if ($people_left == 0)
+				{
+					$dbl->run("DELETE FROM `user_conversations_messages` WHERE `conversation_id` = ?", array($_POST['conversation_id']));
+				}
 				
 				$_SESSION['message'] = 'deleted';
 				$_SESSION['message_extra'] = 'private message';

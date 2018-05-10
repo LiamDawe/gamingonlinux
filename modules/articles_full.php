@@ -868,11 +868,13 @@ else if (isset($_GET['go']))
 		else if (isset($_POST['no']))
 		{
 			header("Location: ".$article_link);
+			die();
 		}
 		else
 		{
 			$article_class->delete_comment($_GET['comment_id']);
 			header("Location: ".$article_link);
+			die();
 		}
 	}
 
@@ -885,6 +887,7 @@ else if (isset($_GET['go']))
 		$title = core::nice_title($title['title']);
 
 		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
+		die();
 	}
 
 	if ($_GET['go'] == 'unsubscribe')
@@ -896,6 +899,7 @@ else if (isset($_GET['go']))
 		$title = core::nice_title($title['title']);
 
 		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
+		die();
 	}
 
 	if ($_GET['go'] == 'report_comment')

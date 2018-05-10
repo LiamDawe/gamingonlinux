@@ -911,6 +911,7 @@ jQuery(document).ready(function()
 	});
 
 	/* Ajax comment editing */
+	/*
 	var current_comment_text = {};
 	$(document).on('click', ".edit_comment_link", function(e)
 	{
@@ -936,7 +937,7 @@ jQuery(document).ready(function()
 		var comment_id = $(this).attr("data-comment-id");
 		$(this).next('.preview_pm').remove(); // not working, need to remove any attached preview box
 		$(this).closest('.simple_ajax_editor').replaceWith(current_comment_text[comment_id]);
-	});
+	});*/
 
 	$(document).on('click', ".gallery_item", function() 
 	{

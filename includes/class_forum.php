@@ -182,86 +182,58 @@ class forum
 		}
 	}
 	
-	public function delete_reply($return_page_done = NULL, $return_page_no = NULL, $post_page = NULL)
+	public function delete_reply($post_id)
 	{
 		global $core, $parray, $templating;
 		
-		if (!isset($_GET['forum_id']) || !isset($_GET['post_id']) || !isset($_GET['topic_id']))
-		{
-			header('Location: ' . $return_page_no);
-			die();
-		}
-		
-		if (!core::is_number($_GET['forum_id']) || !core::is_number($_GET['post_id']) || !core::is_number($_GET['topic_id']))
-		{
-			header('Location: ' . $return_page_no);
-			die();
-		}
+		// Get the info from the post
+		$post_info = $this->dbl->run("SELECT r.author_id, r.reported, r.topic_id, t.forum_id FROM `forum_replies` r INNER JOIN `forum_topics` t ON r.topic_id = t.topic_id WHERE r.`post_id` = ?", array($post_id))->fetch();
 
 		$parray = $this->forum_permissions($_GET['forum_id']);
-		if ($parray['can_delete'] == 0 || !isset($parray['can_delete']))
+		if (($parray['can_delete'] == 0 || !isset($parray['can_delete'])) && $post_info['author_id'] != $_SESSION['user_id'])
 		{
-			header('Location: ' . $return_page_no);
-			die();
+			return false;
 		}
-		
-		if (!isset($_POST['yes']) && !isset($_POST['no']))
+
+		// remove the post
+		$this->dbl->run("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($post_id));
+
+		// update admin notifications
+		if ($post_info['reported'] == 1)
 		{
+			$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report' AND `data` = ?", array(core::$date, $post_id))->fetch();
+		}
+
+		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_reply', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $post_id));
+
+		// update the authors post count
+		if ($post_info['author_id'] != 0)
+		{
+			$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - 1) WHERE `user_id` = ?", array($post_info['author_id']));
+		}
+
+		// now update the forums post count
+		$this->dbl->run("UPDATE `forums` SET `posts` = (posts - 1) WHERE `forum_id` = ?", array($post_info['forum_id']));
+
+		// update the topics info, get the newest last post and update the topics last info with that ones
+		$topic_info = $this->dbl->run("SELECT `creation_date`, `author_id`, `guest_username` FROM `forum_replies` WHERE `topic_id` = ? ORDER BY `post_id` DESC LIMIT 1", array($post_info['topic_id']))->fetch();
+
+		$this->dbl->run("UPDATE `forum_topics` SET `replys` = (replys - 1), `last_post_date` = ?, `last_post_user_id` = ? WHERE `topic_id` = ?", array($topic_info['creation_date'], $topic_info['author_id'], $post_info['topic_id']));
+
+		// finally check if this is the latest topic we are deleting to update the latest topic info for the forum
+		$last_post = $this->dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($post_info['forum_id']))->fetchOne();
+
+		// if it is then we need to get the *now* newest topic and update the forums info
+		if ($last_post == $post_info['topic_id'])
+		{
+			$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($post_info['forum_id']))->fetch();
+
+			$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $post_info['forum_id']));
+		}
 			
-			$templating->set_previous('title', 'Deleting a forum post', 1);
-			$core->yes_no('Are you sure you want to delete that forum post?', $post_page, 'delete_topic');
-		}
-
-		else if (isset($_POST['no']))
-		{
-			header("Location: " . $return_page_no);
-		}
-		
-		else if (isset($_POST['yes']))
-		{
-			// Get the info from the post
-			$post_info = $this->dbl->run("SELECT r.author_id, r.reported, t.forum_id FROM `forum_replies` r INNER JOIN `forum_topics` t ON r.topic_id = t.topic_id WHERE r.`post_id` = ?", array($_GET['post_id']))->fetch();
-
-			// remove the post
-			$this->dbl->run("DELETE FROM `forum_replies` WHERE `post_id` = ?", array($_GET['post_id']));
-
-			// update admin notifications
-			if ($post_info['reported'] == 1)
-			{
-				$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report' AND `data` = ?", array(core::$date, $_GET['post_id']))->fetch();
-			}
-
-			$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_reply', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['post_id']));
-
-			// update the authors post count
-			if ($post_info['author_id'] != 0)
-			{
-				$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - 1) WHERE `user_id` = ?", array($post_info['author_id']));
-			}
-
-			// now update the forums post count
-			$this->dbl->run("UPDATE `forums` SET `posts` = (posts - 1) WHERE `forum_id` = ?", array($post_info['forum_id']));
-
-			// update the topics info, get the newest last post and update the topics last info with that ones
-			$topic_info = $this->dbl->run("SELECT `creation_date`, `author_id`, `guest_username` FROM `forum_replies` WHERE `topic_id` = ? ORDER BY `post_id` DESC LIMIT 1", array($_GET['topic_id']))->fetch();
-
-			$this->dbl->run("UPDATE `forum_topics` SET `replys` = (replys - 1), `last_post_date` = ?, `last_post_user_id` = ? WHERE `topic_id` = ?", array($topic_info['creation_date'], $topic_info['author_id'], $_GET['topic_id']));
-
-			// finally check if this is the latest topic we are deleting to update the latest topic info for the forum
-			$last_post = $this->dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($post_info['forum_id']))->fetchOne();
-
-			// if it is then we need to get the *now* newest topic and update the forums info
-			if ($last_post == $_GET['topic_id'])
-			{
-				$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($post_info['forum_id']))->fetch();
-
-				$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $post_info['forum_id']));
-			}
-			
-			$_SESSION['message'] = 'deleted';
-			$_SESSION['message_extra'] = 'post';
-			header("Location: " . $return_page_done);
-		}
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'post';
+		return true;
 	}
 	
 	public function get_link($id, $additional = NULL)

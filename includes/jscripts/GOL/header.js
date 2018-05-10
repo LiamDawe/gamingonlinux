@@ -1736,7 +1736,31 @@ jQuery(document).ready(function()
 			{
 				if (data.result == "removed")
 				{
-					$('.r49980').fadeOut(500);
+					$('.r'+comment_id).fadeOut(500);
+				}
+			});
+		} 
+		else {
+			// Do nothing!
+		}
+	});
+
+	// user forum post deletion
+	$(document).on('click', '.delete_forum_post', function(e)
+	{
+		e.preventDefault();
+
+		var post_id = $(this).attr('data-post-id');
+		var type = $(this).attr('data-type');
+
+		if (confirm('Are you sure you wish to delete that forum post?')) 
+		{
+			$.post('/includes/ajax/delete_forum_post.php', { 'post_id':post_id, 'type':type },
+			function(data)
+			{
+				if (data.result == "removed")
+				{
+					$('.r'+post_id).fadeOut(500);
 				}
 			});
 		} 

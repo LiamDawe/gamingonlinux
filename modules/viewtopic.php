@@ -17,9 +17,38 @@ else
 
 	if (isset($_GET['view']) && $_GET['view'] == 'deletepost')
 	{
-		$return = "/index.php?module=viewtopic&topic_id=" . $_GET['topic_id'];
-			
-		$forum_class->delete_reply($return, '/forum/topic/' . $_GET['topic_id'], "/index.php?module=viewtopic&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
+		$return = "/forum/topic/" . $_GET['topic_id'];
+
+		if (!isset($_GET['forum_id']) || !isset($_GET['post_id']) || !isset($_GET['topic_id']))
+		{
+			header('Location: ' . $return);
+			die();
+		}
+		
+		if (!core::is_number($_GET['forum_id']) || !core::is_number($_GET['post_id']) || !core::is_number($_GET['topic_id']))
+		{
+			header('Location: ' . $return);
+			die();
+		}
+
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Deleting a forum post', 1);
+			$core->confirmation(array('title' => 'Are you sure you want to delete that forum post?', 'text' => 'This cannot be undone!', 'action_url' => '/index.php?module=viewtopic&view=deletepost&post_id='.$_GET['post_id'].'&topic_id='.$_GET['topic_id'].'&forum_id=' . $_GET['forum_id'], 'act' => 'deletepost'));
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$forum_class->delete_reply($_GET['post_id']);
+			header('Location: ' . $return);
+			die();
+		}
 	}
 
 	else if (!isset($_POST['act']) && !isset($_GET['go']) && !isset($_GET['view']))
@@ -460,9 +489,9 @@ else
 
 							// sort out delete link if it's allowed
 							$delete_link = '';
-							if ($parray['can_delete'] == 1)
+							if ($parray['can_delete'] == 1 || $_SESSION['user_id'] == $post['author_id'])
 							{
-								$delete_link = '<li><a class="tooltip-top" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
+								$delete_link = '<li><a class="tooltip-top delete_forum_post" data-type="reply" data-post-id="'.$post['post_id'].'" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
 							}
 							$templating->set('delete_link', $delete_link);
 

@@ -1,5 +1,5 @@
 <?php
-session_cache_limiter('public');
+session_cache_limiter('');
 
 if (isset($_GET['url']))
 {

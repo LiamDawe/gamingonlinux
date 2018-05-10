@@ -69,127 +69,99 @@ class forum
 		}
 	}
 	
-	public function delete_topic($return_page_done = NULL, $return_page_no = NULL, $post_page = NULL)
+	public function delete_topic($topic_id)
 	{
-		global $core, $parray, $templating;
+		global $core, $parray;
+
+		$check = $this->dbl->run("SELECT `reported`, `replys`, `author_id`, `forum_id` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id))->fetch();
 		
-		if (!isset($_GET['forum_id']) || !isset($_GET['author_id']) || !isset($_GET['topic_id']))
+		$parray = $this->forum_permissions($check['forum_id']);
+		if (($parray['can_delete'] == 0 || !isset($parray['can_delete'])) && $check['author_id'] != $_SESSION['user_id'])
 		{
-			header('Location: ' . $return_page_no);
-			die();
-		}
-		
-		if (!core::is_number($_GET['forum_id']) || !core::is_number($_GET['author_id']) || !core::is_number($_GET['topic_id']))
-		{
-			header('Location: ' . $return_page_no);
-			die();
+			return false;
 		}
 
-		$parray = $this->forum_permissions($_GET['forum_id']);
-		if ($parray['can_delete'] == 0 || !isset($parray['can_delete']))
+		// check if its been reported first so we can remove the report
+		if ($check['reported'] == 1)
 		{
-			header('Location: ' . $return_page_no);
-			die();
-		}
-		
-		if (!isset($_POST['yes']) && !isset($_POST['no']))
-		{
-			
-			$templating->set_previous('title', 'Deleting a forum topic', 1);
-			$core->yes_no('Are you sure you want to delete that topic?', $post_page, 'delete_topic');
+			$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_topic_report' AND `data` = ?", array(core::$date, $topic_id));
 		}
 
-		else if (isset($_POST['no']))
+		// delete any replies that may have been reported from the admin notifications
+		if ($check['replys'] > 0)
 		{
-			header("Location: " . $return_page_no);
-		}
+			$get_replies = $this->dbl->run("SELECT `post_id`, `reported` FROM `forum_replies` WHERE `topic_id` = ?", array($topic_id))->fetch_all();
 
-		else if (isset($_POST['yes']))
-		{
-			// check if its been reported first so we can remove the report
-			$check = $this->dbl->run("SELECT `reported`, `replys` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
-
-			if ($check['reported'] == 1)
+			foreach ($get_replies as $delete_replies)
 			{
-				$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_topic_report' AND `data` = ?", array(core::$date, $_GET['topic_id']));
-			}
-
-			// delete any replies that may have been reported from the admin notifications
-			if ($check['replys'] > 0)
-			{
-				$get_replies = $this->dbl->run("SELECT `post_id`, `reported` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch_all();
-
-				foreach ($get_replies as $delete_replies)
+				if ($delete_replies['reported'] == 1)
 				{
-					if ($delete_replies['reported'] == 1)
-					{
-						$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report' AND `data` = ?", array(core::$date, $delete_replies['post_id']));
-					}
+					$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report' AND `data` = ?", array(core::$date, $delete_replies['post_id']));
 				}
 			}
-
-			$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_topic', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['topic_id']));
-
-			// count all posts including the topic
-			$total_count = 0;
-			$current_count = $this->dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
-			$total_count = $current_count + 1;
-
-			// Here we get each person who has posted along with their post count for the topic ready to remove it from their post count sql
-			$posts = $this->dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch_all();
-
-			$users_posts = array();
-			foreach ($posts as $post)
-			{
-				$user_post_count = $this->dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `author_id` = ? AND `topic_id` = ?", array($post['author_id'], $_GET['topic_id']))->fetchOne();
-
-				$users_posts[$post['author_id']]['author_id'] = $post['author_id'];
-				$users_posts[$post['author_id']]['posts'] = $user_post_count;
-			}
-
-			// now we can remove the topic
-			$this->dbl->run("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']));
-
-			// now we can remove all replys
-			$this->dbl->run("DELETE FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']));
-
-			// now update each users post count
-			foreach($users_posts as $post)
-			{
-				$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - ?) WHERE `user_id` = ?", array($post['posts'], $post['author_id']));
-			}
-
-			// remove a post from the topic author for the topic post itself
-			$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - 1) WHERE `user_id` = ?", array($_GET['author_id']));
-
-			// now update the forums post count
-			$this->dbl->run("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $_GET['forum_id']));
-
-			// finally check if this is the latest topic we are deleting to update the latest topic info for the forum
-			$last_post = $this->dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_GET['forum_id']))->fetchOne();
-
-			// if it is then we need to get the *now* newest topic and update the forums info
-			if ($last_post == $_GET['topic_id'])
-			{
-				$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($_GET['forum_id']))->fetch();
-
-				$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $_GET['forum_id']));
-			}
-
-			$_SESSION['message'] = 'deleted';
-			$_SESSION['message_extra'] = 'post';
-			header("Location: " . $return_page_done);
 		}
+
+		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_topic', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $topic_id));
+
+		// count all posts including the topic
+		$total_count = 0;
+		$current_count = $this->dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($topic_id))->fetchOne();
+		$total_count = $current_count + 1;
+
+		// Here we get each person who has posted along with their post count for the topic ready to remove it from their post count sql
+		$posts = $this->dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `topic_id` = ?", array($topic_id))->fetch_all();
+
+		$users_posts = array();
+		foreach ($posts as $post)
+		{
+			$user_post_count = $this->dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `author_id` = ? AND `topic_id` = ?", array($post['author_id'], $topic_id))->fetchOne();
+
+			$users_posts[$post['author_id']]['author_id'] = $post['author_id'];
+			$users_posts[$post['author_id']]['posts'] = $user_post_count;
+		}
+
+		// now we can remove the topic
+		$this->dbl->run("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id));
+
+		// now we can remove all replys
+		$this->dbl->run("DELETE FROM `forum_replies` WHERE `topic_id` = ?", array($topic_id));
+
+		// now update each users post count
+		foreach($users_posts as $post)
+		{
+			$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - ?) WHERE `user_id` = ?", array($post['posts'], $post['author_id']));
+		}
+
+		// remove a post from the topic author for the topic post itself
+		$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - 1) WHERE `user_id` = ?", array($check['author_id']));
+
+		// now update the forums post count
+		$this->dbl->run("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $check['forum_id']));
+
+		// finally check if this is the latest topic we are deleting to update the latest topic info for the forum
+		$last_post = $this->dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($check['forum_id']))->fetchOne();
+
+		// if it is then we need to get the *now* newest topic and update the forums info
+		if ($last_post == $topic_id)
+		{
+			$new_info = $this->dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($check['forum_id']))->fetch();
+
+			$this->dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $check['forum_id']));
+		}
+
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'post';
+		return $check['forum_id'];
 	}
 	
 	public function delete_reply($post_id)
 	{
-		global $core, $parray, $templating;
+		global $core, $parray;
 		
 		// Get the info from the post
 		$post_info = $this->dbl->run("SELECT r.author_id, r.reported, r.topic_id, t.forum_id FROM `forum_replies` r INNER JOIN `forum_topics` t ON r.topic_id = t.topic_id WHERE r.`post_id` = ?", array($post_id))->fetch();
 
-		$parray = $this->forum_permissions($_GET['forum_id']);
+		$parray = $this->forum_permissions($post_info['forum_id']);
 		if (($parray['can_delete'] == 0 || !isset($parray['can_delete'])) && $post_info['author_id'] != $_SESSION['user_id'])
 		{
 			return false;

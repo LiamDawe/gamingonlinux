@@ -1760,7 +1760,14 @@ jQuery(document).ready(function()
 			{
 				if (data.result == "removed")
 				{
-					$('.r'+post_id).fadeOut(500);
+					if (type == 'reply')
+					{
+						$('.r'+post_id).fadeOut(500);
+					}
+					else if (type == 'topic')
+					{
+						window.location.href = "/forum/"+data.forum_id;
+					}
 				}
 			});
 		} 

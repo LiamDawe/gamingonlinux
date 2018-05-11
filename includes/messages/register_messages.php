@@ -24,6 +24,11 @@ return [
 	[
 		"text" => "You didn't fill out the captcha! You must do this, as it helps us prevent bots. If you don't see a captcha, a plugin may be blocking it!",
 		"error" => 1
+	],
+	"policy_agree" =>
+	[
+		"text" => "Sorry, but you must agree to our Privacy Policy in order to register and you did not tick the box.",
+		"error" => 1
 	]
 ];
 ?>

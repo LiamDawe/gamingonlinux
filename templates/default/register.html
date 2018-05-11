@@ -4,7 +4,7 @@
 	<div class="body group">
 		You can use this form to register to become a full user of the website. If you do not see a captcha to prove you are not a bot disable adblock plus. You never see the captcha again once registered.<br />
     <br />
-    <strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/privacy.html">Privacy Policy</a> and our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
+    <strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
 		<br />
 		<form method="post" action="/index.php?module=register">
 			Timezone:<br />
@@ -19,6 +19,7 @@
 			Email: <br />
 			<input type="text" class="ays-ignore" name="uemail" /><br />
 			<em>Your email address will never be shared with anyone. It's so you can verify your account and so we can see you're not a bot. It also enables you to get notified of replies to comments and forum posts, if you choose to do so.</em><br />
+			<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label><br />
 			{:captcha}
 			<input type="submit" name="register" value="Register" class="btn btn-primary reg-button" />
 		</form>
@@ -32,7 +33,7 @@
 	<div class="body group">
 		You are about to create a new account with twitter, please enter the following details to complete the registration. If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this twitter account.<br />
 		<br />
-		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/privacy.html">Privacy Policy</a> and our <a href="/ethics.html">Ethics Policy</a>.</strong>
+		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
 		Timezone:<br />
 		{:timezone_list}
 		<form method="post" action="/index.php?module=register">
@@ -42,6 +43,7 @@
 		Email: <br />
 		<input class="ays-ignore" type="text" name="uemail" /><br />
 		<em>Your email address will never be shared with anyone. It's so you can verify your account and so we can see you're not a bot. It also enables you to get notified of replies to comments and forum posts, if you choose to do so.</em><br />
+		<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label><br />
 		{:captcha}
 		<input type="submit" value="Register" class="btn btn-primary" />
 		<input type="hidden" name="register" value="twitter" />
@@ -56,7 +58,7 @@
 	<div class="body group">
 		<p>Hello <strong>{:name}</strong>, you are about to create a <strong>new account</strong> with <strong>Google</strong>, please enter the following details to complete the registration (this only needs to be done once).</p>
 		<p>If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this Google account.</p>
-		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/privacy.html">Privacy Policy</a> and our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
+		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
 		Timezone:<br />
 		{:timezone_list}
 		<form method="post" action="/index.php?module=register">
@@ -66,6 +68,7 @@
 		Email: <br />
 		<input class="ays-ignore" type="text" name="uemail" value="{:email}" /><br />
 		<em>Your email address will never be shared with anyone. It's so you can verify your account and so we can see you're not a bot. It also enables you to get notified of replies to comments and forum posts, if you choose to do so.</em><br />
+		<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label><br />
 		{:captcha}
 		<input type="submit" value="Register" class="btn btn-primary" />
 		<input type="hidden" name="register" value="google" />
@@ -78,9 +81,9 @@
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <div class="well well-sm">
 	Hello <strong>{:username}</strong>! You are about to create a <strong>new account</strong> with Steam, please enter the following details to complete the registration. <br />
-If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this Steam account.<br />
-<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/privacy.html">Privacy Policy</a> and our <a href="/ethics.html">Ethics Policy</a>.</strong>
-		<form method="post" action="/index.php?module=register">
+	If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this Steam account.<br />
+	<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
+	<form method="post" action="/index.php?module=register">
 		Timezone:<br />
 		{:timezone_list}
 		Username, please use plain text (we firmly suggest <strong>not</strong> using your real name): <br />
@@ -89,9 +92,10 @@ If you want to link it to an existing account, you need to login normally and do
 		Email: <br />
 		<input class="ays-ignore" type="text" name="uemail" /><br />
 		<em>Your email address will never be shared with anyone. It's so you can verify your account and so we can see you're not a bot. It also enables you to get notified of replies to comments and forum posts, if you choose to do so.</em><br />
+		<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label><br />
 		{:captcha}
 		<input type="submit" value="Register" class="btn btn-primary" />
 		<input type="hidden" name="register" value="steam" />
-		</form>
+	</form>
 </div>
 [/block: steam_new]

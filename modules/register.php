@@ -78,6 +78,14 @@ if ($core->config('allow_registrations') == 1)
 
 	else if (isset($_POST['register']))
 	{
+		// check they agreed to the privacy policy/terms
+		if (!isset($_POST['policy_agree']))
+		{
+			$_SESSION['message'] = 'policy_agree';
+			header("Location: ".$redirect);
+			die();			
+		}
+
 		// disallow certain username characters
 		$aValid = array('-', '_');
 

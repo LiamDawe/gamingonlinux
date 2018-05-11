@@ -153,11 +153,10 @@ class bbcode
 
 	function parse_images($text)
 	{
-		// for the image proxy, images with a link to somewhere else - do this first so it doesn't conflict		
 		$text = preg_replace_callback("~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i",
 		function($matches)
 		{
-			return "<a href=\"".$matches[1]."\" target=\"_blank\"><img itemprop=\"image\" src=\"/includes/image_proxy.php?url=".urlencode($matches[2])."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a href=\"".$matches[1]."\" target=\"_blank\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
 		$text);
 
@@ -165,9 +164,9 @@ class bbcode
 		$text = preg_replace_callback("/\[img\](.+?)\[\/img\]/is",
 		function($matches)
 		{
-			return "<a data-fancybox=\"images\" rel=\"group\" href=\"/includes/image_proxy.php?url=".urlencode($matches[1])."\"><img itemprop=\"image\" src=\"/includes/image_proxy.php?url=".urlencode($matches[1])."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a data-fancybox=\"images\" rel=\"group\" href=\"".$matches[1]."\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
-		$text);
+		$text);		
 		
 		return $text;
 	}
@@ -435,18 +434,26 @@ class bbcode
 
 	function youtube_privacy($text)
 	{
-		/*
 		// to be turned on later, as needed, possibly by GDPR
-		if (!isset($_COOKIE['cookie_consent']) || isset($_COOKIE['cookie_consent']) && $_COOKIE['cookie_consent'] == 'nope')
+		if (!isset($_COOKIE['gol_youtube_consent']) || isset($_COOKIE['gol_youtube_consent']) && $_COOKIE['gol_youtube_consent'] == 'nope')
 		{
-			// for the image proxy, basic images
-			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is",
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is",
 			function($matches)
 			{
-				return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"/includes/image_proxy.php?url=" . urlencode("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . "\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept cookies to view.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show Video &amp; Accept Cookies</a></span></div></div>";
+				$local_cache = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+
+				if (file_exists($local_cache))
+				{
+					$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+				}
+				else
+				{
+					$load_image = "/includes/youtube_image_proxy.php?url=" . urlencode("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg");	
+				}
+				return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"$load_image\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept their cookies to view. <a href=\"/index.php?module=cookie_prefs\">View cookie preferences</a>.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show &amp; Accept Cookies</a></span></div></div>";
 			},
 			$text);
-		}*/
+		}
 		return $text;
 	}
 

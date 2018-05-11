@@ -432,23 +432,30 @@ class bbcode
 		return $text;
 	}
 
+	// required by GDPR since YouTube don't warn about cookies and tracking before playing
 	function youtube_privacy($text)
 	{
-		// to be turned on later, as needed, possibly by GDPR
 		if (!isset($_COOKIE['gol_youtube_consent']) || isset($_COOKIE['gol_youtube_consent']) && $_COOKIE['gol_youtube_consent'] == 'nope')
 		{
 			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is",
 			function($matches)
 			{
-				$local_cache = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+				$local_cache_maxresdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+				$local_cache_hqdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
 
-				if (file_exists($local_cache))
+				// check for highest res local cache
+				if (file_exists($local_cache_maxresdefault))
 				{
 					$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
 				}
+				// check for high quality local cache
+				else if (file_exists($local_cache_hqdefault))
+				{
+					$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
+				}
 				else
 				{
-					$load_image = "/includes/youtube_image_proxy.php?url=" . urlencode("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg");	
+					$load_image = "/includes/youtube_image_proxy.php?id=" . $matches[1];
 				}
 				return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"$load_image\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept their cookies to view. <a href=\"/index.php?module=cookie_prefs\">View cookie preferences</a>.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show &amp; Accept Cookies</a></span></div></div>";
 			},

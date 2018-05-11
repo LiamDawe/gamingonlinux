@@ -1,7 +1,4 @@
 <?php
-
-$core->check_ip_from_stopforumspam(core::$ip);
-
 $templating->set_previous('title', 'Register', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux.com register page', 1);
 
@@ -85,6 +82,15 @@ if ($core->config('allow_registrations') == 1)
 			header("Location: ".$redirect);
 			die();			
 		}
+
+		if (!isset($_POST['spam_list']))
+		{
+			$_SESSION['message'] = 'spam_check_agree';
+			header("Location: ".$redirect);
+			die();	
+		}
+
+		$core->check_ip_from_stopforumspam(core::$ip);
 
 		// disallow certain username characters
 		$aValid = array('-', '_');

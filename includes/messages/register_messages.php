@@ -29,6 +29,11 @@ return [
 	[
 		"text" => "Sorry, but you must agree to our Privacy Policy in order to register and you did not tick the box.",
 		"error" => 1
+	],
+	"spam_check_agree" =>
+	[
+		"text" => "Sorry, but you must agree to us checking your IP address against the Stop Forum Spam list and you did not tick the box.",
+		"error" => 1
 	]
 ];
 ?>

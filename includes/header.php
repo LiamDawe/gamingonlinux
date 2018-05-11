@@ -1,7 +1,7 @@
 <?php
-$timer_start = microtime(true);
-
 session_start();
+
+$timer_start = microtime(true);
 
 error_reporting(-1);
 

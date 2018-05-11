@@ -313,19 +313,19 @@ class user
 	{		
 		if (isset($_COOKIE['gol_session']))
 		{
-			$session = $this->db->run("SELECT `session_id`, `device-id`, `user_id` FROM `saved_sessions` WHERE `session_id` = ?", array($_COOKIE['gol_session']))->fetch();
+			$session_check = $this->db->run("SELECT `session_id`, `device-id`, `user_id` FROM `saved_sessions` WHERE `session_id` = ?", array($_COOKIE['gol_session']))->fetch();
 
-			if ($session)
+			if ($session_check)
 			{
 				// login then
-				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($session['user_id']))->fetch();
+				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($session_check['user_id']))->fetch();
 				
 				$this->check_banned();
 
 				// update IP address and last login
 				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
-				$this->register_session($session['session_id'], $session['device-id']);
+				$this->register_session($session_check['session_id'], $session_check['device-id']);
 
 				return true;
 			}

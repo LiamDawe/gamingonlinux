@@ -325,6 +325,14 @@ class user
 				// update IP address and last login
 				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
+				// update their stay logged in cookie with new details
+				$generated_session = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+				$this->db->run("UPDATE `saved_sessions` SET `session_id` = ? WHERE `session_id` = ? AND `user_id` = ?", array($generated_session, $_COOKIE['gol_session'], $session_check['user_id']));
+				setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
+
+				// update IP address and last login
+				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
+
 				$this->register_session($session_check['session_id'], $session_check['device-id']);
 
 				return true;

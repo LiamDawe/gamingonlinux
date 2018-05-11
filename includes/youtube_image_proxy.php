@@ -46,6 +46,7 @@ if (isset($_GET['id']))
 	}
 
 	// if no cache found, we will loop over the types and attempt to download one of them in the order they're set in $types (best first)
+	// TODO: Add a default YouTube image if none found!
 	$local_file = '';
 	if ($download == 1)
 	{

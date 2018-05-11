@@ -14,20 +14,12 @@ if (!isset($_POST['action']))
 			$templating->set('url', $core->config('website_url'));
 
 			$username = '';
-			$username_remembered = '';
-			if (isset($_COOKIE['remember_username']))
-			{
-				$username = $_COOKIE['remember_username'];
-				$username_remembered = 'checked';
-			}
-
 			if (isset($_SESSION['login_error_username']))
 			{
 				$username = $_SESSION['login_error_username'];
 			}
 
 			$templating->set('username', $username);
-			$templating->set('username_remembered', $username_remembered);
 			
 			$twitter_button = '';
 			if ($core->config('twitter_login') == 1)

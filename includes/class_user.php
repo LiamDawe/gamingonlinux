@@ -71,7 +71,7 @@ class user
 	}
 
 	// normal login form
-	function login($username, $password, $remember_username, $stay)
+	function login($username, $password, $stay)
 	{		
 		if (!empty($password))
 		{
@@ -92,11 +92,6 @@ class user
 					$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
 					$this->new_login($generated_session);
-
-					if ($remember_username == 1)
-					{
-						setcookie('remember_username', $username,  time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
-					}
 
 					if ($stay == 1)
 					{

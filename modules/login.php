@@ -146,19 +146,13 @@ else if (isset($_POST['action']))
 {
 	if ($_POST['action'] == 'Login')
 	{
-		$remember_name = 0;
-		if (isset($_POST['remember_name']))
-		{
-			$remember_name = 1;
-		}
-
 		$stay = 0;
 		if (isset($_POST['stay']))
 		{
 			$stay = 1;
 		}
 
-		if ($user->login($_POST['username'], $_POST['password'], $remember_name, $stay) == true)
+		if ($user->login($_POST['username'], $_POST['password'], $stay) == true)
 		{
 			unset($_SESSION['login_error']);
 			unset($_SESSION['login_error_username']);

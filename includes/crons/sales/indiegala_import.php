@@ -56,6 +56,10 @@ for ($i = 1; $i <= $xml->channel->totalPages; $i++)
 		}
 		if ($on_linux == 1)
 		{
+			$new_title = html_entity_decode($game->title, ENT_QUOTES);
+			$stripped_title = $game_sales->stripped_title($new_title);
+			$new_title = $game_sales->clean_title($new_title);
+
 			// for seeing what we have available
 			/*echo '<pre>';
 			print_r($game);
@@ -67,10 +71,14 @@ for ($i = 1; $i <= $xml->channel->totalPages; $i++)
 			echo "URL: ", $game->link, "\n";
 			echo "Price USD: ", $game->discountPriceUSD, "\n";
 			echo "Original Price: ", $game->priceUSD, "\n";*/
-			
-			$new_title = html_entity_decode($game->title, ENT_QUOTES);
-			$stripped_title = $game_sales->stripped_title($new_title);
-			$new_title = $game_sales->clean_title($new_title);
+
+			$usd_sale_price = NULL;
+			$usd_normal_price = NULL;
+			if ($game->discountPriceUSD > 0 && $game->priceUSD > 0)
+			{
+				$usd_sale_price = $game->discountPriceUSD;
+				$usd_normal_price = $game->priceUSD;
+			}
 		
 			// first check it exists based on the normal name
 			$game_id = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($new_title))->fetchOne();
@@ -93,16 +101,24 @@ for ($i = 1; $i <= $xml->channel->totalPages; $i++)
 					
 			$on_sale[] = $game_id;
 			
-			$check_sale = $dbl->run("SELECT 1 FROM `sales` WHERE `game_id` = ? AND `store_id` = 3", array($game_id))->fetch();
+			$check_sale = $dbl->run("SELECT `id`, `sale_dollars` FROM `sales` WHERE `game_id` = ? AND `store_id` = 3", array($game_id))->fetch();
 		
 			// all sorted out - insert into the sales database
 			if (!$check_sale)
 			{
-				$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 3, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `sale_pounds` = ?, `original_pounds` = ?, sale_euro = ?, `original_euro` = ?, `link` = ?", array($game_id, $game->discountPriceUSD, $game->priceUSD, $game->discountPriceGBP, $game->priceGBP, $game->discountPriceEUR, $game->priceEUR, $game->link));
+				$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 3, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `sale_pounds` = ?, `original_pounds` = ?, sale_euro = ?, `original_euro` = ?, `link` = ?", array($game_id, $usd_sale_price, $usd_normal_price, $game->discountPriceGBP, $game->priceGBP, $game->discountPriceEUR, $game->priceEUR, $game->link));
 					
 				$sale_id = $dbl->new_id();
 					
 				echo "\tAdded ".$new_title." to the sales DB with id: " . $sale_id . ".\n";
+			}
+			else
+			{
+				// update prices if they're wrong
+				if ($check_sale['sale_dollars'] != $usd_sale_price)
+				{
+					$dbl->run("UPDATE `sales` SET `sale_dollars` = ? WHERE `id` = ?", array($usd_sale_price, $check_sale['id']));
+				}
 			}
 		}
 		echo "\n"; //Just a bit of white space here.

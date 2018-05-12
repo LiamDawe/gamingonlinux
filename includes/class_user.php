@@ -152,6 +152,10 @@ class user
 	
 	public function register_session($session_id, $device_id)
 	{
+		if (session_status() == PHP_SESSION_NONE) // not a bastard clue why it's not started sometimes for a few people
+		{
+			session_start();
+		}
 		session_regenerate_id(true);
 		
 		$_SESSION['user_id'] = $this->user_details['user_id'];

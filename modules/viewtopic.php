@@ -559,7 +559,6 @@ else
 							$templating->set('avatar', $avatar);
 
 							$post['user_groups'] = $reply_user_groups[$post['author_id']];
-							print_r($post['user_groups']);
 							$badges = user::user_badges($post, 1);
 							$templating->set('badges', implode(' ', $badges));
 

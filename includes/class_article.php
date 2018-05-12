@@ -1311,7 +1311,7 @@ class article
 					
 					if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
 					{
-						$comment_edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
+						$comment_edit_link = "<li><a class=\"tooltip-top edit_comment_link\" data-comment-id=\"{$comments['comment_id']}\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
 					}
 					
 					if ($can_delete == 1 || $_SESSION['user_id'] == $comments['author_id'])
@@ -1330,17 +1330,9 @@ class article
 			$this->templating->set('block', $block_icon);
 
 			// if we have some user groups for that user
-			if (array_key_exists($comments['author_id'], $comment_user_groups))
-			{
-				$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
-				$badges = user::user_badges($comments, 1);
-				$this->templating->set('badges', implode(' ', $badges));
-			}
-			// otherwise guest account or their account was removed, as we didn't get any groups for it
-			else
-			{
-				$this->templating->set('badges', '');
-			}
+			$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
+			$badges = user::user_badges($comments, 1);
+			$this->templating->set('badges', implode(' ', $badges));
 						
 			$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
 

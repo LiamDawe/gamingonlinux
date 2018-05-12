@@ -69,7 +69,8 @@ class db_mysql extends PDO
         {
 			$trace = $error->getTrace();
 			error_log('SQL ERROR ' . $error->getMessage() . "\n" . 'Full SQL: ' . $sql . "\nURL: " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-			die('SQL Error');
+			include(dirname(dirname(__FILE__)).'/sql_error.html');
+			die();
         }
     }
 	

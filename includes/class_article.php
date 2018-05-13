@@ -1509,7 +1509,7 @@ class article
 	{		
 		$comment = $this->dbl->run("SELECT `author_id`, `comment_text`, `spam`, `article_id` FROM `articles_comments` WHERE `comment_id` = ?", array((int) $comment_id))->fetch();
 
-		if ($comment['author_id'] != $_SESSION['user_id'] && $user->can('mod_delete_comments') == false)
+		if ($comment['author_id'] != $_SESSION['user_id'] && $this->user->can('mod_delete_comments') == false)
 		{
 			return false;
 		}
@@ -1568,7 +1568,7 @@ class article
 							$this->dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = ?, `comment_id` = ? WHERE `id` = ?", array($new_date, $last_comment['author_id'], $seen, $last_comment['comment_id'], $this_note['id']));
 						}
 						// no matter what we need to adjust the counter
-						$dbl->run("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
+						$this->dbl->run("UPDATE `user_notifications` SET `total` = (total - 1) WHERE `id` = ?", array($this_note['id']));
 					}
 					// it's the only comment they were notified about, so just delete the notification to completely remove it
 					else if ($this_note['total'] == 1)

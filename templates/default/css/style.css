@@ -1926,6 +1926,8 @@ span.cookie_action
 	background: rgb(223, 223, 223);
 }
 
+.dark .hidden_video{background: #191919;}
+
 .uploads
 {
 	max-height: 500px;

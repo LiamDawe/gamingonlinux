@@ -25,7 +25,7 @@ foreach ($get_users as $user)
 				$article_ids[$removal['article_id']] = 1;
 			}
 
-			$dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 0 AND `user_id` = ?", array($user['user_id']));
+			$dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 0 AND `user_id` = ? AND `type` = 'mod_queue_comment'", array($user['user_id']));
 		}
 
 		// loop over article ids, adjust total comment counter now

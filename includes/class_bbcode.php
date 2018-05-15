@@ -458,7 +458,7 @@ class bbcode
 				{
 					$load_image = "/includes/youtube_image_proxy.php?id=" . $matches[1];
 				}
-				return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"$load_image\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept their cookies to view. <a href=\"/index.php?module=cookie_prefs\">View cookie preferences</a>.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show &amp; Accept Cookies</a></span></div></div>";
+				return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"$load_image\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept their cookies to view. <a href=\"/index.php?module=cookie_prefs\">View cookie preferences</a>.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show &amp; Accept Cookies</a> </span> &nbsp; <span class=\"badge blue\"><a href=\"https://www.youtube.com/watch?v={$matches[1]}\" target=\"_blank\">Direct Link</a></span></div></div>";
 			},
 			$text);
 		}

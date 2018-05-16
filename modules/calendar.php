@@ -17,11 +17,8 @@ else if (isset($_GET['year']) && !is_numeric($_GET['year']))
 	$year = date("Y");
 }
 
-if (!isset($_GET['month']) || empty($_GET['month']))
-{
-	$month = date("n");
-}
-else if (isset($_GET['month']) && is_numeric($_GET['month']))
+$month = date("n");
+if (isset($_GET['month']) && is_numeric($_GET['month']) && $_GET['month'] <= 12)
 {
 	$month = $_GET['month'];
 }

@@ -14,7 +14,7 @@ if ($user->check_group([1,2,5]) == false)
 	die('You should not be here.');
 }
 
-define ("MAX_SIZE",9*1024*1024); // 9MB
+define ("MAX_SIZE",50*1024*1024); // 50MB
 function getExtension($str)
 {
          $i = strrpos($str,".");

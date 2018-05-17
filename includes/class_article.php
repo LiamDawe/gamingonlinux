@@ -979,6 +979,11 @@ class article
 		{
 			$comments_top_text = 'No comments yet!';
 		}
+
+		if ($article_info['article']['comments_open'] == 0)
+		{
+			$this->core->message('The comments on this article are closed.');
+		}
 		
 		$this->templating->block('comments_top', 'articles_full');
 		$this->templating->set('comments_top_text', $comments_top_text);
@@ -1030,11 +1035,6 @@ class article
 			
 			$this->templating->set('subscribe_link', $subscribe_link);
 			$this->templating->set('close_comments', $close_comments_link);
-			
-			if ($article_info['article']['comments_open'] == 0)
-			{
-				$this->templating->block('comments_closed', 'articles_full');
-			}
 		}
 		else
 		{

@@ -76,7 +76,7 @@ else
 			p.`unread`
 		FROM
 			`user_conversations_info` i
-		INNER JOIN
+		LEFT JOIN
 			`users` u ON u.`user_id` = i.`author_id`
 		INNER JOIN
 			user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id`
@@ -110,7 +110,15 @@ else
 			$templating->set('title', $message['title']);
 			$templating->set('reply_count', $message['replies']);
 			$templating->set('last_reply_date', $core->human_date($message['last_reply_date']));
-			$templating->set('author', "<a href=\"/profiles/{$message['user_id']}/\">{$message['username']}</a>");
+			if (isset($message['username']))
+			{
+				$author_username = "<a href=\"/profiles/{$message['user_id']}/\">{$message['username']}</a>";
+			}
+			else
+			{
+				$author_username = 'Guest';
+			}
+			$templating->set('author', $author_username);
 			$templating->set('creation_date', $core->human_date($message['creation_date']));
 			$templating->set('last_reply_username', "<a href=\"/profiles/{$message['last_user_id']}/\">{$message['last_username']}</a>");
 		}

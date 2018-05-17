@@ -73,7 +73,7 @@ if ($handle = opendir($file_dir.'/uploads/articles/tagline_images/temp/thumbnail
     closedir($handle);
 }
 
-/* remove youtube cache images that are old, not likely to be viewed again */
+/* remove youtube cache images that are old, not likely to be viewed again - Don't think it's needed ATM
 if ($handle = opendir($file_dir.'/cache/youtube_thumbs/')) 
 {
     while (false !== ($entry = readdir($handle)))
@@ -108,4 +108,4 @@ if ($handle = opendir($file_dir.'/cache/youtube_thumbs/'))
 			}
     }
     closedir($handle);
-}
+}*/

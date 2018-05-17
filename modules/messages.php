@@ -51,8 +51,15 @@ else
 		// count them for pagination
 		$total = $dbl->run("SELECT COUNT(i.`conversation_id`) FROM `user_conversations_info` i INNER JOIN user_conversations_participants p ON p.`participant_id` = i.`owner_id` AND p.`conversation_id` = i.`conversation_id` WHERE i.`owner_id` = ? $blocked_sql", array_merge([$_SESSION['user_id']], $blocked_ids))->fetchOne();
 
+		$last_page = ceil($total/10);
+
+		if ($page > $last_page)
+		{
+			$page = $last_page;
+		}
+
 		// sort out the pagination link
-		$pagination = $core->pagination_link(9, $total, "/private-messages/", $page);
+		$pagination = $core->pagination_link(10, $total, "/private-messages/", $page);
 
 		// need to paginate the list
 		$get_pms = $dbl->run("SELECT
@@ -78,7 +85,7 @@ else
 		WHERE
 			i.`owner_id` = ? $blocked_sql
 		ORDER BY
-			i.`last_reply_date` DESC LIMIT ?, 9", array_merge([$_SESSION['user_id']], $blocked_ids, [$core->start]))->fetch_all();
+			i.`last_reply_date` DESC LIMIT ?, 10", array_merge([$_SESSION['user_id']], $blocked_ids, [$core->start]))->fetch_all();
 		foreach ($get_pms as $message)
 		{
 			$templating->block('message_row');

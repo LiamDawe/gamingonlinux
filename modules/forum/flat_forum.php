@@ -73,7 +73,7 @@ if (isset($_SESSION['per-page']))
 	$comments_per_page = $_SESSION['per-page'];
 }
 
-$total_pages = round($total_topics/$comments_per_page);
+$total_pages = ceil($total_topics/$comments_per_page);
 
 if ($page > $total_pages)
 {
@@ -108,7 +108,7 @@ FROM
 	`forum_topics` t
 INNER JOIN
 	`forums` f ON t.forum_id = f.forum_id
-INNER JOIN
+LEFT JOIN
 	`users` u ON t.author_id = u.user_id
 LEFT JOIN
 	`users` u2 ON t.last_post_user_id = u2.user_id
@@ -159,7 +159,15 @@ foreach ($get_topics as $topics)
 	}
 	$templating->set('replies', $replies);
 	$templating->set('avatar', $avatar);
-	$templating->set('username', $topics['username']);
+	if (isset($topics['username']))
+	{
+		$author_username = $topics['username'];
+	}
+	else
+	{
+		$author_username = 'Guest';
+	}
+	$templating->set('username', $author_username);
 	$templating->set('last_link', $last_link);
 	$templating->set('last_username', $topics['username_last']);
 	$templating->set('profile_last_link', $profile_last_link);

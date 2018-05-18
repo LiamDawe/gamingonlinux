@@ -286,6 +286,23 @@ class game_sales
 		$this->templating->set('pagination', $pagination);
 	}
 
+	function notify_wishlists($game_id)
+	{
+		$id_list = $this->dbl->run("SELECT `user_id` FROM `user_wishlist` WHERE `game_id` = ?", array($game_id))->fetch_all(PDO::FETCH_COLUMN);
+		if ($id_list)
+		{
+			$rows = array();
+			foreach ($id_list as $user_id)
+			{
+				$rows[] = [$user_id, $game_id, 'wishlist_sale'];
+			}
+
+			$sql = "insert into `user_notifications` (owner_id, sale_game_id, type) values ";
+
+			$this->dbl->insert_multi($sql, $rows);
+		}
+	}
+
 	function display_normal($filters = NULL)
 	{
 		// for non-ajax requests
@@ -372,8 +389,16 @@ class game_sales
 			{
 				$options_sql = ' AND ' . implode(' AND ', $options_array);
 			}
-			$sales_sql = "SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`$sale_price_field`, s.$original_price_field, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND s.`$sale_price_field` IS NOT NULL $options_sql $stores_sql ORDER BY s.`$sale_price_field` ASC";
-			$sales_res = $this->dbl->run($sales_sql, $store_ids)->fetch_all();
+
+			$game_id_sql = NULL;
+			$game_id_value = NULL;
+			if (isset($_GET['game_id']))
+			{
+				$game_id_sql = " AND `game_id` = ? ";
+				$game_id_value = [$_GET['game_id']];				
+			}
+			$sales_sql = "SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`$sale_price_field`, s.$original_price_field, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND s.`$sale_price_field` IS NOT NULL $game_id_sql $options_sql $stores_sql ORDER BY s.`$sale_price_field` ASC";
+			$sales_res = $this->dbl->run($sales_sql, array_merge($store_ids, $game_id_value))->fetch_all();
 		}
 
 		$sales_merged = [];

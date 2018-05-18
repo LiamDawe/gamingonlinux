@@ -87,7 +87,7 @@ if (isset($view))
 			$all_sql = 'having count(r.`category_id`) = ?';
 		}
 
-		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE r.category_id IN (?) $all_sql", $safe_ids)->fetchOne();
+		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE r.category_id IN (?) AND a.`active` = 1 $all_sql", $safe_ids)->fetchOne();
 
 		if ($total_items > 0)
 		{
@@ -148,7 +148,7 @@ if (isset($view))
 		}
 		
 		// otherwise, pick articles that have any of the selected tags
-		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql $all_sql", $safe_ids)->fetchOne();
+		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql AND a.`active` = 1 $all_sql", $safe_ids)->fetchOne();
 		
 		if ($total_items > 0)
 		{

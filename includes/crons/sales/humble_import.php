@@ -71,6 +71,7 @@ do
 			if ($use_sale == 1)
 			{
 				$sane_name = $game_sales->clean_title($game->human_name);
+				$stripped_title = $game_sales->stripped_title($sane_name);
 
 				echo $sane_name."\n";
 
@@ -84,11 +85,11 @@ do
 						$website = 'https://www.humblebundle.com/store/p/' . $game->machine_name . '?partner=gamingonlinux';
 					
 						// ADD IT TO THE GAMES DATABASE
-						$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
+						$game_list = $dbl->run("SELECT `id`, `stripped_name` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
 			
 						if (!$game_list)
 						{
-							$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `approved` = 1", array($sane_name, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
+							$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `approved` = 1", array($sane_name,$stripped_title, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
 			
 							// need to grab it again
 							$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
@@ -104,6 +105,8 @@ do
 							$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 4, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_list['id'], $game->current_price[0], $game->full_price[0], $website));
 						
 							$sale_id = $dbl->new_id();
+
+							$game_sales->notify_wishlists($game_list['id']);
 						
 							echo "\tAdded ".$sane_name." to the sales DB with id: " . $sale_id . ".\n";
 						}

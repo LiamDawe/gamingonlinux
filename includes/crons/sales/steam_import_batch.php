@@ -190,6 +190,8 @@ do
 					$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 6, `accepted` = 1, `$sale_price_field` = ?, `$original_price_field` = ?, `link` = ?", array($game_id, $price_now, $original_price, $link));
 				
 					$sale_id = $dbl->new_id();
+
+					$game_sales->notify_wishlists($game_id);
 				}
 				// update it with the current info
 				else

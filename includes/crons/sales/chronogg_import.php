@@ -74,6 +74,8 @@ if (!empty($game))
 			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 9, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?, `end_date` = ?", array($game_list['id'], $game->sale_price, $game->normal_price, $website, $end_date));
 						
 			$sale_id = $dbl->new_id();
+
+			$game_sales->notify_wishlists($game_list['id']);
 						
 			echo "\tAdded ".$sane_name." to the sales DB with id: " . $sale_id . ".\n";
 		}

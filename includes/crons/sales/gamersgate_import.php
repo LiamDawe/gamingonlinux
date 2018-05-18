@@ -104,6 +104,8 @@ foreach ($xml->item as $game)
 			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 8, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_id, $game->price, $game->srp, $game->link));
 			
 			$sale_id = $dbl->new_id();
+
+			$game_sales->notify_wishlists($game_id);
 			
 			echo "\tAdded ".$new_title." to the sales DB with id: " . $sale_id . ".\n";
 		}

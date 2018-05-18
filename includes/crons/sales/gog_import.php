@@ -137,6 +137,8 @@ do {
 
 					$sale_id = $dbl->new_id();
 
+					$game_sales->notify_wishlists($game_id);
+
 					//echo "\tAdded ".$games['title']." to the sales DB with id: " . $sale_id . ".\n";
 				}
 			}

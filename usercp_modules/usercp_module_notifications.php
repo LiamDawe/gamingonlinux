@@ -132,7 +132,7 @@ if (!isset($_GET['go']))
 				{
 					$note_row = $templating->block_store('wishlist_sale_row', 'usercp_modules/notifications');
 
-					$link = '/sales.php?game_id='.$note_list['sale_game_id'].'&amp;wipe_note=' . $note_list['id'];
+					$link = '/sales.php?game_id='.$note_list['sale_game_id'].'&amp;clear_note=' . $note_list['id'];
 					$title = $note_list['name'];
 
 					$note_row = $templating->store_replace($note_row, array(

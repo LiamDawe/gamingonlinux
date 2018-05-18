@@ -391,8 +391,8 @@ class game_sales
 			}
 
 			$game_id_sql = NULL;
-			$game_id_value = NULL;
-			if (isset($_GET['game_id']))
+			$game_id_value = [];
+			if (isset($_GET['game_id']) && is_numeric($_GET['game_id']))
 			{
 				$game_id_sql = " AND `game_id` = ? ";
 				$game_id_value = [$_GET['game_id']];				

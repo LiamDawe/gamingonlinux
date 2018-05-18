@@ -661,7 +661,16 @@ class core
 		}
 		
 		$templating->load('editor');
-		$templating->block('editor');
+		if (isset($editor['type']) && $editor['type'] == 'simple')
+		{
+			$templating->block('simple_editor');
+			$templating->set('buttons', $custom_options['buttons']);
+		}
+		else
+		{
+			$templating->block('editor');
+		}
+		
 		$templating->set('this_template', $this->config('website_url') . 'templates/' . $this->config('template'));
 		$templating->set('url', $this->config('website_url'));
 		$templating->set('name', $editor['name']);

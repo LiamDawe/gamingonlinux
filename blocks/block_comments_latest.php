@@ -27,13 +27,7 @@ foreach ($fetch_comments as $comments)
 		$title = $comments['title'];
 	}
 
-	$page = 1;
-	if ($comments['comment_count'] > $comments_per_page)
-	{
-		$page = ceil($comments['comment_count'] / $comments_per_page);
-	}
-	
-	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'page=' . $page . '#' . $comments['comment_id']);
+	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
 
 	$machine_time = date("Y-m-d\TH:i:s", $comments['time_posted']) . 'Z';
 

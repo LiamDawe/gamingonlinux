@@ -54,12 +54,6 @@ if (!isset($_GET['go']))
 			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
 			if (isset($_GET['comment_id']) && core::is_number($_GET['comment_id']))
 			{
-				// have they come from a notification/alert box link?
-				if (isset($_GET['clear_note']))
-				{
-					$dbl->run("UPDATE `user_notifications` SET `seen` = 1, `seen_date` = ? WHERE `id` = ? AND `owner_id` = ? AND `seen` = 0", array(core::$date, (int) $_GET['clear_note'], (int) $_SESSION['user_id']));
-				}
-
 				// check comment still exists
 				$check = $dbl->run("SELECT `comment_id` FROM `articles_comments` WHERE `comment_id` = ? AND `article_id` = ?", array((int) $_GET['comment_id'], (int) $_GET['aid']))->fetchOne();
 				if ($check)

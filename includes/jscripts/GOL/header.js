@@ -80,11 +80,27 @@ jQuery.fn.highlight = function () {
             "position": "absolute",
             "left": el.offset().left,
             "top": el.offset().top,
-            "background-color": "#ffff99",
-            "opacity": ".7",
+            "background-color": "#f4f4b7",
+            "opacity": ".6",
             "z-index": "9999999"
         }).appendTo('body').fadeOut(1000).queue(function () { $(this).remove(); });
     });
+}
+
+// get url params like ?stuff=1
+function $_GET(param) {
+	var vars = {};
+	window.location.href.replace( location.hash, '' ).replace( 
+		/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+		function( m, key, value ) { // callback
+			vars[key] = value !== undefined ? value : '';
+		}
+	);
+
+	if ( param ) {
+		return vars[param] ? vars[param] : null;	
+	}
+	return vars;
 }
 
 function disableFunction()
@@ -935,17 +951,35 @@ jQuery(document).ready(function()
 	{
 		e.preventDefault();
 		var comment_id = $(this).attr("data-comment-id");
-		$(this).next('.preview_pm').remove(); // not working, need to remove any attached preview box
+		$(this).parent('div').parent('.simple_ajax_editor').next('.preview_pm').remove();
+		$(this).closest('.simple_ajax_editor').replaceWith(current_comment_text[comment_id]);
+	});
+
+	$(document).on('click', "#save_comment_edit", function(e) // not done yet
+	{
+		e.preventDefault();
+		var comment_id = $(this).attr("data-comment-id");
+		$(this).parent('div').parent('.simple_ajax_editor').next('.preview_pm').remove(); // not working, need to remove any attached preview box
 		$(this).closest('.simple_ajax_editor').replaceWith(current_comment_text[comment_id]);
 	});*/
+
+	/* tagline image gallery */
 
 	$(document).on('click', ".gallery_item", function() 
 	{
 		var filename = $(this).data('filename');
 		var id = $(this).data('id');
+		if($("#draft_id").length == 0) 
+		{
+			var draft_id = 0;
+		}
+		else
+		{
+			var draft_id = $("#draft_id").val();
+		}
 		$('#preview2').html('<img src="/uploads/tagline_gallery/' + filename + '" alt="image" />');
 		$.fancybox.close();
-		$.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id, 'filename':filename });
+		$.post('/includes/ajax/gallery_tagline_sessions.php', { 'id':id, 'filename':filename, 'draft_id': draft_id });
 	});
 
 	$(document).on('click', "#preview_text_button", function() 
@@ -1515,6 +1549,7 @@ jQuery(document).ready(function()
 	$(document).on('change', "#game_filters", function(e)
 	{
 		var form = $("#game_filters");
+		var game_id;
 
 		var formName = form.attr('name');
 		if (formName == 'free')
@@ -1526,6 +1561,11 @@ jQuery(document).ready(function()
 		{
 			var url = "/includes/ajax/sales/display_normal.php";
 			var list_update = 'normal-sales';
+			if (typeof $_GET('game_id') !== 'undefined')
+			{
+				game_id = $_GET('game_id');
+			}
+
 		}
 		else if (formName == 'hidden_steam')
 		{
@@ -1536,7 +1576,7 @@ jQuery(document).ready(function()
 		$.ajax({
 			type: "GET",
 			url: url,
-			data: {'filters': form.serialize()}, 
+			data: {'filters': form.serialize(), 'game_id': game_id}, 
 			success: function(data)
 			{
 				$(form).removeClass('dirty'); // prevent ays dialogue when leaving

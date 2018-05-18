@@ -805,7 +805,7 @@ class article
 	
 	public function display_article_list($article_list, $get_categories)
 	{
-		global $templating, $user;
+		global $user;
 
 		foreach ($article_list as $article)
 		{
@@ -813,37 +813,37 @@ class article
 			$date = $this->core->human_date($article['date']);
 
 			// get the article row template
-			$templating->block('article_row', 'articles');
+			$this->templating->block('article_row', 'articles');
 
 			if ($user->check_group([1,2,5]))
 			{
-				$templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
+				$this->templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
 				if ($article['show_in_menu'] == 0)
 				{
 					if ($this->core->config('total_featured') < 5)
 					{
 						$editor_pick_expiry = $this->core->human_date($article['date'] + 1209600, 'd/m/y');
-						$templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
+						$this->templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
 					}
 					else if ($this->core->config('total_featured') == 5)
 					{
-						$templating->set('editors_pick_link', "");
+						$this->templating->set('editors_pick_link', "");
 					}
 				}
 				else if ($article['show_in_menu'] == 1)
 				{
-					$templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><strong>Remove Editors Pick</strong></a></p>");
+					$this->templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><strong>Remove Editors Pick</strong></a></p>");
 				}
 			}
 
 			else
 			{
-				$templating->set('edit_link', '');
-				$templating->set('editors_pick_link', '');
+				$this->templating->set('edit_link', '');
+				$this->templating->set('editors_pick_link', '');
 			}
 
-			$templating->set('title', $article['title']);
-			$templating->set('user_id', $article['author_id']);
+			$this->templating->set('title', $article['title']);
+			$this->templating->set('user_id', $article['author_id']);
 
 			if ($article['author_id'] == 0)
 			{
@@ -863,9 +863,9 @@ class article
 				$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
 			}
 
-			$templating->set('username', $username);
+			$this->templating->set('username', $username);
 
-			$templating->set('date', $date);
+			$this->templating->set('date', $date);
 
 			$editors_pick = '';
 			if ($article['show_in_menu'] == 1)
@@ -891,17 +891,17 @@ class article
 				}
 			}
 
-			$templating->set('categories_list', $categories_list);
+			$this->templating->set('categories_list', $categories_list);
 
 			$tagline_image = $this->tagline_image($article);
 
-			$templating->set('top_image', $tagline_image);
+			$this->templating->set('top_image', $tagline_image);
 
 			// set last bit to 0 so we don't parse links in the tagline
-			$templating->set('text', $article['tagline']);
+			$this->templating->set('text', $article['tagline']);
 				
-			$templating->set('article_link', $this->get_link($article['article_id'], $article['slug']));
-			$templating->set('comment_count', $article['comment_count']);
+			$this->templating->set('article_link', $this->get_link($article['article_id'], $article['slug']));
+			$this->templating->set('comment_count', $article['comment_count']);
 		}
 	}
 	

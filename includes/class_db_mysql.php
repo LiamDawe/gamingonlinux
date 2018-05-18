@@ -72,7 +72,34 @@ class db_mysql extends PDO
 			include(dirname(dirname(__FILE__)).'/sql_error.html');
 			die();
         }
-    }
+	}
+	
+	/* For inserting multiple rows at the same time
+	EXAMPLE:
+	SQL = insert into `user_notifications` (field1, field2, field3) values
+	Values = array([1,2,3], [4,5,6])
+	*/
+	public function insert_multi($sql, $rows)
+	{
+		$paramArray = array();
+
+		$sqlArray = array();
+
+		foreach($rows as $row)
+		{
+			$sqlArray[] = '(' . str_repeat('?,', count($row) - 1) . '?'  . ')';
+
+			foreach($row as $element)
+			{
+				$paramArray[] = $element;
+			}
+		}
+
+		$sql .= implode(',', $sqlArray);
+		$this->stmt = $this->prepare($sql);
+		$this->stmt->execute($paramArray);
+		$this->counter++;
+	}
 	
 	// This is used for grabbing a single column, setting the data to it directly, so you don't have to call it again
 	// so $result instead of $result['column']

@@ -109,6 +109,8 @@ for ($i = 1; $i <= $xml->channel->totalPages; $i++)
 				$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 3, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `sale_pounds` = ?, `original_pounds` = ?, sale_euro = ?, `original_euro` = ?, `link` = ?", array($game_id, $usd_sale_price, $usd_normal_price, $game->discountPriceGBP, $game->priceGBP, $game->discountPriceEUR, $game->priceEUR, $game->link));
 					
 				$sale_id = $dbl->new_id();
+
+				$game_sales->notify_wishlists($game_id);
 					
 				echo "\tAdded ".$new_title." to the sales DB with id: " . $sale_id . ".\n";
 			}

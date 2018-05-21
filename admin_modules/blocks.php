@@ -231,7 +231,10 @@ else
 				$new_order = $order['order'] + 1;
 
 				// create block
-				$dbl->run("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_link` = ?, `activated` = ?, `order` = ?", array($_POST['name'], $type . "block_" . $_POST['file'], $activated, $new_order));
+				$dbl->run("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_title` = ?, `block_link` = ?, `activated` = ?, `order` = ?", array($_POST['name'], $_POST['name'], $type . "block_" . $_POST['file'], $activated, $new_order));
+
+				$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
+				core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 
 				$core->message("You have succesfully added the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage&{$_POST['type']}\">Manage blocks</a>?");
 			}

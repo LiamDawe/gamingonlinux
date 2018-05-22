@@ -1591,7 +1591,7 @@ jQuery(document).ready(function()
 	$(document).on('click', "#sale-search-form div.eac-item", function(e)
 	{
 		e.preventDefault();
-		var form = $("#sales_filters");
+		var form = $("#game_filters");
 		var text = $(this).text();
 		var url = "/includes/ajax/sales/display_normal.php";
 

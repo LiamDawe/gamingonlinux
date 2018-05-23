@@ -103,6 +103,53 @@
 						</div>
 [/block: article_comments]
 
+[block: blocked_comment]
+<a class="anchor" id="r{:comment_id}"></a>
+<div class="comment blocked-comment group r{:comment_id}">
+	<div class="comment-meta blocked-comment group">
+		<div class="comment-post">
+			Blocked User
+		</div>
+		<div class="comment-actions">
+			<ul>
+				<li><a class="tooltip-top show_blocked" title="Show" href="#" data-comment-id="{:comment_id}"><span class="icon plus"></span></a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<div class="hidden_comment comment group r{:comment_id}">
+	<div class="comment-meta group">
+		<div class="comment-post">
+			{:username} {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr>
+		</div>
+		<div class="comment-actions">
+			<ul>
+				{:report_link}
+				{:edit} {:delete} {:block} {:bookmark}
+				{:link_to_comment}
+				{:logged_in_options}
+			</ul>
+		</div>
+	</div>
+	<div class="comment-author hide-xsmall">
+		<img class="avatar" alt="" src="{:comment_avatar}" />
+		{:user_info_extra}
+		<ul class="comment-badges">
+			{:badges}
+		</ul>
+		<ul class="comment-social">
+			{:profile_fields}
+		</ul>
+	</div>
+	<div id="{:comment_id}" class="comment-body">
+		<div id="text_{:comment_id}">
+			{:text}
+		</div>
+		<div class="likes {:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
+	</div>
+</div>
+[/block: blocked_comment]
+
 [block: logged_in_options]
 <li><a class="tooltip-top quote_function" title="Quote" data-id="{:post_id}" data-type="article_comment"><span class="icon quote">Quote</span></a></li>
 {:like_button}

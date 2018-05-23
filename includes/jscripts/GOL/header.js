@@ -927,6 +927,26 @@ jQuery(document).ready(function()
 		});
 	});
 
+	// show a blocked comment
+	$(document).on('click', ".show_blocked", function(e)
+	{
+		e.preventDefault();
+		var comment_id = $(this).attr("data-comment-id");
+		$('.hidden_comment.r'+comment_id).show();
+		$('.hidden_comment.r'+comment_id).highlight();
+		$(this).addClass('hide_blocked').removeClass('show_blocked');
+		$(this).children('span').addClass('minus').removeClass('plus');
+
+	});
+	// hide a blocked comment
+	$(document).on('click', ".hide_blocked", function(e)
+	{
+		e.preventDefault();
+		var comment_id = $(this).attr("data-comment-id");
+		$('.hidden_comment.r'+comment_id).fadeOut(500);
+		$(this).addClass('show_blocked').removeClass('hide_blocked');
+		$(this).children('span').addClass('plus').removeClass('minus');
+	});	
 	/* Ajax comment editing */
 	/*
 	var current_comment_text = {};
@@ -1588,6 +1608,7 @@ jQuery(document).ready(function()
 		});
 	});
 
+	// sales page search form
 	$(document).on('click', "#sale-search-form div.eac-item", function(e)
 	{
 		e.preventDefault();

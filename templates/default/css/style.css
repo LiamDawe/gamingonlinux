@@ -667,6 +667,12 @@ select.pagination {
 .comment {
 	margin-bottom: 14px;
 }
+.comment.blocked-comment {
+	margin-bottom: 0px;
+}
+.comment .comment-meta.blocked-comment {
+	margin-bottom: 0px;
+}
 .comment .comment-meta {
 	background: #e5e5e5;
 	border-top: 1px solid #cccccc;
@@ -1056,6 +1062,14 @@ ul.social-networks li > a {
 }
 .icon.bookmark {
     background-image: url('../images/comments/bookmark.png');
+		background-size: 10px 14px;
+}
+.icon.plus {
+    background-image: url('../images/comments/plus.svg');
+		background-size: 10px 14px;
+}
+.icon.minus {
+    background-image: url('../images/comments/minus.svg');
 		background-size: 10px 14px;
 }
 .bookmark-saved {background-color: yellow !important;}
@@ -1984,3 +1998,4 @@ span.cookie_action
 	-ms-transform: translateX(26px);
 	transform: translateX(26px);
   }
+  .hidden_comment {display: none;}

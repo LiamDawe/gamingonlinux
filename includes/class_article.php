@@ -911,7 +911,6 @@ class article
 	public function display_comments($article_info)
 	{
 		// get blocked id's
-		$blocked_sql = '';
 		$blocked_ids = [];
 		$blocked_usernames = [];
 		if (count($this->user->blocked_users) > 0)
@@ -921,14 +920,11 @@ class article
 				$blocked_ids[] = $blocked_id[0];
 				$blocked_usernames[] = $username;
 			}
-
-			$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
-			$blocked_sql = "AND a.`author_id` NOT IN ($in)";
 		}
-		
+
 		// count how many there is in total
-		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` a WHERE a.`article_id` = ? AND a.`approved` = 1 $blocked_sql";
-		$total_comments = $this->dbl->run($sql_count, array_merge([$article_info['article']['article_id']], $blocked_ids))->fetchOne();
+		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` a WHERE a.`article_id` = ? AND a.`approved` = 1";
+		$total_comments = $this->dbl->run($sql_count, array($article_info['article']['article_id']))->fetchOne();
 		
 		$per_page = 15;
 		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
@@ -966,27 +962,12 @@ class article
 		$pagination = $this->core->pagination_link($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
 		$pagination_head = $this->core->head_pagination($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
 
-		$comments_top_text = '';
-		if ($total_comments > 0)
-		{
-			$comments_top_text = number_format($total_comments) . ' comment';
-			if ($total_comments > 1)
-			{
-				$comments_top_text .= 's';
-			}
-		}
-		else
-		{
-			$comments_top_text = 'No comments yet!';
-		}
-
 		if ($article_info['article']['comments_open'] == 0)
 		{
 			$this->core->message('The comments on this article are closed.');
 		}
 		
 		$this->templating->block('comments_top', 'articles_full');
-		$this->templating->set('comments_top_text', $comments_top_text);
 		$this->templating->set('pagination_head', $pagination_head);
 		$this->templating->set('pagination', $pagination);
 		
@@ -1060,9 +1041,9 @@ class article
 			$db_grab_fields .= "u.`{$field['db_field']}`,";
 		}
 		
-		$params = array_merge([(int) $article_info['article']['article_id']], $blocked_ids, [$this->core->start], [$per_page]);
+		$params = array_merge([(int) $article_info['article']['article_id']], [$this->core->start], [$per_page]);
 		
-		$comments_get = $this->dbl->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, a.`total_likes`, u.username, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 $blocked_sql ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
+		$comments_get = $this->dbl->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, a.`total_likes`, u.username, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
 		
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
@@ -1078,6 +1059,37 @@ class article
 			}	
 			$user_ids[] = (int) $id_loop['author_id'];
 		}
+
+		/* total comments indicator */
+		$total_hidden = 0;
+
+		foreach ($user_ids as $user_id)
+		{
+			if (in_array($user_id, $blocked_ids))
+			{
+				$total_hidden++;
+			}
+		}
+
+		$comments_top_text = '';
+		if ($total_comments > 0)
+		{
+			$comments_top_text = number_format($total_comments) . ' comment';
+			if ($total_comments > 1)
+			{
+				$comments_top_text .= 's';
+			}
+
+			if ($total_hidden > 0)
+			{
+				$comments_top_text .= ' ('.$total_hidden.' hidden)';
+			}
+		}
+		else
+		{
+			$comments_top_text = 'No comments yet!';
+		}
+		$this->templating->set('comments_top_text', $comments_top_text);
 					
 		if (!empty($like_array))
 		{
@@ -1118,14 +1130,24 @@ class article
 		
 		foreach ($comments_get as $comments)
 		{
+			$comment_date = $this->core->human_date($comments['time_posted']);
+
+			if (in_array($comments['author_id'], $blocked_ids))
+			{
+				$this->templating->block('blocked_comment');
+			}
+			else
+			{
+				$this->templating->block('article_comments', 'articles_full');
+			}
 			// remove blocked users quotes
 			if (count($blocked_usernames) > 0)
 			{
 				foreach($blocked_usernames as $username)
 				{
-					
+						
 					$capture_quotes = preg_split('~(\[/?quote[^]]*\])~', $comments['comment_text'], NULL, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-					
+						
 					// need to count the amount of [quote=?
 					// each time we hit [/quote] take one away from counter
 					// snip the comment between the start and the final index number?
@@ -1155,9 +1177,7 @@ class article
 						}
 					}
 				}
-			}
-			
-			$comment_date = $this->core->human_date($comments['time_posted']);
+			}	
 
 			if ($comments['author_id'] == 0 || empty($comments['username']))
 			{
@@ -1186,13 +1206,13 @@ class article
 
 			// sort out the avatar
 			$comment_avatar = $this->user->sort_avatar($comments);
-						
+							
 			$into_username = '';
 			if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
 			{
 				$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . $this->core->config('website_url') . 'templates/'.$this->core->config('template').'/images/distros/' . $comments['distro'] . '.svg" />';
 			}
-						
+							
 			$pc_info = '';
 			if (isset($comments['pc_info_public']) && $comments['pc_info_public'] == 1)
 			{
@@ -1202,12 +1222,10 @@ class article
 				}
 			}
 
-			$this->templating->block('article_comments', 'articles_full');
+				
 			$this->templating->set('user_id', $comments['author_id']);
 			$this->templating->set('username', $into_username . $username);
 			$this->templating->set('comment_avatar', $comment_avatar);
-			$this->templating->set('date', $comment_date);
-			$this->templating->set('tzdate', date('c',$comments['time_posted']) );
 			$this->templating->set('user_info_extra', $pc_info);
 
 			$cake_bit = '';
@@ -1225,7 +1243,7 @@ class article
 				{
 					$edit_counter = '. Edited ' . $comments['edit_counter'] . ' times.';
 				}
-							
+								
 				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' at ' . $this->core->human_date($comments['last_edited_time']) . $edit_counter . '[/i]';
 			}
 
@@ -1240,7 +1258,7 @@ class article
 				$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
 			}
 			$this->templating->set('who_likes_link', $who_likes_link);
-			
+				
 			$likes_hidden = '';
 			if ($comments['total_likes'] == 0)
 			{
@@ -1265,7 +1283,7 @@ class article
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
 				$logged_in_options = $this->templating->block_store('logged_in_options', 'articles_full');
-				
+					
 				if (isset($article_info['type']) && $article_info['type'] != 'admin')
 				{
 					// sort bookmark icon out
@@ -1306,20 +1324,20 @@ class article
 					{
 						$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="comment" data-id="'.$comments['comment_id'].'" data-article-id="'.$article_info['article']['article_id'].'" data-author-id="'.$comments['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 					}
-					
+						
 					$report_link = "<li><a class=\"tooltip-top\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$article_info['article']['article_id']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
 					
 					if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
 					{
 						$comment_edit_link = "<li><a class=\"tooltip-top edit_comment_link\" data-comment-id=\"{$comments['comment_id']}\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
 					}
-					
+						
 					if ($can_delete == 1 || $_SESSION['user_id'] == $comments['author_id'])
 					{
 						$comment_delete_link = "<li><a class=\"tooltip-top delete_comment\" title=\"Delete\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\" data-comment-id=\"{$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 					}
 				}
-				
+					
 				$logged_in_options = $this->templating->store_replace($logged_in_options, array('post_id' => $comments['comment_id'], 'like_button' => $like_button));
 			}
 			$this->templating->set('logged_in_options', $logged_in_options);
@@ -1333,13 +1351,16 @@ class article
 			$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
 			$badges = user::user_badges($comments, 1);
 			$this->templating->set('badges', implode(' ', $badges));
-						
+							
 			$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
 
 			$this->templating->set('profile_fields', $profile_fields_output);
 
 			// do this last, to help stop templating tags getting parsed in user text
 			$this->templating->set('text', $this->bbcode->parse_bbcode($comments['comment_text'] . $last_edited, 0));
+			
+			$this->templating->set('date', $comment_date);
+			$this->templating->set('tzdate', date('c',$comments['time_posted']) );
 		}
 
 		$this->templating->block('bottom', 'articles_full');

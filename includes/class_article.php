@@ -1048,6 +1048,7 @@ class article
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
 		$sql_replacers = [];
+		$user_ids = [];
 		
 		foreach ($comments_get as $id_loop)
 		{
@@ -1062,12 +1063,14 @@ class article
 
 		/* total comments indicator */
 		$total_hidden = 0;
-
-		foreach ($user_ids as $user_id)
+		if (!empty($user_ids) && !empty($blocked_ids))
 		{
-			if (in_array($user_id, $blocked_ids))
+			foreach ($user_ids as $user_id)
 			{
-				$total_hidden++;
+				if (in_array($user_id, $blocked_ids))
+				{
+					$total_hidden++;
+				}
 			}
 		}
 

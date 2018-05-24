@@ -1921,4 +1921,18 @@ jQuery(document).ready(function()
 			Cookies.set('gol_youtube_consent', 'nope', { expires: 30 });			
 		}
 	});
+
+	/* register page */
+	// disable register button until they agree to privacy pol and spam check
+	$(document).on('change','#policy_agree, #spam_list',function(e)
+	{
+		if ($("#policy_agree").is(':checked') && $("#spam_list").is(':checked') ) 
+		{
+			$('.reg-button').attr('disabled', false);
+		} 
+		else 
+		{
+			$('.reg-button').attr('disabled', true);
+		}
+  });
 });

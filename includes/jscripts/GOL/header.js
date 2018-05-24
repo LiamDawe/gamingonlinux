@@ -15,6 +15,18 @@ jQuery.fn.outerHTML = function() {
 	return (this[0]) ? this[0].outerHTML : '';  
  };
 
+// this is called to show the recaptcha from google on a button press, so we don't load anything from google without consent
+function recaptchacallback() 
+{
+	var public_key = $('#accept_captcha').attr("data-pub-key");
+	grecaptcha.render('hidden_captcha', {
+		sitekey: public_key,
+		callback: function(response) {
+			console.log(response);
+		}
+	});
+}
+
 // scroll to an element if it's not in view, all other ways I could find completely sucked
 jQuery.fn.scrollMinimal = function(smooth)
 {
@@ -1935,5 +1947,11 @@ jQuery(document).ready(function()
 		{
 			$('.reg-button').attr('disabled', true);
 		}
-  });
+	});
+
+	// press button to show reCAPTCHA
+	$(document).on('click','#accept_captcha',function(e)
+	{
+		$.getScript('https://www.google.com/recaptcha/api.js?onload=recaptchacallback&render=explicit');
+	});
 });

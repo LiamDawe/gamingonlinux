@@ -1,5 +1,4 @@
 [block: main]
-<script src="https://www.google.com/recaptcha/api.js"></script>
 <div class="box">
 	<div class="body group">
 		You can use this form to register to become a full user of the website. If you do not see a captcha to prove you are not a bot disable adblock plus. You never see the captcha again once registered.<br />
@@ -23,6 +22,7 @@
 			<label><input id="policy_agree" type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
 			<label><input id="spam_list" type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
 			{:captcha}
+			<div id="hidden_captcha" class="hidden_captcha"></div>
 			<button type="submit" name="register" value="Register" class="btn btn-primary reg-button">Register</button>
 		</form>
 	</div>
@@ -30,7 +30,6 @@
 [/block: main]
 
 [block: twitter_new]
-<script src="https://www.google.com/recaptcha/api.js"></script>
 <div class="box">
 	<div class="body group">
 		You are about to create a new account with twitter, please enter the following details to complete the registration. If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this twitter account.<br />
@@ -49,6 +48,7 @@
 		<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
 		<label><input type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
 		{:captcha}
+		<div id="hidden_captcha" class="hidden_captcha"></div>
 		<input type="submit" value="Register" class="btn btn-primary" />
 		<input type="hidden" name="register" value="twitter" />
 		</form>
@@ -57,7 +57,6 @@
 [/block: twitter_new]
 
 [block: google_new]
-<script src="https://www.google.com/recaptcha/api.js"></script>
 <div class="box">
 	<div class="body group">
 		<p>Hello <strong>{:name}</strong>, you are about to create a <strong>new account</strong> with <strong>Google</strong>, please enter the following details to complete the registration (this only needs to be done once).</p>
@@ -76,6 +75,7 @@
 		<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
 		<label><input type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
 		{:captcha}
+		<div id="hidden_captcha" class="hidden_captcha"></div>
 		<input type="submit" value="Register" class="btn btn-primary" />
 		<input type="hidden" name="register" value="google" />
 		</form>
@@ -84,7 +84,6 @@
 [/block: google_new]
 
 [block: steam_new]
-<script src="https://www.google.com/recaptcha/api.js"></script>
 <div class="well well-sm">
 	Hello <strong>{:username}</strong>! You are about to create a <strong>new account</strong> with Steam, please enter the following details to complete the registration. <br />
 	If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this Steam account.<br />
@@ -102,6 +101,7 @@
 		<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
 		<label><input type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
 		{:captcha}
+		<div id="hidden_captcha" class="hidden_captcha"></div>
 		<input type="submit" value="Register" class="btn btn-primary" />
 		<input type="hidden" name="register" value="steam" />
 	</form>

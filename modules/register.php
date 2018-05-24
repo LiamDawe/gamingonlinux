@@ -12,7 +12,9 @@ if ($core->config('allow_registrations') == 1)
 {
 	if ($core->config('captcha_disabled') == 0 && $core->config('register_captcha') == 1)
 	{
-		$captcha = '<strong>You must do a captcha to register</strong><br />If you don\'t see a captcha below, then <strong>please allow google reCAPTCHA in your privacy plugins</strong>. <div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
+		$captcha = '<strong>You must do a captcha to register</strong><br />
+		We use Google\'s reCAPTCHA, you must agree to their use of cookies to use it. This is to help us prevent spam!
+		<button id="accept_captcha" type="button" data-pub-key="'.$core->config('recaptcha_public').'">Accept & Show reCAPTCHA</button>';
 	}
 
 	else

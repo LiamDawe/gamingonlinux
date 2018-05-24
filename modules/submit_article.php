@@ -7,7 +7,6 @@ if ($get_ip)
 	header('Location: /index.php?module=home');
 	die();
 }
-$core->check_ip_from_stopforumspam(core::$ip);
 
 $templating->load('submit_article');
 
@@ -118,7 +117,9 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'Submit')
 	{
-        $templating->set_previous('title', 'Submit An Article', 1);
+		$templating->set_previous('title', 'Submit An Article', 1);
+
+		$redirect = '/submit-article/';
         
 		$title = strip_tags($_POST['title']);
 		$title = mb_convert_encoding($title, 'UTF-8');
@@ -134,10 +135,20 @@ if (isset($_POST['act']))
         if (isset($_POST['email']))
         {
 			$guest_email = core::make_safe($_POST['email']);
-        }
-        
-		$redirect = '/submit-article/';
+		}
+		
+		if (!isset($_POST['spam_list']))
+		{
+			$_SESSION['atitle'] = $title;
+			$_SESSION['atext'] = $text;
+			$_SESSION['aname'] = $name;
+			$_SESSION['aemail'] = $guest_email;
 
+			$_SESSION['message'] = 'spam_check_agree';
+			header("Location: ".$redirect);
+			die();	
+		}
+        
         if ($_SESSION['user_id'] == 0 && empty($_POST['email']))
         {
             $_SESSION['atitle'] = $title;
@@ -148,7 +159,7 @@ if (isset($_POST['act']))
             $_SESSION['message'] = 'empty';
             $_SESSION['message_extra'] = 'email address';
             
-            header("Location: " . $redirect . "&error");
+            header("Location: " . $redirect);
             die();
         }
         
@@ -164,7 +175,7 @@ if (isset($_POST['act']))
 			$_SESSION['message'] = 'empty';
             $_SESSION['message_extra'] = $check_empty;
 
-            header("Location: " . $redirect . '&error');
+            header("Location: " . $redirect);
             die();
         }
         
@@ -180,7 +191,7 @@ if (isset($_POST['act']))
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = 'text';	
 			
-            header("Location: " . $redirect . '&error');
+            header("Location: " . $redirect);
             die();
 		}
 
@@ -198,7 +209,7 @@ if (isset($_POST['act']))
 			else
 			{
 				$_SESSION['message'] = 'captcha';
-				header("Location: " . $redirect . "error");
+				header("Location: " . $redirect);
 				die();
 			}
 		}
@@ -211,9 +222,11 @@ if (isset($_POST['act']))
 			$_SESSION['aemail'] = $guest_email;
 			
 			$_SESSION['message'] = 'captcha';
-			header("Location: " . $redirect . "&error");
+			header("Location: " . $redirect);
 			die();
 		}
+
+		$core->check_ip_from_stopforumspam(core::$ip);
 
         // carry on and submit the article
         if (($core->config('captcha_disabled') == 0 && $captcha == 1 && $res['success']) || $captcha == 0 || $core->config('captcha_disabled') == 1)

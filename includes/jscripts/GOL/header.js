@@ -1924,6 +1924,7 @@ jQuery(document).ready(function()
 
 	/* register page */
 	// disable register button until they agree to privacy pol and spam check
+	$('.reg-button').attr('disabled', true);
 	$(document).on('change','#policy_agree, #spam_list',function(e)
 	{
 		if ($("#policy_agree").is(':checked') && $("#spam_list").is(':checked') ) 

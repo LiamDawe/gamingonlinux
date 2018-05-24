@@ -307,7 +307,11 @@ class user
 
 		// keeping a log of logins, to review at anytime
 		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d")));
+
+		$expires_date = new DateTime('now');
+		$expires_date->add(new DateInterval('P30D'));
+
+		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d"), $expires_date->format('Y-m-d H:i:s')));
 
 		$this->register_session($generated_session, $device_id);
 	}
@@ -331,7 +335,9 @@ class user
 
 				// update their stay logged in cookie with new details
 				$generated_session = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
-				$this->db->run("UPDATE `saved_sessions` SET `session_id` = ? WHERE `session_id` = ? AND `user_id` = ?", array($generated_session, $_COOKIE['gol_session'], $session_check['user_id']));
+				$expires_date = new DateTime('now');
+				$expires_date->add(new DateInterval('P30D'));
+				$this->db->run("UPDATE `saved_sessions` SET `session_id` = ?, `expires` = ? WHERE `session_id` = ? AND `user_id` = ?", array($generated_session, $expires_date->format('Y-m-d H:i:s'), $_COOKIE['gol_session'], $session_check['user_id']));
 				setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
 
 				// update IP address and last login

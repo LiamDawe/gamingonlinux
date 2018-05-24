@@ -129,5 +129,8 @@ core::$redis->delete('CONFIG_total_users'); // force new cache
 // remove guests from the mailing list if they haven't activated after 7 days
 $dbl->run("DELETE FROM `mailing_list` WHERE `date_added` <= (now() - INTERVAL 7 DAY) AND `activated` = 0")->fetch_all();
 
+// deleted expired sessions
+$dbl->run("DELETE FROM `saved_sessions` WHERE `expires` < NOW() OR `expires` IS NULL");
+
 // update last ran datetime
 $dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);

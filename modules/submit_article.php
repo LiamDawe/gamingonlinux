@@ -18,6 +18,14 @@ if (!$user->can('skip_submit_article_captcha'))
 	$captcha = 1;
 }
 
+$captcha_output = '';
+if ($core->config('captcha_disabled') == 0 && $captcha == 1)
+{
+	$captcha_output = '<strong>You must do a captcha as you are not registered and logged in. Not required to preview.</strong><br />
+	We use Google\'s reCAPTCHA, you must agree to their use of cookies to use it. This is to help us prevent spam!
+	<button id="accept_captcha" type="button" data-pub-key="'.$core->config('recaptcha_public').'">Accept & Show reCAPTCHA</button>';
+}
+
 if (isset($_GET['view']))
 {
     if ($_GET['view'] == 'Submit')
@@ -96,13 +104,6 @@ if (isset($_GET['view']))
         if ($_SESSION['user_id'] != 0)
         {
             $subscribe_box = '<label>Subscribe to article to receive comment replies via email <input type="checkbox" name="subscribe" checked /></label><br />';
-
-        }
-
-        $captcha_output = '';
-        if ($core->config('captcha_disabled') == 0 && $captcha == 1)
-        {
-            $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
         }
 
         $core->article_editor(['content' => '']);
@@ -135,6 +136,42 @@ if (isset($_POST['act']))
         if (isset($_POST['email']))
         {
 			$guest_email = core::make_safe($_POST['email']);
+		}
+		
+		if ($core->config('captcha_disabled') == 0 && $captcha == 1)
+		{
+			if (isset($_POST['g-recaptcha-response']))
+			{
+                $recaptcha=$_POST['g-recaptcha-response'];
+                $google_url="https://www.google.com/recaptcha/api/siteverify";
+                $ip=core::$ip;
+                $url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
+                $res=getCurlData($url);
+                $res= json_decode($res, true);
+			}
+			else
+			{
+				$_SESSION['atitle'] = $title;
+				$_SESSION['atext'] = $text;
+				$_SESSION['aname'] = $name;
+				$_SESSION['aemail'] = $guest_email;
+				
+				$_SESSION['message'] = 'captcha';
+				header("Location: " . $redirect);
+				die();
+			}
+		}
+
+		if ($core->config('captcha_disabled') == 0 && $captcha == 1 && !$res['success'])
+		{
+			$_SESSION['atitle'] = $title;
+			$_SESSION['atext'] = $text;
+			$_SESSION['aname'] = $name;
+			$_SESSION['aemail'] = $guest_email;
+			
+			$_SESSION['message'] = 'captcha';
+			header("Location: " . $redirect);
+			die();
 		}
 		
 		if (!isset($_POST['spam_list']))
@@ -193,37 +230,6 @@ if (isset($_POST['act']))
 			
             header("Location: " . $redirect);
             die();
-		}
-
-		if ($core->config('captcha_disabled') == 0 && $captcha == 1)
-		{
-			if (isset($_POST['g-recaptcha-response']))
-			{
-                $recaptcha=$_POST['g-recaptcha-response'];
-                $google_url="https://www.google.com/recaptcha/api/siteverify";
-                $ip=core::$ip;
-                $url=$google_url."?secret=".$core->config('recaptcha_secret')."&response=".$recaptcha."&remoteip=".$ip;
-                $res=getCurlData($url);
-                $res= json_decode($res, true);
-			}
-			else
-			{
-				$_SESSION['message'] = 'captcha';
-				header("Location: " . $redirect);
-				die();
-			}
-		}
-
-		if ($core->config('captcha_disabled') == 0 && $captcha == 1 && !$res['success'])
-		{
-			$_SESSION['atitle'] = $title;
-			$_SESSION['atext'] = $text;
-			$_SESSION['aname'] = $name;
-			$_SESSION['aemail'] = $guest_email;
-			
-			$_SESSION['message'] = 'captcha';
-			header("Location: " . $redirect);
-			die();
 		}
 
 		$core->check_ip_from_stopforumspam(core::$ip);
@@ -402,12 +408,6 @@ if (isset($_POST['act']))
         {
             $subscribe_box = '<label>Subscribe to article to receive comment replies via email <input type="checkbox" name="subscribe" checked /></label><br />';
 
-        }
-
-        $captcha_output = '';
-        if ($captcha == 1)
-        {
-            $captcha_output = '<strong>You do not have to do this captcha just to Preview!</strong><br /><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
         }
 
         $core->article_editor(['content' => $_POST['text']]);

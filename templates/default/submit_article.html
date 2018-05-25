@@ -1,6 +1,5 @@
 [block: submit]
         <script src="{:url}includes/jscripts/jquery.form.min.js"></script>
-    		<script src="https://www.google.com/recaptcha/api.js"></script>
 			<!-- submit article page -->
 				<div class="box">
           <div class="head">Full article submissions</div>
@@ -33,6 +32,7 @@
 							<strong>These are required.</strong>
 							<label><input type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
 							{:captcha}
+							<div id="hidden_captcha" class="hidden_captcha"></div>
 							{:subscribe_box}
 							<button type="submit" name="act" value="Submit" class="btn btn-primary">Submit</button> <button input type="submit" name="act" value="Preview" class="btn btn-info">Preview</button>
 						</form>
@@ -48,7 +48,6 @@
 [/block: guest_fields]
 
 [block: preview_row]
-    			<script src="https://www.google.com/recaptcha/api.js"></script>
 <script src="includes/jscripts/jquery.form.min.js"></script>
 				<div class="article individual no-image group">
 					<div class="image group">

@@ -101,9 +101,8 @@ if ($total_to_remove > 0)
 	core::$redis->set('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
 }
 
-/* REMOVE COMPLETED ADMIN NOTES OLDER THAN ONE YEAR */
-$year = 365*24*60*60;
-$dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_date <= (created_date - $year)");
+/* REMOVE COMPLETED ADMIN NOTES OLDER THAN ONE MONTH */
+$dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_date <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))");
 
 /* REMOVE SEEN USER NOTIFICATIONS OLDER THAN SIX MONTH */
 $dbl->run("DELETE FROM `user_notifications` WHERE last_date <= (now() - interval 6 month)");

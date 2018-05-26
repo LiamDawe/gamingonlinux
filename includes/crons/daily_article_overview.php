@@ -41,7 +41,7 @@ if ($article_list)
 
 		// message
 		$html_message = "<p>Hello <strong>{$email['username']}</strong>,</p>
-		<p>Here is your daily news digest from GamingOnLinux!</p>" . $email_article_list . $html_addition . '<p>You can unsubscribe by <a href="'.$unsub_link.'">clicking here</a>.';
+		<p>Here is your daily news digest from GamingOnLinux!</p>" . $email_article_list . $html_addition . '<p>You can unsubscribe by <a href="'.$unsub_link.'">clicking here</a>.</p>';
 		
 		$plain_message = PHP_EOL."Hello {$email['username']}, here is your daily news digest from GamingOnLinux!" . $email_article_list_plain . PHP_EOL . $plain_addition . 'You can unsubscribe any time go going here: ' . $unsub_link;
 

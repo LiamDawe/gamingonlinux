@@ -922,9 +922,8 @@ class article
 			}
 		}
 
-		// count how many there is in total
-		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` a WHERE a.`article_id` = ? AND a.`approved` = 1";
-		$total_comments = $this->dbl->run($sql_count, array($article_info['article']['article_id']))->fetchOne();
+		// count how many there is in total, from cache if it exists
+		$total_comments = $this->article_comments_counter($article_info['article']['article_id']);
 		
 		$per_page = 15;
 		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
@@ -1559,6 +1558,9 @@ class article
 				$this->dbl->run("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array((int) $comment_id));
 				$this->dbl->run("DELETE FROM `likes` WHERE `data_id` = ?", array((int) $comment_id));
 
+				// deal with redis comment counter cache
+				$this->article_comments_counter($comment['article_id'], 'remove');
+
 				// update notifications
 
 				// find any notifications caused by the deleted comment
@@ -1604,6 +1606,38 @@ class article
 				return true;
 			}
 		}		
+	}
+
+	// grab total comments or add/remove 1 from the counter using redis cache if it exists
+	function article_comments_counter($article_id, $type = NULL)
+	{
+		// deal with redis comment counter cache
+		$sql_count = "SELECT COUNT(`comment_id`) FROM `articles_comments` a WHERE a.`article_id` = ? AND a.`approved` = 1";
+
+		// setup a cache
+		$querykey = "KEY" . md5($sql_count . serialize($article_id));
+		$total_comments = unserialize(core::$redis->get($querykey)); // check cache
+							
+		if ($total_comments === false || $total_comments === null) // there's no cache
+		{
+			$total_comments = $this->dbl->run($sql_count, array($article_id))->fetchOne();
+			core::$redis->set($querykey, serialize($total_comments), 21600); // cache for six hours
+			return $total_comments;
+		}
+		else
+		{
+			if ($type == 'add')
+			{
+				core::$redis->set($querykey, serialize($total_comments + 1), 21600);
+				$total_comments = $total_comments + 1;
+			}
+			else if ($type == 'remove')
+			{
+				core::$redis->set($querykey, serialize($total_comments - 1), 21600);
+				$total_comments = $total_comments - 1;
+			}
+			return $total_comments;
+		}	
 	}
 
 	function remove_editor_pick($article_id)

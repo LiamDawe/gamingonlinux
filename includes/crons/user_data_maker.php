@@ -6,6 +6,9 @@ Have a database table of:
 - date requested
 - download link
 Housekeeping cron should delete files and database entry older than 1 week
+Mention on the user deletion page they can download their data - mention this will not work if they delete their account before doing so
+Forum replies
+User profile info - should link to index files for other sections?
 */
 ini_set("memory_limit", "-1");
 
@@ -35,6 +38,8 @@ $zip = new ZipArchive();
 
 $zip_name = $user_id_requested.time().core::random_id().'.zip';
 
+/* article comments */
+
 $comment_text = '<p><a href="index.html">Back to index file</a></p>';
 $comment_index_text = 'Here is a list of files showing your comments on <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a>. Any problems with this archive please email contact@gamingonlinux.com.';
 
@@ -55,7 +60,7 @@ if ($total_comments > 0)
 		foreach($comment_loop as $comment)
 		{
 			$counter++;
-			$comment_date = date('y-m-d H:i:s', $comment['time_posted']);
+			$comment_date = date('Y-m-d H:i:s', $comment['time_posted']);
 
 			$title = '';
 			if (isset($comment['title']))
@@ -121,7 +126,8 @@ if ($total_comments > 0)
 	}
 }
 
-// grab their avatar and put it in the archive
+/* user avatar if uploaded */
+
 if ($check_exists['avatar_uploaded'] == 1)
 {
 	$avatar_path = APP_ROOT . '/uploads/avatars/' . $check_exists['avatar'];
@@ -139,6 +145,90 @@ if ($check_exists['avatar_uploaded'] == 1)
 		}
 	}
 }
+
+/* forum topics */
+
+$forum_topics = $dbl->run("SELECT `topic_title`, `creation_date`, `topic_text` FROM `forum_topics` WHERE `author_id` = ?", array($user_id_requested))->fetch_all();
+
+$total_topics = count($forum_topics);
+
+$topics_text = '<p><a href="index.html">Back to index file</a></p>';
+$topics_index_text = 'Here is a list of files showing your forum topics on <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a>. Any problems with this archive please email contact@gamingonlinux.com.';
+
+$topics_files = [];
+
+$counter = 0;
+$file_number = 0;
+if ($total_topics > 0)
+{
+	$topics_index_text .= '<ul>';
+	while($topics_loop = array_splice($forum_topics, 0, 50)) 
+	{
+		$file_number++;
+		foreach($topics_loop as $topic)
+		{
+			$counter++;
+			$topic_date = date('Y-m-d H:i:s', $topic['creation_date']);
+
+			$title = $topic['topic_title'];
+
+			$topics_text .= '<div><strong>Topic title: '.$title.'</strong></div>
+			<div><em>Topic posted on:  '.$topic_date.'</em></div>
+			<div>'.$topic['topic_text'].'</div>';
+
+			if ($counter < $total_topics)
+			{
+				$topics_text .= '<hr />';
+			}
+		}
+
+		$topics_file = $data_folder . $user_id_requested . 'topics_'.$file_number.'.html';
+		file_put_contents($topics_file, $topics_text);
+		$topics_files[$topics_file] = $user_id_requested . 'topics_'.$file_number.'.html';
+		$topics_text = '';
+
+		$topics_index_text .= '<li><a href="' . $user_id_requested . 'topics_'.$file_number.'.html">File: '.$file_number.'</a></li>';
+	}
+	$topics_index_text .= '</ul>';
+
+	// make an index file with links to the other files, zip it, remove the basic file
+	$topics_index_filename = $data_folder . $user_id_requested . 'forum_topics_index.html';
+
+	file_put_contents($topics_index_filename, $topics_index_text);
+
+	if ($zip->open($data_folder.$zip_name, ZipArchive::CREATE) === TRUE) 
+	{
+		$zip->addFile($topics_index_filename, 'forum_topics/index.html');
+		$zip->close();
+		echo 'ok';
+	} 
+	else 
+	{
+		error_log ( 'Failed making zip file for user data request' );
+	}
+
+	unlink($topics_index_filename);
+
+	// now add each comments file to the zip, then remove the basic file
+	foreach ($topics_files as $full_file_path => $file_name)
+	{
+		if ($zip->open($data_folder.$zip_name, ZipArchive::CREATE) === TRUE) 
+		{
+			$zip->addFile($full_file_path, 'forum_topics/'.$file_name);
+			$zip->close();
+			echo 'ok';
+		} 
+		else 
+		{
+			error_log ( 'Failed making forum topics zip file for user data request' );
+		}
+		unlink($full_file_path);
+	}
+}
+
+/* forum replies */
+
+/* user profile */
 
 echo 'Download: <a href="https://www.gamingonlinux.com/uploads/user_data_request/'.$user_id_requested.'/'.$zip_name.'">https://www.gamingonlinux.com/uploads/user_data_request/'.$user_id_requested.'/'.$zip_name.'</a>';
 

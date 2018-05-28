@@ -133,6 +133,13 @@ class db_mysql extends PDO
 		return $this->result;
 	}
 
+	public function rowcount()
+	{
+		$this->result = $this->stmt->rowCount();
+		
+		return $this->result;		
+	}
+
 	function replaced_query($query, $params)
 	{
 		if (isset($params))

@@ -95,7 +95,12 @@ class user
 
 					if ($stay == 1)
 					{
-						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
+						$cookie_domain = false; // allows cookies for localhost dev env
+						if (!empty($this->core->config('cookie_domain')))
+						{
+							$cookie_domain = $this->core->config('cookie_domain');
+						}
+						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain);
 					}
 
 					return true;
@@ -321,7 +326,7 @@ class user
 	{		
 		if (isset($_COOKIE['gol_session']))
 		{
-			$session_check = $this->db->run("SELECT `session_id`, `device-id`, `user_id` FROM `saved_sessions` WHERE `session_id` = ?", array($_COOKIE['gol_session']))->fetch();
+			$session_check = $this->db->run("SELECT `session_id`, `device-id`, `user_id` FROM `saved_sessions` WHERE `session_id` = ? AND `expires` > NOW()", array($_COOKIE['gol_session']))->fetch();
 
 			if ($session_check)
 			{
@@ -337,13 +342,23 @@ class user
 				$generated_session = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 				$expires_date = new DateTime('now');
 				$expires_date->add(new DateInterval('P30D'));
-				$this->db->run("UPDATE `saved_sessions` SET `session_id` = ?, `expires` = ? WHERE `session_id` = ? AND `user_id` = ?", array($generated_session, $expires_date->format('Y-m-d H:i:s'), $_COOKIE['gol_session'], $session_check['user_id']));
-				setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
 
-				// update IP address and last login
-				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
+				$update_session_db = $this->db->run("UPDATE `saved_sessions` SET `session_id` = ?, `expires` = ? WHERE `session_id` = ? AND `user_id` = ?", array($generated_session, $expires_date->format('Y-m-d H:i:s'), $_COOKIE['gol_session'], $session_check['user_id']));
 
-				$this->register_session($session_check['session_id'], $session_check['device-id']);
+				$check_update = $update_session_db->rowcount();
+
+				// database was updated, so we can update the cookie
+				if($check_update == 1)
+				{
+					$cookie_domain = false; // allows cookies for localhost dev env
+					if (!empty($this->core->config('cookie_domain')))
+					{
+						$cookie_domain = $this->core->config('cookie_domain');
+					}
+					
+					setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain);
+				}
+				$this->register_session($generated_session, $session_check['device-id']);
 
 				return true;
 			}

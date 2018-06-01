@@ -961,7 +961,7 @@ class article
 		$pagination = $this->core->pagination_link($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
 		$pagination_head = $this->core->head_pagination($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
 
-		if ($article_info['article']['comments_open'] == 0)
+		if (isset($article_info['article']['comments_open']) && $article_info['article']['comments_open'] == 0) // wont be set for admin areas
 		{
 			$this->core->message('The comments on this article are closed.');
 		}

@@ -7,7 +7,7 @@ error_reporting(-1);
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-if (isset($_GET['Logout']))
+if (isset($_GET['Logout']) && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
 	$user->logout();
 }

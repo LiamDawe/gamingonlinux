@@ -83,6 +83,12 @@ else
 
 	else if (!isset($_POST['act']) && !isset($_GET['go']) && !isset($_GET['view']))
 	{
+		$per_page = 15;
+		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
+		{
+			$per_page = $_SESSION['per-page'];
+		}
+
 		$profile_fields = include 'includes/profile_fields.php';
 
 		$db_grab_fields = '';
@@ -141,13 +147,13 @@ else
 				$total_replies = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
 
 				//lastpage = total pages / items per page, rounded up.
-				if ($total_replies < $_SESSION['per-page'])
+				if ($total_replies < $per_page)
 				{
 					$lastpage = 1;
 				}
 				else
 				{
-					$lastpage = ceil($total_replies/$_SESSION['per-page']);
+					$lastpage = ceil($total_replies/$per_page);
 				}
 
 				// paging for pagination
@@ -206,7 +212,7 @@ else
 				}
 
 				// sort out the pagination link
-				$pagination = $core->pagination_link($_SESSION['per-page'], $total_replies, "/forum/topic/{$_GET['topic_id']}/", $page);
+				$pagination = $core->pagination_link($per_page, $total_replies, "/forum/topic/{$_GET['topic_id']}/", $page);
 
 				// get the template, sort out the breadcrumb
 				$templating->block('top', 'viewtopic');
@@ -453,15 +459,15 @@ else
 					$prev_comments = $dbl->run("SELECT count(`post_id`) FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ? AND `approved` = 1", array($_GET['topic_id'], $_GET['post_id']))->fetchOne();
 					
 					$comments_per_page = $core->config('default-comments-per-page');
-					if (isset($_SESSION['per-page']))
+					if (isset($per_page))
 					{
-						$comments_per_page = $_SESSION['per-page'];
+						$comments_per_page = $per_page;
 					}
 					
 					$comment_page = 1;
 					if ($topic['replys'] > $comments_per_page)
 					{
-						$comment_page = ceil($prev_comments/$_SESSION['per-page']);
+						$comment_page = ceil($prev_comments/$per_page);
 					}
 
 					$post_link = $forum_class->get_link($_GET['topic_id'], 'page=' . $comment_page . '#r' . $_GET['post_id']);
@@ -484,7 +490,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$_SESSION['per-page']}", array($_GET['topic_id'], $core->start))->fetch_all();
+					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$per_page}", array($_GET['topic_id'], $core->start))->fetch_all();
 
 					if ($get_replies)
 					{

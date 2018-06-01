@@ -14,7 +14,7 @@ body {
 	background: #ffffff;
 	color: #404040;
 	font-family: 'Ubuntu', sans-serif;
-	margin: 47px auto;
+	margin: 47px auto 0 auto;
 	padding: 0px;
 	word-wrap: break-word;
 }

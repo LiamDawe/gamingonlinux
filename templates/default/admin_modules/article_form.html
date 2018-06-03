@@ -10,7 +10,7 @@
 				<script src="includes/jscripts/jquery.form.min.js"></script>
 				<div class="box">
 					<div class="body group">
-						<form id="imageform2" method="post" enctype="multipart/form-data" action='includes/ajax/ajax_tagline_upload.php{:draft_id}' style="clear:both">
+						<form id="imageform2" method="post" enctype="multipart/form-data" action='includes/ajax/ajax_tagline_upload.php' style="clear:both">
 							Article tagline image (shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height). Max of {:max_filesize}!
 							<div id='imageloadstatus2' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
 							<div id='imageloadbutton2'>
@@ -20,7 +20,7 @@
 						<div id='preview2'>
 							{:tagline_image}
 						</div>
-						Or use a <a class="gallery_tagline" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/gallery_tagline.php{:draft_id}">Gallery image for the homepage image</a>.
+						Or use a <a class="gallery_tagline" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/gallery_tagline.php">Gallery image for the homepage image</a>.
 					</div>
 				</div>
 				{:main_formaction}

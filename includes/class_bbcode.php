@@ -432,35 +432,37 @@ class bbcode
 		return $text;
 	}
 
+	function youtube_callback($matches)
+	{
+		// this needs to be improved to be a loop like the image proxy
+		$local_cache_maxresdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+		$local_cache_hqdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
+
+		// check for highest res local cache
+		if (file_exists($local_cache_maxresdefault))
+		{
+			$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+		}
+		// check for high quality local cache
+		else if (file_exists($local_cache_hqdefault))
+		{
+			$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
+		}
+		else
+		{
+			$load_image = "/includes/youtube_image_proxy.php?id=" . $matches[1];
+		}
+		return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"$load_image\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept their cookies to view. <a href=\"/index.php?module=cookie_prefs\">View cookie preferences</a>.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show &amp; Accept Cookies</a> </span> &nbsp; <span class=\"badge blue\"><a href=\"https://www.youtube.com/watch?v={$matches[1]}\" target=\"_blank\">Direct Link</a></span></div></div>";
+	}
+
 	// required by GDPR since YouTube don't warn about cookies and tracking before playing
 	function youtube_privacy($text)
 	{
 		if (!isset($_COOKIE['gol_youtube_consent']) || isset($_COOKIE['gol_youtube_consent']) && $_COOKIE['gol_youtube_consent'] == 'nope')
 		{
-			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is",
-			function($matches)
-			{
-				// this needs to be improved to be a loop like the image proxy
-				$local_cache_maxresdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
-				$local_cache_hqdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is","bbcode::youtube_callback",$text);
 
-				// check for highest res local cache
-				if (file_exists($local_cache_maxresdefault))
-				{
-					$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
-				}
-				// check for high quality local cache
-				else if (file_exists($local_cache_hqdefault))
-				{
-					$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
-				}
-				else
-				{
-					$load_image = "/includes/youtube_image_proxy.php?id=" . $matches[1];
-				}
-				return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"$load_image\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept their cookies to view. <a href=\"/index.php?module=cookie_prefs\">View cookie preferences</a>.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show &amp; Accept Cookies</a> </span> &nbsp; <span class=\"badge blue\"><a href=\"https://www.youtube.com/watch?v={$matches[1]}\" target=\"_blank\">Direct Link</a></span></div></div>";
-			},
-			$text);
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(?:.+?)\"\>(?:.+?)\<\/div\>/is","bbcode::youtube_callback",$text);
 		}
 		return $text;
 	}

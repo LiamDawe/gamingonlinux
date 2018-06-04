@@ -45,9 +45,6 @@ if ((isset($message_map::$error) && $message_map::$error == 1|| $message_map::$e
 	$tagline = $_SESSION['atagline'];
 	$text = $_SESSION['atext'];
 	$slug = $_SESSION['aslug'];
-
-	// sort out previously uploaded images
-	$previously_uploaded = $article_class->display_previous_uploads();
 }
 
 $tagline_image = $article_class->display_tagline_image();
@@ -72,10 +69,17 @@ if ($grab_subscribe == 1)
 
 $core->article_editor(['content' => $text]);
 
+// sort out previously uploaded images
+$previously_uploaded = $article_class->display_previous_uploads();
+
 $templating->block('add_bottom', 'admin_modules/admin_module_articles');
+$templating->set('hidden_upload_fields', $previously_uploaded['hidden']);
 $templating->set('website_url', $core->config('website_url'));
-$templating->set('previously_uploaded', $previously_uploaded);
 $templating->set('subscribe_check', $auto_subscribe);
+
+$templating->block('uploads', 'admin_modules/article_form');
+$templating->set('previously_uploaded', $previously_uploaded['output']);
+$templating->set('article_id', '');
 
 if (isset($_POST['act']) && $_POST['act'] == 'publish_now')
 {

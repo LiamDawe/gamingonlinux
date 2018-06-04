@@ -155,7 +155,9 @@ else
 	// add in uploaded images from database
 	$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 
-	$templating->set('previously_uploaded', $previously_uploaded);
+	$templating->block('uploads', 'admin_modules/article_form');
+	$templating->set('previously_uploaded', $previously_uploaded['output']);
+	$templating->set('article_id', $article['article_id']);
 
 	$grab_subscribe = $dbl->run("SELECT `auto_subscribe_new_article` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 

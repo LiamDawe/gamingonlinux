@@ -197,6 +197,10 @@ $(function()
 				if(data=="YES")
 				{
 					$("div[id='"+image_id+"']").replaceWith('<div class="col-md-12" style="background-color: #15e563; padding: 5px;">Image Deleted</div>');
+					if($('.uploads-'+image_id).val())
+					{
+						$('.uploads-'+image_id).remove();
+					}
 					$('html, body').animate({scrollTop: $("#preview").offset().top}, 0);
                 }
 				else
@@ -498,6 +502,7 @@ jQuery(document).ready(function()
 		}
 	}
 
+	// article media uploader (the bottom form)
 	$('#photoimg').off('click').on('change', function()
 	{
 		$("#imageform").ajaxForm({
@@ -507,20 +512,22 @@ jQuery(document).ready(function()
 		},
 		success:function(data)
 		{
-			$("#preview").append(data);
+			$("#uploaded_media").append(data.output);
+			$('#article_editor').append('<input class="uploads-'+data.media_id+'" type="hidden" name="uploads[]" value="'+data.media_id+'" />');
 		    $("#imageloadstatus").hide();
 		    $("#imageloadbutton").show();
 			resetFormElement($('#photoimg'));
 		},
 		error:function(data)
 		{
-			$("#preview").append(data);
+			$("#uploaded_media").append(data);
 		    $("#imageloadstatus").hide();
 		    $("#imageloadbutton").show();
 			resetFormElement($('#photoimg'));
 		}}).submit();
 	});
 
+	// article tagline image
 	$('#photoimg2').off('click').on('change', function()
 	{
 		$("#imageform2").ajaxForm({target: '#preview2',

@@ -91,21 +91,18 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$new_image = $dbl->run("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?, `filetype` = ?", [$image_name, $_SESSION['user_id'], core::$date, $article_id, $ext]);
 					$media_db_id = $new_image->new_id();
 
-					// if they aren't adding the image to an existing article, store it in the session
-					if (!isset($_POST['article_id']) || $_POST['article_id'] == 0)
-					{
-						$_SESSION['uploads'][$media_db_id]['image_name'] = $image_name;
-						$_SESSION['uploads'][$media_db_id]['image_id'] = $media_db_id;
-						$_SESSION['uploads'][$media_db_id]['image_rand'] = $_SESSION['image_rand'];
-					}
-
-					echo '<div class="box">
+					$html_output = '<div class="box">
 					<div class="body group">
 					<div id="'.$media_db_id.'">'.$preview_file.'
 					URL: <input id="img' . $media_db_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $media_db_id . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" data-type="'.$data_type.'" class="add_button">Insert</button> '.$thumbnail_button.' <button id="' . $media_db_id . '" class="trash">Delete Media</button>
 					</div>
 					</div>
 					</div>';
+
+					header('Content-Type: application/json');
+
+					echo json_encode(array("output" => $html_output, "media_id" => $media_db_id));
+					return;
 				}
 
 				else

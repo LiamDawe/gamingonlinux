@@ -48,23 +48,4 @@
 		</form>
 	</div>
 </div>
-<div class="box">
-	<div class="body group">
-		<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajax/admin/article_media_upload.php' style="clear:both">
-			Upload your images, no bigger than 1MB!
-			<div id='imageloadstatus' style='display:none'>
-				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>
-			</div>
-			<div id='imageloadbutton'>
-				<input type="file" name="media[]" id="photoimg" multiple="true" {:edit_state}/>
-			</div>
-			<input type="hidden" name="article_id" value="{:article_id}" />
-		</form>
-	</div>
-</div>
-<div id="preview" class="uploads">
-</div>
-<div class="uploads">
-{:previously_uploaded}
-</div>
 [/block: review_bottom]

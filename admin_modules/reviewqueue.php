@@ -240,11 +240,12 @@ else
 	$templating->set('article_id', $article['article_id']);
 	$templating->set('author_id', $article['author_id']);
 
-	$previously_uploaded = '';
 	// add in uploaded images from database
 	$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 
-	$templating->set('previously_uploaded', $previously_uploaded);
+	$templating->block('uploads', 'admin_modules/article_form');
+	$templating->set('previously_uploaded', $previously_uploaded['output']);
+	$templating->set('article_id', $article['article_id']);
 
 	$article_class->article_history($article['article_id']);
 	

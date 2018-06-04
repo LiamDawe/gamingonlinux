@@ -25,12 +25,12 @@ $article_class->process_categories($article_id);
 $secret_key = core::random_id(15);
 $dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $secret_key));
 
-// update any uploaded images to have this article id, stop any images not being attached to an article
-if (isset($_SESSION['uploads']))
+// attach uploaded media to this article id
+if (isset($_POST['uploads']))
 {
-	foreach($_SESSION['uploads'] as $key)
+	foreach($_POST['uploads'] as $key)
 	{
-		$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
+		$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `id` = ?", array($article_id, $key));
 	}
 }
 

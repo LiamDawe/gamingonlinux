@@ -88,14 +88,36 @@ class article
 
 	function display_previous_uploads($article_id = NULL)
 	{
-		$previously_uploaded = '';
+		$previously_uploaded['output'] = '';
+		$previously_uploaded['hidden'] = '';
+		$article_images = NULL;
 		if ($article_id != NULL)
 		{
 			// add in uploaded images from database
 			$article_images = $this->dbl->run("SELECT `filename`,`id`,`filetype` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
-
+		}
+		else
+		{
+			if (isset($_SESSION['uploads']['article_media']))
+			{
+				$image_ids = [];
+				foreach ($_SESSION['uploads']['article_media'] as $id)
+				{
+					$image_ids[] = $id;
+				}
+				unset($_SESSION['uploads']['article_media']);
+				$in  = str_repeat('?,', count($image_ids) - 1) . '?';
+				$article_images = $this->dbl->run("SELECT `filename`,`id`,`filetype` FROM `article_images` WHERE `id` IN ($in) ORDER BY `id` ASC", $image_ids)->fetch_all();
+			}
+		}
+		if ($article_images)
+		{
 			foreach($article_images as $value)
 			{
+				if ($article_id == NULL)
+				{
+					$previously_uploaded['hidden'] .= '<input class="uploads-'.$value['id'].'" type="hidden" name="uploads[]" value="'.$value['id'].'" />';
+				}
 				$main_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $value['filename'];
 				$main_path = APP_ROOT . '/uploads/articles/article_media/' . $value['filename'];
 				$gif_static_button = '';
@@ -106,19 +128,19 @@ class article
 				{
 					$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
 					$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
-	
+		
 					if ($value['filetype'] == 'gif')
 					{
 						$static_filename = str_replace('.gif', '_static.jpg', $value['filename']);
 						$static_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $static_filename;
 						$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
 					}
-											
+												
 					// for old uploads where no thumbnail was made, make one
 					if (!file_exists($thumb_path) && file_exists($main_path))
 					{
 						include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
-						
+							
 						$img = new SimpleImage();
 						$img->fromFile($main_path)->resize(350, null)->toFile($thumb_path);					
 					}
@@ -132,37 +154,13 @@ class article
 					$preview_file = '<video width="100%" src="'.$main_url.'" controls></video>';
 					$data_type = 'video';
 				}
-        
-				$previously_uploaded .= '<div class="box">
+			
+				$previously_uploaded['output'] .= '<div class="box">
 				<div class="body group">
 				<div id="'.$value['id'].'">'.$preview_file.'
 				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" data-type="'.$data_type.'" class="add_button">Insert</button> '.$thumbnail_button.' <button id="' . $value['id'] . '" class="trash">Delete Media</button>
 				</div>
-				</div>
-				</div>';
-			}
-		}
-		else if ($article_id == NULL)
-		{
-			// sort out previously uploaded images
-			if (isset($_SESSION['uploads']))
-			{
-				foreach($_SESSION['uploads'] as $key)
-				{
-					if ($key['image_rand'] == $_SESSION['image_rand'])
-					{
-						$main_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $key['image_name'];
-						$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $key['image_name'];
-						
-						$previously_uploaded .= '<div class="box uploads">
-						<div class="body group">
-						<div id="'.$key['image_id'].'"><img src="' . $thumb_url . '" class="imgList"><br />
-						URL: <input id="img' . $key['image_id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $key['image_id'] . '">Copy</button> <button data-url="'.$main_url.'" class="add_button">Insert</button> <button data-url="'.$thumb_url.'" class="add_thumbnail_button">Insert thumbnail</button> <button id="' . $key['image_id'] . '" class="trash">Delete image</button>
-						</div>
-						</div>
-						</div>';
-					}
-				}
+				</div></div>';
 			}
 		}
 		return $previously_uploaded;
@@ -220,8 +218,16 @@ class article
 				$tagline_image = trim($article['tagline_image']); // ensure we don't pick up random spaces
 				if (!empty($tagline_image) && $tagline_image != '')
 				{
-					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image']);
-					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image']);
+					$main = $_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/' . $article['tagline_image'];
+					$thumb = $_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/tagline_images/thumbnails/' . $article['tagline_image'];
+					if (file_exists($main))
+					{
+						unlink($main);
+					}
+					if (file_exists($thumb))
+					{
+						unlink($thumb);
+					}
 				}
 			}
 		}
@@ -230,7 +236,16 @@ class article
 		$res = $this->dbl->run("SELECT * FROM `article_images` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();
 		foreach ($res as $image_search)
 		{
-			unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_media/' . $image_search['filename']);
+			$main = $_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_media/' . $image_search['filename'];
+			$thumb = $_SERVER['DOCUMENT_ROOT'] . '/uploads/articles/article_media/thumbs/' . $image_search['filename'];
+			if (file_exists($main))
+			{
+				unlink($main);
+			}
+			if (file_exists($thumb))
+			{
+				unlink($thumb);
+			}
 		}
 
 		$this->dbl->run("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
@@ -459,6 +474,11 @@ class article
 			$_SESSION['atext'] = $text;
 			$_SESSION['acategories'] = $categories;
 
+			if (isset($_POST['uploads']))
+			{
+				$_SESSION['uploads']['article_media'] = $_POST['uploads'];
+			}
+
 			if (isset($_POST['show_article']))
 			{
 				$_SESSION['aactive'] = 1;
@@ -683,12 +703,12 @@ class article
 			}
 		}
 			
-		// upload attached images
-		if (isset($_SESSION['uploads']))
+		// attach uploaded media to this article id
+		if (isset($_POST['uploads']))
 		{
-			foreach($_SESSION['uploads'] as $key)
+			foreach($_POST['uploads'] as $key)
 			{
-				$this->dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($article_id, $key['image_name']));
+				$this->dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `id` = ?", array($article_id, $key));
 			}
 		}
 			

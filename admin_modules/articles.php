@@ -156,7 +156,6 @@ if (isset($_GET['view']))
 
 				else
 				{
-
 					if (isset($categories_check_array) && in_array($categorys['category_id'], $categories_check_array))
 					{
 						$categorys_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
@@ -211,8 +210,6 @@ if (isset($_GET['view']))
 			// add in uploaded images from database
 			$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 
-			$templating->set('previously_uploaded', $previously_uploaded);
-
 			$templating->set('temp_tagline_image', $temp_tagline_image);
 
 			$templating->set('max_height', $core->config('article_image_max_height'));
@@ -221,9 +218,8 @@ if (isset($_GET['view']))
 			$core->article_editor(['content' => $text, 'disabled' => $editor_disabled]);
 
 			$templating->block('edit_bottom', 'admin_modules/admin_module_articles');
+			$templating->set('hidden_upload_fields', $previously_uploaded['hidden']);
 			$templating->set('edit_state', $edit_state);
-
-			$templating->set('previously_uploaded', $previously_uploaded);
 
 			// check if we need to set article appear in the articles block
 			if ($article['show_in_menu'] == 1)
@@ -262,6 +258,10 @@ if (isset($_GET['view']))
 				}
 			}
 
+			$templating->set('article_id', $article['article_id']);
+
+			$templating->block('uploads', 'admin_modules/article_form');
+			$templating->set('previously_uploaded', $previously_uploaded['output']);
 			$templating->set('article_id', $article['article_id']);
 
 			$article_class->article_history($article['article_id']);
@@ -580,11 +580,6 @@ else if (isset($_POST['act']))
 		}
 	}
 
-	if ($_POST['act'] == 'Preview_Submitted')
-	{
-		include('admin_articles_sections/submitted/preview_submitted.php');
-	}
-
 	if ($_POST['act'] == 'Edit')
 	{
 		if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}"))
@@ -607,14 +602,6 @@ else if (isset($_POST['act']))
 			$enabled_check = $dbl->run("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
 			$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, $_POST['article_id']));
-
-			if (isset($_SESSION['uploads']))
-			{
-				foreach($_SESSION['uploads'] as $key)
-				{
-					$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `filename` = ?", array($_POST['article_id'], $key['image_name']));
-				}
-			}			
 
 			$article_class->process_categories($_POST['article_id']);
 

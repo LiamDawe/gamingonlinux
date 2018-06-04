@@ -56,8 +56,16 @@ $upload_stamp = time() - $upload_timeout;
 $grab_all = $dbl->run("SELECT `filename` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($upload_stamp))->fetch_all();
 foreach ($grab_all as $grabber)
 {
-	unlink(APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename']);
-	unlink(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']);
+	$main = APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename'];
+	$thumb = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename'];
+	if (file_exists($main))
+	{
+		unlink($main);
+	}
+	if (file_exists($thumb))
+	{
+		unlink($thumb);
+	}
 }
 
 $dbl->run("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($stamp));

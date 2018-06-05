@@ -36,7 +36,8 @@ if (isset($_POST['act']))
 				$_SESSION['aemail'] = $_POST['email'];
 				$_SESSION['atext'] = $_POST['message'];
 				$_SESSION['message'] = 'captcha';
-				header('Location: /email-us/');			
+				header('Location: /email-us/');	
+				die();		
 			}
 			$recaptcha=$_POST['g-recaptcha-response'];
 			$google_url="https://www.google.com/recaptcha/api/siteverify";

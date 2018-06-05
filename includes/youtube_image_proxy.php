@@ -65,7 +65,7 @@ if (isset($_GET['id']))
 
 	if (!isset($local_file) || empty($local_file))
 	{
-		$local_file = APP_ROOT.'/cache/youtube_thumbs/default.png';
+		$local_file = APP_ROOT.'/templates/default/images/youtube_cache_default.png';
 	}
 
 	header('Content-Type: image/jpeg');

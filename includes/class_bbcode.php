@@ -460,9 +460,9 @@ class bbcode
 	{
 		if (!isset($_COOKIE['gol_youtube_consent']) || isset($_COOKIE['gol_youtube_consent']) && $_COOKIE['gol_youtube_consent'] == 'nope')
 		{
-			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is","bbcode::youtube_callback",$text);
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is","bbcode::youtube_callback",$text);
 
-			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(?:.+?)\"\>(?:.+?)\<\/div\>/is","bbcode::youtube_callback",$text);
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\" style=\"(?:.+?)\"\>(?:.+?)\<\/div\>/is","bbcode::youtube_callback",$text);
 		}
 		return $text;
 	}

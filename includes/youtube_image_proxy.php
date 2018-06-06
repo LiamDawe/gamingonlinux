@@ -16,6 +16,8 @@ if (isset($_GET['id']))
 
 	$youtube_url = "https://img.youtube.com/vi/";
 
+	$video_id = str_replace(array('?rel=0', '?rel=1'), '', $_GET['id']);
+
 	$types = array('maxresdefault.jpg', 'hqdefault.jpg');
 	$total_to_check = count($types);
 
@@ -26,7 +28,7 @@ if (isset($_GET['id']))
 	{
 		$counter++;
 
-		$cache_file_check = APP_ROOT . '/cache/youtube_thumbs/' . md5($youtube_url.$_GET['id'].'/'.$type) . '.jpg';
+		$cache_file_check = APP_ROOT . '/cache/youtube_thumbs/' . md5($youtube_url.$video_id.'/'.$type) . '.jpg';
 		if (file_exists($cache_file_check))
 		{
 			// cache expired for this file, need to download
@@ -52,10 +54,10 @@ if (isset($_GET['id']))
 	{
 		foreach ($types as $type)
 		{
-			$image_raw = core::file_get_contents_curl($youtube_url . $_GET['id'] . '/' . $type);
+			$image_raw = core::file_get_contents_curl($youtube_url . $video_id . '/' . $type);
 			if ($image_raw)
 			{
-				$local_file = APP_ROOT.'/cache/youtube_thumbs/' . md5($youtube_url.$_GET['id'].'/'.$type) . '.jpg';
+				$local_file = APP_ROOT.'/cache/youtube_thumbs/' . md5($youtube_url.$video_id.'/'.$type) . '.jpg';
 				$new_image = imagecreatefromstring($image_raw);
 				imagejpeg($new_image, $local_file);	
 				break;

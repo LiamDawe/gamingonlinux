@@ -679,16 +679,16 @@ class article
 			{
 				$this->dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
 			}
+
+			$article_id = $_POST['article_id'];
 				
 			if ($_SESSION['user_id'] == $author_id)
 			{
 				if (isset($_POST['subscribe']))
 				{
-					$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $_POST['article_id']));
+					$subscribe_them = 1;
 				}
 			}
-				
-			$article_id = $_POST['article_id'];
 		}
 		// otherwise make the new article
 		else
@@ -699,8 +699,18 @@ class article
 				
 			if (isset($_POST['subscribe']))
 			{
-				$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = 1, `send_email` = 1", array($_SESSION['user_id'], $article_id));
+				$subscribe_them = 1;
 			}
+		}
+
+		if (isset($subscribe_them) && $subscribe_them == 1)
+		{
+			// for unsubscribe link in emails
+			$secret_key = core::random_id(15);
+
+			$send_emails = $this->user->user_details['auto_subscribe_email'];
+
+			$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $send_emails, $send_emails, $secret_key));
 		}
 			
 		// attach uploaded media to this article id

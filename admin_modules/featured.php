@@ -127,7 +127,7 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'edit')
 	{
-		$upload = image_upload::featured_image($_POST['article_id'], 0);
+		$upload = $image_upload->featured_image($_POST['article_id'], 0);
 		if ($upload === true)
 		{
 			header("Location: /admin.php?module=featured&view=manage&message=edited");

@@ -105,7 +105,8 @@ class image_upload
 	{
 		if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 4)
 		{
-			return 'nofile';
+			$_SESSION['message'] = 'nofile';
+			return false;
 		}
 
 		$allowed =  array('gif', 'png' ,'jpg');
@@ -113,20 +114,23 @@ class image_upload
 		$ext = pathinfo($filename, PATHINFO_EXTENSION);
 		if(!in_array($ext,$allowed) )
 		{
-    	return 'filetype';
+			$_SESSION['message'] = 'filetype';
+    		return false;
 		}
 
 		// this will make sure it is an image file, if it cant get an image size then its not an image
 		if (!getimagesize($_FILES['new_image']['tmp_name']))
 		{
-			return 'filetype';
+			$_SESSION['message'] = 'filetype';
+    		return false;
 		}
 
 		if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 0)
 		{
 			if (!@fopen($_FILES['new_image']['tmp_name'], 'r'))
 			{
-				return 'nofile';
+				$_SESSION['message'] = 'nofile';
+				return false;
 			}
 
 			else
@@ -158,7 +162,8 @@ class image_upload
 					// cannot compress gifs so it's just too big
 					else if( $image_type == IMAGETYPE_GIF )
 					{
-						return 'File size too big! The max is 300kb, try to use some more compression on it, or find another image.';
+						$_SESSION['message'] = 'toobig';
+						return false;
 					}
 
 					else if( $image_type == IMAGETYPE_PNG )
@@ -183,14 +188,16 @@ class image_upload
 							// still too big
 							if (filesize($_FILES['new_image']['tmp_name']) > 305900)
 							{
-								return 'toobig';
+								$_SESSION['message'] = 'toobig';
+								return false;
 							}
 						}
 
 						// gif so can't reduce it
 						else
 						{
-							return 'toobig';
+							$_SESSION['message'] = 'toobig';
+							return false;
 						}
 					}
 				}
@@ -234,7 +241,11 @@ class image_upload
 					// remove old image
 					if (!empty($image['featured_image']))
 					{
-						unlink($this->core->config('path') . 'uploads/carousel/' . $image['featured_image']);
+						$current_image = $this->core->config('path') . 'uploads/carousel/' . $image['featured_image'];
+						if (file_exists($current_image))
+						{
+							unlink($current_image);
+						}
 						$this->dbl->run("UPDATE `editor_picks` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
 					}
 				}
@@ -255,7 +266,8 @@ class image_upload
 
 			else
 			{
-				return 'cantmove';
+				$_SESSION['message'] = 'cantmove';
+				return false;
 			}
 
 			return true;

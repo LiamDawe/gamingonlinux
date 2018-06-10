@@ -6,20 +6,10 @@ $templating->load('game_servers');
 
 $templating->block('head', 'game_servers');
 
-// setup a cache
-$mem = new Memcached();
-$mem->addServer("127.0.0.1", 11211);
 
 $query = "SELECT s.`id`, g.`name`, s.`connection_info`, s.`official` FROM `game_servers` s INNER JOIN `calendar` g ON g.id = s.game_id ORDER BY s.`id`, s.`official`";
-$querykey = "KEY" . md5($query);
 
-$get_servers = $mem->get($querykey); // check cache
-
-if (!$get_servers) // there's no cache
-{
-	$get_servers = $dbl->run($query)->fetch_all();
-	$mem->set($querykey, $get_servers, 3600); // cache for one hour
-}
+$get_servers = $dbl->run($query)->fetch_all();
 
 if ($get_servers)
 {

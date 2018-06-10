@@ -1,4 +1,6 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+
 class mailer 
 {
     private $mail;
@@ -6,7 +8,9 @@ class mailer
 
     public function __construct($core) 
 	{
-		$this->mail = new PHPMailer();
+		$this->mail = new PHPMailer;
+
+		$this->mail->CharSet = 'UTF-8';
 		$this->core = $core;
 
 		$this->mail->isHTML(true);

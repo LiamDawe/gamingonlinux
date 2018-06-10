@@ -9,7 +9,7 @@ if ($iniGet != "1")
 }
 
 require dirname(__FILE__) . "/loader.php";
-include(dirname(__FILE__) . '/PHPMailer/PHPMailerAutoload.php');
+require dirname(__FILE__) . '/PHPMailer/src/PHPMailer.php';
 
 include (dirname(__FILE__) . '/config.php');
 

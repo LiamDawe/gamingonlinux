@@ -708,9 +708,7 @@ class article
 			// for unsubscribe link in emails
 			$secret_key = core::random_id(15);
 
-			$send_emails = $this->user->user_details['auto_subscribe_email'];
-
-			$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, $send_emails, $send_emails, $secret_key));
+			$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, 1, 1, $secret_key));
 		}
 			
 		// attach uploaded media to this article id

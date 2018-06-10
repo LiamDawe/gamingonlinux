@@ -87,11 +87,23 @@ do
 					$sql_data[] = $link;
 				}
 
-				// if the game list has no picture, grab it and save it
+				// if the game list has no picture or we can't read it (screwed perms?) grab it and save it
+				$download_image = 0;
+				$small_picture_path = $core->config('path') . 'uploads/gamesdb/small/';
 				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
 				{
+					$download_image = 1;
+				}
+				else if (!is_readable($small_picture_path.$game_list['small_picture']))
+				{
+					$download_image = 1;
+				}
+
+				// okay we need to download the image
+				if ($download_image == 1)
+				{
 					$update = 1;
-					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
+					$saved_file = $small_picture_path . $game_list['id'] . '.jpg';
 					$core->save_image($image, $saved_file);
 					$sql_updates[] = '`small_picture` = ?';
 					$sql_data[] = $game_list['id'] . '.jpg';

@@ -111,6 +111,19 @@ class core
 		return true;
 	}
 
+	// check the given date and time is actually a valid date and time
+	public static function validateDate($date, $format = 'Y-m-d H:i:s') 
+	{
+		$dateTime = DateTime::createFromFormat($format, $date);
+	
+		if ($dateTime instanceof DateTime && $dateTime->format($format) == $date) 
+		{
+			return $dateTime->getTimestamp();
+		}
+	
+		return false;
+	}
+
 	// simple helper function to make sure we always have a page number set
 	public static function give_page()
 	{

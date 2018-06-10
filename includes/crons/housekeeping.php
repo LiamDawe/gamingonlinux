@@ -73,11 +73,7 @@ $dbl->run("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_i
 /*
 REMOVE EXPIRED EDITOR PICKS
 */
-$pick_timeout = 1209600; // 14 days
-
-$pick_stamp = time() - $pick_timeout;
-
-$featured = $dbl->run("SELECT p.`article_id`, p.`featured_image`, p.hits, a.date, a.title FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE a.`date` < ?", array($pick_stamp))->fetch_all();
+$featured = $dbl->run("SELECT p.`article_id`, p.`featured_image`, p.hits, a.date, a.title FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE p.`end_date` < now()")->fetch_all();
 
 $games = '';
 

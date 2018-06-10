@@ -22,7 +22,7 @@ if (core::$current_module['module_file_name'] == 'home')
 
 	if ($total_featured == 1)
 	{
-		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> ''")->fetch();
+		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' AND `end_date` > now()")->fetch();
 	}
 	if ($total_featured > 1)
 	{
@@ -37,7 +37,7 @@ if (core::$current_module['module_file_name'] == 'home')
 			$last_featured_sql = 'AND a.article_id != ?';
 		}
 
-		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
+		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' AND `end_date` > now() $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
 
 		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}

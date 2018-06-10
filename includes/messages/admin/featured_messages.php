@@ -31,6 +31,16 @@ return [
 	"added" =>
 	[
 		"text" => "You have added that featured image!"
+	],
+	"end_date_wrong" =>
+	[
+		"text" => "The end date cannot be before the time now.",
+		"error" => 1
+	],
+	"invalid_end_date" =>
+	[
+		"text" => "The end date was not a valid date or time.",
+		"error" => 1
 	]
 ];
 ?>

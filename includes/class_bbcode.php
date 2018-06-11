@@ -176,7 +176,7 @@ class bbcode
 		$URLRegex = '/(?:(?<!(\[\/url\]|\[\/url=))(\s|^))'; // No [url]-tag in front and is start of string, or has whitespace in front
 		$URLRegex.= '(';                                    // Start capturing URL
 		$URLRegex.= '(https?|ftps?|ircs?):\/\/';            // Protocol
-		$URLRegex.= '[\w\d\.\/#\_\-\?:=]+';                        // Any non-space character
+		$URLRegex.= '[\w\d\.\/#\_\-\?:=&;]+';                 // Any non-space character
 		$URLRegex.= ')';                                    // Stop capturing URL
 		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
 

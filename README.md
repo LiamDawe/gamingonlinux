@@ -23,6 +23,14 @@ It is also required to have the following php extentions available:
 - Json
 - BC Math
 
+## PHP Settings
+
+You should really have these set, to make cookies more secure:
+
+- session.cookie_httponly = 1
+- session.use_only_cookies = 1
+- session.cookie_secure = 1 (If you have an SSL cert)
+
 ## Setting up a dev enviroment
 
 Setup apache, PHP and MySQL to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  

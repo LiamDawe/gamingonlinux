@@ -1,13 +1,4 @@
 <?php
-$iniGet = ini_get('session.cookie_httponly');
-
-if ($iniGet != "1") 
-{
-	session_write_close();
-	ini_set('session.cookie_httponly', '1');
-	session_start();
-}
-
 require dirname(__FILE__) . "/loader.php";
 require dirname(__FILE__) . '/PHPMailer/src/PHPMailer.php';
 

@@ -1676,7 +1676,11 @@ class article
 			if ($featured)
 			{
 				$this->dbl->run("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($article_id));
-				unlink($this->core->config('path') . 'uploads/carousel/' . $featured['featured_image']);
+				$featured_image = $this->core->config('path') . 'uploads/carousel/' . $featured['featured_image'];
+				if (file_exists($featured_image))
+				{
+					unlink($featured_image);
+				}
 
 				$this->dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 

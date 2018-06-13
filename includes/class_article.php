@@ -850,8 +850,7 @@ class article
 				{
 					if ($this->core->config('total_featured') < 5)
 					{
-						$editor_pick_expiry = $this->core->human_date($article['date'] + 1209600, 'd/m/y');
-						$this->templating->set('editors_pick_link', " <a class=\"tooltip-top\" title=\"It would expire around now on $editor_pick_expiry\" href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><span class=\"glyphicon glyphicon-heart-empty\"></span> <strong>Make Editors Pick</strong></a></p>");
+						$this->templating->set('editors_pick_link', " <a href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><strong>Make Editors Pick</strong></a></p>");
 					}
 					else if ($this->core->config('total_featured') == 5)
 					{

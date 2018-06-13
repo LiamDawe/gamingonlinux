@@ -1933,10 +1933,12 @@ jQuery(document).ready(function()
 		if (this.checked) 
 		{
 			Cookies.set('gol_youtube_consent', 'yup', { expires: 30 });
+			$(".youtube_status_text").text('On');
 		}
 		else
 		{
 			$("#youtube-cookie-slider").prop('checked', false);
+			$(".youtube_status_text").text('Off');
 			Cookies.set('gol_youtube_consent', 'nope', { expires: 30 });			
 		}
 	});

@@ -116,24 +116,29 @@ $dbl->run("DELETE FROM `user_notifications` WHERE last_date <= (now() - interval
 $dbl->run("DELETE FROM `user_profile_info` WHERE `date_updated` < DATE_SUB(NOW(),INTERVAL 2 YEAR)");
 
 // remove users who aren't activated after 10 days
-
 $say_bye = $dbl->run("SELECT `user_id` FROM `users` WHERE `register_date` <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 10 DAY)) AND `activated` = 0")->fetch_all();
-$total_users = count($say_bye);
-
-foreach ($say_bye as $remove)
+if ($say_bye)
 {
-	$dbl->run("DELETE FROM `users` WHERE `user_id` = ?", array($remove['user_id']));
-	$dbl->run("DELETE FROM `user_profile_info` WHERE `user_id` = ?", array($remove['user_id']));
-	$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ?", array($remove['user_id']));
+	$total_users = count($say_bye);
+
+	foreach ($say_bye as $remove)
+	{
+		$dbl->run("DELETE FROM `users` WHERE `user_id` = ?", array($remove['user_id']));
+		$dbl->run("DELETE FROM `user_profile_info` WHERE `user_id` = ?", array($remove['user_id']));
+		$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ?", array($remove['user_id']));
+	}
+	$dbl->run("UPDATE `config` SET `data_value` = (data_value - ?) WHERE `data_key` = 'total_users'", array($total_users));
+	core::$redis->delete('CONFIG_total_users'); // force new cache
 }
-$dbl->run("UPDATE `config` SET `data_value` = (data_value - ?) WHERE `data_key` = 'total_users'", array($total_users));
-core::$redis->delete('CONFIG_total_users'); // force new cache
 
 // remove guests from the mailing list if they haven't activated after 7 days
 $dbl->run("DELETE FROM `mailing_list` WHERE `date_added` <= (now() - INTERVAL 7 DAY) AND `activated` = 0")->fetch_all();
 
 // delete expired sessions
 $dbl->run("DELETE FROM `saved_sessions` WHERE `expires` < NOW() OR `expires` IS NULL");
+
+// delete expired password reset requests
+$dbl->run("DELETE FROM `password_reset` WHERE `expires` <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 7 DAY))")->fetch_all();
 
 // update last ran datetime
 $dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);

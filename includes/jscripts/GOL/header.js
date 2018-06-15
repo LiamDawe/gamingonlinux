@@ -1590,6 +1590,7 @@ jQuery(document).ready(function()
 	{
 		var form = $("#game_filters");
 		var game_id;
+		var search;
 
 		var formName = form.attr('name');
 		if (formName == 'free')
@@ -1605,6 +1606,10 @@ jQuery(document).ready(function()
 			{
 				game_id = $_GET('game_id');
 			}
+			if ($('#sale-search').val().length > 0)
+			{
+				search = $('#sale-search').val();
+			}
 
 		}
 		else if (formName == 'hidden_steam')
@@ -1616,7 +1621,7 @@ jQuery(document).ready(function()
 		$.ajax({
 			type: "GET",
 			url: url,
-			data: {'filters': form.serialize(), 'game_id': game_id}, 
+			data: {'filters': form.serialize(), 'game_id': game_id, 'q': search}, 
 			success: function(data)
 			{
 				$(form).removeClass('dirty'); // prevent ays dialogue when leaving

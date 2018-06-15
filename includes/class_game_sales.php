@@ -316,6 +316,12 @@ class game_sales
 			parse_str($filters, $filters_sort);
 		}
 
+		// grab their wishlist items
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			$wishlist_items = $this->dbl->run("SELECT `game_id` FROM `user_wishlist` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
+		}
+
 		$this->templating->load('sales');
 
 		// get normal sales
@@ -436,6 +442,20 @@ class game_sales
 			$stores_output = '';
 			foreach ($sales as $store)
 			{
+				$star = '';
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				{
+					if (in_array($store['game_id'], $wishlist_items))
+					{
+						$star = '<a class="change_wishlist tooltip-top" data-type="remove" data-game-id="'.$store['game_id'].'" title="On Wishlist" href="">&#9733;</a>';
+					}
+					else
+					{
+						$star = '<a class="change_wishlist tooltip-top" data-type="add" data-game-id="'.$store['game_id'].'" title="Not On Wishlist" href="">&#9734;</a>';
+					}
+				}
+				$this->templating->set('star', $star);
+
 				$edit = '';
 				if ($this->user->check_group([1,2,5]))
 				{

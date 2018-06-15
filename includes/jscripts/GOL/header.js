@@ -1585,6 +1585,37 @@ jQuery(document).ready(function()
 		});
 	});
 
+	// wishlist
+	$(document).on('click', ".change_wishlist", function(e) 
+	{
+		e.preventDefault();
+		var $this = $(this);
+		var url = "/includes/ajax/sales/wishlist.php";
+		var wish_type = $(this).attr("data-type");
+		var game_id = $(this).attr("data-game-id");
+
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'type': wish_type, 'game_id': game_id}, 
+			success: function(data)
+			{
+				if (data.message == 'Added')
+				{
+					$this.html('&#9733;');
+					$this.attr('data-type', 'remove');
+					$this.highlight();
+				}
+				else if (data.message == 'Removed')
+				{
+					$this.html('&#9734;');
+					$this.attr('data-type', 'add');
+					$this.highlight();
+				}
+			}
+		});
+	});
+
 	// sales & free games page filters
 	$(document).on('change', "#game_filters", function(e)
 	{

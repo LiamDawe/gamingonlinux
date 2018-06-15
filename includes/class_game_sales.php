@@ -381,6 +381,8 @@ class game_sales
 			$search_query = str_replace('+', ' ', $_GET['q']);
 			$where = '%'.$search_query.'%';
 			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`$sale_price_field`, s.$original_price_field, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND c.`name` LIKE ? AND s.`$sale_price_field` IS NOT NULL $options_sql ORDER BY s.`$sale_price_field` ASC", [$where])->fetch_all();
+
+			$search_q = $_GET['q'];
 		}
 		else
 		{
@@ -399,7 +401,11 @@ class game_sales
 			}
 			$sales_sql = "SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`$sale_price_field`, s.$original_price_field, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND s.`$sale_price_field` IS NOT NULL $game_id_sql $options_sql $stores_sql ORDER BY s.`$sale_price_field` ASC";
 			$sales_res = $this->dbl->run($sales_sql, array_merge($store_ids, $game_id_value))->fetch_all();
+
+			$search_q = '';
 		}
+
+		$this->templating->set('search_q', $search_q);
 
 		$sales_merged = [];
 		foreach ($sales_res as $sale)

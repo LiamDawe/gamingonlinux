@@ -280,16 +280,16 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 						$total = bcdiv($total, 1, 2);
 											
 						$min = NULL;
-						if (isset($data_series[1]) && is_numeric($data_series[1]))
+						if (isset($data_series[2]) && is_numeric($data_series[2]))
 						{
-							$min = $data_series[1] + 0;
+							$min = $data_series[2] + 0;
 							$min = bcdiv($min, 1, 2);
 						}
 											
 						$max = NULL;
-						if (isset($data_series[2]) && is_numeric($data_series[2]))
+						if (isset($data_series[3]) && is_numeric($data_series[3]))
 						{
-							$max = $data_series[2] + 0;
+							$max = $data_series[3] + 0;
 							$max = bcdiv($max, 1, 2);
 						}
 						

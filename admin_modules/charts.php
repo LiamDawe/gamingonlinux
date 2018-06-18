@@ -104,7 +104,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$chart_info = $dbl->run("SELECT `name`, `enabled`, `sub_title`, `order_by_data`, `h_label`,`counters_inside`, `grouped` FROM `charts` WHERE `id` = ?", array($chart_id))->fetch();
 
 		$labels = $dbl->run("SELECT `label_id`, `name` FROM `charts_labels` WHERE `chart_id` = ?", array($chart_id))->fetch_all();
-		$datas = $dbl->run("SELECT `data_id`, `data`, `min`, `max`, `data_series` FROM `charts_data` WHERE `chart_id` = ?", array($chart_id))->fetch_all();
+		$datas = $dbl->run("SELECT `data_id`, `data`, `min`, `max`, `data_series`, `label_id` FROM `charts_data` WHERE `chart_id` = ?", array($chart_id))->fetch_all();
 		
 		if ($chart_info)
 		{
@@ -148,22 +148,43 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('h_label', $chart_info['h_label']);
 
 			$label_list = '';
+			$data_list = '';
 			$counter = 1;
 			foreach ($labels as $label)
 			{
 				$label_list .= '<div id="label-'.$counter.'" class="input-field box fleft" style="width: 50%"><span class="addon">Label #'.$counter.':</span><input class="labels" type="text" name="labels['.$label['label_id'].']" value="'.$label['name'].'" /></div><div id="colour-'.$counter.'" class="input-field box fleft" style="width: 50%"><span class="addon">Colour #'.$counter.':</span><input class="colours" type="text" name="colours[]" placeholder="#ffffff" /></div>';
-				$counter++;
 
 				if ($chart_info['grouped'] == 1)
 				{
-					
+					$data_includes = [];
+					foreach ($datas as $data)
+					{
+						if ($data['label_id'] == $label['label_id'])
+						{
+							$data_sorted = $data['data'];
+							if ($data['data_series'] != NULL)
+							{
+								$data_sorted .= ','.$data['data_series'];
+							}
+							if ($data['min'] != NULL)
+							{
+								$data_sorted .= ','.$data['min'];
+							}
+							if ($data['max'] != NULL)
+							{
+								$data_sorted .= ','.$data['max'];
+							}
+							$data_includes[] = $data_sorted;
+						}
+					}
+					$data_list .= '<div id="data-'.$counter.'" class="box">Data for Label #'.$counter.'<textarea class="data" name="data[]" rows="10">'.implode("\r\n",$data_includes).'</textarea></div>';
 				}
+				$counter++;
 			}
 			$templating->set('labels_list', $label_list);
 
 			if ($chart_info['grouped'] == 0)
 			{
-				$data_list = '';
 				$counter = 1;
 				foreach ($datas as $data)
 				{
@@ -448,6 +469,8 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$data_ids = $dbl->run("SELECT `data_id` FROM `charts_data` WHERE `chart_id` = ?", array($chart_id))->fetch_all(PDO::FETCH_COLUMN, 0);
 		}
 
+		$label_counter = 0;
+		$data_counter = 0;
 		foreach ($_POST['labels'] as $label_id => $name)
 		{
 			$dbl->run("UPDATE `charts_labels` SET `name` = ? WHERE `label_id` = ?", array($name, $label_id));
@@ -456,8 +479,8 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			if (isset($_POST['grouped']))
 			{
 				$data = preg_split('/(\\n|\\r)/', $_POST['data'][$label_counter], -1, PREG_SPLIT_NO_EMPTY);
+
 				// put in the data
-				$data_counter = 0;
 				foreach ($data as $dat)
 				{
 					$data_series = explode(',',$dat);
@@ -466,27 +489,24 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 					$total = bcdiv($total, 1, 2);
 											
 					$min = NULL;
-					if (isset($data_series[1]) && is_numeric($data_series[1]))
+					if (isset($data_series[2]) && is_numeric($data_series[2]))
 					{
-						$min = $data_series[1] + 0;
+						$min = $data_series[2] + 0;
 						$min = bcdiv($min, 1, 2);
 					}
 											
 					$max = NULL;
-					if (isset($data_series[2]) && is_numeric($data_series[2]))
+					if (isset($data_series[3]) && is_numeric($data_series[3]))
 					{
-						$max = $data_series[2] + 0;
+						$max = $data_series[3] + 0;
 						$max = bcdiv($max, 1, 2);
 					}
-
-					echo $data_ids[$data_counter];
-
-					die();
 						
 					$dbl->run("UPDATE `charts_data` SET `data` = ?, `data_series` = ?, `min` = ?, `max` = ? WHERE `data_id` = ?", array($data_series[0], trim($data_series[1]), $min, $max, $data_ids[$data_counter]));
 					$data_counter++;
 				}
 			}
+			$label_counter++;
 		}
 
 		if (!isset($_POST['grouped']))

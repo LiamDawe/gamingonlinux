@@ -1,6 +1,7 @@
 <?php
 require dirname(__FILE__) . "/loader.php";
 require dirname(__FILE__) . '/PHPMailer/src/PHPMailer.php';
+require dirname(__FILE__) . '/PHPMailer/src/Exception.php';
 
 include (dirname(__FILE__) . '/config.php');
 

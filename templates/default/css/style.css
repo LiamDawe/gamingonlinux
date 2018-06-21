@@ -1075,6 +1075,11 @@ ul.social-networks li > a {
 .bookmark-saved {background-color: yellow !important;}
 
 /* Dark CSS */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 
+{
+    color: #428BCA;
+    font-weight: 600;
+}
 .dark input[type="text"][readonly] {
     background-color: #000000;
 }

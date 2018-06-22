@@ -59,6 +59,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.extraPlugins = 'html5video';
 	config.extraPlugins = 'youtube';
 	config.removePlugins = 'about';
+	config.extraPlugins = 'pasteFromGoogleDoc';
 
 	config.youtube_responsive = true;
 	config.youtube_related = false;

@@ -52,9 +52,12 @@ do
 			$clean_release_date = steam_release_date($release_date_raw);
 
 			// ADD IT TO THE GAMES DATABASE
-			$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `bundle`, `date`, `stripped_name`, `steam_link` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `small_picture`, `bundle`, `date`, `stripped_name`, `steam_link` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 
-			if (!$game_list)
+			// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+			$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
+
+			if (!$game_list && !$check_dupes)
 			{
 				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1", array($title, $stripped_title, $clean_release_date, $link, $bundle));
 
@@ -68,11 +71,10 @@ do
 			}	
 			else
 			{
-				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 				$game_id = $game_list['id'];
-				if ($game_list['also_known_as'] != NULL && $game_list['also_known_as'] != 0)
+				if ($check_dupes)
 				{
-					$game_id = $game_list['also_known_as'];
+					$game_id = $check_dupes['real_id'];
 				}
 
 				$updated_list[] = $game_id;
@@ -92,10 +94,10 @@ do
 				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
 				{
 					$update = 1;
-					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_id . '.jpg';
 					$core->save_image($image, $saved_file);
 					$sql_updates[] = '`small_picture` = ?';
-					$sql_data[] = $game_list['id'] . '.jpg';
+					$sql_data[] = $game_id . '.jpg';
 				}
 
 				// if we haven't checked if it's a bundle yet

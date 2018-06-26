@@ -56,10 +56,13 @@ do
 			}
 			
 			// ADD IT TO THE GAMES DATABASE
-			$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `bundle`, `date`, `steam_link`, `stripped_name`, `soon_date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `small_picture`, `bundle`, `date`, `steam_link`, `stripped_name`, `soon_date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+
+			// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+			$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
 					
-			if (!$game_list)
-			{
+			if (!$game_list && !$check_dupes)
+			{				
 				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1, `stripped_name` = ?, `soon_date` = ?", array($title, $clean_release_date, $link, $bundle, $stripped_title, $release_date_raw));
 					
 				$new_id = $dbl->new_id();
@@ -72,13 +75,12 @@ do
 			}
 			else
 			{
-				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 				$game_id = $game_list['id'];
-				if ($game_list['also_known_as'] != NULL && $game_list['also_known_as'] != 0)
+				if ($check_dupes)
 				{
-					$game_id = $game_list['also_known_as'];
+					$game_id = $check_dupes['real_id'];
 				}
-					
+
 				$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", array($clean_release_date, $game_id));
 
 				// update rows as needed that are empty
@@ -103,10 +105,10 @@ do
 				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
 				{
 					$update = 1;
-					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_id . '.jpg';
 					$core->save_image($image, $saved_file);
 					$sql_updates[] = '`small_picture` = ?';
-					$sql_data[] = $game_list['id'] . '.jpg';
+					$sql_data[] = $game_id . '.jpg';
 				}
 
 				// If there's no proper date, make sure it's kept up to date for changes

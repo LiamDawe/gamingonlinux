@@ -43,99 +43,26 @@ do
 			$image = $element->find('div.search_capsule img', 0)->src;
 			echo $image . "\n";
 
-			$bundle = 0;
-			if (strpos($link, '/sub/') !== false) 
-			{
-				$bundle = 1;
-			}
-
 			$release_date_raw = $element->find('div.search_released', 0)->plaintext;
 			$clean_release_date = steam_release_date($release_date_raw);
 
 			// ADD IT TO THE GAMES DATABASE
-			$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture`, `bundle`, `date`, `steam_link`, `stripped_name`, `free_game` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+			$game_list = $dbl->run("SELECT 1 FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 				
 			if (!$game_list)
 			{
-				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `free_game` = 1, `bundle` = ?, `approved` = 1, `stripped_name` = ?", array($title, $clean_release_date, $link, $bundle, $stripped_title));
-				
-				$new_id = $dbl->new_id();
-
-				$new_games[] = $new_id;
-
-				$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $new_id . '.jpg';
-				$core->save_image($image, $saved_file);
-				$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$new_id . '.jpg', $new_id]);
-			}
-			else
-			{
-				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
-				$game_id = $game_list['id'];
-				if ($game_list['also_known_as'] != NULL && $game_list['also_known_as'] != 0)
+				$check_dupes = $dbl->run("SELECT 1 FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
+				if (!$check_dupes)
 				{
-					$game_id = $game_list['also_known_as'];
-				}
+					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `free_game` = 1, `approved` = 1, `stripped_name` = ?", array($title, $clean_release_date, $link, $stripped_title));
+					
+					$new_id = $dbl->new_id();
 
-				// update rows as needed that are empty
-				$update = 0;
-				$sql_updates = array();
-				$sql_data = array();
-				if ($game_list['steam_link'] == NULL || $game_list['steam_link'] == '')
-				{
-					$update = 1;
-					$sql_updates[] = '`steam_link` = ?';
-					$sql_data[] = $link;
-				}
+					$new_games[] = $new_id;
 
-				// if the game list has no picture or we can't read it (screwed perms?) grab it and save it
-				$download_image = 0;
-				$small_picture_path = $core->config('path') . 'uploads/gamesdb/small/';
-				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
-				{
-					$download_image = 1;
-				}
-				else if (!is_readable($small_picture_path.$game_list['small_picture']))
-				{
-					$download_image = 1;
-				}
-
-				// okay we need to download the image
-				if ($download_image == 1)
-				{
-					$update = 1;
-					$saved_file = $small_picture_path . $game_list['id'] . '.jpg';
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $new_id . '.jpg';
 					$core->save_image($image, $saved_file);
-					$sql_updates[] = '`small_picture` = ?';
-					$sql_data[] = $game_list['id'] . '.jpg';
-				}
-
-				// if we haven't checked if it's a bundle yet
-				if ($game_list['bundle'] == NULL || $game_list['bundle'] == '')
-				{
-					$update = 1;
-					$sql_updates[] = '`bundle` = ?';
-					$sql_data[] = $bundle;
-				}
-				
-				// if it has no date
-				if ($game_list['date'] == NULL || $game_list['date'] == '')
-				{
-					$update = 1;
-					$sql_updates[] = '`date` = ?';
-					$sql_data[] = $clean_release_date;
-				}
-
-				// if it has no date
-				if ($game_list['free_game'] == NULL || $game_list['free_game'] == 0)
-				{
-					$update = 1;
-					$sql_updates[] = '`free_game` = 1';
-				}
-
-				if ($update == 1)
-				{
-					$sql_data[] = $game_id;
-					$dbl->run("UPDATE `calendar` SET " . implode(', ', $sql_updates) . " WHERE `id` = ?", $sql_data);
+					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$new_id . '.jpg', $new_id]);
 				}
 			}
 		}
@@ -146,7 +73,5 @@ do
 $total_found_new = count($new_games);
 
 echo 'Total new found: ' . $total_found_new . "\n";
-
-//$dbl->run("UPDATE `crons` SET `last_ran` = ?, `data` = ? WHERE `name` = 'steam_sales'", [core::$sql_date_now, $total_on_sale]);
 
 echo "End of Steam Free Games Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

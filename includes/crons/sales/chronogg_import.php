@@ -54,8 +54,11 @@ if (!empty($game))
 					
 		// ADD IT TO THE GAMES DATABASE
 		$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
+
+		// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+		$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($sane_name))->fetch();
 			
-		if (!$game_list)
+		if (!$game_list && !$check_dupes)
 		{
 			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `approved` = 1", array($sane_name));
 			
@@ -63,7 +66,13 @@ if (!empty($game))
 			$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
 		}
 
-		$check_sale = $dbl->run("SELECT 1 FROM `sales` WHERE `game_id` = ? AND `store_id` = 9", array($game_list['id']))->fetch();
+		$game_id = $game_list['id'];
+		if ($check_dupes)
+		{
+			$game_id = $check_dupes['real_id'];
+		}
+
+		$check_sale = $dbl->run("SELECT 1 FROM `sales` WHERE `game_id` = ? AND `store_id` = 9", array($game_id))->fetch();
 						
 		// if it does exist, make sure it's not from Chrono.gg already
 		if (!$check_sale)
@@ -71,11 +80,11 @@ if (!empty($game))
 			$now = new DateTime($game->end_date);
 			$end_date = $now->format('Y-m-d H:m:s');
 
-			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 9, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?, `end_date` = ?", array($game_list['id'], $game->sale_price, $game->normal_price, $website, $end_date));
+			$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 9, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?, `end_date` = ?", array($game_id, $game->sale_price, $game->normal_price, $website, $end_date));
 						
 			$sale_id = $dbl->new_id();
 
-			$game_sales->notify_wishlists($game_list['id']);
+			$game_sales->notify_wishlists($game_id);
 						
 			echo "\tAdded ".$sane_name." to the sales DB with id: " . $sale_id . ".\n";
 		}

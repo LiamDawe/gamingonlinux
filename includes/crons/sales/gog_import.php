@@ -92,9 +92,12 @@ do {
 				echo $image . '<br />';
 
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `also_known_as`, `small_picture` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `small_picture` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
 
-				if (!$game_list)
+				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+				$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($games['title']))->fetch();
+
+				if (!$game_list && !$check_dupes)
 				{
 					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `gog_link` = ?, `approved` = 1", array($games['title'], $games['original_release_date'], $website));
 
@@ -103,27 +106,24 @@ do {
 
 					$game_id = $game_list['id'];
 				}
-				else
+
+				$game_id = $game_list['id'];
+				if ($check_dupes)
 				{
-					// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
-					$game_id = $game_list['id'];
-					if ($game_list['also_known_as'] != NULL && $game_list['also_known_as'] != 0)
-					{
-						$game_id = $game_list['also_known_as'];
-					}
+					$game_id = $check_dupes['real_id'];
 				}
 
 				// if the game list has no picture, grab it and save it
 				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
 				{
-					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_id . '.jpg';
 					$core->save_image($image, $saved_file);
 
 					// make their image match the sizing of Steam images
 					$img = new SimpleImage();
 					$img->fromFile($saved_file)->resize(120, 45)->toFile($saved_file);
 
-					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_list['id'] . '.jpg', $game_list['id']]);
+					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_id . '.jpg', $game_id]);
 				}
 
 				$on_sale[] = $game_id;

@@ -86,27 +86,36 @@ do
 					
 						// ADD IT TO THE GAMES DATABASE
 						$game_list = $dbl->run("SELECT `id`, `stripped_name` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
+
+						// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+						$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($sane_name))->fetch();
 			
-						if (!$game_list)
+						if (!$game_list && !$check_dupes)
 						{
 							$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `approved` = 1", array($sane_name,$stripped_title, date('Y-m-d')));// they don't give the release date, just add in today's date, we can fix manually later if/when we need to
 			
 							// need to grab it again
 							$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
 						}
-			
-						$on_sale[] = $game_list['id'];
 
-						$check_sale = $dbl->run("SELECT `id`, `sale_dollars` FROM `sales` WHERE `game_id` = ? AND `store_id` = 4", array($game_list['id']))->fetch();
+						$game_id = $game_list['id'];
+						if ($check_dupes)
+						{
+							$game_id = $check_dupes['real_id'];
+						}
+			
+						$on_sale[] = $game_id;
+
+						$check_sale = $dbl->run("SELECT `id`, `sale_dollars` FROM `sales` WHERE `game_id` = ? AND `store_id` = 4", array($game_id))->fetch();
 						
 						// if it does exist, make sure it's not from HUMBLE already
 						if (!$check_sale)
 						{
-							$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 4, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_list['id'], $game->current_price[0], $game->full_price[0], $website));
+							$dbl->run("INSERT INTO `sales` SET `game_id` = ?, `store_id` = 4, `accepted` = 1, `sale_dollars` = ?, `original_dollars` = ?, `link` = ?", array($game_id, $game->current_price[0], $game->full_price[0], $website));
 						
 							$sale_id = $dbl->new_id();
 
-							$game_sales->notify_wishlists($game_list['id']);
+							$game_sales->notify_wishlists($game_id);
 						
 							echo "\tAdded ".$sane_name." to the sales DB with id: " . $sale_id . ".\n";
 						}

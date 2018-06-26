@@ -121,10 +121,13 @@ do
 				echo 'SteamID: ' . $steam_id . "\n";
 
 				// ADD IT TO THE GAMES DATABASE
-				$select_sql = "SELECT `id`, `also_known_as`, `small_picture`, `steam_id`, `bundle`, `date`, `stripped_name` FROM `calendar` WHERE `name` = ?";
+				$select_sql = "SELECT `id`, `small_picture`, `steam_id`, `bundle`, `date`, `stripped_name` FROM `calendar` WHERE `name` = ?";
 				$game_list = $dbl->run($select_sql, array($title))->fetch();
+
+				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+				$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
 				
-				if (!$game_list)
+				if (!$game_list && !$check_dupes)
 				{
 					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $stripped_title, $clean_release_date, $link, $steam_id, $bundle));
 				
@@ -135,11 +138,10 @@ do
 				}
 				else
 				{
-					// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 					$game_id = $game_list['id'];
-					if ($game_list['also_known_as'] != NULL && $game_list['also_known_as'] != 0)
+					if ($check_dupes)
 					{
-						$game_id = $game_list['also_known_as'];
+						$game_id = $check_dupes['real_id'];
 					}
 				
 					$dbl->run("UPDATE `calendar` SET `steam_link` = ? WHERE `id` = ?", array($link, $game_id));
@@ -148,9 +150,9 @@ do
 				// if the game list has no picture, grab it and save it
 				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
 				{
-					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_list['id'] . '.jpg';
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_id . '.jpg';
 					$core->save_image($image, $saved_file);
-					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_list['id'] . '.jpg', $game_list['id']]);
+					$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$game_id . '.jpg', $game_id]);
 				}
 
 				// if it has no steam_id, give it one

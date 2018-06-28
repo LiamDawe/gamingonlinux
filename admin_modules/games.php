@@ -89,7 +89,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	{
 		$templating->block('quick_links');
 
-		$game_res = $dbl->run("SELECT g.id, g.name, c.`category_name`, c.category_id, s.`suggested_by_id` FROM calendar g INNER JOIN `game_genres_suggestions` s ON s.game_id = g.id INNER JOIN `articles_categorys` c ON s.genre_id = c.category_id GROUP BY s.suggested_by_id, g.`id`, c.category_id")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
+		$game_res = $dbl->run("SELECT g.id, g.name, g.link, g.gog_link, g.steam_link, g.itch_link, c.`category_name`, c.category_id, s.`suggested_by_id` FROM calendar g INNER JOIN `game_genres_suggestions` s ON s.game_id = g.id INNER JOIN `articles_categorys` c ON s.genre_id = c.category_id GROUP BY s.suggested_by_id, g.`id`, c.category_id")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
 
 		if ($game_res)
 		{
@@ -115,6 +115,24 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set('suggested_list', $suggested_list);
 				$templating->set('time', core::$date);
 				$templating->set('suggested_by_id', $tags[0]['suggested_by_id']);
+
+				// sort out the external links we have for it
+				$external_links = 'None';
+				$links_array = [];
+				$link_types = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];
+				foreach ($link_types as $key => $text)
+				{
+					if (!empty($tags[0][$key]))
+					{
+						$links_array[] = '<a href="'.$tags[0][$key].'" target="_blank">'.$text.'</a>';
+					}
+				}
+
+				if (!empty($links_array))
+				{
+					$external_links = implode(', ', $links_array);
+				}
+				$templating->set('external_links', $external_links);
 			}
 		}
 		else

@@ -84,26 +84,28 @@
 [/block: google_new]
 
 [block: steam_new]
-<div class="well well-sm">
-	Hello <strong>{:username}</strong>! You are about to create a <strong>new account</strong> with Steam, please enter the following details to complete the registration. <br />
-	If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this Steam account.<br />
-	<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
-	<form method="post" action="/index.php?module=register">
-		Timezone:<br />
-		{:timezone_list}
-		Username, please use plain text (we firmly suggest <strong>not</strong> using your real name): <br />
-		<input class="keyup-char ays-ignore" type="text" name="username" /><br />
-		<div class="register-warning"><div class="input-alert-text">We only allow letters, numbers, "-" and "_" characters in usernames.</div></div>
-		Email: <br />
-		<input class="ays-ignore" type="text" name="uemail" /><br />
-		<em>Your email address will never be shared with anyone. It's so you can verify your account and so we can see you're not a bot. It also enables you to get notified of replies to comments and forum posts, if you choose to do so.</em><br />
-		<strong>These are required.</strong><br />
-		<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
-		<label><input type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
-		{:captcha}
-		<div id="hidden_captcha" class="hidden_captcha"></div>
-		<input type="submit" value="Register" class="btn btn-primary" />
-		<input type="hidden" name="register" value="steam" />
-	</form>
+<div class="box">
+	<div class="body group">
+		Hello <strong>{:username}</strong>! You are about to create a <strong>new account</strong> with Steam, please enter the following details to complete the registration. <br />
+		If you want to link it to an existing account, you need to login normally and do this from the user control panel home page. As this creates a whole new user linked with this Steam account.<br />
+		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
+		<form method="post" action="/index.php?module=register">
+			Timezone:<br />
+			{:timezone_list}
+			Username, please use plain text (we firmly suggest <strong>not</strong> using your real name): <br />
+			<input class="keyup-char ays-ignore" type="text" name="username" /><br />
+			<div class="register-warning"><div class="input-alert-text">We only allow letters, numbers, "-" and "_" characters in usernames.</div></div>
+			Email: <br />
+			<input class="ays-ignore" type="text" name="uemail" /><br />
+			<em>Your email address will never be shared with anyone. It's so you can verify your account and so we can see you're not a bot. It also enables you to get notified of replies to comments and forum posts, if you choose to do so.</em><br />
+			<strong>These are required.</strong><br />
+			<label><input type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
+			<label><input type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
+			{:captcha}
+			<div id="hidden_captcha" class="hidden_captcha"></div>
+			<input type="submit" value="Register" class="btn btn-primary" />
+			<input type="hidden" name="register" value="steam" />
+		</form>
+	</div>
 </div>
 [/block: steam_new]

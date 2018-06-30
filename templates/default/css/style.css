@@ -516,15 +516,11 @@ select.pagination {
 }
 .article .info .desc {
 	border-top: 1px solid #cccccc;
-	border-bottom: 1px solid #cccccc;
 	padding: 7px 0;
 	margin: 7px 0;
 }
 .article .content {
 	padding: 0 14px;
-}
-.article .tags {
-	padding: 7px 0;
 }
 .article .tags ul {
 	list-style: none;
@@ -1138,7 +1134,6 @@ ul.social-networks li > a {
 }
 .dark .article .info .desc {
     border-top: 1px solid #111111;
-    border-bottom: 1px solid #111111;
 }
 .dark .article.individual .info {
 	border-bottom: 1px solid #111111;

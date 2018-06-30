@@ -2035,6 +2035,10 @@ input:checked + .slider:before
     position: relative;
 }
 
+.dark .comments-pip a {
+    color: #fff;
+}
+
 .comments-pip a:after {
     position: absolute;
     bottom: -3px;

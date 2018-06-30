@@ -2,7 +2,7 @@
 $templating->set_previous('title', 'About Us', 1);
 $templating->set_previous('meta_description', 'About Us information for GamingOnLinux', 1);
 
-if ($filecache->check_cache('about_us', 1)) // 1 week cache, almost never needed to update
+if ($filecache->check_cache('about_us', 604800)) // 1 week cache, almost never needed to update
 {
 	$templating->get_cache('about_us');
 }

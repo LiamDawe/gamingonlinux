@@ -838,7 +838,11 @@ class article
 		foreach ($article_list as $article)
 		{
 			// make date human readable
-			$date = $this->core->human_date($article['date']);
+			$date = $this->core->human_date($article['date'], 'j F Y');
+
+			$machine_time = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
+
+			$article_date = "<time class=\"timeago\" datetime=\"$machine_time\">{$date}</time>";
 
 			// get the article row template
 			$this->templating->block('article_row', 'articles');
@@ -892,7 +896,7 @@ class article
 
 			$this->templating->set('username', $username);
 
-			$this->templating->set('date', $date);
+			$this->templating->set('date', $article_date);
 
 			$editors_pick = '';
 			if ($article['show_in_menu'] == 1)

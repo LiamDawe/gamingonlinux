@@ -53,10 +53,7 @@ class user
 			{
 				if ($this->stay_logged_in() == false) // make a guest session if they aren't saved
 				{
-					$_SESSION['user_id'] = 0;
-					$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
-					$_SESSION['articles-per-page'] = 15;
-					$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gallery' => NULL];
+					$this->guest_session();
 				}
 			}
 			
@@ -68,6 +65,14 @@ class user
 				return;
 			}
 		}
+	}
+
+	function guest_session()
+	{
+		$_SESSION['user_id'] = 0;
+		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
+		$_SESSION['articles-per-page'] = 15;
+		$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gallery' => NULL];		
 	}
 
 	// normal login form
@@ -403,6 +408,8 @@ class user
 
 		$this->user_details = [];
 
+		$this->guest_session();
+
 		if ($banned == 1)
 		{
 			$_SESSION['message'] = 'banned';
@@ -437,6 +444,10 @@ class user
 		{
 			foreach ($check_groups as $group)
 			{
+				if (!$this->user_groups || $this->user_groups == NULL)
+				{
+					error_log("No user groups listed, from page: " . 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+				}
 				if ( in_array($group, $this->user_groups) )
 				{
 					return true;

@@ -970,7 +970,7 @@ jQuery(document).ready(function()
 		$(this).children('span').addClass('plus').removeClass('minus');
 	});	
 	/* Ajax comment editing */
-	
+	/*
 	var current_comment_text = {};
 	$(document).on('click', ".edit_comment_link", function(e)
 	{
@@ -1028,7 +1028,7 @@ jQuery(document).ready(function()
 		});	
 
 		
-	});
+	});*/
 
 	/* tagline image gallery */
 

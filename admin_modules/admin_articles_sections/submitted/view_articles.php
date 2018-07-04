@@ -313,6 +313,8 @@ else if (isset($_GET['aid']))
 
 	$templating->set('self_check', $self_check);
 
+	$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
+
 	$templating->block('uploads', 'admin_modules/article_form');
 	$templating->set('previously_uploaded', $previously_uploaded['output']);
 	$templating->set('article_id', $article['article_id']);

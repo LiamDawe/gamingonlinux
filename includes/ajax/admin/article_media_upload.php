@@ -14,6 +14,8 @@ if ($user->check_group([1,2,5]) == false)
 	die('You should not be here.');
 }
 
+header('Content-Type: application/json');
+
 define ("MAX_SIZE",50*1024*1024); // 50MB
 function getExtension($str)
 {
@@ -24,6 +26,7 @@ function getExtension($str)
          return $ext;
 }
 
+$return_data = [];
 $valid_formats = array("jpg", "png", "gif", "jpeg", "svg", 'mp4', 'webm');
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 {
@@ -99,10 +102,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					</div>
 					</div>';
 
-					header('Content-Type: application/json');
-
-					echo json_encode(array("output" => $html_output, "media_id" => $media_db_id));
-					return;
+					$return_data[] = array('output' => $html_output, "media_id" => $media_db_id);
 				}
 
 				else
@@ -123,6 +123,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 		}
 
 	}
+	echo json_encode(array("data" => $return_data));
+	return;
 }
-
 ?>

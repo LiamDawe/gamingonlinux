@@ -512,11 +512,14 @@ jQuery(document).ready(function()
 		},
 		success:function(data)
 		{
-			$("#uploaded_media").append(data.output);
-			$('#article_editor').append('<input class="uploads-'+data.media_id+'" type="hidden" name="uploads[]" value="'+data.media_id+'" />');
-		    $("#imageloadstatus").hide();
-		    $("#imageloadbutton").show();
-			resetFormElement($('#photoimg'));
+			$.each(data.data, function(index) 
+			{
+				$("#uploaded_media").append(data.data[index].output);
+				$('#article_editor').append('<input class="uploads-'+data.data[index].media_id+'" type="hidden" name="uploads[]" value="'+data.data[index].media_id+'" />');
+				$("#imageloadstatus").hide();
+				$("#imageloadbutton").show();
+				resetFormElement($('#photoimg'));
+			});
 		},
 		error:function(data)
 		{
@@ -967,7 +970,7 @@ jQuery(document).ready(function()
 		$(this).children('span').addClass('plus').removeClass('minus');
 	});	
 	/* Ajax comment editing */
-	/*
+	
 	var current_comment_text = {};
 	$(document).on('click', ".edit_comment_link", function(e)
 	{
@@ -977,9 +980,9 @@ jQuery(document).ready(function()
 		current_comment_text[comment_id] = $("#text_"+comment_id)[0].outerHTML;
 
 		$.ajax({
-			type: "GET",
+			type: "POST",
 			url: url,
-			data: {'comment_id': comment_id}, 
+			data: {'comment_id': comment_id, 'type': 'show_plain'}, 
 			success: function(data)
 			{
 				$("#text_"+comment_id).replaceWith(data);
@@ -999,9 +1002,33 @@ jQuery(document).ready(function()
 	{
 		e.preventDefault();
 		var comment_id = $(this).attr("data-comment-id");
-		$(this).parent('div').parent('.simple_ajax_editor').next('.preview_pm').remove(); // not working, need to remove any attached preview box
-		$(this).closest('.simple_ajax_editor').replaceWith(current_comment_text[comment_id]);
-	});*/
+		var container = $(this).parent('div').parent('.simple_ajax_editor');
+		//$(this).parent('div').parent('.simple_ajax_editor').next('.preview_pm').remove();
+		var url = "/includes/ajax/edit_comment.php";
+		var new_comment_text = $('#ajax_comment_edit').val();
+
+		container.next('.preview_pm').remove();
+
+		$.ajax({
+			type: "POST",
+			url: url,
+			dataType:"json",
+			data: {'comment_id': comment_id, 'type': 'do_edit', 'text': new_comment_text}, 
+			success: function(data)
+			{
+				if (data.error)
+				{
+					container.replaceWith(current_comment_text[comment_id] + data.message);
+				}
+				else
+				{
+					$(this).closest('.simple_ajax_editor').replaceWith(data.text);
+				}
+			}
+		});	
+
+		
+	});
 
 	/* tagline image gallery */
 

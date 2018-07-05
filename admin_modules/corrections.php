@@ -44,8 +44,10 @@ if ($res)
 		$templating->set('username', $username);
 		$templating->set('title', $corrections['title']);
     	$templating->set('article_link', $article_link);
-    	$templating->set('correction', $bbcode->parse_bbcode($corrections['correction_comment']));
+		$templating->set('correction', $bbcode->parse_bbcode($corrections['correction_comment']));
+		$templating->set('correction_text_plain', $corrections['correction_comment']);
 		$templating->set('correction_id', $corrections['row_id']);
+		$templating->set('reporter_id', $corrections['user_id']);
 	}
 
     $templating->block('bottom', 'admin_modules/corrections');
@@ -55,7 +57,6 @@ else
 {
 	$core->message('Nothing to display! There are no suggestions.');
 }
-
 
 if (isset($_POST['act']) && $_POST['act'] == 'delete')
 {
@@ -67,15 +68,78 @@ if (isset($_POST['act']) && $_POST['act'] == 'delete')
 		die();
 	}
 
-	else
+	if (isset($_GET['message']))
 	{
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'article_correction' AND `data` = ?", array(core::$date, $_POST['correction_id']));
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_correction', $_POST['correction_id']));
-		$dbl->run("DELETE FROM `article_corrections` WHERE `row_id` = ?", array($_POST['correction_id']));
+		$text = trim($_POST['text']);
+		$text = core::make_safe($text);
+		$reporter_id = $_POST['reporter_id'];
 
-		$_SESSION['message'] = 'deleted';
-		$_SESSION['message_extra'] = 'correction';
-		header("Location: /admin.php?module=corrections&message=deleted");
+		$title = 'Your correction on: ' . $_POST['correction_title'];
+	
+		// check empty
+		$check_empty = core::mempty(compact('text'));
+		if ($check_empty !== true)
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $check_empty;
+			header("Location: /admin.php?module=corrections");
+			die();
+		}
+		
+		$text = 'Your correction report was: [quote]'.$_POST['correction_text'].'[/quote]' . $text;
+
+		// make the new message
+		$dbl->run("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));
+
+		$conversation_id = $dbl->new_id();
+
+		$dbl->run("INSERT INTO `user_conversations_messages` SET `conversation_id` = ?, `author_id` = ?, `creation_date` = ?, `message` = ?, `position` = 0", array($conversation_id, $_SESSION['user_id'], core::$date, $text));
+
+		$dbl->run("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 0", array($conversation_id, $_SESSION['user_id']));
+
+		// make the duplicate message for the reporter
+		$dbl->run("INSERT INTO `user_conversations_info` SET `conversation_id` = ?, `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($conversation_id, $title, core::$date, $_SESSION['user_id'], $reporter_id, core::$date, $_SESSION['user_id']));
+
+		$dbl->run("INSERT INTO `user_conversations_participants` SET `conversation_id` = ?, `participant_id` = ?, unread = 1", array($conversation_id, $reporter_id));
+
+		// email user to tell them they have a new convo, if allowed
+		$email_data = $dbl->run("SELECT `username`, `email`, `email_on_pm` FROM `users` WHERE `user_id` = ?", array($reporter_id))->fetch();
+
+		if ($email_data['email_on_pm'] == 1)
+		{
+			// subject
+			$subject = 'New conversation started on GamingOnLinux';
+
+			$email_text = $bbcode->email_bbcode($text);
+
+			$message = '';
+
+			// message
+			$html_message = "<p>Hello <strong>{$email_data['username']}</strong>,</p>
+			<p><strong>{$_SESSION['username']}</strong> has started a new conversation with you on <a href=\"".$core->config('website_url')."private-messages/\" target=\"_blank\">GamingOnLinux</a>, titled \"<a href=\"".$core->config('website_url')."private-messages/{$conversation_id}\" target=\"_blank\"><strong>{$title}</strong></a>\".</p>
+			<br style=\"clear:both\">
+			<div>
+			<hr>
+			{$email_text}";
+
+			$plain_message = PHP_EOL."Hello {$email_data['username']}, {$_SESSION['username']} has started a new conversation with you on ".$core->config('website_url')."private-messages/, titled \"{$title}\",\r\n{$_POST['text']}";
+
+			// Mail it
+			if ($core->config('send_emails') == 1)
+			{
+				$mail = new mailer($core);
+				$mail->sendMail($email_data['email'], $subject, $html_message, $plain_message);
+			}
+		}
 	}
+
+
+	$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'article_correction' AND `data` = ?", array(core::$date, $_POST['correction_id']));
+	$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_correction', $_POST['correction_id']));
+	$dbl->run("DELETE FROM `article_corrections` WHERE `row_id` = ?", array($_POST['correction_id']));
+
+	$_SESSION['message'] = 'deleted';
+	$_SESSION['message_extra'] = 'correction';
+	header("Location: /admin.php?module=corrections");
 }
 ?>

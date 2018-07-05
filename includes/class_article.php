@@ -318,7 +318,7 @@ class article
 		$title = mb_convert_encoding($title, 'UTF-8');
 		$tagline = trim($_POST['tagline']);
 		$text = trim($_POST['text']);
-		$categories = '';
+		$categories = [];
 		if (!empty($_POST['categories']))
 		{
 			$categories = $_POST['categories'];

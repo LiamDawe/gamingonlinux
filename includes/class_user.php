@@ -291,9 +291,9 @@ class user
 				<p>We have detected a login from a new device, if you have just logged in yourself don't be alarmed (your cookies may have just been wiped at somepoint)! However, if you haven't just logged into the <a href=\"".$this->core->config('website_url')."\">".$this->core->config('site_title')."</a> website you may want to let the admin know and change your password immediately.</p>
 				<div>
 				<hr>
-				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "</p>
+				<p>Login detected from: {$_SERVER['HTTP_USER_AGENT']} - IP: " . $this->core::$ip . ' - on: ' . date("Y-m-d H:i:s") . "</p>
 				<hr>
-				<p>You can turn this notice off any time from your User Control Panel, in the Notification Preferences page.</p>";
+				<p>You can turn this notice off any time from your User Control Panel, in the <a href=\"https://www.gamingonlinux.com/usercp.php?module=notification_preferences\">Notification Preferences</a> page. For your security, we do recommend keeping it on.</p>";
 
 				$plain_message = "Hello " . $this->user_details['username'] . ",\r\nWe have detected a login from a new device, if you have just logged in yourself don't be alarmed! However, if you haven't just logged into the ".$this->core->config('site_title')." ".$this->core->config('website_url')." website you may want to let the admin know and change your password immediately.\r\n\r\nLogin detected from: {$_SERVER['HTTP_USER_AGENT']} on " . date("Y-m-d H:i:s") . "\r\nYou can turn this notice off any time from your User Control Panel, in the Notification Preferences page.";
 

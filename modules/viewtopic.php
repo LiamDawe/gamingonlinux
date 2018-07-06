@@ -179,7 +179,7 @@ else
 
 				// sort out edit link if its allowed
 				$edit_link = '';
-				if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true))
+				if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 				{
 					$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"/index.php?module=editpost&amp;topic_id={$topic['topic_id']}&page=$page\"><span class=\"icon edit\"></span></a></li>";
 				}
@@ -251,12 +251,12 @@ else
 
 				// find if there's a poll
 				$show_results = 1;
-				$grab_poll = $dbl->run("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 				if (isset($_SESSION['user_id']))
 				{
+					$grab_poll = $dbl->run("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 					if ($grab_poll)
 					{
-						if (isset($_SESSION['user_id']))
+						if ($_SESSION['user_id'] != 0)
 						{
 							if ($grab_poll['poll_open'] == 1)
 							{
@@ -343,7 +343,7 @@ else
 
 					if ($grab_poll['poll_open'] == 0)
 					{
-						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $topic['author_id'])
+						if ($_SESSION['user_id'] == $topic['author_id'])
 						{
 							$results .= '<ul style="list-style: none; padding:5px; margin: 0;"><li><button name="openpoll" class="open_poll" data-poll-id="'.$grab_poll['poll_id'].'">Open Poll</button></li></ul>';
 						}
@@ -383,7 +383,7 @@ else
 
 					// sort out delete link if it's allowed
 					$delete_link = '';
-					if (isset($_SESSION['user_id']) && ($parray['can_delete'] == 1 || $_SESSION['user_id'] == $topic['author_id']))
+					if ($parray['can_delete'] == 1 || $_SESSION['user_id'] == $topic['author_id'])
 					{
 						$delete_link = '<li><a class="tooltip-top delete_forum_post" data-type="topic" data-post-id="'.$topic['topic_id'].'" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletetopic&topic_id=' . $topic['topic_id'] . '&forum_id='. $topic['forum_id'] . '&author_id=' . $topic['author_id'] . '"><span class="icon delete"></span></a>';
 					}
@@ -427,7 +427,7 @@ else
 
 					$user_options = '';
 					$bookmark = '';
-					if (isset($_SESSION['user_id']))
+					if ($_SESSION['user_id'] != 0)
 					{
 						// sort bookmark icon out
 						if (in_array($topic['topic_id'], $bookmarks_array))
@@ -517,7 +517,7 @@ else
 
 							// sort out edit link if its allowed
 							$edit_link = '';
-							if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true))
+							if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 							{
 								$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . $core->config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
 							}
@@ -525,7 +525,7 @@ else
 
 							// sort out delete link if it's allowed
 							$delete_link = '';
-							if (isset($_SESSION['user_id']) && ($parray['can_delete'] == 1 || $_SESSION['user_id'] == $post['author_id']))
+							if ($parray['can_delete'] == 1 || $_SESSION['user_id'] == $post['author_id'])
 							{
 								$delete_link = '<li><a class="tooltip-top delete_forum_post" data-type="reply" data-post-id="'.$post['post_id'].'" title="Delete" href="' . $core->config('website_url') . 'index.php?module=viewtopic&amp;view=deletepost&amp;post_id=' . $post['post_id'] . '&amp;topic_id=' . $topic['topic_id'] . '&amp;forum_id='. $topic['forum_id'] .'"><span class="icon delete"></span></a>';
 							}
@@ -578,7 +578,7 @@ else
 
 							$user_options = '';
 							$bookmark_reply = '';
-							if (isset($_SESSION['user_id']))
+							if ($_SESSION['user_id'] != 0)
 							{
 								$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\"><span class=\"icon quote\">Quote</span></a></li>";
 								// sort bookmark icon out
@@ -711,7 +711,7 @@ else
 
 				if ($core->config('forum_posting_open') == 1)
 				{
-					if (!isset($_SESSION['user_id']))
+					if ($_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 					{
 						$templating->load('login');
 						$templating->block('small');

@@ -251,9 +251,9 @@ else
 
 				// find if there's a poll
 				$show_results = 1;
+				$grab_poll = $dbl->run("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 				if (isset($_SESSION['user_id']))
 				{
-					$grab_poll = $dbl->run("SELECT `poll_id`, `author_id`, `poll_question`, `topic_id`, `poll_open` FROM `polls` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 					if ($grab_poll)
 					{
 						if ($_SESSION['user_id'] != 0)

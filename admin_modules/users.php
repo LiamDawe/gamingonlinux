@@ -599,6 +599,9 @@ else
 			// update cache
 			$groups_query = $dbl->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);		
 			core::$redis->set('user_group_list', serialize($groups_query));	
+
+			// alert admins this was done
+			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'edited_user_group', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
 			
 			header('Location: admin.php?module=users&view=edit_group&id=' . $_POST['group_id']);
 		}

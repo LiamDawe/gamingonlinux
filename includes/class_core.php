@@ -1037,5 +1037,27 @@ class core
 		}
 	}
 
+	// for inserting a new admin notification
+	function new_admin_note($options)
+	{
+		$completed = 0;
+		$completed_date = NULL;
+		if (isset($options['completed']) && $options['completed'] == 1)
+		{
+			$completed = 1;
+			$completed_date = core::$date;
+		}
+
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			$options['content'] = '<a href="/profiles/'.$_SESSION['user_id'].'">' . $_SESSION['username'] . '</a> ' . $options['content'];
+		}
+		else
+		{
+			$options['content'] = 'Guest ' . $options['content'];
+		}
+
+		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = ?, `created_date` = ?, `completed_date` = ?, `content` = ?", array($_SESSION['user_id'], $completed, core::$date, $completed_date, $options['content']));
+	}
 }
 ?>

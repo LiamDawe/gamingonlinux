@@ -219,7 +219,7 @@ if (isset($_POST['act']))
 
 		$core->process_livestream_users($new_id, $user_ids);
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'new_livestream_event', core::$date, core::$date));
+		$core->new_admin_note(array('completed' => 1, 'content' => ' added a new livestream event to the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 		header("Location: /admin.php?module=livestreams&view=manage&&message=added");
 	}
@@ -260,7 +260,7 @@ if (isset($_POST['act']))
 
 		$core->process_livestream_users($_POST['id'], $user_ids);
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'edit_livestream_event', $_POST['id'], core::$date, core::$date));
+		$core->new_admin_note(array('completed' => 1, 'content' => ' edited a livestream event on the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 		header("Location: /admin.php?module=livestreams&view=manage&message=edited");
 	}
@@ -294,7 +294,7 @@ if (isset($_POST['act']))
 
 			$dbl->run("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_GET['id']));
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], 'deleted_livestream_event', core::$date, core::$date));
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a livestream event from the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 			header("Location: /admin.php?module=livestreams&view=manage&message=deleted");
 		}
@@ -344,8 +344,10 @@ if (isset($_POST['act']))
 
 			$dbl->run("DELETE FROM `livestream_presenters` WHERE `id` = ?", array($_POST['id']));
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'denied_livestream_submission', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
-			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE type = 'new_livestream_submission' AND `data` = ?", array(core::$date, $livestream['row_id']));
+			// notify editors you've done this
+			$core->update_admin_note(array('type' => 'new_livestream_submission', 'data' => $livestream['row_id']));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' denied a new livestream submission event on the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 			header("Location: /admin.php?module=livestreams&view=submitted&message=denied");
 		}
@@ -399,8 +401,10 @@ if (isset($_POST['act']))
 
 		$core->process_livestream_users($_POST['id'], $user_ids);
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'accepted_livestream_submission', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE type = 'new_livestream_submission' AND `data` = ?", array(core::$date, $livestream['row_id']));
+		// notify editors you've done this
+		$core->update_admin_note(array('type' => 'new_livestream_submission', 'data' => $livestream['row_id']));
+
+		$core->new_admin_note(array('completed' => 1, 'content' => ' approved a new livestream submission event on the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 		header("Location: /admin.php?module=livestreams&view=submitted&message=approved");
 	}

@@ -128,6 +128,8 @@ if (isset($_POST['act']))
 
 		$dbl->run("INSERT INTO `sales_bundles` SET `name` = ?, `linux_total` = ?, `link` = ?, `end_date` = ?, `store_id` = ?, `approved` = 1", [$name, $total, $link, $end_date, $_POST['store']]);
 
+		$core->new_admin_note(array('completed' => 1, 'content' => ' added a new bundle to the <a href="/sales/">sales page</a>.'));
+
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'bundle';
 		header("Location: /admin.php?module=sales&view=manage_bundles");
@@ -160,6 +162,8 @@ if (isset($_POST['act']))
 
 		$dbl->run("UPDATE `sales_bundles` SET `name` = ?, `linux_total` = ?, `link` = ?, `end_date` = ?, `store_id` = ? WHERE `id` = ?", [$name, $total, $link, $end_date, $_POST['store'], $id]);
 
+		$core->new_admin_note(array('completed' => 1, 'content' => ' updated the '.$name.' bundle on the <a href="/sales/">sales page</a>.'));
+
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'bundle';
 		header("Location: /admin.php?module=sales&view=". $_POST['return_page']);
@@ -181,12 +185,13 @@ if (isset($_POST['act']))
 			$dbl->run("DELETE FROM `sales_bundles` WHERE `id` = ?", [$_GET['id']]);
 			if ($_POST['return_page'] == 'submitted_bundles')
 			{
-				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_sale_bundle' AND `data` = ?", array(core::$date, $_GET['id']));
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'denied_submitted_sale_bundle', core::$date, core::$date, $_GET['id']));
+				$core->update_admin_note(array('type' => 'submitted_sale_bundle', 'data' => $_GET['id']));
+
+				$core->new_admin_note(array('completed' => 1, 'content' => ' removed a submitted bundle from the <a href="/sales/">sales page</a>.'));
 			}
 			else if ($_POST['return_page'] == 'manage_bundles')
 			{
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'removed_sale_bundle', core::$date, core::$date, $_GET['id']));				
+				$core->new_admin_note(array('completed' => 1, 'content' => ' removed a bundle from the <a href="/sales/">sales page</a>.'));				
 			}
 
 			$_SESSION['message'] = 'deleted';
@@ -199,7 +204,9 @@ if (isset($_POST['act']))
 	{
 		$dbl->run("UPDATE `sales_bundles` SET `approved` = 1 WHERE `id` = ?", [$_POST['id']]);
 
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_sale_bundle' AND `data` = ?", array(core::$date, $_POST['id']));
+		$core->update_admin_note(array('type' => 'submitted_sale_bundle', 'data' => $_POST['id']));
+
+		$core->new_admin_note(array('completed' => 1, 'content' => ' approved a submitted bundle for the <a href="/sales/">sales page</a>.'));
 
 		$_SESSION['message'] = 'accepted';
 		$_SESSION['message_extra'] = 'sale bundle';

@@ -38,6 +38,8 @@ else
 		{
 			$core->set_config($rules, 'rules');
 
+			$core->new_admin_note(array('completed' => 1, 'content' => ' edited the <a href="/index.php?module=rules">website rules</a>.'));
+
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'site rules';
 			header('Location: '.$core->config('website_url').'admin.php?module=rules');

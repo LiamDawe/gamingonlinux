@@ -82,6 +82,9 @@ if (isset($_POST['act']))
 				$dbl->run("INSERT INTO `game_giveaways_keys` SET `game_id` = ?, `game_key` = ?", array($new_id, $the_key));
 			}
 
+			// notify editors you did this
+			$core->new_admin_note(array('completed' => 1, 'content' => ' added a new key giveaway for: ' . $name . '.'));
+
 			$_SESSION['message'] = 'saved';
 			$_SESSION['message_extra'] = 'giveaway';
 			header("Location: /admin.php?module=giveaways");
@@ -104,7 +107,12 @@ if (isset($_POST['act']))
 		{
 			// make the category
 			$dbl->run("INSERT INTO `game_giveaways_keys` SET `game_id` = ?, `game_key` = ?", array($_POST['id'], $the_key));
-		}		
+		}
+
+		$name = $dbl->run("SELECT `game_name` FROM `game_giveaways` WHERE `id` = ?", array($_POST['id']))->fetchOne();
+
+		// notify editors you did this
+		$core->new_admin_note(array('completed' => 1, 'content' => ' added more keys to the giveaway for: ' . $name . '.'));
 
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'key list';

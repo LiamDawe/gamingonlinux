@@ -136,20 +136,10 @@ if (!isset($_GET['view']))
 		$types[$types_set['name']] = $types_set;
 	}
 
-	$get_notifications = $dbl->run("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 100")->fetch_all();
+	$get_notifications = $dbl->run("SELECT * FROM `admin_notifications` ORDER BY `id` DESC LIMIT 100")->fetch_all();
 	foreach ($get_notifications as $tracking)
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
-
-		$username = '';
-		if (empty($tracking['username']))
-		{
-			$username = 'Guest';
-		}
-		else
-		{
-			$username = '<a href="/profiles/'.$tracking['user_id'].'">'.$tracking['username'].'</a>';
-		}
 
 		$completed_indicator = '&#10004;';
 		if ($tracking['completed'] == 0)
@@ -157,28 +147,7 @@ if (!isset($_GET['view']))
 			$completed_indicator = '<span class="badge badge-important">!</span>';
 		}
 
-		// if their is a "View" link to see what item the action was done on
-		$link = '';
-		if (!empty($types[$tracking['type']]['link']))
-		{
-			$link = $types[$tracking['type']]['link'];
-
-			// if it has a title in the URL for article, only do this if we have to so we save on queries
-			// still need a better way so we don't need a query for each one, but it works for now
-			if (preg_match('/{:title}/', $link))
-			{
-				$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($tracking['data']))->fetch();
-				$link = str_replace('{:title}', core::nice_title($title['title']), $link);
-			}
-
-			// replace id numbers
-			$id_array = array('{:topic_id}','{:article_id}', '{:post_id}');
-			$link = str_replace($id_array, $tracking['data'], $link);
-
-			$link = ' <a href="'.$link.'">View</a> - ';
-		}
-
-		$templating->set('editor_action', '<li>' . $completed_indicator . ' ' . $username . ': ' . $types[$tracking['type']]['text'] . $link . ' When: ' . $core->human_date($tracking['created_date']) . '</li>');
+		$templating->set('editor_action', '<li>' . $completed_indicator . ' ' . $tracking['content'] . ' When: ' . $core->human_date($tracking['created_date']) . '</li>');
 	}
 	$templating->block('tracking_bottom', 'admin_modules/admin_home');
 }

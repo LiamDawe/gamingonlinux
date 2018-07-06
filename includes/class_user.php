@@ -876,7 +876,7 @@ class user
 		die();
 	}
 
-	function delete_user($user_id, $options)
+	function delete_user($user_id, $options = NULL)
 	{
 		// remove any old avatar if one was uploaded
 		$deleted_info = $this->db->run("SELECT `avatar`, `avatar_uploaded`, `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetch();
@@ -910,6 +910,7 @@ class user
 		
 		$this->db->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
 
-		$this->db->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'delete_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $deleted_info['username'], core::$date, core::$date));
+		$this->core->new_admin_note(array('completed' => 1,
+		'content' => 'deleted the user account for ' . $deleted_info['username']));
 	}
 }

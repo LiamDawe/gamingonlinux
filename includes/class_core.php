@@ -1059,5 +1059,18 @@ class core
 
 		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = ?, `created_date` = ?, `completed_date` = ?, `content` = ?", array($_SESSION['user_id'], $completed, core::$date, $completed_date, $options['content']));
 	}
+
+	// setting an admin notification as completed
+	function update_admin_note($options)
+	{
+		$extra_sql_where = '';
+		$extra_values = [];
+		if (isset($options['sql_where']))
+		{
+			$extra_sql_where = ' AND ' . $options['sql_where']['fields'];
+			$extra_values[] = $options['sql_where']['values'];
+		}
+		$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ? $extra_sql_where", array_merge(array(core::$date, $options['type'], $options['data']), $extra_values));
+	}
 }
 ?>

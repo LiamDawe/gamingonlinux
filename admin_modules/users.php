@@ -295,7 +295,13 @@ else
 					$dbl->run("INSERT INTO `admin_user_notes` SET `notes` = ?, `last_edited` = ?, `last_edit_by` = ?, `user_id` = ?", array($notes, core::$date, $_SESSION['user_id'], $_GET['user_id']));
 				}
 
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'edited_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
+				// alert admins this was done
+				$additional_text = '';
+				if ($current_username != $username)
+				{
+					$additional_text = ' Their new username is: ' . $username;
+				}
+				$core->new_admin_note(array('completed' => 1, 'content' => ' edited the user: <a href="/profiles/'.$_GET['user_id'].'">' . $current_username . '</a>.' . $additional_text));
 
 				$_SESSION['message'] = 'edited';
 				$_SESSION['message_extra'] = 'user account';
@@ -323,7 +329,8 @@ else
 				{
 					$dbl->run("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 
-					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'banned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
+					// alert admins this was done
+					$core->new_admin_note(array('completed' => 1, 'content' => ' banned the user: <a href="/profiles/'.$_GET['user_id'].'">' . $ban_info['username'] . '</a>.'));
 
 					$_SESSION['message'] = 'user_banned';
 					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
@@ -333,9 +340,12 @@ else
 
 		if ($_POST['act'] == 'unban')
 		{
+			$get_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
+
 			$dbl->run("UPDATE `users` SET `banned` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unbanned_user', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
+			// alert admins this was done
+			$core->new_admin_note(array('completed' => 1, 'content' => ' unbanned the user: <a href="/profiles/'.$_GET['user_id'].'">' . $get_username . '</a>.'));
 
 			$_SESSION['message'] = 'user_unbanned';
 			header('Location: /admin.php?module=users&view=edituser&user_id='.$_GET['user_id']);
@@ -353,6 +363,9 @@ else
 				$dbl->run("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_POST['ip'], core::$sql_date_now));
 
 				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'ip_banned', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_POST['ip'], core::$date, core::$date));
+
+				// alert admins this was done
+				$core->new_admin_note(array('completed' => 1, 'content' => ' banned the IP: ' . $_POST['ip'] . '.'));
 
 				$_SESSION['message'] = 'ip_ban';
 				header("Location: /admin.php?module=users&view=ipbanmanage");
@@ -386,7 +399,8 @@ else
 					$dbl->run("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_GET['user_id']));
 					$dbl->run("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_SESSION['ban_ip'], core::$sql_date_now));
 
-					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'total_ban', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
+					// alert admins this was done
+					$core->new_admin_note(array('completed' => 1, 'content' => ' banned the user ' . $ban_info['username'] . ' along with their IP: ' . $_SESSION['ban_ip'].'.'));
 
 					$_SESSION['message'] = 'user_banned';
 					header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
@@ -401,7 +415,8 @@ else
 
 			$dbl->run("DELETE FROM `ipbans` WHERE `id` = ?", array($_POST['id']));
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'unban_ip', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $get_ip_ban['ip'], core::$date, core::$date));
+			// alert admins this was done
+			$core->new_admin_note(array('completed' => 1, 'content' => ' unbanned the IP address: ' . $get_ip_ban['ip']));
 
 			$_SESSION['message'] = 'ip_unban';
 			header("Location: /admin.php?module=users&view=ipbanmanage");
@@ -435,6 +450,9 @@ else
 				else
 				{
 					$dbl->run("UPDATE `ipbans` SET `ip` = ? WHERE `id` = ?", array($_POST['ip'], $_POST['id']));
+
+					// alert admins this was done
+					$core->new_admin_note(array('completed' => 1, 'content' => ' updated an <a href="/admin.php?module=users&view=ipbanmanage">IP ban</a> address.'));
 					
 					$_SESSION['message'] = 'edited';
 					$_SESSION['message_extra'] = 'IP address ban';
@@ -446,7 +464,7 @@ else
 		if ($_POST['act'] == 'deleteavatar')
 		{
 			// remove any old avatar if one was uploaded
-			$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
+			$avatar = $dbl->run("SELECT `username`, `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
 
 			if ($avatar['avatar_uploaded'] == 1)
 			{
@@ -455,9 +473,12 @@ else
 
 			$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0 WHERE `user_id` = ?", array($_GET['user_id']));
 
+			// alert admins this was done
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted the avatar for <a href="/profiles/'.$_GET['user_id'].'">' . $avatar['username'] . '</a>'));
+
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'avatar';
-			header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}&message=deleted&extra=avatar");
+			header("Location: /admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
 		}
 
 		if ($_POST['act'] == 'delete_user')
@@ -555,7 +576,7 @@ else
 						$dbl->run("DELETE FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']));
 
 						// alert admins this was done
-						$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'deleted_user_content', `data` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_GET['user_id'], core::$date, core::$date));
+						$core->new_admin_note(array('completed' => 1, 'content' => ' deleted all content for <a href="/profiles/'.$_GET['user_id'].'">' . $check_ban['username'] . '</a>'));
 
 						$_SESSION['message'] = 'user_content_deleted';
 						$_SESSION['message_extra'] = 'user content';
@@ -601,7 +622,8 @@ else
 			core::$redis->set('user_group_list', serialize($groups_query));	
 
 			// alert admins this was done
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'edited_user_group', `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
+			$core->new_admin_note(array('completed' => 1, 
+			'content' => 'edited the <a href="/admin.php?module=users&view=edit_group&id='.$_POST['group_id'].'">'.$_POST['name'].'</a> user group.'));
 			
 			header('Location: admin.php?module=users&view=edit_group&id=' . $_POST['group_id']);
 		}

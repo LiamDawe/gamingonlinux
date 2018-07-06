@@ -22,7 +22,7 @@ if (isset($_GET['view']))
 		}
 
 		$category_list = '';
-		$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC");
+		$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
 		foreach( $cats as $category )
 		{
 			$category_list .= '<option value="' . $category['category_id'] . '">' . $category['category_name'] . '</option>';
@@ -180,6 +180,9 @@ if (isset($_POST['act']))
 			if (!$check)
 			{
 				$dbl->run("INSERT INTO `goty_games` SET `game` = ?, `accepted` = 1, `category_id` = ?", array($_POST['name'], $_POST['category']));
+
+				$core->new_admin_note(array('completed' => 1, 'content' => ' added a game '.$_POST['name'].' to the GOTY awards.'));
+
 				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=add&message=added");
 			}
 
@@ -206,6 +209,8 @@ if (isset($_POST['act']))
 			{
 				$dbl->run("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
 
+				$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a game from the GOTY awards.'));
+
 				$_SESSION['message'] = 'deleted';
 				$_SESSION['message_extra'] = 'GOTY game';
 				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage");
@@ -231,6 +236,8 @@ if (isset($_POST['act']))
 			if ($check)
 			{
 				$dbl->run("UPDATE `goty_games` SET `category_id` = ? WHERE `id` = ?", array($_POST['category'], $_POST['id']));
+
+				$core->new_admin_note(array('completed' => 1, 'content' => ' edited a game in the GOTY awards.'));
 
 				$_SESSION['message'] = 'saved';
 				$_SESSION['message_extra'] = 'game\'s goty category';
@@ -268,8 +275,10 @@ if (isset($_POST['act']))
 				else
 				{
 					$dbl->run("UPDATE `goty_games` SET `accepted` = 1, `accepted_by` = ? WHERE `id` = ?", array($_SESSION['user_id'], $_POST['id']));
-					$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
-					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_accepted_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+
+					// notify editors you did this
+					$core->update_admin_note(array('type' => 'goty_game_submission', 'data' => $_POST['id']));
+					$core->new_admin_note(array('completed' => 1, 'content' => ' accepted a game for the GOTY awards.'));
 
 					$_SESSION['message'] = 'accepted';
 					$_SESSION['message_extra'] = 'GOTY game submission';
@@ -296,8 +305,10 @@ if (isset($_POST['act']))
 			if ($check)
 			{
 				$dbl->run("DELETE FROM `goty_games` WHERE `id` = ?", array($_POST['id']));
-				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'goty_game_submission' AND `data` = ?", array(core::$date, $_POST['id']));
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'goty_denied_game', `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+
+				// notify editors you did this
+				$core->update_admin_note(array('type' => 'goty_game_submission', 'data' => $_POST['id']));
+				$core->new_admin_note(array('completed' => 1, 'content' => ' denied a game for the GOTY awards.'));
 
 				$_SESSION['message'] = 'deleted';
 				$_SESSION['message_extra'] = 'GOTY game submission';
@@ -334,6 +345,9 @@ if (isset($_POST['act']))
 		$dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_games_open'", array($games));
 		$dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_voting_open'", array($voting));
 
+		// notify editors you did this
+		$core->new_admin_note(array('completed' => 1, 'content' => ' edited the GOTY awards settings.'));
+
 		header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=config");
 	}
 
@@ -344,8 +358,6 @@ if (isset($_POST['act']))
 			$dbl->run("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_games_open'");
 			$dbl->run("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_voting_open'");
 			$dbl->run("UPDATE `config` SET `data_value` = 1 WHERE `data_key` = 'goty_finished'");
-
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, type = 'goty_finished', `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], core::$date, core::$date));
 
 			// make the chart for each category
 			$result = $dbl->run("SELECT `category_name`, `category_id` FROM `goty_category` ORDER BY `category_id` ASC")->fetch_all();
@@ -363,6 +375,9 @@ if (isset($_POST['act']))
 					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($chart_key, $game_key, $game['data']));
 				}
 			}
+
+			// notify editors you did this
+			$core->new_admin_note(array('completed' => 1, 'content' => ' closed the GOTY awards.'));
 
 			$_SESSION['message'] = 'goty_ended';
 			header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=config");

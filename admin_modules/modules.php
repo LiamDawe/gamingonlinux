@@ -97,6 +97,9 @@ else if (isset($_POST['action']))
 				$active = 1;
 			}
 			$dbl->run("INSERT INTO `modules` SET `module_file_name` = ?, `activated` = ?", array($_POST['file'], $active));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website module: '.$_POST['file'].'.'));
+
 			$core->message("The module {$_POST['file']} has been added! <a href=\"admin.php?module=modules&page={$_POST['type']}\">Click here to return.</a>");
 		}
 	}
@@ -112,7 +115,11 @@ else if (isset($_POST['action']))
 		
 		else
 		{
+			$module_name = $dbl->run("SELECT `module_file_name` FROM `{$type}modules` WHERE `module_id` = ?", array($id))->fetchOne();
+
 			$dbl->run("UPDATE `{$type}modules` SET `activated` = 1 WHERE `module_id` = ?", array($id));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' enabled a website module: '.$module_name.'.'));
 			
 			$core->message('That module is now active!');
 		}
@@ -129,7 +136,11 @@ else if (isset($_POST['action']))
 		
 		else
 		{
-			$dbl->run("UPDATE `{$type}modules` SET `activated` = 0 WHERE `module_id` = ", array($id));
+			$module_name = $dbl->run("SELECT `module_file_name` FROM `{$type}modules` WHERE `module_id` = ?", array($id))->fetchOne();
+
+			$dbl->run("UPDATE `{$type}modules` SET `activated` = 0 WHERE `module_id` = ?", array($id));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' disabled a website module: '.$module_name.'.'));
 			
 			$core->message('That module is now deactivated! Be sure to delete/disable any block using it or you will encouter errors!');
 		}
@@ -144,7 +155,11 @@ else if (isset($_POST['action']))
 		
 		else
 		{
+			$module_name = $dbl->run("SELECT `module_file_name` FROM `{$type}modules` WHERE `module_id` = ?", array($_POST['id']))->fetchOne();
+
 			$dbl->run("DELETE FROM `{$type}modules` WHERE `module_id` = ?", array($_POST['id']));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a website module: '.$module_name.'.'));
 			
 			$core->message('That module is now deleted! Be sure to delete/disable any block using it or you will encouter errors!');
 		}
@@ -165,8 +180,12 @@ else if (isset($_POST['action']))
 			{
 				$sidebar = 1;
 			}
+
+			$module_name = $dbl->run("SELECT `module_file_name` FROM `{$type}modules` WHERE `module_id` = ?", array($_POST['id']))->fetchOne();
 			
 			$dbl->run("UPDATE `{$type}modules` SET `module_file_name` = ?, `module_title` = ?, `module_link` = ?, `show_in_sidebar` = ? WHERE `module_id` = ?", array($_POST['file'], $_POST['title'], $_POST['link'], $sidebar, $_POST['id']));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' edited a website module: '.$module_name.'.'));
 			
 			$core->message("That module has been edited! <a href=\"admin.php?module=modules&page={$_POST['type']}\">Click here to return.</a>");
 		}		

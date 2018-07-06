@@ -136,7 +136,7 @@ if (!isset($_GET['view']))
 		$types[$types_set['name']] = $types_set;
 	}
 
-	$get_notifications = $dbl->run("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 50")->fetch_all();
+	$get_notifications = $dbl->run("SELECT n.*, u.`username` FROM `admin_notifications` n LEFT JOIN `users` u ON n.`user_id` = u.`user_id` ORDER BY n.`id` DESC LIMIT 100")->fetch_all();
 	foreach ($get_notifications as $tracking)
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
@@ -197,14 +197,6 @@ if (isset($_GET['view']))
 
 if (isset($_POST['act']))
 {
-	if ($_POST['act'] == 'edit')
-	{
-		$notes_text = trim($_POST['text']);
-		$dbl->run("UPDATE `admin_notes` SET `text` = ? WHERE `user_id` = ?", array($notes_text, $_SESSION['user_id']));
-
-		header('Location: /admin.php?message=updated');
-	}
-
 	if ($_POST['act'] == 'comment')
 	{
 		$text = trim($_POST['text']);

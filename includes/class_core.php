@@ -1057,7 +1057,19 @@ class core
 			$options['content'] = 'Guest ' . $options['content'];
 		}
 
-		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = ?, `created_date` = ?, `completed_date` = ?, `content` = ?", array($_SESSION['user_id'], $completed, core::$date, $completed_date, $options['content']));
+		$type = NULL;
+		if (isset($options['type']))
+		{
+			$type = $options['type'];
+		}
+
+		$data = NULL;
+		if (isset($options['data']))
+		{
+			$data = $options['data'];
+		}		
+
+		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = ?, `created_date` = ?, `completed_date` = ?, `content` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], $completed, core::$date, $completed_date, $options['content'], $type, $data));
 	}
 
 	// setting an admin notification as completed
@@ -1070,7 +1082,22 @@ class core
 			$extra_sql_where = ' AND ' . $options['sql_where']['fields'];
 			$extra_values[] = $options['sql_where']['values'];
 		}
-		$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ? $extra_sql_where", array_merge(array(core::$date, $options['type'], $options['data']), $extra_values));
+
+		/* either a single type of notification (=) or when looking for multiple (IN)
+		Some updates may need to wipe multiple types of notifications
+		*/
+		$type_search = '=';
+		$type_value = '?';
+		if (isset($options['type_search']) && $options['type_search'] == 'IN')
+		{
+			$type_search = 'IN';
+			$type_value = '(' . str_repeat('?,', count($options['type']) - 1) . '?)';
+		}
+		else
+		{
+			$options['type'] = [$options['type']];
+		}
+		$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` $type_search $type_value AND `data` = ? $extra_sql_where", array_merge([core::$date], $options['type'], [$options['data']], $extra_values));
 	}
 }
 ?>

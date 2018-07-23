@@ -68,6 +68,16 @@ if (isset($_POST['act']) && $_POST['act'] == 'delete')
 		die();
 	}
 
+	// check correction report still exists
+	$check = $dbl->run("SELECT `row_id` FROM `article_corrections` WHERE `row_id` = ?", array($_POST['correction_id']))->fetchOne();
+	if (!$check)
+	{
+		$_SESSION['message'] = 'none_found';
+		$_SESSION['message_extra'] = 'correction reports matching that ID (someone already dealt with it?)';
+		header("Location: /admin.php?module=corrections");
+		die();		
+	}
+
 	if (isset($_GET['message']))
 	{
 		$text = trim($_POST['text']);
@@ -133,9 +143,12 @@ if (isset($_POST['act']) && $_POST['act'] == 'delete')
 		}
 	}
 
+	// update existing notification
+	$core->update_admin_note(array("type" => 'article_correction', 'data' => $_POST['correction_id']));
 
-	$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'article_correction' AND `data` = ?", array(core::$date, $_POST['correction_id']));
-	$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_correction', $_POST['correction_id']));
+	// note who deleted it
+	$core->new_admin_note(array('completed' => 1, 'content' => ' deleted correction report.'));
+
 	$dbl->run("DELETE FROM `article_corrections` WHERE `row_id` = ?", array($_POST['correction_id']));
 
 	$_SESSION['message'] = 'deleted';

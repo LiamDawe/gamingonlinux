@@ -51,12 +51,17 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 
 				$dbl->run("INSERT INTO `articles_categorys` SET `category_name` = ?, `is_genre` = ?", [$_POST['category_name'], $genre_check]);
 
+				// note who did it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new content category named: '.$_POST['category_name'].'.'));
+
 				header("Location: admin.php?module=categorys&message=added");
+				die();
 			}
 			else
 			{
 				$_SESSION['message'] = 'category_exists';
 				header("Location: admin.php?module=categorys");
+				die();
 			}
 		}
 	}
@@ -78,6 +83,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			}
 
 			$dbl->run("UPDATE `articles_categorys` SET `category_name` = ?, `is_genre` = ? WHERE `category_id` = ?", array($_POST['category_name'], $genre_check, $_POST['category_id']));
+
+			// note who did it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' updated a content category named: '.$_POST['category_name'].'.'));
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'category';
@@ -104,7 +112,7 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			else
 			{
 				// check category exists
-				$cat_id = $dbl->run("SELECT `category_id` FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']))->fetchOne();
+				$cat_id = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']))->fetch();
 				if (!$cat_id)
 				{
 					$core->message('That is not a correct id!');
@@ -113,6 +121,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				else
 				{
 					$dbl->run("DELETE FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']));
+
+					// note who did it
+					$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a content category named: '.$cat_id['category_name'].'.'));
 
 					$_SESSION['message'] = 'deleted';
 					$_SESSION['message_extra'] = 'category';

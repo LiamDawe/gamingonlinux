@@ -97,8 +97,16 @@ else if (isset($_GET['aid']))
 	LEFT JOIN `users` u on a.`author_id` = u.`user_id`
 	LEFT JOIN `users` u2 ON a.`locked_by` = u2.`user_id`
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
-	WHERE `submitted_article` = 1 AND `active` = 0 AND `article_id` = ?";
+	WHERE a.`submitted_article` = 1 AND a.`active` = 0 AND a.`article_id` = ? AND a.`submitted_unapproved` = 1";
 	$article = $dbl->run($article_sql, array($_GET['aid']))->fetch();
+
+	if (!$article)
+	{
+		$_SESSION['message'] = 'none_found';
+		$_SESSION['message_extra'] = 'articles matching that ID';
+		header("Location: /admin.php?module=articles&view=Submitted");
+		die();
+	}
 
 	if (isset($_GET['unlock']) && $article['locked'] == 1 && $_GET['unlock'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{

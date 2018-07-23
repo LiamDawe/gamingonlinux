@@ -108,6 +108,9 @@ if (isset($_POST['act']))
 			$new_featured_total = $core->config('total_featured') + 1;
 			core::$redis->set('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
 
+			// note who deleted it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' added a new featured article.'));
+
 			$_SESSION['message'] = 'added';
 		}
 		// this needs to change depending on if it was successful or not
@@ -160,13 +163,22 @@ if (isset($_POST['act']))
 		{
 			$_SESSION['message'] = 'edited';
 		}
+
+		// note who deleted it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' updated a featured article.'));
+
 		header("Location: /admin.php?module=featured&view=manage");
+		die();
 	}
 
 	if ($_POST['act'] == 'delete')
 	{
 		$article_class->remove_editor_pick($_POST['article_id']);
 
+		// note who deleted it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' removed an article from being featured.'));
+
 		header("Location: /admin.php?module=featured&view=manage");
+		die();
 	}
 }

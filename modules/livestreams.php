@@ -181,9 +181,10 @@ if (isset($_POST['act']))
 
 			$core->process_livestream_users($new_id, $_SESSION['live_info']['user_ids']);
 			
-			unset($_SESSION['live_info']);
+			// add a new notification for the mod queue
+			$core->new_admin_note(array('content' => ' has submitted a new livestream titled: <a href="/admin.php?module=livestreams&view=submitted">'.$_SESSION['live_info']['title'].'</a>.', 'type' => 'new_livestream_submission', 'data' => $new_id));
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'new_livestream_submission', core::$date, $new_id));
+			unset($_SESSION['live_info']);
 
 			$_SESSION['message'] = 'livestream_submitted';
 			header("Location: /index.php?module=livestreams");

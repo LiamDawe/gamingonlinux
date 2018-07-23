@@ -124,7 +124,7 @@ class article
 				$thumbnail_button = '';
 				$data_type = '';
 
-				if ($value['filetype'] != 'mp4' && $value['filetype'] != 'webm')
+				if ($value['filetype'] != 'mp4' && $value['filetype'] != 'webm' && $value['filetype'] != 'mp3' && $value['filetype'] != 'ogg')
 				{
 					$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
 					$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
@@ -201,14 +201,37 @@ class article
 
 	function delete_article($article)
 	{
+		// get some details on the article first
+		$article_info = $this->dbl->run("SELECT `title`, `active`, `draft`, `submitted_article` FROM `articles` WHERE `article_id` = ?", array($article['article_id']))->fetch();
+
 		$this->dbl->run("DELETE FROM `articles` WHERE `article_id` = ?", array($article['article_id']));
 		$this->dbl->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($article['article_id']));
 		$this->dbl->run("DELETE FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']));
 		$this->dbl->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($article['article_id']));
 		$this->dbl->run("DELETE FROM `article_history` WHERE `article_id` = ?", array($article['article_id']));
-    
-		$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` IN ('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article')  AND `completed` = 0", array(core::$date, $article['article_id']));
-		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `data` = ?, `type` = ?, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $article['article_id'], 'deleted_article', core::$date, core::$date));
+
+		$additional_text = '';
+		if ($article_info['active'] == 1)
+		{
+			$additional_text = ' This was a live article.';
+		}
+		if ($article_info['draft'] == 1)
+		{
+			$additional_text = ' This was a draft article.';
+		}
+		if ($article_info['submitted_article'] == 1)
+		{
+			$additional_text = ' This was a submitted article.';
+		}
+		
+		// update any existing notification
+		$this->core->update_admin_note(array(
+			'type_search' => 'IN', 
+			'type' => array('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article'), 
+			'data' => $article['article_id']));
+
+		// note who did it
+		$this->core->new_admin_note(array('completed' => 1, 'content' => ' deleted an article titled: ' . $article_info['title'] . '.' . $additional_text));
 
 		// if it wasn't posted by the bot, as the bot uses static images, can remove this when the bot uses gallery images
 		if ($article['author_id'] != 1844)
@@ -667,9 +690,9 @@ class article
 			$this->dbl->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
 			$this->dbl->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
 				
-			if ($options['type'] != 'draft')
+			if (isset($options['type']) && $options['type'] != 'draft')
 			{
-				$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = ?", array(core::$date, $_POST['article_id'], $options['clear_notification_type']));
+				$this->core->update_admin_note(array('type' => $options['clear_notification_type'], 'data' => $_POST['article_id']));
 			}
 				
 			$this->dbl->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0, `guest_email` = '', `guest_ip` = '' WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
@@ -728,8 +751,6 @@ class article
 			$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 		}
 			
-		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $options['new_notification_type'], core::$date, core::$date, $article_id));
-			
 		$this->dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
 			
 		unset($_SESSION['original_text']);
@@ -751,7 +772,7 @@ class article
 				$message = "
 				<html>
 				<head>
-				<title>Your article was review and approved GamingOnLinux.com!</title>
+				<title>Your article was reviewed and approved GamingOnLinux.com!</title>
 				</head>
 				<body>
 				<img src=\"http://www.gamingonlinux.com/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
@@ -828,7 +849,12 @@ class article
 		{
 			$redirect = $this->core->config('website_url') . "admin.php?module=featured&view=add&article_id=".$article_id;
 		}
+
+		// note who did it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' published a new article titled: <a href="/articles/'.$checked['slug'].'.'.$article_id.'">'.$checked['title'].'</a>.'));
+
 		header("Location: " . $redirect);
+		die();
 	}
 	
 	public function display_article_list($article_list, $get_categories)
@@ -1561,7 +1587,7 @@ class article
 
 	function delete_comment($comment_id)
 	{		
-		$comment = $this->dbl->run("SELECT `author_id`, `comment_text`, `spam`, `article_id` FROM `articles_comments` WHERE `comment_id` = ?", array((int) $comment_id))->fetch();
+		$comment = $this->dbl->run("SELECT c.`author_id`, c.`comment_text`, c.`spam`, c.`article_id`, u.`username`, a.`title`, a.`slug` FROM `articles_comments` c LEFT JOIN `users` u ON u.`user_id` = c.`author_id` LEFT JOIN `articles` a ON a.`article_id` = c.`article_id` WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
 
 		if ($comment['author_id'] != $_SESSION['user_id'] && $this->user->can('mod_delete_comments') == false)
 		{
@@ -1580,10 +1606,19 @@ class article
 				// this comment was reported as spam but as its now deleted remove the notification
 				if ($comment['spam'] == 1)
 				{
-					$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'reported_comment'", array(core::$date, (int) $comment_id));
+					$this->core->update_admin_note(array('type' => 'reported_comment', 'data' => $comment_id));
 				}
 
-				$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `type` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, 'comment_deleted', core::$date, (int) $comment_id, $comment['comment_text']));
+				if (isset($comment['username']) && !empty($comment['username']))
+				{
+					$username = $comment['username'];
+				}
+				else
+				{
+					$username = 'Guest';
+				}
+
+				$this->core->new_admin_note(array('completed' => 1, 'type' => 'comment_deleted', 'data' => $comment_id, 'content' => ' deleted a comment from ' . $username . ' in the article titled <a href="/articles/'.$comment['slug'].'.'.$comment['article_id'].'">'.$comment['title'].'</a>.'));
 
 				$this->dbl->run("UPDATE `articles` SET `comment_count` = (comment_count - 1) WHERE `article_id` = ?", array($comment['article_id']));
 				$this->dbl->run("DELETE FROM `articles_comments` WHERE `comment_id` = ?", array((int) $comment_id));

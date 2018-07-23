@@ -17,12 +17,6 @@ if (!isset($_GET['ip_id']))
 
 	$templating->block('comments_top', 'admin_modules/comment_reports');
 
-	// if we have just deleted one tell us
-	if (isset($_GET['deleted']) && $_GET['deleted'] == 1)
-	{
-		$core->message('That comment report has been deleted, and the comment left in place.');
-	}
-
 	// count how many there is in total
 	$total_pages = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `spam` = 1")->fetchOne();
 
@@ -80,11 +74,17 @@ if (isset($_POST['act']) && $_POST['act'] == 'delete_spam_report')
 
 	else
 	{
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'reported_comment' AND `data` = ?", array(core::$date, $_GET['comment_id']));
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_comment_report', $_GET['comment_id']));
+		// update existing notification
+		$core->update_admin_note(array("type" => 'reported_comment', 'data' => $_GET['comment_id']));
+
+		// note who did it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a comment report.'));
+
 		$dbl->run("UPDATE `articles_comments` SET `spam` = 0 WHERE `comment_id` = ?", array($_GET['comment_id']));
 
-		header("Location: /admin.php?module=comment_reports&deleted=1");
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'comment report';
+		header("Location: /admin.php?module=comment_reports");
 	}
 }
 ?>

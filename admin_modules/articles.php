@@ -613,11 +613,11 @@ else if (isset($_POST['act']))
 			// update admin notes if it was disabled
 			if (!isset($_POST['show_article']) && $enabled_check['active'] == 1)
 			{
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'disabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
+				$core->new_admin_note(array('completed' => 1, 'content' => ' disabled an article titled: <a href="/admin.php?module=articles&view=Edit&article_id='.$_POST['article_id'].'">'.$checked['title'].'</a>.'));
 			}
 			if (isset($_POST['show_article']) && $enabled_check['active'] == 0)
 			{
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = 'enabled_article', `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, $_POST['article_id']));
+				$core->new_admin_note(array('completed' => 1, 'content' => ' enabled an article titled: <a href="/admin.php?module=articles&view=Edit&article_id='.$_POST['article_id'].'">'.$checked['title'].'</a>.'));
 			}
 
 			// update history

@@ -168,6 +168,9 @@ else
 
 			$core->set_config($_POST['text'], 'support_us_text');
 
+			// note who did it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' updated the website config.'));
+
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'config';
 			header('Location: '.$core->config('website_url').'admin.php?module=config');

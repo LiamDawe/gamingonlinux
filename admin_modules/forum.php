@@ -285,8 +285,38 @@ if (isset($_GET['view']))
 	
 	if ($_GET['view'] == 'deletetopic')
 	{
-		$return_page = "/admin.php?module=forum&view=reportedtopics";
-		$forum_class->delete_topic($return_page, $return_page, "admin.php?module=forum&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}");
+		$return = "/admin.php?module=forum&view=reportedtopics";
+
+		if (!isset($_GET['forum_id']) || !isset($_GET['author_id']) || !isset($_GET['topic_id']))
+		{
+			header('Location: ' . $return);
+			die();
+		}
+		
+		if (!core::is_number($_GET['forum_id']) || !core::is_number($_GET['author_id']) || !core::is_number($_GET['topic_id']))
+		{
+			header('Location: ' . $return);
+			die();
+		}
+
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Deleting a forum topic', 1);
+			$core->confirmation(array('title' => 'Are you sure you want to delete that forum topic?', 'text' => 'This cannot be undone, all replies all also get removed!', 'action_url' => "admin.php?module=forum&view=deletetopic&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&author_id={$_GET['author_id']}", 'act' => 'deletetopic'));
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$forum_class->delete_topic($_GET['topic_id']);
+			header('Location: ' . $return);
+			die();
+		}
 	}
 
 	if ($_GET['view'] == 'reportedreplies')
@@ -345,8 +375,38 @@ if (isset($_GET['view']))
 	
 	if ($_GET['view'] == 'deletepost')
 	{
-		$return_page = "/admin.php?module=forum&view=reportedreplies";
-		$forum_class->delete_reply($return_page, $return_page, "admin.php?module=forum&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}");
+		$return = "/admin.php?module=forum&view=reportedreplies";
+
+		if (!isset($_GET['forum_id']) || !isset($_GET['post_id']) || !isset($_GET['topic_id']))
+		{
+			header('Location: ' . $return);
+			die();
+		}
+		
+		if (!core::is_number($_GET['forum_id']) || !core::is_number($_GET['post_id']) || !core::is_number($_GET['topic_id']))
+		{
+			header('Location: ' . $return);
+			die();
+		}
+
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Deleting a forum post', 1);
+			$core->confirmation(array('title' => 'Are you sure you want to delete that forum post?', 'text' => 'This cannot be undone!', 'action_url' => "admin.php?module=forum&view=deletepost&topic_id={$_GET['topic_id']}&forum_id={$_GET['forum_id']}&post_id={$_GET['post_id']}", 'act' => 'deletepost'));
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$forum_class->delete_reply($_GET['post_id']);
+			header('Location: ' . $return);
+			die();
+		}
 	}
 
 	if ($_GET['view'] == 'removetopicreport')
@@ -364,8 +424,11 @@ if (isset($_GET['view']))
 		{
 			$dbl->run("UPDATE `forum_topics` SET `reported` = 0 WHERE `topic_id` = ?", array($_GET['topic_id']));
 
-			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_topic_report', $_GET['topic_id']));
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_topic_report', $_GET['topic_id']));
+			// update existing notification
+			$core->update_admin_note(array('type' => 'forum_topic_report', 'data' => $_GET['topic_id']));
+
+			// note who deleted it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a forum topic report.'));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'report';
@@ -388,8 +451,11 @@ if (isset($_GET['view']))
 		{
 			$dbl->run("UPDATE `forum_replies` SET `reported` = 0 WHERE `post_id` = ?", array($_GET['post_id']));
 
-			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = ? AND `data` = ?", array(core::$date, 'forum_reply_report', $_GET['post_id']));
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `type` = ?, `data` = ?, `completed` = 1", array($_SESSION['user_id'], core::$date, core::$date, 'deleted_reply_report', $_GET['post_id']));
+			// update existing notification
+			$core->update_admin_note(array('type' => 'forum_reply_report', 'data' => $_GET['post_id']));
+
+			// note who deleted it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a forum reply report.'));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'report';
@@ -422,6 +488,9 @@ else if (isset($_POST['act']))
 
 				// make the category
 				$dbl->run("INSERT INTO `forums` SET `name` = ?, `is_category` = 1, `order` = ?", array($name, $order_now));
+
+				// note who added it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new forum category named: '.$name.'.'));
 
 				$core->message("Category $name added!");
 			}
@@ -570,6 +639,9 @@ else if (isset($_POST['act']))
 			// add permissions for this forum
 			$dbl->run("INSERT INTO `forum_permissions` SET `forum_id` = ?, `group_id` = ?, `can_view` = ?, `can_topic` = ?, `can_reply` = ?, `can_lock` = ?, `can_sticky` = ?, `can_delete` = ?, `can_delete_own` = ?, `can_avoid_floods` = ?, `can_move` = ?", array($last_id, $ids[$ind], $cv, $ct, $cr, $cl, $cs, $cd, $cdo, $cf, $cm));
 		}
+		// note who deleted it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' added a new forum named: '.$name.'.'));
+
 		$core->message("Forum {$name} added!");
 	}
 
@@ -587,6 +659,9 @@ else if (isset($_POST['act']))
 			else
 			{
 				$dbl->run("UPDATE `forums` SET `name` = ?, `order` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['category_id']));
+
+				// note who deleted it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' edited the category named: '.$name.'.'));
 
 				$core->message("Category $name has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
 			}
@@ -606,7 +681,13 @@ else if (isset($_POST['act']))
 				// if it has none
 				else
 				{
+					// get the name
+					$name = $dbl->run("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_POST['category_id']))->fetchOne();
+
 					$dbl->run("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['category_id']));
+
+					// note who deleted it
+					$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a forum category named: '.$name.'.'));
 
 					$core->message('Category has been deleted! <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
 				}
@@ -630,13 +711,15 @@ else if (isset($_POST['act']))
 			{
 				$dbl->run("UPDATE `forums` SET `name` = ?, `order` = ?, `description` = ? WHERE `forum_id` = ?", array($name, $_POST['order'], $_POST['description'],  $_POST['forum_id']));
 
-				$core->message("Category $name has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
+				// note who did it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' updated a forum named: '.$name.'.'));
+
+				$core->message("Forum $name has been updated. <a href=\"admin.php?module=forum&amp;view=manage\">Click here to return</a>.");
 			}
 		}
 
 		if ($_POST['submit'] == 'Delete')
 		{
-
 			// check if it has posts
 			$forum_post_check = $dbl->run("SELECT 1 FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['forum_id']))->fetch();
 			if ($forum_post_check)
@@ -647,13 +730,19 @@ else if (isset($_POST['act']))
 			// if it has none
 			else
 			{
+				// get the name
+				$name = $dbl->run("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']))->fetchOne();
+
 				// delete the forum
 				$dbl->run("DELETE FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']));
 
 				// remove forum permission rows
 				$dbl->run("DELETE FROM `forum_permissions` WHERE `forum_id` = ?", array($_POST['forum_id']));
 
-				$core->message('Forum has been deleted! <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
+				// note who did it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a forum named: '.$name.'.'));
+
+				$core->message('Forum '.$name.' has been deleted! <a href="admin.php?module=forum&amp;view=manage">Click here to return</a>.');
 			}
 		}
 	}
@@ -793,6 +882,9 @@ else if (isset($_POST['act']))
 			}
 
 			$name = $dbl->run("SELECT `name` FROM `forums` WHERE `forum_id` = ?", array($_POST['forum_id']))->fetchOne();
+
+			// note who did it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' updated the permissions for a forum named: '.$name.'.'));
 
 			$_SESSION['message'] = 'permissions_updated';
 			$_SESSION['message_extra'] = $name;

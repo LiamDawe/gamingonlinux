@@ -128,15 +128,8 @@ if (!isset($_GET['view']))
 	// editor tracking
 	$templating->block('editor_tracking', 'admin_modules/admin_home');
 
-	// get the different types of notifications
-	$fetch_types = $dbl->run("SELECT `name`, `text`, `link` FROM `admin_notification_types`")->fetch_all();
-	// make their key their name, so we can easily call them
-	foreach ($fetch_types as $types_set)
-	{
-		$types[$types_set['name']] = $types_set;
-	}
-
-	$get_notifications = $dbl->run("SELECT * FROM `admin_notifications` ORDER BY `id` DESC LIMIT 100")->fetch_all();
+	$last_id = 0;
+	$get_notifications = $dbl->run("SELECT * FROM `admin_notifications` ORDER BY `id` DESC LIMIT 50")->fetch_all();
 	foreach ($get_notifications as $tracking)
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
@@ -147,9 +140,19 @@ if (!isset($_GET['view']))
 			$completed_indicator = '<span class="badge badge-important">!</span>';
 		}
 
-		$templating->set('editor_action', '<li>' . $completed_indicator . ' ' . $tracking['content'] . ' When: ' . $core->human_date($tracking['created_date']) . '</li>');
+		$templating->set('editor_action', '<li data-id="'.$tracking['id'].'">' . $completed_indicator . ' ' . $tracking['content'] . ' When: ' . $core->human_date($tracking['created_date']) . '</li>');
+
+		$last_id = $tracking['id'];
 	}
 	$templating->block('tracking_bottom', 'admin_modules/admin_home');
+
+	$total_notifications = $dbl->run("SELECT COUNT(*) FROM `admin_notifications`")->fetchOne();
+	$load_more_link = '';
+	if ($total_notifications > 50)
+	{
+		$load_more_link = '<a class="load_admin_notifications" data-last-id="'.$last_id.'" href="#">Load More</a>';
+	}
+	$templating->set('more_link', $load_more_link);
 }
 
 if (isset($_GET['view']))

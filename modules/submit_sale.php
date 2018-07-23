@@ -59,7 +59,7 @@ if (isset($_POST['act']))
 
 		$bundle_id = $dbl->new_id();
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_sale_bundle', core::$date, $bundle_id));
+		$core->new_admin_note(array('content' => ' submitted a new bundle for the sales page named: <a href="/admin.php?module=sales&view=submitted_bundles">'.$name.'</a>.', 'type' => 'submitted_sale_bundle', 'data' => $bundle_id));
 
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'bundle';

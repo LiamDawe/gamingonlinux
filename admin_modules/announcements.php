@@ -122,7 +122,11 @@ if (isset($_POST['act']))
 
 		core::$redis->delete('index_announcements');
 
+		// note who did it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website announcement bar.'));
+
 		header("Location: /admin.php?module=announcements&view=manage&message=saved&extra=announcement");
+		die();
 	}
 	if ($_POST['act'] == 'edit')
 	{
@@ -166,9 +170,13 @@ if (isset($_POST['act']))
 
 		core::$redis->delete('index_announcements');
 
+		// note who did it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' edited a website announcement bar.'));
+
 		$_SESSION['message'] = 'edited';
 		$_SESSION['message_extra'] = 'announcement';
 		header("Location: /admin.php?module=announcements&view=manage");
+		die();
 	}
 
 	if ($_POST['act'] == 'delete')
@@ -186,6 +194,9 @@ if (isset($_POST['act']))
 			$dbl->run("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
 
 			core::$redis->delete('index_announcements');
+
+			// note who did it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a website announcement bar.'));
 
 			$_SESSION['message'] = 'deleted';
 			$_SESSION['message_extra'] = 'announcement';

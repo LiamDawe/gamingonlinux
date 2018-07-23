@@ -26,9 +26,6 @@ else
 	{
 		$article_class->delete_article($check);
 
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_article' AND `data` = ?", array(core::$date, $_GET['article_id']));
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = ?, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'denied_submitted_article', core::$date, core::$date, $_GET['article_id']));
-
 		if (isset($_POST['message']))
 		{
 			$message = trim($_POST['message']);

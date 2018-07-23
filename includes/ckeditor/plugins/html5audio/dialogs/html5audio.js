@@ -109,24 +109,6 @@ CKEDITOR.dialog.add( 'html5audio', function( editor ) {
                         commit: function( widget ) {
                             widget.setData( 'autoplay', this.getValue() );
                         }
-                    },
-                    {
-                        type: 'radio',
-                        id: 'allowdownload',
-                        label: editor.lang.html5audio.allowdownload,
-                        items: [
-                            [editor.lang.html5audio.yes, 'yes'],
-                            [editor.lang.html5audio.no, 'no']
-                        ],
-                        'default': 'no',
-                        setup: function( widget ) {
-                            if ( widget.data.allowdownload ) {
-                                this.setValue(widget.data.allowdownload);
-                            }
-                        },
-                        commit: function( widget ) {
-                            widget.setData( 'allowdownload', this.getValue() );
-                        }
                     } ]
                 } ]
             } ]

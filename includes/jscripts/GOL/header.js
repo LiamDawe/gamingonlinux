@@ -1400,6 +1400,10 @@ jQuery(document).ready(function()
 		{
 			CKEDITOR.instances.ckeditor_gol.insertHtml('<div class="ckeditor-html5-video" style="text-align: center;"><video controls="controls" src="'+text+'">&nbsp;</video></div>');
 		}
+		if (type == 'audio')
+		{
+			CKEDITOR.instances.ckeditor_gol.insertHtml('<div class="ckeditor-html5-audio" style="text-align: center;"><audio controls="controls" src="'+text+'">&nbsp;</audio></div>');
+		}
 		else
 		{
 			CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+text+'" data-fancybox="images"><img src="'+text+'" /></a></p>');
@@ -2025,5 +2029,33 @@ jQuery(document).ready(function()
 	$(document).on('click','#accept_captcha',function(e)
 	{
 		$.getScript('https://www.google.com/recaptcha/api.js?onload=recaptchacallback&render=explicit');
+	});
+
+	/* editor notifications loading */
+	$(document).on('click', ".load_admin_notifications", function(e)
+	{
+		e.preventDefault();
+		var load_link = $(this);
+		var last_id = $(this).attr("data-last-id");
+		var url = "/includes/ajax/admin/load_notifications.php";
+
+		$.ajax({
+			type: "GET",
+			url: url,
+			data: {'last_id': last_id,}, 
+			success: function(data)
+			{
+				if(data.result == 'done')
+				{
+					$('.notifications-list').append(data.text);
+					load_link.attr('data-last-id', data.last_id);
+
+					if (data.total_left == 0)
+					{
+						load_link.replaceWith('None left!');
+					}
+				}
+			}
+		});		
 	});
 });

@@ -3,26 +3,36 @@ session_start();
 
 define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
-require APP_ROOT . "/includes/bootstrap.php";
+require APP_ROOT . '/includes/twitter/twitteroauth/autoload.php';
+use Abraham\TwitterOAuth\TwitterOAuth;
 
-include (APP_ROOT . "/includes/twitter/twitteroauth.php");
+require APP_ROOT . "/includes/bootstrap.php";
 include (APP_ROOT . "/includes/twitter/functions.php");
 
-define('YOUR_CONSUMER_KEY', $core->config('tw_consumer_key'));
-define('YOUR_CONSUMER_SECRET', $core->config('tw_consumer_skey'));
+define('CONSUMER_KEY', $core->config('tw_consumer_key'));
+define('CONSUMER_SECRET', $core->config('tw_consumer_skey'));
+define('OAUTH_CALLBACK', getenv('OAUTH_CALLBACK'));
+
+$request_token = [];
+$request_token['oauth_token'] = $_SESSION['oauth_token'];
+$request_token['oauth_token_secret'] = $_SESSION['oauth_token_secret'];
 
 $cookie_length = 60*60*24*30; // 30 days
 
-if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empty($_SESSION['oauth_token_secret']))
+if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUEST['oauth_token'])
 {
 	// We've got everything we need
-	$twitteroauth = new TwitterOAuth(YOUR_CONSUMER_KEY, YOUR_CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
+	$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $request_token['oauth_token'], $request_token['oauth_token_secret']);
+
 	// Let's request the access token
-	$access_token = $twitteroauth->getAccessToken($_GET['oauth_verifier']);
+	$access_token = $connection->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
+
+	print_r($access_token);
+
 	// Save it in a session var
 	$_SESSION['access_token'] = $access_token;
 	// Let's get the user's info
-	$user_info = $twitteroauth->get('account/verify_credentials');
+	$user_info = $connection->get('account/verify_credentials');
 
 	if (isset($user_info->error))
 	{
@@ -32,6 +42,8 @@ if (!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empt
 
 	else
 	{
+		print_r($user_info);
+		die();
 		$uid = $user_info->id;
 		$username = $user_info->screen_name;
 		$twitter_user = new twitter_user();

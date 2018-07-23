@@ -83,8 +83,11 @@ if (isset($_POST['act']))
 			}
 			else if (isset($_POST['yes']))
 			{
+				// get the title
+				$topic_title = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
+
 				// update admin notifications
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_topic_report', core::$date, $_GET['topic_id']));
+				$core->new_admin_note(array('content' => ' reported a forum topic titled: <a href="/admin.php?module=forum&view=reportedtopics">'.$topic_title.'</a>.', 'type' => 'forum_topic_report', 'data' => $_GET['topic_id']));
 
 				// give it a report
 				$dbl->run("UPDATE `forum_topics` SET `reported` = 1, `reported_by_id` = ? WHERE `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
@@ -112,8 +115,11 @@ if (isset($_POST['act']))
 			}
 			else if (isset($_POST['yes']))
 			{
+				// get the title
+				$topic_title = $dbl->run("SELECT t.`topic_title` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` WHERE p.`post_id` = ?", array($_GET['post_id']))->fetchOne();
+
 				// update admin notifications
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'forum_reply_report', core::$date, $_GET['post_id']));
+				$core->new_admin_note(array('content' => ' reported a post in the topic titled: <a href="/admin.php?module=forum&view=reportedreplies">'.$topic_title.'</a>.', 'type' => 'forum_reply_report', 'data' => $_GET['post_id']));
 
 				// give it a report
 				$dbl->run("UPDATE `forum_replies` SET `reported` = 1, `reported_by_id` = ? WHERE `post_id` = ?", array($_SESSION['user_id'], $_GET['post_id']));

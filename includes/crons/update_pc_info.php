@@ -27,5 +27,6 @@ $dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `categ
 $dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = 83", array($article_id));
 
 // update admin notifications
-$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = 1844, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array('article_admin_queue', core::$date, $article_id));
+$admin_note_content = ' added an article to the admin queue titled: Reminder: Update your PC info for the next round of statistics updates';
+$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = 1844, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?, `content` = ?", array('article_admin_queue', core::$date, $article_id, $admin_note_content));
 ?>

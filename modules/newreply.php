@@ -223,7 +223,11 @@ else
 						// help stop double postings
 						unset($message);
 
-						$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue_reply'", array($_SESSION['user_id'], core::$date, $post_id));
+						// get the title
+						$topic_title = $dbl->run("SELECT t.`topic_title` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` WHERE p.`post_id` = ?", array($post_id))->fetchOne();
+
+						// add a new notification for the mod queue
+						$core->new_admin_note(array('content' => ' has a new forum post in the mod queue for the topic titled: <a href="/admin.php?module=mod_queue&view=manage">'.$topic_title.'</a>.', 'type' => 'mod_queue_reply', 'data' => $post_id));
 						
 						$_SESSION['message'] = 'mod_queue';
 

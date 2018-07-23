@@ -593,8 +593,8 @@ if (isset($_POST['act']))
 			{
 				$games_database->move_small($new_id, $_SESSION['gamesdb_smallpic']['image_name']);
 			}
-	
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_addition', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $new_id));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' added a new game to the database - <a href="/index.php?module=items_database&view=item&id='.$new_id.'">'.$name.'</a>.'));
 	
 			$_SESSION['message'] = 'saved';
 			$_SESSION['message_extra'] = 'game';
@@ -610,8 +610,8 @@ if (isset($_POST['act']))
 			{
 				$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
 			}
-	
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_edit', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' edited a game in the database - <a href="/index.php?module=items_database&view=item&id='.$_POST['id'].'">'.$name.'</a>.'));
 
 			$_SESSION['message'] = 'edited';
 			$_SESSION['message_extra'] = 'game';	
@@ -629,10 +629,10 @@ if (isset($_POST['act']))
 			}
 	
 			// update the original notification to clear it
-			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'item_database_addition'", [core::$date, $_POST['id']]);
+			$core->update_admin_note(array('type' => 'item_database_addition', 'data' => $_POST['id']));
 	
 			// note who approved this item for the database
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'item_database_approved', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+			$core->new_admin_note(array('completed' => 1, 'content' => ' approved a submitted game for the database - <a href="/index.php?module=items_database&view=item&id='.$_POST['id'].'">'.$name.'</a>.'));
 		
 			$_SESSION['message'] = 'submit_approved';	
 		}
@@ -671,6 +671,7 @@ if (isset($_POST['act']))
 				$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` IN ($in)", $merged_array);
 			}
 
+			$genre_ids = [];
 			foreach ($_POST['genre_ids'] as $genre_id)
 			{
 				// ensure it isn't already tagged (perhaps an editor recently added it manually?)
@@ -678,16 +679,25 @@ if (isset($_POST['act']))
 				if (!$check_exists)
 				{
 					$dbl->run("INSERT INTO `game_genres_reference` SET `game_id` = ?, `genre_id` = ?", [$_POST['id'], $genre_id]);
+					$genre_ids[] = $genre_id;
 				}
 				
 				// no matter what, if we actually approved it, or silently ignored it (due to the above) - remove the suggestion
 				$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `genre_id` = ?", [$_POST['id'], $genre_id]);
 			}
 
-			// now set the admin notification as read, for anyone who submitted tags up until we saw them on this item
-			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_game_genre_suggestion' AND `data` = ? AND `created_date` <= ?", array(core::$date, $_POST['id'], $_POST['current_time']));
+			// get the name for the admin note
+			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_POST['id']))->fetchOne();
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = 'approved_gametag_submission', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+			// get the tag names for the admin note
+			$in = str_repeat('?,', count($genre_ids) - 1) . '?';
+			$genre_names = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_id` IN ($in)", $genre_ids)->fetch_all(PDO::FETCH_COLUMN);
+
+			// update the original notification to clear it
+			$core->update_admin_note(array('type' => 'submitted_game_genre_suggestion', 'data' => $_POST['id'], 'sql_where' => array('fields' => 'created_date <= ?', 'values' => $_POST['current_time'])));
+	
+			// note who approved this item for the database and note the new tags
+			$core->new_admin_note(array('completed' => 1, 'content' => ' approved submitted tags for a game in the database - <a href="/index.php?module=items_database&view=item&id='.$_POST['id'].'">'.$name.'</a>. New tags: ' . implode(', ', $genre_names) . '.'));
 
 			$_SESSION['message'] = 'tags_approved';
 			header("Location: /admin.php?module=games&view=tag_suggestions");
@@ -710,10 +720,11 @@ if (isset($_POST['act']))
 		// delete all suggested tags for this game, that were suggested up until we saw them (so we don't deny submissions we haven't seen since coming here)
 		$dbl->run("DELETE FROM `game_genres_suggestions` WHERE `game_id` = ? AND `suggested_time` <= ?", [$_POST['id'], $_POST['current_time']]);
 
-		// now set the admin notification as read, for anyone who submitted tags up until we saw them on this item
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'submitted_game_genre_suggestion' AND `data` = ? AND `created_date` <= ?", array(core::$date, $_POST['id'], $_POST['current_time']));
-
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed_date` = ?, `completed` = 1, `type` = 'denied_gametag_submission', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id']));
+		// update the original notification to clear it
+		$core->update_admin_note(array('type' => 'submitted_game_genre_suggestion', 'data' => $_POST['id'], 'sql_where' => array('fields' => 'created_date <= ?', 'values' => $_POST['current_time'])));
+	
+		// note who approved this item for the database and note the new tags
+		$core->new_admin_note(array('completed' => 1, 'content' => ' denied submitted tags for a game in the database.'));
 
 		$_SESSION['message'] = 'tags_denied';
 		header("Location: /admin.php?module=games&view=tag_suggestions");
@@ -763,10 +774,10 @@ if (isset($_POST['act']))
 			$dbl->run("DELETE FROM `game_genres_reference` WHERE `game_id` = ?", [$_GET['id']]);
 
 			// update the original notification to clear it
-			$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `data` = ? AND `type` = 'item_database_addition'", [core::$date, $_GET['id']]);
-
-			// note who denied this item for the database
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'item_database_denied', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $info['name']));
+			$core->update_admin_note(array('type' => 'item_database_addition', 'data' => $_GET['id']));
+	
+			// note who denied it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' denied a submitted game for the database.'));
 
 			header("Location: /admin.php?module=games&view=submitted_list");
 			die();
@@ -804,11 +815,11 @@ if (isset($_POST['act']))
 
 		$dbl->run("UPDATE `developers` SET `approved` = 1, `name` = ?, `website` = ? WHERE `id` = ?", [$name, $link, $_POST['id']]);
 
-		// update original notification
-		$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'dev_database_addition' AND `data` = ?", array(core::$date, $_POST['id']));
-
-		// make new notification for who did this
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'dev_database_approve', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['id'], $name));		
+		// update the original notification to clear it
+		$core->update_admin_note(array('type' => 'dev_database_addition', 'data' => $_POST['id']));
+	
+		// note who denied it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' approved a submitted developer for inclusion in the database: ' . $name . '.'));		
 
 		$_SESSION['message'] = 'submit_approved';
 		header("Location: /admin.php?module=games&view=submitted_list");
@@ -835,11 +846,11 @@ if (isset($_POST['act']))
 			{
 				$dbl->run("DELETE FROM `developers` WHERE `id` = ?", array($_GET['id']));
 
-				// update original notification
-				$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'dev_database_addition' AND `data` = ?", array(core::$date, $_GET['id']));
-
-				// make new notification for who did this
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'dev_database_denied', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $info['name']));		
+				// update the original notification to clear it
+				$core->update_admin_note(array('type' => 'dev_database_addition', 'data' => $_GET['id']));
+	
+				// note who denied it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' denied a submitted developer for inclusion in the database: ' . $info['name'] . '.'));		
 
 				$_SESSION['message'] = 'dev_denied';
 				header("Location: /admin.php?module=games&view=submitted_list");
@@ -923,7 +934,8 @@ if (isset($_POST['act']))
 			// delete any tags attached to it
 			$dbl->run("DELETE FROM `game_genres_reference` WHERE `game_id` = ?", [$_GET['id']]);
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'game_database_deletion', `created_date` = ?, `completed_date` = ?, `data` = ?, `content` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_GET['id'], $info['name']));
+			// note who deleted it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted an item from the games database: ' . $info['name'] . '.'));	
 
 			if (isset($_GET['return']) && !empty($_GET['return']))
 			{

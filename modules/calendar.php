@@ -293,12 +293,11 @@ if (isset($_POST['act']))
 			}
 		}
 
-		$check = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($name));
+		$check = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($name))->fetch();
 		if ($check)
 		{
-			$game = $dbl->fetch();
 			$_SESSION['message'] = 'exists';
-			$_SESSION['message_extra'] = $game['id'];
+			$_SESSION['message_extra'] = $check['id'];
 			header("Location: /index.php?module=calendar");
 			die();
 		}
@@ -313,7 +312,7 @@ if (isset($_POST['act']))
 
 		$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `link` = ?, `best_guess` = ?, `approved` = 0", array($name, $date->format('Y-m-d'), $_POST['link'], $guess));
 
-		$new_id = $dbl->grab_id();
+		$new_id = $dbl->new_id();
 		
 		if (isset($_POST['genre_ids']) && is_array($_POST['genre_ids']) && core::is_number($_POST['genre_ids']))
 		{
@@ -323,7 +322,7 @@ if (isset($_POST['act']))
 			}
 		}
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'calendar_submission', core::$date, $new_id));
+		$core->new_admin_note(['complete' => 0, 'type' => 'calendar_submission', 'content' => 'submitted a new item for the release calendar.', 'data' => $new_id]);
 
 		$_SESSION['message'] = 'game_submitted';
 		header("Location: /index.php?module=calendar");

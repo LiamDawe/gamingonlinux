@@ -1,4 +1,6 @@
 <?php
+use Abraham\TwitterOAuth\TwitterOAuth;
+
 $templating->set_previous('title', 'Login', 1);
 $templating->set_previous('meta_description', 'Login page for GamingOnLinux', 1);
 
@@ -115,7 +117,7 @@ if (!isset($_POST['action']))
 	
 	else if (isset($_GET['twitter']))
 	{		
-		require("includes/twitter/twitteroauth.php");
+		/*require("includes/twitter/twitteroauth.php");
 
 		$twitteroauth = new TwitterOAuth($core->config('tw_consumer_key'), $core->config('tw_consumer_skey'));
 
@@ -138,7 +140,24 @@ if (!isset($_POST['action']))
 		else
 		{
 			$core->message('We were unable to autheticate you, Twitter might be having issues. If this persists please contact the admins.');
-		}
+		}*/
+		require 'includes/twitter/twitteroauth/autoload.php';
+		
+		define('CONSUMER_KEY', $core->config('tw_consumer_key'));
+		define('CONSUMER_SECRET', $core->config('tw_consumer_skey'));
+		define('OAUTH_CALLBACK', getenv('OAUTH_CALLBACK'));
+
+		$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET);
+
+		$request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => OAUTH_CALLBACK));
+
+		$_SESSION['oauth_token'] = $request_token['oauth_token'];
+		$_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
+
+		$url = $connection->url('oauth/authorize', array('oauth_token' => $request_token['oauth_token']));
+
+		header('Location: ' . $url);
+		die();
 	}
 }
 

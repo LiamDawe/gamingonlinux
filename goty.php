@@ -70,7 +70,7 @@ if (isset($_POST['act']))
 						$dbl->run("INSERT INTO `goty_games` SET `game_id` = ?, `category_id` = ?", array($_POST['game_id'], $_POST['category']));
 						$game_id = $dbl->new_id();
 
-						$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 0, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'goty_game_submission', core::$date, $game_id));
+						$core->new_admin_note(array('type' => 'goty_game_submission', 'data' => $game_id, 'content' => ' submitted a new game to the <a href="/admin.php?module=goty&view=submitted">GOTY awards</a>.'));
 
 						$_SESSION['message'] = 'goty_game_submitted';
 						header("Location: " . $core->config('website_url') . "goty.php");
@@ -80,7 +80,7 @@ if (isset($_POST['act']))
 						$dbl->run("INSERT INTO `goty_games` SET `game_id` = ?, `category_id` = ?, `accepted` = 1", array($_POST['game_id'], $_POST['category']));
 						$game_id = $dbl->new_id();
 
-						$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], 'goty_game_added', core::$date, core::$date, $game_id));
+						$core->new_admin_note(array('completed' => 1, 'type' => 'goty_game_added', 'data' => $game_id, 'content' => ' added a new game to the GOTY awards.'));
 
 						$_SESSION['message'] = 'goty_added_editor';
 						header("Location: " . $core->config('website_url') . "goty.php");

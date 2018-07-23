@@ -351,6 +351,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				}
 			}
 
+			// note who did it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' added a new chart.'));
+
 			$_SESSION['message'] = 'saved';
 			$_SESSION['message_extra'] = 'chart';
 			header("Location: /admin.php?module=charts&view=edit&id=".$new_chart_id);
@@ -382,15 +385,23 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				$dbl->run("DELETE FROM `user_stats_charts` WHERE `id` = ?", array($_GET['id']));
 				$dbl->run("DELETE FROM `user_stats_charts_data` WHERE `chart_id` = ?", array($_GET['id']));
 				$dbl->run("DELETE FROM `user_stats_charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
-				header("Location: /admin.php?module=charts&view=manage_stats&message=deleted");
+
+				$return = "/admin.php?module=charts&view=manage_stats&message=deleted";
 			}
 			else
 			{
 				$dbl->run("DELETE FROM `charts` WHERE `id` = ?", array($_GET['id']));
 				$dbl->run("DELETE FROM `charts_data` WHERE `chart_id` = ?", array($_GET['id']));
 				$dbl->run("DELETE FROM `charts_labels` WHERE `chart_id` = ?", array($_GET['id']));
-				header("Location: /admin.php?module=charts&view=manage&message=deleted");
+
+				$return = "/admin.php?module=charts&view=manage&message=deleted";
 			}
+
+			// note who did it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a chart.'));
+
+			header("Location: $return");
+			die();
 		}
 	}
 
@@ -410,7 +421,11 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 			$dbl->run("DELETE FROM `user_stats_charts_data` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
 			$dbl->run("DELETE FROM `user_stats_charts_labels` WHERE `grouping_id` = ?", array($_GET['grouping_id']));
 
+			// note who did it
+			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a chart group.'));
+
 			header("Location: /admin.php?module=charts&view=manage_stats&message=deleted");
+			die();
 		}
 	}
 	
@@ -530,6 +545,9 @@ else if (isset($_POST['act']) && !isset($_GET['view']))
 				$dbl->run("UPDATE `charts_data` SET `data` = ?, `min` = ?, `max` = ? WHERE `data_id` = ?", array($data_series[0], $min, $max, $data_id));
 			}
 		}
+
+		// note who did it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' updated a chart.'));
 		
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'chart';

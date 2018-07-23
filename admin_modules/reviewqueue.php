@@ -367,6 +367,7 @@ if (isset($_POST['act']))
 
 			$_SESSION['message'] = 'admin_edited';
 			header("Location: ".$core->config('website_url')."admin.php?module=reviewqueue&aid={$_POST['article_id']}&lock=0");
+			die();
 		}
 	}
 }

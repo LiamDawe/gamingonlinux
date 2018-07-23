@@ -315,7 +315,7 @@ if (isset($_POST['act']))
 
 				if ($total_added > 0)
 				{
-					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_game_genre_suggestion', core::$date, $_POST['id']));
+					$core->new_admin_note(['complete' => 0, 'type' => 'submitted_game_genre_suggestion', 'content' => 'submitted a genre suggestion for an item in the database.', 'data' => $_POST['id']]);
 				}
 
 				$core->message('Your tag suggestions for ' . $get_item_res['name'] . ' have been submitted! Thank you!');
@@ -413,7 +413,7 @@ if (isset($_POST['act']))
 
 		$core->process_game_genres($new_id);
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = 'item_database_addition', `created_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, $new_id));
+		$core->new_admin_note(['complete' => 0, 'type' => 'item_database_addition', 'content' => 'submitted a new item for the games database.', 'data' => $new_id]);
 
 		$_SESSION['message'] = 'item_submitted';
 		$_SESSION['message_extra'] = $name;
@@ -446,7 +446,7 @@ if (isset($_POST['act']))
 
 		$new_id = $dbl->new_id();
 
-		$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = 'dev_database_addition', `created_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, $new_id));
+		$core->new_admin_note(['complete' => 0, 'type' => 'dev_database_addition', 'content' => 'submitted a new developer for the games database.', 'data' => $new_id]);
 
 		$_SESSION['message'] = 'dev_submitted';
 		$_SESSION['message_extra'] = $name;

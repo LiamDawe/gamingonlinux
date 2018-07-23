@@ -19,15 +19,15 @@ header('Content-Type: application/json');
 define ("MAX_SIZE",50*1024*1024); // 50MB
 function getExtension($str)
 {
-         $i = strrpos($str,".");
-         if (!$i) { return ""; }
-         $l = strlen($str) - $i;
-         $ext = substr($str,$i+1,$l);
-         return $ext;
+	$i = strrpos($str,".");
+    if (!$i) { return ""; }
+    $l = strlen($str) - $i;
+    $ext = substr($str,$i+1,$l);
+    return $ext;
 }
 
 $return_data = [];
-$valid_formats = array("jpg", "png", "gif", "jpeg", "svg", 'mp4', 'webm');
+$valid_formats = array("jpg", "png", "gif", "jpeg", "svg", 'mp4', 'webm', 'ogg', 'mp3');
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 {
 	$uploaddir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/articles/article_media/";
@@ -54,7 +54,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				$data_type = '';
 
 				// only for images
-				if ($ext != 'mp4' && $ext != 'webm')
+				if ($ext != 'mp4' && $ext != 'webm' && $ext != 'ogg' && $ext != 'mp3')
 				{
 					$thumb_url = $core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $image_name;
 
@@ -77,10 +77,15 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$preview_file = '<img src="' . $thumb_url . '" class="imgList"><br />';
 					$data_type = 'image';
 				}
-				else
+				else if ($ext == 'mp4' || $ext == 'webm')
 				{
 					$preview_file = '<video width="100%" src="'.$main_url.'" controls></video>';
 					$data_type = 'video';
+				}
+				else if ($ext == 'mp3' || $ext == 'ogg')
+				{
+					$preview_file = '<div class="ckeditor-html5-audio" style="text-align: center;"><audio controls="controls" src="'.$main_url.'">&nbsp;</audio></div>';
+					$data_type = 'audio';
 				}
 				
 				if (move_uploaded_file($_FILES['media']['tmp_name'][$name], $main_newname))

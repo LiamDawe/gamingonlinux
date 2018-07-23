@@ -99,7 +99,7 @@ else
 	$get_all_cats = $dbl->run("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
 	foreach ($get_all_cats as $categorys)
 	{
-		if (isset($_GET['error']))
+		if (isset($message_map::$error) && $message_map::$error > 0)
 		{
 			if (!empty($_SESSION['acategories']) && in_array($categorys['category_id'], $_SESSION['acategories']))
 			{

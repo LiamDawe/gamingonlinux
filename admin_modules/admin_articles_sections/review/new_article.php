@@ -8,8 +8,8 @@ if ($checked = $article_class->check_article_inputs($return_page))
 
 	$article_id = $dbl->new_id();
 
-	// update admin notifications
-	$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'article_admin_queue', core::$date, $article_id));
+	// note who did it
+	$core->new_admin_note(array('completed' => 0, 'content' => ' sent a new article for review titled: <a href="/admin.php?module=reviewqueue">'.$checked['title'].'</a>.', 'type' => 'article_admin_queue', 'data' => $article_id));
 
 	// update any uploaded images to have this article id, stop any images not being attached to an article
 	if (isset($_POST['uploads']))

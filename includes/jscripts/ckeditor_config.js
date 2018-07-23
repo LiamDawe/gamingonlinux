@@ -13,7 +13,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
 		{ name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
 		{ name: 'links' },
-		{ name: 'insert' },
+		{ name: 'insert', },
 		{ name: 'forms' },
 		{ name: 'tools' },
 		{ name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
@@ -52,15 +52,9 @@ CKEDITOR.editorConfig = function( config ) {
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 
-	config.extraPlugins = 'widget';
-	config.extraPlugins = 'widgetselection';
-	config.extraPlugins = 'lineutils';
-	config.extraPlugins = 'html5audio';
-	config.extraPlugins = 'html5video';
-	config.extraPlugins = 'youtube';
+	config.extraPlugins = 'widget,widgetselection,lineutils,html5audio,youtube,html5video';
 	config.removePlugins = 'about';
 	
-
 	config.youtube_responsive = true;
 	config.youtube_related = false;
 	config.youtube_privacy = true;

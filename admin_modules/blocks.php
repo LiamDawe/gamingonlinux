@@ -198,6 +198,9 @@ else
 				// create block
 				$dbl->run("INSERT INTO `{$type}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `activated` = ?, `block_custom_content` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ?, `order` = ?", array($_POST['name'], $title, $_POST['link'], $activated, $text, $_POST['style'], $nonpremium, $homepage, $new_order));
 
+				// note who did it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
+
 				$core->message('You have succesfully made the new block! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=add">Create another block</a>?');
 			}
 		}
@@ -236,6 +239,9 @@ else
 				$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
 				core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 
+				// note who did it
+				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
+
 				$core->message("You have succesfully added the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage&{$_POST['type']}\">Manage blocks</a>?");
 			}
 		}
@@ -245,8 +251,8 @@ else
 			if ($_POST['type'] == 'normal')
 			{
 				// make safe
-				$name = $_POST['name'];
-				$title = $_POST['title'];
+				$name = trim($_POST['name']);
+				$title = trim($_POST['title']);
 				$id = $_POST['block_id'];
 
 				if (!is_numeric($id))
@@ -279,6 +285,9 @@ else
 
 					// update
 					$dbl->run("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_link` = ?, `activated` = ? WHERE `block_id` = ?", array($name, $title, $_POST['link'], $_POST['filename'], $activated, $id));
+
+					// note who did it
+					$core->new_admin_note(array('completed' => 1, 'content' => ' updated the sidebar block named: '.$name.'.'));
 
 					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
 				}
@@ -335,6 +344,9 @@ else
 					// update
 					$dbl->run("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_custom_content` = ?, `activated` = ?, `style` = ?, `nonpremium_only` = ?, `homepage_only` = ? WHERE `block_id` = ?", array($_POST['name'], $title, $_POST['link'], $text, $activated, $_POST['style'], $nonpremium, $homepage, $id));
 
+					// note who did it
+					$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
+
 					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
 				}
 			}
@@ -378,7 +390,7 @@ else
 				else
 				{
 					// check block exists
-					$check_res = $dbl->run("SELECT `block_id` FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id))->fetch();
+					$check_res = $dbl->run("SELECT `block_id`, `block_name` FROM `{$usercp}blocks` WHERE `block_id` = ?", array($id))->fetch();
 					if (!$check_res)
 					{
 						$core->message('That is not a correct id!');
@@ -394,6 +406,9 @@ else
 							$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
 							core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 						}
+
+						// note who did it
+						$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a website sidebar block named: '.$check_res['block_name'].'.'));
 
 						$core->message('That block has now been deleted! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=manage">Manage another block</a>?');
 					}

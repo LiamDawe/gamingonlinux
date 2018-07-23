@@ -9,6 +9,19 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
 	{
+		/*
+		New sql to cover all of them, in progress:
+		SELECT n.id, n.user_id, ids.type, ids.item_id, ids.post_title
+		FROM admin_notifications n 
+		JOIN (
+			(SELECT t.topic_title AS post_title, t.topic_id AS item_id, 'mod_queue' AS type FROM `forum_topics` t WHERE t.approved = 0)
+		UNION
+			(SELECT t.topic_title AS post_title, p.post_id AS item_id, 'mod_queue_reply' AS type FROM `forum_replies` p LEFT JOIN `forum_topics` t ON p.topic_id = t.topic_id WHERE p.approved = 0)
+			UNION
+			(SELECT a.title AS post_title, c.comment_id AS item_id, 'mod_queue_comment' AS type FROM `articles_comments` c INNER JOIN `articles` a ON a.article_id = c.article_id WHERE c.approved = 0)
+		) ids ON n.data = ids.item_id AND n.type = ids.type
+		WHERE n.completed = 0
+		*/
 		$topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username`, u.`mod_approved` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0")->fetch_all();
 
 		if ($topics)
@@ -129,8 +142,6 @@ if (isset($_POST['action']))
 
 				// get article name for the email and redirect
 				$topic_info = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']))->fetch();
-
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `type` = 'mod_queue_reply_approved', `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $_POST['post_id']));
 
 				// notify editors this was done
 				$core->update_admin_note(array('type' => 'mod_queue_reply', 'data' => $_POST['post_id']));

@@ -121,8 +121,9 @@ if (isset($_POST['act']))
 		$templating->set_previous('title', 'Submit An Article', 1);
 
 		$redirect = '/submit-article/';
-        
-		$title = strip_tags($_POST['title']);
+		
+		$title = trim($_POST['title']);
+		$title = strip_tags($title);
 		$title = mb_convert_encoding($title, 'UTF-8');
         $text = trim($_POST['text']);
         
@@ -268,7 +269,7 @@ if (isset($_POST['act']))
 
 			$article_id = $dbl->new_id();
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array($_SESSION['user_id'], 'submitted_article', core::$date, $article_id));
+			$core->new_admin_note(array('content' => ' submitted a new article titled: <a href="/admin.php?module=articles&view=Submitted&aid='.$article_id.'">'.$title.'</a>.', 'type' => 'submitted_article', 'data' => $article_id));
 
 			// check if they are subscribing
 			if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)

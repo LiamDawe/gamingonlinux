@@ -362,8 +362,6 @@ else
 			{
 				$dbl->run("INSERT INTO `ipbans` SET `ip` = ?, `ban_date` = ?", array($_POST['ip'], core::$sql_date_now));
 
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = 'ip_banned', `data` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?", array($_SESSION['user_id'], $_POST['ip'], core::$date, core::$date));
-
 				// alert admins this was done
 				$core->new_admin_note(array('completed' => 1, 'content' => ' banned the IP: ' . $_POST['ip'] . '.'));
 
@@ -546,7 +544,7 @@ else
 							$dbl->run("DELETE FROM `forum_topics_subscriptions` WHERE `topic_id` = ?", array( $row['topic_id'] ));
 							if ($row['reported'] == 1)
 							{
-								$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `data` = ? AND `type` = 'forum_topic_report'", array(core::$date, $row['topic_id']));
+								$core->update_admin_note(array('type' => 'forum_topic_report', 'data' => $row['topic_id']));
 							}
 						}
 
@@ -556,7 +554,7 @@ else
 						{
 							if ($row['reported'] == 1)
 							{
-								$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ?  WHERE `data` = ? AND `type` = 'forum_reply_report'", array(core::$date, $row['post_id']));
+								$core->update_admin_note(array('type' => 'forum_reply_report', 'data' => $row['post_id']));
 							}
 						}
 
@@ -566,7 +564,7 @@ else
 						{
 							if ($comment_loop['spam'] == 1)
 							{
-								$dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'reported_comment' AND `data` = ?", array(core::$date, $comment_loop['comment_id']));
+								$core->update_admin_note(array('type' => 'reported_comment', 'data' => $comment_loop['comment_id']));
 							}
 						}
 

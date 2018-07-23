@@ -1,6 +1,6 @@
 CKEDITOR.plugins.add( 'html5audio', {
     requires: 'widget',
-    lang: 'de,el,en,eu,es,fr,ru,uk,uz,zh-cn',
+    lang: 'de,en,eu,es,ru,uk,fr',
     icons: 'html5audio',
     init: function( editor ) {
         editor.widgets.add( 'html5audio', {
@@ -13,7 +13,7 @@ CKEDITOR.plugins.add( 'html5audio', {
              *  - div-s with text-align,float,margin-left,margin-right inline style rules and required ckeditor-html5-audio class.
              *  - audio tags with src and controls attributes.
              */
-            allowedContent: 'div(!ckeditor-html5-audio){text-align,float,margin-left,margin-right}; audio[src,controls,controlslist,autoplay];',
+            allowedContent: 'div(!ckeditor-html5-audio){text-align,float,margin-left,margin-right}; audio[src,controls,autoplay];',
             requiredContent: 'div(ckeditor-html5-audio); audio[src,controls];',
             upcast: function( element ) {
                 return element.name === 'div' && element.hasClass( 'ckeditor-html5-audio' );
@@ -29,7 +29,6 @@ CKEDITOR.plugins.add( 'html5audio', {
                     // get it's attributes.
                     src = this.element.getChild( 0 ).getAttribute( 'src' );
                     autoplay = this.element.getChild( 0 ).getAttribute( 'autoplay' );
-                    allowdownload = !this.element.getChild( 0 ).getAttribute( 'controlslist' );
                 }
 
                 if ( src ) {
@@ -43,10 +42,6 @@ CKEDITOR.plugins.add( 'html5audio', {
 
                     if ( autoplay ) {
                         this.setData( 'autoplay', 'yes' );
-                    }
-
-                    if ( allowdownload ) {
-                        this.setData( 'allowdownload', 'yes' );
                     }
                 }
             },
@@ -88,11 +83,6 @@ CKEDITOR.plugins.add( 'html5audio', {
                         this.element.getChild( 0 ).setAttribute( 'autoplay', 'autoplay' );
                     } else {
                         this.element.getChild( 0 ).removeAttribute( 'autoplay' );
-                    }
-                    if ( this.data.allowdownload === 'yes' ) {
-                        this.element.getChild( 0 ).removeAttribute( 'controlslist' );
-                    } else {
-                        this.element.getChild( 0 ).setAttribute( 'controlslist', 'nodownload' );
                     }
                 }
             }

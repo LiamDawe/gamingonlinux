@@ -280,7 +280,8 @@ else
 
 						else if ($approved == 0)
 						{
-							$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue'", array($_SESSION['user_id'], core::$date, $topic_id));
+							// add a new notification for the mod queue
+							$core->new_admin_note(array('content' => ' has a new forum topic in the mod queue titled: <a href="/admin.php?module=mod_queue&view=manage">'.$title.'</a>.', 'type' => 'mod_queue', 'data' => $topic_id));
 
 							$_SESSION['message'] = 'mod_queue';
 							

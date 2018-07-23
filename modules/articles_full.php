@@ -585,7 +585,8 @@ else if (isset($_GET['go']))
 
 			$correction_id = $dbl->new_id();
 
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `type` = ?, `data` = ?, `completed` = 0", array((int) $_SESSION['user_id'], core::$date, 'article_correction', $correction_id));
+			// note who did it
+			$core->new_admin_note(array('completed' => 0, 'content' => ' sent a new article correction for: <a href="/admin.php?module=corrections">'.$title['title'].'</a>.', 'type' => 'article_correction', 'data' => $correction_id));
 
 			$_SESSION['message'] = 'tip_sent';
 			header("Location: " . $article_link);
@@ -825,7 +826,8 @@ else if (isset($_GET['go']))
 						}
 						else if ($approved == 0)
 						{
-							$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `created_date` = ?, `data` = ?, `type` = 'mod_queue_comment'", array($_SESSION['user_id'], core::$date, $new_comment_id));
+							// note who did it
+							$core->new_admin_note(array('completed' => 0, 'content' => ' has a comment that <a href="/admin.php?module=mod_queue&view=manage">needs approval.</a>', 'type' => 'mod_queue_comment', 'data' => $new_comment_id));
 
 							// try to stop double postings, clear text
 							unset($_POST['text']);
@@ -931,8 +933,8 @@ else if (isset($_GET['go']))
 		{
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
-				// update admin notifications
-				$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 0, `type` = ?, `created_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], 'reported_comment', core::$date, (int) $_GET['comment_id']));
+				// note who did it
+				$core->new_admin_note(array('completed' => 0, 'content' => ' has <a href="/admin.php?module=comment_reports">reported a comment.</a>', 'type' => 'reported_comment', 'data' => $_GET['comment_id']));
 
 				$dbl->run("UPDATE `articles_comments` SET `spam` = 1, `spam_report_by` = ? WHERE `comment_id` = ?", array((int) $_SESSION['user_id'], (int) $_GET['comment_id']));
 			}
@@ -951,26 +953,16 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'open_comments')
 	{
+		// get info for title
+		$title = $dbl->run("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
+			
+		$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
+
 		if ($user->check_group([1,2]) == true)
 		{
-			// get info for title
-			$title = $dbl->run("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
-			
-			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
+			$dbl->run("UPDATE `articles` SET `comments_open` = 1 WHERE `article_id` = ?", array((int) $_GET['article_id']));
 
-			header("Location: ".$article_link);
-
-			if ($user->check_group([1,2]) == false)
-			{
-				header("Location: ".$article_link);
-			}
-
-			else
-			{
-				$dbl->run("UPDATE `articles` SET `comments_open` = 1 WHERE `article_id` = ?", array((int) $_GET['article_id']));
-			}
-
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], core::$date, 'opened_comments', core::$date, (int) $_GET['article_id']));
+			$core->new_admin_note(['complete' => 1, 'type' => 'opened_comments', 'content' => 'opened the comments on the article titled: <a href="'.$article_link.'">'.$title['title'] . '</a>', 'data' => $_GET['article_id']]);
 
 			$_SESSION['message'] = 'comments_opened';
 			header("Location: ".$article_link);
@@ -985,35 +977,27 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'close_comments')
 	{
+		// get info for title
+		$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
+			
+		$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
+
 		if ($user->check_group([1,2]) == true)
 		{
-			// get info for title
-			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
-			
-			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
+			$dbl->run("UPDATE `articles` SET `comments_open` = 0 WHERE `article_id` = ?", array((int) $_GET['article_id']));
 
-			header("Location: ".$article_link);
-
-			if ($user->check_group([1,2]) == false)
-			{
-				header("Location: ".$article_link);
-			}
-
-			else
-			{
-				$dbl->run("UPDATE `articles` SET `comments_open` = 0 WHERE `article_id` = ?", array((int) $_GET['article_id']));
-			}
-
-			$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `created_date` = ?, `completed` = 1, `type` = ?, `completed_date` = ?, `data` = ?", array((int) $_SESSION['user_id'], core::$date, 'closed_comments', core::$date, (int) $_GET['article_id']));
+			$core->new_admin_note(['complete' => 1, 'type' => 'closed_comments', 'content' => 'closed the comments on the article titled: <a href="'.$article_link.'">'.$title['title'] . '</a>', 'data' => $_GET['article_id']]);
 
 			$_SESSION['message'] = 'comments_closed';
 			header("Location: ".$article_link);
+			die();
 		}
 
 		else
 		{
 			$_SESSION['message'] = 'no_permission';
 			header("Location: ".$article_link);
+			die();
 		}
 	}
 }

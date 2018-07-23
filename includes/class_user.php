@@ -410,6 +410,8 @@ class user
 
 		$this->guest_session();
 
+		$this->user_groups = $this->get_user_groups();
+
 		if ($banned == 1)
 		{
 			$_SESSION['message'] = 'banned';

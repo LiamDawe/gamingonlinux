@@ -71,7 +71,7 @@ class forum
 	
 	public function delete_topic($topic_id)
 	{
-		global $core, $parray;
+		global $parray;
 
 		$check = $this->dbl->run("SELECT `reported`, `replys`, `author_id`, `forum_id` FROM `forum_topics` WHERE `topic_id` = ?", array($topic_id))->fetch();
 		
@@ -84,7 +84,7 @@ class forum
 		// check if its been reported first so we can remove the report
 		if ($check['reported'] == 1)
 		{
-			$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_topic_report' AND `data` = ?", array(core::$date, $topic_id));
+			$this->core->update_admin_note(array('type' => 'forum_topic_report', 'data' => $topic_id));
 		}
 
 		// delete any replies that may have been reported from the admin notifications
@@ -96,12 +96,13 @@ class forum
 			{
 				if ($delete_replies['reported'] == 1)
 				{
-					$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report' AND `data` = ?", array(core::$date, $delete_replies['post_id']));
+					$this->core->update_admin_note(array('type' => 'forum_reply_report', 'data' => $delete_replies['post_id']));
 				}
 			}
 		}
 
-		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_topic', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $topic_id));
+		// note who deleted it
+		$this->core->new_admin_note(array('completed' => 1, 'content' => ' deleted a forum topic.'));
 
 		// count all posts including the topic
 		$total_count = 0;
@@ -156,7 +157,7 @@ class forum
 	
 	public function delete_reply($post_id)
 	{
-		global $core, $parray;
+		global $parray;
 		
 		// Get the info from the post
 		$post_info = $this->dbl->run("SELECT r.author_id, r.reported, r.topic_id, t.forum_id FROM `forum_replies` r INNER JOIN `forum_topics` t ON r.topic_id = t.topic_id WHERE r.`post_id` = ?", array($post_id))->fetch();
@@ -173,10 +174,11 @@ class forum
 		// update admin notifications
 		if ($post_info['reported'] == 1)
 		{
-			$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` = 'forum_reply_report' AND `data` = ?", array(core::$date, $post_id))->fetch();
+			$this->core->update_admin_note(array('type' => 'forum_topic_report', 'data' => $post_id));
 		}
 
-		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `type` = 'delete_forum_reply', `created_date` = ?, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], core::$date, core::$date, $post_id));
+		// note who deleted it
+		$this->core->new_admin_note(array('completed' => 1, 'content' => ' deleted a forum post.'));
 
 		// update the authors post count
 		if ($post_info['author_id'] != 0)

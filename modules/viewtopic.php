@@ -959,8 +959,11 @@ else
 							$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['new_forum']));
 						}
 
+						// get the name of the topic
+						$topic_title = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
+
 						// add to editor tracking
-						$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = 1, `created_date` = ?, `completed_date` = ?, `data` = ?, `type` = 'moved_forum_topic'", array($_SESSION['user_id'], core::$date, core::$date, $new_comment_id));
+						$core->new_admin_note(array('completed' => 1, 'content' => ' moved a forum topic titled: <a href="/forum/topic/'.$_GET['topic_id'].'">'.$topic_title.'</a>.', 'type' => 'moved_forum_topic'));
 
 						$core->message("The topic has been moved! Options: <a href=\"index.php?module=viewforum&amp;forum_id={$_POST['new_forum']}\">View Forum</a> or <a href=\"index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}\">View Topic</a>");
 					}
@@ -985,6 +988,7 @@ else
 						$mod_sql = '`is_sticky` = 1';
 						$action = 'Stuck';
 						$sql_type = 'stuck_forum_topic';
+						$admin_note_text = ' stuck a forum topic titled: ';
 					}
 				}
 
@@ -996,6 +1000,7 @@ else
 						$mod_sql = '`is_sticky` = 0';
 						$action = 'Unstuck';
 						$sql_type = 'unstuck_forum_topic';
+						$admin_note_text = ' unstuck a forum topic titled: ';
 					}
 				}
 
@@ -1007,6 +1012,7 @@ else
 						$mod_sql = '`is_locked` = 1';
 						$action = 'Locked';
 						$sql_type = 'locked_forum_topic';
+						$admin_note_text = ' locked a forum topic titled: ';
 					}
 				}
 
@@ -1018,6 +1024,7 @@ else
 						$mod_sql = '`is_locked` = 0';
 						$action = 'Unlocked';
 						$sql_type = 'unlocked_forum_topic';
+						$admin_note_text = ' unlocked a forum topic titled: ';
 					}
 				}
 
@@ -1029,6 +1036,7 @@ else
 						$mod_sql = '`is_locked` = 0,`is_sticky` = 1';
 						$action = 'Unlocked and Stuck';
 						$sql_type = 'unlocked_stuck_forum_topic';
+						$admin_note_text = ' unlocked and stuck a forum topic titled: ';
 					}
 				}
 
@@ -1040,6 +1048,7 @@ else
 						$mod_sql = '`is_locked` = 1,`is_sticky` = 0';
 						$action = 'Locked and Unstuck';
 						$sql_type = 'locked_unstuck_forum_topic';
+						$admin_note_text = ' locked and unstuck a forum topic titled: ';
 					}
 				}
 
@@ -1051,6 +1060,7 @@ else
 						$mod_sql = '`is_locked` = 0,`is_sticky` = 0';
 						$action = 'Unlocked and Unstuck';
 						$sql_type = 'unlocked_unstuck_forum_topic';
+						$admin_note_text = ' unlocked and unstuck a forum topic titled: ';
 					}
 				}
 
@@ -1062,6 +1072,7 @@ else
 						$mod_sql = '`is_locked` = 1,`is_sticky` = 1';
 						$action = 'Locked and Stuck';
 						$sql_type = 'locked_stuck_forum_topic';
+						$admin_note_text = ' locked and stuck a forum topic titled: ';
 					}
 				}
 
@@ -1070,8 +1081,11 @@ else
 					// do the lock/stick action
 					$dbl->run("UPDATE `forum_topics` SET $mod_sql WHERE `topic_id` = ?", array($_GET['topic_id']));
 
+					// get the name of the topic
+					$topic_title = $dbl->run("SELECT `topic_title` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
+
 					// add to editor tracking
-					$dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `type` = ?, `created_date` = ?, `completed` = 1, `completed_date` = ?, `data` = ?", array($_SESSION['user_id'], $sql_type, core::$date, core::$date, $_GET['topic_id']));
+					$core->new_admin_note(array('completed' => 1, 'content' => $admin_note_text . '<a href="/forum/topic/'.$_GET['topic_id'].'">'.$topic_title.'</a>.', 'type' => $sql_type));
 
 					$_SESSION['message'] = 'mod_action_done';
 					$_SESSION['message_extra'] = $action;	

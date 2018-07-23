@@ -8,7 +8,6 @@ CKEDITOR.plugins.setLang( 'html5audio', 'eu', {
     btnUpload: 'Bidali zerbitzarira',
     advanced: 'Aurreratua',
     autoplay: 'Automatikoki erreproduzitu?',
-    allowdownload: 'Baimendu deskargatzea?',
     yes: 'Bai',
     no: 'Ez'
 } );

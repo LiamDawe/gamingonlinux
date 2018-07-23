@@ -26,7 +26,7 @@
 									Select your timezone (we will convert this to UTC for you):<br />
 									{:timezones_list}
 									Start Date: <br />
-									<input name="date" id="datetimepicker1" type="text" value="{:date}" />
+									<input name="date" id="datetimepicker1" type="text" value="{:date}" autocomplete="off" />
 									<script>
 									var timepicker = new Pikaday(
 										{
@@ -40,7 +40,7 @@
 											use24hour: false
 										});</script>
 										End Date: <br />
-										<input name="end_date" id="datetimepickere2" type="text" value="{:end_date}" />
+										<input name="end_date" id="datetimepickere2" type="text" value="{:end_date}" autocomplete="off" />
 										<script>
 										var timepicker = new Pikaday(
 											{

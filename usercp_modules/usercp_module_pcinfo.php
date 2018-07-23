@@ -175,7 +175,7 @@ if (!isset($_POST['act']))
 		{
 			$ram_selected = 'selected';
 		}
-    $ram_options .= '<option value="'.$i.'" '.$ram_selected.'>'.$i.'GB</a>';
+		$ram_options .= '<option value="'.$i.'" '.$ram_selected.'>'.$i.'GB</a>';
 		$ram_selected = '';
 	}
 	$templating->set('ram_options', $ram_options);

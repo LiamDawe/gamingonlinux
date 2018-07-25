@@ -3,12 +3,6 @@ define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-// don't count people who haven't logged in for six months, need to test this more before putting it in
-// last time i ran it, it already cut off a ton of people even though the system has only been around a few weeks, which wasn't right at all
-// I THINK it's because I forgot to even include the class_core which I do now, so it might actually work now
-$cutoff = 182*24*3600;
-$last_login = core::$date - $cutoff;
-
 // get the last grouping_id, this is how we group together each new generation for easy edits and deletions
 $get_grouping_id = $dbl->run("SELECT `grouping_id` FROM `user_stats_charts` ORDER BY `id` DESC LIMIT 1")->fetch();
 if (!$get_grouping_id)

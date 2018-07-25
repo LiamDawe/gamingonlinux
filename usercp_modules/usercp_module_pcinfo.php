@@ -10,6 +10,7 @@ if (!isset($_POST['act']))
 	$additional = $dbl->run($additional_sql, array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
+	// they're purged for inactive users
 	if (!$additional)
 	{
 		$dbl->run("INSERT INTO `user_profile_info` SET `user_id` = ?", array($_SESSION['user_id']));

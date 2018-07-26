@@ -77,12 +77,6 @@ if (!isset($_POST['act']))
 			$url = $field['base_link'];
 		}
 
-		$image = '';
-		if ($field['image'] != NULL)
-		{
-			$image = "<img src=\"{$field['image']}\" alt=\"{$field['name']}\" />";
-		}
-
 		$span = '';
 		if (isset($field['span']))
 		{

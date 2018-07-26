@@ -735,12 +735,6 @@ class user
 					$url = $field['base_link'];
 				}
 
-				$image = '';
-				if (isset($field['image']) && $field['image'] != NULL)
-				{
-					$image = "<img src=\"{$field['image']}\" alt=\"{$field['name']}\" />";
-				}
-
 				$span = '';
 				if (isset($field['span']))
 				{

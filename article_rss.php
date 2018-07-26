@@ -4,7 +4,7 @@ require dirname(__FILE__) . "/includes/loader.php";
 include dirname(__FILE__) . '/includes/config.php';
 $dbl = new db_mysql();
 $core = new core($dbl);
-$bbcode = new bbcode($dbl, $core);
+$bbcode = new bbcode($dbl, $core, $user);
 
 if ($core->config('articles_rss') == 1)
 {

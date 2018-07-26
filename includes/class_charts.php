@@ -45,6 +45,11 @@ class charts
 	{
 		$this->dbl = $dbl;
 	}
+
+	function rand_color() 
+	{
+		return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+	}
 	
 	function setup($custom_options = NULL)
 	{
@@ -1215,9 +1220,11 @@ class charts
 		$labels = array();
 
 		// get each chart along with the date they were generated to make the axis
-		$get_charts = $this->dbl->run("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ?", array($name))->fetch_all();
+		$get_charts = $this->dbl->run("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ? ORDER BY `generated_date` DESC LIMIT 20", array($name))->fetch_all();
 		if ($get_charts)
 		{
+			// since we want the latest, we grab the latest going back x times, but we display it for the chart with the latest at the end, flip the data
+			$get_charts = array_reverse($get_charts);
 			foreach ($get_charts as $chart_info)
 			{
 				if ($chart_info['total_answers'] > 0)
@@ -1240,14 +1247,14 @@ class charts
 				$total_points = count($dates);
 
 				// only grab the top 10 labels, so graphs don't get messy with tons of labels
-				$top_10_labels = array_slice($get_labels, 0, 10);
+				//$top_10_labels = array_slice($get_labels, 0, 10);
 				if ($name == 'RAM' || $name == 'Resolution')
 				{
-					uasort($top_10_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
+					uasort($get_labels, function($a, $b) { return strnatcmp($a["name"], $b["name"]); });
 				}
-				foreach ($top_10_labels as $key => $sort_labels)
+				foreach ($get_labels as $key => $sort_labels)
 				{
-					$get_data = $this->dbl->run("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id` LIMIT 10")->fetch_all();
+					$get_data = $this->dbl->run("SELECT l.`label_id`, l.`name`, d.`data`, c.`generated_date`, c.`total_answers` FROM `user_stats_charts_labels` l LEFT JOIN `user_stats_charts_data` d ON d.label_id = l.label_id LEFT JOIN `user_stats_charts` c ON c.id = l.chart_id WHERE l.`chart_id` IN ($chart_ids_sql) AND `l`.name = '{$sort_labels['name']}' GROUP BY c.generated_date, l.`name` ASC, d.`data`, c.`total_answers`, l.`label_id`")->fetch_all();
 
 					$total_data = count($get_data);
 
@@ -1261,35 +1268,22 @@ class charts
 					}
 
 					// adjust the data points for this label if it started late (not enough data points), so the data point starts at the right place
-					for ($data_counter = 0; $data_counter < $missing_data; $data_counter++)
+					/*for ($data_counter = 0; $data_counter < $missing_data; $data_counter++)
 					{
 						$labels[$sort_labels['name'] . $label_add][] = 0;
-					}
+					}*/
 					// add in the actual data we do have for this label
 					foreach ($get_data as $data)
 					{
 						$percent = round(($data['data'] / $data['total_answers']) * 100, 2);
 						$labels[$data['name'] . $label_add][] = $percent;
 					}
-				}
-
-				$colours = array(
-				'#a6cee3',
-				'#1f78b4',
-				'#b2df8a',
-				'#33a02c',
-				'#fb9a99',
-				'#e31a1c',
-				'#fdbf6f',
-				'#ff7f00',
-				'#cab2d6',
-				'#6a3d9a'
-				);
+				}				
 
 				$graph_name = str_replace(' ', '', $name); // Replaces all spaces with hyphens.
 				$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
 
-				$get_graph['graph'] = '<canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
+				$get_graph['graph'] = '<div id="'.$graph_name.'-legends"></div><canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
 
 				$total_array = count($labels);
 
@@ -1297,7 +1291,7 @@ class charts
 				$counter = 0;
 				foreach ($labels as $key => $data)
 				{
-					$colour = $colours[$counter];
+					$colour = $this->rand_color();
 					if ($key == 'Intel')
 					{
 						$colour = "#1f78b4";
@@ -1337,9 +1331,18 @@ class charts
 				datasets: [$data_sets]
 					},
 					options: {
-						legend: {
-							display: true
-						},
+						legend: { display: false },
+						legendCallback: function(chart) {
+							var text = [];
+							text.push('<div class=\"collapse_container\"><div class=\"collapse_header\">Click to show legend</div><div class=\"collapse_content\"><div class=\"body group\"><ul style=\"list-style: none; padding: 0; margin: 0;\">');
+							for (var i=0; i<chart.data.datasets.length; i++) {
+							  text.push('<li style=\"float: left; padding: 2px; margin: 0 7px 7px 0; line-height: 15px;\">');
+							  text.push('<div style=\"float: left; width: 15px; height: 15px; background-color:' + chart.data.datasets[i].borderColor + '\">&nbsp;</div>&nbsp;' + chart.data.datasets[i].label);
+							  text.push('</li>');
+							}
+							text.push('</ul></div></div></div>');
+							return text.join(\"\");
+						  },
 				scales: {
 				yAxes: [{
 					ticks: {
@@ -1363,6 +1366,8 @@ class charts
 						},
 				}
 				});
+
+				document.getElementById('".$graph_name."-legends').innerHTML = Chart".$graph_name.".generateLegend();
 				</script>";
 
 				return $get_graph;

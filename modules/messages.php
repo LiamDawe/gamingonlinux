@@ -95,12 +95,12 @@ else
 
 			$unread = '';
 			$new_bg = '';
-			$mail_icon ='<span class="icon envelope-open"></span> ';
+			$mail_icon ='<span class="icon inline envelope-open"></span> ';
 			if ($message['unread'] == 1)
 			{
 				$unread = 'class="strong"';
 				$new_bg = 'new-message-bg';
-				$mail_icon = '<span class="icon envelope"></span> ';
+				$mail_icon = '<span class="icon inline envelope"></span> ';
 
 			}
 			$templating->set('new_message_bolding', $unread);

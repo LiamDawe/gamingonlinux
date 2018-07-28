@@ -103,7 +103,7 @@ if (!isset($_POST['act']))
 		$form_input .= "<input id=\"{$field['db_field']}_field\" type=\"text\" name=\"{$field['db_field']}\" value=\"{$usercpcp[$field['db_field']]}\" />";
 		$form_input .= "</div>";
 
-		$profile_fields_output .= "<label for=\"{$field['name']}\">$image $span {$field['name']} $form_input <small>$description</small></label><br />";
+		$profile_fields_output .= "<label for=\"{$field['name']}\"> $span {$field['name']} $form_input <small>$description</small></label><br />";
 	}
 
 	$templating->set('profile_fields', $profile_fields_output);

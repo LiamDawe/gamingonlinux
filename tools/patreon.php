@@ -27,6 +27,8 @@ if (isset($_POST['go']))
 {
 	$csv = array_map('str_getcsv', file('patreon.csv'));
 
+	$email_list = [];
+
 	array_splice($csv, 0, 2);
 	foreach ($csv as $line)
 	{
@@ -67,23 +69,46 @@ if (isset($_POST['go']))
 			// it found an account, give them their badge
 			else
 			{
-				$their_groups = $user->post_group_list([$user_info['user_id']]);
-				if (!in_array(6, $their_groups[$user_info['user_id']]))
-				{
-					echo 'Username: ' . $user_info['username'] . ' ' . $line[2] . ' | Pledge: '. $pledge .'<pre>';
-					print_r($their_groups);
-					echo '</pre>';
+				// gather a list of all emails that are eligble for supporter status
+				$user_id_list[] = $user_info['user_id'];
 
-					if (!isset($_POST['test_run']))
-					{					
-						$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 6", [$user_info['user_id']]);
+				$their_groups = $user->post_group_list([$user_info['user_id']]);
+
+				echo '<p>Username: ' . $user_info['username'] . ' ' . $line[2] . ' | Pledge: '. $pledge .'<br />';
+				
+				echo 'Their user groups: ' . implode(', ', $their_groups[$user_info['user_id']]) . '</p>';
+
+				$dbl->run("UPDATE `users` SET `supporter_type` = 'patreon' WHERE `user_id` = ?", array($user_info['user_id']));
+
+				if ($pledge >= 4)
+				{
+					// they're not currently set as a supporter, give them the status
+					if (!in_array(6, $their_groups[$user_info['user_id']]))
+					{
+						if (!isset($_POST['test_run']))
+						{					
+							$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 6", [$user_info['user_id']]);
+						}
+						
+						echo "\nGiven Supporter status\n\n";
 					}
-					
-					echo "\nGiven Supporter status\n\n";
+					if ($pledge <= 6)
+					{
+						// they don't pledge enough for supporter plus, if they're currently in it then remove them
+						if (in_array(9, $their_groups[$user_info['user_id']]))
+						{
+							if (!isset($_POST['test_run']))
+							{					
+								$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ? AND `group_id` = 9", [$user_info['user_id']]);
+							}
+							
+							echo "\nRemoved Supporter Plus status\n\n";
+						}
+					}
 				}
+				// they pledge enough to be given the Supporter Plus group
 				if ($pledge >= 7)
 				{
-					$their_groups = $user->post_group_list([$user_info['user_id']]);
 					if (!in_array(9, $their_groups[$user_info['user_id']]))
 					{
 						if (!isset($_POST['test_run']))
@@ -98,6 +123,14 @@ if (isset($_POST['go']))
 		}
 		unset($pledge); // don't let them accidentally add up
 		unset($status);
+		unset($their_groups);
 	}
+
+	// okay, now we need to remove anyone not in that list
+	$in = str_repeat('?,', count($user_id_list) - 1) . '?';
+
+	$dbl->run("DELETE g FROM `user_group_membership` g INNER JOIN `users` u ON u.user_id = g.user_id WHERE u.`user_id` NOT IN ( $in ) AND g.group_id IN (9,6) AND u.`lifetime_supporter` = 0 AND u.supporter_type = 'patreon'", $user_id_list);
+
+	$dbl->run("UPDATE `users` SET `supporter_type` = NULL WHERE `supporter_type` = 'patreon' AND `user_id` NOT IN ( $in )", $user_id_list);
 }
 ?>

@@ -48,16 +48,24 @@ if ($core->config('allow_registrations') == 1)
 
 	else if (!isset($_POST['register']) && isset($_GET['steam_new']))
 	{
-		$templating->block('steam_new');
+		if (isset($_SESSION['steam_username']))
+		{
+			$templating->block('steam_new');
 
-		$templating->set('username', $_SESSION['steam_username']);
+			$templating->set('username', $_SESSION['steam_username']);
 
-		$templating->set('rules', $core->config('rules'));
-		$templating->set('captcha', $captcha);
-		$templating->set('timezone_list', core::timezone_list());
+			$templating->set('rules', $core->config('rules'));
+			$templating->set('captcha', $captcha);
+			$templating->set('timezone_list', core::timezone_list());
 
-		// set time to check against registration time to prevent really fast bots
-		$_SESSION['register_time'] = time();
+			// set time to check against registration time to prevent really fast bots
+			$_SESSION['register_time'] = time();
+		}
+		else
+		{
+			header("Location: /index.php?module=login");
+			die();
+		}
 	}
 	
 	else if (!isset($_POST['register']) && isset($_GET['google_new']))

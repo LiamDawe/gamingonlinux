@@ -743,7 +743,7 @@ class user
 				$into_output = '';
 				if ($field['name'] != 'Distro')
 				{
-					$into_output .= "<li><a href=\"$url{$data[$field['db_field']]}\">$image$span</a></li>";
+					$into_output .= "<li><a href=\"$url{$data[$field['db_field']]}\">$span</a></li>";
 				}
 
 				$profile_fields_output .= $into_output;

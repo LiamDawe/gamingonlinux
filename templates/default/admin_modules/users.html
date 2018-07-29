@@ -49,6 +49,7 @@
 
 [block: edituser]
 <div class="box"><div class="head">Here you can edit {:username}'s details. <span class="fright"><a href="{:profile_link}">View live profile</a></span></div>
+	<div class="subhead">Profile</div>
 	<div class="body group">
 		<form method="post" action="admin.php?module=users&user_id={:user_id}">
 			Username: <input type="text" name="username" value="{:username}" /><br />
@@ -56,12 +57,8 @@
 			Website: <input type="text" name="website" value="{:website}" /><br />
 			<label for="bio">Biography, for Editors this will show on articles you create, for normal users it will just show it on your profile, keep it short.</label>
 			<textarea name="article_bio" class="bbcode-editor" cols="100" rows="10">{:bio}</textarea><br />
-			<strong>User Groups</strong><br />
-			<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen">{:groups_list}</select><br />
 			<label><input type="checkbox" name="game_developer" {:developer_check} />Game developer?</label>
 			Avatar: <br /><img src="{:avatar}" alt="avatar" /><br />
-			<em>These notes are never shown to a user, if you feel the need to note something down other editors to know enter it here</em><br />
-			<textarea name="notes" rows="20">{:admin_notes}</textarea>
 			<button type="submit" name="act" value="edituser" class="btn btn-primary">Edit</button>
 			<button type="submit" name="act" value="deleteavatar" class="btn btn-danger">Delete Avatar</button>
 			<button type="submit" name="act" value="delete_user" class="btn btn-danger">Delete User</button>
@@ -71,6 +68,21 @@
 	</div>
 </div>
 [/block: edituser]
+
+[block: edituser_admin]
+<div class="box">
+	<div class="subhead">Admin Stuff</div>
+	<div class="body group">
+		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+			<strong>User Groups</strong><br />
+			<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen">{:groups_list}</select><br />
+			<em>These notes are never shown to a user, if you feel the need to note something down other editors to know enter it here</em><br />
+			<textarea name="notes" rows="20">{:admin_notes}</textarea>
+			<button type="submit" name="act" value="edituser_admin" class="btn btn-primary">Edit</button>
+		</form>
+	</div>
+</div>
+[/block: edituser_admin]
 
 [block: ipban]
 <div class="box">

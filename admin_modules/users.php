@@ -97,16 +97,6 @@ else
 				$templating->set('email', $user_info['email']);
 				$templating->set('website', $user_info['website']);
 				$templating->set('bio', $user_info['article_bio']);
-
-				$groups_list = '';
-				
-				$users_groups = $dbl->run("SELECT m.`group_id`, g.`group_name` FROM `user_group_membership` m INNER JOIN `user_groups` g ON m.group_id = g.group_id WHERE m.`user_id` = ?", [$user_info['user_id']])->fetch_all();
-
-				foreach($users_groups as $group)
-				{
-					$groups_list .= "<option value=\"{$group['group_id']}\" selected>{$group['group_name']}</option>";
-				}
-				$templating->set('groups_list', $groups_list);
 				
 				$developer_check = '';
 				if ($user_info['game_developer'] == 1)
@@ -132,9 +122,26 @@ else
 
 				$templating->set('ban_button', $ban_button);
 
-				$grab_notes = $dbl->run("SELECT `notes` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
+				if($user->check_group(1))
+				{
+					$templating->block('edituser_admin', 'admin_modules/users');
 
-				$templating->set('admin_notes', $grab_notes);
+					$templating->set('user_id', $user_info['user_id']);
+
+					$groups_list = '';
+				
+					$users_groups = $dbl->run("SELECT m.`group_id`, g.`group_name` FROM `user_group_membership` m INNER JOIN `user_groups` g ON m.group_id = g.group_id WHERE m.`user_id` = ?", [$user_info['user_id']])->fetch_all();
+	
+					foreach($users_groups as $group)
+					{
+						$groups_list .= "<option value=\"{$group['group_id']}\" selected>{$group['group_name']}</option>";
+					}
+					$templating->set('groups_list', $groups_list);
+
+					$grab_notes = $dbl->run("SELECT `notes` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
+
+					$templating->set('admin_notes', $grab_notes);
+				}
 			}
 		}
 
@@ -246,12 +253,6 @@ else
 					}
 				}
 
-				$expires = 0;
-				if (isset($_POST['expires']))
-				{
-					$expires = strtotime(gmdate($_POST['expires']));
-				}
-
 				$dev_check = 0;
 				if (isset($_POST['game_developer']))
 				{
@@ -259,7 +260,25 @@ else
 				}
 
 				$dbl->run("UPDATE `users` SET `username` = ?, `email` = ?, `article_bio` = ?, `website` = ?, `game_developer` = ? WHERE `user_id` = ?", array($_POST['username'], $_POST['email'], $_POST['article_bio'], $_POST['website'], $dev_check, $_GET['user_id']));
-				
+
+				// alert admins this was done
+				$additional_text = '';
+				if ($current_username != $username)
+				{
+					$additional_text = ' Their new username is: ' . $username;
+				}
+				$core->new_admin_note(array('completed' => 1, 'content' => ' edited the user: <a href="/profiles/'.$_GET['user_id'].'">' . $current_username . '</a>.' . $additional_text));
+
+				$_SESSION['message'] = 'edited';
+				$_SESSION['message_extra'] = 'user account';
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
+			}
+		}
+
+		if ($_POST['act'] == 'edituser_admin')
+		{
+			if($user->check_group(1))
+			{
 				// user group updating
 				$current_groups = $dbl->run("SELECT `group_id` FROM `user_group_membership` WHERE `user_id` = ?", [$_GET['user_id']])->fetch_all(PDO::FETCH_COLUMN);
 
@@ -271,7 +290,7 @@ else
 						$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ? AND `group_id` = ?", [$_GET['user_id'], $group]);
 					}
 				}
-				
+					
 				// add in any missing groups
 				foreach ($_POST['user_groups'] as $key => $group)
 				{
@@ -280,7 +299,7 @@ else
 						$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$_GET['user_id'], $group]);
 					}
 				}
-					
+						
 				// make sure they have a row for notes, if not add a new row otherwise edit
 				$note_res = $dbl->run("SELECT 1 FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
 
@@ -295,16 +314,18 @@ else
 					$dbl->run("INSERT INTO `admin_user_notes` SET `notes` = ?, `last_edited` = ?, `last_edit_by` = ?, `user_id` = ?", array($notes, core::$date, $_SESSION['user_id'], $_GET['user_id']));
 				}
 
+				$current_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", [$_GET['user_id']])->fetchOne();
+
 				// alert admins this was done
-				$additional_text = '';
-				if ($current_username != $username)
-				{
-					$additional_text = ' Their new username is: ' . $username;
-				}
-				$core->new_admin_note(array('completed' => 1, 'content' => ' edited the user: <a href="/profiles/'.$_GET['user_id'].'">' . $current_username . '</a>.' . $additional_text));
+				$core->new_admin_note(array('completed' => 1, 'content' => ' edited the admin options for user: <a href="/profiles/'.$_GET['user_id'].'">' . $current_username . '</a>.' . $additional_text));
 
 				$_SESSION['message'] = 'edited';
 				$_SESSION['message_extra'] = 'user account';
+				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
+			}
+			else
+			{
+				$_SESSION['message'] = 'no_permission';
 				header("Location: admin.php?module=users&view=edituser&user_id={$_GET['user_id']}");
 			}
 		}

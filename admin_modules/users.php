@@ -317,7 +317,7 @@ else
 				$current_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", [$_GET['user_id']])->fetchOne();
 
 				// alert admins this was done
-				$core->new_admin_note(array('completed' => 1, 'content' => ' edited the admin options for user: <a href="/profiles/'.$_GET['user_id'].'">' . $current_username . '</a>.' . $additional_text));
+				$core->new_admin_note(array('completed' => 1, 'content' => ' edited the admin options for user: <a href="/profiles/'.$_GET['user_id'].'">' . $current_username . '</a>.'));
 
 				$_SESSION['message'] = 'edited';
 				$_SESSION['message_extra'] = 'user account';

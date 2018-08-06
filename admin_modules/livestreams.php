@@ -206,6 +206,13 @@ if (isset($_POST['act']))
 		if (isset($_POST['community']))
 		{
 			$community = 1;
+
+			if (empty($stream_url))
+			{
+				$_SESSION['message'] = 'community_link_needed';
+				header("Location: /admin.php?module=livestreams&view=manage");
+				die();				
+			}
 		}
 
 		$dbl->run("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 1, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = ?, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $title, $date_created, $start_time, $end_time, $community, $community_name, $stream_url));

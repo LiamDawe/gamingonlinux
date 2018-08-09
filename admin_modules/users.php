@@ -138,6 +138,21 @@ else
 					}
 					$templating->set('groups_list', $groups_list);
 
+					$supporter_types = array('patreon', 'paypal', 'liberapay');
+
+					$supporter_types_list = '';
+
+					foreach ($supporter_types as $type)
+					{
+						$selected = '';
+						if ($user_info['supporter_type'] == $type)
+						{
+							$selected = 'selected';
+						}
+						$supporter_types_list .= '<option value="'.$type.'" '.$selected.'>'.$type.'</option>';
+					}
+					$templating->set('supporter_types_list', $supporter_types_list);
+
 					$grab_notes = $dbl->run("SELECT `notes` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
 
 					$templating->set('admin_notes', $grab_notes);
@@ -299,6 +314,15 @@ else
 						$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = ?", [$_GET['user_id'], $group]);
 					}
 				}
+
+				// update supporter information
+
+				$supporter_type = NULL;
+				if (!empty($_POST['supporter_type']) && isset($_POST['supporter_type']))
+				{
+					$supporter_type = $_POST['supporter_type'];
+				}
+				$dbl->run("UPDATE `users` SET `supporter_type` = ? WHERE `user_id` = ?", array($supporter_type, $_GET['user_id']));
 						
 				// make sure they have a row for notes, if not add a new row otherwise edit
 				$note_res = $dbl->run("SELECT 1 FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();

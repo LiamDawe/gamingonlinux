@@ -847,21 +847,43 @@ jQuery(document).ready(function()
 	});
 
 	// claim a key from bbcode key giveaway
-	$(document).on('click', '#claim_key', function(e)
+	$(document).on('click', '.claim_key', function(e)
 	{
 		e.preventDefault();
 
 		var giveaway_id = $(this).attr('data-game-id');
-		$.post('/includes/ajax/claim_key.php', { 'giveaway_id':giveaway_id },
+		var key_id = null;
+		if ($(this).attr('data-key-id'))
+		{
+			var key_id = $(this).attr('data-key-id');
+		}
+
+		$.post('/includes/ajax/claim_key.php', { 'giveaway_id':giveaway_id, 'key_id':key_id },
 		function(data)
 		{
 			if (data.result == 1)
 			{
 				$('#key-area').text("Here's your key: " + data.key);
 			}
+			if (data.result == 2)
+			{
+				$('#key-area').text("All keys have gone, sorry!");
+			}
 			if (data.result == 3)
 			{
 				$('#key-area').text("You have to login to redeem a key!");
+			}
+			if (data.result == 4)
+			{
+				$('#key-area').text("This giveaway is only for supporters!");
+			}
+			if (data.result == 5)
+			{
+				$(this).replaceWith("That key has been taken!")
+			}
+			if (data.result == 6)
+			{
+				$('#key-area').text("You have already claimed one!")
 			}
 		});
 	});

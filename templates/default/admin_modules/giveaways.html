@@ -3,9 +3,11 @@
 	<div class="head">Add a new giveaway</div>
 	<div class="body group">
 		<form method="post" action="admin.php?module=giveaways">
-			Game name: <input type="text" name="name" /><br />
-			Game keys, put each one on a new line.<br />
+			Game/Giveaway name: <input type="text" name="name" /><br />
+			Game keys, put each one on a new line or "game name,key" if displaying them all together<br />
 			<textarea name="list" cols="100" rows="10"></textarea><br />
+			<label><input type="checkbox" name="display_all" /> Display All (this will allow a user to pick, for multiple games)</label>
+			<label><input type="checkbox" name="supporters_only" /> Supporters Only</label>
 			<button type="submit" name="act" value="add">Add</button>
 		</form>
 	</div>
@@ -40,8 +42,10 @@
 		<form method="post" action="admin.php?module=giveaways">
 			Game keys, put each one on a new line.<br />
 			<textarea name="list" cols="100" rows="10"></textarea><br />
+			<label><input type="checkbox" name="display_all" {:display_all_check} /> Display All (this will allow a user to pick, for multiple games)</label>
+			<label><input type="checkbox" name="supporters_only" {:supporters_only_check} /> Supporters Only</label>
 			<input type="hidden" name="id" value="{:id}" />
-			<button type="submit" name="act" value="add_more">Add</button>
+			<button type="submit" name="act" value="add_more">Update</button>
 		</form>
 	</div>
 </div>

@@ -36,13 +36,13 @@ class bbcode
 		
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$game_info = $this->dbl->run("SELECT `id`, `game_name`, `supporters_only` FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
+			$game_info = $this->dbl->run("SELECT `id`, `giveaway_name`, `supporters_only`, `display_all` FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
 
 			$your_key = $this->dbl->run("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", [$_SESSION['user_id'], $giveaway_id])->fetch();
 
 			if ($external_page == 1)
 			{
-				$key_claim .= '<p>This is a giveaway for: <strong>' . $game_info['game_name'] . '</strong></p>';
+				$key_claim .= '<p>This is a giveaway for: <strong>' . $game_info['giveaway_name'] . '</strong></p>';
 			}
 
 			// they have a key already
@@ -53,7 +53,8 @@ class bbcode
 			// they do not have a key
 			else if ($your_key['counter'] == 0)
 			{
-				$can_claim = 1;
+				$can_claim = 1; // start off by allowing them and removing as needed
+
 				// doing this here, in case they redeemed a key while they were a supporter and not now - still allow them to view their previously redeemed key
 				if ($game_info['supporters_only'] == 1)
 				{
@@ -66,6 +67,7 @@ class bbcode
 
 				$keys_left = $this->dbl->run("SELECT COUNT(id) as counter FROM `game_giveaways_keys` WHERE `claimed` = 0 AND `game_id` = ?", [$giveaway_id])->fetch();
 
+				// there are keys left
 				if ($keys_left['counter'] == 0)
 				{
 					$key_claim .= '<strong>Grab a key</strong><br />All keys are now gone, sorry!';
@@ -74,16 +76,33 @@ class bbcode
 				{
 					// check their registration date is older than one day
 					$reg_fetch = $this->dbl->run("SELECT `register_date` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-		
+			
 					$day_ago = time() - 24 * 3600;
-		
-					if ($day_ago > $reg_fetch['register_date'] && $can_claim == 1)
-					{
-						$key_claim .= '<strong>Grab a key</strong> (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a id="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
-					}
-					else
+
+					// either they're too new or they can't claim (not a supporter?)
+					if ($day_ago < $reg_fetch['register_date'] || $can_claim == 0)
 					{
 						$key_claim .= $nope_message;
+					}
+					// all good, let them claim
+					else if ($day_ago > $reg_fetch['register_date'] && $can_claim == 1)
+					{
+						// standard single-title giveaway
+						if ($game_info['display_all'] == 0)
+						{
+							$key_claim .= '<strong>Grab a key</strong> (keys left: '.$keys_left['counter'].')<br /><div id="key-area"><a class="claim_key" data-game-id="'.$game_info['id'].'" href="#">click here to claim</a></div>';
+						}
+						// giving away multiple items, display them and let users pick
+						else
+						{
+							$key_claim .= '<strong>Grab a key</strong> (keys left: '.$keys_left['counter'].')';
+
+							$all_keys = $this->dbl->run("SELECT `id`, `name` FROM `game_giveaways_keys` WHERE `game_id` = ?", [$giveaway_id])->fetch_all();
+							foreach ($all_keys as $pick)
+							{
+								$key_claim .= '<p>'.$pick['name'].' - <a class="claim_key" data-game-id="'.$game_info['id'].'" data-key-id="'.$pick['id'].'" href="#">click here to claim</a></p>';
+							}
+						}
 					}
 				}
 			}

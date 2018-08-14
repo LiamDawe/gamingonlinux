@@ -49,7 +49,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		foreach ($users_array as $email_user)
 		{
 			$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-			<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$_POST['article_id']}\">{$title}</a></strong>\".</p>
+			<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$_POST['article_id']}\">{$checked['title']}</a></strong>\".</p>
 			</body>
 			</html>";
 			

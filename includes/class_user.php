@@ -12,7 +12,7 @@ class user
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gallery`,
 	`display_comment_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`";
 	
-	public $user_groups;
+	public $user_groups = [0 => 4]; // default for guests
 	public $blocked_users = [];
 
 	public $cookie_length = 60*60*24*30; // 30 days
@@ -186,10 +186,6 @@ class user
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			$this->blocked_users = $this->db->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
-		}
-		else
-		{
-			$this->blocked_users = [];
 		}
 	}
 	
@@ -382,6 +378,7 @@ class user
 		}
 	}
 
+	// only place redirect = 0 is used, is when removing account - that page handles redirection
 	function logout($banned = 0, $redirect = 1)
 	{
 		// remove this specific session from the DB
@@ -407,10 +404,6 @@ class user
 		setcookie('gol-device', "", time()-60, '/', $this->core->config('cookie_domain'));
 
 		$this->user_details = [];
-
-		$this->guest_session();
-
-		$this->user_groups = $this->get_user_groups();
 
 		if ($banned == 1)
 		{

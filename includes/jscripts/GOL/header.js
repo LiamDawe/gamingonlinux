@@ -851,6 +851,7 @@ jQuery(document).ready(function()
 	{
 		e.preventDefault();
 
+		var link = $(this);
 		var giveaway_id = $(this).attr('data-game-id');
 		var key_id = null;
 		if ($(this).attr('data-key-id'))
@@ -879,7 +880,7 @@ jQuery(document).ready(function()
 			}
 			if (data.result == 5)
 			{
-				$(this).replaceWith("That key has been taken!")
+				link.replaceWith("That key has already been taken by someone else, sorry!");
 			}
 			if (data.result == 6)
 			{

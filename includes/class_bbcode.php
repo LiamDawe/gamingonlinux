@@ -58,7 +58,7 @@ class bbcode
 				// doing this here, in case they redeemed a key while they were a supporter and not now - still allow them to view their previously redeemed key
 				if ($game_info['supporters_only'] == 1)
 				{
-					if (!$this->user->check_group(9))
+					if (!$this->user->check_group([1,9]))
 					{
 						$can_claim = 0;
 						$nope_message .= ' You also need to support GamingOnLinux to qualify for this giveaway.';
@@ -97,7 +97,7 @@ class bbcode
 						{
 							$key_claim .= '<strong>Grab a key</strong> (keys left: '.$keys_left['counter'].')';
 
-							$all_keys = $this->dbl->run("SELECT `id`, `name` FROM `game_giveaways_keys` WHERE `game_id` = ?", [$giveaway_id])->fetch_all();
+							$all_keys = $this->dbl->run("SELECT `id`, `name` FROM `game_giveaways_keys` WHERE `game_id` = ? AND `claimed` = 0", [$giveaway_id])->fetch_all();
 							foreach ($all_keys as $pick)
 							{
 								$key_claim .= '<p>'.$pick['name'].' - <a class="claim_key" data-game-id="'.$game_info['id'].'" data-key-id="'.$pick['id'].'" href="#">click here to claim</a></p>';

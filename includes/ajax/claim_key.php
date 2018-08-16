@@ -16,7 +16,7 @@ if($_POST)
 
 		if ($giveaway['supporters_only'] == 1)
 		{
-			if (!$user->check_group(9))
+			if (!$user->check_group([1,9]))
 			{
 				echo json_encode(array("result" => 4));
 				return;

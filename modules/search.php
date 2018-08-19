@@ -15,7 +15,7 @@ if (isset($_GET['q']))
 	$search_text = str_replace("+", ' ', $_GET['q']);
 	$search_text = strip_tags($_GET['q']);
 }
-$templating->set('search_text', $search_text);
+$templating->set('search_text', htmlspecialchars($search_text));
 
 if (!isset($_GET['q']) && !isset($_GET['author_id']))
 {

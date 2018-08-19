@@ -411,7 +411,7 @@ class game_sales
 			$search_q = '';
 		}
 
-		$this->templating->set('search_q', $search_q);
+		$this->templating->set('search_q', htmlspecialchars($search_q));
 
 		$sales_merged = [];
 		foreach ($sales_res as $sale)

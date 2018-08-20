@@ -181,7 +181,7 @@ else if (isset($_POST['action']))
 
 		else
 		{
-			$_SESSION['login_error_username'] = $_POST['username'];
+			$_SESSION['login_error_username'] = htmlspecialchars($_POST['username']);
 			header("Location: ".$core->config('website_url')."index.php?module=login");
 		}
 	}

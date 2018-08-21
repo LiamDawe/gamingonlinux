@@ -33,7 +33,7 @@ if (isset($_GET['user_id']))
 			{
 				// check blocked list
 				$blocked = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($profile_id, $_SESSION['user_id']))->fetchOne();
-				if (($blocked || $profile['private_profile'] == 1) && !$user->check_group([1,2]))
+				if (($blocked || $profile['private_profile'] == 1) && !$user->check_group([1,2]) && (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $profile_id))
 				{
 					$core->message("Sorry, this user has set their profile to private.", 1);
 				}

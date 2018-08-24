@@ -690,7 +690,7 @@ class user
 			}
 
 			$subscribe_check['emails'] = '';
-			if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
+			if (isset($check_current_sub) && $check_current_sub['emails'] == 1 || !$check_current_sub && $_SESSION['auto_subscribe_email'] == 1)
 			{
 				$subscribe_check['emails'] = 'selected';
 			}

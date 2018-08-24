@@ -549,7 +549,7 @@ class article
 			if (!$sub_info)
 			{
 				// have we been given an email option, if so use it
-				if ($emails == NULL)
+				if ($emails === NULL)
 				{
 					// find how they like to normally subscribe
 					$get_email_type = $this->dbl->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();

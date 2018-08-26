@@ -43,6 +43,13 @@ do
 			echo $image . "\n";
 
 			$bundle = 0;
+			$steam_id = NULL;
+			if (strpos($link, '/app/') !== false) 
+			{
+				$steam_id = preg_replace('~https:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
+			}
+			echo 'steam id is ' . $steam_id;
+
 			if (strpos($link, '/sub/') !== false) 
 			{
 				$bundle = 1;
@@ -57,9 +64,16 @@ do
 			// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 			$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
 
-			if (!$game_list && !$check_dupes)
+			// check for name change, insert different name into dupes table and keep original name
+			$name_change = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND `name` != ?", array($steam_id, $title))->fetchOne();
+			if ($name_change)
 			{
-				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1", array($title, $stripped_title, $clean_release_date, $link, $bundle));
+				$dbl->run("INSERT INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+			}
+
+			if (!$game_list && !$check_dupes && !$name_change)
+			{
+				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1, `steam_id` = ?", array($title, $stripped_title, $clean_release_date, $link, $bundle, $steam_id));
 
 				$new_id = $dbl->new_id();
 

@@ -110,7 +110,7 @@ do
 				$steam_id = NULL;
 				if (strpos($link, '/app/') !== false) 
 				{
-					$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
+					$steam_id = preg_replace('~https:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
 				}
 
 				if (strpos($link, '/sub/') !== false) 

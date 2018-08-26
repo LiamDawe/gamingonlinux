@@ -46,10 +46,31 @@ do
 			$release_date_raw = $element->find('div.search_released', 0)->plaintext;
 			$clean_release_date = steam_release_date($release_date_raw);
 
+			$steam_id = NULL;
+			if (strpos($link, '/app/') !== false) 
+			{
+				$steam_id = preg_replace('~https:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
+			}
+			echo 'steam id is ' . $steam_id;
+
 			// ADD IT TO THE GAMES DATABASE
 			$game_list = $dbl->run("SELECT 1 FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+
+			// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+			$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
+
+			// check for name change, insert different name into dupes table and keep original name
+			$name_change = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND `name` != ?", array($steam_id, $title))->fetchOne();
+			if ($name_change)
+			{
+				$exists = $dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND `name` = ?", array($name_change, $title))->fetchOne();
+				if (!$exists)
+				{
+					$dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+				}
+			}
 				
-			if (!$game_list)
+			if (!$game_list && !$check_dupes && !$name_change)
 			{
 				$check_dupes = $dbl->run("SELECT 1 FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
 				if (!$check_dupes)

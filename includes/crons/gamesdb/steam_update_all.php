@@ -149,6 +149,8 @@ if ($total_added > 0)
 
 	$html_message = implode("<br />", $email_output);
 
+	$html_message .= '<br />Total pages scanned: ' . $page;
+
 	$to = $core->config('contact_email');
 	$subject = 'GOL Steam New';
 

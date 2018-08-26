@@ -68,7 +68,7 @@ do
 				$dbl->run("UPDATE `calendar` SET `name` = ? WHERE `id` = ?", array($title, $name_change));
 			}
 					
-			if (!$game_list && !$check_dupes)
+			if (!$game_list && !$check_dupes && !$name_change)
 			{				
 				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1, `stripped_name` = ?, `soon_date` = ?", array($title, $clean_release_date, $link, $bundle, $stripped_title, $release_date_raw));
 					
@@ -86,6 +86,10 @@ do
 				if ($check_dupes)
 				{
 					$game_id = $check_dupes['real_id'];
+				}
+				if ($name_change)
+				{
+					$game_id = $name_change;
 				}
 
 				$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", array($clean_release_date, $game_id));

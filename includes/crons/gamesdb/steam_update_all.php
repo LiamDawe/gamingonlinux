@@ -68,7 +68,11 @@ do
 			$name_change = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND `name` != ?", array($steam_id, $title))->fetchOne();
 			if ($name_change)
 			{
-				$dbl->run("INSERT INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+				$exists = $dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND `name` = ?", array($name_change, $title))->fetchOne();
+				if (!$exists)
+				{
+					$dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+				}
 			}
 
 			if (!$game_list && !$check_dupes && !$name_change)
@@ -89,6 +93,10 @@ do
 				if ($check_dupes)
 				{
 					$game_id = $check_dupes['real_id'];
+				}
+				if ($name_change)
+				{
+					$game_id = $name_change;
 				}
 
 				$updated_list[] = $game_id;

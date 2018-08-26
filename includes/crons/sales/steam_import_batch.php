@@ -107,6 +107,7 @@ do
 				echo 'Price now: ' . $price_now  . ' ' . $currencies[$currency_id]['key'] . "\n";
 
 				$bundle = 0;
+				$steam_id = NULL;
 				if (strpos($link, '/app/') !== false) 
 				{
 					$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
@@ -115,7 +116,6 @@ do
 				if (strpos($link, '/sub/') !== false) 
 				{
 					$bundle = 1;
-					$steam_id = preg_replace('~http:\/\/store\.steampowered\.com\/sub\/([0-9]*)\/.*~', '$1', $link);
 				}
 
 				echo 'SteamID: ' . $steam_id . "\n";

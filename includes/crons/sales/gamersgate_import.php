@@ -76,7 +76,7 @@ foreach ($xml->item as $game)
 	if ($game->price != "-" && $game->price > 0)
 	{
 		// first check it exists based on the normal name
-		$game_id = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($new_title))->fetchOne();
+		$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($new_title))->fetchOne();
 
 		// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 		$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($new_title))->fetch();
@@ -96,12 +96,16 @@ foreach ($xml->item as $game)
 				$game_id = $game_list_stripped;
 			}
 		}
-
-		$game_id = $game_list['id'];
-		if ($check_dupes)
+		else
 		{
-			$game_id = $check_dupes['real_id'];
+			$game_id = $game_list;
+			if ($check_dupes)
+			{
+				$game_id = $check_dupes['real_id'];
+			}
 		}
+
+		echo 'game id is ' . $game_id;
 			
 		$on_sale[] = $game_id;
 			

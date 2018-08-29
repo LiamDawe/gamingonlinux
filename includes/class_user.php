@@ -566,6 +566,10 @@ class user
 			WHERE
 			p.`user_id` = ?", array($user_id))->fetch();
 
+		foreach ($additionaldb as $key => $value)
+		{
+			$additionaldb[$key] = htmlspecialchars($value);
+		}
 
 		if (!empty($additionaldb['distro']) && $additionaldb['distro'] != 'Not Listed')
 		{

@@ -157,8 +157,16 @@ else // otherwise generate the page and make a cache from it
 	$year_list = '';
 	$preview_data = [];
 	$yearly = $dbl->run("SELECT YEAR(FROM_UNIXTIME(`date`)) as `name`, COUNT(*) as `data` FROM `articles` WHERE `active` = 1 AND `author_id` != 1844 GROUP BY YEAR(FROM_UNIXTIME(`date`)) ORDER BY `name` DESC LIMIT 7")->fetch_all();
-	$yearly_chart = $charts->render(NULL, ['name' => 'Articles per year', 'grouped' => 0, 'data' => $yearly, 'h_label' => 'Total Posted']);
+	$yearly_chart = $charts->render(['filetype' => 'png'], ['name' => 'Articles per year', 'grouped' => 0, 'data' => $yearly, 'h_label' => 'Total Posted']);
 	$templating->set('year_chart', $yearly_chart);
+
+	$templating->block('monthly_users');
+
+	$charts = new charts($dbl);
+
+	$monthly_registrations = $dbl->run("SELECT date_format(FROM_UNIXTIME(register_date), '%Y-%m') as `name`, Count(*) as `data` FROM users WHERE year(FROM_UNIXTIME(register_date)) = $year_selector GROUP BY date_format(FROM_UNIXTIME(register_date), '%Y-%m')")->fetch_all();
+	$monthly_reg_chart = $charts->render(['filetype' => 'png'], ['name' => 'User registrations per month', 'grouped' => 0, 'data' => $monthly_registrations, 'h_label' => 'Total Users']);
+	$templating->set('monthly_registrations', $monthly_reg_chart);
 
 	echo $templating->output();
 

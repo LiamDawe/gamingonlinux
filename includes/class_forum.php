@@ -174,7 +174,7 @@ class forum
 		// update admin notifications
 		if ($post_info['reported'] == 1)
 		{
-			$this->core->update_admin_note(array('type' => 'forum_topic_report', 'data' => $post_id));
+			$this->core->update_admin_note(array('type' => 'forum_reply_report', 'data' => $post_id));
 		}
 
 		// note who deleted it

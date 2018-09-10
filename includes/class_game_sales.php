@@ -163,7 +163,7 @@ class game_sales
 		}
 
 		// paging for pagination
-		$page = isset($_GET['page'])?intval($_GET['page']-1):0;
+		$page = core::give_page();
 
 		$where = NULL;
 		$sql_where = '';
@@ -177,7 +177,7 @@ class game_sales
 			$merged_arrays = array_merge([$where], $genre_ids, $licenses);
 
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct id) FROM `calendar` c WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 ORDER BY c.`name` ASC", [$where])->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page + 1, $link_extra);	
+			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page, $link_extra);	
 
 			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
 		}
@@ -185,7 +185,7 @@ class game_sales
 		{
 			$merged_arrays = array_merge($genre_ids, $licenses);
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 $options_sql  ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page + 1, $link_extra);
+			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page, $link_extra);
 
 			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer` FROM `calendar` c $genre_join WHERE c.`free_game` = 1 AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
 		}

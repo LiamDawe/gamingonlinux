@@ -67,20 +67,8 @@ if (isset($search_text) && !empty($search_text))
 			$article_id_array[] = $article['article_id'];
 		}
 		$article_id_sql = implode(', ', $article_id_array);
-	
-		// this is required to properly count up the rank for the tags
-		$dbl->run("SET @rank=null, @val=null");
 
-		$category_tag_sql = "SELECT * FROM (
-			SELECT r.`article_id`, c.`category_name` , c.`category_id` , @rank := IF( @val = r.`article_id`, @rank +1, 1 ) AS rank, @val := r.`article_id`
-			FROM  `article_category_reference` r
-			INNER JOIN  `articles_categorys` c ON c.`category_id` = r.`category_id`
-			WHERE r.`article_id`
-			IN ( $article_id_sql )
-			ORDER BY CASE WHEN (r.`category_id` = 60) THEN 0 ELSE 1 END, r.`article_id` ASC
-		) AS a
-		WHERE rank < 5";
-		$get_categories = $dbl->run($category_tag_sql)->fetch_all();
+		$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
 
 		// loop through results
 		foreach ($found_search as $found)
@@ -104,30 +92,18 @@ if (isset($search_text) && !empty($search_text))
 			}
 			$templating->set('username', $username);
 
-			$editors_pick = '';
-			if ($found['show_in_menu'] == 1)
+			$categories_display = '';
+			if ($article['show_in_menu'] == 1)
 			{
-				$editors_pick = '<li><a href="#">Editors Pick</a></li>';
+				$categories_display = '<li><a href="#">Editors Pick</a></li>';
 			}
-			$categories_list = $editors_pick;
-			foreach ($get_categories as $k => $category_list)
+
+			if (isset($get_categories[$found['article_id']]))
 			{
-				if (in_array($found['article_id'], $category_list))
-				{
-					$tag_link = $article_class->tag_link($category_list['category_name']);
-
-					if ($category_list['category_id'] == 60)
-					{
-						$categories_list .= " <li class=\"ea\"><a href=\"$tag_link\">{$category_list['category_name']}</a></li> ";
-					}
-
-					else
-					{
-						$categories_list .= " <li><a href=\"$tag_link\">{$category_list['category_name']}</a></li> ";
-					}
-				}
+				$categories_display .= $article_class->display_article_tags($get_categories[$found['article_id']]);
 			}
-			$templating->set('categories_list', $categories_list);
+
+			$templating->set('categories_list', $categories_display);
 		}
 	}
 	else
@@ -154,7 +130,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		$pagination = $core->pagination_link(15, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
 		// do the search query
-		$found_search = $dbl->run("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();
+		$found_search = $dbl->run("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, a.`show_in_menu`, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();
 
 		if ($total > 0)
 		{
@@ -164,6 +140,16 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 			$templating->block('author_top');
 			$templating->set('username', $username);
 			$templating->set('profile_link', $core->config('website_url') . 'profiles/' . $found_search[0]['author_id']);
+
+			$article_id_array = array();
+
+			foreach ($found_search as $article)
+			{
+				$article_id_array[] = $article['article_id'];
+			}
+			$article_id_sql = implode(', ', $article_id_array);
+	
+			$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
 
 			// loop through results
 			foreach ($found_search as $found)
@@ -180,26 +166,18 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 				
 				$templating->set('username', $username_link);
 
-				// sort out the categories (tags)
-				$categories_list = '';
-				$res = $dbl->run("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($found['article_id']))->fetch_all();
-				foreach ($res as $get_categories)
+				$categories_display = '';
+				if ($found['show_in_menu'] == 1)
 				{
-					$tag_link = $article_class->tag_link($get_categories['category_name']);
-					
-					if ($get_categories['category_id'] == 60)
-					{
-						$categories_list .= " <li class=\"ea\"><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
-					}
-
-					else
-					{
-						$categories_list .= " <li><a href=\"$tag_link\">{$get_categories['category_name']}</a></li> ";
-					}
+					$categories_display = '<li><a href="#">Editors Pick</a></li>';
 				}
-
-
-				$templating->set('categories_list', $categories_list);
+	
+				if (isset($get_categories[$found['article_id']]))
+				{
+					$categories_display .= $article_class->display_article_tags($get_categories[$found['article_id']]);
+				}
+	
+				$templating->set('categories_list', $categories_display);
 			}
 		}
 		else

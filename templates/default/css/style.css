@@ -539,6 +539,12 @@ select.pagination {
 	padding: 2px 0;
 	margin: 0 7px 7px 0;
 }
+.article .tags ul li.steamplay {
+	background: #b8b159;
+	float: left;
+	padding: 2px 0;
+	margin: 0 7px 7px 0;
+}
 .article .tags ul li a {
 	color: #ffffff;
 	padding: 4px 7px;

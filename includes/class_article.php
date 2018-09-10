@@ -57,8 +57,77 @@ class article
 		{
 			$tagline_image = "<img alt src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
 		}
-
 		return $tagline_image;
+	}
+
+	/* Find tags for an article or multiple articles
+	OPTIONS
+	article_ids - multiple ids to pull when showing a list of articles
+	limit - How many to limit
+	*/
+	public function find_article_tags($options)
+	{
+		// this is required to properly count up the rank for the tags
+		$this->dbl->run("SET @rank=null, @val=null;");
+
+		// setting a limit on the amount of tags per article
+		if (isset($options['limit']))
+		{
+			$category_tag_sql = "SELECT * FROM 
+			(
+				SELECT a.article_id, a.`category_name`, a.`category_id`, 
+				@rank1 := IF( @val = a.article_id, @rank1 +1, 1 ) AS rank1, 
+				@val := a.article_id 
+				FROM 
+				(
+					SELECT r.article_id, c.`category_name`, c.`category_id`
+					FROM  `article_category_reference` r
+					INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
+					WHERE r.article_id IN ("  . $options['article_ids'] . ")
+					ORDER BY r.`article_id`,CASE WHEN (c.`show_first` = 1) THEN 0 ELSE 1 END ASC, c.category_name ASC
+				) AS a
+			)as Z
+			WHERE Z.rank1 < " . $options['limit'];
+		}
+		// no limit, display all tags
+		else
+		{
+			$category_tag_sql = "SELECT r.article_id, c.`category_name`, c.`category_id`
+			FROM  `article_category_reference` r
+			INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
+			WHERE r.article_id IN ("  . $options['article_ids'] . ")
+			ORDER BY r.`article_id`,CASE WHEN (c.`show_first` = 1) THEN 0 ELSE 1 END ASC, c.category_name ASC";		
+		}
+
+		$get_categories = $this->dbl->run($category_tag_sql)->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
+
+		return $get_categories;
+	}
+
+	public function display_article_tags($categories_list)
+	{
+		$categories_output = '';
+		if (!empty($categories_list))
+		{
+			foreach ($categories_list as $tag)
+			{
+				$category_link = $this->tag_link($tag['category_name']);
+
+				if ($tag['category_id'] == 60)
+				{
+					$categories_output .= " <li class=\"ea\"><a href=\"$category_link\">{$tag['category_name']}</a></li> ";
+				}
+				else if ($tag['category_name'] == 'Steam Play')
+				{
+					$categories_output .= " <li class=\"steamplay\"><a href=\"$category_link\">{$tag['category_name']}</a></li> ";
+				}
+				else
+				{
+					$categories_output .= " <li><a href=\"$category_link\">{$tag['category_name']}</a></li> ";
+				}
+			}
+		}
+		return $categories_output;
 	}
 
 	// if they have set a tagline image from the gallery, remove any existing images
@@ -857,7 +926,7 @@ class article
 		die();
 	}
 	
-	public function display_article_list($article_list, $get_categories)
+	public function display_article_list($article_list, $categories_list)
 	{
 		global $user;
 
@@ -924,31 +993,18 @@ class article
 
 			$this->templating->set('date', $article_date);
 
-			$editors_pick = '';
+			$categories_display = '';
 			if ($article['show_in_menu'] == 1)
 			{
-				$editors_pick = '<li><a href="#">Editors Pick</a></li>';
+				$categories_display = '<li><a href="#">Editors Pick</a></li>';
 			}
-			$categories_list = $editors_pick;
 
-			foreach ($get_categories as $k => $category_list)
+			if (isset($categories_list[$article['article_id']]))
 			{
-				if ($article['article_id'] == $category_list['article_id'])
-				{
-					$category_link = $this->tag_link($category_list['category_name']);
-
-					if ($category_list['category_id'] == 60)
-					{
-						$categories_list .= " <li class=\"ea\"><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
-					}
-					else
-					{
-						$categories_list .= " <li><a href=\"$category_link\">{$category_list['category_name']}</a></li> ";
-					}
-				}
+				$categories_display .= $this->display_article_tags($categories_list[$article['article_id']]);
 			}
 
-			$this->templating->set('categories_list', $categories_list);
+			$this->templating->set('categories_list', $categories_display);
 
 			$tagline_image = $this->tagline_image($article);
 

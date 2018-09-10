@@ -39,6 +39,7 @@ if (!isset($_GET['go']))
 				a.`gallery_tagline`,
 				a.`comment_count`,
 				a.`total_likes`,
+				a.`show_in_menu`,
 				t.`filename` as `gallery_tagline_filename`,
 				a.`comments_open`,
 				u.`username`,
@@ -319,29 +320,23 @@ if (!isset($_GET['go']))
 
 				$templating->set('paging', $article_pagination);
 
-				$categories_list = '';
-				// sort out the categories (tags)
-				$fetch_cats = $dbl->run("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? ORDER BY r.`category_id` = 60 DESC, r.`category_id` ASC", array($article['article_id']))->fetch_all();
-				foreach ($fetch_cats as $get_categories)
+				$categories_display = '';
+				if ($article['show_in_menu'] == 1)
 				{
-					$category_link = $article_class->tag_link($get_categories['category_name']);
-					
-					$category_name = str_replace(' ', '-', $get_categories['category_name']);
-					if ($get_categories['category_id'] == 60)
-					{
-						$categories_list .= '<li class="ea"><a href="'.$category_link.'">'. $get_categories['category_name'] . '</a></li>';
-					}
-
-					else
-					{
-						$categories_list .= '<li><a href="'.$category_link.'">' . $get_categories['category_name'] . '</a></li>';
-					}
+					$categories_display = '<li><a href="#">Editors Pick</a></li>';
 				}
 
-				if (!empty($categories_list))
+				$get_categories = $article_class->find_article_tags(array('article_ids' => $article['article_id']));
+	
+				if (isset($article['article_id']))
+				{
+					$categories_display .= $article_class->display_article_tags($get_categories[$article['article_id']]);
+				}
+
+				if (!empty($categories_display))
 				{
 					$templating->block('tags', 'articles_full');
-					$templating->set('categories_list', $categories_list);
+					$templating->set('categories_list', $categories_display);
 				}
 
 				// article meta for bookmarking, likes etc
@@ -361,8 +356,6 @@ if (!isset($_GET['go']))
 					}
 				}
 				$templating->set('bookmark_link', $bookmark_link);
-
-
 
 				$templating->set('total_likes', $article['total_likes']);
 

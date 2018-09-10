@@ -328,7 +328,7 @@ if (!isset($_GET['go']))
 
 				$get_categories = $article_class->find_article_tags(array('article_ids' => $article['article_id']));
 	
-				if (isset($article['article_id']))
+				if ($get_categories)
 				{
 					$categories_display .= $article_class->display_article_tags($get_categories[$article['article_id']]);
 				}

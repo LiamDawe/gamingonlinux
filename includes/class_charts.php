@@ -1335,8 +1335,9 @@ class charts
 						legendCallback: function(chart) {
 							var text = [];
 							text.push('<div class=\"collapse_container\"><div class=\"collapse_header\">Click to show legend</div><div class=\"collapse_content\"><div class=\"body group\"><ul style=\"list-style: none; padding: 0; margin: 0;\">');
-							for (var i=0; i<chart.data.datasets.length; i++) {
-							  text.push('<li style=\"float: left; padding: 2px; margin: 0 7px 7px 0; line-height: 15px;\">');
+							for (var i=0; i<chart.data.datasets.length; i++) 
+							{
+							  text.push('<li onClick=\"toggleLabels(' + i + ', Chart".$graph_name.")\" style=\"float: left; padding: 2px; margin: 0 7px 7px 0; line-height: 15px;\">');
 							  text.push('<div style=\"float: left; width: 15px; height: 15px; background-color:' + chart.data.datasets[i].borderColor + '\">&nbsp;</div>&nbsp;' + chart.data.datasets[i].label);
 							  text.push('</li>');
 							}

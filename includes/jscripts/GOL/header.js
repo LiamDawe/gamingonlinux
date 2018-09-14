@@ -4,6 +4,18 @@ function decodeEntities(encodedString) {
     textArea.innerHTML = encodedString;
     return textArea.value;
 }
+/* chart.js custom legend filtering */
+function toggleLabels(index,chart)
+{
+	var ci = window.chart //Chart
+	var meta = ci.getDatasetMeta(index);
+	
+	// See controller.isDatasetVisible comment
+	meta.hidden = meta.hidden === null? !ci.data.datasets[index].hidden : null;
+	
+	// We hid a dataset ... rerender the chart
+	ci.update();
+}
 // update ckeditor so it can be captured and parsed by the article preview
 function CKupdate() 
 {

@@ -7,7 +7,7 @@ function decodeEntities(encodedString) {
 /* chart.js custom legend filtering */
 function toggleLabels(index,chart)
 {
-	var ci = window.chart //Chart
+	var ci = chart //Chart
 	var meta = ci.getDatasetMeta(index);
 	
 	// See controller.isDatasetVisible comment

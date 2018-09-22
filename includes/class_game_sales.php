@@ -281,7 +281,199 @@ class game_sales
 		$this->templating->block('bottom', 'free_games');
 		if ($pagination != '')
 		{
-			$pagination = '<div class="free-games-pagination">'.$pagination.'</div>';
+			$pagination = '<div class="games-pagination">'.$pagination.'</div>';
+		}
+		$this->templating->set('pagination', $pagination);
+	}
+
+	// free games list needs merging with this, to have free games auto ticked - less code dupe, only place for all
+	function display_all_games($filters = NULL)
+	{
+		$this->templating->load('games_list');
+
+		$this->templating->block('list_top', 'games_list');
+
+		// for non-ajax requests
+		if (isset($_GET['option']) && is_array($_GET['option']) && $filters == NULL)
+		{
+			$filters_sort = ['option' => $_GET['option']];
+		}
+		else if ($filters)
+		{
+			$filters_sort = array();
+			parse_str($filters, $filters_sort);
+		}
+
+		$genre_ids = [];
+		$licenses = [];
+		$options_sql = '';
+		$genre_join = '';
+		if (isset($filters_sort) && is_array($filters_sort))
+		{
+			if (isset($filters_sort['genres']))
+			{
+				foreach ($filters_sort['genres'] as $genre)
+				{
+					$genre_ids[] = $genre;
+					$options_link[] = 'genres[]=' . $genre;
+				}
+				$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
+				$options_sql .= ' AND r.genre_id IN ('.$in.') ';
+				$genre_join = ' INNER JOIN `game_genres_reference` r ON r.game_id = c.`id` ';
+			}
+
+			if (isset($filters_sort['licenses']))
+			{
+				foreach ($filters_sort['licenses'] as $license)
+				{
+					$licenses[] = $license;
+					$options_link[] = 'licenses[]=' . $license;
+				}
+				$in  = str_repeat('?,', count($licenses) - 1) . '?';
+				$options_sql .= ' AND c.license IN ('.$in.') ';
+			}
+			if (isset($filters_sort['misc']))
+			{
+				foreach ($filters_sort['misc'] as $misc)
+				{
+					if ($misc == 'free_only')
+					{
+						$options_sql .= ' AND c.free_game = 1 ';
+					}
+					if ($misc == 'no_dlc')
+					{
+						$options_sql .= ' AND c.is_dlc = 0 ';
+					}
+				}
+			}
+		}
+
+		// paging for pagination
+		$page = core::give_page();
+
+		$where = NULL;
+		$sql_where = '';
+		$link_extra = '';
+		if (isset($_GET['q']))
+		{
+			$search_query = str_replace('+', ' ', $_GET['q']);
+			$where = '%'.$search_query.'%';
+			$sql_where = ' c.`name` LIKE ? AND ';
+
+			$merged_arrays = array_merge([$where], $genre_ids, $licenses);
+
+			$total_rows = $this->dbl->run("SELECT COUNT(Distinct id) FROM `calendar` c WHERE $sql_where AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 ORDER BY c.`name` ASC", [$where])->fetchOne();
+			$pagination = $this->core->pagination_link(50, $total_rows, '/games_list.php?', $page, $link_extra);	
+
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE $sql_where AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
+		}
+		else
+		{
+			$merged_arrays = array_merge($genre_ids, $licenses);
+			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 $options_sql ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
+			$pagination = $this->core->pagination_link(50, $total_rows, '/games_list.php?', $page, $link_extra);
+
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
+		}
+
+		$this->templating->set('filter_total', $total_rows);
+
+		if ($games_res)
+		{
+			// first grab a list of all the genres for each game, so we only do one query instead of one for each
+			$genre_ids = [];
+			foreach ($games_res as $set)
+			{
+				$genre_ids[] = $set['id'];
+			}
+			$in  = str_repeat('?,', count($genre_ids) - 1) . '?';
+			$genre_tag_sql = "SELECT r.`game_id`, c.`category_name` AS `name` FROM `game_genres_reference` r INNER JOIN `articles_categorys` c ON c.`category_id` = r.genre_id WHERE r.`game_id` IN ($in) GROUP BY r.`game_id`, `name`";
+			$genre_res = $this->dbl->run($genre_tag_sql, $genre_ids)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+
+			foreach ($games_res as $game)
+			{
+				$this->templating->block('row', 'free_games');
+
+				$small_pic = '';
+				if ($game['small_picture'] != NULL && $game['small_picture'] != '')
+				{
+					$small_pic = '<img src="' . $this->core->config('website_url') . 'uploads/gamesdb/small/' . $game['small_picture'] . '" alt="" />';
+				}
+
+				if ($game['trailer'] != NULL && $game['trailer'] != '')
+				{
+					$small_pic = '<a data-fancybox href="'.$game['trailer'].'">' . $small_pic . '</a>';
+				}
+
+				$this->templating->set('small_pic', $small_pic);
+
+				$edit = '';
+				if ($this->user->check_group([1,2,5]))
+				{
+					$edit = '<a href="/admin.php?module=games&view=edit&id='.$game['id'].'"><span class="icon edit edit-sale-icon"></span></a> ';
+				}
+				$this->templating->set('edit', $edit);
+
+				$this->templating->set('name', $game['name']);
+				$this->templating->set('id', $game['id']);
+
+				$links = [];
+				$stores = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];
+				foreach ($stores as $type => $name)
+				{
+					if (isset($game[$type]) && !empty($game[$type]))
+					{
+						$links[] = '<a href="'.$game[$type].'">'.$name.'</a>';
+					}
+				}
+				$this->templating->set('links', implode(', ', $links));
+
+				$license = '';
+				if (isset($game['license']) && $game['license'] != '')
+				{
+					$license = $game['license'];
+				}
+				$this->templating->set('license', $license);
+				
+				$genre_list = [];
+				if ($game['is_dlc'] == 1)
+				{
+					$genre_list[] = '<span class="badge yellow">DLC</span>';
+				}
+				
+				if (isset($genre_res[$game['id']]))
+				{	
+					foreach ($genre_res[$game['id']] as $k => $name)
+					{
+						$genre_list[] = "<span class=\"badge\">{$name}</span>";
+					}
+				}
+
+				$suggest_link = '';
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+				{
+					$suggest_link .= '<a href="/index.php?module=items_database&view=suggest_tags&id='.$game['id'].'">Suggest Tags</a>';
+				}
+
+				$genre_output = 'None';
+				if (!empty($genre_list))
+				{
+					$genre_output = implode(' ', $genre_list);
+				}
+
+				$this->templating->set('genre_list', $genre_output);
+				$this->templating->set('suggest_link', $suggest_link);
+			}
+		}
+		else
+		{
+			$this->core->message("We aren't finding any games at the moment, try a different filtering option? Or come back soon!");
+		}
+
+		$this->templating->block('bottom', 'games_list');
+		if ($pagination != '')
+		{
+			$pagination = '<div class="games-pagination">'.$pagination.'</div>';
 		}
 		$this->templating->set('pagination', $pagination);
 	}

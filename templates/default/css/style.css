@@ -673,6 +673,10 @@ select.pagination {
 	border: 1px solid #dbdbdb;
 	background: #efefef;
 }
+.comment.mod_queue
+{
+	margin-bottom: 0px;
+}
 .dark .comment 
 {
 	border: 1px solid #444444;
@@ -797,6 +801,10 @@ select.pagination {
 	.comment .comment-body {
 		margin-left: 155px;
 		margin-right: 10px;
+	}
+	.comment .comment-body.mod_queue
+	{
+		margin-left: 10px;
 	}
     .comment .comment-quote {
         display: none;

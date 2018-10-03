@@ -979,7 +979,7 @@ else if (isset($_GET['go']))
 		{
 			$dbl->run("UPDATE `articles` SET `comments_open` = 0 WHERE `article_id` = ?", array((int) $_GET['article_id']));
 
-			$core->new_admin_note(['complete' => 1, 'type' => 'closed_comments', 'content' => 'closed the comments on the article titled: <a href="'.$article_link.'">'.$title['title'] . '</a>', 'data' => $_GET['article_id']]);
+			$core->new_admin_note(['completed' => 1, 'type' => 'closed_comments', 'content' => 'closed the comments on the article titled: <a href="'.$article_link.'">'.$title['title'] . '</a>', 'data' => $_GET['article_id']]);
 
 			$_SESSION['message'] = 'comments_closed';
 			header("Location: ".$article_link);

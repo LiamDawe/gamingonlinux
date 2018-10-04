@@ -1249,7 +1249,7 @@ class article
 
 			if (in_array($comments['author_id'], $blocked_ids))
 			{
-				$this->templating->block('blocked_comment');
+				$this->templating->block('blocked_comment', 'articles_full');
 			}
 			else
 			{

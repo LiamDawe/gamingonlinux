@@ -103,6 +103,54 @@
 					</div>
 [/block: reply]
 
+[block: blocked_reply]
+<a class="anchor" id="r{:post_id}"></a>
+<div class="comment blocked-comment group r{:post_id}">
+	<div class="comment-meta blocked-comment group">
+		<div class="comment-post">
+			Blocked User
+		</div>
+		<div class="comment-actions">
+			<ul>
+				<li><a class="tooltip-top show_blocked" title="Show" href="#" data-comment-id="{:post_id}"><span class="icon plus"></span></a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<a class="anchor" id="r{:post_id}"></a>
+<div class="hidden_comment comment group r{:post_id}">
+	<div class="comment-meta group">
+		<div class="comment-post">
+			{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:reply_date}</abbr>
+		</div>
+		<div class="comment-actions">
+			<ul>
+				{:edit_link}
+				{:delete_link}
+				{:user_options}
+				{:bookmark}
+				<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" data-src="/includes/ajax/call_post_link.php?post_id={:post_id}&type=forum_reply" href="{:permalink}" title="Link to this post"><span class="icon link">Link</span></a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="comment-author hide-xsmall">
+		<img class="avatar" alt="" src="{:avatar}" />
+		<ul class="comment-badges">
+			{:badges}
+			{:user_info_extra}
+		</ul>
+		<ul class="comment-social">
+			{:profile_fields}
+		</ul>
+	</div>
+	<div id="{:post_id}" class="comment-body">
+		<div id="{:post_id}">
+			<p>{:post_text}</p>
+		</div>
+	</div>
+</div>
+[/block: blocked_reply]
+
 [block: bottom]
 
 {:pagination}

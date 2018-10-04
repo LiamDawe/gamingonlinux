@@ -501,10 +501,29 @@ else
 							$user_ids[] = (int) $id_loop['author_id'];
 						}
 						$reply_user_groups = $user->post_group_list($user_ids);
+
+						// get blocked id's
+						$blocked_ids = [];
+						$blocked_usernames = [];
+						if (count($user->blocked_users) > 0)
+						{
+							foreach ($user->blocked_users as $username => $blocked_id)
+							{
+								$blocked_ids[] = $blocked_id[0];
+								$blocked_usernames[] = $username;
+							}
+						}
 					
 						foreach ($get_replies as $post)
 						{
-							$templating->block('reply', 'viewtopic');
+							if (in_array($post['author_id'], $blocked_ids))
+							{
+								$templating->block('blocked_reply', 'viewtopic');
+							}
+							else
+							{
+								$templating->block('reply', 'viewtopic');
+							}
 							
 							$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
 							$templating->set('permalink', $permalink);

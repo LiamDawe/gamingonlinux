@@ -27,6 +27,12 @@ $ip_timeout = $core->config('ip_ban_length');
 $dbl->run("DELETE FROM `ipbans` WHERE `ban_date` < NOW() - INTERVAL $ip_timeout DAY");
 
 /*
+REMOVE EXPIRED SUPPORTERS
+*/
+$dbl->run("DELETE g.* FROM `user_group_membership` g INNER JOIN `users` u ON u.user_id = g.user_id WHERE g.group_id IN (9,6) AND u.`lifetime_supporter` = 0 AND `supporter_end_date` < NOW() AND `supporter_end_date` IS NOT NULL");
+$dbl->run("UPDATE `users` SET `supporter_end_date` = NULL, `supporter_type` = NULL WHERE `supporter_end_date` < NOW() AND `supporter_end_date` IS NOT NULL AND `lifetime_supporter` = 0");
+
+/*
 Remove IP address from users who haven't logged into the site in 3 months
 */
 $dbl->run("UPDATE `users` SET `ip` = NULL, `private_profile` = 1 WHERE `last_login` <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 90 DAY))");

@@ -12,7 +12,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles`, `mailing_list_key`, `social_stay_cookie` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `supporter_link`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles`, `mailing_list_key`, `social_stay_cookie`, `supporter_end_date` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 	
 	// make sure they have a mailing_list_key
 	// if they unsubscribe it's wiped, but if they stay subscribed/make a new sub = use new or existing key
@@ -34,11 +34,18 @@ if (!isset($_POST['act']))
 		$templating->set('url', $core->config('website_url'));
 
 		$supporter_link = '';
+		$end_date = '';
 		if ($user->check_group(6))
 		{
 			$supporter_link = "<br />Donate Page Link <em>Here you may enter a link to sit beside your name on the Support Us</em>:<br />
 			<input type=\"text\" name=\"supporter_link\" value=\"{$usercpcp['supporter_link']}\" /><br />";
+			if ($usercpcp['supporter_end_date'] != NULL)
+			{
+				$end_date = '<p>Supporter status end date: '.$usercpcp['supporter_end_date'].'</p>';
+			}
 		}
+
+		$templating->set('end_date_info', $end_date);
 
 		$templating->set('supporter_link', $supporter_link);
 

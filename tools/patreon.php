@@ -129,7 +129,7 @@ if (isset($_POST['go']))
 	// okay, now we need to remove anyone not in that list
 	$in = str_repeat('?,', count($user_id_list) - 1) . '?';
 
-	$dbl->run("DELETE g FROM `user_group_membership` g INNER JOIN `users` u ON u.user_id = g.user_id WHERE u.`user_id` NOT IN ( $in ) AND g.group_id IN (9,6) AND u.`lifetime_supporter` = 0 AND u.supporter_type = 'patreon'", $user_id_list);
+	$dbl->run("DELETE FROM `user_group_membership` g INNER JOIN `users` u ON u.user_id = g.user_id WHERE u.`user_id` NOT IN ( $in ) AND g.group_id IN (9,6) AND u.`lifetime_supporter` = 0 AND u.supporter_type = 'patreon'", $user_id_list);
 
 	$dbl->run("UPDATE `users` SET `supporter_type` = NULL WHERE `supporter_type` = 'patreon' AND `user_id` NOT IN ( $in )", $user_id_list);
 }

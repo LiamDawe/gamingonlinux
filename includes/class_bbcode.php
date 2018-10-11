@@ -459,7 +459,7 @@ class bbcode
 		":S:" => '<img src="'.$smilie_location.'/images/emoticons/unsure.png" alt="" />',
 		":woot:" => '<img src="'.$smilie_location.'/images/emoticons/w00t.png" alt="" />',
 		":whistle:" => '<img src="'.$smilie_location.'/images/emoticons/whistle.png" alt="" />',
-		";)" => '<img src="'.$smilie_location.'/images/emoticons/wink.png" alt="" />',
+		":wink:" => '<img src="'.$smilie_location.'/images/emoticons/wink.png" alt="" />',
 		":wub:" => '<img src="'.$smilie_location.'/images/emoticons/wub.png" alt="" />'
 		);
 

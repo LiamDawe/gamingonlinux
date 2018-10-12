@@ -180,7 +180,10 @@ if ($get_announcements)
 	$templating->block('announcement_bottom', 'announcements');
 }
 
-$core->check_old_pc_info($_SESSION['user_id']);
+if (isset($_SESSION) && isset($_SESSION['user_id']))
+{
+	$core->check_old_pc_info($_SESSION['user_id']);
+}
 
 // let them know they aren't activated yet
 if (isset($_GET['user_id']))

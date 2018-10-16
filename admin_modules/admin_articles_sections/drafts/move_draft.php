@@ -10,7 +10,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		$dbl->run("UPDATE `articles` SET `draft` = 0, `admin_review` = 1, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ? WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $_POST['article_id']));
 
 		// note who did it
-		$core->new_admin_note(array('completed' => 0, 'content' => ' sent a new article for review titled: <a href="/admin.php?module=reviewqueue">'.$checked['title'].'</a>.', 'type' => 'article_admin_queue'));
+		$core->new_admin_note(array('completed' => 0, 'content' => ' sent a new article for review titled: <a href="/admin.php?module=reviewqueue">'.$checked['title'].'</a>.', 'type' => 'article_admin_queue', 'data' => $_POST['article_id']));
 
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{

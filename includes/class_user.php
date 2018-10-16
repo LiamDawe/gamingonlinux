@@ -370,7 +370,7 @@ class user
 				}
 				else
 				{
-					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . ", original expiry was: " . $session_check['expires']);
+					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . ", data: " . print_r($session_check, true));
 				}
 
 				$this->register_session($generated_session, $session_check['device-id']);

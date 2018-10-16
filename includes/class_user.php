@@ -101,11 +101,19 @@ class user
 					if ($stay == 1)
 					{
 						$cookie_domain = false; // allows cookies for localhost dev env
+						$secure = 0; // allows cookies for localhost dev env
 						if (!empty($this->core->config('cookie_domain')))
 						{
 							$cookie_domain = $this->core->config('cookie_domain');
+							$secure = 1;
 						}
-						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain);
+						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain, $secure);
+					}
+
+					if ($stay != 1 && $this->user_details['user_id'] == 1)
+					{
+						// DEBUG FOR RANDOM LOGOUTS, PERHAPS SOMETIMES THE BOX ISNT TICKED PROPERLY?
+						error_log('You didnt set it to stay logged in!');
 					}
 
 					return true;
@@ -280,7 +288,7 @@ class user
 
 			if ($this->user_details['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
-				setcookie('gol-device', $device_id, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
+				setcookie('gol-device', $device_id, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'), 1);
 
 				// send email about new device
 				$html_message = "<p>Hello <strong>" . $this->user_details['username'] . "</strong>,</p>
@@ -327,7 +335,7 @@ class user
 	{		
 		if (isset($_COOKIE['gol_session']))
 		{
-			$session_check = $this->db->run("SELECT `session_id`, `device-id`, `user_id` FROM `saved_sessions` WHERE `session_id` = ? AND `expires` > NOW()", array($_COOKIE['gol_session']))->fetch();
+			$session_check = $this->db->run("SELECT `session_id`, `device-id`, `user_id`, `expires` FROM `saved_sessions` WHERE `session_id` = ? AND `expires` > NOW()", array($_COOKIE['gol_session']))->fetch();
 
 			if ($session_check)
 			{
@@ -352,13 +360,19 @@ class user
 				if($check_update == 1)
 				{
 					$cookie_domain = false; // allows cookies for localhost dev env
+					$secure = 0; // allows cookies for localhost dev env
 					if (!empty($this->core->config('cookie_domain')))
 					{
 						$cookie_domain = $this->core->config('cookie_domain');
+						$secure = 1;
 					}
-					
-					setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain);
+					setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain, $secure);
 				}
+				else
+				{
+					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . ", original expiry was: " . $session_check['expires']);
+				}
+
 				$this->register_session($generated_session, $session_check['device-id']);
 
 				return true;

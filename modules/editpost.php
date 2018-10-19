@@ -13,7 +13,7 @@ if (!isset($_POST['act']))
 		header("Location: /index.php?module=forum");
 		die();
 	}
-	
+
 	$templating->block('post');
 
 	// editing the main topic
@@ -89,14 +89,14 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 		$_SESSION['message_extra'] = 'page id';
 		header("Location: /index.php?module=forum");
 	}
-	
+
 	// edit topic
 	if (isset($_GET['topic_id']) && is_numeric($_GET['topic_id']))
 	{
 		// check empty
 		if (empty($_POST['title']) || empty($_POST['text']))
 		{
-			$core->message("You have to enter in a title and text to edit! Options: <a href=\"index.php?module=editpost&amp;topic_id={$_GET['topic_id']}\">Edit Again</a> - <a href=\"index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}&page={$_GET['page']}\">Return to topic</a>.");
+			$core->message("You have to enter in a title and text to edit! Options: <a href=\"index.php?module=editpost&amp;topic_id={$_GET['topic_id']}&amp;page={$_POST['page']}\">Edit Again</a> - <a href=\"index.php?module=viewtopic&amp;topic_id={$_GET['topic_id']}&page={$_GET['page']}\">Return to topic</a>.");
 		}
 
 		else
@@ -127,7 +127,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 		// check empty
 		if (empty($_POST['text']))
 		{
-			$core->message("You have to enter in some text to edit! Options: <a href=\"index.php?module=editpost&amp;post_id={$_GET['post_id']}\">Edit Again</a> - <a href=\"index.php?module=viewtopic&amp;topic_id={$_POST['topic_id']}&page={$_GET['page']}\">Return to topic</a>.");
+			$core->message("You have to enter in some text to edit! Options: <a href=\"index.php?module=editpost&amp;post_id={$_GET['post_id']}&amp;page={$_POST['page']}\">Edit Again</a> - <a href=\"index.php?module=viewtopic&amp;topic_id={$_POST['topic_id']}&page={$_GET['page']}\">Return to topic</a>.");
 		}
 
 		else

@@ -121,24 +121,24 @@ if (isset($_POST['act']))
 		$templating->set_previous('title', 'Submit An Article', 1);
 
 		$redirect = '/submit-article/';
-		
+
 		$title = trim($_POST['title']);
 		$title = strip_tags($title);
 		$title = mb_convert_encoding($title, 'UTF-8');
         $text = trim($_POST['text']);
-        
+
         $name = '';
         if (isset($_POST['name']))
         {
 			$name = core::make_safe($_POST['name']);
         }
-        
+
         $guest_email = '';
         if (isset($_POST['email']))
         {
 			$guest_email = core::make_safe($_POST['email']);
 		}
-		
+
 		if ($core->config('captcha_disabled') == 0 && $captcha == 1)
 		{
 			if (isset($_POST['g-recaptcha-response']))
@@ -156,7 +156,7 @@ if (isset($_POST['act']))
 				$_SESSION['atext'] = $text;
 				$_SESSION['aname'] = $name;
 				$_SESSION['aemail'] = $guest_email;
-				
+
 				$_SESSION['message'] = 'captcha';
 				header("Location: " . $redirect);
 				die();
@@ -169,12 +169,12 @@ if (isset($_POST['act']))
 			$_SESSION['atext'] = $text;
 			$_SESSION['aname'] = $name;
 			$_SESSION['aemail'] = $guest_email;
-			
+
 			$_SESSION['message'] = 'captcha';
 			header("Location: " . $redirect);
 			die();
 		}
-		
+
 		if (!isset($_POST['spam_list']))
 		{
 			$_SESSION['atitle'] = $title;
@@ -184,39 +184,39 @@ if (isset($_POST['act']))
 
 			$_SESSION['message'] = 'spam_check_agree';
 			header("Location: ".$redirect);
-			die();	
+			die();
 		}
-        
+
         if ($_SESSION['user_id'] == 0 && empty($_POST['email']))
         {
             $_SESSION['atitle'] = $title;
             $_SESSION['atext'] = $text;
             $_SESSION['aname'] = $name;
             $_SESSION['aemail'] = $guest_email;
-            
+
             $_SESSION['message'] = 'empty';
             $_SESSION['message_extra'] = 'email address';
-            
+
             header("Location: " . $redirect);
             die();
         }
-        
+
         $check_empty = core::mempty(compact('title', 'text'));
-        
+
         if ($check_empty !== true)
         {
             $_SESSION['atitle'] = $title;
             $_SESSION['atext'] = $text;
             $_SESSION['aname'] = $name;
             $_SESSION['aemail'] = $guest_email;
-            
+
 			$_SESSION['message'] = 'empty';
             $_SESSION['message_extra'] = $check_empty;
 
             header("Location: " . $redirect);
             die();
         }
-        
+
 		// prevent ckeditor just giving us a blank article (this is the default for an empty editor)
 		// this way if there's an issue and it gets wiped, we still don't get a blank article published
 		if ($text == '<p>&nbsp;</p>')
@@ -227,8 +227,8 @@ if (isset($_POST['act']))
             $_SESSION['aemail'] = $guest_email;
 
 			$_SESSION['message'] = 'empty';
-			$_SESSION['message_extra'] = 'text';	
-			
+			$_SESSION['message_extra'] = 'text';
+
             header("Location: " . $redirect);
             die();
 		}
@@ -249,23 +249,25 @@ if (isset($_POST['act']))
                 $category_sql = $_POST['category'];
             }
 
-            $guest_username = '';
-            if (!empty($_POST['name']))
-            {
-                $guest_username = core::make_safe($_POST['name']);
-                $username = core::make_safe($_POST['name']);
-            }
+			if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || !isset($_SESSION['user_id']))
+			{
+				$username = 'Guest';
+				if (!empty($_POST['name']))
+				{
+					$username = core::make_safe($_POST['name']);
+				}
+			}
 
-            else
-            {
-                $username = $_SESSION['username'];
-            }
+			else
+			{
+				$username = $_SESSION['username'];
+			}
 
 			// make the slug
 			$title_slug = core::nice_title($_POST['title']);
 
 			// insert the article itself
-			$dbl->run("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $guest_username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
+			$dbl->run("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
 
 			$article_id = $dbl->new_id();
 
@@ -286,11 +288,11 @@ if (isset($_POST['act']))
 			$editor_emails = array();
 
 			$subject = "GamingOnLinux article submission from {$username}";
-                
+
 			$email_groups = $user->get_group_ids('article_submission_emails');
-                
+
 			$in = str_repeat('?,', count($email_groups) - 1) . '?';
-			
+
 			$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` from `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN ($in) AND u.`submission_emails` = 1", $email_groups)->fetch_all();
 
 			foreach ($grab_editors as $get_emails)
@@ -311,7 +313,7 @@ if (isset($_POST['act']))
 					$mail->sendMail($get_emails['email'], $subject, $html_message, $plain_message);
 				}
 			}
-                
+
 			$core->message('Thank you for submitting an article to us! The article has been sent to the admins for review before it is posted, please allow time for us to go over it properly. Keep an eye on your email in case we send it back to you with feedback. <a href="/submit-article/">Click here to post more</a> or <a href="/index.php">click here to go to the site home</a>.');
 
             unset($_SESSION['atitle']);

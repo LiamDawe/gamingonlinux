@@ -8,7 +8,7 @@ class article
 	private $user;
 	private $templating;
 	private $bbcode;
-	
+
 	function __construct($dbl, $core, $user, $templating, $bbcode)
 	{
 		$this->dbl = $dbl;
@@ -17,7 +17,7 @@ class article
 		$this->templating = $templating;
 		$this->bbcode = $bbcode;
 	}
-	
+
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
 	// TO DO: Use an array of $_SESSION['article']['blah'] and just remove that, would much much cleaer
 	function reset_sessions()
@@ -34,7 +34,7 @@ class article
 		{
 			unset($_SESSION['conflict_checked']);
 		}
-		
+
 		unset($_SESSION['atitle']);
 		unset($_SESSION['aslug']);
 		unset($_SESSION['atagline']);
@@ -73,12 +73,12 @@ class article
 		// setting a limit on the amount of tags per article
 		if (isset($options['limit']))
 		{
-			$category_tag_sql = "SELECT * FROM 
+			$category_tag_sql = "SELECT * FROM
 			(
-				SELECT a.article_id, a.`category_name`, a.`category_id`, 
-				@rank1 := IF( @val = a.article_id, @rank1 +1, 1 ) AS rank1, 
-				@val := a.article_id 
-				FROM 
+				SELECT a.article_id, a.`category_name`, a.`category_id`,
+				@rank1 := IF( @val = a.article_id, @rank1 +1, 1 ) AS rank1,
+				@val := a.article_id
+				FROM
 				(
 					SELECT r.article_id, c.`category_name`, c.`category_id`
 					FROM  `article_category_reference` r
@@ -96,7 +96,7 @@ class article
 			FROM  `article_category_reference` r
 			INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
 			WHERE r.article_id IN ("  . $options['article_ids'] . ")
-			ORDER BY r.`article_id`,CASE WHEN (c.`show_first` = 1) THEN 0 ELSE 1 END ASC, c.category_name ASC";		
+			ORDER BY r.`article_id`,CASE WHEN (c.`show_first` = 1) THEN 0 ELSE 1 END ASC, c.category_name ASC";
 		}
 
 		$get_categories = $this->dbl->run($category_tag_sql)->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
@@ -197,21 +197,21 @@ class article
 				{
 					$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
 					$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
-		
+
 					if ($value['filetype'] == 'gif')
 					{
 						$static_filename = str_replace('.gif', '_static.jpg', $value['filename']);
 						$static_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $static_filename;
 						$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
 					}
-												
+
 					// for old uploads where no thumbnail was made, make one
 					if (!file_exists($thumb_path) && file_exists($main_path))
 					{
 						include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
-							
+
 						$img = new SimpleImage();
-						$img->fromFile($main_path)->resize(350, null)->toFile($thumb_path);					
+						$img->fromFile($main_path)->resize(350, null)->toFile($thumb_path);
 					}
 					$thumbnail_button = '<button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button>';
 
@@ -223,7 +223,7 @@ class article
 					$preview_file = '<video width="100%" src="'.$main_url.'" controls></video>';
 					$data_type = 'video';
 				}
-			
+
 				$previously_uploaded['output'] .= '<div class="box">
 				<div class="body group">
 				<div id="'.$value['id'].'">'.$preview_file.'
@@ -292,11 +292,11 @@ class article
 		{
 			$additional_text = ' This was a submitted article.';
 		}
-		
+
 		// update any existing notification
 		$this->core->update_admin_note(array(
-			'type_search' => 'IN', 
-			'type' => array('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article'), 
+			'type_search' => 'IN',
+			'type' => array('article_admin_queue', 'article_correction', 'article_submission_queue', 'submitted_article'),
 			'data' => $article['article_id']));
 
 		// note who did it
@@ -425,7 +425,7 @@ class article
 		{
 			$slug = core::nice_title($_POST['title']);
 		}
-		
+
 		// check for newer articles, to prevent crossover
 		if (isset($_SESSION['conflict_checked']) && is_array($_SESSION['conflict_checked']))
 		{
@@ -448,9 +448,9 @@ class article
 				$article_link = $this->get_link($res['article_id'], $res['title']);
 				$article_list .= '<li><a href="'.$article_link.'" target="_blank">'.$res['title'].'</a><input type="hidden" name="article_ids[]" value="'.$res['article_id'].'" /></li>';
 			}
-			
+
 			$article_list .= '</ul><button type="button" class="conflict_confirmed">Confirmed</button></form>';
-			
+
 			$redirect = 1;
 			$_SESSION['message'] = 'article_conflicts';
 			$_SESSION['message_extra'] = $article_list;
@@ -473,7 +473,7 @@ class article
 				$redirect = 1;
 
 				$_SESSION['message'] = 'empty';
-				$_SESSION['message_extra'] = 'text';		
+				$_SESSION['message_extra'] = 'text';
 			}
 
 			else if (strlen($tagline) < 100)
@@ -501,7 +501,7 @@ class article
 			else if (isset($_POST['show_block']) && $core->config('total_featured') == $core->config('editor_picks_limit'))
 			{
 				$redirect = 1;
-				
+
 				$_SESSION['message'] = 'editor_picks_full';
 				$_SESSION['message_extra'] = $core->config('editor_picks_limit');
 			}
@@ -515,21 +515,21 @@ class article
 				{
 					$has_tagline_img = 1;
 				}
-				
+
 				if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 				{
 					$has_tagline_img = 1;
 				}
-				
+
 				if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
 				{
 					$has_tagline_img = 1;
 				}
-				
+
 				if ($has_tagline_img == 0)
 				{
 					$redirect = 1;
-					
+
 					$_SESSION['message'] = 'noimageselected';
 				}
 			}
@@ -543,16 +543,16 @@ class article
 				{
 					$has_tagline_img = 1;
 				}
-				
+
 				if (isset($_SESSION['gallery_tagline_id']) && $_SESSION['gallery_tagline_rand'] == $_SESSION['image_rand'])
 				{
 					$has_tagline_img = 1;
 				}
-				
+
 				if ($has_tagline_img == 0)
 				{
 					$redirect = 1;
-					
+
 					$_SESSION['message'] = 'noimageselected';
 				}
 			}
@@ -622,14 +622,14 @@ class article
 				{
 					// find how they like to normally subscribe
 					$get_email_type = $this->dbl->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-					
+
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
 				else
 				{
 					$sql_emails = (int) $emails;
 				}
-        
+
 				// for unsubscribe link in emails
 				$secret_key = core::random_id(15);
 
@@ -646,13 +646,13 @@ class article
 				{
 					$secret_key = $sub_info['secret_key'];
 				}
-				
+
 				// check over their email options on this new subscription
 				if ($emails == NULL)
 				{
 					// find how they like to normally subscribe
 					$get_email_type = $this->dbl->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-					
+
 					$sql_emails = $get_email_type['auto_subscribe_email'];
 				}
 				else
@@ -693,14 +693,14 @@ class article
 		$templating->block('history', 'admin_modules/admin_module_articles');
 		$templating->set('history', $history);
 	}
-  
+
 	public function get_link($id, $title, $additional = NULL)
 	{
 		$link = '';
 		$nice_title = core::nice_title($title);
-		
+
 		$link = 'articles/'.$nice_title.'.'.$id;
-			
+
 		if ($additional != NULL)
 		{
 			$link = $link . '/' . $additional;
@@ -708,14 +708,14 @@ class article
 
 		return $this->core->config('website_url') . $link;
 	}
-	
+
 	public function tag_link($name)
 	{
 		$name = urlencode($name);
 		$link = 'articles/category/'.$name;
 		return $this->core->config('website_url') . $link;
 	}
-	
+
 	public function publish_article($options)
 	{
 		global $core;
@@ -733,16 +733,16 @@ class article
 
 		// check everything is set correctly
 		$checked = $this->check_article_inputs($options['return_page']);
-				
+
 		// check if it's an editors pick
 		$editors_pick = 0;
 		if (isset($_POST['show_block']))
 		{
 			$editors_pick = 1;
 		}
-			
+
 		$gallery_tagline_sql = $this->gallery_tagline($checked);
-			
+
 		// an existing article (submitted/review/draft)
 		if (isset($_POST['article_id']) && !empty($_POST['article_id']))
 		{
@@ -755,17 +755,17 @@ class article
 			{
 				$author_id = $check_article['author_id'];
 			}
-			
+
 			$this->dbl->run("DELETE FROM `articles_subscriptions` WHERE `article_id` = ?", array($_POST['article_id']));
 			$this->dbl->run("DELETE FROM `articles_comments` WHERE `article_id` = ?", array($_POST['article_id']));
-				
+
 			if (isset($options['type']) && $options['type'] != 'draft')
 			{
 				$this->core->update_admin_note(array('type' => $options['clear_notification_type'], 'data' => $_POST['article_id']));
 			}
-				
+
 			$this->dbl->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0, `guest_email` = '', `guest_ip` = '' WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
-				
+
 			// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
 			if ($_SESSION['original_text'] != $checked['text'])
 			{
@@ -773,7 +773,7 @@ class article
 			}
 
 			$article_id = $_POST['article_id'];
-				
+
 			if ($_SESSION['user_id'] == $author_id)
 			{
 				if (isset($_POST['subscribe']))
@@ -786,9 +786,9 @@ class article
 		else
 		{
 			$this->dbl->run("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date));
-				
+
 			$article_id = $this->dbl->new_id();
-				
+
 			if (isset($_POST['subscribe']))
 			{
 				$subscribe_them = 1;
@@ -802,7 +802,7 @@ class article
 
 			$this->dbl->run("INSERT INTO `articles_subscriptions` SET `user_id` = ?, `article_id` = ?, `emails` = ?, `send_email` = ?, `secret_key` = ?", array($_SESSION['user_id'], $article_id, 1, 1, $secret_key));
 		}
-			
+
 		// attach uploaded media to this article id
 		if (isset($_POST['uploads']))
 		{
@@ -811,21 +811,21 @@ class article
 				$this->dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `id` = ?", array($article_id, $key));
 			}
 		}
-			
+
 		$this->process_categories($article_id);
-			
+
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{
 			$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 		}
-			
+
 		$this->dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
-			
+
 		unset($_SESSION['original_text']);
 
 		$this->reset_sessions();
-			
+
 		// if the person publishing it is not the author then email them
 		if ($options['type'] == 'admin_review')
 		{
@@ -862,7 +862,7 @@ class article
 				}
 			}
 		}
-			
+
 		if ($options['type'] == 'submitted_article')
 		{
 			// pick the email to use
@@ -903,11 +903,11 @@ class article
 				mail($email, $subject, $message, $headers);
 			}
 		}
-			
+
 		include($this->core->config('path') . 'includes/telegram_poster.php');
 
 		$article_link = self::get_link($article_id, $checked['slug']);
-			
+
 		telegram($checked['title'] . ' ' . $article_link);
 
 		if (!isset($_POST['show_block']))
@@ -925,7 +925,7 @@ class article
 		header("Location: " . $redirect);
 		die();
 	}
-	
+
 	public function display_article_list($article_list, $categories_list)
 	{
 		global $user;
@@ -1012,12 +1012,12 @@ class article
 
 			// set last bit to 0 so we don't parse links in the tagline
 			$this->templating->set('text', $article['tagline']);
-				
+
 			$this->templating->set('article_link', $this->get_link($article['article_id'], $article['slug']));
 			$this->templating->set('comment_count', $article['comment_count']);
 		}
 	}
-	
+
 	// placeholder, so we can merge admin comments, plain article comments and the ajax updater into one function
 	// article_info = required article details
 	// pagination_link = destination link for pagination
@@ -1037,7 +1037,7 @@ class article
 
 		// count how many there is in total, from cache if it exists
 		$total_comments = $this->article_comments_counter($article_info['article']['article_id']);
-		
+
 		$per_page = 15;
 		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
 		{
@@ -1069,7 +1069,7 @@ class article
 		{
 			$page = $lastpage;
 		}
-		
+
 		// sort out the pagination link
 		$pagination = $this->core->pagination_link($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
 		$pagination_head = $this->core->head_pagination($per_page, $total_comments, $article_info['pagination_link'], $page, '#comments');
@@ -1078,11 +1078,11 @@ class article
 		{
 			$this->core->message('The comments on this article are closed.');
 		}
-		
+
 		$this->templating->block('comments_top', 'articles_full');
 		$this->templating->set('pagination_head', $pagination_head);
 		$this->templating->set('pagination', $pagination);
-		
+
 		if (isset($article_info['type']) && $article_info['type'] != 'admin')
 		{
 			$subscribe_link = '';
@@ -1125,16 +1125,16 @@ class article
 					}
 				}
 			}
-			
+
 			$this->templating->set('subscribe_link', $subscribe_link);
 			$this->templating->set('close_comments', $close_comments_link);
 		}
 		else
 		{
 			$this->templating->set('subscribe_link', '');
-			$this->templating->set('close_comments', '');		
+			$this->templating->set('close_comments', '');
 		}
-		
+
 		//
 		/* DISPLAY THE COMMENTS */
 		//
@@ -1152,24 +1152,24 @@ class article
 		{
 			$db_grab_fields .= "u.`{$field['db_field']}`,";
 		}
-		
+
 		$params = array_merge([(int) $article_info['article']['article_id']], [$this->core->start], [$per_page]);
-		
+
 		$comments_get = $this->dbl->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`edit_counter`, a.`total_likes`, u.username, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`comment_id` ASC LIMIT ?, ?", $params)->fetch_all();
-		
+
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
 		$sql_replacers = [];
 		$user_ids = [];
-		
+
 		foreach ($comments_get as $id_loop)
 		{
 			// no point checking for if they've liked a comment, that has no likes
-			if ($id_loop['total_likes'] > 0) 
+			if ($id_loop['total_likes'] > 0)
 			{
 				$like_array[] = (int) $id_loop['comment_id'];
 				$sql_replacers[] = '?';
-			}	
+			}
 			$user_ids[] = (int) $id_loop['author_id'];
 		}
 
@@ -1205,11 +1205,11 @@ class article
 			$comments_top_text = 'No comments yet!';
 		}
 		$this->templating->set('comments_top_text', $comments_top_text);
-					
+
 		if (!empty($like_array))
 		{
 			$to_replace = implode(',', $sql_replacers);
-						
+
 			// get this users likes
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 			{
@@ -1228,7 +1228,7 @@ class article
 		{
 			$comment_user_groups = $this->user->post_group_list($user_ids);
 		}
-		
+
 		// check over their permissions now
 		$permission_check = $this->user->can(array('mod_delete_comments', 'mod_edit_comments'));
 
@@ -1242,7 +1242,7 @@ class article
 		{
 			$can_edit = 1;
 		}
-		
+
 		foreach ($comments_get as $comments)
 		{
 			$comment_date = $this->core->human_date($comments['time_posted']);
@@ -1260,9 +1260,9 @@ class article
 			{
 				foreach($blocked_usernames as $username)
 				{
-						
+
 					$capture_quotes = preg_split('~(\[/?quote[^]]*\])~', $comments['comment_text'], NULL, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-						
+
 					// need to count the amount of [quote=?
 					// each time we hit [/quote] take one away from counter
 					// snip the comment between the start and the final index number?
@@ -1278,7 +1278,7 @@ class article
 							if(strpos($quote,'[quote=') !== false || strpos($quote,'[quote]') !== false)
 							{
 								++$opens;
-							}	
+							}
 							else if(strpos($quote,'[/quote]')!==false)
 							{
 								--$opens;
@@ -1292,7 +1292,7 @@ class article
 						}
 					}
 				}
-			}	
+			}
 
 			if ($comments['author_id'] == 0 || empty($comments['username']))
 			{
@@ -1321,13 +1321,13 @@ class article
 
 			// sort out the avatar
 			$comment_avatar = $this->user->sort_avatar($comments);
-							
+
 			$into_username = '';
 			if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
 			{
 				$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . $this->core->config('website_url') . 'templates/'.$this->core->config('template').'/images/distros/' . $comments['distro'] . '.svg" />';
 			}
-							
+
 			$pc_info = '';
 			if (isset($comments['pc_info_public']) && $comments['pc_info_public'] == 1)
 			{
@@ -1337,7 +1337,7 @@ class article
 				}
 			}
 
-				
+
 			$this->templating->set('user_id', $comments['author_id']);
 			$this->templating->set('username', $into_username . $username);
 			$this->templating->set('comment_avatar', $comment_avatar);
@@ -1358,7 +1358,7 @@ class article
 				{
 					$edit_counter = '. Edited ' . $comments['edit_counter'] . ' times.';
 				}
-								
+
 				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' at ' . $this->core->human_date($comments['last_edited_time']) . $edit_counter . '[/i]';
 			}
 
@@ -1373,7 +1373,7 @@ class article
 				$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
 			}
 			$this->templating->set('who_likes_link', $who_likes_link);
-				
+
 			$likes_hidden = '';
 			if ($comments['total_likes'] == 0)
 			{
@@ -1398,7 +1398,7 @@ class article
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
 				$logged_in_options = $this->templating->block_store('logged_in_options', 'articles_full');
-					
+
 				if (isset($article_info['type']) && $article_info['type'] != 'admin')
 				{
 					// sort bookmark icon out
@@ -1421,11 +1421,11 @@ class article
 					$like_text = "Like";
 					$like_class = "like";
 					if ($_SESSION['user_id'] != 0)
-					{								
+					{
 						if (isset($get_user_likes) && in_array($comments['comment_id'], $get_user_likes))
 						{
 							$like_text = "Unlike";
-							$like_class = "unlike";									
+							$like_class = "unlike";
 						}
 						else
 						{
@@ -1439,20 +1439,20 @@ class article
 					{
 						$like_button = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="comment" data-id="'.$comments['comment_id'].'" data-article-id="'.$article_info['article']['article_id'].'" data-author-id="'.$comments['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 					}
-						
+
 					$report_link = "<li><a class=\"tooltip-top\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$article_info['article']['article_id']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
-					
+
 					if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
 					{
 						$comment_edit_link = "<li><a class=\"tooltip-top edit_comment_link\" data-comment-id=\"{$comments['comment_id']}\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
 					}
-						
+
 					if ($can_delete == 1 || $_SESSION['user_id'] == $comments['author_id'])
 					{
 						$comment_delete_link = "<li><a class=\"tooltip-top delete_comment\" title=\"Delete\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\" data-comment-id=\"{$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
 					}
 				}
-					
+
 				$logged_in_options = $this->templating->store_replace($logged_in_options, array('post_id' => $comments['comment_id'], 'like_button' => $like_button));
 			}
 			$this->templating->set('logged_in_options', $logged_in_options);
@@ -1466,31 +1466,31 @@ class article
 			$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
 			$badges = user::user_badges($comments, 1);
 			$this->templating->set('badges', implode(' ', $badges));
-							
+
 			$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
 
 			$this->templating->set('profile_fields', $profile_fields_output);
 
 			// do this last, to help stop templating tags getting parsed in user text
 			$this->templating->set('text', $this->bbcode->parse_bbcode($comments['comment_text'] . $last_edited, 0));
-			
+
 			$this->templating->set('date', $comment_date);
 			$this->templating->set('tzdate', date('c',$comments['time_posted']) );
 		}
 
 		$this->templating->block('bottom', 'articles_full');
 		$this->templating->set('pagination', $pagination);
-		
+
 		if (isset($article_info['type']) && $article_info['type'] != 'admin' && $this->user->check_group([6,9]) === false)
 		{
 			$this->templating->block('patreon_comments', 'articles_full');
 		}
 	}
-	
+
 	public function display_category_picker($categorys_ids = NULL)
 	{
 		global $templating;
-		
+
 		// show the category selection box
 		$templating->block('articles_top', 'articles');
 		$options = '';
@@ -1509,7 +1509,7 @@ class article
 			$options .= '<option value="'.$get_cats['category_id'].'" ' . $selected . '>'.$get_cats['category_name'].'</option>';
 		}
 		$templating->set('options', $options);
-		
+
 		$all_check = '';
 		$any_check = 'checked';
 		if (isset($_GET['type']))
@@ -1605,7 +1605,7 @@ class article
 
 		return $article_pagination;
 	}
-	
+
 	// give a user a notification if their name was quoted in a comment
 	function quote_notification($text, $username, $author_id, $article_id, $comment_id)
 	{
@@ -1616,7 +1616,7 @@ class article
 
 		// we only want to notify them once on being quoted, so make sure each quote has a unique name
 		$quoted_usernames = array_values(array_unique($matches[1]));
-		
+
 		$new_notification_id = [];
 
 		if (!empty($quoted_usernames))
@@ -1635,14 +1635,14 @@ class article
 				}
 			}
 		}
-		
+
 		$new_notification_id['quoted_usernames'] = $quoted_usernames;
-		
+
 		return $new_notification_id;
 	}
 
 	function delete_comment($comment_id)
-	{		
+	{
 		$comment = $this->dbl->run("SELECT c.`author_id`, c.`comment_text`, c.`spam`, c.`article_id`, u.`username`, a.`title`, a.`slug` FROM `articles_comments` c LEFT JOIN `users` u ON u.`user_id` = c.`author_id` LEFT JOIN `articles` a ON a.`article_id` = c.`article_id` WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
 
 		if ($comment['author_id'] != $_SESSION['user_id'] && $this->user->can('mod_delete_comments') == false)
@@ -1727,7 +1727,7 @@ class article
 
 				return true;
 			}
-		}		
+		}
 	}
 
 	// grab total comments or add/remove 1 from the counter using redis cache if it exists
@@ -1739,7 +1739,7 @@ class article
 		// setup a cache
 		$querykey = "KEY" . md5($sql_count . serialize($article_id));
 		$total_comments = unserialize(core::$redis->get($querykey)); // check cache
-							
+
 		if ($total_comments === false || $total_comments === null) // there's no cache
 		{
 			$total_comments = $this->dbl->run($sql_count, array($article_id))->fetchOne();
@@ -1759,7 +1759,7 @@ class article
 				$total_comments = $total_comments - 1;
 			}
 			return $total_comments;
-		}	
+		}
 	}
 
 	function remove_editor_pick($article_id)

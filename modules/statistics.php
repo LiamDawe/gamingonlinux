@@ -11,23 +11,23 @@ $templating->block('top', 'statistics');
 $templating->set('total_users', $core->config('total_users'));
 
 $charts_list = array(
-	array("name" => "Linux Distributions (Combined)"),
-	array("name" => "Linux Distributions (Split)"),
-	array("name" => "Desktop Environment"),
-	array("name" => "Distro Architecture"),
-	array("name" => "Dual Booting"),
-	array("name" => "Wine Use"),
-	array("name" => "RAM"),
-	array("name" => "CPU Vendor"),
-	array("name" => "GPU Vendor"),
-	array("name" => "GPU Model"),
-	array("name" => "GPU Driver", "order" => "drivers"),
-	array("name" => "GPU Driver (Nvidia)", "order" => "drivers"),
-	array("name" => "GPU Driver (AMD)", "order" => "drivers"),
-	array("name" => "Monitors"),
-	array("name" => "Resolution"),
-	array("name" => "Main Gaming Machine"),
-	array("name" => "Main Gamepad")
+	array("name" => "Linux Distributions (Combined)", "bundle_outside_top10" => 1),
+	array("name" => "Linux Distributions (Split)", "bundle_outside_top10" => 1),
+	array("name" => "Desktop Environment", "bundle_outside_top10" => 1),
+	array("name" => "Distro Architecture", "bundle_outside_top10" => 0),
+	array("name" => "Dual Booting", "bundle_outside_top10" => 0),
+	array("name" => "Wine Use", "bundle_outside_top10" => 0),
+	array("name" => "RAM", "bundle_outside_top10" => 1),
+	array("name" => "CPU Vendor", "bundle_outside_top10" => 0),
+	array("name" => "GPU Vendor", "bundle_outside_top10" => 0),
+	array("name" => "GPU Model", "bundle_outside_top10" => 0),
+	array("name" => "GPU Driver", "order" => "drivers", "bundle_outside_top10" => 0),
+	array("name" => "GPU Driver (Nvidia)", "order" => "drivers", "bundle_outside_top10" => 0),
+	array("name" => "GPU Driver (AMD)", "order" => "drivers", "bundle_outside_top10" => 0),
+	array("name" => "Monitors", "bundle_outside_top10" => 0),
+	array("name" => "Resolution", "bundle_outside_top10" => 1),
+	array("name" => "Main Gaming Machine", "bundle_outside_top10" => 0),
+	array("name" => "Main Gamepad", "bundle_outside_top10" => 1)
 );
 
 if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
@@ -66,22 +66,22 @@ if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 	else
 	{
 		echo $templating->output();
-		
+
 		$filecache->init();
 
 		foreach($charts_list as $chart)
 		{
 			$get_chart_id = $dbl->run("SELECT `id`, `grouping_id`,`name`, `h_label`, `total_answers` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $grouping_id))->fetch();
-			
+
 			if ($get_chart_id['total_answers'] > 0)
 			{
 				$previous_group = $dbl->run("SELECT `grouping_id` FROM `user_stats_charts` WHERE `grouping_id` < ? ORDER BY `id` DESC LIMIT 1", array($get_chart_id['grouping_id']))->fetch();
 
 				$get_last_chart_id = $dbl->run("SELECT `id` FROM `user_stats_charts` WHERE `name` = ? AND `grouping_id` = ? ORDER BY `id` DESC LIMIT 1", array($chart['name'], $previous_group['grouping_id']))->fetchOne();
-			
+
 				$charts = new charts($dbl);
-			
-				$options = ['padding_right' => 70, 'show_top_10' => 1];
+
+				$options = ['padding_right' => 70, 'show_top_10' => 1, 'bundle_outside_top10' => $chart['bundle_outside_top10']];
 
 				if (isset($get_chart_id['id']))
 				{
@@ -110,7 +110,7 @@ if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 			}
 		}
 			$templating->block('monthly_bottom', 'statistics');
-		
+
 		echo $templating->output();
 		$filecache->write('user_statistics_'.$grouping_id);
 	}

@@ -5,7 +5,7 @@ $templating->set_previous('meta_description', 'Steam Linux Market Share', 1);
 $templating->load('steam_linux_share');
 $templating->block('top');
 
-$data = $dbl->run("SELECT * FROM `steam_linux_share` ORDER BY `date` ASC")->fetch_all();
+$data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` > '2016-01-01' ORDER BY `date` ASC")->fetch_all();
 
 $colours = array(
 	'#a6cee3',
@@ -87,6 +87,68 @@ yAxes: [{
 </script>";
 
 $templating->set('linuxonly', $linuxonly);
+
+// daily active users
+
+$get_daily = $dbl->run("SELECT d.`date`, d.`total`, s.`linux_share` from `steam_daily_active` d INNER JOIN `steam_linux_share` s ON d.date = s.date ORDER BY d.`date` ASC")->fetch_all();
+
+$daily_dates = array();
+
+foreach ($get_daily as $daily_point)
+{
+	$daily_dates[] = "'". date('M-Y', strtotime($daily_point['date'])) . "'";
+
+	$daily_linux[] = $daily_point['total'] / 100 * $daily_point['linux_share'];
+}
+
+$linux_daily_data = "
+{
+	label: 'Linux',
+	fill: false,
+	data: [".implode(', ', $daily_linux)."],
+	backgroundColor: '".$colours[1]."',
+	borderColor: '".$colours[1]."',
+	borderWidth: 1
+}";
+
+$dailyactive = "<div class=\"chartjs-container\"><canvas id=\"dailyshare\" width=\"400\" height=\"200\"></canvas></div><script>
+var dailyshare = document.getElementById('dailyshare');
+var Chartdailyshare = new Chart.Line(dailyshare, {
+type: 'line',
+data: {
+labels: [".implode(',', $daily_dates)."],
+datasets: [$linux_daily_data]
+	},
+	options: {
+		legend: {
+			display: true
+		},responsive: true, maintainAspectRatio: false,
+scales: {
+yAxes: [{
+	ticks: {
+	beginAtZero:true
+	},
+				scaleLabel: {
+			display: true,
+			labelString: 'Percentage of Steam users'
+		}
+}]
+},
+		tooltips:
+		{
+			callbacks: {
+				label: function(tooltipItem, data) {
+	var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+					var label = data.datasets[tooltipItem.datasetIndex].label;
+	return label + ' ' + value + ' Linux users';
+		}
+		},
+		},
+}
+});
+</script>";
+
+$templating->set('dailyactive', $dailyactive);
 
 // languages comparison
 

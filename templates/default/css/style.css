@@ -195,7 +195,7 @@ margin-bottom: -3px;
  }
 /* toggle menus */
 .right-menu{float: right; right: 0px;}
-.toggle-content 
+.toggle-content
 {
 	display: none;
 	white-space: nowrap;
@@ -212,7 +212,7 @@ margin-bottom: -3px;
      box-sizing: border-box;
 }
 .toggle-active {display: block;}
-.toggle-content ul 
+.toggle-content ul
 {
 	list-style: none;
 	list-style-type: none;
@@ -220,15 +220,15 @@ margin-bottom: -3px;
 	padding: 0;
 	color: #999;
 }
-.toggle-content li 
+.toggle-content li
 {
 	margin: 0;
 	padding: 0;
 }
-.toggle-content a 
+.toggle-content a
 {
-	display: block; 
-	color: #999; 
+	display: block;
+	color: #999;
 	padding: 5px
 	!important;
 }
@@ -518,6 +518,8 @@ select.pagination {
 	border-top: 1px solid #cccccc;
 	padding: 7px 0;
 	margin: 7px 0;
+	text-align: justify;
+	text-justify: inter-word;
 }
 .article .content {
 	padding: 0 14px;
@@ -677,7 +679,7 @@ select.pagination {
 {
 	margin-bottom: 0px;
 }
-.dark .comment 
+.dark .comment
 {
 	border: 1px solid #444444;
 	background: #222;
@@ -1095,7 +1097,7 @@ ul.social-networks li > a {
 .bookmark-saved {background-color: yellow !important;}
 
 /* Dark CSS */
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6
 {
     color: #428BCA;
     font-weight: 600;
@@ -1664,8 +1666,8 @@ a.anchor {
     cursor: pointer;
 }
 .btn-icon {
-	float: left; 
-	height: 22px; 
+	float: left;
+	height: 22px;
 	padding-right: 5px;
 	padding-left: 5px;
 	border-right: 1px solid #CCCCCC;
@@ -1676,12 +1678,12 @@ a.anchor {
 	height: 22px;
 }
 .btn-steam, .btn-steam:link, .btn-steam:visited, .btn-steam:active {
-	color: #FFFFFF; 
-	background: #878787; 
+	color: #FFFFFF;
+	background: #878787;
 	border-color:#292929;
 }
 .btn-steam:hover {
-	color: #FFFFFF; 
+	color: #FFFFFF;
 	-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -1736,13 +1738,13 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 }
 /* FANCYBOXES */
 .who_likes_div {
-	width: 70%; 
-	max-width: 800px; 
+	width: 70%;
+	max-width: 800px;
 	max-height: 600px;
 }
 .post_link_div {
-	width: 70%; 
-	max-width: 800px; 
+	width: 70%;
+	max-width: 800px;
 	max-height: 600px;
 }
 .tagline_gallery_div{
@@ -1750,8 +1752,8 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 	height: 80%;
 }
 .pc_info_div {
-	width: 70%; 
-	max-width: 800px; 
+	width: 70%;
+	max-width: 800px;
 	max-height: 600px;
 }
 .gol_twitch{display: none;}
@@ -1768,7 +1770,7 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .dark .bundle-row:hover {background-color: rgb(32, 42, 53)}
 .sales-options {border-bottom: 1px solid rgb(177, 177, 177);}
 .sales-table{border-spacing: 0px;}
-.dark .sales-table th {color: #eee;} 
+.dark .sales-table th {color: #eee;}
 .edit-sale-icon{display: inline-block; background-size: 10px 10px;}
 
 /* free games page */
@@ -1793,14 +1795,14 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .chartjs-container{min-height: 450px;}
 
 /* timeline */
-  
+
   /* The actual timeline (the vertical ruler) */
   .timeline {
 	position: relative;
 	max-width: 1200px;
 	margin: 0 auto;
   }
-  
+
   /* The actual timeline (the vertical ruler) */
   .timeline::after {
 	content: '';
@@ -1813,7 +1815,7 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	margin-left: -3px;
 	box-sizing: border-box;
   }
-  
+
   /* Container around content */
   .timeline-container {
 	padding: 10px 40px;
@@ -1822,7 +1824,7 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	width: 50%;
 	box-sizing: border-box;
   }
-  
+
   /* The circles on the timeline */
   .timeline-container::after {
 	content: '';
@@ -1836,17 +1838,17 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	border-radius: 50%;
 	z-index: 1;
   }
-  
+
   /* Place the container to the left */
   .container-left {
 	left: 0;
   }
-  
+
   /* Place the container to the right */
   .container-right {
 	left: 50%;
   }
-  
+
   /* Add arrows to the left container (pointing right) */
   .container-left::before {
 	content: " ";
@@ -1861,7 +1863,7 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	border-color: transparent transparent transparent #eee;
 	box-sizing: border-box;
   }
-  
+
   /* Add arrows to the right container (pointing left) */
   .container-right::before {
 	content: " ";
@@ -1876,12 +1878,12 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	border-color: transparent #eee transparent transparent;
 	box-sizing: border-box;
   }
-  
+
   /* Fix the circle for containers on the right side */
   .container-right::after {
 	left: -16px;
   }
-  
+
   /* The actual content */
   .container-content {
 	padding: 20px 30px;
@@ -1890,14 +1892,14 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	border-radius: 6px;
 	box-sizing: border-box;
   }
-  
+
   /* Media queries - Responsive timeline on screens less than 600px wide */
   @media screen and (max-width: 600px) {
   /* Place the timelime to the left */
 	.timeline::after {
 	  left: 31px;
 	}
-  
+
   /* Full-width containers */
 	.timeline-container {
 	  width: 100%;
@@ -1905,7 +1907,7 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	  padding-right: 25px;
 	  box-sizing: border-box;
 	}
-  
+
   /* Make sure that all arrows are pointing leftwards */
 	.timeline-container::before {
 	  left: 60px;
@@ -1914,12 +1916,12 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	  border-color: transparent black transparent transparent;
 	  box-sizing: border-box;
 	}
-  
+
   /* Make sure all circles are at the same spot */
 	.container-left::after, .container-right::after {
 	  left: 15px;
 	}
-  
+
   /* Make all right containers behave like the left ones */
 	.container-right {
 	  left: 0%;
@@ -1929,10 +1931,10 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .affiliate_meta{margin-bottom: 0px;}
 
 #cookie_warning {
-	bottom: 0px; 
-	width: 100%; 
+	bottom: 0px;
+	width: 100%;
 	background: linear-gradient(to bottom, rgba(30,30,30,0.95) 0, rgba(0,0,0,0.95) 100%);
-	display: none;    
+	display: none;
 	left: 0;
     line-height: 1.5;
     margin: 0;
@@ -1956,7 +1958,7 @@ span.cookie_action
 .hidden_video
 {
 	position: relative;
-	text-align: center; 
+	text-align: center;
 	min-height: 50px;
 	width: 90%;
 	margin: auto;
@@ -1985,13 +1987,13 @@ span.cookie_action
 	width: 60px;
 	height: 34px;
 }
-  
+
 /* Hide default HTML checkbox */
   .switch input {display:none;}
 
 /* The slider */
-  
-.slider 
+
+.slider
 {
 	position: absolute;
 	cursor: pointer;
@@ -2004,8 +2006,8 @@ span.cookie_action
 	transition: .4s;
 	border-radius: 34px;
 }
-  
-.slider:before 
+
+.slider:before
 {
 	position: absolute;
 	content: "";
@@ -2018,18 +2020,18 @@ span.cookie_action
 	transition: .4s;
 	border-radius: 50%;
 }
-  
-input:checked + .slider 
+
+input:checked + .slider
 {
 	background-color: #2196F3;
 }
-  
-input:focus + .slider 
+
+input:focus + .slider
 {
 	box-shadow: 0 0 1px #2196F3;
 }
-  
-input:checked + .slider:before 
+
+input:checked + .slider:before
 {
 	-webkit-transform: translateX(26px);
 	-ms-transform: translateX(26px);

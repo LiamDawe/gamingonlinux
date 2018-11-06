@@ -18,7 +18,7 @@ else
 			header('Location: ' . $return_no);
 			die();
 		}
-		
+
 		if (!core::is_number($_GET['forum_id']) || !core::is_number($_GET['author_id']) || !core::is_number($_GET['topic_id']))
 		{
 			header('Location: ' . $return_no);
@@ -54,7 +54,7 @@ else
 			header('Location: ' . $return);
 			die();
 		}
-		
+
 		if (!core::is_number($_GET['forum_id']) || !core::is_number($_GET['post_id']) || !core::is_number($_GET['topic_id']))
 		{
 			header('Location: ' . $return);
@@ -189,7 +189,7 @@ else
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 				{
 					$check_sub = $dbl->run("SELECT `send_email` FROM `forum_topics_subscriptions` WHERE `topic_id` = ? AND `user_id` = ?", array($_GET['topic_id'], $_SESSION['user_id']))->fetch();
-					
+
 					if ($check_sub)
 					{
 						if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
@@ -323,7 +323,7 @@ else
 								}
 							}
 						}
-						
+
 						$total_perc = 0;
 						if ($total_votes > 0)
 						{
@@ -427,7 +427,7 @@ else
 
 					$user_options = '';
 					$bookmark = '';
-					if ($_SESSION['user_id'] != 0)
+					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 					{
 						// sort bookmark icon out
 						if (in_array($topic['topic_id'], $bookmarks_array))
@@ -439,9 +439,45 @@ else
 							$bookmark = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="forum_topic" data-id="'.$_GET['topic_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
 						}
 						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$topic['topic_id']."\" data-type=\"forum_topic\"><span class=\"icon quote\">Quote</span></a></li>";
+
+						// see if the user has liked the forum topic
+						$get_user_like = $dbl->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` = ? AND `type` = 'forum_topic'", array($_SESSION['user_id'], $topic['topic_id']))->fetchOne();
+
+						if ($get_user_like)
+						{
+							$like_text = "Unlike";
+							$like_class = "unlike";
+						}
+						else
+						{
+							$like_text = "Like";
+							$like_class = "like";
+						}
+
+						// don't let them like their own post
+						if ($topic['author_id'] != $_SESSION['user_id'])
+						{
+							$user_options = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="forum_topic" data-id="'.$topic['topic_id'].'" data-author-id="'.$topic['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+						}
 					}
 					$templating->set('bookmark', $bookmark);
 					$templating->set('user_options', $user_options);
+
+					$templating->set('total_likes', $topic['total_likes']);
+
+					$who_likes_link = '';
+					if ($topic['total_likes'] > 0)
+					{
+						$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?topic_id='.$topic['topic_id'].'">Who?</a>';
+					}
+					$templating->set('who_likes_link', $who_likes_link);
+
+					$likes_hidden = '';
+					if ($topic['total_likes'] == 0)
+					{
+						$likes_hidden = 'likes_hidden';
+					}
+					$templating->set('hidden_likes_class', $likes_hidden);
 
 					// do last to help prevent templating tags in user text getting replaced
 					$templating->set('post_text', $bbcode->parse_bbcode($topic['topic_text'], 0));
@@ -457,13 +493,13 @@ else
 				if (isset($_GET['post_id']) && is_numeric($_GET['post_id']))
 				{
 					$prev_comments = $dbl->run("SELECT count(`post_id`) FROM `forum_replies` WHERE `topic_id` = ? AND `post_id` <= ? AND `approved` = 1", array($_GET['topic_id'], $_GET['post_id']))->fetchOne();
-					
+
 					$comments_per_page = $core->config('default-comments-per-page');
 					if (isset($per_page))
 					{
 						$comments_per_page = $per_page;
 					}
-					
+
 					$comment_page = 1;
 					if ($topic['replys'] > $comments_per_page)
 					{
@@ -513,7 +549,7 @@ else
 								$blocked_usernames[] = $username;
 							}
 						}
-					
+
 						foreach ($get_replies as $post)
 						{
 							if (in_array($post['author_id'], $blocked_ids))
@@ -524,7 +560,7 @@ else
 							{
 								$templating->block('reply', 'viewtopic');
 							}
-							
+
 							$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
 							$templating->set('permalink', $permalink);
 
@@ -734,27 +770,27 @@ else
 					{
 						$templating->load('login');
 						$templating->block('small');
-						
+
 						$templating->set('url', $core->config('website_url'));
-								
+
 						$twitter_button = '';
 						if ($core->config('twitter_login') == 1)
-						{	
+						{
 							$twitter_button = '<a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
 						}
 						$templating->set('twitter_button', $twitter_button);
-								
+
 						$steam_button = '';
 						if ($core->config('steam_login') == 1)
 						{
 							$steam_button = '<a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
 						}
 						$templating->set('steam_button', $steam_button);
-								
+
 						$google_button = '';
 						if ($core->config('google_login') == 1)
 						{
-							$client_id = $core->config('google_login_public'); 
+							$client_id = $core->config('google_login_public');
 							$client_secret = $core->config('google_login_secret');
 							$redirect_uri = $core->config('website_url') . 'includes/google/login.php';
 							require_once ($core->config('path') . 'includes/google/libraries/Google/autoload.php');
@@ -766,7 +802,7 @@ else
 							$client->addScope("profile");
 							$service = new Google_Service_Oauth2($client);
 							$authUrl = $client->createAuthUrl();
-									
+
 							$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
 						}
 						$templating->set('google_button', $google_button);
@@ -777,7 +813,7 @@ else
 						{
 							// check they don't already have a reply in the mod queue for this forum topic
 							$check = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `approved` = 0 AND `author_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']))->fetchOne();
-							
+
 							if ($check == 0)
 							{
 								$subscribe_check = $user->check_subscription($_GET['topic_id'], 'forum');
@@ -872,7 +908,7 @@ else
 									}
 
 									$templating->set('moderator_options', $reply_options);
-									
+
 									$templating->block('preview', 'viewtopic');
 								}
 								else
@@ -1107,13 +1143,13 @@ else
 					$core->new_admin_note(array('completed' => 1, 'content' => $admin_note_text . '<a href="/forum/topic/'.$_GET['topic_id'].'">'.$topic_title.'</a>.', 'type' => $sql_type));
 
 					$_SESSION['message'] = 'mod_action_done';
-					$_SESSION['message_extra'] = $action;	
+					$_SESSION['message_extra'] = $action;
 				}
 				else
 				{
-					$_SESSION['message'] = 'no_permission_mod';				
+					$_SESSION['message'] = 'no_permission_mod';
 				}
-				
+
 				$topic_link = $forum_class->get_link($_GET['topic_id']);
 				header("Location: " . $topic_link);
 				die();

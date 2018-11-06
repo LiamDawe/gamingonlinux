@@ -14,11 +14,20 @@ if($_POST && isset($_SESSION['user_id']))
 		$item_id = $_POST['comment_id'];
 		$main_table = 'articles_comments';
 		$main_table_id_field = 'comment_id';
-		$table = 'likes';	
+		$table = 'likes';
 		$field = 'data_id';
 		$type_insert = "`type` = 'comment', ";
 		$type_delete = "`type` = 'comment' AND ";
-
+	}
+	if ($_POST['type'] == 'forum_topic')
+	{
+		$item_id = $_POST['comment_id'];
+		$main_table = 'forum_topics';
+		$main_table_id_field = 'topic_id';
+		$table = 'likes';
+		$field = 'data_id';
+		$type_insert = "`type` = 'forum_topic', ";
+		$type_delete = "`type` = 'forum_topic' AND ";
 	}
 	if ($_POST['type'] == 'article')
 	{
@@ -51,10 +60,10 @@ if($_POST && isset($_SESSION['user_id']))
 		if ($count_notifications == 0)
 		{
 			$dbl->run("INSERT INTO `$table` SET $type_insert `$field` = ?, `user_id` = ?, `date` = ?", array($item_id, $_SESSION['user_id'], core::$date));
-			
+
 			$dbl->run("UPDATE `$main_table` SET `total_likes` = (total_likes + 1) WHERE `$main_table_id_field` = ?", array($item_id));
 			$total_likes = $dbl->run("SELECT `total_likes` FROM `$main_table` WHERE `$main_table_id_field` = ?", array($item_id))->fetchOne();
-			
+
 			echo json_encode(array("result" => 'liked', 'total' => $total_likes));
 			return true;
 		}
@@ -73,7 +82,7 @@ if($_POST && isset($_SESSION['user_id']))
 				{
 					// find the last available like now (second to last row)
 					$last_like = $dbl->run("SELECT `user_id`, `data_id`, `date` FROM `likes` WHERE `data_id` = ? ORDER BY `date` DESC LIMIT 1 OFFSET 1", array($_POST['comment_id']))->fetch();
-					
+
 					$seen = '';
 					// if the last time they saw this like notification was before the date of the new last like, they haven't seen it
 					if ($last_like['date'] > $current_likes['seen_date'])
@@ -96,10 +105,10 @@ if($_POST && isset($_SESSION['user_id']))
 				}
 			}
 			$dbl->run("DELETE FROM `$table` WHERE $type_delete `$field` = ? AND user_id = ?", array($item_id, $_SESSION['user_id']));
-			
+
 			$dbl->run("UPDATE `$main_table` SET `total_likes` = (total_likes - 1) WHERE `$main_table_id_field` = ?", array($item_id));
 			$total_likes = $dbl->run("SELECT `total_likes` FROM `$main_table` WHERE `$main_table_id_field` = ?", array($item_id))->fetchOne();
-			
+
 			echo json_encode(array("result" => 'unliked', 'total' => $total_likes));
 			return true;
 		}

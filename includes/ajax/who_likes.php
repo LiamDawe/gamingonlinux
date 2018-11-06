@@ -3,21 +3,30 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-if(isset($_GET['comment_id']) || isset($_GET['article_id']))
+if(isset($_GET['comment_id']) || isset($_GET['article_id']) || isset($_GET['topic_id']))
 {
 	if (isset($_GET['comment_id']))
 	{
 		$table = 'likes';
 		$field = 'data_id';
 		$replacer = 'comment_id';
+		$type = " AND l.`type` = 'comment'";
+	}
+	if (isset($_GET['topic_id']))
+	{
+		$table = 'likes';
+		$field = 'data_id';
+		$replacer = 'topic_id';
+		$type = " AND l.`type` = 'forum_topic'";
 	}
 	if (isset($_GET['article_id']))
 	{
 		$table = 'article_likes';
 		$field = 'article_id';
 		$replacer = $field;
+		$type = '';
 	}
-	$grab_users = $dbl->run("SELECT u.`username`, u.`user_id`, u.`avatar_gallery`, u.`avatar`, u.`avatar_uploaded`, l.like_id FROM `users` u INNER JOIN `$table` l ON u.`user_id` = l.`user_id` WHERE l.`$field` = ? ORDER BY u.`username` ASC LIMIT 50", array($_GET[$replacer]))->fetch_all();
+	$grab_users = $dbl->run("SELECT u.`username`, u.`user_id`, u.`avatar_gallery`, u.`avatar`, u.`avatar_uploaded`, l.like_id FROM `users` u INNER JOIN `$table` l ON u.`user_id` = l.`user_id` WHERE l.`$field` = ? $type ORDER BY u.`username` ASC LIMIT 50", array($_GET[$replacer]))->fetch_all();
 	if (!$grab_users)
 	{
 		$core->message('That does not exist!');

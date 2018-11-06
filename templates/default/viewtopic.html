@@ -45,8 +45,6 @@
 										{:user_options}
 										{:bookmark}
 										<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" data-src="/includes/ajax/call_post_link.php?post_id={:post_id}&type=forum_topic" href="{:permalink}" title="Link to this post"><span class="icon link">Link</span></a></li>
-										
-										</li>
 									</ul>
 								</div>
 							</div>
@@ -63,6 +61,7 @@
 							<div id="{:post_id}" class="comment-body">
 								<div id="{:post_id}">
 									<p>{:post_text}</p>
+									<div class="likes {:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
 								</div>
 							</div>
 					</div>

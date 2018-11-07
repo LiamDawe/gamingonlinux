@@ -3,7 +3,7 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-if(isset($_GET['comment_id']) || isset($_GET['article_id']) || isset($_GET['topic_id']))
+if(isset($_GET['comment_id']) || isset($_GET['article_id']) || isset($_GET['topic_id']) || isset($_GET['reply_id']))
 {
 	if (isset($_GET['comment_id']))
 	{
@@ -18,6 +18,13 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']) || isset($_GET['topi
 		$field = 'data_id';
 		$replacer = 'topic_id';
 		$type = " AND l.`type` = 'forum_topic'";
+	}
+	if (isset($_GET['reply_id']))
+	{
+		$table = 'likes';
+		$field = 'data_id';
+		$replacer = 'reply_id';
+		$type = " AND l.`type` = 'forum_reply'";
 	}
 	if (isset($_GET['article_id']))
 	{

@@ -10,13 +10,13 @@ class user
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gallery`,
-	`display_comment_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`";
-	
+	`display_comment_alerts`, `display_like_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`";
+
 	public $user_groups = [0 => 4]; // default for guests
 	public $blocked_users = [];
 
 	public $cookie_length = 60*60*24*30; // 30 days
-	
+
 	function __construct($dbl, $core)
 	{
 		$this->db = $dbl;
@@ -46,7 +46,7 @@ class user
 					$logout = 1;
 				}
 				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
-				
+
 				$this->check_banned();
 			}
 			else
@@ -56,7 +56,7 @@ class user
 					$this->guest_session();
 				}
 			}
-			
+
 			$this->user_groups = $this->get_user_groups();
 
 			if ($logout == 1)
@@ -72,12 +72,12 @@ class user
 		$_SESSION['user_id'] = 0;
 		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
-		$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gallery' => NULL];		
+		$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gallery' => NULL];
 	}
 
 	// normal login form
 	function login($username, $password, $stay)
-	{		
+	{
 		if (!empty($password))
 		{
 			// check username/email exists first
@@ -134,7 +134,7 @@ class user
 		else
 		{
 			$_SESSION['message'] = "no_password";
-			return false;			
+			return false;
 		}
 	}
 
@@ -163,11 +163,11 @@ class user
 			{
 				$this->db->run("INSERT INTO `ipbans` SET `ip` = ?", [core::$ip]);
 			}
-			
+
 			$this->logout(1);
 		}
 	}
-	
+
 	public function register_session($session_id, $device_id)
 	{
 		if (session_status() == PHP_SESSION_NONE) // not a bastard clue why it's not started sometimes for a few people
@@ -175,7 +175,7 @@ class user
 			session_start();
 		}
 		session_regenerate_id(true);
-		
+
 		$_SESSION['user_id'] = $this->user_details['user_id'];
 		$_SESSION['username'] = $this->user_details['username'];
 		$_SESSION['new_login'] = 1;
@@ -196,21 +196,21 @@ class user
 			$this->blocked_users = $this->db->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 		}
 	}
-	
+
 	// return a list of group ids that have a particular permission
 	function get_group_ids($permission)
 	{
 		$allowed_groups = $this->db->run("SELECT m.`group_id` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` INNER JOIN `user_group_permissions` p ON p.id = m.permission_id WHERE p.`name` = ?", [$permission])->fetch_all(PDO::FETCH_COLUMN);
-		
+
 		return $allowed_groups;
 	}
-	
+
 	// check if a user is able to do or not do something
 	function can($do)
 	{
 		// simplistic true or false check for a single permission type
 		if (!is_array($do))
-		{			
+		{
 			// find all groups that have that permission
 			$allowed_groups = $this->db->run("SELECT p.name, m.`group_id` FROM `user_group_permissions_membership` m INNER JOIN `user_groups` g ON m.`group_id` = g.`group_id` INNER JOIN `user_group_permissions` p ON p.id = m.permission_id WHERE p.`name` = ?", [$do])->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
 
@@ -255,9 +255,9 @@ class user
 				}
 			}
 			return $final;
-		}		
+		}
 	}
-	
+
 	// check if it's a new device, then set the session up
 	public function new_login($generated_session)
 	{
@@ -332,7 +332,7 @@ class user
 
 	// if they have a stay logged in cookie log them in
 	function stay_logged_in()
-	{		
+	{
 		if (isset($_COOKIE['gol_session']))
 		{
 			$session_check = $this->db->run("SELECT `session_id`, `device-id`, `user_id`, `expires` FROM `saved_sessions` WHERE `session_id` = ? AND `expires` > NOW()", array($_COOKIE['gol_session']))->fetch();
@@ -341,7 +341,7 @@ class user
 			{
 				// login then
 				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($session_check['user_id']))->fetch();
-				
+
 				$this->check_banned();
 
 				// update IP address and last login
@@ -352,7 +352,14 @@ class user
 				$expires_date = new DateTime('now');
 				$expires_date->add(new DateInterval('P30D'));
 
-				$update_session_db = $this->db->run("UPDATE `saved_sessions` SET `session_id` = ?, `expires` = ? WHERE `session_id` = ? AND `user_id` = ?", array($generated_session, $expires_date->format('Y-m-d H:i:s'), $_COOKIE['gol_session'], $session_check['user_id']));
+				$update_session_sql = "UPDATE
+				`saved_sessions`
+				SET
+				`session_id` = ?,
+				`expires` = ?
+				WHERE
+				`session_id` = ? AND `user_id` = ?";
+				$update_session_db = $this->db->run($update_session_sql, array($generated_session, $expires_date->format('Y-m-d H:i:s'), $_COOKIE['gol_session'], $session_check['user_id']));
 
 				$check_update = $update_session_db->rowcount();
 
@@ -370,7 +377,7 @@ class user
 				}
 				else
 				{
-					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . ", user session data: " . print_r($session_check, true) . ", user cookie data: " . $_COOKIE['gol_session']);
+					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . ", user session data: " . print_r($session_check, true) . ", user cookie data: " . $_COOKIE['gol_session'] . ' Database info: ' . print_r($update_session_db, true));
 				}
 
 				$this->register_session($generated_session, $session_check['device-id']);
@@ -381,7 +388,7 @@ class user
 			{
 				setcookie('gol_session', "",  time()-60, '/');
 				setcookie('gol-device', "",  time()-60, '/');
-				
+
 				return false;
 			}
 		}
@@ -400,18 +407,18 @@ class user
 
 		// remove all session information
 		$_SESSION = array();
-		
+
 		// delete the session cookie
 		$params = session_get_cookie_params();
 		setcookie(session_name(), '', time() - 42000,
         $params["path"], $params["domain"],
         $params["secure"], $params["httponly"]
 		);
-		
+
 		session_destroy();
-		
+
 		session_start();
-		
+
 		session_regenerate_id(true);
 
 		setcookie('gol_session', "", time()-60, '/', $this->core->config('cookie_domain'));
@@ -423,14 +430,14 @@ class user
 		{
 			$_SESSION['message'] = 'banned';
 		}
-		
+
 		if ($redirect == 1)
 		{
 			header("Location: ".$this->core->config('website_url'));
 			die();
 		}
 	}
-	
+
 	// get a list of this users user groups, store it so we can access it as many times as required without hitting the DB constantly
 	function get_user_groups()
 	{
@@ -448,7 +455,7 @@ class user
 	// check a users group to perform a certain task
 	// useful for seeing if they are an admin or editor to perform editing, deleting, publishing etc
 	function check_group($check_groups = NULL)
-	{	
+	{
 		if ( is_array($check_groups) )
 		{
 			foreach ($check_groups as $group)
@@ -482,7 +489,7 @@ class user
 		{
 			$your_theme = $this->user_details['theme']; // should always be set, but somehow sometimes it isn't *shrugs* couldn't figure out why
 		}
-		
+
 		if ($your_theme == 'dark')
 		{
 			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar_dark.png";
@@ -493,7 +500,7 @@ class user
 		}
 
 		$avatar = $default_avatar;
-		
+
 		if (!empty($data))
 		{
 			if ($data['avatar_gallery'] != NULL)
@@ -507,7 +514,7 @@ class user
 				$avatar = $this->core->config('website_url') . "uploads/avatars/{$data['avatar']}";
 			}
 		}
-			
+
 		return $avatar;
 	}
 
@@ -567,14 +574,14 @@ class user
 			p.`gamepad`,
 			p.`date_updated`,
 			u.`distro`,
-			g.`id` AS `gpu_id`, 
+			g.`id` AS `gpu_id`,
 			g.`name` AS `gpu_model`
 			FROM
 			`user_profile_info` p
 			INNER JOIN
 			`users` u ON u.user_id = p.user_id
 			LEFT JOIN
-			`gpu_models` g ON g.id = p.gpu_model 
+			`gpu_models` g ON g.id = p.gpu_model
 			WHERE
 			p.`user_id` = ?", array($user_id))->fetch();
 
@@ -613,7 +620,7 @@ class user
 				$pc_info['counter']++;
 				$pc_info['wine'] = '<strong>When was the last time you used Wine to play a Windows game?</strong> '.$additionaldb['wine'];
 			}
-			
+
 			if ($additionaldb['ram_count'] != NULL && !empty($additionaldb['ram_count']))
 			{
 				$pc_info['counter']++;
@@ -676,12 +683,12 @@ class user
 		}
 		return $pc_info;
 	}
-	
+
 	// check their subscription details to an item (article, forum topic etc)
 	function check_subscription($data_id, $type)
 	{
 		global $db;
-		
+
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0 && core::is_number($data_id))
 		{
 			$sql_table = '';
@@ -695,7 +702,7 @@ class user
 				$sql_table = 'forum_topics_subscriptions';
 				$sql_id_field = 'topic_id';
 			}
-			
+
 			// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 			$subscribe_check = [];
 			$check_current_sub = $this->db->run("SELECT `$sql_id_field`, `emails`, `send_email` FROM `$sql_table` WHERE `user_id` = ? AND `$sql_id_field` = ?", array($_SESSION['user_id'], $data_id))->fetch();
@@ -711,11 +718,11 @@ class user
 			{
 				$subscribe_check['emails'] = 'selected';
 			}
-			
+
 			return $subscribe_check;
 		}
 	}
-	
+
 	public static function user_profile_icons($profile_fields, $data)
 	{
 		$profile_fields_output = '';
@@ -729,7 +736,7 @@ class user
 					//Skip if it's only the first part of the url
 					continue;
 				}
-								
+
 				if ($field['db_field'] == 'website')
 				{
 					$url = parse_url($data[$field['db_field']]);
@@ -759,10 +766,10 @@ class user
 				$profile_fields_output .= $into_output;
 			}
 		}
-		
+
 		return $profile_fields_output;
 	}
-	
+
 	// this function gets a list of [user_id => [group id, group id], another_user_id => [group_id, group_id]]
 	// helper function for grabbing user badges for comments, forum posts etc
 	public function post_group_list($user_ids)
@@ -773,29 +780,29 @@ class user
 		$group_list[0] = [0]; // guest user/group
 
 		// if we can't find their groups for whatever reason, just give them no groups
-		foreach ($user_ids as $user_id) 
+		foreach ($user_ids as $user_id)
 		{
 			if (!array_key_exists($user_id, $group_list))
 			{
 				$group_list[$user_id] = [0];
 			}
 		}
-		
+
 		return $group_list;
 	}
-	
-	// helper function to get the data needed for sorting user_badges in the function below this one 
+
+	// helper function to get the data needed for sorting user_badges in the function below this one
 	public function grab_user_groups()
 	{
 		$get_groups = unserialize(core::$redis->get('user_group_list'));
 		if ($get_groups === false || $get_groups === null) // there's no cache
 		{
-			$groups_query = $this->db->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);		
+			$groups_query = $this->db->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
 			core::$redis->set('user_group_list', serialize($groups_query));
 		}
 		self::$user_group_list = $get_groups;
 	}
-	
+
 	// the actual user badge sorting, which gives the expected output of user badges for comments, forum posts etc
 	public static function user_badges($data, $list = 0)
 	{
@@ -803,23 +810,23 @@ class user
 		if (isset($data['game_developer']) && $data['game_developer'] == 1)
 		{
 			$text = '<span class="badge yellow">Game Dev</span>';
-			
+
 			if ($list == 1)
 			{
 				$text = '<li>'.$text.'</li>';
 			}
-			
+
 			$badges[] = $text;
 		}
 		if (isset($data['register_date']) && $data['register_date'] > strtotime("-7 days"))
 		{
 			$text = '<span class="badge blue">New User</span>';
-			
+
 			if ($list == 1)
 			{
 				$text = '<li>'.$text.'</li>';
 			}
-			
+
 			$badges[] = $text;
 		}
 		if (isset($data['user_groups']))
@@ -844,40 +851,40 @@ class user
 	{
 		// get their username
 		$username = $this->db->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
-		
+
 		// check they're not on the list already
 		$check = $this->db->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id))->fetchOne();
 		if ($check)
 		{
 			$_SESSION['message'] = 'already_blocked';
 			$_SESSION['message_extra'] = $username;
-			
+
 			header("Location: /usercp.php?module=block_list");
 			die();
 		}
 		else
 		{
-			// add them to the block block list 
+			// add them to the block block list
 			$this->db->run("INSERT INTO `user_block_list` SET `user_id` = ?, `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
 
 			$_SESSION['message'] = 'blocked';
 			$_SESSION['message_extra'] = $username;
-			
+
 			header("Location: /usercp.php?module=block_list");
 			die();
-		}		
+		}
 	}
 
 	function unblock_user($user_id)
 	{
 		// get their username
 		$username = $this->db->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($user_id))->fetchOne();
-		
+
 		$this->db->run("DELETE FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
-		
+
 		$_SESSION['message'] = 'unblocked';
 		$_SESSION['message_extra'] = $username;
-			
+
 		header("Location: /usercp.php?module=block_list");
 		die();
 	}
@@ -913,7 +920,7 @@ class user
 		$this->db->run("DELETE FROM `user_conversations_info` WHERE `owner_id` = ?", array($user_id));
 		$this->db->run("DELETE FROM `user_conversations_participants` WHERE `participant_id` = ?", array($user_id));
 		$this->db->run("DELETE FROM `user_notifications` WHERE `owner_id` = ?", array($user_id));
-		
+
 		$this->db->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
 
 		$this->core->new_admin_note(array('completed' => 1,

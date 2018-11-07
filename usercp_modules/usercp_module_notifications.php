@@ -3,12 +3,13 @@ $templating->set_previous('title', 'Notifications manager' . $templating->get('t
 $templating->load('usercp_modules/notifications');
 
 $notification_types = [
-'quoted' => 			['text' => 'quoted your post on'], 
-'admin_comment' => 		['text' => 'left a message in'], 
+'quoted' => 			['text' => 'quoted your post on'],
+'admin_comment' => 		['text' => 'left a message in'],
 'editor_comment' => 	['text' => 'left a message in'],
 'editor_plan' => 		['text' => 'added a new article plan in'],
 'article_comment' => 	['text' => 'replied to'],
 'liked' =>				['text' => 'liked your comment on'],
+'liked_forum_topic' =>  ['text' => 'liked your forum topic titled'],
 'wishlist_sale' => 		['text' => 'has been detected as going on sale!']
 ];
 
@@ -41,29 +42,32 @@ if (!isset($_GET['go']))
 			$unread_array = array();
 			$read_array = array();
 			// show the notifications here
-			$res_list = $dbl->run("SELECT 
-			n.`id`, 
-			n.`last_date`, 
-			n.`article_id`, 
+			$res_list = $dbl->run("SELECT
+			n.`id`,
+			n.`last_date`,
+			n.`article_id`,
 			n.`comment_id`,
+			n.`forum_topic_id`,
 			n.`sale_game_id`,
-			n.`seen`, 
-			n.`total`, 
-			n.`type`, 
-			u.user_id, 
-			u.username, 
-			u.avatar_gallery, 
-			u.avatar, 
-			u.avatar_uploaded,
+			n.`seen`,
+			n.`total`,
+			n.`type`,
+			u.`user_id`,
+			u.`username`,
+			u.`avatar_gallery`,
+			u.`avatar`,
+			u.`avatar_uploaded`,
 			a.`title`,
+			ft.`topic_title`,
 			c.`name`
-			FROM 
-				`user_notifications` n 
-			LEFT JOIN `users` u ON u.user_id = n.notifier_id 
-			LEFT JOIN `articles` a ON n.article_id = a.article_id 
-			LEFT JOIN `calendar` c ON n.sale_game_id = c.id
-			WHERE n.`owner_id` = ? 
-			ORDER BY n.seen, n.last_date 
+			FROM
+				`user_notifications` n
+			LEFT JOIN `users` u ON u.`user_id` = n.`notifier_id`
+			LEFT JOIN `articles` a ON n.`article_id` = a.`article_id`
+			LEFT JOIN `forum_topics` ft ON n.`forum_topic_id` = ft.`topic_id`
+			LEFT JOIN `calendar` c ON n.`sale_game_id` = c.id
+			WHERE n.`owner_id` = ?
+			ORDER BY n.`seen`, n.`last_date`
 			DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
 			foreach ($res_list as $note_list)
 			{
@@ -107,6 +111,11 @@ if (!isset($_GET['go']))
 						$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
 						$title = $note_list['title'];
 					}
+					if ($note_list['type'] == 'liked_forum_topic')
+					{
+						$link = '/forum/topic/'.$note_list['forum_topic_id'];
+						$title = $note_list['topic_title'];
+					}
 					if ($note_list['type'] == 'admin_comment' || $note_list['type'] == 'editor_comment' || $note_list['type'] == 'editor_plan')
 					{
 						$link = '/admin.php?wipe_note=' . $note_list['id'];
@@ -116,15 +125,15 @@ if (!isset($_GET['go']))
 					$note_row = $templating->block_store('plain_row', 'usercp_modules/notifications');
 
 					$note_row = $templating->store_replace($note_row, array(
-						'id' => $note_list['id'], 
-						'icon' => $icon, 
-						'link' => $link, 
-						'avatar' => $avatar, 
-						'username' => $username, 
-						'profile_link' => '/profiles/' . $note_list['user_id'], 
-						'action_text' => $notification_types[$note_list['type']]['text'], 
-						'title' => $title, 
-						'additional_comments' => $additional_comments, 
+						'id' => $note_list['id'],
+						'icon' => $icon,
+						'link' => $link,
+						'avatar' => $avatar,
+						'username' => $username,
+						'profile_link' => '/profiles/' . $note_list['user_id'],
+						'action_text' => $notification_types[$note_list['type']]['text'],
+						'title' => $title,
+						'additional_comments' => $additional_comments,
 						'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 				}
 
@@ -136,11 +145,11 @@ if (!isset($_GET['go']))
 					$title = $note_list['name'];
 
 					$note_row = $templating->store_replace($note_row, array(
-						'id' => $note_list['id'], 
-						'icon' => $icon, 
-						'link' => $link, 
-						'action_text' => $notification_types[$note_list['type']]['text'], 
-						'title' => $title, 
+						'id' => $note_list['id'],
+						'icon' => $icon,
+						'link' => $link,
+						'action_text' => $notification_types[$note_list['type']]['text'],
+						'title' => $title,
 						'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 				}
 

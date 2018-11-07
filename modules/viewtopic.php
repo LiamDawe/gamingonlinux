@@ -457,7 +457,7 @@ else
 						// don't let them like their own post
 						if ($topic['author_id'] != $_SESSION['user_id'])
 						{
-							$user_options = '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="forum_topic" data-id="'.$topic['topic_id'].'" data-author-id="'.$topic['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+							$user_options .= '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="forum_topic" data-id="'.$topic['topic_id'].'" data-author-id="'.$topic['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 						}
 					}
 					$templating->set('bookmark', $bookmark);
@@ -526,16 +526,27 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$per_page}", array($_GET['topic_id'], $core->start))->fetch_all();
+					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`total_likes`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$per_page}", array($_GET['topic_id'], $core->start))->fetch_all();
+
+					// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
+					$like_array = [];
+					$sql_replacers = [];
+					$user_ids = [];
+
+					foreach ($get_replies as $id_loop)
+					{
+						// no point checking for if they've liked a comment, that has no likes
+						if ($id_loop['total_likes'] > 0)
+						{
+							$like_array[] = (int) $id_loop['post_id'];
+							$sql_replacers[] = '?';
+						}
+						$user_ids[] = (int) $id_loop['author_id'];
+					}
 
 					if ($get_replies)
 					{
 						// make an array of all user ids to grab user groups for badge displaying
-						$user_ids = [];
-						foreach ($get_replies as $id_loop)
-						{
-							$user_ids[] = (int) $id_loop['author_id'];
-						}
 						$reply_user_groups = $user->post_group_list($user_ids);
 
 						// get blocked id's
@@ -547,6 +558,23 @@ else
 							{
 								$blocked_ids[] = $blocked_id[0];
 								$blocked_usernames[] = $username;
+							}
+						}
+
+						if (!empty($like_array))
+						{
+							$to_replace = implode(',', $sql_replacers);
+
+							// get this users likes
+							if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+							{
+								$replace = [$_SESSION['user_id']];
+								foreach ($like_array as $comment_id)
+								{
+									$replace[] = $comment_id;
+								}
+
+								$get_user_likes = $dbl->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'forum_reply'", $replace)->fetch_all(PDO::FETCH_COLUMN);
 							}
 						}
 
@@ -631,9 +659,25 @@ else
 							$templating->set('post_id', $post['post_id']);
 							$templating->set('topic_id', $_GET['topic_id']);
 
+							$templating->set('total_likes', $post['total_likes']);
+
+							$who_likes_link = '';
+							if ($post['total_likes'] > 0)
+							{
+								$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?reply_id='.$post['post_id'].'">Who?</a>';
+							}
+							$templating->set('who_likes_link', $who_likes_link);
+
+							$likes_hidden = '';
+							if ($post['total_likes'] == 0)
+							{
+								$likes_hidden = 'likes_hidden';
+							}
+							$templating->set('hidden_likes_class', $likes_hidden);
+
 							$user_options = '';
 							$bookmark_reply = '';
-							if ($_SESSION['user_id'] != 0)
+							if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 							{
 								$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\"><span class=\"icon quote\">Quote</span></a></li>";
 								// sort bookmark icon out
@@ -644,6 +688,25 @@ else
 								else
 								{
 									$bookmark_reply = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="forum_reply" data-id="'.$post['post_id'].'" data-parent-id="'.$_GET['topic_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
+								}
+
+								$like_text = "Like";
+								$like_class = "like";
+								if (isset($get_user_likes) && in_array($post['post_id'], $get_user_likes))
+								{
+									$like_text = "Unlike";
+									$like_class = "unlike";
+								}
+								else
+								{
+									$like_text = "Like";
+									$like_class = "like";
+								}
+
+								// don't let them like their own post
+								if ($post['author_id'] != $_SESSION['user_id'])
+								{
+									$user_options .= '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="forum_reply" data-id="'.$post['post_id'].'" data-author-id="'.$post['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 								}
 							}
 							$templating->set('user_options', $user_options);

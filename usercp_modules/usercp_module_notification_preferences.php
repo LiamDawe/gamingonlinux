@@ -21,21 +21,29 @@ if (!isset($_GET['go']))
 		$comments_check = 'checked';
 	}
 	$templating->set('comments_check', $comments_check);
-	
+
 	$admin_comment_pref = '';
 	if ($user->check_group([1,2,5]))
 	{
 		$admin_comment_alerts = $user->user_details['admin_comment_alerts'];
-		
+
 		$admin_comment_check = '';
 		if ($admin_comment_alerts == 1)
 		{
 			$admin_comment_check = 'checked';
 		}
-		
-		$admin_comment_pref = '<label><input type="checkbox" name="admin_comments" '.$admin_comment_check.'> Admin area comments</label><br />';
+
+		$admin_comment_pref = '<label><input type="checkbox" name="admin_comments" '.$admin_comment_check.'> Admin area comments</label>';
 	}
 	$templating->set('admin_comment_pref', $admin_comment_pref);
+
+	$likes_check = '';
+	$user_likes_alerts = $user->user_details['display_like_alerts'];
+	if ($user_likes_alerts == 1)
+	{
+		$likes_check = 'checked';
+	}
+	$templating->set('likes_check', $likes_check);
 
 	$usercpcp = $dbl->run("SELECT `auto_subscribe`, `auto_subscribe_email`, `email_on_pm`, `auto_subscribe_new_article`, `email_options`, `login_emails` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
@@ -108,6 +116,13 @@ else if (isset($_GET['go']))
 			$comment_alerts = 1;
 		}
 
+		// activate the notification area for likes
+		$likes_alerts = 0;
+		if (isset($_POST['likes']))
+		{
+			$likes_alerts = 1;
+		}
+
 		$auto_subscribe = 0;
 		$subscribe_article = 0;
 		$subscribe_emails = 0;
@@ -143,6 +158,7 @@ else if (isset($_GET['go']))
 
 		$dbl->run("UPDATE `users` SET
 			`display_comment_alerts` = ?,
+			`display_like_alerts` = ?,
 			`auto_subscribe` = ?,
 			`auto_subscribe_new_article` = ?,
 			`auto_subscribe_email` = ?,
@@ -152,6 +168,7 @@ else if (isset($_GET['go']))
 			WHERE
 			`user_id` = ?",
 			array($comment_alerts,
+			$likes_alerts,
 			$auto_subscribe,
 			$subscribe_article,
 			$subscribe_emails,
@@ -163,7 +180,7 @@ else if (isset($_GET['go']))
 		$_SESSION['email_options'] = $_POST['email_options'];
 		$_SESSION['auto_subscribe'] = $auto_subscribe;
 		$_SESSION['auto_subscribe_email'] = $subscribe_emails;
-		
+
 		if ($user->check_group([1,2,5]))
 		{
 			$admin_comment_check = 0;
@@ -171,7 +188,7 @@ else if (isset($_GET['go']))
 			{
 				$admin_comment_check = 1;
 			}
-			
+
 			$dbl->run("UPDATE `users` SET `admin_comment_alerts` = ? WHERE `user_id` = ?", array($admin_comment_check, $_SESSION['user_id']));
 		}
 

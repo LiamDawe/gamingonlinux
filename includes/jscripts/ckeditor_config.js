@@ -29,19 +29,19 @@ CKEDITOR.editorConfig = function( config ) {
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Subscript,Superscript';
-	
+
 	config.contentsCss = [ '/templates/default/css/content.css', '/templates/default/css/reset.css' ];
-	
+
 	config.height = 500;
 
 	config.bodyClass = 'article';
 
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';
-	
+
 	// we don't want an empty <p></p> as content
 	config.ignoreEmptyParagraph = false;
-	
+
 	// allow these tags to accept classes
 	config.extraAllowedContent = 'hr(*)';
 	config.extraAllowedContent = 'audio(*)';
@@ -54,11 +54,13 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.extraPlugins = 'widget,widgetselection,lineutils,html5audio,youtube,html5video';
 	config.removePlugins = 'about';
-	
+
 	config.youtube_responsive = true;
 	config.youtube_related = false;
 	config.youtube_privacy = true;
 	config.youtube_disabled_fields = ['chkAutoplay','chkResponsive','txtWidth','txtHeight','chkRelated','chkPrivacy'];
-	
+
 	config.linkShowTargetTab = false
+
+	config.disableNativeSpellChecker = false;
 };

@@ -1743,19 +1743,19 @@ class article
 		if ($total_comments === false || $total_comments === null) // there's no cache
 		{
 			$total_comments = $this->dbl->run($sql_count, array($article_id))->fetchOne();
-			core::$redis->set($querykey, serialize($total_comments), 21600); // cache for six hours
+			core::$redis->set($querykey, serialize($total_comments), 3600); // cache for six hours
 			return $total_comments;
 		}
 		else
 		{
 			if ($type == 'add')
 			{
-				core::$redis->set($querykey, serialize($total_comments + 1), 21600);
+				core::$redis->set($querykey, serialize($total_comments + 1), 3600);
 				$total_comments = $total_comments + 1;
 			}
 			else if ($type == 'remove')
 			{
-				core::$redis->set($querykey, serialize($total_comments - 1), 21600);
+				core::$redis->set($querykey, serialize($total_comments - 1), 3600);
 				$total_comments = $total_comments - 1;
 			}
 			return $total_comments;

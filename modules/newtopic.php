@@ -216,8 +216,11 @@ else
 						}
 
 						// add the topic
-						$dbl->run("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `topic_text` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_user_id` = ?, `approved` = ?", array($_POST['category'], $author, $title, $text, core::$date, core::$date, $author, $approved));
+						$dbl->run("INSERT INTO `forum_topics` SET `forum_id` = ?, `author_id` = ?, $mod_sql `topic_title` = ?, `creation_date` = ?, `last_post_date` = ?, `last_post_user_id` = ?, `approved` = ?", array($_POST['category'], $author, $title, core::$date, core::$date, $author, $approved));
 						$topic_id = $dbl->new_id();
+
+						// add the post for the topic
+						$dbl->run("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `creation_date` = ?, `reply_text` = ?, `approved` = ?, `is_topic` = 1", array($topic_id, $author, core::$date, $text, $approved));
 
 						// update forums post counter and last post info
 						if ($approved == 1)

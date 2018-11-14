@@ -110,7 +110,7 @@ else
 					}
 
 					// add the reply
-					$dbl->run("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?, `approved` = ?", array($topic_id, $author, $message, core::$date, $approved));
+					$dbl->run("INSERT INTO `forum_replies` SET `topic_id` = ?, `author_id` = ?, `reply_text` = ?, `creation_date` = ?, `approved` = ?, `is_topic` = 0", array($topic_id, $author, $message, core::$date, $approved));
 					$post_id = $dbl->new_id();
 
 					// update user post counter

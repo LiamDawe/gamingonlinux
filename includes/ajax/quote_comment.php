@@ -15,9 +15,9 @@ if(isset($_POST) && isset($_POST['type']))
 	
 	if ($_POST['type'] == 'forum_topic')
 	{
-		$get_comment = $dbl->run("SELECT t.`topic_text`, u.`username` FROM `forum_topics` t LEFT JOIN `users` u ON u.user_id = t.author_id WHERE t.topic_id = ?", array($_POST['id']))->fetch();
+		$get_comment = $dbl->run("SELECT p.`reply_text`, u.`username` FROM `forum_replies` p LEFT JOIN `users` u ON u.user_id = p.author_id WHERE p.topic_id = ? AND p.is_topic = 1", array($_POST['id']))->fetch();
 		
-		echo json_encode(array("result" => 'done', 'username' => $get_comment['username'], 'text' => $get_comment['topic_text']));
+		echo json_encode(array("result" => 'done', 'username' => $get_comment['username'], 'text' => $get_comment['reply_text']));
 		return;
 	}
 	

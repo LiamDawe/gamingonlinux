@@ -139,22 +139,7 @@ foreach ($get_users as $user)
 		$dbl->run("UPDATE `articles_comments` SET `comment_text` = ? WHERE `comment_id` = ?", array($comment['comment_text'], $comment['comment_id']));
 	}
 
-	// okay, now we need to remove their username from all direct quotes in forum topics
-	$forum_topics = $dbl->run("SELECT `topic_id`, `topic_text` FROM `forum_topics` WHERE `topic_text` LIKE ?", array('%[quote='.$user['username'].']%'))->fetch_all();
-
-	foreach ($forum_topics as $topic)
-	{
-		$pattern = '/\[quote='.$user['username'].'\]/';
-		$replace = '[quote=Guest]';
-		while(preg_match($pattern, $topic['topic_text']))
-		{
-			$topic['topic_text'] = preg_replace($pattern, $replace, $topic['topic_text']);
-		}
-
-		$dbl->run("UPDATE `forum_topics` SET `topic_text` = ? WHERE `topic_id` = ?", array($topic['topic_text'], $topic['topic_id']));
-	}
-
-	// okay, now we need to remove their username from all direct quotes in forum replies
+	// okay, now we need to remove their username from all direct quotes in forum replies and forum topics (they both now have a row in the same table for the text)
 	$forum_posts = $dbl->run("SELECT `post_id`, `reply_text` FROM `forum_replies` WHERE `reply_text` LIKE ?", array('%[quote='.$user['username'].']%'))->fetch_all();
 
 	foreach ($forum_posts as $post)

@@ -242,7 +242,7 @@ if (isset($_GET['view']))
 
 		$templating->block('topic_top', 'admin_modules/admin_module_forum');
 
-		$topic_res = $dbl->run("SELECT t.*, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `forum_topics` t LEFT JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1")->fetch_all();
+		$topic_res = $dbl->run("SELECT t.*, p.reply_text, u2.user_id AS reporter_id, u2.username AS reporter_user, u.user_id, u.user_group, u.secondary_user_group, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery FROM `forum_topics` t JOIN `forum_replies` p ON p.topic_id = t.topic_id AND p.is_topic = 1 LEFT JOIN `users` u ON t.author_id = u.user_id LEFT JOIN `users` u2 ON t.reported_by_id = u2.user_id WHERE t.reported = 1")->fetch_all();
 		foreach ($topic_res as $topic)
 		{
 			$templating->block('topic', 'admin_modules/admin_module_forum');
@@ -270,7 +270,7 @@ if (isset($_GET['view']))
 			$templating->set('topic_id', $topic['topic_id']);
 			$templating->set('forum_id', $topic['forum_id']);
 			$templating->set('author_id', $topic['author_id']);
-			$templating->set('post_text', $bbcode->parse_bbcode($topic['topic_text'], 0));
+			$templating->set('post_text', $bbcode->parse_bbcode($topic['reply_text'], 0));
 			if ($topic['reported_by_id'] == 0)
 			{
 				$reported_by = "Guest";

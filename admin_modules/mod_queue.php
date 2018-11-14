@@ -9,20 +9,25 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
 	{
-		/*
+		/* THIS NEEDS ADJUSTING FOR THE REPLY_TEXT FOR FORUM TOPICS ALONG WITH IS_TOPIC = 1
 		New sql to cover all of them, in progress:
-		SELECT n.id, n.user_id, ids.type, ids.item_id, ids.post_title
+		SELECT n.id, ids.user_id, n.created_date, u.username as 'author_username', ids.type, ids.item_id, ids.post_title, ids.post_text, ids.reported_by_id, r.username as 'reporter_username'
 		FROM admin_notifications n 
 		JOIN (
-			(SELECT t.topic_title AS post_title, t.topic_id AS item_id, 'mod_queue' AS type FROM `forum_topics` t WHERE t.approved = 0)
+			(SELECT t.author_id as 'user_id', t.topic_title AS post_title, t.topic_text as post_text, t.topic_id AS item_id, 'mod_queue' AS type, NULL as 'reported_by_id' FROM `forum_topics` t WHERE t.approved = 0)
 		UNION
-			(SELECT t.topic_title AS post_title, p.post_id AS item_id, 'mod_queue_reply' AS type FROM `forum_replies` p LEFT JOIN `forum_topics` t ON p.topic_id = t.topic_id WHERE p.approved = 0)
-			UNION
-			(SELECT a.title AS post_title, c.comment_id AS item_id, 'mod_queue_comment' AS type FROM `articles_comments` c INNER JOIN `articles` a ON a.article_id = c.article_id WHERE c.approved = 0)
+			(SELECT p.author_id as 'user_id', t.topic_title AS post_title, p.reply_text as post_text, p.post_id AS item_id, 'mod_queue_reply' AS type, NULL as 'reported_by_id' FROM `forum_replies` p LEFT JOIN `forum_topics` t ON p.topic_id = t.topic_id WHERE p.approved = 0)
+		UNION
+			(SELECT c.author_id as 'user_id', a.title AS post_title, c.comment_text as post_text, a.article_id AS item_id, 'mod_queue_comment' AS type, NULL as 'reported_by_id' FROM `articles_comments` c INNER JOIN `articles` a ON a.article_id = c.article_id WHERE c.approved = 0)
+		UNION
+			(SELECT c.author_id as 'user_id', a.title AS post_title, c.comment_text as post_text, c.comment_id AS item_id, 'reported_comment' AS type, c.spam_report_by as 'reported_by_id' FROM `articles_comments` c INNER JOIN `articles` a ON a.article_id = c.article_id WHERE c.spam = 1)
 		) ids ON n.data = ids.item_id AND n.type = ids.type
+		LEFT JOIN `users` u ON u.user_id = ids.user_id
+		LEFT JOIN `users` r ON r.user_id = ids.reported_by_id
 		WHERE n.completed = 0
+		ORDER BY n.created_date
 		*/
-		$topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`topic_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username`, u.`mod_approved` FROM `forum_topics` t INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0")->fetch_all();
+		$topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, r.`reply_text`, t.`author_id`, t.`forum_id`, t.`creation_date`, u.`username`, u.`mod_approved` FROM `forum_topics` t JOIN `forum_replies` r ON r.topic_id = t.topic_id AND r.is_topic = 1 INNER JOIN `users` u ON t.`author_id` = u.`user_id` WHERE t.`approved` = 0")->fetch_all();
 
 		if ($topics)
 		{
@@ -36,14 +41,14 @@ if (isset($_GET['view']))
 				$templating->set('post_id', '');
 				$templating->set('type', 'forum_topic');
 				$templating->set('title', $results['topic_title']);
-				$templating->set('text', $bbcode->parse_bbcode($results['topic_text']));
+				$templating->set('text', $bbcode->parse_bbcode($results['reply_text']));
 				$templating->set('author_id', $results['author_id']);
 				$templating->set('forum_id', $results['forum_id']);
 				$templating->set('creation_date', $results['creation_date']);
 			}
 		}
 
-		$replies = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username`, u.`mod_approved` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0")->fetch_all();
+		$replies = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, p.`post_id`, p.`reply_text`, p.`author_id`, t.`forum_id`, p.`creation_date`, u.`username`, u.`mod_approved` FROM `forum_replies` p INNER JOIN `forum_topics` t ON t.`topic_id` = p.`topic_id` INNER JOIN `users` u ON p.`author_id` = u.`user_id` WHERE p.`approved` = 0 AND p.is_topic = 0")->fetch_all();
 
 		if ($replies)
 		{
@@ -108,6 +113,8 @@ if (isset($_POST['action']))
 			if ($find_approval['approved'] == 0)
 			{
 				$dbl->run("UPDATE `forum_topics` SET `approved` = 1, `creation_date` = ? WHERE `topic_id` = ?", array(core::$date, $_POST['topic_id']));
+
+				$dbl->run("UPDATE `forum_replies` SET `approved` = 1 WHERE `topic_id` = ? AND `is_topic` = 1", array($_POST['topic_id']));
 
 				$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ?, `posts` = (posts + 1) WHERE `forum_id` = ?", array(core::$date, $_POST['author_id'], $_POST['topic_id'], $_POST['forum_id']));
 
@@ -371,6 +378,7 @@ if (isset($_POST['action']))
 		{
 			// now we can remove the topic
 			$dbl->run("DELETE FROM `forum_topics` WHERE `topic_id` = ?", array($_POST['topic_id']));
+			$dbl->run("DELETE FROM `forum_replies` WHERE `topic_id` = ? AND `is_topic` = 1", array($_POST['topic_id']));
 			$dbl->run("DELETE FROM `forum_topics_subscriptions` WHERE `topic_id` = ?", array($_POST['topic_id']));
 
 			// notify editors this was done

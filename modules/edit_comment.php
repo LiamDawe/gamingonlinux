@@ -10,7 +10,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 	$nice_title = core::nice_title($comment['title']);
 
 	// check if author
-	if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || $_SESSION['user_id'] == 0)
+	if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || !isset($_SESSION['user_id']))
 	{
 		header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 		die();
@@ -50,7 +50,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'editcomment')
 	$comment = $dbl->run("SELECT c.`author_id`, c.`comment_text`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_POST['comment_id']))->fetch();
 
 	// check if author or editor/admin
-	if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || $_SESSION['user_id'] == 0)
+	if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || !isset($_SESSION['user_id']))
 	{
 		$nice_title = core::nice_title($comment['title']);
 		header("Location: /articles/$nice_title.{$comment['article_id']}#comments");

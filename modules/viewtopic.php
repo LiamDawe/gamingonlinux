@@ -100,6 +100,7 @@ else
 		// get topic info/make sure it exists
 		$topic = $dbl->run("SELECT
 			t.*,
+			p.`reply_text`,
 			u.`user_id`,
 			u.`distro`,
 			u.`pc_info_public`,
@@ -114,6 +115,7 @@ else
 			$db_grab_fields
 			f.`name` as `forum_name`
 			FROM `forum_topics` t
+			JOIN `forum_replies` p ON p.topic_id = t.topic_id AND p.is_topic = 1
 			LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
 			INNER JOIN `forums` f ON t.`forum_id` = f.`forum_id`
 			WHERE t.`topic_id` = ? AND t.`approved` = 1", array($_GET['topic_id']))->fetch();
@@ -124,7 +126,7 @@ else
 
 		else
 		{
-			$remove_bbcode = $bbcode->remove_bbcode($topic['topic_text']);
+			$remove_bbcode = $bbcode->remove_bbcode($topic['reply_text']);
 			$rest = substr($remove_bbcode, 0, 70);
 
 			$templating->set_previous('title', "Viewing topic {$topic['topic_title']}", 1);
@@ -480,7 +482,7 @@ else
 					$templating->set('hidden_likes_class', $likes_hidden);
 
 					// do last to help prevent templating tags in user text getting replaced
-					$templating->set('post_text', $bbcode->parse_bbcode($topic['topic_text'], 0));
+					$templating->set('post_text', $bbcode->parse_bbcode($topic['reply_text'], 0));
 				}
 
 				$reply_count = 0;
@@ -526,7 +528,7 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`total_likes`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$per_page}", array($_GET['topic_id'], $core->start))->fetch_all();
+					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`total_likes`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.is_topic = 0 AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$per_page}", array($_GET['topic_id'], $core->start))->fetch_all();
 
 					// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 					$like_array = [];

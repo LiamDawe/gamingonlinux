@@ -108,7 +108,7 @@ if (isset($_GET['user_id']))
 
 						$templating->set('avatar', $avatar);
 						$templating->set('article_comments', $profile['comment_count']);
-						$templating->set('forum_posts', $profile['forum_posts']);
+						$templating->set('forum_posts_counter', $profile['forum_posts']);
 
 						$profile_fields_output = '';
 
@@ -255,6 +255,60 @@ if (isset($_GET['user_id']))
 						$templating->set('view_more_comments', $view_more_comments);
 
 						$templating->set('comment_posts', $comment_posts);
+
+						// latest forum posts from user //
+
+						// need to find forums this viewing user is allowed to see
+
+						$groups_in = str_repeat('?,', count($user->user_groups) - 1) . '?';
+
+						// get the forum ids this user is actually allowed to view
+						$forum_ids = $dbl->run("SELECT p.`forum_id` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all(PDO::FETCH_COLUMN);
+
+						if ($forum_ids)
+						{
+							$forum_posts = '';
+
+							$forum_id_in  = str_repeat('?,', count($forum_ids) - 1) . '?';
+
+							$posts_sql = "SELECT p.creation_date as 'date', t.topic_title, t.last_post_id, t.topic_id, p.reply_text as 'text', p.is_topic FROM `forum_replies` p JOIN `forum_topics` t ON t.topic_id = p.topic_id WHERE t.approved = 1 and p.approved = 1 AND t.`forum_id` IN (".$forum_id_in.") AND p.author_id = ? ORDER BY p.creation_date DESC LIMIT 5";
+
+							$posts_execute = $dbl->run($posts_sql, array_merge($forum_ids,[$_GET['user_id']]))->fetch_all();
+
+							if ($posts_execute)
+							{
+								$total_posts = count($posts_execute);
+
+								// comments block
+								$templating->block('forum_post_list', 'profile');
+
+								foreach ($posts_execute as $posts)
+								{
+									$date = $core->human_date($posts['date']);
+									$title = $posts['topic_title'];
+
+									// remove quotes, it's not their actual comment, and can leave half-open quotes laying around
+									$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $posts['text']);
+									$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
+
+									$link_additional = NULL;
+									if ($posts['last_post_id'] != NULL)
+									{
+										$link_additional = 'post_id=' . $posts['last_post_id'];
+									}
+									
+									$post_link = $forum_class->get_link($posts['topic_id'], $link_additional);
+
+									$forum_posts .= "<li class=\"list-group-item\">
+								<a href=\"".$post_link."\">{$title}</a>
+								<div>".substr(strip_tags($bbcode->parse_bbcode($text)), 0, 63)."&hellip;</div>
+								<small>{$date}</small>
+							</li>";
+								}
+							}
+
+							$templating->set('forum_posts', $forum_posts);
+						}
 
 						//Do not show end block if it's empty
 						if ($user->check_group([1,2]))

@@ -106,6 +106,8 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^forum/([0-9]+)/page\=([0-9]+)?$ /index.php?module=viewforum&forum_id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^forum/topic/([0-9]+)/?$ /index.php?module=viewtopic&topic_id=$1 [N,NC,QSA]
+  
+  RewriteRule ^forum/topic/([0-9]+)/clear_note\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&clear_note=$2 [N,NC,QSA]
 
   RewriteRule ^forum/topic/([0-9]+)/page\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&page=$2 [N,NC,QSA]
 

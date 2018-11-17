@@ -10,6 +10,7 @@ $notification_types = [
 'article_comment' => 	['text' => 'replied to'],
 'liked' =>				['text' => 'liked your comment on'],
 'liked_forum_topic' =>  ['text' => 'liked your forum topic titled'],
+'liked_forum_reply' =>  ['text' => 'liked your forum post in the topic titled'],
 'wishlist_sale' => 		['text' => 'has been detected as going on sale!']
 ];
 
@@ -48,6 +49,7 @@ if (!isset($_GET['go']))
 			n.`article_id`,
 			n.`comment_id`,
 			n.`forum_topic_id`,
+			n.`forum_reply_id`,
 			n.`sale_game_id`,
 			n.`seen`,
 			n.`total`,
@@ -113,7 +115,12 @@ if (!isset($_GET['go']))
 					}
 					if ($note_list['type'] == 'liked_forum_topic')
 					{
-						$link = '/forum/topic/'.$note_list['forum_topic_id'];
+						$link = '/forum/topic/'.$note_list['forum_topic_id'] . '/clear_note='.$note_list['id'];
+						$title = $note_list['topic_title'];
+					}
+					if ($note_list['type'] == 'liked_forum_reply')
+					{
+						$link = '/forum/topic/'.$note_list['forum_topic_id'] . '/post_id=' . $note_list['forum_reply_id'] . '/clear_note='.$note_list['id'];
 						$title = $note_list['topic_title'];
 					}
 					if ($note_list['type'] == 'admin_comment' || $note_list['type'] == 'editor_comment' || $note_list['type'] == 'editor_plan')

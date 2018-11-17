@@ -46,6 +46,10 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 		$like_sql_field = 'data_id';
 		$type_insert = "`type` = 'forum_reply', ";
 		$type_delete = "`type` = 'forum_reply' AND ";
+		$notification_type = 'liked_forum_reply';
+		$notification_sql_field = 'forum_reply_id';
+		$additional_sql = ', `forum_topic_id` = ?';
+		$additional_data = $_POST['topic_id'];
 	}
 	if ($_POST['type'] == 'article')
 	{
@@ -62,7 +66,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 	if($_POST['sta'] == "like")
 	{
 		// deal with notifications, either add a new one or update
-		if ($_POST['type'] == 'comment' || $_POST['type'] == 'forum_topic')
+		if ($_POST['type'] == 'comment' || $_POST['type'] == 'forum_topic' || $_POST['type'] == 'forum_reply')
 		{
 			// first, check they even want like notifications
 			$author_likes = $dbl->run("SELECT `display_like_alerts` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetchOne();

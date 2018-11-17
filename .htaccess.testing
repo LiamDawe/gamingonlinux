@@ -112,6 +112,8 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^forum/topic/([0-9]+)/page\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^forum/topic/([0-9]+)/post_id\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&post_id=$2 [N,NC,QSA]
+  
+    RewriteRule ^forum/topic/([0-9]+)/post_id\=([0-9]+)/clear_note\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&post_id=$2&clear_note=$3 [N,NC,QSA]
 
   RewriteRule ^private-messages/page\=([0-9]+)?$ /index.php?module=messages&page=$1 [N,NC,QSA]
 

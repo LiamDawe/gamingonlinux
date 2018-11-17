@@ -708,7 +708,7 @@ else
 								// don't let them like their own post
 								if ($post['author_id'] != $_SESSION['user_id'])
 								{
-									$user_options .= '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="forum_reply" data-id="'.$post['post_id'].'" data-author-id="'.$post['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+									$user_options .= '<li class="like-button" style="display:none !important"><a class="likebutton tooltip-top" data-type="forum_reply" data-id="'.$post['post_id'].'" data-topic-id="'.$_GET['topic_id'].'" data-author-id="'.$post['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 								}
 							}
 							$templating->set('user_options', $user_options);

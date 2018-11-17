@@ -578,6 +578,8 @@ jQuery(document).ready(function()
 		var author_id = $(this).attr("data-author-id");
 		// get the id of the article it's on
 		var article_id = $(this).attr("data-article-id");
+		// get the id of the article it's on
+		var topic_id = $(this).attr("data-topic-id");
 		// the type of like this is
 		var type = $(this).attr("data-type");
 		//Send off a like
@@ -587,6 +589,7 @@ jQuery(document).ready(function()
 			comment_id: sid,
 			author_id: author_id,
 			article_id: article_id,
+			topic_id: topic_id,
 			type: type,
 			sta: $that.find("span").text().toLowerCase()
 		}, 
@@ -1435,7 +1438,7 @@ jQuery(document).ready(function()
 		{
 			CKEDITOR.instances.ckeditor_gol.insertHtml('<div class="ckeditor-html5-video" style="text-align: center;"><video controls="controls" src="'+text+'">&nbsp;</video></div>');
 		}
-		if (type == 'audio')
+		else if (type == 'audio')
 		{
 			CKEDITOR.instances.ckeditor_gol.insertHtml('<div class="ckeditor-html5-audio" style="text-align: center;"><audio controls="controls" src="'+text+'">&nbsp;</audio></div>');
 		}
@@ -1695,6 +1698,11 @@ jQuery(document).ready(function()
 			var url = "/includes/ajax/gamesdb/display_free.php";
 			var list_update = 'free-list';
 		}
+		else if (formName == 'all')
+		{
+			var url = "/includes/ajax/gamesdb/display_all_games.php";
+			var list_update = 'all-list';
+		}
 		else if (formName == 'sales')
 		{
 			var url = "/includes/ajax/sales/display_normal.php";
@@ -1787,14 +1795,27 @@ jQuery(document).ready(function()
     }).submit();
 	});
 
-	/* free games page */
+	/* free/all games page */
 
 	// pagination ajax
-	$(document).on('click', ".free-games-pagination li a", function(e) 
+	$(document).on('click', ".games-pagination li a", function(e) 
 	{
 		e.preventDefault();
+
 		var form = $("#game_filters");
-		var url = "/includes/ajax/gamesdb/display_free.php";
+		var formName = form.attr('name');
+
+		if (formName == 'free')
+		{
+			var url = "/includes/ajax/gamesdb/display_free.php";
+			var list_update = 'free-list';
+		}
+		else if (formName == 'all')
+		{
+			var url = "/includes/ajax/gamesdb/display_all_games.php";
+			var list_update = 'all-list';
+			console.log('hit');
+		}
 		var page = $(this).attr("data-page");
 	  
 		$.ajax({
@@ -1803,9 +1824,9 @@ jQuery(document).ready(function()
 			data: {'page': page, 'filters': form.serialize()}, 
 			success: function(data)
 			{
-				$('div.free-list').html(data);
-				$('div.free-list').highlight();
-				$('div.free-list').scrollMinimal();
+				$('div.'+list_update).html(data);
+				$('div.'+list_update).highlight();
+				$('div.'+list_update).scrollMinimal();
 				$('#free-search').easyAutocomplete(free_search_options); // required so EAC works when loaded dynamically
 			}
 		});

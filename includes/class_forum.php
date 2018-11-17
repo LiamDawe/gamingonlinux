@@ -104,10 +104,8 @@ class forum
 		// note who deleted it
 		$this->core->new_admin_note(array('completed' => 1, 'content' => ' deleted a forum topic.'));
 
-		// count all posts including the topic
-		$total_count = 0;
-		$current_count = $this->dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($topic_id))->fetchOne();
-		$total_count = $current_count + 1;
+		// count all posts to update post counter
+		$total_count = $this->dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($topic_id))->fetchOne();
 
 		// Here we get each person who has posted along with their post count for the topic ready to remove it from their post count sql
 		$posts = $this->dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `topic_id` = ?", array($topic_id))->fetch_all();
@@ -132,9 +130,6 @@ class forum
 		{
 			$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - ?) WHERE `user_id` = ?", array($post['posts'], $post['author_id']));
 		}
-
-		// remove a post from the topic author for the topic post itself
-		$this->dbl->run("UPDATE `users` SET `forum_posts` = (forum_posts - 1) WHERE `user_id` = ?", array($check['author_id']));
 
 		// now update the forums post count
 		$this->dbl->run("UPDATE `forums` SET `posts` = (posts - ?) WHERE `forum_id` = ?", array($total_count, $check['forum_id']));

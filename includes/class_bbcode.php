@@ -515,7 +515,7 @@ class bbcode
 		$find_replace = [
 		'/\[users-only\](.+?)\[\/users-only\]/is'
 			=> ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see this bit, this is for logged in users only ',
-		"/\<div class=\"youtube-embed-wrapper\"(?:\s)?(?:data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(?:.+?)?(?:\?rel=0)?\")?(?:\s)?style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(?:.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is"
+		"/\<div class=\"youtube-embed-wrapper\"(?:\s)?(?:data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(?:.+?)?(?:\?rel=0)?\")?(?:\s)?style=\"(?:.+?)\"\>(?:.*)\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(?:.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is"
 			=> "<a href=\"https://www.youtube.com/watch?v=$1\"><img src=\"https://img.youtube.com/vi/$1/0.jpg\" alt=\"youtube video thumbnail\"><br />Watch video on YouTube.com</a>",
 		];
 		

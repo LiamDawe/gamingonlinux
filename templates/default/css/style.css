@@ -849,6 +849,9 @@ select.pagination {
 .badge.yellow {
     background: #ccb845;
 }
+.badge.purple {
+    background: #4b367c;
+}
 
 /* Social Networks */
 ul.social-networks {

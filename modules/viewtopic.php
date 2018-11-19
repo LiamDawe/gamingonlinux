@@ -146,7 +146,7 @@ else
 				$dbl->run("UPDATE `forum_topics` SET `views` = (views + 1) WHERE `topic_id` = ?", array($_GET['topic_id']));
 
 				// count how many replies this topic has
-				$total_replies = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetchOne();
+				$total_replies = $dbl->run("SELECT COUNT(`post_id`) FROM `forum_replies` WHERE `topic_id` = ? AND `is_topic` = 0", array($_GET['topic_id']))->fetchOne();
 
 				//lastpage = total pages / items per page, rounded up.
 				if ($total_replies < $per_page)

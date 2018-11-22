@@ -64,7 +64,8 @@ class charts
 		6 => '#fdbf6f',
 		7 => '#ff7f00',
 		8 => '#cab2d6',
-		9 => '#6a3d9a'];
+		9 => '#6a3d9a',
+		10 => '#6A8552'];
 
 		$this->chart_options['title_color'] = '';
 

@@ -118,7 +118,6 @@ $dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_d
 $dbl->run("DELETE FROM `user_notifications` WHERE last_date <= (now() - interval 6 month)");
 
 // remove pc info where the user hasn't updated the info for 2 years
-
 $dbl->run("DELETE FROM `user_profile_info` WHERE `date_updated` < DATE_SUB(NOW(),INTERVAL 2 YEAR)");
 
 // remove users who aren't activated after 10 days
@@ -145,6 +144,31 @@ $dbl->run("DELETE FROM `saved_sessions` WHERE `expires` < NOW() OR `expires` IS 
 
 // delete expired password reset requests
 $dbl->run("DELETE FROM `password_reset` WHERE `expires` <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 7 DAY))")->fetch_all();
+
+// delete private messages older than six month
+$find_old_pms = $dbl->run("SELECT `conversation_id` FROM `user_conversations_info` WHERE `last_reply_date` <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 6 MONTH))")->fetch_all();
+foreach ($find_old_pms as $pms)
+{
+	// delete conversation
+	$dbl->run("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ?", array($pms['conversation_id']));
+
+	// remove participants
+	$dbl->run("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ?", array($pms['conversation_id']));
+
+	// delete the actual messages
+	$dbl->run("DELETE FROM `user_conversations_messages` WHERE `conversation_id` = ?", array($pms['conversation_id']));
+}
+
+// remove old user data requests
+$find_requests = $dbl->run("SELECT `id`, `user_id`, `date_requested`, `filename` FROM `user_data_request` WHERE `date_requested` < DATE_SUB(NOW(), INTERVAL 2 DAY) ORDER BY `id` ASC")->fetch_all();
+foreach ($find_requests as $request)
+{
+	$full_filename = APP_ROOT . '/uploads/user_data_request/' . $request['user_id'] . '/' . $request['filename'];
+	if (unlink($full_filename))
+	{
+		$dbl->run("DELETE FROM `user_data_request` WHERE `id` = ?", array($request['id']));
+	}
+}
 
 // update last ran datetime
 $dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);

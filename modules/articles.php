@@ -60,7 +60,7 @@ if (isset($view))
 			die();
 		}
 
-		$safe_category = urldecode($_GET['catid']);
+		$safe_category = strip_tags($_GET['catid']);
 		$get_category = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `category_name` = ?", array($safe_category))->fetch();
 		if (!$get_category)
 		{

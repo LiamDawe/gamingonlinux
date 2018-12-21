@@ -304,6 +304,8 @@ class game_sales
 			parse_str($filters, $filters_sort);
 		}
 
+		print_r($filters_sort);
+
 		$genre_ids = [];
 		$licenses = [];
 		$options_sql = '';
@@ -345,6 +347,10 @@ class game_sales
 						$options_sql .= ' AND c.is_dlc = 0 ';
 					}
 				}
+			}
+			if (isset($filters['initial']))
+			{
+				$options_sql .= ' AND c.`name` LIKE ';
 			}
 		}
 
@@ -567,15 +573,15 @@ class game_sales
 		$sale_price_field = 'sale_' . $picked_currency['field'];
 		$original_price_field = 'original_' . $picked_currency['field'];
 
+		$options_sql = '';
+		if (!empty($options_array))
+		{
+			$options_sql = ' AND ' . implode(' AND ', $options_array);
+		}
+
 		$where = '';
 		if (isset($_GET['q']) && !empty($_GET['q']))
 		{
-			$options_sql = '';
-			if (!empty($options_array))
-			{
-				$options_sql = implode(' AND ', $options_array);
-			}
-
 			$search_query = str_replace('+', ' ', $_GET['q']);
 			$where = ['%'.$search_query.'%'];
 			$sales_res = $this->dbl->run("SELECT c.id as game_id, c.`name`, c.`is_dlc`, c.`small_picture`, s.`$sale_price_field`, s.$original_price_field, g.name as store_name, s.link FROM `sales` s INNER JOIN calendar c ON c.id = s.game_id INNER JOIN game_stores g ON s.store_id = g.id WHERE c.`free_game` = 0 AND c.`name` LIKE ? AND s.`$sale_price_field` IS NOT NULL $options_sql $stores_sql ORDER BY s.`$sale_price_field` ASC", array_merge($where, $store_ids))->fetch_all();
@@ -584,12 +590,6 @@ class game_sales
 		}
 		else
 		{
-			$options_sql = '';
-			if (!empty($options_array))
-			{
-				$options_sql = ' AND ' . implode(' AND ', $options_array);
-			}
-
 			$game_id_sql = NULL;
 			$game_id_value = [];
 			if (isset($_GET['game_id']) && is_numeric($_GET['game_id']))

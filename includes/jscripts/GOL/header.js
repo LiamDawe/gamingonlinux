@@ -13,7 +13,19 @@ function toggleLabels(index,chart)
 	// See controller.isDatasetVisible comment
 	meta.hidden = meta.hidden === null? !ci.data.datasets[index].hidden : null;
 	
-	// We hid a dataset ... rerender the chart
+	// We hid a dataset, rerender the chart
+	ci.update();
+}
+function toggle_all_Labels(chart)
+{
+	var ci = chart //Chart
+
+	ci.data.datasets.forEach(function(ds) 
+	{
+		ds.hidden = !ds.hidden;
+	});
+	
+	// We hid all, rerender the chart
 	ci.update();
 }
 // update ckeditor so it can be captured and parsed by the article preview

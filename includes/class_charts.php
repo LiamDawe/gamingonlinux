@@ -1365,7 +1365,7 @@ class charts
 							  text.push('<div style=\"float: left; width: 15px; height: 15px; background-color:' + chart.data.datasets[i].borderColor + '\">&nbsp;</div>&nbsp;' + chart.data.datasets[i].label);
 							  text.push('</li>');
 							}
-							text.push('</ul></div></div></div>');
+							text.push('</ul><button class=\"chart-toggle\" onClick=\"toggle_all_Labels(Chart".$graph_name.")\">show/hide all</button></div></div></div>');
 							return text.join(\"\");
 						  },
 				scales: {

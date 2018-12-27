@@ -16,6 +16,7 @@ $charts_list = array(
 	array("name" => "Desktop Environment", "bundle_outside_top10" => 1),
 	array("name" => "Distro Architecture", "bundle_outside_top10" => 0),
 	array("name" => "Dual Booting", "bundle_outside_top10" => 0),
+	array("name" => "Steam Play Use", "bundle_outside_top10" => 0),
 	array("name" => "Wine Use", "bundle_outside_top10" => 0),
 	array("name" => "RAM", "bundle_outside_top10" => 1),
 	array("name" => "CPU Vendor", "bundle_outside_top10" => 0),

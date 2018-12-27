@@ -71,6 +71,7 @@ array ("name" => "Linux Distributions (Split)", "db_field" => "u.distro", "table
 array ("name" => "Desktop Environment", "db_field" => "p.desktop_environment"),
 array ("name" => "Distro Architecture", "db_field" => "p.what_bits"),
 array ("name" => "Dual Booting", "db_field" => "p.dual_boot"),
+array ("name" => "Steam Play Use", "db_field" => "p.steamplay"),
 array ("name" => "Wine Use", "db_field" => "p.wine"),
 array ("name" => "CPU Vendor", "db_field" => "p.cpu_vendor"),
 array ("name" => "GPU Vendor", "db_field" => "p.gpu_vendor"),

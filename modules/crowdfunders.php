@@ -10,9 +10,13 @@ $templating->block('list_top');
 $templating->set('total', $total);
 $templating->set('total_failed', $total_failed);
 
-$percentage = round($total_failed/$total*100);
+$difference = $total - $total_failed;
 
-$templating->set('percentage', $percentage . '%');
+$succeed_percentage = round($difference/$total*100);
+$failed_percentage = round($total_failed/$total*100);
+
+$templating->set('success_rate', $succeed_percentage . '%');
+$templating->set('failed_percentage', $failed_percentage . '%');
 
 $crowdfunders = $dbl->run("SELECT * FROM `kickstarters` ORDER BY `name` ASC")->fetch_all();
 

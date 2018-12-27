@@ -6,7 +6,7 @@ if (!isset($_POST['act']))
 {
 	$usercpcp = $dbl->run("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();#
 
-	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
+	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`steamplay`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
 	$additional = $dbl->run($additional_sql, array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
@@ -98,6 +98,20 @@ if (!isset($_POST['act']))
 		$dual_boot_options .= '<option value="'.$system.'" '.$selected.'>'.$system.'</option>';
 	}
 	$templating->set('dual_boot_options', $dual_boot_options);
+
+	// Steam Play
+	$steamplay_options_output = '';
+	$options = array("I will not use it", "Waiting on a specific game working", "In the last month", "In the last six months", "More than six months ago");
+	foreach ($options as $option)
+	{
+		$selected = '';
+		if ($additional['steamplay'] == $option)
+		{
+			$selected = 'selected';
+		}
+		$steamplay_options_output .= '<option value="'.$option.'" '.$selected.'>'.$option.'</option>';
+	}
+	$templating->set('steamplay_options', $steamplay_options_output);
 
 	// WINE USE
 	$wine_options_output = '';

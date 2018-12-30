@@ -35,7 +35,7 @@ if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 {
 	$templating->block('monthly_top');
 	$options = '';
-	$query_list = $dbl->run("SELECT `grouping_id`, `generated_date` FROM `user_stats_grouping` ORDER BY `grouping_id` DESC LIMIT 12")->fetch_all();
+	$query_list = $dbl->run("SELECT `grouping_id`, `generated_date` FROM `user_stats_grouping` ORDER BY `grouping_id` DESC LIMIT 24")->fetch_all();
 	foreach ($query_list as $get_list)
 	{
 		$selected = '';

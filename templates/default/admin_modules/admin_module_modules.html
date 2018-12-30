@@ -23,7 +23,7 @@
 	<div class="body group">
 		<form method="post" action="admin.php?module=modules">
 		Module File Name: {:module_file_name} <br />
-		<input type="submit" name="action" value="Disable" {:disabled_check} class="button" /> <input type="submit" name="action" value="Enable" {:enabled_check} class="button" /> <input type="submit" name="action" value="Delete" class="red-button" />
+		<button type="submit" name="action" value="{:button_action}">{:button_text}</button> <input type="submit" name="action" value="Delete" class="red-button" />
 		<input type="hidden" name="type" value="{:type}" /> <input type="hidden" name="id" value="{:id}" />
 		</form>
 	</div>
@@ -45,7 +45,8 @@ Module Title (<em>This will be the title of the link to it</em>): <br />
 Module Link: <br />
 <input type="text" name="link" value="{:link}" /><br />
 <label>Show a link in sidebar menu? <input type="checkbox" name="sidebar" {:sidebar_checked}/></label><br />
-<input type="submit" name="action" value="Disable" {:disabled_check} class="button" /> <input type="submit" name="action" value="Enable" {:enabled_check} class="button" /> <input type="submit" name="action" value="Delete" class="red-button" /> <input type="submit" name="action" value="Edit" class="button" />
+<button type="submit" name="action" value="{:button_action}">{:button_text}</button>
+<input type="submit" name="action" value="Delete" class="red-button" /> <input type="submit" name="action" value="Edit" class="button" />
 <input type="hidden" name="type" value="{:type}" /> <input type="hidden" name="id" value="{:id}" />
 </form><br />
 [/block: usercp_module]

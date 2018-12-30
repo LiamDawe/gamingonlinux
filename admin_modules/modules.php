@@ -14,19 +14,21 @@ if (isset($_GET['page']) && !isset($_POST['action']))
 			$templating->set('module_file_name', $module['module_file_name']);
 			
 			// check for disable/enable options
-			$disable_check = '';
-			$enable_check = '';
+			$button_action = '';
+			$button_text = '';
 			if ($module['activated'] == 1)
 			{
-				$enable_check = 'disabled="disabled"';
+				$button_action = 'Disable';
+				$button_text = 'Disable';
 			}
 			
 			else
 			{
-				$disable_check = 'disabled="disabled"';
+				$button_action = 'Enable';
+				$button_text = 'Enable';
 			}
-			$templating->set('enabled_check', $enable_check);
-			$templating->set('disabled_check', $disable_check);
+			$templating->set('button_action', $button_action);
+			$templating->set('button_text', $button_text);
 			$templating->set('type', 'main');
 			$templating->set('id', $module['module_id']);
 		}
@@ -52,20 +54,21 @@ if (isset($_GET['page']) && !isset($_POST['action']))
 			$templating->set('sidebar_checked', $sidebar);
 			
 			// check for disable/enable options
-			$disable_check = '';
-			$enable_check = '';
+			$button_action = '';
+			$button_text = '';
 			if ($module['activated'] == 1)
 			{
-				$enable_check = 'disabled="disabled"';
+				$button_action = 'Disable';
+				$button_text = 'Disable';
 			}
 			
 			else
 			{
-				$disable_check = 'disabled="disabled"';
+				$button_action = 'Enable';
+				$button_text = 'Enable';
 			}
-			
-			$templating->set('enabled_check', $enable_check);
-			$templating->set('disabled_check', $disable_check);
+			$templating->set('button_action', $button_action);
+			$templating->set('button_text', $button_text);
 			$templating->set('title', $module['module_title']);
 			$templating->set('link', $module['module_link']);
 			$templating->set('type', 'usercp');

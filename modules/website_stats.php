@@ -47,7 +47,6 @@ else // otherwise generate the page and make a cache from it
 		$year_selector = date("Y", $time);
 	}
 	$last_month_start = mktime(0, 0, 0, $prev_month, 1, $year_selector);
-	echo $last_month_start;
 	$now = time();
 
 	$article_list = $dbl->run("SELECT

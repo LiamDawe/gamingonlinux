@@ -1294,7 +1294,7 @@ class charts
 					// adjust the data points for this label if it started late (not enough data points), so the data point starts at the right place
 					for ($data_counter = 0; $data_counter < $missing_data; $data_counter++)
 					{
-						$labels[$sort_labels['name'] . $label_add][] = 0;
+						$labels[$sort_labels['name'] . $label_add][] = null;
 					}
 
 					// add in the actual data we do have for this label

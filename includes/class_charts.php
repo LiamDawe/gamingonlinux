@@ -41,6 +41,8 @@ class charts
 	private $image; // for pngs
 	private $bar_spacing = 5;
 
+	private $colour_number = 0;
+
 	function __construct($dbl)
 	{
 		$this->dbl = $dbl;
@@ -51,21 +53,31 @@ class charts
 		return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
 	}
 
+	// simpler helper function to grab a colour for bars, loop over
+	function get_colour()
+	{
+		if (!array_key_exists($this->colour_number, $this->chart_options['colours']))
+		{
+			$this->colour_number = 0;
+		}
+
+		$send_colour = $this->chart_options['colours'][$this->colour_number];
+		$this->colour_number++;
+
+		return $send_colour;
+	}
+
 	function setup($custom_options = NULL)
 	{
 		// set some defaults
 		$this->chart_options['colours'] = [
-		0 => '#a6cee3',
-		1 => '#1f78b4',
-		2 => '#b2df8a',
-		3 => '#33a02c',
-		4 => '#fb9a99',
-		5 => '#e31a1c',
-		6 => '#fdbf6f',
-		7 => '#ff7f00',
-		8 => '#cab2d6',
-		9 => '#6a3d9a',
-		10 => '#6A8552'];
+		0 => '#a6cee3',  1 => '#1f78b4',
+		2 => '#b2df8a',  3 => '#33a02c',
+		4 => '#fb9a99',  5 => '#e31a1c',
+		6 => '#fdbf6f',  7 => '#ff7f00',
+		8 => '#cab2d6',  9 => '#6a3d9a',
+		10 => '#6A8552', 11 => '#85526A',
+		12 => '#52856D', 13 => '#856E52'];
 
 		$this->chart_options['title_color'] = '';
 
@@ -227,7 +239,7 @@ class charts
 
 					// sort the bar colouring, taking into account any special colouring
 					// start off with the basic colour label_loop
-					$bar_colour = $this->chart_options['colours'][$label_loop_counter];
+					$bar_colour = $this->get_colour();
 
 					// lastly, if we have them in the list of special colours, force that
 					if (array_key_exists($label_loop['data_series'], $this->chart_options['special_colours']))
@@ -1074,7 +1086,7 @@ class charts
 				$bar_width = $label['total']*$this->scale;
 
 				// bars
-				list($r, $g, $b) = sscanf($this->chart_options['colours'][$label_counter], "#%02x%02x%02x");
+				list($r, $g, $b) = sscanf($this->get_colour(), "#%02x%02x%02x");
 				$bar_background = imagecolorallocate($this->image,$r,$g,$b);
 				$bar_outline_colour = imagecolorallocate($this->image, 117, 117, 117);
 				imagefilledrectangle($this->image, $this->bars_x_start, $this_bar_y, $this->bars_x_start+$bar_width, $this_bar_y+$this->chart_options['bar_thickness'],$bar_background);

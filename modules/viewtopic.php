@@ -1,5 +1,5 @@
 <?php
-if (!core::is_number($_GET['topic_id']))
+if (!isset($_GET['topic_id']) || !core::is_number($_GET['topic_id']))
 {
 	$core->message('That is not a valid forum topic!');
 }

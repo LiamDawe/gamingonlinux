@@ -176,17 +176,32 @@ if (isset($_POST['act']))
 		{
 			$date_created = core::$sql_date_now;
 
-			$dbl->run("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = 0, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = 1, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $_SESSION['live_info']['title'], $date_created, $_SESSION['live_info']['start'], $_SESSION['live_info']['end'], $_SESSION['live_info']['community_name'], $_SESSION['live_info']['stream_url']));
+			$mod_queue = $user->user_details['in_mod_queue'];
+			$forced_mod_queue = $user->can('forced_mod_queue');
+
+			$approved = 1;
+			if ($mod_queue == 1 || $forced_mod_queue == true)
+			{
+				$approved = 0;
+			}
+
+			$dbl->run("INSERT INTO `livestreams` SET `author_id` = ?, `accepted` = ?, `title` = ?, `date_created` = ?, `date` = ?, `end_date` = ?, `community_stream` = 1, `streamer_community_name` = ?, `stream_url` = ?", array($_SESSION['user_id'], $approved, $_SESSION['live_info']['title'], $date_created, $_SESSION['live_info']['start'], $_SESSION['live_info']['end'], $_SESSION['live_info']['community_name'], $_SESSION['live_info']['stream_url']));
 			$new_id = $dbl->new_id();
 
 			$core->process_livestream_users($new_id, $_SESSION['live_info']['user_ids']);
 			
 			// add a new notification for the mod queue
-			$core->new_admin_note(array('content' => ' has submitted a new livestream titled: <a href="/admin.php?module=livestreams&view=submitted">'.$_SESSION['live_info']['title'].'</a>.', 'type' => 'new_livestream_submission', 'data' => $new_id));
+			if ($approved == 0)
+			{
+				$_SESSION['message'] = 'livestream_submitted';
+				$core->new_admin_note(array('content' => ' has submitted a new livestream titled: <a href="/admin.php?module=livestreams&view=submitted">'.$_SESSION['live_info']['title'].'</a>.', 'type' => 'new_livestream_submission', 'data' => $new_id));
+			}
+			else
+			{
+				$_SESSION['message'] = 'livestream_accepted';
+			}
 
 			unset($_SESSION['live_info']);
-
-			$_SESSION['message'] = 'livestream_submitted';
 			header("Location: /index.php?module=livestreams");
 		}
 	}

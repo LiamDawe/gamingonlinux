@@ -201,8 +201,6 @@ else
 					else
 					{
 						// see if we need to add it into the mod queue
-						$check_queue = $dbl->run("SELECT `in_mod_queue` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-
 						$approved = 1;
 						if ($mod_queue == 1 || $forced_mod_queue == true)
 						{

@@ -342,67 +342,76 @@ if (isset($_GET['user_id']))
 		{
 			if (isset($_GET['user_id']) && is_numeric($_GET['user_id']))
 			{
-				$get_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
+				$get_username = $dbl->run("SELECT `username`, `private_profile` FROM `users` WHERE `user_id` = ?", array($_GET['user_id']))->fetch();
 				if ($get_username)
 				{
-					// count how many there is in total
-					$total = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']))->fetchOne();
-					
-					$page = core::give_page();
-
-					// sort out the pagination link
-					$pagination = $core->pagination_link(10, $total, $core->config('website_url')  . "profiles/".$_GET['user_id']."/comments/", $page);
-
-					// get top of comments section
-					$templating->block('more_comments');
-					$templating->set('username', $get_username);
-					$templating->set('profile_link', "/profiles/" . $_GET['user_id']);
-
-					$comment_posts = '';
-					$all_comments = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start))->fetch_all();
-					
-					// make an array of all comment ids to search for likes (instead of one query per comment for likes)
-					$like_array = [];
-					$sql_replacers = [];
-					foreach ($all_comments as $id_loop)
+					// check blocked list
+					$blocked = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($_GET['user_id'], $_SESSION['user_id']))->fetchOne();
+					if (($blocked || $get_username['private_profile'] == 1) && !$user->check_group([1,2]) && (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $profile_id))
 					{
-						$like_array[] = $id_loop['comment_id'];
-						$sql_replacers[] = '?';
+						$core->message("Sorry, this user has set their profile to private.", 1);
 					}
-					if (!empty($sql_replacers))
+					else
 					{
-						// Total number of likes for the comments
-						$get_likes = $dbl->run("SELECT data_id, COUNT(*) FROM likes WHERE data_id IN ( ".implode(',', $sql_replacers)." ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
-					}
-					
-					foreach ($all_comments as $comments)
-					{
-						$date = $core->human_date($comments['time_posted']);
-						$title = $comments['title'];
-						
-						// sort out the likes
-						$likes = NULL;
-						if (isset($get_likes[$comments['comment_id']]))
+						// count how many there is in total
+						$total = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `author_id` = ?", array($_GET['user_id']))->fetchOne();
+							
+						$page = core::give_page();
+
+						// sort out the pagination link
+						$pagination = $core->pagination_link(10, $total, $core->config('website_url')  . "profiles/".$_GET['user_id']."/comments/", $page);
+
+						// get top of comments section
+						$templating->block('more_comments');
+						$templating->set('username', $get_username);
+						$templating->set('profile_link', "/profiles/" . $_GET['user_id']);
+
+						$comment_posts = '';
+						$all_comments = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start))->fetch_all();
+							
+						// make an array of all comment ids to search for likes (instead of one query per comment for likes)
+						$like_array = [];
+						$sql_replacers = [];
+						foreach ($all_comments as $id_loop)
 						{
-							$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
+							$like_array[] = $id_loop['comment_id'];
+							$sql_replacers[] = '?';
 						}
-						
-						$view_comment_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
-						$view_article_link = $article_class->get_link($comments['article_id'], $comments['slug']);
-						$view_comments_full_link = $article_class->get_link($comments['article_id'], $comments['slug'], '#comments');
+						if (!empty($sql_replacers))
+						{
+							// Total number of likes for the comments
+							$get_likes = $dbl->run("SELECT data_id, COUNT(*) FROM likes WHERE data_id IN ( ".implode(',', $sql_replacers)." ) AND `type` = 'comment' GROUP BY data_id", $like_array)->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+						}
+							
+						foreach ($all_comments as $comments)
+						{
+							$date = $core->human_date($comments['time_posted']);
+							$title = $comments['title'];
+								
+							// sort out the likes
+							$likes = NULL;
+							if (isset($get_likes[$comments['comment_id']]))
+							{
+								$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
+							}
+							
+							$view_comment_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+							$view_article_link = $article_class->get_link($comments['article_id'], $comments['slug']);
+							$view_comments_full_link = $article_class->get_link($comments['article_id'], $comments['slug'], '#comments');
 
-						$comment_posts .= "<div class=\"box\"><div class=\"body group\">
-						<a href=\"".$view_comment_link."\">{$title}</a><br />
-						<small>{$date}" . $likes ."</small><br />
-						<hr />
-						<div>".$bbcode->parse_bbcode($comments['comment_text'])."</div>
-						<hr />
-						<div><a href=\"".$view_comment_link."\">View this comment</a> - <a href=\"".$view_article_link."\">View article</a> - <a href=\"".$view_comments_full_link."\">View full comments</a></div>
-						</div></div>";
+							$comment_posts .= "<div class=\"box\"><div class=\"body group\">
+							<a href=\"".$view_comment_link."\">{$title}</a><br />
+							<small>{$date}" . $likes ."</small><br />
+							<hr />
+							<div>".$bbcode->parse_bbcode($comments['comment_text'])."</div>
+							<hr />
+							<div><a href=\"".$view_comment_link."\">View this comment</a> - <a href=\"".$view_article_link."\">View article</a> - <a href=\"".$view_comments_full_link."\">View full comments</a></div>
+							</div></div>";
+						}
+
+						$templating->set('comment_posts', $comment_posts);
+						$templating->set('pagination', $pagination);
 					}
-
-					$templating->set('comment_posts', $comment_posts);
-					$templating->set('pagination', $pagination);
 				}
 				else
 				{

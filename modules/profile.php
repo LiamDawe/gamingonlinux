@@ -363,7 +363,7 @@ if (isset($_GET['user_id']))
 
 						// get top of comments section
 						$templating->block('more_comments');
-						$templating->set('username', $get_username);
+						$templating->set('username', $get_username['username']);
 						$templating->set('profile_link', "/profiles/" . $_GET['user_id']);
 
 						$comment_posts = '';

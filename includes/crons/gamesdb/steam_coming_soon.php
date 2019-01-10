@@ -74,7 +74,7 @@ do
 					
 				$new_id = $dbl->new_id();
 
-				$new_games[] = $new_id;
+				$new_games[] = array('release_date' => $clean_release_date, 'name' => $title, 'link' => $link);
 	
 				$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $new_id . '.jpg';
 				$core->save_image($image, $saved_file);
@@ -142,6 +142,29 @@ do
 } while ($stop == 0);
 
 $total_found_new = count($new_games);
+
+if ($total_found_new > 0)
+{
+	$email_output = array();
+	foreach ($new_games as $new)
+	{
+		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: <a href="'.$new['link'].'">' . $new['link'] . '</a>';
+	}
+
+	$html_message = implode("<br />", $email_output);
+
+	$html_message .= '<br />Total pages scanned: ' . $page;
+
+	$to = $core->config('contact_email');
+	$subject = 'GOL Steam New - Coming Soon';
+
+	// Mail it
+	if ($core->config('send_emails') == 1)
+	{
+		$mail = new mailer($core);
+		$mail->sendMail($to, $subject, $html_message);
+	}
+}
 
 echo 'Total new found: ' . $total_found_new . "\n";
 

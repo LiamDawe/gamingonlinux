@@ -60,8 +60,8 @@ else
 	{
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{
-			$new_topic = "<a href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a>";
-			$new_topic_bottom = "<span class=\"block3\"><a href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"><i class=\"icon-comment-alt\"></i> Create New Topic</a></span><br /><br />";
+			$new_topic = "<span class=\"fright\"><a class=\"badge blue\" href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"> Create Post</a></span>";
+			$new_topic_bottom = "<div class=\"fright\"><span class=\"badge blue\"><a class=\"\" href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\">Create Post</a></span></div>";
 		}
 	}
 	$templating->set('new_topic_link', $new_topic);

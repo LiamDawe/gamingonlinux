@@ -348,7 +348,7 @@ class user
 				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
 				// update their stay logged in cookie with new details
-				$generated_session = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+				$generated_session = md5(time() . mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
 				$expires_date = new DateTime('now');
 				$expires_date->add(new DateInterval('P30D'));
 
@@ -356,10 +356,11 @@ class user
 				`saved_sessions`
 				SET
 				`session_id` = ?,
-				`expires` = ?
+				`expires` = ?,
+				`date` = ?
 				WHERE
 				`session_id` = ? AND `user_id` = ?";
-				$update_session_db = $this->db->run($update_session_sql, array($generated_session, $expires_date->format('Y-m-d H:i:s'), $_COOKIE['gol_session'], $session_check['user_id']));
+				$update_session_db = $this->db->run($update_session_sql, array($generated_session, $expires_date->format('Y-m-d H:i:s'), date("Y-m-d"), $_COOKIE['gol_session'], $session_check['user_id']));
 
 				$check_update = $update_session_db->rowcount();
 
@@ -377,7 +378,7 @@ class user
 				}
 				else
 				{
-					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . ", user session data: " . print_r($session_check, true) . ", user cookie data: " . $_COOKIE['gol_session'] . ' Database info: ' . print_r($update_session_db, true));
+					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . "\n" . "Current user session data: \n" . print_r($session_check, true) . "\nUser cookie data: " . $_COOKIE['gol_session'] . "\n Database info: " . print_r($update_session_db, true));
 				}
 
 				$this->register_session($generated_session, $session_check['device-id']);

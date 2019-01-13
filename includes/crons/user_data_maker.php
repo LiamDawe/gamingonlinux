@@ -1,11 +1,9 @@
 <?php
 /* TODO
+
+FORUM TOPIC NEEDS ADJUSTING - GET TEXT FROM FORUM_REPLIES WITH IS_TOPIC = 1
+
 Email people the link once finished
-Have a database table of:
-- user id
-- date requested
-- download link
-Housekeeping cron should delete files and database entry older than 1 week
 Mention on the user deletion page they can download their data - mention this will not work if they delete their account before doing so
 Forum replies
 User profile info - should link to index files for other sections?

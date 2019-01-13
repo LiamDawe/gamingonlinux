@@ -167,6 +167,12 @@ if (isset($_GET['user_id']))
 						}
 						$templating->set('email', $email);
 
+						if (!empty($profile['article_bio']))
+						{
+							$templating->block('bio', 'profile');
+							$templating->set('bio_text', $bbcode->parse_bbcode($profile['article_bio']));
+						}
+
 						// additional profile info
 						if ($profile['pc_info_public'] == 1)
 						{
@@ -208,13 +214,6 @@ if (isset($_GET['user_id']))
 							$templating->block('articles_bottom');
 							$templating->set('user_id', $profile['user_id']);
 							$templating->set('username', $profile['username']);
-						}
-
-
-						if (!empty($profile['article_bio']))
-						{
-							$templating->block('bio', 'profile');
-							$templating->set('bio_text', $bbcode->parse_bbcode($profile['article_bio']));
 						}
 
 						$comment_posts = '';

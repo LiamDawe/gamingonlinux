@@ -19,7 +19,7 @@ if (!isset($_POST['act']))
 	// editing the main topic
 	if (isset($_GET['topic_id']) && is_numeric($_GET['topic_id']))
 	{
-		$topic = $dbl->run("SELECT `topic_id`, `author_id`, `topic_title`, `topic_text` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
+		$topic = $dbl->run("SELECT t.`topic_id`, t.`author_id`, t.`topic_title`, r.`reply_text` FROM `forum_topics` t JOIN `forum_replies` r ON r.topic_id = t.topic_id AND r.is_topic = 1 WHERE t.`topic_id` = ?", array($_GET['topic_id']))->fetch();
 
 		if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 		{
@@ -34,7 +34,7 @@ if (!isset($_POST['act']))
 			$templating->block('edit_top');
 			$templating->set('title', htmlentities($topic['topic_title'], ENT_QUOTES));
 
-			$core->editor(['name' => 'text', 'content' => $topic['topic_text'], 'editor_id' => 'post_text']);
+			$core->editor(['name' => 'text', 'content' => $topic['reply_text'], 'editor_id' => 'post_text']);
 
 			$templating->block('edit_bottom', 'editpost');
 			$templating->set('page', $_GET['page']);
@@ -107,7 +107,9 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			{
 				// update the topic
 				$message = core::make_safe($_POST['text']);
-				$dbl->run("UPDATE `forum_topics` SET `topic_title` = ?, `topic_text` = ? WHERE `topic_id` = ?", array($_POST['title'], $message, $_GET['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `topic_title` = ? WHERE `topic_id` = ?", array($_POST['title'], $_GET['topic_id']));
+
+				$dbl->run("UPDATE `forum_replies` SET `reply_text` = ? WHERE `topic_id` = ? AND `is_topic` = 1", array($message, $_GET['topic_id']));
 
 				// get them to go back
 				header("Location: index.php?module=viewtopic&topic_id={$_GET['topic_id']}&page={$_POST['page']}");

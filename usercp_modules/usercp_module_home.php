@@ -1,4 +1,7 @@
 <?php
+define('articles_per_page_max', 30);
+define('per_page_max', 50); // comments and posts
+
 $templating->set_previous('title', 'Home' . $templating->get('title', 1)  , 1);
 $templating->load('usercp_modules/usercp_module_home');
 
@@ -167,7 +170,7 @@ if (!isset($_POST['act']))
 
 	$page_options = '';
 	$per_page_selected = '';
-	for ($i = 10; $i <= 50; $i += 5)
+	for ($i = 10; $i <= per_page_max; $i += 5)
 	{
 		if ($i == $usercpcp['per-page'])
 		{
@@ -180,7 +183,7 @@ if (!isset($_POST['act']))
 
 	$apage_options = '';
 	$aper_page_selected = '';
-	for ($i = 15; $i <= 30; $i += 5)
+	for ($i = 15; $i <= articles_per_page_max; $i += 5)
 	{
 		if ($i == $usercpcp['articles-per-page'])
 		{
@@ -279,13 +282,27 @@ else if (isset($_POST['act']))
 		$per_page = 10;
 		if (is_numeric($_POST['per-page']))
 		{
-			$per_page = $_POST['per-page'];
+			if ($_POST['per-page'] > per_page_max)
+			{
+				$per_page = per_page_max;
+			}
+			else
+			{
+				$per_page = $_POST['per-page'];
+			}
 		}
 
 		$aper_page = 15;
 		if (is_numeric($_POST['articles-per-page']))
 		{
-			$aper_page = $_POST['articles-per-page'];
+			if ($_POST['articles-per-page'] > articles_per_page_max)
+			{
+				$aper_page = articles_per_page_max;
+			}
+			else
+			{
+				$aper_page = $_POST['articles-per-page'];
+			}
 		}
 
 		$single_article_page = 0;

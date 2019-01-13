@@ -106,8 +106,31 @@ else
 		LEFT JOIN `users` u2 ON t.`last_post_user_id` = u2.`user_id`
 		WHERE t.`forum_id`= ? AND t.`approved` = 1 ' . $blocked_sql . '
 		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, ' . $per_page, array_merge([$_GET['forum_id']], $blocked_ids, [$core->start]))->fetch_all();
+
+	$pinned = 0;
+	$normal_test = 0;
 	foreach ($all_posts as $post)
-	{		
+	{
+		// detect if we have sticky/pinned topics
+		if ($post['is_sticky'] == 1)
+		{
+			$pinned++;
+		}
+		// if we're on the first sticky topic, show the notice (only once)
+		if ($pinned == 1 && $post['is_sticky'] == 1)
+		{
+			$templating->block('pinned');
+		}
+
+		if ($post['is_sticky'] == 0 && $pinned != 0)
+		{
+			$normal_test++;
+			if ($normal_test == 1)
+			{
+				$templating->block('normal_posts');
+			}
+		}
+
 		$pagination_post = '';
 		
 		$rows_per_page = $_SESSION['per-page'];

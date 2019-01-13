@@ -5,7 +5,7 @@ $templating->set_previous('meta_description', 'Steam Linux Market Share', 1);
 $templating->load('steam_linux_share');
 $templating->block('top');
 
-$data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` > '2016-01-01' ORDER BY `date` ASC")->fetch_all();
+$data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` > '2016-04-01' ORDER BY `date` ASC")->fetch_all();
 
 $colours = array(
 	'#a6cee3',
@@ -34,8 +34,7 @@ foreach ($data as $point)
 	$english[] = $point['english_share'];
 	$chinese[] = $point['chinese_share'];
 
-	$linux_wo_chinese[] = round($point['linux_share'] * 100 / (100 - $point['chinese_share']), 2);
-	$linux_eng_only[] = round($point['linux_share'] * 100 / ($point['english_share']), 2);
+	$linux_eng_only[] = round($point['linux_share'] * $point['linux_english_share'] / ($point['english_share']), 2);
 }
 
 // linux share only
@@ -130,7 +129,7 @@ yAxes: [{
 	},
 				scaleLabel: {
 			display: true,
-			labelString: 'Percentage of Steam users'
+			labelString: 'Daily active user count'
 		}
 }]
 },
@@ -218,14 +217,6 @@ $threesome_data = "
 	data: [".implode(', ', $linux_perc)."],
 	backgroundColor: '".$colours[3]."',
 	borderColor: '".$colours[3]."',
-	borderWidth: 1
-},
-{
-	label: 'Linux w/o Simplified Chinese',
-	fill: false,
-	data: [".implode(', ', $linux_wo_chinese)."],
-	backgroundColor: '".$colours[5]."',
-	borderColor: '".$colours[5]."',
 	borderWidth: 1
 },
 {

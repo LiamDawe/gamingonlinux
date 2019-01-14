@@ -10,6 +10,13 @@ $dual_boot_systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other"
 $steamplay_options = array("I will not use it", "Waiting on a specific game working", "In the last month", "In the last six months", "More than six months ago");
 $wine_options = array("In the last month", "In the last three months", "In the last six months", "Over six months ago", "I never use it");
 $cpu_vendors = array('Intel', 'AMD');
+$gpu_vendors = array('Intel', 'AMD', 'Nvidia');
+$gpu_driver_options = array('Open Source', 'Proprietary');
+$ram_numbers = array();
+for ($i = 1; $i <= 128; $i++)
+{
+	$ram_numbers[] = $i;
+}
 
 if (!isset($_POST['act']))
 {
@@ -144,24 +151,18 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('cpu_options', $cpu_options);
 
-	$templating->set('cpu_model', $additional['cpu_model']);
+	$templating->set('cpu_model', htmlspecialchars($additional['cpu_model']));
 
-	$intel_gpu = '';
-	if ($additional['gpu_vendor'] == 'Intel')
+	$gpu_options = '';
+	foreach ($gpu_vendors as $vendor)
 	{
-		$intel_gpu = 'selected';
+		$selected = '';
+		if ($additional['gpu_vendor'] == $vendor)
+		{
+			$selected = 'selected';
+		}
+		$gpu_options .= '<option value="'.$vendor.'" '.$selected.'>'.$vendor.'</option>';
 	}
-	$amd_gpu = '';
-	if ($additional['gpu_vendor'] == 'AMD')
-	{
-		$amd_gpu = 'selected';
-	}
-	$nvidia_gpu = '';
-	if ($additional['gpu_vendor'] == 'Nvidia')
-	{
-		$nvidia_gpu = 'selected';
-	}
-	$gpu_options = '<option value="AMD" '.$amd_gpu.'>AMD</option><option value="Intel" '.$intel_gpu.'>Intel</option><option value="Nvidia" '.$nvidia_gpu.'>Nvidia</option>';
 	$templating->set('gpu_options', $gpu_options);
 
 	// GPU MODEL 
@@ -172,30 +173,29 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('gpu_model', $gpu_model);
 
-	$open = '';
-	if ($additional['gpu_driver'] == 'Open Source')
+	// gpu driver type
+	$gpu_driver = '';
+	foreach ($gpu_driver_options as $type)
 	{
-		$open = 'selected';
+		$selected = '';
+		if ($additional['gpu_driver'] == $type)
+		{
+			$selected = 'selected';
+		}
+		$gpu_driver .= '<option value="'.$type.'" '.$selected.'>'.$type.'</option>';
 	}
-	$prop = '';
-	if ($additional['gpu_driver'] == 'Proprietary')
-	{
-		$prop = 'selected';
-	}
-	$gpu_driver = '<option value="Open Source" '.$open.'>Open Source</option><option value="Proprietary" '.$prop.'>Proprietary</option>';
 	$templating->set('gpu_driver', $gpu_driver);
 
 	// RAM
 	$ram_options = '';
-	$ram_selected = '';
-	for ($i = 1; $i <= 64; $i++)
+	foreach ($ram_numbers as $i)
 	{
+		$ram_selected = '';
 		if ($i == $additional['ram_count'])
 		{
 			$ram_selected = 'selected';
 		}
 		$ram_options .= '<option value="'.$i.'" '.$ram_selected.'>'.$i.'GB</a>';
-		$ram_selected = '';
 	}
 	$templating->set('ram_options', $ram_options);
 
@@ -390,6 +390,23 @@ else if (isset($_POST['act']))
 		if (!in_array($_POST['pc_info']['cpu_vendor'], $cpu_vendors))
 		{
 			$_POST['pc_info']['cpu_vendor'] = '';
+		}
+		$cpu_model = strip_tags(trim($_POST['pc_info']['cpu_model']));
+		if (!in_array($_POST['pc_info']['gpu_vendor'], $gpu_vendors))
+		{
+			$_POST['pc_info']['gpu_vendor'] = '';
+		}
+		if (!is_numeric($_POST['pc_info']['gpu_model']))
+		{
+			$_POST['pc_info']['gpu_model'] = NULL;
+		}
+		if (!in_array($_POST['pc_info']['gpu_driver'], $gpu_driver_options))
+		{
+			$_POST['pc_info']['gpu_driver'] = '';
+		}
+		if (!in_array($_POST['pc_info']['ram_count'], $ram_numbers))
+		{
+			$_POST['pc_info']['ram_count'] = '';
 		}
 
 		// build the query of fields to update

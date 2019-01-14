@@ -8,6 +8,8 @@ $get_desktops = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `n
 $bits_allowed = array('32bit', '64bit');
 $dual_boot_systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other", "No");
 $steamplay_options = array("I will not use it", "Waiting on a specific game working", "In the last month", "In the last six months", "More than six months ago");
+$wine_options = array("In the last month", "In the last three months", "In the last six months", "Over six months ago", "I never use it");
+$cpu_vendors = array('Intel', 'AMD');
 
 if (!isset($_POST['act']))
 {
@@ -118,8 +120,7 @@ if (!isset($_POST['act']))
 
 	// WINE USE
 	$wine_options_output = '';
-	$options = array("In the last month", "In the last three months", "In the last six months", "Over six months ago", "I never use it");
-	foreach ($options as $option)
+	foreach ($wine_options as $option)
 	{
 		$selected = '';
 		if ($additional['wine'] == $option)
@@ -130,17 +131,17 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('wine_options', $wine_options_output);
 
-	$intel = '';
-	if ($additional['cpu_vendor'] == 'Intel')
+	// CPU vendor
+	$cpu_options = '';
+	foreach ($cpu_vendors as $vendor)
 	{
-		$intel = 'selected';
+		$selected = '';
+		if ($additional['cpu_vendor'] == $vendor)
+		{
+			$selected = 'selected';
+		}
+		$cpu_options .= '<option value="'.$vendor.'" '.$selected.'>'.$vendor.'</option>';
 	}
-	$amd = '';
-	if ($additional['cpu_vendor'] == 'AMD')
-	{
-		$amd = 'selected';
-	}
-	$cpu_options = '<option value="AMD" '.$amd.'>AMD</option><option value="Intel" '.$intel.'>Intel</option>';
 	$templating->set('cpu_options', $cpu_options);
 
 	$templating->set('cpu_model', $additional['cpu_model']);
@@ -381,6 +382,14 @@ else if (isset($_POST['act']))
 		if (!in_array($_POST['pc_info']['steamplay'], $steamplay_options))
 		{
 			$_POST['pc_info']['steamplay'] = '';
+		}
+		if (!in_array($_POST['pc_info']['wine'], $wine_options))
+		{
+			$_POST['pc_info']['wine'] = '';
+		}
+		if (!in_array($_POST['pc_info']['cpu_vendor'], $cpu_vendors))
+		{
+			$_POST['pc_info']['cpu_vendor'] = '';
 		}
 
 		// build the query of fields to update

@@ -5,6 +5,11 @@ define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
+if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0 || !$user->check_group([1,2,5]))
+{
+	die('You shouldn\'t be here.');
+}
+
 if(isset($_POST))
 {
 	// if it's an existing article: draft, submitted, review

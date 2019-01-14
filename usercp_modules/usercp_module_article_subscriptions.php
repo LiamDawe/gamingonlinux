@@ -95,6 +95,14 @@ else if (isset($_GET['go']))
 		}
 		else
 		{
+			if (!isset($_GET['article_id']) || !is_numeric($_GET['article_id']))
+			{
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message'] = 'article';
+				header("Location: /usercp.php?module=article_subscriptions");
+				die();			
+			}
+
 			$dbl->run("DELETE FROM `articles_subscriptions` WHERE `user_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['article_id']));
 			header("Location: /usercp.php?module=article_subscriptions&message=done");
 		}
@@ -104,7 +112,10 @@ else if (isset($_GET['go']))
 	{
 		if (!isset($_POST['article_id']) || !is_numeric($_POST['article_id']))
 		{
-			$core->message("There was an error, as no ID was set!");
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message'] = 'article';
+			header("Location: /usercp.php?module=article_subscriptions");
+			die();
 		}
 		else
 		{

@@ -81,6 +81,8 @@ if (!isset($_POST['act']))
 
 	foreach ($profile_fields as $field)
 	{
+		$usercpcp[$field['db_field']] = htmlspecialchars($usercpcp[$field['db_field']]);
+
 		$url = '';
 		if ($field['base_link_required'] == 1)
 		{

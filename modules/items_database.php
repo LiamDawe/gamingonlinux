@@ -424,12 +424,12 @@ if (isset($_POST['act']))
 			$_POST[$link] = trim($_POST[$link]);
 
 			// make doubly sure it's an actual URL, if not make it blank
-			if (!filter_var($sanatized, FILTER_VALIDATE_URL)) 
+			if (!filter_var($_POST[$link], FILTER_VALIDATE_URL)) 
 			{
 				$_POST[$link] = '';
 			}
 
-			if (!empty($link))
+			if (!empty($_POST[$link]))
 			{
 				$empty_check = 1;
 			}

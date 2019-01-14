@@ -219,12 +219,12 @@ class bbcode
 		$text = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $text);
 
 		$find = array(
-		"/\[url\=(.+?)\](.+?)\[\/url\]/is",
-		"/\[url\](.+?)\[\/url\]/is"
+		"/\[url\=((http[s]?|ftp):\/\/.+?)\](.+?)\[\/url\]/is",
+		"/\[url\]((http[s]?|ftp):\/\/.+?)\[\/url\]/is"
 		);
 
 		$replace = array(
-		"<a href=\"$1\" target=\"_blank\">$2</a>",
+		"<a href=\"$1\" target=\"_blank\">$3</a>",
 		"<a href=\"$1\" target=\"_blank\">$1</a>"
 		);
 

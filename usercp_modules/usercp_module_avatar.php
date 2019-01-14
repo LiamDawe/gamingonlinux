@@ -4,21 +4,6 @@ $image_upload = new image_upload($dbl, $core);
 $templating->set_previous('title', 'Change your avatar', 1);
 $templating->set_previous('meta_description', 'Here you can change your avatar!', 1);
 
-if (isset($_GET['message']))
-{
-	if ($_GET['message'] == 'deleted')
-	{
-		$core->message("Your avatar has been deleted and reset to the default!");
-	}
-	if ($_GET['message'] == 'uploaded')
-	{
-		$core->message("Your avatar has been uploaded!");
-	}
-	if ($_GET['message'] == 'gallery')
-	{
-		$core->message("You are now using an avatar picked from the gallery!");
-	}
-}
 $templating->load('usercp_modules/usercp_module_avatar');
 $templating->block('main');
 
@@ -44,13 +29,16 @@ if (isset($_POST['action']))
 	{
 		if ($image_upload->avatar() == true)
 		{
-			header("Location: /usercp.php?module=avatar&message=uploaded");
+			$_SESSION['message'] = 'uploaded';
+			header("Location: /usercp.php?module=avatar");
+			die();
 		}
 
 		else
 		{
 			$_SESSION['message'] = image_upload::$return_message;
 			header("Location: /usercp.php?module=avatar");
+			die();
 		}
 	}
 
@@ -58,21 +46,36 @@ if (isset($_POST['action']))
 	{
 		if (isset($_POST['gallery']))
 		{
-			// remove any old avatar if one was uploaded
-			$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-
-			if ($avatar['avatar_uploaded'] == 1)
+			// first, check that gallery avatar actually exists
+			$check = $dbl->run("SELECT `id` FROM `avatars_gallery` WHERE `id` = ?", array($_POST['gallery']))->fetch();
+			if ($check)
 			{
-				unlink('uploads/avatars/' . $avatar['avatar']);
-			}
+				// remove any old avatar if one was uploaded
+				$avatar = $dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
-			$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gallery` = ? WHERE `user_id` = ?", array($_POST['gallery'], $_SESSION['user_id']));
-			
-			header("Location: /usercp.php?module=avatar&message=gallery");
+				if ($avatar['avatar_uploaded'] == 1)
+				{
+					unlink('uploads/avatars/' . $avatar['avatar']);
+				}
+
+				$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gallery` = ? WHERE `user_id` = ?", array($_POST['gallery'], $_SESSION['user_id']));
+				
+				$_SESSION['message'] = 'gallery_picked';
+				header("Location: /usercp.php?module=avatar");
+				die();
+			}
+			else
+			{
+				$_SESSION['message'] = 'no_gallery_picked';
+				header("Location: /usercp.php?module=avatar");
+				die();				
+			}
 		}
 		else
 		{
+			$_SESSION['message'] = 'no_gallery_picked';
 			header("Location: /usercp.php?module=avatar");
+			die();
 		}
 	}
 
@@ -88,7 +91,10 @@ if (isset($_POST['action']))
 
 		$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gallery` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
 
-		header("Location: /usercp.php?module=avatar&message=deleted");
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'avatar';
+		header("Location: /usercp.php?module=avatar");
+		die();
 	}
 }
 ?>

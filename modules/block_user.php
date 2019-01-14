@@ -3,6 +3,14 @@ $templating->set_previous('title', 'User blocking', 1);
 
 if (isset($_GET['block']))
 {
+	if (!isset($_GET['block']) || !is_numeric($_GET['block']))
+	{
+		$_SESSION['message'] = 'no_id';
+		$_SESSION['message_extra'] = 'user';
+		header('Location: /index.php');
+		die();
+	}
+
 	// get their username
 	$username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['block']))->fetchOne();
 
@@ -22,6 +30,14 @@ if (isset($_GET['block']))
 
 if (isset($_GET['unblock']))
 {
+	if (!isset($_GET['unblock']) || !is_numeric($_GET['unblock']))
+	{
+		$_SESSION['message'] = 'no_id';
+		$_SESSION['message_extra'] = 'user';
+		header('Location: /index.php');
+		die();
+	}
+
 	// get their username
 	$username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_GET['unblock']))->fetchOne();
 	

@@ -592,6 +592,8 @@ else
 		$templating->block('pagination', 'private_messages');
 		$templating->set('pagination', $pagination);
 		$templating->block('bottom', 'private_messages');
+		$compose_link = $core->config('website_url') . 'private-messages/compose/';
+		$templating->set('compose_link', $compose_link);
 	}
 
 	if (isset($_POST['act']) && $_POST['act'] == 'New')

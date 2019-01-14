@@ -17,6 +17,25 @@ for ($i = 1; $i <= 128; $i++)
 {
 	$ram_numbers[] = $i;
 }
+$monitor_numbers = array();
+for ($i = 1; $i <= 128; $i++)
+{
+	$monitor_numbers[] = $i;
+}
+$resolution_options = array(
+	"800x600", "1024x600", "1024x768",
+	"1152x864", "1280x720", "1280x768",
+	"1280x800", "1280x1024", "1360x768",
+	"1366x768", "1440x900", "1400x1050",
+	"1600x900", "1600x1200", "1680x1050",
+	"1920x1080", "1920x1200", "2560x1080",
+	"2560x1440", "2560x1600", "3200x1800",
+	"3440x1440", "3840x1600", "3840x1080",
+	"3840x1200", "3840x2160", "4096x2160",
+	"5120x1440", "5120x2160", "5120x2880",
+	"7680x4320");
+$gaming_machine_types = array('Desktop', 'Laptop', 'Sofa/Console PC');
+$gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Other");
 
 if (!isset($_POST['act']))
 {
@@ -201,88 +220,44 @@ if (!isset($_POST['act']))
 
 	// Monitors
 	$monitor_options = '';
-	$monitor_selected = '';
-	for ($i = 1; $i <= 10; $i++)
+	foreach ($monitor_numbers as $i)
 	{
+		$monitor_selected = '';
 		if ($i == $additional['monitor_count'])
 		{
 			$monitor_selected = 'selected';
 		}
 		$monitor_options .= '<option value="'.$i.'" '.$monitor_selected.'>'.$i.'</a>';
-		$monitor_selected = '';
 	}
 	$templating->set('monitor_options', $monitor_options);
 
 	// Resolution
 	$resolution_options_html = '';
-	$resolution_selected = '';
-	$resolution_options = array(
-		"800x600",
-		"1024x600",
-		"1024x768",
-		"1152x864",
-		"1280x720",
-		"1280x768",
-		"1280x800",
-		"1280x1024",
-		"1360x768",
-		"1366x768",
-		"1440x900",
-		"1400x1050",
-		"1600x900",
-		"1600x1200",
-		"1680x1050",
-		"1920x1080",
-		"1920x1200",
-		"2560x1080",
-		"2560x1440",
-		"2560x1600",
-		"3200x1800",
-		"3440x1440",
-		"3840x1600",
-		"3840x1080",
-		"3840x1200",
-		"3840x2160",
-		"4096x2160",
-		"5120x1440",
-		"5120x2160",
-		"5120x2880",
-		"7680x4320");
 	foreach ($resolution_options as $res)
 	{
+		$resolution_selected = '';
 		if ($res == $additional['resolution'])
 		{
 			$resolution_selected = 'selected';
 		}
 		$resolution_options_html .= '<option value="'.$res.'" '.$resolution_selected.'>'.$res.'</a>';
-		$resolution_selected = '';
 	}
 	$templating->set('resolution_options', $resolution_options_html);
 
 	// Type of machine
-	$desktop = '';
-	if ($additional['gaming_machine_type'] == 'Desktop')
+	$machine_options = '';
+	foreach ($gaming_machine_types as $type)
 	{
-		$desktop = 'selected';
+		$selected = '';
+		if ($type == $additional['gaming_machine_type'])
+		{
+			$selected = 'selected';
+		}
+		$machine_options .= '<option value="'.$type.'" '.$selected.'>'.$type.'</a>';
 	}
-
-	$laptop = '';
-	if ($additional['gaming_machine_type'] == 'Laptop')
-	{
-		$laptop = 'selected';
-	}
-
-	$sofa = '';
-	if ($additional['gaming_machine_type'] == 'Sofa/Console PC')
-	{
-		$sofa = 'selected';
-	}
-
-	$machine_options = '<option value="Desktop" '.$desktop.'>Desktop</option><option value="Laptop" '.$laptop.'>Laptop</option><option value="Sofa/Console PC" '.$sofa.'>Sofa/Console PC</option>';
 	$templating->set('machine_options', $machine_options);
 
 	$gamepad_options = '';
-	$gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Other");
 	foreach ($gamepads as $gamepad)
 	{
 		$selected = '';
@@ -408,6 +383,22 @@ else if (isset($_POST['act']))
 		{
 			$_POST['pc_info']['ram_count'] = '';
 		}
+		if (!in_array($_POST['pc_info']['monitor_count'], $monitor_numbers))
+		{
+			$_POST['pc_info']['monitor_count'] = '';
+		}
+		if (!in_array($_POST['pc_info']['resolution'], $resolution_options))
+		{
+			$_POST['pc_info']['resolution'] = '';
+		}
+		if (!in_array($_POST['pc_info']['gaming_machine_type'], $gaming_machine_types))
+		{
+			$_POST['pc_info']['gaming_machine_type'] = '';
+		}
+		if (!in_array($_POST['pc_info']['gamepad'], $gamepads))
+		{
+			$_POST['pc_info']['gamepad'] = '';
+		}		
 
 		// build the query of fields to update
 		$update_sql = "UPDATE `user_profile_info` SET ";

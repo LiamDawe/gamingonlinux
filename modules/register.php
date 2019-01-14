@@ -195,6 +195,13 @@ if ($core->config('allow_registrations') == 1)
 					
 				$email = trim($_POST['uemail']);
 
+				if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
+				{
+					$_SESSION['message'] = 'invalid_email';
+					header('Location: /index.php?module=register');
+					die();
+				}
+
 				// i don't know why (possibly plugins blocking it), but sometimes we just don't get a timezone
 				$timezone = 'UTC';
 				if (isset($_POST['timezone']) && !empty($_POST['timezone']))

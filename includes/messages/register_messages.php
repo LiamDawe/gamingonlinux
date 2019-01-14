@@ -10,6 +10,11 @@ return [
 		"text" => 'Your username is not properly formatted. We only allow numbers, letters, "-" and "_".',
 		"error" => 1
 	],
+	"invalid_email" =>
+	[
+		"text" => "That was not a valid email, please try again.",
+		"error" => 1
+	],
 	"email_taken" =>
 	[
 		"text" => 'Sorry but that email is taken, please try another! If you have forgotten your password, <a href="https://www.gamingonlinux.com/index.php?module=login&forgot">click here to start a lost password request.</a>',

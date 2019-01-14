@@ -896,12 +896,38 @@ else if (isset($_GET['go']))
 
 	if ($_GET['go'] == 'report_comment')
 	{
+		if (!isset($_GET['comment_id']) || !isset($_GET['article_id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'comment and article';
+			header("Location: /index.php");
+			die();
+		}
+
+		$comment_id = strip_tags($_GET['comment_id']);
+		$article_id = strip_tags($_GET['article_id']);
+
+		if (!is_numeric($comment_id) || !is_numeric($article_id))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'comment and article';
+			header("Location: /index.php");
+			die();
+		}
+
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
+			if (!isset($_SESSION['user_id']) || isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0)
+			{
+				$_SESSION['message'] = 'notloggedin';
+				header("Location: /index.php");
+				die();
+			}
+
 			$templating->set_previous('title', 'Reporting a comment', 1);
 
 			// show the comment they are reporting
-			$comment = $dbl->run("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN `users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
+			$comment = $dbl->run("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN `users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
 			$templating->block('report', 'articles_full');
 			$templating->set('text', $bbcode->parse_bbcode($comment['comment_text']));
 
@@ -910,14 +936,14 @@ else if (isset($_GET['go']))
 
 			$templating->set('comment_avatar', $comment_avatar);
 
-			$core->yes_no('Are you sure you wish to report that comment?', url."index.php?module=articles_full&go=report_comment&article_id={$_GET['article_id']}&comment_id={$_GET['comment_id']}", "");
+			$core->yes_no('Are you sure you wish to report that comment?', url."index.php?module=articles_full&go=report_comment&article_id$article_id&comment_id=$comment_id", "");
 		}
 		else if (isset($_POST['no']))
 		{
 			// get info for title
-			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
+			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
 			
-			$article_link = $article_class->get_link($_GET['article_id'], $title['slug'], '#comments');
+			$article_link = $article_class->get_link($article_id, $title['slug'], '#comments');
 
 			header("Location: ".$article_link);
 		}
@@ -927,15 +953,15 @@ else if (isset($_GET['go']))
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
 				// note who did it
-				$core->new_admin_note(array('completed' => 0, 'content' => ' has <a href="/admin.php?module=comment_reports">reported a comment.</a>', 'type' => 'reported_comment', 'data' => $_GET['comment_id']));
+				$core->new_admin_note(array('completed' => 0, 'content' => ' has <a href="/admin.php?module=comment_reports">reported a comment.</a>', 'type' => 'reported_comment', 'data' => $comment_id));
 
-				$dbl->run("UPDATE `articles_comments` SET `spam` = 1, `spam_report_by` = ? WHERE `comment_id` = ?", array((int) $_SESSION['user_id'], (int) $_GET['comment_id']));
+				$dbl->run("UPDATE `articles_comments` SET `spam` = 1, `spam_report_by` = ? WHERE `comment_id` = ?", array((int) $_SESSION['user_id'], (int) $comment_id));
 			}
 
 			// get info for title
-			$title = $dbl->run("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
+			$title = $dbl->run("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array((int) $article_id))->fetch();
 			
-			$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
+			$article_link = $article_class->get_link($article_id, $title['slug']);
 
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'comment';

@@ -378,7 +378,19 @@ class user
 				}
 				else
 				{
-					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . "\n" . "Current user session data: \n" . print_r($session_check, true) . "\nUser cookie data: " . $_COOKIE['gol_session'] . "\n Database info: " . print_r($update_session_db, true));
+					// let's be sure it didn't update in case of PHP/MySQL bugs
+					$true_check = $dbl->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($session_check['user_id'],$generated_session))->fetchOne();
+
+					if ($true_check)
+					{
+						$message = 'We did find that new session ID inserted. So this is a real bug, it was inserted and mysql told us it was not.';
+					}
+					else
+					{
+						$message = 'We did *not* find that new session ID inserted.';
+					}
+
+					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . "\n" . "Current user session data: \n" . print_r($session_check, true) . "\nUser cookie data: " . $_COOKIE['gol_session'] . "\n Database info: " . print_r($update_session_db, true) . "\n" . $message);
 				}
 
 				$this->register_session($generated_session, $session_check['device-id']);
@@ -872,6 +884,12 @@ class user
 		}
 		else
 		{
+			if ($user_id == $_SESSION['user_id'])
+			{
+				$_SESSION['message'] = 'block_yourself';
+				header("Location: /usercp.php?module=block_list");
+				die();
+			}
 			// add them to the block block list
 			$this->db->run("INSERT INTO `user_block_list` SET `user_id` = ?, `blocked_id` = ?", array($_SESSION['user_id'], $user_id));
 

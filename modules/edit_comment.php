@@ -5,7 +5,17 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 {
 	$templating->set_previous('meta_data', '', 1);
 
-	$comment = $dbl->run("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
+	if (!isset($_GET['comment_id']) || isset($_GET['comment_id']) && !is_numeric($_GET['comment_id']))
+	{
+		$_SESSION['message'] = 'no_id';
+		$_SESSION['message_extra'] = 'comment';
+		header('Location: /index.php');
+		die();
+	}
+
+	$comment_id = strip_tags($_GET['comment_id']);
+
+	$comment = $dbl->run("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
 
 	$nice_title = core::nice_title($comment['title']);
 
@@ -27,7 +37,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 	}
 
 	$page = 1;
-	if (isset($_GET['page']))
+	if (isset($_GET['page']) && is_numeric($_GET['page']))
 	{
 		$page = $_GET['page'];
 	}

@@ -45,8 +45,16 @@ class core
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
 		$this->dbl = $dbl;
-		core::$redis = new Redis();
-		core::$redis->connect('127.0.0.1', 6379);
+
+		try 
+		{
+			core::$redis = new Redis();
+			core::$redis->connect('127.0.0.1', 6379);
+		}
+		catch (Exception $e) 
+		{
+			error_log($e->getMessage());
+		}
 	}
 	
 	// check in_array for a multidimensional array

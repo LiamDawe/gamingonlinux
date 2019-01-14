@@ -5,24 +5,35 @@ if (isset($_GET['type']))
 	{
 		if (isset($_GET['id']) && isset($_GET['key']))
 		{
+			if (!is_numeric($_GET['id']))
+			{
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message_extra'] = 'subscription';
+				header('Location: /index.php');
+				die();
+			}
+
 			// check key
 			$check = $dbl->run("SELECT `email` FROM `mailing_list` WHERE `id` = ? AND `activation_key` = ?", array($_GET['id'], $_GET['key']))->fetch();
 			if ($check)
 			{
 				$dbl->run("UPDATE `mailing_list` SET `activated` = 1, `activated_date` = ? WHERE `id` = ?", array(core::$sql_date_now, $_GET['id']));
 				$_SESSION['message'] = 'mail_list_subbed';
-				header('Location: '.$core->config('website_url').'mailinglist');		
+				header('Location: '.$core->config('website_url').'mailinglist');
+				die();
 			}
 			else
 			{
 				$_SESSION['message'] = 'no_key_match';
 				header('Location: '.$core->config('website_url').'mailinglist');
+				die();
 			}
 		}
 		else
 		{
 			$_SESSION['message'] = 'keys_missing';
 			header('Location: '.$core->config('website_url').'mailinglist');
+			die();
 		}
 	}
 	
@@ -30,11 +41,22 @@ if (isset($_GET['type']))
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$core->yes_no('Are you sure you want to unsubscribe? Hitting yes now will remove you right away with no further steps required!', '/index.php?module=mailing_list&type=remove_guest&id='.$_GET['id'].'&key='.$_GET['key'], "delete");
+			if (!isset($_GET['id']) || !isset($_GET['key']) || !is_numeric($_GET['id']))
+			{
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message_extra'] = 'subscription';
+				header('Location: /index.php');
+				die();				
+			}
+
+			$key = strip_tags($_GET['key']);
+
+			$core->yes_no('Are you sure you want to unsubscribe? Hitting yes now will remove you right away with no further steps required!', '/index.php?module=mailing_list&type=remove_guest&id='.$_GET['id'].'&key='.$key, "delete");
 		}
 		else if (isset($_POST['no']))
 		{
 			header("Location: /mailinglist");
+			die();
 		}
 		else if (isset($_POST['yes']))
 		{
@@ -46,18 +68,21 @@ if (isset($_GET['type']))
 				{
 					$dbl->run("DELETE FROM `mailing_list` WHERE `id` = ?", array($_GET['id']));
 					$_SESSION['message'] = 'mail_list_unsubbed';
-					header('Location: '.$core->config('website_url').'mailinglist');			
+					header('Location: '.$core->config('website_url').'mailinglist');
+					die();			
 				}
 				else
 				{
 					$_SESSION['message'] = 'no_key_match';
 					header('Location: '.$core->config('website_url').'mailinglist');
+					die();
 				}
 			}
 			else
 			{
 				$_SESSION['message'] = 'keys_missing';
 				header('Location: '.$core->config('website_url').'mailinglist');
+				die();
 			}		
 		}
 	}
@@ -66,11 +91,22 @@ if (isset($_GET['type']))
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$core->yes_no('Are you sure you want to unsubscribe? Hitting yes now will remove you right away with no further steps required!', '/index.php?module=mailing_list&type=remove_user&id='.$_GET['id'].'&key='.$_GET['key'], "delete");
+			if (!isset($_GET['id']) || !isset($_GET['key']) || !is_numeric($_GET['id']))
+			{
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message_extra'] = 'subscription';
+				header('Location: /index.php');
+				die();				
+			}
+
+			$key = strip_tags($_GET['key']);
+
+			$core->yes_no('Are you sure you want to unsubscribe? Hitting yes now will remove you right away with no further steps required!', '/index.php?module=mailing_list&type=remove_user&id='.$_GET['id'].'&key='.$key, "delete");
 		}
 		else if (isset($_POST['no']))
 		{
 			header("Location: /mailinglist");
+			die();
 		}
 		else if (isset($_POST['yes']))
 		{
@@ -82,18 +118,21 @@ if (isset($_GET['type']))
 				{
 					$dbl->run("UPDATE `users` SET `email_articles` = NULL WHERE `user_id` = ?", array($_GET['id']));
 					$_SESSION['message'] = 'mail_list_unsubbed';
-					header('Location: '.$core->config('website_url').'mailinglist');			
+					header('Location: '.$core->config('website_url').'mailinglist');
+					die();	
 				}
 				else
 				{
 					$_SESSION['message'] = 'no_key_match';
 					header('Location: '.$core->config('website_url').'mailinglist');
+					die();
 				}
 			}
 			else
 			{
 				$_SESSION['message'] = 'keys_missing';
 				header('Location: '.$core->config('website_url').'mailinglist');
+				die();
 			}		
 		}
 	}

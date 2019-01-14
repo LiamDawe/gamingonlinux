@@ -371,8 +371,20 @@ else if (isset($_POST['act']))
 			}
 			else
 			{
-				$sanatized = htmlspecialchars($_POST[$field['db_field']]);
-				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = ? WHERE `user_id` = ?", array($sanatized, $_SESSION['user_id']));
+				$sanatized = trim(strip_tags($_POST[$field['db_field']]));
+
+				if (!empty($sanatized))
+				{
+					// make doubly sure it's an actual URL
+					if (filter_var($sanatized, FILTER_VALIDATE_URL)) 
+					{	
+						$dbl->run("UPDATE `users` SET `{$field['db_field']}` = ? WHERE `user_id` = ?", array($sanatized, $_SESSION['user_id']));
+					}	
+				}
+				else
+				{
+					$dbl->run("UPDATE `users` SET `{$field['db_field']}` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
+				}
 			}
 		}
 

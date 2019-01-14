@@ -116,6 +116,8 @@ if (isset($_GET['user_id']))
 						{
 							if (!empty($profile[$field['db_field']]))
 							{
+								$profile[$field['db_field']] = htmlspecialchars($profile[$field['db_field']]);
+								
 								if ($field['db_field'] == 'website')
 								{
 									$profile[$field['db_field']] = core::check_url($profile[$field['db_field']]);

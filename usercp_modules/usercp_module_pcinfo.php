@@ -2,6 +2,11 @@
 $templating->set_previous('title', 'PC Info' . $templating->get('title', 1)  , 1);
 $templating->load('usercp_modules/usercp_module_pcinfo');
 
+// get the lists of everything we need, so we can validate input when saving as well as displaying for picking
+$get_distros = $dbl->run("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
+$get_desktops = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
+$bits_allowed = array('32bit', '64bit');
+
 if (!isset($_POST['act']))
 {
 	$usercpcp = $dbl->run("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();#
@@ -45,46 +50,44 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('include_in_survey_check', $include_in_survey);
 
-	// grab distros
+	// display distros
 	$distro_list = '';
-	$get_distros = $dbl->run("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all();
 	foreach ($get_distros as $distros)
 	{
 		$selected = '';
-		if ($usercpcp['distro'] == $distros['name'])
+		if ($usercpcp['distro'] == $distros)
 		{
 			$selected = 'selected';
 		}
-		$distro_list .= "<option value=\"{$distros['name']}\" $selected>{$distros['name']}</option>";
+		$distro_list .= "<option value=\"{$distros}\" $selected>{$distros}</option>";
 	}
 	$templating->set('distro_list', $distro_list);
 
 	// Desktop environment
 	$desktop_list = '';
-	$get_desktops = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all();
 	foreach ($get_desktops as $desktops)
 	{
 		$selected = '';
-		if ($additional['desktop_environment'] == $desktops['name'])
+		if ($additional['desktop_environment'] == $desktops)
 		{
 			$selected = 'selected';
 		}
-		$desktop_list .= "<option value=\"{$desktops['name']}\" $selected>{$desktops['name']}</option>";
+		$desktop_list .= "<option value=\"{$desktops}\" $selected>{$desktops}</option>";
 	}
 	$templating->set('desktop_list', $desktop_list);
 
-	$arc_32 = '';
-	if ($additional['what_bits'] == '32bit')
+	// distribution architecture 32/64bit
+	$bits_options = '';
+	foreach ($bits_allowed as $bitsy)
 	{
-		$arc_32 = 'selected';
+		$selected = '';
+		if ($additional['what_bits'] == $bitsy)
+		{
+			$selected = 'selected';
+		}
+		$bits_options .= '<option value="'.$bitsy.'" ' . $selected . '>'.$bitsy.'</option>';
 	}
-	$arc_64 = '';
-	if ($additional['what_bits'] == '64bit')
-	{
-		$arc_64 = 'selected';
-	}
-	$what_bits_options = '<option value="32bit" ' . $arc_32 . '>32bit</option><option value="64bit" '.$arc_64.'>64bit</option>';
-	$templating->set('what_bits_options', $what_bits_options);
+	$templating->set('what_bits_options', $bits_options);
 
 	$dual_boot_options = '';
 	$systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other", "No");
@@ -355,6 +358,22 @@ else if (isset($_POST['act']))
 		if (isset($_POST['pc_info']['monitor_count']) && is_numeric($_POST['pc_info']['monitor_count']))
 		{
 			$monitor_count = $_POST['pc_info']['monitor_count'];
+		}
+
+		// make sure they match what's actually allowed
+		if (!in_array($_POST['distribution'], $get_distros))
+		{
+			$_POST['distribution'] = '';
+		}
+
+		if (!in_array($_POST['pc_info']['desktop_environment'], $get_desktops))
+		{
+			$_POST['pc_info']['desktop_environment'] = '';
+		}
+
+		if (!in_array($_POST['pc_info']['what_bits'], $bits_allowed))
+		{
+			$_POST['pc_info']['what_bits'] = '';
 		}
 
 		// build the query of fields to update

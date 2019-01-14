@@ -14,7 +14,7 @@ if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'item')
 	{
-		if (!core::is_number($_GET['id']))
+		if (!isset($_GET['id']) || !core::is_number($_GET['id']))
 		{
 			$_SESSION['message'] = 'no_id';
 			$_SESSION['message_extra'] = 'item id';
@@ -274,13 +274,80 @@ if (isset($_GET['view']))
 	if ($_GET['view'] == 'submit_item')
 	{
 		$templating->block('submit_item');
+
+		// there was an error on submission, populate fields with previous data
+		if (isset($message_map::$error) && $message_map::$error >= 1 && isset($_SESSION['item_post_data']))
+		{
+			//print_r($_SESSION['item_post_data']);
+			foreach ($_SESSION['item_post_data'] as $key => $previous_data)
+			{
+				if ($previous_data == 'on')
+				{
+					$previous_data = 'checked';
+				}
+				$templating->set($key, $previous_data);
+			}
+		}
+		// clear any old info left in session from previous error when submitting, make fields blank
+		else
+		{
+			unset($_SESSION['item_post_data']); 
+			$templating->set_many(array('name' => '', 'link' => '', 'steam_link' => '', 'gog_link' => '', 'itch_link' => '', 'supports_linux' => 'checked', 'hidden_steam' => ''));
+		}
+
+		$types_options = '';
+		$item_types = array('is_game' => 'Game', 'is_application' => 'Misc Software or Application', 'is_emulator' => 'Emulator');
+		foreach ($item_types as $key => $value)
+		{
+			$selected = '';
+			if (isset($_SESSION['item_post_data']['type']) && $_SESSION['item_post_data']['type'] == $key)
+			{
+				$selected = 'selected';
+			}
+			$types_options .= '<option value="'.$key.'" '.$selected.'>'.$value.'</option>';
+		}
+		$templating->set('types_options', $types_options);
+
 		$licenses = $dbl->run("SELECT `license_name` FROM `item_licenses` ORDER BY `license_name` ASC")->fetch_all();
 		$license_options = '';
 		foreach ($licenses as $license)
 		{
-			$license_options .= '<option value="'.$license['license_name'].'">'.$license['license_name'].'</option>';
+			$selected = '';
+			if (isset($_SESSION['item_post_data']['license']) && $_SESSION['item_post_data']['license'] == $license['license_name'])
+			{
+				$selected = 'selected';
+			}
+			$license_options .= '<option value="'.$license['license_name'].'" '.$selected.'>'.$license['license_name'].'</option>';
 		}
 		$templating->set('license_options', $license_options);
+
+		// game name if DLC
+		if (isset($_SESSION['item_post_data']['game']))
+		{
+			$check_exists = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", array($_SESSION['item_post_data']['game']))->fetch();
+			if ($check_exists)
+			{
+				$game = '<option value="'.$_SESSION['item_post_data']['game'].'">'.$check_exists['name'].'</option>';
+			}
+		}
+		else
+		{
+			$game = '';
+		}
+		$templating->set('game', $game);
+
+		// game tags
+		$genre_ids = '';
+		if (isset($_SESSION['item_post_data']['genre_ids']))
+		{
+			$in  = str_repeat('?,', count($_SESSION['item_post_data']['genre_ids']) - 1) . '?';
+			$grab_genres = $dbl->run("SELECT `category_name`, `category_id` FROM `articles_categorys` WHERE `category_id` IN ($in)", $_SESSION['item_post_data']['genre_ids'])->fetch_all();
+			foreach($grab_genres as $genre)
+			{
+				$genre_ids .= '<option value="'.$genre['category_id'].'" selected>'.$genre['category_name'].'</option>';
+			}
+		}
+		$templating->set('genre_ids', $genre_ids);
 	}
 }
 
@@ -328,11 +395,51 @@ if (isset($_POST['act']))
 	}
 	if ($_POST['act'] == 'submit_item')
 	{
-		$name = trim($_POST['name']);
-		$link = trim($_POST['link']);
-		$steam_link = trim($_POST['steam_link']);
-		$gog_link = trim($_POST['gog_link']);
-		$itch_link = trim($_POST['itch_link']);
+		// quick helper func for below
+		function filter($value) 
+		{
+			$value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+		}
+
+		// in case of form errors, set it in the session to use it again
+		foreach ($_POST as $key => $data)
+		{
+			if (!is_array($data))
+			{
+				$_SESSION['item_post_data'][$key] = htmlspecialchars($data);
+			}
+			else
+			{
+				array_walk_recursive($data, "filter");
+				$_SESSION['item_post_data'][$key] = $data;
+			}
+		}
+		$name = strip_tags(trim($_POST['name']));
+
+		// deal with the links, make sure not empty and validate
+		$links = array('link', 'steam_link', 'gog_link', 'itch_link');
+		$empty_check = 0;
+		foreach ($links as $link)
+		{
+			$_POST[$link] = trim($_POST[$link]);
+
+			// make doubly sure it's an actual URL, if not make it blank
+			if (!filter_var($sanatized, FILTER_VALIDATE_URL)) 
+			{
+				$_POST[$link] = '';
+			}
+
+			if (!empty($link))
+			{
+				$empty_check = 1;
+			}
+		}
+		if ($empty_check == 0)
+		{
+			$_SESSION['message'] = 'one_link_needed';
+			header("Location: /index.php?module=items_database&view=submit_item");
+			die();
+		}
 		
 		// make sure its not empty
 		$empty_check = core::mempty(compact('name'));
@@ -342,6 +449,22 @@ if (isset($_POST['act']))
 			$_SESSION['message_extra'] = $empty_check;
 			header("Location: /index.php?module=items_database&view=submit_item");
 			die();
+		}
+
+		// make sure it doesn't exist already
+		$add_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']))->fetch();
+		if ($add_res)
+		{
+			$_SESSION['message'] = 'item_submit_exists';
+			header("Location: /index.php?module=items_database&view=submit_item");
+			die();
+		}
+
+		// this needs finishing
+		$check_similar = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ?", array('%'.$_POST['name'].'%'))->fetch_all();
+		if ($check_similar)
+		{
+			
 		}
 
 		$types = ['is_game', 'is_application', 'is_emulator'];
@@ -355,21 +478,6 @@ if (isset($_POST['act']))
 		else
 		{
 			$sql_type = '`'.$_POST['type'].'` = 1, ';
-		}
-		
-		if (empty($link) && empty($steam_link) && empty($gog_link) && empty($itch_link))
-		{
-			$_SESSION['message'] = 'one_link_needed';
-			header("Location: /index.php?module=items_database&view=submit_item");
-			die();
-		}
-
-		$add_res = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` = ?", array($_POST['name']))->fetch();
-		if ($add_res)
-		{
-			$_SESSION['message'] = 'item_submit_exists';
-			header("Location: /index.php?module=items_database&view=submit_item");
-			exit;
 		}
 
 		$supports_linux = 0;
@@ -415,6 +523,8 @@ if (isset($_POST['act']))
 
 		$core->new_admin_note(['complete' => 0, 'type' => 'item_database_addition', 'content' => 'submitted a new item for the games database.', 'data' => $new_id]);
 
+		unset($_SESSION['item_post_data']);
+
 		$_SESSION['message'] = 'item_submitted';
 		$_SESSION['message_extra'] = $name;
 		header("Location: /index.php?module=items_database&view=submit_item");		
@@ -423,7 +533,7 @@ if (isset($_POST['act']))
 	if ($_POST['act'] == 'submit_dev')
 	{
 		// make sure its not empty
-		$name = trim($_POST['name']);
+		$name = trim(strip_tags($_POST['name']));
 		if (empty($name))
 		{
 			$_SESSION['message'] = 'empty';

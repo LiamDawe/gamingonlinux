@@ -90,6 +90,13 @@ else if (isset($_GET['go']))
 		}
 		else
 		{
+			if (!isset($_GET['topic_id']) || !is_numeric($_GET['topic_id']))
+			{
+				$_SESSION['message'] = 'no_id';
+				$_SESSION['message_extra'] = 'topic';
+				header("Location: /usercp.php?module=topic_subscriptions");
+				die();
+			}
 			$dbl->run("DELETE FROM `forum_topics_subscriptions` WHERE `user_id` = ? AND `topic_id` = ?", array($_SESSION['user_id'], $_GET['topic_id']));
 
 			header("Location: /usercp.php?module=topic_subscriptions&message=done");

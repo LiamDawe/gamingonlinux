@@ -26,6 +26,13 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
+		if (!isset($_POST['game']) || !is_numeric($_POST['game']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message'] = 'game';
+			header("Location: /usercp.php?module=wishlist");
+			die();			
+		}
 		// check it doesn't exist
 		$test = $dbl->run("SELECT `wish_id` FROM `user_wishlist` WHERE `game_id` = ? AND `user_id` = ?", [$_POST['game'], $_SESSION['user_id']])->fetch();
 
@@ -48,6 +55,14 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'delete')
 	{
+		if (!isset($_POST['wish_id']) || !is_numeric($_POST['wish_id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message'] = 'wishlist item';
+			header("Location: /usercp.php?module=wishlist");
+			die();			
+		}
+
 		// check it doesn't exist
 		$dbl->run("DELETE FROM `user_wishlist` WHERE `wish_id` = ? AND `user_id` = ?", [$_POST['wish_id'], $_SESSION['user_id']])->fetch();
 

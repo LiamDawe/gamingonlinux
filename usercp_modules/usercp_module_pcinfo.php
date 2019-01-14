@@ -6,6 +6,8 @@ $templating->load('usercp_modules/usercp_module_pcinfo');
 $get_distros = $dbl->run("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
 $get_desktops = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
 $bits_allowed = array('32bit', '64bit');
+$dual_boot_systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other", "No");
+$steamplay_options = array("I will not use it", "Waiting on a specific game working", "In the last month", "In the last six months", "More than six months ago");
 
 if (!isset($_POST['act']))
 {
@@ -90,8 +92,7 @@ if (!isset($_POST['act']))
 	$templating->set('what_bits_options', $bits_options);
 
 	$dual_boot_options = '';
-	$systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other", "No");
-	foreach ($systems as $system)
+	foreach ($dual_boot_systems as $system)
 	{
 		$selected = '';
 		if ($additional['dual_boot'] == $system)
@@ -104,8 +105,7 @@ if (!isset($_POST['act']))
 
 	// Steam Play
 	$steamplay_options_output = '';
-	$options = array("I will not use it", "Waiting on a specific game working", "In the last month", "In the last six months", "More than six months ago");
-	foreach ($options as $option)
+	foreach ($steamplay_options as $option)
 	{
 		$selected = '';
 		if ($additional['steamplay'] == $option)
@@ -361,19 +361,26 @@ else if (isset($_POST['act']))
 		}
 
 		// make sure they match what's actually allowed
+		// need to make this prettier one day...
 		if (!in_array($_POST['distribution'], $get_distros))
 		{
 			$_POST['distribution'] = '';
 		}
-
 		if (!in_array($_POST['pc_info']['desktop_environment'], $get_desktops))
 		{
 			$_POST['pc_info']['desktop_environment'] = '';
 		}
-
 		if (!in_array($_POST['pc_info']['what_bits'], $bits_allowed))
 		{
 			$_POST['pc_info']['what_bits'] = '';
+		}
+		if (!in_array($_POST['pc_info']['dual_boot'], $dual_boot_systems))
+		{
+			$_POST['pc_info']['dual_boot'] = '';
+		}
+		if (!in_array($_POST['pc_info']['steamplay'], $steamplay_options))
+		{
+			$_POST['pc_info']['steamplay'] = '';
 		}
 
 		// build the query of fields to update

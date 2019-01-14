@@ -9,5 +9,10 @@ return [
 	[
 		"text" => "You cannot remove the main admin account!",
 		"error" => 1
+	],
+	"no_confirmation" =>
+	[
+		"text" => "You didn't tick the final box to confirm you understand what you're doing.",
+		"error" => 1
 	]
 ];

@@ -25,49 +25,43 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		if (!isset($_POST['confirm_removal']))
 		{
-			$core->confirmation(array("title" => "Remove Account", "text" => "Are you sure you wish to delete your account? This CANNOT be undone!", "action_url" => "usercp.php?module=removeacc", "act" => "remove_account", "act_2_name" => "password", "act_2_value" => $_POST['password']));
-		}
-
-		else if (isset($_POST['no']))
-		{
-			header("Location: /usercp.php");
-		}
-
-		else
-		{
-			// find current password
-			$grab_current_password = $dbl->run("SELECT `username`, `password`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-			
-			// check the original matches
-			if (!password_verify($_POST['password'], $grab_current_password['password']))
-			{
-				$_SESSION['message'] = 'password_match';
-				header("Location: /usercp.php?module=removeacc");
-				die();
-			}
-
-			$remove_comments = 0;
-			if (isset($_POST['remove_comments']))
-			{
-				$remove_comments = 1;
-			}
-
-			$remove_forum_posts = 0;
-			if (isset($_POST['remove_forum']))
-			{
-				$remove_forum_posts = 1;
-			}
-			
-			$user->delete_user($_SESSION['user_id'], array('remove_comments' => $remove_comments, 'remove_forum_posts' => $remove_forum_posts));
-			$user->logout(0,0); // not banned, don't redirect
-
-			$_SESSION['message'] = 'deleted';
-			$_SESSION['message_extra'] = 'user account';
-			header("Location: " . $core->config('website_url'));
+			$_SESSION['message'] = 'no_confirmation';
+			header("Location: /usercp.php?module=removeacc");
 			die();
 		}
+
+		// find current password
+		$grab_current_password = $dbl->run("SELECT `username`, `password`, `email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+			
+		// check the original matches
+		if (!password_verify($_POST['password'], $grab_current_password['password']))
+		{
+			$_SESSION['message'] = 'password_match';
+			header("Location: /usercp.php?module=removeacc");
+			die();
+		}
+
+		$remove_comments = 0;
+		if (isset($_POST['remove_comments']))
+		{
+			$remove_comments = 1;
+		}
+
+		$remove_forum_posts = 0;
+		if (isset($_POST['remove_forum']))
+		{
+			$remove_forum_posts = 1;
+		}
+			
+		$user->delete_user($_SESSION['user_id'], array('remove_comments' => $remove_comments, 'remove_forum_posts' => $remove_forum_posts));
+		$user->logout(0,0); // not banned, don't redirect
+
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'user account';
+		header("Location: " . $core->config('website_url'));
+		die();
 	}
 }
 ?>

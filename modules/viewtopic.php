@@ -183,7 +183,7 @@ else
 				$edit_link = '';
 				if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 				{
-					$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"/index.php?module=editpost&amp;topic_id={$topic['topic_id']}&page=$page\"><span class=\"icon edit\"></span></a></li>";
+					$edit_link = "<li><a class=\"tooltip-top\" title=\"Edit\" href=\"/index.php?module=editpost&amp;topic_id={$topic['topic_id']}&amp;forum_id={$topic['forum_id']}&amp;page=$page\"><span class=\"icon edit\"></span></a></li>";
 				}
 
 				// update their subscriptions if they are reading the last page, also adjust sub link

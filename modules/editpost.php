@@ -6,13 +6,18 @@ $templating->load('editpost');
 // if its the topic
 if (!isset($_POST['act']))
 {
-	if (!core::is_number($_GET['page']))
+	if (!core::is_number($_GET['page']) || !core::is_number($_GET['forum_id']))
 	{
 		$_SESSION['message'] = 'empty';
 		$_SESSION['message_extra'] = 'page id';
 		header("Location: /index.php?module=forum");
 		die();
 	}
+
+	$name = $dbl->run("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetchOne();
+	$templating->block('main_top', 'editpost');
+	$templating->set('forum_name', $name);
+	$templating->set('forum_id', $_GET['forum_id']);
 
 	$templating->block('post');
 
@@ -23,7 +28,6 @@ if (!isset($_POST['act']))
 
 		if ($_SESSION['user_id'] == $topic['author_id'] || $user->check_group([1,2]) == true)
 		{
-
 			$reported = 0;
 			if (isset($_GET['reported']))
 			{

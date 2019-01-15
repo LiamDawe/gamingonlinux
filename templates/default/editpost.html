@@ -1,6 +1,16 @@
+[block: main_top]
+				<div class="box">
+					<ul class="breadcrumb">
+						<li><a href="/forum/">Forum</a></li>
+						<li class="active"><a href="/forum/{:forum_id}">{:forum_name}</a></li>
+					</ul>
+				</div>
+[/block: main_top]
+
 [block: post]
 			<!-- edit forum post -->
-				<div class="box"><div class="head">Editing a forum post</div></div>
+				<div class="box"><div class="head">Editing a forum post</div>
+				<div class="body group">
 				<form method="post">
 [/block: post]
 
@@ -9,15 +19,13 @@ Topic Title: <input type="text" name="title" value="{:title}" /><br />
 [/block: edit_top]
 
 [block: edit_bottom]
-<div class="box">
-	<div class="body group">
 		<button type="submit" name="act" value="Edit" formaction="{:action}">Edit</button>
 		<button type="submit" formaction="{:cancel_action}">Cancel</button>
 		<button id="preview_text_button" type="button">Preview</button>
 		<input type="hidden" name="page" value="{:page}" /><input type="hidden" name="topic_id" value="{:topic_id}" />
+	</form>
 	</div>
 </div>
-</form>
 [/block: edit_bottom]
 
 [block: preview]

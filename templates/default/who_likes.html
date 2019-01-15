@@ -1,11 +1,15 @@
 [block: top]
 <div class="box"><div class="head">Who likes this?</div>
+<div class="body group flex-columns">
 [/block: top]
 
 [block: user_row]
-<div class="body group"><div class="fleft" style="padding-right: 2px;"><img src="{:avatar}" alt="avatar" width="30" height="30" /></div> <div class="fleft"><a href="{:profile_link}">{:username}</a></div></div>
+<div class="flex-column-item">
+	<img src="{:avatar}" height="20" width="20" alt="" /> <a href="{:profile_link}">{:username}</a>
+</div>		
 [/block: user_row]
 
 [block: end]
+</div>
 </div>
 [/block: end]

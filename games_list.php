@@ -1,5 +1,6 @@
 <?php
 define("APP_ROOT", dirname(__FILE__));
+define('golapp', TRUE);
 
 include(APP_ROOT . '/includes/header.php');
 
@@ -133,6 +134,13 @@ $templating->set('total', $total_games);
 $game_sales->display_all_games();
 
 $templating->block('filters', 'games_list');
+
+$filters = [];
+foreach (range('A', 'Z') as $letter) 
+{
+    $filters[] = '<option value="'.$letter.'">' . $letter . '</option>';
+}
+$templating->set('alpha_filters', implode(' ', $filters));
 
 // genre checkboxes
 $genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id from `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`free_game` = 1 group by cat.category_name, cat.category_id")->fetch_all();

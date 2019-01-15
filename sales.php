@@ -1,6 +1,6 @@
 <?php
 define("APP_ROOT", dirname(__FILE__));
-
+define('golapp', TRUE);
 include(APP_ROOT . '/includes/header.php');
 
 $game_sales = new game_sales($dbl, $templating, $user, $core);

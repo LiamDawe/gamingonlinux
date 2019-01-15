@@ -1,4 +1,6 @@
 <?php
+define('golapp', TRUE);
+
 // we dont need the whole bootstrap
 require dirname(__FILE__) . "/includes/loader.php";
 include dirname(__FILE__) . '/includes/config.php';
@@ -16,11 +18,30 @@ if ($core->config('articles_rss') == 1)
 		$sql_addition = ' AND c.`category_id` = 63';
 	}
 
+	// viewing specific tags only
+	if (isset($_GET['tags']))
+	{
+		if (!is_array($_GET['tags']))
+		{
+			die("Tags list needs to be an array if tags!");
+		}
+		if (!core::is_number($_GET['tags']))
+		{
+			die("Tags list needs to be an array if tags!");
+		}
+		$sql_join .= " INNER JOIN `article_category_reference` c ON a.article_id = c.article_id ";
+		$in  = str_repeat('?,', count($_GET['tags']) - 1) . '?';
+		$sql_addition .= ' AND c.`category_id` IN ( ' . $in . ' ) ';
+	}
+
+	// the total they can display at a time *not used yet*
+	$max_allowed = 50;
+
 	$last_time = $dbl->run("SELECT a.`date`
 	FROM `articles` a $sql_join
 	WHERE a.`active` = 1 $sql_addition
 	ORDER BY a.`date` DESC
-	LIMIT 1")->fetchOne();
+	LIMIT 1", $_GET['tags'])->fetchOne();
 
 	header('Content-Type: application/rss+xml; charset=utf-8');
 	header("Cache-Control: max-age=600");
@@ -65,7 +86,7 @@ if ($core->config('articles_rss') == 1)
 		`users` u ON a.author_id = u.user_id $sql_join
 	WHERE a.`active` = 1 $sql_addition
 	ORDER BY a.`date` DESC
-	LIMIT 15")->fetch_all();
+	LIMIT 15", $_GET['tags'])->fetch_all();
 
 	foreach ($articles as $line)
 	{

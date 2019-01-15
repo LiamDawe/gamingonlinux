@@ -1,5 +1,6 @@
 <?php
 define("APP_ROOT", dirname(__FILE__));
+define('golapp', TRUE);
 
 include(APP_ROOT . '/includes/header.php');
 

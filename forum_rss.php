@@ -1,5 +1,6 @@
 <?php
 session_start();
+define('golapp', TRUE);
 
 define("APP_ROOT", dirname(__FILE__));
 

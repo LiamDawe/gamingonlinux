@@ -2,6 +2,7 @@
 $file_dir = dirname(__FILE__);
 
 $db_conf = include $file_dir . '/includes/config.php';
+define('golapp', TRUE);
 
 include($file_dir. '/includes/class_db_mysql.php');
 $dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password'], $db_conf['table_prefix']);

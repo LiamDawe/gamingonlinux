@@ -1,7 +1,7 @@
 <?php
 header('Content-type: text/calendar; charset=utf-8');
 header('Content-Disposition: attachment; filename=calendar.ical');
-
+define('golapp', TRUE);
 // we dont need the whole bootstrap
 require dirname(__FILE__) . "/includes/loader.php";
 include dirname(__FILE__) . '/includes/config.php';

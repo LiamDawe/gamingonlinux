@@ -1,6 +1,7 @@
 <?php
 header('Content-type: text/calendar; charset=utf-8');
 header('Content-Disposition: attachment; filename=calendar.ical');
+define('golapp', TRUE);
 
 define("APP_ROOT", dirname(__FILE__));
 

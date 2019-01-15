@@ -1,8 +1,12 @@
 <?php
 /* 
-need a cron to remove cache files this makes older than 3 months to save disk space?
 Also need to add a random number to the time_to_cache when checking, to prevent cache hammering for loads of people accessing at the same time?
 */
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 session_cache_limiter('');
 define('time_to_cache', 172800); // 48 hours
 

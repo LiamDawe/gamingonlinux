@@ -19,14 +19,6 @@ $profile_fields['twitter']['span'] = '<span class="inline icon twitter">Twitter<
 $profile_fields['twitter']['link'] = 1;
 $profile_fields['twitter']['preinput'] = 'https://twitter.com/';
 
-$profile_fields['google']['name'] = 'G+';
-$profile_fields['google']['db_field'] = 'google_plus';
-$profile_fields['google']['base_link'] = 'https://plus.google.com/u/0/';
-$profile_fields['google']['base_link_required'] = 1;
-$profile_fields['google']['span'] = '<span class="inline icon google-plus">G+</span>';
-$profile_fields['google']['link'] = 1;
-$profile_fields['google']['preinput'] = 'https://plus.google.com/u/0/';
-
 $profile_fields['website']['name'] = 'Website:';
 $profile_fields['website']['db_field'] = 'website';
 $profile_fields['website']['span'] = '<span class="inline icon website">Website</span>';

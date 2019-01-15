@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $profile_fields = array();
 
 $profile_fields['steam']['name'] = 'Steam ID:';

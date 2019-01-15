@@ -1,6 +1,9 @@
 <?php
 session_start();
-
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $timer_start = microtime(true);
 
 error_reporting(-1);

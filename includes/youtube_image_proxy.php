@@ -1,7 +1,4 @@
 <?php
-/* 
-Also need to add a random number to the time_to_cache when checking, to prevent cache hammering for loads of people accessing at the same time?
-*/
 session_cache_limiter('');
 define('time_to_cache', 172800); // 48 hours
 
@@ -30,8 +27,8 @@ if (isset($_GET['id']))
 		$cache_file_check = APP_ROOT . '/cache/youtube_thumbs/' . md5($youtube_url.$video_id.'/'.$type) . '.jpg';
 		if (file_exists($cache_file_check))
 		{
-			// cache expired for this file, need to download
-			if (filemtime($cache_file_check) + time_to_cache < time())
+			// cache expired for this file, need to download with a random time taken away from the time_to_cache to prevent hammering at the exact time
+			if (filemtime($cache_file_check) + (time_to_cache - rand(100,200)) < time())
 			{
 				$download = 1;
 				break;
@@ -47,7 +44,6 @@ if (isset($_GET['id']))
 	}
 
 	// if no cache found, we will loop over the types and attempt to download one of them in the order they're set in $types (best first)
-	// TODO: Add a default YouTube image if none found!
 	$local_file = '';
 	if ($download == 1)
 	{
@@ -64,6 +60,7 @@ if (isset($_GET['id']))
 		}
 	}
 
+	// if none found
 	if (!isset($local_file) || empty($local_file))
 	{
 		$local_file = APP_ROOT.'/templates/default/images/youtube_cache_default.png';

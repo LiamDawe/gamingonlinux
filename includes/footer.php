@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->load('footer');
 $templating->block('footer');
 $templating->set('url', url);

@@ -608,7 +608,7 @@ else
 							$edit_link = '';
 							if ($_SESSION['user_id'] == $post['author_id'] || $user->check_group([1,2]) == true)
 							{
-								$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . $core->config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&page=' . $page . '"><span class="icon edit"></span></a></li>';
+								$edit_link = '<li><a class="tooltip-top" title="Edit" href="' . $core->config('website_url') . 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&amp;forum_id='.$topic['forum_id'].'&amp;page=' . $page . '"><span class="icon edit"></span></a></li>';
 							}
 							$templating->set('edit_link', $edit_link);
 

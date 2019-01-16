@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 if (isset($_GET['type']))
 {
 	if ($_GET['type'] == 'guestsub')

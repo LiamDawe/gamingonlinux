@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 if (!isset($_GET['topic_id']) || !core::is_number($_GET['topic_id']))
 {
 	$core->message('That is not a valid forum topic!');

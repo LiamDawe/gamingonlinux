@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 $templating->set_previous('title', 'Login', 1);

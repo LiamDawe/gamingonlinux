@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'User stats', 1);
 $templating->set_previous('meta_description', 'Statistics generated from the users of the GamingOnLinux website', 1);
 

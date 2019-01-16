@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->load('search');
 if (!isset($_GET['author_id']))
 {

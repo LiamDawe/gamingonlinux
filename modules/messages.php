@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Private Messages', 1);
 
 if ($_SESSION['user_id'] == 0)

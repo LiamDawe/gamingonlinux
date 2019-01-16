@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('meta_description', $core->config('meta_description'), 1);
 
 $templating->load('home');

@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 // check for ipban (spammers) and don't let them submit
 $get_ip = $dbl->run("SELECT `ip` FROM `ipbans` WHERE `ip` = ?", array(core::$ip))->fetchOne();
 if ($get_ip)

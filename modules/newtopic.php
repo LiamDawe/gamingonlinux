@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Create new topic', 1);
 if ($_SESSION['user_id'] > 0 && !isset($_SESSION['activated']))
 {

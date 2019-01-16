@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Game giveaways', 1);
 $templating->set_previous('meta_description', 'GamingOnLinux game giveaways', 1);
 

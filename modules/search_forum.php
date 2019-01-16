@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Forum Search', 1);
 $templating->set_previous('meta_description', 'Search the forum on GamingOnLinux', 1);
 

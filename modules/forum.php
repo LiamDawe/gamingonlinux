@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $forum_types = ['normal_forum', 'flat_forum'];
 
 $forum_type = $user->user_details['forum_type'];

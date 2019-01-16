@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 {
 	$_SESSION['message'] = "no_forum_reply_permission";

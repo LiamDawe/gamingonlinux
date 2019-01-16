@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 if (!core::is_number($_GET['forum_id']))
 {
 	$core->message('The forum ID has to be a number!', 1);

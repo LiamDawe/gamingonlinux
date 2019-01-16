@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 // not logged in
 if ((!isset($_SESSION['user_id'])) || ( isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 ) || ( isset($_SESSION['user_id']) && !core::is_number($_SESSION['user_id']) ))
 {

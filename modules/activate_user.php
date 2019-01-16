@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 if (!isset($_GET['redo']))
 {
 	if (!isset($_GET['user_id']) || !isset($_GET['code']))

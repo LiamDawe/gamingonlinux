@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 if (isset($_GET['today']))
 {
 	header("Location: /index.php?module=calendar#today");

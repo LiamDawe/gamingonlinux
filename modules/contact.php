@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Contact Us', 1);
 $templating->set_previous('meta_description', 'Contact Us form for GamingOnLinux', 1);
 

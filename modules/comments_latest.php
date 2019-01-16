@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Latest Comments', 1);
 $templating->set_previous('meta_description', 'The latest article comments on GamingOnLinux', 1);
 

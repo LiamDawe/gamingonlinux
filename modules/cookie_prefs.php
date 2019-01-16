@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('meta_description', 'Cookie Preferences', 1);
 $templating->set_previous('title', 'Cookie Preferences', 1);
 

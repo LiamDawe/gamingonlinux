@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->load('edit_comment');
 
 if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))

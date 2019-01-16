@@ -2,11 +2,6 @@
 /* 
 Also need to add a random number to the time_to_cache when checking, to prevent cache hammering for loads of people accessing at the same time?
 */
-if(!defined('golapp')) 
-{
-	die('Direct access not permitted');
-}
-
 session_cache_limiter('');
 define('time_to_cache', 172800); // 48 hours
 

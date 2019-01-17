@@ -18,7 +18,7 @@ for ($i = 1; $i <= 128; $i++)
 	$ram_numbers[] = $i;
 }
 $monitor_numbers = array();
-for ($i = 1; $i <= 128; $i++)
+for ($i = 1; $i <= 12; $i++)
 {
 	$monitor_numbers[] = $i;
 }

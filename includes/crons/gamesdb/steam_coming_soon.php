@@ -143,17 +143,22 @@ do
 
 $total_found_new = count($new_games);
 
+$html_message = '';
+$plain_message = '';
 if ($total_found_new > 0)
 {
 	$email_output = array();
 	foreach ($new_games as $new)
 	{
 		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: <a href="'.$new['link'].'">' . $new['link'] . '</a>';
+		$email_output_plain[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: ' . $new['link'];
 	}
 
 	$html_message = implode("<br />", $email_output);
-
 	$html_message .= '<br />Total pages scanned: ' . $page;
+
+	$plain_message = implode("\n", $email_output_plain);
+	$plain_message .= "\nTotal pages scanned: " . $page;
 
 	$to = $core->config('contact_email');
 	$subject = 'GOL Steam New - Coming Soon';
@@ -162,7 +167,7 @@ if ($total_found_new > 0)
 	if ($core->config('send_emails') == 1)
 	{
 		$mail = new mailer($core);
-		$mail->sendMail($to, $subject, $html_message);
+		$mail->sendMail($to, $subject, $html_message, $plain_message);
 	}
 }
 

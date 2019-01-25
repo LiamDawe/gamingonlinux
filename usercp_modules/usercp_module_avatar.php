@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $image_upload = new image_upload($dbl, $core);
 
 $templating->set_previous('title', 'Change your avatar', 1);

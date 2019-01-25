@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 define('articles_per_page_max', 30);
 define('per_page_max', 50); // comments and posts
 

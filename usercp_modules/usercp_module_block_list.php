@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Block List' . $templating->get('title', 1)  , 1);
 
 if (isset($_POST['act']))

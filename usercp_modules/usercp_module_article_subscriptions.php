@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->set_previous('title', 'Manage article subscriptions' . $templating->get('title', 1)  , 1);
 $templating->load('usercp_modules/usercp_module_article_subscriptions');
 

@@ -6,8 +6,8 @@ if(!defined('golapp'))
 $templating->set_previous('title', 'Crowdfunded Linux games', 1);
 $templating->set_previous('meta_description', 'Crowdfunded Linux games', 1);
 
-$total = $dbl->run("SELECT COUNT(*) FROM `kickstarters` ORDER BY `name` ASC")->fetchOne();
-$total_failed = $dbl->run("SELECT COUNT(*) FROM `kickstarters` WHERE `failed_linux` = 1 ORDER BY `name` ASC")->fetchOne();
+$total = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` ORDER BY `name` ASC")->fetchOne();
+$total_failed = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` WHERE `failed_linux` = 1 ORDER BY `name` ASC")->fetchOne();
 
 $templating->load('crowdfunders');
 $templating->block('list_top');
@@ -22,7 +22,7 @@ $failed_percentage = round($total_failed/$total*100);
 $templating->set('success_rate', $succeed_percentage . '%');
 $templating->set('failed_percentage', $failed_percentage . '%');
 
-$crowdfunders = $dbl->run("SELECT * FROM `kickstarters` ORDER BY `name` ASC")->fetch_all();
+$crowdfunders = $dbl->run("SELECT * FROM `crowdfunders` ORDER BY `name` ASC")->fetch_all();
 
 foreach ($crowdfunders as $item)
 {

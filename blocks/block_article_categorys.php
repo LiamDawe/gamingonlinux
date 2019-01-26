@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 $templating->load('blocks/block_article_categorys');
 $templating->block('menu');
 

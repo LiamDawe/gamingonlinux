@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 define("TITLE_MAX_LENGTH", 55);
 
 $templating->load('blocks/block_comments_latest');

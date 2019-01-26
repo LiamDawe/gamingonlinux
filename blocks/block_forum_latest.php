@@ -1,4 +1,8 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 // main menu block
 $templating->load('blocks/block_forum_latest');
 $templating->block('list');

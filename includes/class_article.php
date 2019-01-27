@@ -928,21 +928,19 @@ class article
 
 	public function display_article_list($article_list, $categories_list)
 	{
-		global $user;
-
 		foreach ($article_list as $article)
 		{
 			// make date human readable
 			$date = $this->core->human_date($article['date'], 'j F Y');
 
-			$machine_time = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
+			$machine_time = date('c',$article['date']) . 'Z';
 
 			$article_date = "<time class=\"timeago\" datetime=\"$machine_time\">{$date}</time>";
 
 			// get the article row template
 			$this->templating->block('article_row', 'articles');
 
-			if ($user->check_group([1,2,5]))
+			if ($this->user->check_group([1,2,5]))
 			{
 				$this->templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
 				if ($article['show_in_menu'] == 0)

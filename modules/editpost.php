@@ -10,7 +10,7 @@ $templating->load('editpost');
 // if its the topic
 if (!isset($_POST['act']))
 {
-	if (!core::is_number($_GET['page']) || !core::is_number($_GET['forum_id']))
+	if (!isset($_GET['page']) || !isset($_GET['forum_id']) || !core::is_number($_GET['page']) || !core::is_number($_GET['forum_id']))
 	{
 		$_SESSION['message'] = 'empty';
 		$_SESSION['message_extra'] = 'page id';

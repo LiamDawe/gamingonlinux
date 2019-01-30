@@ -91,7 +91,7 @@ class user
 
 					$this->check_banned($this->user_details['user_id']);
 
-					$generated_session = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+					$generated_session = md5(time() . mt_rand() . $this->user_details['user_id']);
 
 					// update IP address and last login
 					$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
@@ -284,7 +284,7 @@ class user
 		// register the new device to their account
 		if ($new_device == 1)
 		{
-			$device_id = md5(mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+			$device_id = md5(mt_rand() . $this->user_details['user_id']);
 
 			if ($this->user_details['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
@@ -348,7 +348,7 @@ class user
 				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
 				// update their stay logged in cookie with new details
-				$generated_session = md5(time() . mt_rand() . $this->user_details['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+				$generated_session = md5(time() . mt_rand() . $this->user_details['user_id']);
 				$expires_date = new DateTime('now');
 				$expires_date->add(new DateInterval('P30D'));
 
@@ -379,7 +379,7 @@ class user
 				else
 				{
 					// let's be sure it didn't update in case of PHP/MySQL bugs
-					$true_check = $dbl->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($session_check['user_id'],$generated_session))->fetchOne();
+					$true_check = $this->db->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($session_check['user_id'],$generated_session))->fetchOne();
 
 					if ($true_check)
 					{

@@ -375,7 +375,7 @@ else if (isset($_POST['act']))
 		{
 			$_POST['pc_info']['gpu_vendor'] = '';
 		}
-		if (!is_numeric($_POST['pc_info']['gpu_model']))
+		if (isset($_POST['pc_info']['gpu_model']) && !is_numeric($_POST['pc_info']['gpu_model']))
 		{
 			$_POST['pc_info']['gpu_model'] = NULL;
 		}

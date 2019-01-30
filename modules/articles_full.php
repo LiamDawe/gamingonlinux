@@ -940,7 +940,7 @@ else if (isset($_GET['go']))
 
 			$templating->set('comment_avatar', $comment_avatar);
 
-			$core->yes_no('Are you sure you wish to report that comment?', url."index.php?module=articles_full&go=report_comment&article_id$article_id&comment_id=$comment_id", "");
+			$core->yes_no('Are you sure you wish to report that comment?', url."index.php?module=articles_full&go=report_comment&article_id=$article_id&comment_id=$comment_id", "");
 		}
 		else if (isset($_POST['no']))
 		{

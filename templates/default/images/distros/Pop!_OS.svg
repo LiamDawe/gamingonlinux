@@ -1,86 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   data-name="Layer 1"
-   width="32"
-   height="32"
-   viewBox="0 0 32 32"
-   version="1.1"
-   id="svg14"
-   sodipodi:docname="Pop!_OS.svg"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
-   inkscape:export-filename="/mnt/storage/public_html/templates/default/images/distros/Pop!_OS.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
-  <metadata
-     id="metadata20">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>Pop_icon</dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs18" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="986"
-     id="namedview16"
-     showgrid="false"
-     inkscape:zoom="11.277868"
-     inkscape:cx="-17.83559"
-     inkscape:cy="12.687779"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg14" />
-  <title
-     id="title2">Pop_icon</title>
-  <circle
-     cx="15.945925"
-     cy="16.03558"
-     r="16"
-     id="circle4"
-     style="fill:#000000;stroke-width:0.03382664" />
-  <rect
-     x="7.4892607"
-     y="24.559902"
-     width="16.913319"
-     height="2.6032979"
-     rx="1.2515856"
-     ry="1.2515856"
-     id="rect6"
-     style="fill:#ffffff;stroke-width:0.03382664" />
-  <path
-     d="m 18.077,12.077863 c -0.81184,1.72516 -2.16491,3.11205 -4.0592,3.78859 l 1.62368,4.22833 c 0.30444,0.77801 0.57505,1.58985 0.33827,2.33403 -0.23679,0.74419 -1.31924,0.98098 -2.09725,0.16914 -1.48838,-1.58985 -6.4947201,-11.60254 -6.8668101,-12.34673 -0.3721,-0.7441804 -0.77802,-1.3530604 -0.77802,-2.0972504 0.0338,-1.11628 1.75899,-2.26638 2.60466,-2.84143 0.84566,-0.57506 2.5031701,-1.35307 3.9577101,-1.3869 1.45455,-0.0338 2.06343,0.30444 2.90909,0.84567 1.28542,0.84567 2.19874,2.1649 2.537,3.6871 0.33827,1.5222 0.23679,2.7061304 -0.16913,3.5518004 m -3.82241,-1.82664 C 13.95015,9.1349526 13.30744,8.1201526 12.46178,7.4436126 c -0.16914,-0.1353 -0.3721,-0.30444 -0.60888,-0.37209 -1.55603,-0.5074 -0.8795,2.09725 -0.64271,2.77379 0.23679,0.6765304 0.87949,2.0972504 1.58985,2.8076104 0.16914,0.16913 0.33827,0.30444 0.54123,0.33826 0.20296,0.0338 0.60888,-0.16913 0.77801,-0.43974 0.16913,-0.27062 0.20296,-0.47358 0.20296,-0.74419 a 4.3298097,4.3298097 0 0 0 -0.0677,-1.62368 z"
-     id="path8"
-     inkscape:connector-curvature="0"
-     style="fill:#ffffff;stroke-width:0.03382664" />
-  <g
-     id="g12"
-     style="fill:#ffffff"
-     transform="matrix(0.03382664,0,0,0.03382664,-0.05408007,0.00175263)">
-    <path
-       d="m 625,664 c -2,9 -7,17 -15,22 -8,5 -27,5 -38,-4 -11,-9 -13,-24 -10,-36 3,-12 13,-25 27,-29 29,-9 42,23 36,47 z m -18,-91 c -18,-7 -12,-103 5,-220 5,-32 13,-48 22,-56 9,-8 36,-12 52,-9 a 90,90 0 0 1 49,24 c 12,11 13,23 9,38 -4,15 -18,47 -29,70 l -28,53 c -54,96 -65,106 -80,100 z"
-       id="path10"
-       inkscape:connector-curvature="0" />
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="svg14" width="32" height="32" data-name="Layer 1" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <metadata id="metadata20">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Pop_icon</dc:title>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <title id="title2">Pop_icon</title>
+ <circle id="circle4" cx="15.946" cy="16.036" r="16" stroke-width=".033827"/>
+ <rect id="rect6" x="7.4893" y="24.56" width="16.913" height="2.6033" rx="1.2516" ry="1.2516" fill="#fff" stroke-width=".033827"/>
+ <path id="path8" d="m18.077 12.078c-0.81184 1.7252-2.1649 3.112-4.0592 3.7886l1.6237 4.2283c0.30444 0.77801 0.57505 1.5898 0.33827 2.334-0.23679 0.74419-1.3192 0.98098-2.0972 0.16914-1.4884-1.5898-6.4947-11.603-6.8668-12.347-0.3721-0.74418-0.77802-1.3531-0.77802-2.0973 0.0338-1.1163 1.759-2.2664 2.6047-2.8414 0.84566-0.57506 2.5032-1.3531 3.9577-1.3869 1.4546-0.0338 2.0634 0.30444 2.9091 0.84567 1.2854 0.84567 2.1987 2.1649 2.537 3.6871 0.33827 1.5222 0.23679 2.7061-0.16913 3.5518m-3.8224-1.8266c-0.30444-1.0486-0.94715-2.0634-1.7928-2.74-0.16914-0.1353-0.3721-0.30444-0.60888-0.37209-1.556-0.5074-0.8795 2.0972-0.64271 2.7738 0.23679 0.67653 0.87949 2.0973 1.5898 2.8076 0.16914 0.16913 0.33827 0.30444 0.54123 0.33826 0.20296 0.0338 0.60888-0.16913 0.77801-0.43974 0.16913-0.27062 0.20296-0.47358 0.20296-0.74419a4.3298 4.3298 0 0 0-0.0677-1.6237z" fill="#fff" stroke-width=".033827"/>
+ <g id="g12" transform="matrix(.033827 0 0 .033827 -.05408 .0017526)" fill="#fff">
+  <path id="path10" d="m625 664c-2 9-7 17-15 22s-27 5-38-4-13-24-10-36 13-25 27-29c29-9 42 23 36 47zm-18-91c-18-7-12-103 5-220 5-32 13-48 22-56s36-12 52-9a90 90 0 0 1 49 24c12 11 13 23 9 38s-18 47-29 70l-28 53c-54 96-65 106-80 100z"/>
+ </g>
 </svg>

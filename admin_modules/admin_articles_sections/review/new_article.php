@@ -1,4 +1,10 @@
-<?php // this page is for brand new articles instantly being sent into the review queue
+<?php 
+// this page is for brand new articles instantly being sent into the review queue
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $return_page = "admin.php?module=add_article";
 if ($checked = $article_class->check_article_inputs($return_page))
 {

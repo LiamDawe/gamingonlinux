@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->set_previous('title', 'Comments & Forum moderation queue', 1);
 
 $templating->load('admin_modules/mod_queue');

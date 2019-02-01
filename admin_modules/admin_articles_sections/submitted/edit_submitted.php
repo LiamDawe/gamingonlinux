@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $return_page = "admin.php?module=articles&view=Submitted&aid={$_POST['article_id']}";
 if ($checked = $article_class->check_article_inputs($return_page))
 {

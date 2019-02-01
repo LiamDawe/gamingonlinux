@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->load('admin_modules/admin_articles_sections/submitted_articles');
 
 // first check if there is a guest email or a users email

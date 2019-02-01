@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $grab_author = $dbl->run("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 if ($grab_author['author_id'] == $_SESSION['user_id'])
 {

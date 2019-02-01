@@ -1,6 +1,10 @@
 <?php
-$templating->load('admin_modules/admin_module_charts');
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
 
+$templating->load('admin_modules/admin_module_charts');
 
 if (isset($_GET['view']) && !isset($_POST['act']))
 {

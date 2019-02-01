@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->load('admin_modules/admin_module_announcements');
 
 $group_types = ['' => '', 'in_groups' => 'Only those groups', 'not_in_groups' => 'Not in those groups'];

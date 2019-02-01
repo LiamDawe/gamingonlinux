@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $text = trim($_POST['text']);
 
 $title = strip_tags($_POST['title']);

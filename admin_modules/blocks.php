@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 if (!$user->check_group(1))
 {
 	$core->message("You do not have permission to access this page!");

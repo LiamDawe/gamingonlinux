@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 if (!$user->check_group([1,2]))
 {
 	$core->message("You need to be an editor or an admin to access this section!", 1);

@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $image_upload = new image_upload($dbl, $core);
 
 $templating->load('admin_modules/admin_module_featured');

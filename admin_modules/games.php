@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $games_database = new game_sales($dbl, $templating, $user, $core);
 
 $templating->load('admin_modules/games');

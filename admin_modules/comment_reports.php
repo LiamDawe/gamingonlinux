@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->load('admin_modules/comment_reports');
 
 $templating->set_previous('title', 'Article comments' . $templating->get('title', 1)  , 1);

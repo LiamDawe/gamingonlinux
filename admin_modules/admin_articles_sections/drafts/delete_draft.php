@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $check = $dbl->run("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image', `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
 // anti-cheese deleting the wrong article feature, not sure this is even needed any more?

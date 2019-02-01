@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->set_previous('title', 'Sales Admin', 1);
 
 $templating->load('admin_modules/admin_module_sales');

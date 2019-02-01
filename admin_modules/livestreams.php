@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->load('admin_modules/livestreams');
 
 if (isset($_GET['view']) && !isset($_POST['act']))

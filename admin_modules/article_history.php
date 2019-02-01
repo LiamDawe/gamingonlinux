@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->set_previous('title', 'Viewing the history of an article', 1);
 
 $templating->load('admin_modules/article_history');

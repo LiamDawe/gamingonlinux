@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $return_page = "/admin.php?module=articles&view=drafts&aid=" . $_POST['article_id'];
 $grab_author = $dbl->run("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 if ($grab_author['author_id'] == $_SESSION['user_id'])

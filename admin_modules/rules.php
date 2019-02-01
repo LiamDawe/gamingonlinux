@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 define("POPULAR_COUNTER_DEFAULT", 1000);
 
 if (!$user->check_group(1))

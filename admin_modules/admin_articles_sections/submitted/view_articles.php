@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->load('admin_modules/admin_articles_sections/submitted_articles');
 if (!isset($_GET['aid']))
 {

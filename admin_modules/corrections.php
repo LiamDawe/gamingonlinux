@@ -1,4 +1,9 @@
 <?php
+if(!defined('golapp')) 
+{
+	die('Direct access not permitted');
+}
+
 $templating->load('admin_modules/corrections');
 
 $templating->set_previous('title', 'Article correction suggestions' . $templating->get('title', 1)  , 1);

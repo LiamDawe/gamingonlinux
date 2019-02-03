@@ -1,6 +1,5 @@
 <?php
 /* TODO
-Check for Fedora in kernel strings when it's not named directly as a distro
 */
 $file_dir = dirname (dirname( dirname(__FILE__) ));
 

@@ -52,7 +52,7 @@ if (isset($_POST['act']))
 			$mail->sendMail($grab_current_password['email'], $subject, $html_message, $plain_message);
 		}
 		
-		$_SESSION['message'] = 'password-sent';
+		$_SESSION['message'] = 'password_sent';
 		header("Location: /usercp.php?module=password");
 	}
 	

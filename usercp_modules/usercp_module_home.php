@@ -44,7 +44,7 @@ if (!isset($_POST['act']))
 		$end_date = '';
 		if ($user->check_group(6))
 		{
-			$supporter_link = "<br />Donate Page Link <em>Here you may enter a link to sit beside your name on the Support Us</em>:<br />
+			$supporter_link = "<br />Donate Page Link <em>Here you may enter a link to sit beside your name on the Support Us page</em>:<br />
 			<input type=\"text\" name=\"supporter_link\" value=\"{$usercpcp['supporter_link']}\" /><br />";
 			if ($usercpcp['supporter_end_date'] != NULL)
 			{
@@ -55,21 +55,6 @@ if (!isset($_POST['act']))
 		$templating->set('end_date_info', $end_date);
 
 		$templating->set('supporter_link', $supporter_link);
-
-		$theme_options = '';
-		if ($usercpcp['theme'] == 'dark')
-		{
-			$theme_options .= '<option value="dark" selected>dark</option>';
-			$theme_options .= '<option value="default">default</option>';
-		}
-
-		else
-		{
-			$theme_options .= '<option value="dark">dark</option>';
-			$theme_options .= '<option value="default" selected>default</option>';
-		}
-
-		$templating->set('theme_options', $theme_options);
 	}
 	else
 	{
@@ -78,6 +63,21 @@ if (!isset($_POST['act']))
 
 	$templating->block('main', 'usercp_modules/usercp_module_home');
 	$templating->set('url', $core->config('website_url'));
+
+	$theme_options = '';
+	if ($usercpcp['theme'] == 'dark')
+	{
+		$theme_options .= '<option value="dark" selected>dark</option>';
+		$theme_options .= '<option value="default">default</option>';
+	}
+
+	else
+	{
+		$theme_options .= '<option value="dark">dark</option>';
+		$theme_options .= '<option value="default" selected>default</option>';
+	}
+
+	$templating->set('theme_options', $theme_options);
 	
 	$templating->set('timezone_list', core::timezone_list($usercpcp['timezone']));
 
@@ -342,7 +342,7 @@ else if (isset($_POST['act']))
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
-		$dbl->run("UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ? WHERE `user_id` = ?", array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ?, `theme` = ? WHERE `user_id` = ?", array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_POST['theme'], $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;
@@ -411,7 +411,7 @@ else if (isset($_POST['act']))
 			}
 
 			// need to add theme updating back into here
-			$dbl->run("UPDATE `users` SET `supporter_link` = ?, `theme` = ? WHERE `user_id` = ?", array($supporter_link, $_POST['theme'], $_SESSION['user_id']), 'usercp_module_home.php');
+			$dbl->run("UPDATE `users` SET `supporter_link` = ? WHERE `user_id` = ?", array($supporter_link, $_SESSION['user_id']), 'usercp_module_home.php');
 
 			header("Location: " . $core->config('website_url') . "usercp.php?module=home&updated");
 		}

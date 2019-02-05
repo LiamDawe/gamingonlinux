@@ -381,8 +381,14 @@ else if (isset($_POST['act']))
 
 				if (!empty($sanatized))
 				{
+					$check_link = $sanatized;
+					if ($field['base_link_required'] == 1)
+					{
+						$check_link = $field['base_link'] . $sanatized;
+					}
+
 					// make doubly sure it's an actual URL
-					if (filter_var($sanatized, FILTER_VALIDATE_URL)) 
+					if (filter_var($check_link, FILTER_VALIDATE_URL)) 
 					{	
 						$dbl->run("UPDATE `users` SET `{$field['db_field']}` = ? WHERE `user_id` = ?", array($sanatized, $_SESSION['user_id']));
 					}	

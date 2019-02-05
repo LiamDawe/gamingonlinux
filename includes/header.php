@@ -54,22 +54,12 @@ $templating->block('header', 'header');
 $templating->set('url', $core->config('website_url'));
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
-// add a gol premium class tag to the body html tag, this is used to ignore gol premium and editors from the ad-blocking stats gathering
+// if using the dark theme
 $body_class = '';
-if ($theme == 'default')
-{
-	$body_class = '';
-}
-else if ($theme != 'default' && $user->can('premium_features') == true)
+if ($theme == 'dark')
 {
 	$body_class = 'class="dark"';
 }
-
-else
-{
-	$body_class = '';
-}
-
 $templating->set('body_class', $body_class);
 
 $templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for GamingOnLinux" href="'.$core->config('website_url').'article_rss.php" />');

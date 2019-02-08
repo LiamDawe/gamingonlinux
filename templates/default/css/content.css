@@ -39,7 +39,7 @@ a {
 /* Dark CSS */
 body.dark {
 	background: #151515;
-	color: #ffffff;
+	color: #cccccc;
 }
 .dark a, .dark a:hover, .dark a:active {
     color: #428BCA;
@@ -56,7 +56,7 @@ body.dark {
 .dark pre {background:#222;}
 
 .dark .collapse_header {background: #000;}
-.dark .cke_dialog_contents textarea, .dark .cke_dialog_contents input[type="text"], .dark .cke_dialog_ui_input_select { background-color: #151515 !important; color: #ffffff;}
+.dark .cke_dialog_contents textarea, .dark .cke_dialog_contents input[type="text"], .dark .cke_dialog_ui_input_select { background-color: #151515 !important; color: #cccccc}
 
 /* misc elements */
 .bbcodeblock, code {

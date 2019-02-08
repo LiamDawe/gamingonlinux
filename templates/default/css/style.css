@@ -845,6 +845,7 @@ select.pagination {
 .badge.blue {
     background: #006EA1;
 }
+.dark a.badge.blue {color: #cccccc}
 .badge.green {
     background: #04B404;
 }

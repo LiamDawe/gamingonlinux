@@ -116,6 +116,8 @@ foreach ($get_users as $user)
 		{
 			$dbl->run("UPDATE `forum_topics` SET `replys` = (replys - ?) WHERE `topic_id` = ?", array($total, $key));
 		}
+
+		$dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 0 AND `user_id` = ? AND `type` = 'mod_queue_reply'", array($user['user_id']));
 	}
 
 	else

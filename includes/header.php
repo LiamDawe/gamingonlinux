@@ -104,13 +104,6 @@ $templating->set('submit_a', $submit_a);
 if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESSION['user_id'])))
 {
 	$unread_counter = 0;
-	$username = '';
-	$username_remembered = '';
-	if (isset($_COOKIE['remember_username']))
-	{
-		$username = $_COOKIE['remember_username'];
-		$username_remembered = 'checked';
-	}
 
 	$templating->set('user_link', '<li><a href="/index.php?module=login">Login</a></li><li><a href="/index.php?module=register">Register</a></li>');
 

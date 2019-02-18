@@ -13,6 +13,11 @@ if (isset($_GET['id']))
 	require APP_ROOT . "/includes/bootstrap.php";
 	define("APP_URL", $core->config('website_url'));
 
+	if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0 || !$user->check_group([1,2,5]))
+	{
+		die('You shouldn\'t be here.');
+	}
+
 	$youtube_url = "https://img.youtube.com/vi/";
 
 	$video_id = str_replace(array('?rel=0', '?rel=1'), '', $_GET['id']);

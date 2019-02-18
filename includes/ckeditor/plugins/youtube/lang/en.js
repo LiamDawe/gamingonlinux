@@ -2,12 +2,11 @@ CKEDITOR.plugins.setLang('youtube', 'en', {
 	button : 'Embed YouTube Video',
 	title : 'Embed YouTube Video',
 	txtUrl : 'Paste YouTube Video URL',
+	txtPreviewImage : 'Image to show before showing video',
 	txtWidth : 'Width',
 	txtHeight : 'Height',
 	chkRelated : 'Show suggested videos at the video\'s end',
 	txtStartAt : 'Start at (ss or mm:ss or hh:mm:ss)',
-	chkPrivacy : 'Enable privacy-enhanced mode',
-	chkOlderCode : 'Use old embed code',
 	chkAutoplay: 'Autoplay',
 	chkControls: 'Show player controls',
 	noCode : 'You must input an embed code or URL',
@@ -20,5 +19,5 @@ CKEDITOR.plugins.setLang('youtube', 'en', {
 	invalidHeight : 'Inform a valid height',
 	invalidTime : 'Inform a valid start time',
 	txtResponsive : 'Make Responsive (ignore width and height, fit to width)',
-	txtNoEmbed : 'Video image and link only'
+	txtPreviewImageLoad : 'Load image from YouTube'
 });

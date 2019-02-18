@@ -40,7 +40,7 @@
 								[
 								{
 									type : 'hbox',
-									widths : [ '70%', '15%', '15%' ],
+									widths : [ '100%', '15%', '15%' ],
 									children :
 									[
 										{
@@ -117,6 +117,46 @@
 								},
 								{
 									type : 'hbox',
+									widths : [ '55%', '45%'],
+									children :
+									[
+										{
+											id : 'txtPreviewImage',
+											type : 'text',
+											label : editor.lang.youtube.txtPreviewImage
+										},
+										{
+											id : 'txtPreviewImageLoad',
+											type : 'button',
+											label : editor.lang.youtube.txtPreviewImageLoad,
+											onClick: function() 
+											{
+												if (this.getDialog().getContentElement('youtubePlugin', 'txtUrl').getValue().length === 0) 
+												{
+													alert("You didn't provide a YouTube URL!");
+												}
+												else
+												{
+													var videoID = ytVidId(this.getDialog().getContentElement('youtubePlugin', 'txtUrl').getValue());
+													var inputbox = this.getDialog();
+													var xhttp = new XMLHttpRequest();
+													xhttp.onreadystatechange = function() 
+													{
+														if (this.readyState == 4 && this.status == 200) 
+														{
+															inputbox.getContentElement('youtubePlugin', 'txtPreviewImage').setValue(this.responseText);
+														}
+													};
+													xhttp.open("GET", "/includes/youtube_image_proxy.php?id="+videoID, true);
+													xhttp.setRequestHeader ("Cache-Control", "no-store, no-cache, must-revalidate");
+													xhttp.send();
+												}
+											}
+										},
+									]
+								},
+								{
+									type : 'hbox',
 									widths : [ '55%', '45%' ],
 									children :
 										[
@@ -125,12 +165,6 @@
 												type : 'checkbox',
 												label : editor.lang.youtube.txtResponsive,
 												'default' : editor.config.youtube_responsive != null ? editor.config.youtube_responsive : false
-											},
-											{
-												id : 'chkNoEmbed',
-												type : 'checkbox',
-												label : editor.lang.youtube.txtNoEmbed,
-												'default' : editor.config.youtube_noembed != null ? editor.config.youtube_noembed : false
 											}
 										]
 								},
@@ -152,12 +186,6 @@
 									widths : [ '55%', '45%' ],
 									children :
 									[
-										{
-											id : 'chkPrivacy',
-											type : 'checkbox',
-											label : editor.lang.youtube.chkPrivacy,
-											'default' : editor.config.youtube_privacy != null ? editor.config.youtube_privacy : false
-										},
 										{
 											id : 'chkAutoplay',
 											type : 'checkbox',
@@ -185,12 +213,6 @@
 													}
 												}
 											}
-										},
-										{
-											id : 'chkControls',
-											type : 'checkbox',
-											'default' : editor.config.youtube_controls != null ? editor.config.youtube_controls : true,
-											label : editor.lang.youtube.chkControls
 										}
 									]
 								}
@@ -203,58 +225,53 @@
 						var responsiveStyle = '';
 
 						
-						var url = 'https://', params = [], startSecs;
+						var url = 'https://www.youtube-nocookie.com/', params = [], startSecs;
 						var width = this.getValueOf('youtubePlugin', 'txtWidth');
 						var height = this.getValueOf('youtubePlugin', 'txtHeight');
 
-						if (this.getContentElement('youtubePlugin', 'chkPrivacy').getValue() === true) {
-							url += 'www.youtube-nocookie.com/';
-						}
-						else {
-							url += 'www.youtube.com/';
-						}
-
 						url += 'embed/' + video;
 
-						if (this.getContentElement('youtubePlugin', 'chkRelated').getValue() === false) {
+						if (this.getContentElement('youtubePlugin', 'chkRelated').getValue() === false) 
+						{
 							params.push('rel=0');
 						}
 
-						if (this.getContentElement('youtubePlugin', 'chkAutoplay').getValue() === true) {
+						if (this.getContentElement('youtubePlugin', 'chkAutoplay').getValue() === true) 
+						{
 							params.push('autoplay=1');
 						}
 
-						if (this.getContentElement('youtubePlugin', 'chkControls').getValue() === false) {
-							params.push('controls=0');
+						previewImageOutput = '';
+						if (this.getContentElement('youtubePlugin', 'txtPreviewImage').getValue().length > 0) 
+						{
+							previewImageOutput = 'data-video-urlpreview="' + this.getValueOf('youtubePlugin', 'txtPreviewImage') + '"';
 						}
 
 						startSecs = this.getValueOf('youtubePlugin', 'txtStartAt');
 
-						if (startSecs) {
+						if (startSecs) 
+						{
 							var seconds = hmsToSeconds(startSecs);
 
 							params.push('start=' + seconds);
 						}
 
-						if (params.length > 0) {
+						if (params.length > 0) 
+						{
 							url = url + '?' + params.join('&');
 						}
 
-						if (this.getContentElement('youtubePlugin', 'chkResponsive').getValue() === true) {
-							content += '<div class="youtube-embed-wrapper" data-video-url="'+url+'" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden">';
+						if (this.getContentElement('youtubePlugin', 'chkResponsive').getValue() === true) 
+						{
+							content += '<div class="youtube-embed-wrapper" data-video-url="'+url+'" '+previewImageOutput+' style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden">';
 							responsiveStyle = 'style="position:absolute;top:0;left:0;width:100%;height:100%"';
 						}
 
-						if (this.getContentElement('youtubePlugin', 'chkNoEmbed').getValue() === true) {
-							var imgSrc = '//img.youtube.com/vi/' + video + '/sddefault.jpg';
-							content += '<a href="' + url + '" ><img width="' + width + '" height="' + height + '" src="' + imgSrc + '" '  + responsiveStyle + '/></a>';
-						}
-						else {
-							content += '<iframe width="' + width + '" height="' + height + '" src="' + url + '" ' + responsiveStyle;
-							content += 'frameborder="0" allowfullscreen></iframe>';
-						}
+						content += '<iframe width="' + width + '" height="' + height + '" src="' + url + '" ' + responsiveStyle;
+						content += 'frameborder="0" allowfullscreen></iframe>';
 
-						if (this.getContentElement('youtubePlugin', 'chkResponsive').getValue() === true) {
+						if (this.getContentElement('youtubePlugin', 'chkResponsive').getValue() === true) 
+						{
 							content += '</div>';
 						}
 						

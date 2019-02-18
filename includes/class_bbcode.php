@@ -470,24 +470,32 @@ class bbcode
 
 	function youtube_callback($matches)
 	{
-		// this needs to be improved to be a loop like the image proxy
-		$local_cache_maxresdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
-		$local_cache_hqdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
+		if ($matches[2]) // custom set preview image
+		{
+			$load_image = $matches[2];
+		}
+		else // otherwise see if we have an image stored from YT or use a default image
+		{
+			// this needs to be improved to be a loop like the image proxy
+			$local_cache_maxresdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+			$local_cache_hqdefault = APP_ROOT.'/cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
 
-		// check for highest res local cache
-		if (file_exists($local_cache_maxresdefault))
-		{
-			$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+			// check for highest res local cache
+			if (file_exists($local_cache_maxresdefault))
+			{
+				$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/maxresdefault.jpg") . '.jpg';
+			}
+			// check for high quality local cache
+			else if (file_exists($local_cache_hqdefault))
+			{
+				$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
+			}
+			else
+			{
+				$load_image = $this->core->config('website_url') . "templates/default/images/youtube_cache_default.png";
+			}
 		}
-		// check for high quality local cache
-		else if (file_exists($local_cache_hqdefault))
-		{
-			$load_image = $this->core->config('website_url') . 'cache/youtube_thumbs/' . md5("https://img.youtube.com/vi/".$matches[1]."/hqdefault.jpg") . '.jpg';
-		}
-		else
-		{
-			$load_image = "/includes/youtube_image_proxy.php?id=" . $matches[1];
-		}
+
 		return "<div class=\"hidden_video\" data-video-id=\"{$matches[1]}\"><img src=\"$load_image\"><div class=\"hidden_video_content\">YouTube videos require cookies, you must accept their cookies to view. <a href=\"/index.php?module=cookie_prefs\">View cookie preferences</a>.<br /><span class=\"video_accept_button badge blue\"><a class=\"accept_video\" data-video-id=\"{$matches[1]}\" href=\"#\">Show &amp; Accept Cookies</a> </span> &nbsp; <span class=\"badge blue\"><a href=\"https://www.youtube.com/watch?v={$matches[1]}\" target=\"_blank\">Direct Link</a></span></div></div>";
 	}
 
@@ -496,9 +504,9 @@ class bbcode
 	{
 		if (!isset($_COOKIE['gol_youtube_consent']) || isset($_COOKIE['gol_youtube_consent']) && $_COOKIE['gol_youtube_consent'] == 'nope')
 		{
-			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\" style=\"(.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is","bbcode::youtube_callback",$text);
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\" style=\"(?:.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is","bbcode::youtube_callback",$text); // this is for older videos, one day we should convert them all to save a little code here...
 
-			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\" style=\"(?:.+?)\"\>(?:.+?)\<\/div\>/is","bbcode::youtube_callback",$text);
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\"(?: data-video-urlpreview=\"([^\"]+?)\")? style=\"(?:.+?) style=\"(?:.+?)\"\>(?:.+?)\<\/div\>/is","bbcode::youtube_callback",$text);
 		}
 		return $text;
 	}

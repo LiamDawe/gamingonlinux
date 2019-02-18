@@ -57,8 +57,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.youtube_responsive = true;
 	config.youtube_related = false;
-	config.youtube_privacy = true;
-	config.youtube_disabled_fields = ['chkAutoplay','chkResponsive','txtWidth','txtHeight','chkRelated','chkPrivacy'];
+	config.youtube_disabled_fields = ['chkAutoplay','chkResponsive','txtWidth','txtHeight','chkRelated'];
 
 	config.linkShowTargetTab = false
 

@@ -215,7 +215,7 @@ if (!isset($_GET['go']))
 
 				if (($user->check_group([1,2,5]) == true) && !isset($_GET['preview']))
 				{
-					$templating->set('edit_link', " <a href=\"" . $core->config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\">Edit</a>");
+					$templating->set('edit_link', " <a href=\"" . $core->config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;aid={$article['article_id']}\">Edit</a>");
 					$templating->set('admin_button', '');
 				}
 

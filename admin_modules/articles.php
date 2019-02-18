@@ -21,10 +21,10 @@ if (isset($_GET['view']))
 		{
 			$article_class->reset_sessions();
 		}
-		$article_id = $_GET['article_id'];
+		$article_id = $_GET['aid'];
 
 		// make sure its a number
-		if (!is_numeric($_GET['article_id']))
+		if (!is_numeric($article_id))
 		{
 			$core->message('That is not a correct Article ID!');
 		}
@@ -57,11 +57,11 @@ if (isset($_GET['view']))
 			LEFT JOIN
 			`articles_tagline_gallery` t ON t.id = a.gallery_tagline
 			WHERE `article_id` = ?";
-			$article = $dbl->run($article_info_sql, array($_GET['article_id']))->fetch();
+			$article = $dbl->run($article_info_sql, array($article_id))->fetch();
 
 			if (isset($_GET['unlock']) && $article['locked'] == 1 && $_GET['unlock'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 			{
-				$dbl->run("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article['article_id']));
+				$dbl->run("UPDATE `articles` SET `locked` = 0, `locked_by` = 0, `locked_date` = 0 WHERE `article_id` = ?", array($article_id));
 
 				$core->message("You have unlocked the article for others to edit!");
 
@@ -71,7 +71,7 @@ if (isset($_GET['view']))
 
 			if (isset($_GET['lock']) && $_GET['lock'] == 1 && $article['locked'] == 0)
 			{
-				$dbl->run("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article['article_id']));
+				$dbl->run("UPDATE `articles` SET `locked` = 1, `locked_by` = ?, `locked_date` = ? WHERE `article_id` = ?", array($_SESSION['user_id'], core::$date, $article_id));
 
 				// we need to re-catch the article info as we have changed lock status
 				$article = $dbl->run($article_info_sql, array($article_id))->fetch();
@@ -117,11 +117,11 @@ if (isset($_GET['view']))
 			$lock_button = '';
 			if ($article['locked'] == 0)
 			{
-				$lock_button = '<a class="button_link fleft" href="/admin.php?module=articles&view=Edit&article_id=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
+				$lock_button = '<a class="button_link fleft" href="/admin.php?module=articles&view=Edit&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
 			}
 			else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 			{
-				$lock_button = '<a class="button_link fleft" href="/admin.php?module=articles&view=Edit&article_id=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
+				$lock_button = '<a class="button_link fleft" href="/admin.php?module=articles&view=Edit&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
 			}
 			$templating->set('lock_button', $lock_button);
 

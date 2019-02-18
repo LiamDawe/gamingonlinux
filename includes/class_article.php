@@ -942,7 +942,7 @@ class article
 
 			if ($this->user->check_group([1,2,5]))
 			{
-				$this->templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;article_id={$article['article_id']}\"> <strong>Edit</strong></a>");
+				$this->templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;aid={$article['article_id']}\"> <strong>Edit</strong></a>");
 				if ($article['show_in_menu'] == 0)
 				{
 					if ($this->core->config('total_featured') < 5)

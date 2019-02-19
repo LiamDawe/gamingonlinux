@@ -506,7 +506,7 @@ class bbcode
 		{
 			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" style=\"(?:.+?)\"\>\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\" style=\"(?:.+?)\" width=\"640\"\>\<\/iframe\>(?:.*?)\<\/div\>/is","bbcode::youtube_callback",$text); // this is for older videos, one day we should convert them all to save a little code here...
 
-			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\"(?: data-video-urlpreview=\"([^\"]+?)\")? style=\"(?:.+?) style=\"(?:.+?)\"\>(?:.+?)\<\/div\>/is","bbcode::youtube_callback",$text);
+			$text = preg_replace_callback("/\<div class=\"youtube-embed-wrapper\" data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=[0|1])?(?:&amp;start=[0-9]*)?\"(?: data-video-urlpreview=\"([^\"]+?)\")? style=\"(?:.+?)\"\>(?:.+?)\<\/div\>/is","bbcode::youtube_callback",$text);
 		}
 		return $text;
 	}

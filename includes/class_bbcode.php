@@ -470,7 +470,7 @@ class bbcode
 
 	function youtube_callback($matches)
 	{
-		if ($matches[2]) // custom set preview image
+		if (isset($matches[2])) // custom set preview image
 		{
 			$load_image = $matches[2];
 		}

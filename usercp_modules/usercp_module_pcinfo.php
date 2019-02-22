@@ -37,7 +37,8 @@ $resolution_options = array(
 	"3440x1440", "3840x1600", "3840x1080",
 	"3840x1200", "3840x2160", "4096x2160",
 	"5120x1440", "5120x2160", "5120x2880",
-	"7680x4320");
+	"5760x1080", "7680x4320", "Not Listed");
+
 $gaming_machine_types = array('Desktop', 'Laptop', 'Sofa/Console PC');
 $gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Other");
 

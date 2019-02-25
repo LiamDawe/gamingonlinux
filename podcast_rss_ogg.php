@@ -22,6 +22,11 @@ $output = '<?xml version="1.0" encoding="UTF-8"?>
 <atom:link href="https://www.gamingonlinux.com/podcast_rss_ogg.php" rel="self" type="application/rss+xml"/>
 <language>en</language>
 <description>Linux gaming chat and general banter</description>
+<image>
+<url>https://www.gamingonlinux.com/templates/default/images/favicons/apple-touch-icon-144x144.png</url>
+<title>Gaming On Linux Podcasts</title>
+<link>https://www.gamingonlinux.com/</link>
+</image>
 <itunes:author>gamingonlinux.com</itunes:author>
 <itunes:summary>Talking about the latest games for Linux and general chat about Linux and gaming</itunes:summary>
 <itunes:owner>
@@ -56,7 +61,7 @@ foreach ($articles as $line)
 		<description>{$line['tagline']}</description>
 		<enclosure url=\"{$matches[1]}\" type=\"audio/ogg\" length=\"$size\" />
 		<pubDate>$date</pubDate>
-		<guid>https://www.gamingonlinux.com/$nice_title.{$line['article_id']}/</guid>
+		<guid>https://www.gamingonlinux.com/articles/$nice_title.{$line['article_id']}/</guid>
 		</item>";
 	}
 }

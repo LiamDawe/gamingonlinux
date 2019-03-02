@@ -130,8 +130,29 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		// count how many there is in total
 		$total = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE active = 1 AND `author_id` = ?", array($_GET['author_id']))->fetchOne();
 
+		$per_page = 15;
+		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
+		{
+			$per_page = $_SESSION['per-page'];
+		}
+
+		//lastpage is = total found / items per page, rounded up.
+		if ($total <= 10)
+		{
+			$lastpage = 1;
+		}
+		else
+		{
+			$lastpage = ceil($total/$per_page);
+		}
+
+		if ($page > $lastpage)
+		{
+			$page = $lastpage;
+		}
+
 		// sort out the pagination link
-		$pagination = $core->pagination_link(15, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
+		$pagination = $core->pagination_link($per_page, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
 		// do the search query
 		$found_search = $dbl->run("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, a.`show_in_menu`, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();

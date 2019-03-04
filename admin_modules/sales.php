@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: admin sales config.');
 }
 
 $templating->set_previous('title', 'Sales Admin', 1);

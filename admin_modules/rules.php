@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: admin rules config.');
 }
 
 define("POPULAR_COUNTER_DEFAULT", 1000);

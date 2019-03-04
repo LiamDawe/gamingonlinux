@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: correction reports');
 }
 
 $templating->load('admin_modules/corrections');

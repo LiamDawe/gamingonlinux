@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: admin view more comments.');
 }
 
 $templating->load('admin_modules/admin_module_more_comments');

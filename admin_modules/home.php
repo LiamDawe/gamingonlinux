@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: admin home.');
 }
 
 $templating->set_previous('title', 'Home' . $templating->get('title', 1)  , 1);

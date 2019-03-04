@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: admin review queue.');
 }
 
 $templating->set_previous('title', 'Review articles' . $templating->get('title', 1)  , 1);

@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: admin livestreams config.');
 }
 
 $templating->load('admin_modules/livestreams');

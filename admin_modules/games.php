@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: games');
 }
 
 $games_database = new game_sales($dbl, $templating, $user, $core);

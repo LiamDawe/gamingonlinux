@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: admin featured article config.');
 }
 
 $image_upload = new image_upload($dbl, $core);

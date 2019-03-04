@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: article history');
 }
 
 $templating->set_previous('title', 'Viewing the history of an article', 1);

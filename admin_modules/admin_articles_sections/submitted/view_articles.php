@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: viewing submitted articles');
 }
 
 $templating->load('admin_modules/admin_articles_sections/submitted_articles');

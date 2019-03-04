@@ -2,7 +2,7 @@
 // this page is for brand new articles instantly being sent into the review queue
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: new admin review article.');
 }
 
 $return_page = "admin.php?module=add_article";

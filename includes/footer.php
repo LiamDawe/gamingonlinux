@@ -1,7 +1,7 @@
 <?php
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: footer.');
 }
 $templating->load('footer');
 $templating->block('footer');

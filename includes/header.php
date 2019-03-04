@@ -2,7 +2,7 @@
 session_start();
 if(!defined('golapp')) 
 {
-	die('Direct access not permitted');
+	die('Direct access not permitted: header');
 }
 $timer_start = microtime(true);
 

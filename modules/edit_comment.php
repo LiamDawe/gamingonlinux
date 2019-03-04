@@ -90,7 +90,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'editcomment')
 		{
 			$comment_text = core::make_safe($comment_text);
 
-			$dbl->run("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ?, `edit_counter` = (edit_counter + 1) WHERE `comment_id` = ?", array($comment_text, (int) $_SESSION['user_id'], core::$date, (int) $_POST['comment_id']));
+			$dbl->run("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `comment_id` = ?", array($comment_text, (int) $_SESSION['user_id'], core::$date, (int) $_POST['comment_id']));
 				
 			$edit_redirect = $article_class->get_link($comment['article_id'], $comment['slug'], 'comment_id=' . $_POST['comment_id']);
 

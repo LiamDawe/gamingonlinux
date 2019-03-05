@@ -55,13 +55,13 @@ foreach ($json as $key => $value)
 	// one of the dates is totally messed up and we only want the full month of data (for when data includes a couple days of the newer month)
 	if (date('mY', $value['timestamp']) != '080118' && date('mY', $value['timestamp']) != LAST_MONTH + 1 . CURRENT_YEAR) 
 	{
-		if (array_key_exists(date('mY', $value['timestamp']), $reports_over_time))
+		if (array_key_exists(date('Y-m', $value['timestamp']), $reports_over_time))
 		{
-			$reports_over_time[date('mY', $value['timestamp'])]++;
+			$reports_over_time[date('Y-m', $value['timestamp'])]++;
 		}
 		else
 		{
-			$reports_over_time[date('mY', $value['timestamp'])] = 1;
+			$reports_over_time[date('Y-m', $value['timestamp'])] = 1;
 		}
 	}
 	
@@ -222,7 +222,15 @@ foreach ($json as $key => $value)
 
 echo "\nReports over time:\n";
 
-arsort($reports_over_time, SORT_NATURAL);
+// sort the reports in the correct date order
+uksort($reports_over_time, function($a1, $a2) 
+{
+	$time1 = strtotime($a1);
+	$time2 = strtotime($a2);
+
+	return $time1 - $time2;
+});
+
 print_r($reports_over_time);
 
 echo "There were $this_month_reports for this month and there's $total_reports reports in total!";
@@ -297,7 +305,7 @@ print_r($top_plat);
 /* CHART GENERATION */
 
 // number of reports
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - February 2019', `sub_title` = 'Reports Over Time', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
+$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - February 2019', `sub_title` = 'Reports Over Time', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 0");
 $new_chart_id = $dbl->new_id();
 foreach ($reports_over_time as $key => $total)
 {

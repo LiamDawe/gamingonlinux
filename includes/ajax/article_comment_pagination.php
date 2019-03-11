@@ -51,7 +51,7 @@ if(isset($_POST))
 
 				$article_id = $_POST['article_id'];
 
-				$dbl->run("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?", array($article_id, $_SESSION['user_id'], core::$date, $comment));
+				$dbl->run("INSERT INTO `articles_comments` SET `article_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?, `approved` = 1", array($article_id, $_SESSION['user_id'], core::$date, $comment));
 
 				$new_comment_id = $dbl->new_id();
 				
@@ -150,7 +150,7 @@ if(isset($_POST))
 		
 		$templating->load('articles_full');
 		
-		$article_info = $dbl->run("SELECT `article_id`, `slug`, `comments_open` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
+		$article_info = $dbl->run("SELECT `article_id`, `slug`, `comments_open`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 		
 		$article_class->display_comments(['article' => $article_info, 'pagination_link' => $pagination_link, 'type' => 'admin', 'page' => $_POST['page']]);
 

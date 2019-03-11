@@ -49,6 +49,7 @@ else
 	a.`locked_by`,
 	a.`locked_date`,
 	a.`gallery_tagline`,
+	a.`comment_count`,
 	t.`filename` as gallery_tagline_filename,
 	u.`username`,
 	u2.`username` as username_lock

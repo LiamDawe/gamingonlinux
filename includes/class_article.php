@@ -157,6 +157,8 @@ class article
 
 	function display_previous_uploads($article_id = NULL)
 	{
+		$image_formats = array("jpg", "png", "gif", "jpeg", "svg");
+
 		$previously_uploaded['output'] = '';
 		$previously_uploaded['hidden'] = '';
 		$article_images = NULL;
@@ -193,7 +195,7 @@ class article
 				$thumbnail_button = '';
 				$data_type = '';
 
-				if ($value['filetype'] != 'mp4' && $value['filetype'] != 'webm' && $value['filetype'] != 'mp3' && $value['filetype'] != 'ogg')
+				if (in_array($value['filetype'], $image_formats))
 				{
 					$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
 					$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
@@ -218,10 +220,15 @@ class article
 					$preview_file = '<img src="' . $thumb_url . '" class="imgList"><br />';
 					$data_type = 'image';
 				}
-				else
+				else if ($value['filetype'] == 'mp4' || $value['filetype'] == 'webm')
 				{
 					$preview_file = '<video width="100%" src="'.$main_url.'" controls></video>';
 					$data_type = 'video';
+				}
+				else if ($value['filetype'] == 'mp3' || $value['filetype'] == 'ogg')
+				{
+					$preview_file = '<div class="ckeditor-html5-audio" style="text-align: center;"><audio controls="controls" src="'.$main_url.'">&nbsp;</audio></div>';
+					$data_type = 'audio';
 				}
 
 				$previously_uploaded['output'] .= '<div class="box">

@@ -699,9 +699,6 @@ else if (isset($_GET['go']))
 
 						if ($approved == 1)
 						{
-							// deal with redis comment counter cache
-							$article_class->article_comments_counter($article_id, 'add');
-
 							// update the news items comment count
 							$dbl->run("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", array($article_id));
 

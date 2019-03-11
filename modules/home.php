@@ -67,8 +67,6 @@ if (!isset($_GET['view']))
 			core::$redis->set($querykey, serialize($articles_get), 30); // cache for 30 seconds
 		}
 
-		$seperator_counter = 0;
-
 		$article_id_array = array();
 
 		foreach ($articles_get as $article)

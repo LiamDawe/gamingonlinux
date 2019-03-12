@@ -246,9 +246,6 @@ if (isset($_POST['action']))
 				$dbl->run("UPDATE `articles` SET `comment_count` = (comment_count + 1) WHERE `article_id` = ?", [$approved['article_id']]);
 				
 				$dbl->run("UPDATE `articles_comments` SET `approved` = 1 WHERE `comment_id` = ?", [$_POST['post_id']]);
-
-				// deal with redis comment counter cache
-				$article_class->article_comments_counter($approved['article_id'], 'add');
 				
 				// add 1 to their approval rating
 				$user_get = $dbl->run("SELECT `mod_approved` FROM `users` WHERE `user_id` = ?", [$_POST['author_id']])->fetch();

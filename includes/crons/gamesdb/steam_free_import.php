@@ -87,6 +87,10 @@ do
 				}
 			}
 		}
+		// free up memory
+		$html->__destruct();
+		unset($html);
+		$html = null;
 	}
 	$page++;
 } while ($stop == 0);

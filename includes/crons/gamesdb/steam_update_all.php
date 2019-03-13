@@ -22,6 +22,8 @@ do
 {
 	$html = file_get_html($url . $page);
 
+	echo 'Page: ' . $page . "\r\n";
+
 	$get_games = $html->find('a.search_result_row');
 
 	if (empty($get_games))
@@ -153,9 +155,12 @@ do
 				}
 			}
 		}
+		// free up memory
+		$html->__destruct();
+		unset($html);
+		$html = null;
 	}
 	$page++;
-	echo 'Moving onto page: ' . $page;
 } while ($stop == 0);
 
 $total_updated = count($updated_list);

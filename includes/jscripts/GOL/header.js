@@ -925,7 +925,7 @@ jQuery(document).ready(function()
 			if (data.result == 1)
 			{
 				$('#pc_info_done').show();
-				$('#pc_info_done').html("<br />Thank you, your PC info has been updated!");
+				$('#pc_info_done').html("Thank you, your PC info has been updated!");
 			}
 		});
 	});

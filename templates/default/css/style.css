@@ -1620,6 +1620,7 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 	background-color:#333333;
 	width:100%;
 	display:none;
+	padding: 5px;
 }
 .input-alert-text {padding: 5px 5px 5px 5px;}
 /* fix fancybox going under the navbar */

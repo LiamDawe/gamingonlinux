@@ -23,7 +23,7 @@ $output = '<?xml version="1.0" encoding="UTF-8"?>
 <language>en</language>
 <description>Linux gaming chat and general banter</description>
 <image>
-	<url>http://www.gamingonlinux.com/templates/default/images/favicons/apple-touch-icon-144x144.png</url>
+	<url>http://www.gamingonlinux.com/templates/default/images/favicons/podcast.png</url>
 	<title>Gaming On Linux Podcasts</title>
 	<link>http://www.gamingonlinux.com/</link>
 </image>

@@ -448,6 +448,14 @@ if (isset($_POST['action']))
 			$core->new_admin_note(array('completed' => 1, 'content' => ' removed an article comment from the mod queue and banned the user <a href="/profiles/'.$_POST['author_id'].'">'.$get_details['username'].'</a>.'));
 		}
 
+		// remove any other pending items from this user, as we clearly don't want them
+		$dbl->run("DELETE FROM `articles_comments` WHERE `approved` = 0 AND `author_id` = ?", array($_POST['author_id']));
+		$dbl->run("DELETE FROM `forum_topics` WHERE `approved` = 0 AND `author_id` = ?", array($_POST['author_id']));
+		$dbl->run("DELETE FROM `forum_replies` WHERE `approved` = 0 AND `author_id` = ?", array($_POST['author_id']));
+
+		// remove their other pending admin notifications for the above removals
+		$dbl->run("DELETE FROM `admin_notifications` WHERE `user_id` = ? AND `type` IN ('mod_queue', 'mod_queue_reply', 'mod_queue_comment')", array($_POST['author_id']));
+
 		// do the ban as well
 		$dbl->run("UPDATE `users` SET `banned` = 1 WHERE `user_id` = ?", array($_POST['author_id']));
 		$dbl->run("INSERT INTO `ipbans` SET `ip` = ?", array($get_details['ip']));

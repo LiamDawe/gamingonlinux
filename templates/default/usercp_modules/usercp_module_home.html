@@ -49,6 +49,17 @@
 	</div>
 </div>
 <div class="box">
+	<div class="subhead">Content preferences</div>
+	<div class="body group">
+		Do not show articles with any of these tags on the homepage:
+		<form method="post" action="usercp.php?module=home">
+			<select tabindex="-1" multiple="" name="bar_tags[]" id="bar-tag-select" style="width:300px" class="populate select2-offscreen"><option value="0">None</option>{:tags_list}</select>
+			<button type="submit" name="act" value="bar_tags">Change</button>
+		</form>
+		Note: Sometimes articles might cover more than just what the tag represents like Editorials. You can view all articles regardless of this setting any time, with the "All News" link on the homepage (or <a href="https://www.gamingonlinux.com/all-articles/">click right here</a>).
+	</div>
+</div>
+<div class="box">
 	<div class="subhead">Profile Details</div>
 	<div class="body group">
 		<form method="post" action="{:url}usercp.php?module=home">

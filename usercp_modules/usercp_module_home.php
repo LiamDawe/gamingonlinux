@@ -64,6 +64,16 @@ if (!isset($_POST['act']))
 	$templating->block('main', 'usercp_modules/usercp_module_home');
 	$templating->set('url', $core->config('website_url'));
 
+	/* for content preferences */
+	// grab a list of tags they don't want on the homepage
+	$tags_list = '';
+	$user_tag_bars = $dbl->run("SELECT ut.`category_id`, c.`category_name` FROM `user_tags_bar` ut LEFT JOIN `articles_categorys` c ON ut.category_id = c.category_id WHERE ut.`user_id` = ?", array($_SESSION['user_id']))->fetch_all();
+	foreach ($user_tag_bars as $tags)
+	{
+		$tags_list .= "<option value=\"{$tags['category_id']}\" selected>{$tags['category_name']}</option>";
+	}
+	$templating->set('tags_list', $tags_list);
+
 	$theme_options = '';
 	if ($usercpcp['theme'] == 'dark')
 	{
@@ -458,6 +468,45 @@ else if (isset($_POST['act']))
 
 		$dbl->run("UPDATE `users` SET `social_stay_cookie` = ? WHERE `user_id` = ?", array($stay_cookie, $_SESSION['user_id']));
 
+		header("Location: " . $core->config('website_url') . "usercp.php");
+	}
+
+	if ($_POST['act'] == 'bar_tags')
+	{
+		if (isset($_POST['bar_tags']) && !empty($_POST['bar_tags']))
+		{
+			// delete any existing categories that aren't in the final list for publishing
+			$user_tag_bars = $dbl->run("SELECT ut.`ref_id`, ut.`category_id`, c.`category_name` FROM `user_tags_bar` ut LEFT JOIN `articles_categorys` c ON ut.category_id = c.category_id WHERE ut.`user_id` = ?", array($_SESSION['user_id']))->fetch_all();
+
+			if (!empty($user_tag_bars))
+			{
+				foreach ($user_tag_bars as $tag)
+				{
+					if (!in_array($tag['category_id'], $_POST['bar_tags']))
+					{
+						$dbl->run("DELETE FROM `user_tags_bar` WHERE `ref_id` = ?", array($tag['ref_id']));
+					}
+				}
+			}
+
+			// get fresh list of categories, and insert any that don't exist
+			$current_tags = $dbl->run("SELECT `category_id` FROM `user_tags_bar` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN, 0);
+
+			foreach($_POST['bar_tags'] as $new_tag)
+			{
+				if (!in_array($new_tag, $current_tags))
+				{
+					$dbl->run("INSERT INTO `user_tags_bar` SET `user_id` = ?, `category_id` = ?", array($_SESSION['user_id'], $new_tag));
+				}
+			}
+		}
+		if ((isset($_POST['bar_tags']) && empty($_POST['bar_tags']) || !isset($_POST['bar_tags'])))
+		{
+			$dbl->run("DELETE FROM `user_tags_bar` WHERE `user_id` = ?", array($_SESSION['user_id']));
+		}
+
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'set of excluded article tags';
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}
 }

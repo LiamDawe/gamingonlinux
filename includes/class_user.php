@@ -14,6 +14,7 @@ class user
 
 	public $user_groups = [0 => 4]; // default for guests
 	public $blocked_users = [];
+	public $blocked_tags = [0 => 0];
 
 	public $cookie_length = 60*60*24*30; // 30 days
 
@@ -23,6 +24,7 @@ class user
 		$this->core = $core;
 		$this->grab_user_groups();
 		$this->block_list();
+		$this->blocked_homepage_tags();
 		$this->check_session();
 	}
 
@@ -197,6 +199,19 @@ class user
 		}
 	}
 
+	function blocked_homepage_tags()
+	{
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			$this->blocked_tags = $this->db->run("SELECT `category_id` FROM `user_tags_bar` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
+			if (empty($this->blocked_tags))
+			{
+				$this->blocked_tags = [0 => 0];
+			}
+		}
+		//print_r($this->blocked_tags);
+	}
+
 	// return a list of group ids that have a particular permission
 	function get_group_ids($permission)
 	{
@@ -335,7 +350,7 @@ class user
 	{
 		if (isset($_COOKIE['gol_session']))
 		{
-			$session_check = $this->db->run("SELECT `session_id`, `device-id`, `user_id`, `expires` FROM `saved_sessions` WHERE `session_id` = ? AND `expires` > NOW()", array($_COOKIE['gol_session']))->fetch();
+			$session_check = $this->db->run("SELECT `id`, `session_id`, `device-id`, `user_id`, `expires`, `browser_agent`, `date` FROM `saved_sessions` WHERE `session_id` = ? AND `expires` > NOW()", array($_COOKIE['gol_session']))->fetch();
 
 			if ($session_check)
 			{
@@ -359,8 +374,8 @@ class user
 				`expires` = ?,
 				`date` = ?
 				WHERE
-				`session_id` = ? AND `user_id` = ?";
-				$update_session_db = $this->db->run($update_session_sql, array($generated_session, $expires_date->format('Y-m-d H:i:s'), date("Y-m-d"), $_COOKIE['gol_session'], $session_check['user_id']));
+				`id` = ? AND `user_id` = ?";
+				$update_session_db = $this->db->run($update_session_sql, array($generated_session, $expires_date->format('Y-m-d H:i:s'), date("Y-m-d"), $session_check['id'], $session_check['user_id']));
 
 				$check_update = $update_session_db->rowcount();
 
@@ -389,8 +404,11 @@ class user
 					{
 						$message = 'We did *not* find that new session ID inserted.';
 					}
+					
+					// get a list of all sessions for this user to look over
+					$see_all = $this->db->run("SELECT * FROM `saved_sessions` WHERE `user_id` = ?", array($session_check['user_id']))->fetch_all();
 
-					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . "\n" . "Current user session data: \n" . print_r($session_check, true) . "\nUser cookie data: " . $_COOKIE['gol_session'] . "\n Database info: " . print_r($update_session_db, true) . "\n" . $message);
+					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . "\n" . "Current user session data: \n" . print_r($session_check, true) . "\nUser cookie data: " . $_COOKIE['gol_session'] . "\n Database info: " . print_r($update_session_db, true) . "\n" . $message . "\n" . "Here's their current session info from the DB" . "\n" . print_r($see_all, true));
 				}
 
 				$this->register_session($generated_session, $session_check['device-id']);

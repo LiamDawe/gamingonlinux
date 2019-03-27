@@ -42,6 +42,10 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^mailinglist/?$ /index.php?module=mailing_list [N]
 
   RewriteRule ^articles/?$ /index.php?module=home [N]
+  
+  RewriteRule ^all-articles/?$ /index.php?module=home&displayall [N]
+  
+  RewriteRule ^all-articles/page\=([0-9]+)?$ /index.php?module=home&page=$1&displayall [N]
 
   RewriteRule ^admin/?$ /index.php?module=home [N]
 

@@ -56,16 +56,20 @@ if (!isset($_GET['view']))
 		// sort out the pagination link
 		$pagination = $core->pagination_link($per_page, $total, '/home/', $page);
 
-		// latest news
-		$query = "SELECT a.`article_id`, a.`author_id`, a.`guest_username`, a.`title`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`tagline_image`, a.`show_in_menu`, a.`slug`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`active` = 1 ORDER BY a.`date` DESC LIMIT ?, ?";
-		$querykey = "KEY" . md5($query . serialize(array($core->start, $per_page)));
-		$articles_get = unserialize(core::$redis->get($querykey)); // check cache
-		
-		if (!$articles_get) // there's no cache
+		if (!isset($_GET['displayall']))
 		{
-			$articles_get = $dbl->run($query, array($core->start, $per_page))->fetch_all();
-			core::$redis->set($querykey, serialize($articles_get), 30); // cache for 30 seconds
+			$in  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
 		}
+		else
+		{
+			$in = '?';
+			$user->blocked_tags = [0 => 0];
+		}
+
+		// latest news
+		$query = "SELECT a.`article_id`, a.`author_id`, a.`guest_username`, a.`title`, a.`tagline`, a.`text`, a.`date`, a.`comment_count`, a.`tagline_image`, a.`show_in_menu`, a.`slug`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`active` = 1 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $in )) ORDER BY a.`date` DESC LIMIT ?, ?";
+
+		$articles_get = $dbl->run($query, array_merge($user->blocked_tags, [$core->start], [$per_page]))->fetch_all();
 
 		$article_id_array = array();
 

@@ -1641,6 +1641,30 @@ jQuery(document).ready(function()
   minimumInputLength: 2
   });
 
+  $("#bar-tag-select").select2({
+	selectOnClose: true,
+	width: '100%',
+	ajax: {
+    url: "/includes/ajax/categories_ajax.php",
+    dataType: 'json',
+    delay: 250,
+    data: function (params) {
+      return {
+        q: params.term // search term
+      };
+    },
+    processResults: function (data) {
+      return {
+        results: $.map(data, function(obj) {
+          return { id: obj.id, text: obj.text };
+        })
+      };
+    },
+    cache: true,
+  },
+  minimumInputLength: 2
+  });
+
 	/* SALES PAGE */
 
 	// pagination ajax

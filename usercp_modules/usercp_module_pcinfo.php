@@ -40,7 +40,7 @@ $resolution_options = array(
 	"5760x1080", "7680x4320", "Not Listed");
 
 $gaming_machine_types = array('Desktop', 'Laptop', 'Sofa/Console PC');
-$gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Other");
+$gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Switch Pro", "Other");
 
 if (!isset($_POST['act']))
 {

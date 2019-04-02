@@ -23,9 +23,9 @@ class user
 		$this->db = $dbl;
 		$this->core = $core;
 		$this->grab_user_groups();
+		$this->check_session();
 		$this->block_list();
 		$this->blocked_homepage_tags();
-		$this->check_session();
 	}
 
 	// check their session is valid and register guest session if needed

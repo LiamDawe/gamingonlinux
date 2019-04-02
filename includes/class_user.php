@@ -170,7 +170,7 @@ class user
 		}
 	}
 
-	public function register_session($session_id, $device_id)
+	public function register_session()
 	{
 		if (session_status() == PHP_SESSION_NONE) // not a bastard clue why it's not started sometimes for a few people
 		{
@@ -187,8 +187,6 @@ class user
 		$_SESSION['email_options'] = $this->user_details['email_options'];
 		$_SESSION['auto_subscribe'] = $this->user_details['auto_subscribe'];
 		$_SESSION['auto_subscribe_email'] = $this->user_details['auto_subscribe_email'];
-		$_SESSION['session_id'] = $session_id;
-		$_SESSION['device_id'] = $device_id;
 	}
 
 	function block_list()
@@ -342,7 +340,7 @@ class user
 
 		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d"), $expires_date->format('Y-m-d H:i:s')));
 
-		$this->register_session($generated_session, $device_id);
+		$this->register_session();
 	}
 
 	// if they have a stay logged in cookie log them in
@@ -411,7 +409,7 @@ class user
 					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . "\n" . "Current user session data: \n" . print_r($session_check, true) . "\nUser cookie data: " . $_COOKIE['gol_session'] . "\n Database info: " . print_r($update_session_db, true) . "\n" . $message . "\n" . "Here's their current session info from the DB" . "\n" . print_r($see_all, true));
 				}
 
-				$this->register_session($generated_session, $session_check['device-id']);
+				$this->register_session();
 
 				return true;
 			}

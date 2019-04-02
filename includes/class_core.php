@@ -32,8 +32,6 @@ class core
 	
 	public static $top_bar_links = [];
 
-	public static $mem;
-
 	public static $redis;
 
 	function __construct($dbl)
@@ -838,38 +836,6 @@ class core
 						$this->dbl->run("INSERT INTO `livestream_presenters` SET `livestream_id` = ?, `user_id` = ?", array($livestream_id, $streamer_id));
 					}
 				}				
-			}
-		}
-	}
-
-	function check_old_pc_info($user_id)
-	{
-		global $templating;
-
-		if (isset($user_id) && $user_id != 0)
-		{
-			$checker = $this->dbl->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($user_id))->fetch();
-
-			if ($checker['date_updated'] != NULL)
-			{
-				$minus_4months = strtotime('-4 months');
-
-				if (strtotime($checker['date_updated']) < $minus_4months)
-				{
-					if (!isset($_COOKIE['gol_announce_pc_info']))
-					{
-						$templating->load('announcements');
-						$templating->block('announcement_top', 'announcements');
-						$templating->block('announcement', 'announcements');
-						$templating->set('text', 'You haven\'t updated your PC information in over 4 months! <a href="/usercp.php?module=pcinfo">Click here to go and check</a>. You can simply update if nothing has changed to be included in our statistics!');
-						
-						$dismiss = '<span class="fright"><a href="#" class="remove_announce" title="Hide Announcement" data-announce-id="pc_info">&#10799;</a></span>';
-						$templating->set('dismiss', $dismiss);
-
-											
-						$templating->block('announcement_bottom', 'announcements');
-					}
-				}
 			}
 		}
 	}

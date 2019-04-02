@@ -19,6 +19,8 @@ $filecache = new file_cache($core);
 
 $user = new user($dbl, $core);
 
+$announcements_class = new announcements($dbl, $user);
+
 $bbcode = new bbcode($dbl, $core, $user);
 
 $article_class = new article($dbl, $core, $user, $templating, $bbcode);

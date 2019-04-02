@@ -112,12 +112,6 @@ class user
 						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain, $secure);
 					}
 
-					if ($stay != 1 && $this->user_details['user_id'] == 1)
-					{
-						// DEBUG FOR RANDOM LOGOUTS, PERHAPS SOMETIMES THE BOX ISNT TICKED PROPERLY?
-						error_log('You didnt set it to stay logged in!');
-					}
-
 					return true;
 				}
 

@@ -245,10 +245,12 @@ class bbcode
 		$body = preg_replace_callback("/\[code\](.+?)\[\/code\]/is",
 			function($matches) use(&$codeBlocks)
 			{
+				$matches[1] = str_replace(' ', '&nbsp;', $matches[1]); // preserve whitespace no matter what
 				$codeBlocks[] = str_replace(array('[', ']'), array('&#91;', '&#93;'), "<code class='bbcodeblock'>" . $matches[1] . '</code>');
 				end($codeBlocks); //Move array pointer to the end
 				$k = key($codeBlocks); //Get the last inserted number
 				reset($codeBlocks); //Reset the array pointer to the start
+
 				return "!!@codeblock".$k."!!";
 			},
 			$body);

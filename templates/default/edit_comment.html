@@ -23,3 +23,9 @@
 </div>
 </form>
 [/block: edit_comment_buttons]
+
+[block: edit_ajax_buttons]
+<button type="submit" id="save_comment_edit" name="act" value="editcomment" data-comment-id="{:comment_id}">Save Edit</button>
+<button id="preview_text_button" type="button">Preview Comment</button>
+<button type="submit" id="cancel_comment_edit" data-comment-id="{:comment_id}">Cancel</button>
+[/block: edit_ajax_buttons]

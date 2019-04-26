@@ -26,7 +26,7 @@ else
 	$templating->load('private_messages');
 
 	// if nothing list messages
-	if (!isset($_GET['view']) && !isset($_POST['act']))
+	if (!isset($_GET['view']) && !isset($_POST['act']) && !isset($_GET['act']))
 	{
 		$templating->block('top');
 
@@ -230,6 +230,7 @@ else
 			$templating->block('view_row', 'private_messages');
 			$templating->set('title', $start['title']);
 			$templating->set('post_id', $start['message_id']);
+			$templating->set('pm_id', $start['conversation_id']);
 			$templating->set('message_date', $core->human_date($start['creation_date']));
 			$templating->set('tzdate', date('c',$start['creation_date']) ); //piratelv timeago
 			$templating->set('plain_username',$start['username']);
@@ -802,17 +803,36 @@ else
 		}
 	}
 
-	if (isset($_POST['act']) && $_POST['act'] == 'Delete')
+	if (isset($_POST['act']) && $_POST['act'] == 'Delete' || isset($_GET['act']) && $_GET['act'] == 'Delete')
 	{
+		$conversation_id = NULL;
+		if (isset($_GET['act']) && $_GET['act'] == 'Delete')
+		{
+			$conversation_id = $_GET['conversation_id'];
+		}
+		else if (isset($_POST['act']) && $_POST['act'] == 'Delete')
+		{
+			$conversation_id = $_POST['conversation_id'];
+		}
+
+		if ($conversation_id == NULL)
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'private message';
+			
+			header("Location: /private-messages/");
+			die();
+		}
+
 		// check the id exists
-		$check_res = $dbl->run("SELECT `conversation_id` FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']))->fetch();
+		$check_res = $dbl->run("SELECT `conversation_id` FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($conversation_id, $_SESSION['user_id']))->fetch();
 		if ($check_res)
 		{
 			// check they are okay with deleting it
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
 			{
 				$templating->set_previous('title', 'Deleting PM', 1);
-				$core->yes_no('Are you sure you want to delete that Personal Messaging thread?', "index.php?module=messages", 'Delete', $_POST['conversation_id'], 'conversation_id');
+				$core->yes_no('Are you sure you want to delete that Personal Messaging thread?', "index.php?module=messages", 'Delete', $conversation_id, 'conversation_id');
 			}
 
 			else if (isset($_POST['no']))
@@ -822,20 +842,21 @@ else
 
 			else if (isset($_POST['yes']))
 			{
-				$dbl->run("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
-				$dbl->run("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($_POST['conversation_id'], $_SESSION['user_id']));
+				$dbl->run("DELETE FROM `user_conversations_info` WHERE `conversation_id` = ? AND `owner_id` = ?", array($conversation_id, $_SESSION['user_id']));
+				$dbl->run("DELETE FROM `user_conversations_participants` WHERE `conversation_id` = ? AND `participant_id` = ?", array($conversation_id, $_SESSION['user_id']));
 
 				// check if there's no one left in the conversation, remove it entirely
-				$people_left = $dbl->run("SELECT COUNT(*) FROM `user_conversations_participants` WHERE `conversation_id` = ?", array($_POST['conversation_id']))->fetchOne();
+				$people_left = $dbl->run("SELECT COUNT(*) FROM `user_conversations_participants` WHERE `conversation_id` = ?", array($conversation_id))->fetchOne();
 				if ($people_left == 0)
 				{
-					$dbl->run("DELETE FROM `user_conversations_messages` WHERE `conversation_id` = ?", array($_POST['conversation_id']));
+					$dbl->run("DELETE FROM `user_conversations_messages` WHERE `conversation_id` = ?", array($conversation_id));
 				}
 				
 				$_SESSION['message'] = 'deleted';
 				$_SESSION['message_extra'] = 'private message';
 				
 				header("Location: /private-messages/");
+				die();
 			}
 		}
 

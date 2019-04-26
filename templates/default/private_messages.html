@@ -7,7 +7,7 @@
 
 [block: search]
 <div class="box">
-	<div class="body group"><form method="get" action="/index.php?module=messages"><input type="hidden" name="module" value="messages" /> <span class="col-8"><input type="text" name="search_title" placeholder="Search by message title..." value="{:search_term}" /><br /> </span><span class="col-4"><button type="submit" name="view" value="search_title" style="display: inline; float: right;">Search</button></span></form></div>
+	<div class="body group"><form method="get" action="/index.php?module=messages"><input type="hidden" name="module" value="messages" /> <span class="col-8"><input type="text" name="search_title" placeholder="Search by message title..." value="{:search_term}" /><br /> </span><span class="col-4"><button type="submit" name="view" value="search_title" style="float: right;">Search</button></span></form></div>
 </div>
 [/block: search]
 
@@ -74,6 +74,7 @@
 								<div class="comment-actions">
 									<ul>
 										<li><a class="tooltip-top quote_function" title="Quote" data-id="{:post_id}" data-type="pm"><span class="icon quote">Quote</span></a></li>
+										<li><a class="tooltip-top" title="Delete" href="/index.php?module=messages&amp;act=Delete&amp;conversation_id={:pm_id}"><span class="icon delete"></span></a></li>
 									</ul>
 								</div>
 							</div>

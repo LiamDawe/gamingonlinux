@@ -324,8 +324,6 @@ class bbcode
 			$body = preg_replace($find, $replace, $body);
 		}
 
-		$body = nl2br($body);
-
 		// stop adding breaks to lists
 		$body = str_replace('<ul><br />', '<ul>', $body);
 		$body = str_replace('</ul><br />', '</ul>', $body);
@@ -336,6 +334,8 @@ class bbcode
 		{
 			$body = str_replace("!!@codeblock".$key."!!", $codeblock, $body);
 		}
+
+		$body = nl2br($body);
 
 		return $body;
 	}

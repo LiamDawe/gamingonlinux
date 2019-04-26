@@ -71,8 +71,8 @@ body.dark {
 	white-space: pre;
 	overflow: auto;
 	vertical-align: middle;
-	line-height: 1em;
-	padding: 5px;
+	line-height: 0.6em;
+	padding: 6px;
 	font-family: monospace;
 	box-sizing: border-box;
 }

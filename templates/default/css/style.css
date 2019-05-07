@@ -621,6 +621,7 @@ select.pagination {
 }
 .featured-title-text {padding: 5px; font-weight: bold;}
 .featured-title a {color: #fff; display: block;}
+.rss-home {padding-left:5px;}
 
 /* Individual Article Page */
 .article.individual .info {
@@ -1551,7 +1552,6 @@ th, td { vertical-align: top; }
 .link_button {
     background: #474747;
     color: #ffffff;
-    font-size: 80%;
     padding: 3px;
     -webkit-border-radius: 3px;
      -khtml-border-radius: 3px;

@@ -80,7 +80,7 @@
 /* Lists */
 	ul, ol {list-style: outside none square; padding: 0 0 5px 21px;}
 	ol {list-style: decimal; padding: 0 0 21px 29px;}
-	li, dd {margin: 0px; padding: 0 0 7px 0;}
+	li, dd {margin: 0px; padding: 0 0 0 0;}
 	dt {font-weight: bold;margin: 0 0 7px 0px;}
 	dl {list-style: disc; padding: 0 0 0 0;}
 	dd {margin: 0 0 7px 21px;}

@@ -26,6 +26,7 @@ class mailer
 		$body = $body . '<div>
 		<hr>
 		<p><em>If you think you shouldn\'t be getting this email, please forward this email to '. $this->core->config('contact_email') .' so that we can take action.</em></p>
+		<p>You can find us on: <a href="https://twitter.com/gamingonlinux">Twitter</a>, <a href="https://mastodon.social/@gamingonlinux">Mastodon</a>, <a href="https://t.me/linuxgaming">Telegram</a>, <a href="https://discord.gg/0rxBtcSOonvGzXr4">Discord</a> and <a href="https://www.gamingonlinux.com/irc/">IRC</a>.</p>
 		</div>';
 
         $this->mail->addAddress($to);

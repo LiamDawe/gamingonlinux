@@ -16,15 +16,14 @@ $api_endpoint = "https://www.humblebundle.com/store/api/";
 $json = core::file_get_contents_curl($api_endpoint."search?sort=discount&filter=onsale&request=2&page_size=20&page=0&platform[]=linux");
 if ($json == false)
 {
-	$to = 'liamdawe@gmail.com';
 	$subject = 'GOL ERROR - Cannot reach Humble sales importer';
 
-	// To send HTML mail, the Content-type header must be set
-	$headers  = 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-	$headers .= "From: GOL Contact Us <noreply@gamingonlinux.com>\r\n";
+	$html_message = "Could not reach the importer!";
+	$plain_message = "Could not reach the importer!";
 
-	mail($to, $subject, "Could not reach the importer!", $headers);
+	$mail = new mailer($core);
+	$mail->sendMail('liamdawe@gmail.com', $subject, $html_message, $plain_message);
+
 	error_log("Couldn't reach the Humble sales json");
 	die('Humble JSON not available!');
 }

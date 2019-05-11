@@ -4,7 +4,7 @@ if(!defined('golapp'))
 	die('Direct access not permitted');
 }
 
-$grab_author = $dbl->run("SELECT `article_id`, `author_id`, `tagline_image` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
+$grab_author = $dbl->run("SELECT `article_id`, `author_id`, `tagline_image`, `text` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 if ($grab_author['author_id'] == $_SESSION['user_id'])
 {
 	$title = strip_tags($_POST['title']);
@@ -23,7 +23,10 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $text);
 	}
 
-	$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+	if ($grab_author['text'] != $text) // only update history if text is actually different
+	{
+		$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+	}
 
 	unset($_SESSION['atitle']);
 	unset($_SESSION['atagline']);

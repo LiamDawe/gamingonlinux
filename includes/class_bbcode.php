@@ -192,7 +192,7 @@ class bbcode
 		$text = preg_replace_callback("~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i",
 		function($matches)
 		{
-			return "<a href=\"".$matches[1]."\" target=\"_blank\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a href=\"".$matches[1]."\" target=\"_blank\" rel=\"noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
 		$text);
 
@@ -200,7 +200,7 @@ class bbcode
 		$text = preg_replace_callback("/\[img\](.+?)\[\/img\]/is",
 		function($matches)
 		{
-			return "<a data-fancybox=\"images\" rel=\"group\" href=\"".$matches[1]."\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a data-fancybox=\"images\" rel=\"group\" href=\"".$matches[1]."\" rel=\"noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
 		$text);		
 		
@@ -224,8 +224,8 @@ class bbcode
 		);
 
 		$replace = array(
-		"<a href=\"$1\" target=\"_blank\">$3</a>",
-		"<a href=\"$1\" target=\"_blank\">$1</a>"
+		"<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">$3</a>",
+		"<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">$1</a>"
 		);
 
 		$text = preg_replace($find, $replace, $text);
@@ -526,7 +526,7 @@ class bbcode
 		'/\[users-only\](.+?)\[\/users-only\]/is'
 			=> ' Visit <a href="https://www.gamingonlinux.com">GamingOnLinux.com</a> to see this bit, this is for logged in users only ',
 		"/\<div class=\"youtube-embed-wrapper\"(?:\s)?(?:data-video-url=\"https:\/\/www.youtube-nocookie.com\/embed\/(?:.+?)?(?:\?rel=0)?\")?(?:\s)?style=\"(?:.+?)\"\>(?:.*)\<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"360\" src=\"https:\/\/www.youtube-nocookie.com\/embed\/(.+?)(?:\?rel=0)?\" style=\"(?:.+?)\" width=\"640\"\>\<\/iframe\>\<\/div\>/is"
-			=> "<a href=\"https://www.youtube.com/watch?v=$1\"><img src=\"https://img.youtube.com/vi/$1/0.jpg\" alt=\"youtube video thumbnail\"><br />Watch video on YouTube.com</a>",
+			=> "<a href=\"https://www.youtube.com/watch?v=$1\" rel=\"noopener noreferrer\"><img src=\"https://img.youtube.com/vi/$1/0.jpg\" alt=\"youtube video thumbnail\"><br />Watch video on YouTube.com</a>",
 		];
 		
 		foreach ($find_replace as $find => $replace)

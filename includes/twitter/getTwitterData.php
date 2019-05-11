@@ -27,7 +27,7 @@ if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUES
 	// Let's request the access token
 	$access_token = $connection->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
 
-	print_r($access_token);
+	$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $access_token['oauth_token'], $access_token['oauth_token_secret']); 
 
 	// Save it in a session var
 	$_SESSION['access_token'] = $access_token;
@@ -42,8 +42,6 @@ if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUES
 
 	else
 	{
-		print_r($user_info);
-		die();
 		$uid = $user_info->id;
 		$username = $user_info->screen_name;
 		$twitter_user = new twitter_user();
@@ -80,6 +78,7 @@ if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUES
 			}
 
 			header("Location: " . $core->config('website_url'));
+			die();
 		}
 
 		// registering a new account with a twitter handle, send them to register with the twitter data
@@ -93,14 +92,13 @@ if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUES
 			$_SESSION['twitter_data'] = $userdata;
 
 			header("Location: /index.php?module=register&twitter_new");
+			die();
 		}
 	}
 }
 
 else
 {
-    // Something's missing, go back to square 1
-    print_r($_SESSION);
-    die('error2');
+    die('Sorry but your authorization details did not match.');
 }
 ?>

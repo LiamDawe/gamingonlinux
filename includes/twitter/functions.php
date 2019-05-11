@@ -14,13 +14,13 @@ class twitter_user
 		if ($_SESSION['user_id'] == 0)
 		{
 			$result = $dbl->run("SELECT ".user::$user_sql_fields." FROM `users` WHERE oauth_uid = ? and oauth_provider = ? AND `twitter_username` = ?", array($uid, $oauth_provider, $username))->fetch();
-			if (!empty($result))
+			if (!empty($result)) // logging in via twitter
 			{
 				$this->new = 1;
 				return $result;
 			}
 
-			else
+			else // registering a new account with a twitter handle, send them to register with the twitter data
 			{
 				$this->new = 2;
 

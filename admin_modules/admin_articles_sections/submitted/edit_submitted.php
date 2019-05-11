@@ -24,8 +24,10 @@ if ($checked = $article_class->check_article_inputs($return_page))
 		$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 	}
 
-	// update history
-	$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+	if ($_SESSION['original_text'] != $checked['text']) // only update history if text is actually different
+	{
+		$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+	}
 
 	// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 	$article_class->reset_sessions();

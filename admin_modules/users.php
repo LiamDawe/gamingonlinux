@@ -158,6 +158,13 @@ else
 					}
 					$templating->set('supporter_types_list', $supporter_types_list);
 
+					$end_date = 'None set.';
+					if (!empty($user_info['supporter_end_date']))
+					{
+						$end_date = $user_info['supporter_end_date'];
+					}
+					$templating->set('end_date', $end_date);
+
 					$grab_notes = $dbl->run("SELECT `notes` FROM `admin_user_notes` WHERE `user_id` = ?", array($_GET['user_id']))->fetchOne();
 
 					$templating->set('admin_notes', $grab_notes);

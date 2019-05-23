@@ -78,7 +78,8 @@
 			<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen">{:groups_list}</select><br />
 			Supporter Type:
 			<select name="supporter_type"><option value=""></option>{:supporter_types_list}</select><br />
-			<em>These notes are never shown to a user, if you feel the need to note something down other editors to know enter it here</em><br />
+			Supporter Status End Date: {:end_date}<br />
+			<em>These notes are never shown to a user. If you need to note something down for other editors to know, enter it here:</em><br />
 			<textarea name="notes" rows="20">{:admin_notes}</textarea>
 			<button type="submit" name="act" value="edituser_admin" class="btn btn-primary">Edit</button>
 		</form>

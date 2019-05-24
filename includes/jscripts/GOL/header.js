@@ -277,7 +277,7 @@ jQuery(document).ready(function()
 		event.preventDefault();
 		var announce_id = $(this).attr("data-announce-id");
 		var days = $(this).attr('data-days');
-		var expiry_days = 30;
+		var expiry_days = 60;
 
 		if (typeof days !== typeof undefined && days !== false) 
 		{
@@ -2060,7 +2060,7 @@ jQuery(document).ready(function()
 	$(document).on('click','#deny_cookies',function(e)
 	{
 		e.preventDefault();
-		Cookies.set('cookie_consent', 'nope', { expires: 30 });
+		Cookies.set('cookie_consent', 'nope', { expires: 60 });
 		$('#cookie_warning').fadeOut(500);
 	});
 
@@ -2068,7 +2068,7 @@ jQuery(document).ready(function()
 	$(document).on('click','#allow_cookies',function(e)
 	{
 		e.preventDefault();
-		Cookies.set('cookie_consent', 'yup', { expires: 30 });
+		Cookies.set('cookie_consent', 'yup', { expires: 60 });
 		$('#cookie_warning').fadeOut(500);
 		// replace any hidden videos
 		$(".hidden_video").each(function( index ) 
@@ -2084,6 +2084,7 @@ jQuery(document).ready(function()
 		e.preventDefault();
 		var video_id = $(this).attr("data-video-id");
 		$(this).closest('.hidden_video').replaceWith('<div class="youtube-embed-wrapper" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden"><iframe allowfullscreen="" frameborder="0" height="360" src="https://www.youtube-nocookie.com/embed/'+video_id+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%" width="640"></iframe></div>');
+		Cookies.set('gol_youtube_consent', 'yup', { expires: 60 });
 	});
 
 	/* cookie preferences page */
@@ -2091,14 +2092,14 @@ jQuery(document).ready(function()
 	{
 		if (this.checked) 
 		{
-			Cookies.set('gol_youtube_consent', 'yup', { expires: 30 });
+			Cookies.set('gol_youtube_consent', 'yup', { expires: 60 });
 			$(".youtube_status_text").text('On');
 		}
 		else
 		{
 			$("#youtube-cookie-slider").prop('checked', false);
 			$(".youtube_status_text").text('Off');
-			Cookies.set('gol_youtube_consent', 'nope', { expires: 30 });			
+			Cookies.set('gol_youtube_consent', 'nope', { expires: 60 });			
 		}
 	});
 

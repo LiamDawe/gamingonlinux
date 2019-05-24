@@ -16,7 +16,7 @@ class user
 	public $blocked_users = [];
 	public $blocked_tags = [0 => 0];
 
-	public $cookie_length = 60*60*24*30; // 30 days
+	public $cookie_length = 60*60*24*60; // 30 days
 
 	function __construct($dbl, $core)
 	{

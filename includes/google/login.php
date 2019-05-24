@@ -15,7 +15,7 @@ $client_id = $core->config('google_login_public');
 $client_secret = $core->config('google_login_secret');
 $redirect_uri = $core->config('website_url') . 'includes/google/login.php';
 
-$cookie_length = 60*60*24*30; // 30 days
+$cookie_length = 60*60*24*60; // 30 days
 
 /************************************************
   Make an API request on behalf of a user. In

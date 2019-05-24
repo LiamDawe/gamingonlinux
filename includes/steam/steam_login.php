@@ -13,7 +13,7 @@ class steam_user
 	private $core;
 	protected $dbl;
 
-	public $cookie_length = 60*60*24*30; // 30 days
+	public $cookie_length = 60*60*24*60; // 30 days
 
 	function __construct($dbl, $user, $core)
 	{

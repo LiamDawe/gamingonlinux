@@ -17,7 +17,7 @@ $request_token = [];
 $request_token['oauth_token'] = $_SESSION['oauth_token'];
 $request_token['oauth_token_secret'] = $_SESSION['oauth_token_secret'];
 
-$cookie_length = 60*60*24*30; // 30 days
+$cookie_length = 60*60*24*60; // 30 days
 
 if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUEST['oauth_token'])
 {

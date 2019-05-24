@@ -538,10 +538,21 @@ else if (isset($_POST['act']))
 			if (!isset($_POST['show_block']))
 			{
 				header("Location: /articles/{$checked['slug']}.{$_POST['article_id']}/");
+				die();
 			}
 			else
 			{
-				header("Location: " . $core->config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
+				$check = $dbl->run("SELECT 1 FROM `editor_picks` WHERE `article_id` = ?", array($_POST['article_id']))->fetchOne();
+				if (!$check)
+				{
+					header("Location: " . $core->config('website_url') . "admin.php?module=featured&view=add&article_id={$_POST['article_id']}");
+					die();
+				}
+				else
+				{
+					header("Location: /articles/{$checked['slug']}.{$_POST['article_id']}/");
+					die();
+				}
 			}
 		}
 	}

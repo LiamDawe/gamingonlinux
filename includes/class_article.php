@@ -839,33 +839,21 @@ class article
 			if ($_POST['author_id'] != $_SESSION['user_id'])
 			{
 				// find the authors email
-				$author_email = $this->dbl->run("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
+				$author_email = $this->dbl->run("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetchOne();
 
 				// subject
-				$subject = 'Your article was reviewed and published on GamingOnLinux.com!';
+				$subject = 'Your article "'.$checked['title'].'" was reviewed and published on GamingOnLinux.com!';
 
 				// message
-				$message = "
-				<html>
-				<head>
-				<title>Your article was reviewed and approved GamingOnLinux.com!</title>
-				</head>
-				<body>
-				<img src=\"http://www.gamingonlinux.com/templates/default/images/logo.png\" alt=\"Gaming On Linux\">
-				<br />
-				<p><strong>{$_SESSION['username']}</strong> has reviewed and published your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"https://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>.</p>
-				</body>
-				</html>";
+				$html_message = "<p><strong>{$_SESSION['username']}</strong> has reviewed and published your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"https://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>.</p>";
 
-				// To send HTML mail, the Content-type header must be set
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+				$plain_message = "{$_SESSION['username']} has reviewed and published your article \"{$checked['title']}\", here's the live link: http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/";
 
 				// Mail it
 				if ($this->core->config('send_emails') == 1)
 				{
-					mail($author_email['email'], $subject, $message, $headers);
+					$mail = new mailer($core);
+					$mail->sendMail($author_email, $subject, $html_message, $plain_message);
 				}
 			}
 		}
@@ -885,29 +873,17 @@ class article
 			}
 
 			// subject
-			$subject = 'Your article was approved on GamingOnLinux.com!';
+			$subject = 'Your article "'.$checked['title'].'" was approved on GamingOnLinux.com!';
 
 			// message
-			$message = "
-			<html>
-			<head>
-			<title>Your article was approved GamingOnLinux.com!</title>
-			</head>
-			<body>
-			<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-			<br />
-			<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>
-			</body>
-			</html>";
+			$html_message = "<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>";
 
-			// To send HTML mail, the Content-type header must be set
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+			$plain_message = "We have accepted your article \"{$checked['title']}\" on GamingOnLinux.com, here's the live link: http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}";
 
 			if ($this->core->config('send_emails') == 1)
 			{
-				mail($email, $subject, $message, $headers);
+				$mail = new mailer($core);
+				$mail->sendMail($email, $subject, $html_message, $plain_message);
 			}
 		}
 

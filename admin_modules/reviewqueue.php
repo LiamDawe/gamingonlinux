@@ -344,32 +344,20 @@ if (isset($_POST['act']))
 				$author_email = $dbl->run("SELECT `email` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
 
 				// subject
-				$subject = 'Your article was reviewed and edited on GamingOnLinux';
+				$subject = 'Your article "' . $checked['title'] . '" was reviewed and edited on GamingOnLinux';
 
 				$nice_title = core::nice_title($_POST['title']);
 
 				// message
-				$message = "
-				<html>
-				<head>
-				<title>$subject</title>
-				</head>
-				<body>
-				<img src=\"http://www.gamingonlinux.com/templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-				<br />
-				<p>{$_SESSION['username']} has reviewed and edited your article on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>, here's a link to the article: <a href=\"http://www.gamingonlinux.com/admin.php?module=reviewqueue&aid={$_POST['article_id']}/\">{$_POST['title']}</a></p>
-				</body>
-				</html>";
+				$html_message = "<p>{$_SESSION['username']} has reviewed and edited your article \"{$checked['title']}\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>, here's a link to the article: <a href=\"http://www.gamingonlinux.com/admin.php?module=reviewqueue&aid={$_POST['article_id']}/\">{$_POST['title']}</a></p>";
 
-				// To send HTML mail, the Content-type header must be set
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From: GamingOnLinux.com Editor Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
+				$plain_message = "{$_SESSION['username']} has reviewed and edited your article \"{$checked['title']}\" on GamingOnLinux.com. Here's the link to view it: http://www.gamingonlinux.com/admin.php?module=reviewqueue&aid={$_POST['article_id']}";
 
 				// Mail it
 				if ($core->config('send_emails') == 1)
 				{
-					mail($author_email['email'], $subject, $message, $headers);
+					$mail = new mailer($core);
+					$mail->sendMail($email_user['email'], $subject, $html_message, $plain_message);
 				}
 			}
 

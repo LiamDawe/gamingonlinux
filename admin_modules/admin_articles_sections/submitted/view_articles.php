@@ -453,70 +453,33 @@ if (isset($_POST['act']))
 				// send the emails
 				foreach ($users_array as $email_user)
 				{
-					$to = $email_user['email'];
-
 					// set the title to upper case
 					$title_upper = $title['title'];
 
 					// subject
-					$subject = "New reply to article {$title_upper} on GamingOnLinux.com";
+					$subject = "New reply to the submitted article {$title_upper} on GamingOnLinux.com";
 
 					$username = $_SESSION['username'];
-				}
 
-				$comment_email = $bbcode->email_bbcode($comment);
+					$comment_email = $bbcode->email_bbcode($comment);
 
-				$message = '';
+					// message
+					$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
+					<p><strong>{$username}</strong> has replied to an article you follow in the submitted queue titled \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=articles&view=Submitted&aid=".$article_id."#comments\">{$title_upper}</a></strong>\".</p>
+					<div>
+					<hr>
+					{$comment_email}
+					<hr>
+					<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
 
-				// message
-				$html_message = "
-				<html>
-				<head>
-				<title>New reply to an article you follow on GamingOnLinux.com</title>
-				<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-				</head>
-				<body>
-				<img src=\"" . $core->config('website_url') . "templates/default/images/icon.png\" alt=\"Gaming On Linux\">
-				<br />
-				<p>Hello <strong>{$email_user['username']}</strong>,</p>
-				<p><strong>{$username}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "articles/$title_nice.$article_id#comments\">{$title_upper}</a></strong>\".</p>
-				<div>
-				<hr>
-				{$comment_email}
-				<hr>
-				You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.
-				<hr>
-				<p>If you haven&#39;t registered at <a href=\"" . $core->config('website_url') . "\" target=\"_blank\">" . $core->config('website_url') . "</a>, Forward this mail to <a href=\"mailto:liamdawe@gmail.com\" target=\"_blank\">liamdawe@gmail.com</a> with some info about what you want us to do about it or if you logged in and found no message let us know!</p>
-				<p>Please, Don&#39;t reply to this automated message, We do not read any mails recieved on this email address.</p>
-				</div>
-				</body>
-				</html>";
+					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article you follow in the submitted queue " . $core->config('website_url') . "admin.php?module=articles&view=Submitted&aid=".$article_id."#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
-				$plain_message = PHP_EOL."Hello {$email_user['username']}, {$username} replied to an article on " . $core->config('website_url') . "articles/$title_nice.$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
-
-				$boundary = uniqid('np');
-
-				// To send HTML mail, the Content-type header must be set
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= "Content-Type: multipart/alternative;charset=utf-8;boundary=" . $boundary . "\r\n";
-				$headers .= "From: GamingOnLinux.com Notification <noreply@gamingonlinux.com>\r\n" . "Reply-To: noreply@gamingonlinux.com\r\n";
-
-				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-				$message .= "Content-Type: text/plain;charset=utf-8".PHP_EOL;
-				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-				$message .= $plain_message;
-
-				$message .= "\r\n\r\n--" . $boundary.PHP_EOL;
-				$message .= "Content-Type: text/html;charset=utf-8".PHP_EOL;
-				$message .= "Content-Transfer-Encoding: 7bit".PHP_EOL;
-				$message .= "$html_message";
-
-				$message .= "\r\n\r\n--" . $boundary . "--";
-
-				// Mail it
-				if ($core->config('send_emails') == 1)
-				{
-					mail($to, $subject, $message, $headers);
+					// Mail it
+					if ($core->config('send_emails') == 1)
+					{
+						$mail = new mailer($core);
+						$mail->sendMail($email_user['email'], $subject, $html_message, $plain_message);
+					}
 				}
 			}
 

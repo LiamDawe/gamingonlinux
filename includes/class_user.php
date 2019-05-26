@@ -426,7 +426,10 @@ class user
 	function logout($banned = 0, $redirect = 1)
 	{
 		// remove this specific session from the DB
-		$this->db->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_SESSION['user_id'], $_SESSION['session_id']));
+		if (isset($_SESSION['user_id']) && isset($_SESSION['session_id']))
+		{
+			$this->db->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_SESSION['user_id'], $_SESSION['session_id']));
+		}
 
 		// remove all session information
 		$_SESSION = array();

@@ -708,6 +708,7 @@ class charts
 				$icon = '<img class="distro" src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
 			}
 
+			// work out the percentage difference for each item against the previous month
 			$percent = round(($all_labels['data'] / $this->chart_info['total_answers']) * 100, 2);
 			if (core::is_number($last_id))
 			{
@@ -716,10 +717,11 @@ class charts
 				{
 					if ($all_old['name'] == $all_labels['name'])
 					{
-						$percent_old = round(($all_old['data'] / $this->chart_info_old['total_answers']) * 100, 2);
-						$difference_percentage = round($percent - $percent_old, 2);
-
 						$difference_people = $all_labels['data'] - $all_old['data'];
+
+						$difference_number = $difference_people / $all_old['data'];
+
+						$difference_percentage = round($difference_number * 100,2);
 
 						if (strpos($difference_percentage, '-') === FALSE)
 						{

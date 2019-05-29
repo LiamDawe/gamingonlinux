@@ -23,9 +23,19 @@ if (!isset($_GET['manage']))
 	$current_res = $dbl->run("SELECT `id`, `giveaway_name` FROM `game_giveaways` ORDER BY `date_created` DESC")->fetch_all();
 	foreach ($current_res as $current)
 	{
+		$key_totals = $dbl->run("SELECT SUM(CASE WHEN claimed = 1 AND game_id = ? THEN 1 ELSE 0 END) AS claimed, SUM(CASE WHEN game_id = ? THEN 1 ELSE 0 END) AS total FROM game_giveaways_keys", array($current['id'], $current['id']))->fetch();
 		$templating->block('row', 'admin_modules/giveaways');
 		$templating->set('name', $current['giveaway_name']);
 		$templating->set('id', $current['id']);
+		$templating->set('claimed', $key_totals['claimed']);
+		$templating->set('total', $key_totals['total']);
+
+		$status = '';
+		if ($key_totals['claimed'] == $key_totals['total'])
+		{
+			$status = '<strong>All Gone!</strong>';
+		}
+		$templating->set('status', $status);
 	}
 }
 else if (isset($_GET['manage']))

@@ -2077,3 +2077,5 @@ input:checked + .slider:before
     border-width: 3px 3px 0 0;
 	border-color: #474747 transparent;
 }
+/* test for stolen content */
+.hidden_message {display: none;}

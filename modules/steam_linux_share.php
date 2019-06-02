@@ -13,20 +13,30 @@ $data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` > '2016-04-01'
 
 $colours = array(
 	'#a6cee3',
-	'#1f78b4',
 	'#b2df8a',
-	'#33a02c',
 	'#fb9a99',
 	'#e31a1c',
 	'#fdbf6f',
 	'#ff7f00',
 	'#cab2d6',
-	'#6a3d9a'
+	'#6a3d9a',
+	'#1f78b4',
+	'#33a02c'
 	);
 
+// for holding data on the overall language share across all platforms
+$lang_data = array(
+	'English' => array(),
+	'Simplified Chinese' => array(),
+	'Russian' => array()
+);
+
+$lang_data_linux = array(
+	'English' => array(),
+	'Simplified Chinese' => array()
+);
+
 $linux_perc = [];
-$english = [];
-$chinese = [];
 $linux_wo_chinese = [];
 $linux_eng_only = [];
 $dates = [];
@@ -35,8 +45,15 @@ foreach ($data as $point)
 	$dates[] = "'". date('M-Y', strtotime($point['date'])) . "'";
 
 	$linux_perc[] = $point['linux_share'];
-	$english[] = $point['english_share'];
-	$chinese[] = $point['chinese_share'];
+
+	// overall share
+	$lang_data['English'][] = $point['english_share'];
+	$lang_data['Simplified Chinese'][] = $point['chinese_share'];
+	$lang_data['Russian'][] = $point['russian_share'];
+
+	// linux only
+	$lang_data_linux['English'][] = $point['linux_english_share'];
+	$lang_data_linux['Simplified Chinese'][] = $point['linux_chinese_share'];
 
 	$linux_eng_only[] = round($point['linux_share'] * $point['linux_english_share'] / ($point['english_share']), 2);
 }
@@ -92,7 +109,7 @@ yAxes: [{
 $templating->set('linuxonly', $linuxonly);
 
 // daily active users
-
+/*
 $get_daily = $dbl->run("SELECT d.`date`, d.`total`, s.`linux_share` from `steam_daily_active` d INNER JOIN `steam_linux_share` s ON d.date = s.date ORDER BY d.`date` ASC")->fetch_all();
 
 $daily_dates = array();
@@ -152,26 +169,31 @@ yAxes: [{
 </script>";
 
 $templating->set('dailyactive', $dailyactive);
+*/
+// languages comparison - ALL platforms
 
-// languages comparison
+$languages_data = '';
+$counter = 0;
+$total_languages = count($lang_data);
+foreach ($lang_data as $key => $data)
+{
+	//print_r($data);
+	$languages_data .= "{
+		label: '".$key."',
+		fill: false,
+		data: [".implode(', ', $data)."],
+		backgroundColor: '".$colours[$counter]."',
+		borderColor: '".$colours[$counter]."',
+		borderWidth: 1
+	}";
 
-$languages_data = "
-{
-	label: 'English',
-	fill: false,
-	data: [".implode(', ', $english)."],
-	backgroundColor: '".$colours[3]."',
-	borderColor: '".$colours[3]."',
-	borderWidth: 1
-},
-{
-	label: 'Simplified Chinese',
-	fill: false,
-	data: [".implode(', ', $chinese)."],
-	backgroundColor: '".$colours[5]."',
-	borderColor: '".$colours[5]."',
-	borderWidth: 1
-}";
+	if ($counter != ($total_languages - 1))
+	{
+		$languages_data .= ',';
+	}
+
+	$counter++;
+}
 
 $languages = "<div class=\"chartjs-container\"><canvas id=\"languages\" width=\"400\" height=\"200\"></canvas></div><script>
 var languages = document.getElementById('languages');
@@ -211,6 +233,70 @@ yAxes: [{
 </script>";
 
 $templating->set('languages', $languages);
+
+// languages comparison - Linux ONLY
+
+$languages_linux_data = '';
+$counter_linux = 0;
+$total_languages_linux = count($lang_data_linux);
+foreach ($lang_data_linux as $key => $data)
+{
+	//print_r($data);
+	$languages_linux_data .= "{
+		label: '".$key."',
+		fill: false,
+		data: [".implode(', ', $data)."],
+		backgroundColor: '".$colours[$counter_linux]."',
+		borderColor: '".$colours[$counter_linux]."',
+		borderWidth: 1
+	}";
+
+	if ($counter_linux != ($total_languages_linux - 1))
+	{
+		$languages_linux_data .= ',';
+	}
+
+	$counter_linux++;
+}
+
+$languages_linux = "<div class=\"chartjs-container\"><canvas id=\"languages_linux\" width=\"400\" height=\"200\"></canvas></div><script>
+var languages_linux = document.getElementById('languages_linux');
+var Chartlanguages_linux = new Chart.Line(languages_linux, {
+type: 'line',
+data: {
+labels: [".implode(',', $dates)."],
+datasets: [$languages_linux_data]
+	},
+	options: {
+		legend: {
+			display: true
+		},responsive: true, maintainAspectRatio: false,
+scales: {
+yAxes: [{
+	ticks: {
+	beginAtZero:true
+	},
+				scaleLabel: {
+			display: true,
+			labelString: 'Percentage of Steam users'
+		}
+}]
+},
+		tooltips:
+		{
+			callbacks: {
+				label: function(tooltipItem, data) {
+	var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+					var label = data.datasets[tooltipItem.datasetIndex].label;
+	return label + ' ' + value + '%';
+		}
+		},
+		},
+}
+});
+</script>";
+
+$templating->set('languages_linux', $languages_linux);
 
 // all together now badumtish
 

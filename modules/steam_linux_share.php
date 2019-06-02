@@ -177,7 +177,6 @@ $counter = 0;
 $total_languages = count($lang_data);
 foreach ($lang_data as $key => $data)
 {
-	//print_r($data);
 	$languages_data .= "{
 		label: '".$key."',
 		fill: false,

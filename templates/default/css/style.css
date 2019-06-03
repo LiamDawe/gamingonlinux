@@ -1743,34 +1743,20 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 	background: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
 }
 /* FANCYBOXES */
-div.fancybox-content {
-	padding: 0px;
-}
-.fancybox-content .fancybox-close-small
-{
-	background: #efefef;
-	opacity: 1;
-}
 .who_likes_div {
 	width: 70%;
 	max-width: 800px;
 	max-height: 600px;
-	overflow: hidden;
-	background:none;
 }
 .post_link_div {
 	width: 70%;
 	max-width: 800px;
 	max-height: 600px;
-	overflow: hidden;
-	background:none;
 }
 .pc_info_div {
 	width: 70%;
 	max-width: 800px;
 	max-height: 600px;
-	overflow: hidden;
-	background:none;
 }
 .tagline_gallery_div{
 	width: 80%;

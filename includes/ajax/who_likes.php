@@ -55,6 +55,6 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']) || isset($_GET['topi
 		}
 
 		$templating->block('end');
-		echo '<div class="who_likes_div">' . $templating->output() . '</div>';
+		echo $templating->output();
 	}
 }

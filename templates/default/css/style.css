@@ -1383,6 +1383,62 @@ color: #fff !important;
 .database-extra ul li {padding: 0px;}
 .dark .database-extra{background-color: #515151;}
 
+/* FANCYBOXES */
+.pc_info_div {
+	width: 70%;
+	max-width: 800px;
+	max-height: 600px;
+}
+.tagline_gallery_div{
+	width: 80%;
+	height: 80%;
+}
+.tagline_gallery_div .fancybox-close-small
+{
+	top: 0;
+	right: 0;
+	position: fixed;
+}
+.modal-container {
+	width: 60%;
+	padding: 0;
+	margin: 20px 0;
+	border-radius: .3em;
+	box-shadow: 0 0.1em 0.4em rgba(0,0,0,.3);
+	background-color: #222;
+  }
+
+  .dark .modal-container .fancybox-close-small {background: #383838; border: none;}
+
+  .modal-container .fancybox-close-small
+  {
+	background-color: #efefef;
+	opacity: 1;
+	height: 38px;
+  }
+
+  .dark .modal-title{background: #383838;}
+  
+  .modal-title {
+	background-color: #222;
+	color: #fff;
+	font-weight: 700;
+	padding: 7px 10px;
+  }
+
+  .modal-title a {color: white;}
+
+  .dark .modal-body {background: #222;}
+  
+  .modal-body {
+	max-height: calc(100vh - 230px);
+	min-height: 50px;
+	max-width: 100%;
+	padding: 0 1.5em 1.5em 1.5em;
+	overflow-y: auto;
+	background-color: #efefef;
+  }
+
 /* Responsive CSS */
 @media only screen and (min-width: 700px) {
     .masonry {
@@ -1485,6 +1541,10 @@ color: #fff !important;
 	#navigation-mobile {display: block;}
 	.quick-nav-slider {display: inline;}
 	.quick-tags {display: none;}
+	.modal-container 
+	{
+		width: 90%;
+	}
 }
 /* SMALL TABLET */
 @media only screen and (max-width: 600px) {
@@ -1742,61 +1802,6 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 	background: #383838;
 	background: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
 }
-/* FANCYBOXES */
-.pc_info_div {
-	width: 70%;
-	max-width: 800px;
-	max-height: 600px;
-}
-.tagline_gallery_div{
-	width: 80%;
-	height: 80%;
-}
-.tagline_gallery_div .fancybox-close-small
-{
-	top: 0;
-	right: 0;
-	position: fixed;
-}
-.modal-container {
-	width: 85%;
-	padding: 0;
-	margin: 20px 0;
-	border-radius: .3em;
-	box-shadow: 0 0.1em 0.4em rgba(0,0,0,.3);
-	background-color: #222;
-  }
-
-  .dark .modal-container .fancybox-close-small {background: #383838; border: none;}
-
-  .modal-container .fancybox-close-small
-  {
-	background-color: #efefef;
-	opacity: 1;
-	height: 38px;
-  }
-
-  .dark .modal-title{background: #383838;}
-  
-  .modal-title {
-	background-color: #222;
-	color: #fff;
-	font-weight: 700;
-	padding: 7px 10px;
-  }
-
-  .modal-title a {color: white;}
-
-  .dark .modal-body {background: #222;}
-  
-  .modal-body {
-	max-height: calc(100vh - 230px);
-	min-height: 50px;
-	max-width: 100%;
-	padding: 0 1.5em 1.5em 1.5em;
-	overflow-y: auto;
-	background-color: #efefef;
-  }
 .gol_twitch{display: none;}
 div.gol_twitch .twitch_announce{background-color: #4b367c; color: #fff; font-style: italic;}
 .dark div.gol_twitch .twitch_announce{background-color: #4b367c; color: #fff; font-style: italic;}

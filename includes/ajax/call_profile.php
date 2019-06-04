@@ -23,8 +23,8 @@ if(isset($user_id))
 	{
 		if ($grab_fields['pc_info_public'] == 1)
 		{
-			$templating->load('profile');
-			$templating->block('additional');
+			$templating->load('pc_info_overlay');
+			$templating->block('main');
 			$templating->set('username', $grab_fields['username']);
 			$templating->set('profile_link', '/profiles/' . $user_id);
 
@@ -45,8 +45,6 @@ if(isset($user_id))
 				$fields_output = '<li><em>This user has not filled out their PC info!</em></li>';
 			}
 			$templating->set('fields', $fields_output);
-
-			$templating->block('view_full');
 			$templating->set('stats_link', "/users/statistics");
 			$templating->set('profile_link', '/profiles/' . $user_id);
 
@@ -60,7 +58,7 @@ if(isset($user_id))
 			}
 			$templating->set('edit_link', $edit_link);
 
-			echo '<div class="pc_info_div">' . $templating->output() . '</div>';
+			echo $templating->output();
 		}
 	}
 }

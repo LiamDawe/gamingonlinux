@@ -1785,6 +1785,8 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 	padding: 7px 10px;
   }
 
+  .modal-title a {color: white;}
+
   .dark .modal-body {background: #222;}
   
   .modal-body {

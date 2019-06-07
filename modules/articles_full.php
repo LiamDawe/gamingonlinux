@@ -411,7 +411,9 @@ if (!isset($_GET['go']))
 
 				$templating->block('article_bottom', 'articles_full');
 
-				if ($_SESSION['user_id'] > 0)
+				
+				// only show corrections box if logged in and it's not old
+				if ($_SESSION['user_id'] > 0 && $article['date'] >= strtotime('-1 year'))
 				{
 					$templating->block('corrections', 'articles_full');
 					$templating->set('article_id', $article['article_id']);

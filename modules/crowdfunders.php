@@ -29,6 +29,14 @@ foreach ($crowdfunders as $item)
 	$templating->block('row');
 	$templating->set('name', $item['name']);
 	$templating->set('link', $item['link']);
+
+	$notes = '';
+	if (!empty($item['notes']))
+	{
+		$notes = '<br /><em>'.$item['notes'].'</em>';
+	}
+	$templating->set('notes', $notes);
+
 	$failed = '';
 	if ($item['failed_linux'] == 1)
 	{

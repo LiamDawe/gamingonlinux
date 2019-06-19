@@ -6,7 +6,7 @@ if(!defined('golapp'))
 $templating->set_previous('title', 'Crowdfunded Linux games', 1);
 $templating->set_previous('meta_description', 'Crowdfunded Linux games', 1);
 
-$total = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` ORDER BY `name` ASC")->fetchOne();
+$total = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` WHERE `failed_linux` IN (0,1) ORDER BY `name` ASC")->fetchOne();
 $total_failed = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` WHERE `failed_linux` = 1 ORDER BY `name` ASC")->fetchOne();
 
 $templating->load('crowdfunders');
@@ -37,6 +37,13 @@ foreach ($crowdfunders as $item)
 	}
 	$templating->set('notes', $notes);
 
+	$stretch_goal = 'No';
+	if ($item['linux_stretch_goal'] == 1)
+	{
+		$stretch_goal = 'Yes';
+	}
+	$templating->set('stretch_goal', $stretch_goal);
+
 	$failed = '';
 	if ($item['failed_linux'] == 1)
 	{
@@ -45,6 +52,10 @@ foreach ($crowdfunders as $item)
 	else if ($item['failed_linux'] == 0)
 	{
 		$failed = 'Linux build released.';
+	}
+	else if ($item['failed_linux'] == 2)
+	{
+		$failed = 'In development.';
 	}
 	$templating->set('linux_status', $failed);
 }

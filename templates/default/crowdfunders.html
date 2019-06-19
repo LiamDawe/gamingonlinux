@@ -3,19 +3,20 @@
 			<div class="head">Linux games that were crowdfunded.</div>
 			<div class="body group">This page is a heavy work in progress, mostly an experiment for now. <a href="https://www.gamingonlinux.com/forum/topic/3534">Provide feedback here please</a>.<br />
 			To be clear, this is not meant as a place to put down developers if they don't do it, it's more for statistics gathering and to help Linux gamers find games they might have missed.<br />
-			Total: {:total}, Total Failed: {:total_failed}<br />
+			Total Counted: {:total} (in development not counted), Total Failed: {:total_failed}<br />
 			Success Rate: {:success_rate}, Failure rate: {:failed_percentage}</div>
 		
 			<table class="sales-table table-stripes-tbody">
 			<thead>
-				<tr><th>Name</th><th>Linux build status</th></tr>
+				<tr><th>Name</th><th>Stretch Goal?</th><th>Linux build status</th></tr>
 			</thead>
 [/block: list_top]
 
 [block: row]
 			<tbody>
 			<tr>
-				<td width="80%;"><a href="{:link}">{:name}</a>{:notes}</td>
+				<td width="70%;"><a href="{:link}">{:name}</a>{:notes}</td>
+				<td width="10%;">{:stretch_goal}</td>
 				<td width="20%;">{:linux_status}</td>
 			</tr>
 			</tbody>

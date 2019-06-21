@@ -22,12 +22,20 @@ $failed_percentage = round($total_failed/$total*100);
 $templating->set('success_rate', $succeed_percentage . '%');
 $templating->set('failed_percentage', $failed_percentage . '%');
 
-$crowdfunders = $dbl->run("SELECT * FROM `crowdfunders` ORDER BY `name` ASC")->fetch_all();
+$crowdfunders = $dbl->run("SELECT c.*,d.name AS dev_name FROM `crowdfunders` c LEFT JOIN `developers` d ON d.id = c.developer_id ORDER BY c.`name` ASC")->fetch_all();
 
 foreach ($crowdfunders as $item)
 {
 	$templating->block('row');
 	$templating->set('name', $item['name']);
+
+	$dev_name = '';
+	if (isset($item['dev_name']))
+	{
+		$dev_name = ' - Developer: ' . $item['dev_name'];
+	}
+	$templating->set('dev_name', $dev_name);
+
 	$templating->set('link', $item['link']);
 
 	$notes = '';

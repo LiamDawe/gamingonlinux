@@ -16,6 +16,43 @@ if (!isset($_GET['view']) && !isset($_POST['act']))
 
 if (isset($_GET['view']))
 {
+	if ($_GET['view'] == 'developer')
+	{
+		if (!isset($_GET['id']) || !core::is_number($_GET['id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'item id';
+			header("Location: /index.php");
+			die();
+		}
+		
+		// make sure they exist
+		$check_dev = $dbl->run("SELECT `name` FROM `developers` WHERE `id` = ?", array($_GET['id']))->fetchOne();
+		if (!$check_dev)
+		{
+			$_SESSION['message'] = 'none_found';
+			$_SESSION['message_extra'] = 'developers matching that ID';
+			header("Location: /index.php");
+			die();			
+		}
+
+		// look for some games
+		$get_item = $dbl->run("select c.`name` from `calendar` c JOIN `game_developer_reference` d WHERE d.game_id = c.id AND d.developer_id = ?", array($_GET['id']))->fetch_all();
+		if ($get_item)
+		{
+			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$check_dev, 1);
+			$templating->set_previous('title', $check_dev, 1);			
+
+			$templating->block('developer_list_top');
+			$templating->set('dev_name', $check_dev);
+
+			foreach ($get_item as $game)
+			{
+				$templating->block('dev_game_row');
+				$templating->set('name', $game['name']);
+			}
+		}	
+	}
 	if ($_GET['view'] == 'item')
 	{
 		if (!isset($_GET['id']) || !core::is_number($_GET['id']))

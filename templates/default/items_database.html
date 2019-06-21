@@ -27,6 +27,18 @@
 </div>
 [/block: suggest_tags]
 
+[block: developer_list_top]
+<div class="box">
+		<div class="head">Viewing Linux games from {:dev_name}</div>
+</div>
+[/block: developer_list_top]
+
+[block: dev_game_row]
+<div class="box">
+	<div class="body group">{:name}</div>
+</div>
+[/block: dev_game_row]
+
 [block: submit_picker]
 <div class="box">
 		<div class="head">Submit an item to our database</div>
@@ -48,36 +60,34 @@
 	<div class="head">Required</div>
 	<div class="body group">
 		<form method="post" action="/index.php?module=items_database">
-			Name: <input type="text" name="name" /><br />
+			Name: <input type="text" name="name" value="{:name}" /><br />
 			<em>Items need to have <strong>at least one</strong> link at a minimum!</em><br />
 			Official website:<br />
-			<input type="text" name="link" /><br />
+			<input type="text" name="link" value="{:link}" /><br />
 			Steam Link:<br />
-			<input type="text" name="steam_link" /><br />
+			<input type="text" name="steam_link" value="{:steam_link}" /><br />
 			GOG Link:<br />
-			<input type="text" name="gog_link" /><br />
+			<input type="text" name="gog_link" value="{:gog_link}" /><br />
 			itch.io Link:<br />
-			<input type="text" name="itch_link" /><br />
-			<label><input type="checkbox" name="supports_linux" checked/> Does it currently support Linux? <em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label>
-			<label><input type="checkbox" name="hidden_steam" /> Is the Linux version hidden on Steam currently? (Alpha, Beta - No SteamOS icon)</label>
+			<input type="text" name="itch_link" value="{:itch_link}" /><br />
+			<label><input type="checkbox" name="supports_linux" {:supports_linux}/> Does it currently support Linux? <em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label>
+			<label><input type="checkbox" name="hidden_steam" {:hidden_steam}/> Is the Linux version hidden on Steam currently? (Alpha, Beta - No SteamOS icon)</label>
 			What is it?<br />
 			<select name="type">
 				<option value=""></option>
-				<option value="is_game">Game</option>
-				<option value="is_emulator">Emulator</option>
-				<option value="is_application">Misc Software or Application</option>
+				{:types_options}
 			</select>
 	</div>
 	<div class="head">Not Required</div>
 	<div class="body group">
-		<label><input type="checkbox" name="free" /> Free (as in money)? <em>Tick if this is free/free to play</em></label>
-		<label><input type="checkbox" name="dlc" /> DLC <em>Tick if this is a DLC</em></label>
-		Base game name <em>If it's a DLC, what game is it for?</em><br />
-		<select tabindex="-1" name="game" id="articleGames" style="width:300px" class="populate select2-offscreen"><option value="0">None</option></select><br />
+		<label><input type="checkbox" name="free" {:free}/> Free (as in money)? <em>Tick if this is free/free to play</em></label>
+		<label><input type="checkbox" name="dlc" {:dlc}/> DLC <em>Tick if this is a DLC</em></label>
+		If it's a DLC, enter the name of the game below:<br />
+		<select tabindex="-1" name="game" id="articleGames" class="populate select2-offscreen">{:game}</select><br />
 		<button class="clear-games">Clear game</button><br />
 		License <select name="license"><option value=""></option>{:license_options}</select><br />
 		Tags<br />
-		<select tabindex="-1" multiple="" name="genre_ids[]" class="populate select2-offscreen genres_picker"></select>
+		<select tabindex="-1" multiple="" name="genre_ids[]" class="populate select2-offscreen genres_picker">{:genre_ids}</select>
 	</div>
 	<div class="body group"><button formaction="/index.php?module=items_database" name="act" value="submit_item">Submit</button>
 	</form></div>

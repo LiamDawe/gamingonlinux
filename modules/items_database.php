@@ -36,22 +36,26 @@ if (isset($_GET['view']))
 			die();			
 		}
 
+		$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$check_dev, 1);
+		$templating->set_previous('title', $check_dev, 1);	
+
+		$templating->block('developer_list_top');
+		$templating->set('dev_name', $check_dev);
+
 		// look for some games
 		$get_item = $dbl->run("select c.`name` from `calendar` c JOIN `game_developer_reference` d WHERE d.game_id = c.id AND d.developer_id = ?", array($_GET['id']))->fetch_all();
 		if ($get_item)
 		{
-			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$check_dev, 1);
-			$templating->set_previous('title', $check_dev, 1);			
-
-			$templating->block('developer_list_top');
-			$templating->set('dev_name', $check_dev);
-
 			foreach ($get_item as $game)
 			{
 				$templating->block('dev_game_row');
 				$templating->set('name', $game['name']);
 			}
 		}	
+		else
+		{
+			$core->message('No games were found in our database from that developer.');
+		}
 	}
 	if ($_GET['view'] == 'item')
 	{

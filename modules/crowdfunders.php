@@ -32,7 +32,7 @@ foreach ($crowdfunders as $item)
 	$dev_name = '';
 	if (isset($item['dev_name']))
 	{
-		$dev_name = ' - Developer: ' . $item['dev_name'];
+		$dev_name = $item['dev_name'];
 	}
 	$templating->set('dev_name', $dev_name);
 

@@ -142,9 +142,6 @@
 		min-height: 49px;
 		resize: vertical;
 	}
-	select {
-		padding: 10px;
-	}
 	input:hover, input:focus, textarea:hover, textarea:focus, select:hover, select:focus {
 		border: 1px solid #05c9f0;
 	}

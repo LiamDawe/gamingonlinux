@@ -99,7 +99,9 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/Chart.min.js (http://www.chartjs.org/ MIT)
 
-- /inclides/image_class/ (https://github.com/claviska/SimpleImage MIT)
+- /includes/image_class/ (https://github.com/claviska/SimpleImage MIT)
+
+- /includes/datatables/ (https://datatables.net/ MIT)
 
 ## Misc
 

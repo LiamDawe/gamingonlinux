@@ -1,11 +1,13 @@
 [block: pcdeets]
-<form method="post">
+<form class="gol-form" method="post">
 <div class="box">
 	<div class="head">Computer info</div>
 	<div class="body group profile">
 		You last updated yours: {:date_updated}<br />
-		<label><input type="checkbox" name="public" {:public_check}/> Make public?</label>
-		<label><input type="checkbox" name="include_in_survey" {:include_in_survey_check}/> Include your PC details in our Monthly User Statistics? <em>Only your answers are captured, it doesn't store your username or user id.</em></label>
+		<label><input type="checkbox" name="public" {:public_check}/> Make public?</label><br />
+		<em>This will allow others to view your PC Info and show a link in your comments.</em><br />
+		<label><input type="checkbox" name="include_in_survey" {:include_in_survey_check}/> Include your PC details in our Monthly User Statistics?<br />
+		<em>Only your answers are captured, it doesn't store your username, email or user id (only the exact PC info supplied).</em></label>
 	</div>
 	<div class="head">Signature image</div>
 	<div class="body group profile">
@@ -26,32 +28,32 @@
 		<strong>Distro Architecture:</strong><br />
 		<select name="pc_info[what_bits]"><option value=""></option>{:what_bits_options}</select><br />
 		<strong>Do you dual-boot with a different operating system?</strong><br />
-		<select name="pc_info[dual_boot]"><option value=""></option>{:dual_boot_options}</select>
-		<strong>Steam Play use</strong>
-		<select name="pc_info[steamplay]"><option value=""></option>{:steamplay_options}</select>
+		<select name="pc_info[dual_boot]"><option value=""></option>{:dual_boot_options}</select><br />
+		<strong>Steam Play use</strong><br />
+		<select name="pc_info[steamplay]"><option value=""></option>{:steamplay_options}</select><br />
 		<strong>When was the last time you used Wine to play a Windows game?</strong><br />
-		<em>This includes any derivative of Wine (excluding Proton inside of Steam, see above question for Steam Play).</em>
-		<select name="pc_info[wine]"><option value=""></option>{:wine_options}</select>
-		<strong>RAM:</strong>
+		<em>This includes any derivative of Wine (excluding Proton inside of Steam, see above question for Steam Play).</em><br />
+		<select name="pc_info[wine]"><option value=""></option>{:wine_options}</select><br />
+		<strong>RAM:</strong><br />
 		<select name="pc_info[ram_count]"><option value=""></option>{:ram_options}</select><br />
 		<strong>CPU Vendor:</strong><br />
 		<select name="pc_info[cpu_vendor]"><option value=""></option>{:cpu_options}</select><br />
 		<strong>CPU Model:</strong><br />
 		<input name="pc_info[cpu_model]" type="text" value="{:cpu_model}"/><br />
-		<strong>GPU Vendor:</strong>
+		<strong>GPU Vendor:</strong><br />
 		<select name="pc_info[gpu_vendor]"><option value=""></option>{:gpu_options}</select><br />
 		<strong>GPU Model:</strong><br />
 		<select name="pc_info[gpu_model]" id="gpu_picker" style="width:300px" >{:gpu_model}</select><br />
 		<small>Missing your GPU Model? <a href="https://www.gamingonlinux.com/email-us/">Email us here</a>!</small><br />
-		<strong>GPU Driver:</strong>
+		<strong>GPU Driver:</strong><br />
 		<select name="pc_info[gpu_driver]"><option value=""></option>{:gpu_driver}</select><br />
-		<strong>Monitors:</strong>
+		<strong>Monitors:</strong><br />
 		<select name="pc_info[monitor_count]"><option value=""></option>{:monitor_options}</select><br />
 		<strong>Main Gaming Resolution</strong><br />
 		<select name="pc_info[resolution]"><option value=""></option>{:resolution_options}</select><br />
-		<strong>Main gaming machine:</strong>
+		<strong>Main gaming machine:</strong><br />
 		<select name="pc_info[gaming_machine_type]"><option value=""></option>{:machine_options}</select><br />
-		<strong>Main Gamepad</strong>
+		<strong>Main Gamepad</strong><br />
 		<select name="pc_info[gamepad]"><option value=""></option>{:gamepad_options}</select><br />
 	</div>
 	<button type="submit" name="act" value="Update" formaction="{:url}usercp.php?module=pcinfo">Update</button> <button type="submit" name="act" value="wipe" formaction="{:url}usercp.php?module=pcinfo">Wipe PC Info</button><br />

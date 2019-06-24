@@ -12,7 +12,7 @@
 	<div class="subhead">Suggestion from {:username}</div>
 	<div class="body group">
 		{:correction}
-		<form method="post" action="admin.php?module=articles">
+		<form class="gol-form" method="post" action="admin.php?module=articles">
 			<input type="hidden" name="correction_id" value="{:correction_id}" />
 			<input type="hidden" name="correction_text" value="{:correction_text_plain}" />
 			<input type="hidden" name="reporter_id" value="{:reporter_id}" />

@@ -17,7 +17,7 @@
 					<div class="head">Articles planned/in progress</div>
 					<div class="body group">
 						Please take note of everyone's plans for articles here and add your own! Please check this every time before writing an article.
-						<form method="post" action="admin.php?module=home">
+						<form class="gol-form" method="post" action="admin.php?module=home">
 							<input type="text" name="text" class="form-control" /><br />
 							<input type="hidden" name="type" value="add_plan" />
 							<button class="send_editor_plan" type="submit" name="act" value="plan">Add plan</button>
@@ -39,7 +39,7 @@
 				<div class="box">
 					<div class="head">Admin message-box</div>
 					<div class="body group">
-						<form method="post" action="admin.php?module=home">
+						<form class="gol-form" method="post" action="admin.php?module=home">
 							<textarea name="text" class="admin_text form-control" rows="5"></textarea><br />
 							<input type="hidden" name="type" value="admin" />
 							<button class="send_admin_comment" type="submit" name="act" value="comment">Add Comment</button>
@@ -63,7 +63,7 @@
 				<div class="box">
 					<div class="head">Message all editors here</div>
 					<div class="body group">
-						<form method="post" action="admin.php?module=home">
+						<form class="gol-form" method="post" action="admin.php?module=home">
 							<textarea name="text" class="editor_text form-control" rows="8"></textarea><br />
 							<input type="hidden" name="type" value="editor" />
 							<button class="send_admin_comment" type="submit" name="act" value="commentall">Add Comment</button>

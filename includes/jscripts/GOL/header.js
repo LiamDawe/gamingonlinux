@@ -256,6 +256,13 @@ $(function(){
 });
 jQuery(document).ready(function()
 {  
+	// table sorting
+	$('#crowdfunded').dataTable( 
+	{
+		"iDisplayLength": 25,
+		colReorder: true
+	});
+
   // this will grab any url parameter like ?module=test and give you "test" if you search for "module"
   var getUrlParameter = function getUrlParameter(sParam) {
       var sPageURL = decodeURIComponent(window.location.search.substring(1)),

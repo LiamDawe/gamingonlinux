@@ -10,18 +10,18 @@
 
 				<div class="box">
 					<div class="body group">
-						<form id="imageform2" method="post" enctype="multipart/form-data" action='{:url}includes/ajax/ajax_tagline_upload.php' style="clear:both">
+						<form class="gol-form" id="imageform2" method="post" enctype="multipart/form-data" action='{:url}includes/ajax/ajax_tagline_upload.php' style="clear:both">
 							Article homepage image. Max of 120kb!
 							<div id='imageloadstatus2' style='display:none'><img src="{:url}templates/default/images/loader2.gif" alt="Uploading...."/></div>
 							<div id='imageloadbutton2'>
-								<input type="file" name="photos2" id="photoimg2" multiple="true" />
+								<input type="file" name="photos2" id="photoimg2" multiple="true" /><br />
 								<small>Shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height. </small>
 							</div>
 						</form>
 						<div id='preview2'>
 							{:tagline_image}
 						</div>
-						<form action="{:url}index.php?module=submit_article" method="post">
+						<form class="gol-form" action="{:url}index.php?module=submit_article" method="post">
 							<label class="control-label">Title</label>
               <input type="text" name="title" class="ays-ignore" placeholder="Enter a title..." value="{:title}" /><br />
 							{:guest_fields}
@@ -29,10 +29,10 @@
 
 [block: submit_bottom]
 							<p>Please be aware that by submitting an article you agree to us making changes to it including spelling, grammar, rewording to fit the websites style.</p>
-							<strong>These are required.</strong>
+							<strong>These are required.</strong><br />
 							<label><input type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
 							{:captcha}
-							<div id="hidden_captcha" class="hidden_captcha"></div>
+							<div id="hidden_captcha" class="hidden_captcha"></div><br />
 							{:subscribe_box}
 							<button type="submit" name="act" value="Submit" class="btn btn-primary">Submit</button> <button input type="submit" name="act" value="Preview" class="btn btn-info">Preview</button>
 						</form>

@@ -11,7 +11,19 @@
 [/block: multi]
 
 [block: articles_top]
-<div class="box"><div class="body group"><form method="get" action="/index.php?module=articles&amp;view=cat"><input type="hidden" name="module" value="articles" /><input type="hidden" name="view" value="multiple" /> Pick categories (CTRL+click for multiple): <select class="ays-ignore" name="catid[]" multiple>{:options}</select><label><input type="radio" name="type" value="any" {:any_check}/>Match any</label> <label><input type="radio" name="type" value="all" {:all_check}/>Match all tags</label><button type="submit">View</button></form></div></div>
+<div class="box">
+	<div class="body group">
+		<form class="gol-form" method="get" action="/index.php?module=articles&amp;view=cat">
+			<input type="hidden" name="module" value="articles" />
+			<input type="hidden" name="view" value="multiple" /> 
+			Pick categories (CTRL+click for multiple): 
+			<select class="ays-ignore" name="catid[]" multiple>{:options}</select>
+			<label><input type="radio" name="type" value="any" {:any_check}/>Match any</label> 
+			<label><input type="radio" name="type" value="all" {:all_check}/>Match all tags</label> &nbsp;
+			<button type="submit">View</button>
+		</form>
+	</div>
+</div>
 [/block: articles_top]
 
 [block: article_row]

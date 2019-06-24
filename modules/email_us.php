@@ -123,7 +123,6 @@ $templating->set('url', url);
 // social and sharing icons
 $social_icons = [
 'twitter_username' => ['config' => 'twitter_username', 'icon' => 'twitter.svg'],
-'gplus_page' => ['config' => 'gplus_page', 'icon' => 'google-plus.svg'],
 'facebook_page' => ['config' => 'facebook_page', 'icon' => 'facebook.svg']
 ];
 

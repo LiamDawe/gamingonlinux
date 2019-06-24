@@ -91,7 +91,7 @@ else
 	$templating->set('edit_state_textarea', $edit_state_textarea);
 
 	$templating->set('url', $core->config('website_url'));
-	$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+	$templating->set('main_formaction', '<form class="gol-form" id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 
 	// get categorys
 	$get_cats = $dbl->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();

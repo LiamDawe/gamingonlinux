@@ -1,6 +1,6 @@
 [block: preview_code]
 <div id="article_preview"></div>
-<div class="box">
+<div class="gol-form box">
 	<div class="body group">Preview url. Give this to people to see it before it's live. Generate a new one to disable the old one. <br />
 	<input type="text" value="{:preview_url}" id="preview_code" name="preview_code" {:edit_state} /> <button type="button" data-article-id="{:article_id}" id="generate_preview" {:edit_state}>Generate New Url</button></div>
 </div>
@@ -10,7 +10,7 @@
 				<script src="includes/jscripts/jquery.form.min.js"></script>
 				<div class="box">
 					<div class="body group">
-						<form id="imageform2" method="post" enctype="multipart/form-data" action='includes/ajax/ajax_tagline_upload.php' style="clear:both">
+						<form class="gol-form" id="imageform2" method="post" enctype="multipart/form-data" action='includes/ajax/ajax_tagline_upload.php' style="clear:both">
 							Article tagline image (shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height). Max of {:max_filesize}!
 							<div id='imageloadstatus2' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
 							<div id='imageloadbutton2'>
@@ -54,7 +54,7 @@
 [block: uploads]
 <div class="box">
 	<div class="body group">
-		<form id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajax/admin/article_media_upload.php' style="clear:both">
+		<form class="gol-form" id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajax/admin/article_media_upload.php' style="clear:both">
 			Upload your images, no bigger than 1MB!
 			<div id='imageloadstatus' style='display:none'>
 				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>

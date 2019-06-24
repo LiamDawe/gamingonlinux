@@ -19,7 +19,7 @@ $templating->block('add', 'admin_modules/admin_module_articles');
 
 $templating->load('admin_modules/article_form');
 $templating->block('full_editor', 'admin_modules/article_form');
-$templating->set('main_formaction', '<form id="article_editor" method="post" name="article-form" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+$templating->set('main_formaction', '<form class="gol-form" id="article_editor" method="post" name="article-form" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 $templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 
 // get categorys if we need to

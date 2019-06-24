@@ -42,7 +42,7 @@
 <script src="{:url}includes/jscripts/jquery.form.min.js"></script>
 <div class="box">
 	<div class="body group">
-		<form id="imageform2" method="post" enctype="multipart/form-data" action='{:url}includes/ajax/ajax_tagline_upload.php' style="clear:both">
+		<form class="gol-form" id="imageform2" method="post" enctype="multipart/form-data" action='{:url}includes/ajax/ajax_tagline_upload.php' style="clear:both">
 			<h4>Article Tagline Image (shows at the side of an article, the width can be no lower than {:max_width} width, with a minimum {:max_height} height). Max of 120kb!</h4>
 			<div id='imageloadstatus2' style='display:none'><img src="{:url}templates/default/images/loader2.gif" alt="Uploading...."/></div>
 			<div id='imageloadbutton2'>
@@ -86,10 +86,10 @@
 	<div class="body group">
 		<label class="checkbox">
 			<input type="checkbox" name="show_block" /> Editors Pick? <em>This will show the article under the Editors Pick heading on the Articles block!</em>
-		</label>
+		</label><br />
 		<label class="checkbox">
 			<input type="checkbox" id="self-submit" name="submit_as_self" {:self_check}/> Submit article as yourself? <em>Useful if you rewrote an article based on what was submitted. It will add a thank you text to the bottom.</em>
-		</label>
+		</label><br />
 		<button type="submit" name="act" value="Approve" {:edit_state}/>Approve & Publish Now</button> <button type="submit" name="act" value="Edit_Submitted" class="btn btn-primary" {:edit_state}>Finish Edit</button> <button type="submit" name="act" value="Deny" {:edit_state}/>Deny</button> <button class="admin_preview_article" type="button">Preview</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />
 		<input type="hidden" name="check" value="Submitted" />
@@ -104,7 +104,7 @@
 <div class="box">
 	<div class="body group">
 		You are about to deny posting of the submitted article, please leave a message to tell the user why! This will include a copy of their article in the email it sends them.<br />
-		<form method="post" action="admin.php?module=articles&amp;article_id={:article_id}">
+		<form class="gol-form" method="post" action="admin.php?module=articles&amp;article_id={:article_id}">
 		<textarea name="message" rows="5" cols="100"></textarea>
 		<button type="submit" name="act" value="Deny" class="btn btn-danger">Deny Article</button>
 		<input type="hidden" name="article_id" value="{:article_id}" />

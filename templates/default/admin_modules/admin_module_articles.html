@@ -14,13 +14,13 @@
 					<div class="body group">
 							<label class="checkbox">
 								<input type="checkbox" name="show_block" /> Editors Pick? <em>You will be sent to the featured image uploader after!</em>
-							</label>
+							</label><br />
 							<label class="checkbox">
 								<input type="checkbox" name="show_article" checked /> Enable article?
-							</label>
+							</label><br />
 							<label class="checkbox">
 								<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to article to receive comment replies via email?
-							</label>
+							</label><br />
 							<button type="submit" name="act" value="publish_now" formaction="{:website_url}admin.php?module=add_article" class="btn btn-primary">Publish Now</button> <button class="admin_preview_article" type="button">Preview</button> <button type="submit" name="act" value="review" class="btn btn-info">Submit for Review</button> <button type="submit" name="act" value="Save_Draft" class="btn btn-info">Save as draft</button>
 							<input type="hidden" name="check" value="Add" />
 							<input type="hidden" name="temp_tagline_image" value="{:temp_tagline_image}" />
@@ -53,10 +53,10 @@
 					<div class="body group">
 						<label class="checkbox">
 							<input type="checkbox" name="show_block" {:show_block_check}/> Editors Pick? <em>You will be sent to the featured image uploader after!</em>
-						</label>
+						</label><br />
 						<label class="checkbox">
 							<input type="checkbox" name="show_article" {:show_article_check} /> Enable article?
-						</label>
+						</label><br />
 						<button type="submit" name="act" value="Edit" {:edit_state}>Edit</button> <button class="admin_preview_article" type="button">Preview</button>
 						<input type="hidden" name="article_id" value="{:article_id}" />
 						<input type="hidden" name="check" value="Edit" />
@@ -106,7 +106,7 @@
 		</div>
 		<div class="box">
 			<div class="body group">
-			<form method="post" action="admin.php?module=articles">
+			<form class="gol-form" method="post" action="admin.php?module=articles">
 			<button type="submit" formaction="admin.php?module=articles&view=Edit&article_id={:article_id}">Edit</button>
 			<button type="submit" name="act" value="Delete" formaction="admin.php?module=articles&article_id={:article_id}{:inactive}">Delete</button>
 			</form>

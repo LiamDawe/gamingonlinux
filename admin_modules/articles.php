@@ -192,7 +192,7 @@ if (isset($_GET['view']))
 				$templating->set('slug', $article['slug']);
 			}
 
-			$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+			$templating->set('main_formaction', '<form class="gol-form" id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 
 			if (empty($article['username']))
 			{

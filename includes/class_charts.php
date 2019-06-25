@@ -1256,6 +1256,7 @@ class charts
 		$dates = array();
 		$chart_ids = array();
 		$labels = array();
+		$tooltips = array();
 
 		// get each chart along with the date they were generated to make the axis
 		$get_charts = $this->dbl->run("SELECT `id`, `name`, `h_label`, `generated_date`, `total_answers` FROM `user_stats_charts` WHERE `name` = ? ORDER BY `generated_date` DESC LIMIT 20", array($name))->fetch_all();
@@ -1314,6 +1315,10 @@ class charts
 					// add in the actual data we do have for this label
 					foreach ($get_data as $data)
 					{
+						$make_time = strtotime($data['generated_date']);
+						$date = date("M-Y", $make_time);
+
+						$tooltips[$date][$data['name'] . $label_add] = $data['data'] . '/' . $data['total_answers'];
 						$percent = round(($data['data'] / $data['total_answers']) * 100, 2);
 						$labels[$data['name'] . $label_add][] = $percent;
 					}
@@ -1398,9 +1403,10 @@ class charts
 						{
 							callbacks: {
 								label: function(tooltipItem, data) {
+									var tooltip_extra = ". json_encode($tooltips) .";
 					var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 									var label = data.datasets[tooltipItem.datasetIndex].label;
-					return label + ' ' + value + '%';
+					return label + ' ' + value + '%' + ' (' + tooltip_extra[data.labels[tooltipItem.index]][label] + ')';
 						}
 						},
 						},

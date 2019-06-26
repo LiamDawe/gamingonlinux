@@ -12,14 +12,14 @@
 	<div class="subhead">Suggestion from {:username}</div>
 	<div class="body group">
 		{:correction}
+	</div>
+	<div class="subhead">Delete or Delete &amp; message the user</div>
+	<div class="body group">
 		<form class="gol-form" method="post" action="admin.php?module=articles">
 			<input type="hidden" name="correction_id" value="{:correction_id}" />
 			<input type="hidden" name="correction_text" value="{:correction_text_plain}" />
 			<input type="hidden" name="reporter_id" value="{:reporter_id}" />
 			<input type="hidden" name="correction_title" value="{:title}" />
-	</div>
-	<div class="subhead">Delete or Delete &amp; message the user</div>
-	<div class="body group">
 			Their text is automatically quoted, only enter a plain message to the user (not required if just deleting):<br />
 			<textarea name="text"></textarea>
 			<button type="submit" name="act" value="delete" formaction="/admin.php?module=corrections&correction_id={:correction_id}" />Delete suggestion</button> <button type="submit" name="act" value="delete" formaction="/admin.php?module=corrections&amp;correction_id={:correction_id}&amp;message" />Delete &amp; Message User</button>

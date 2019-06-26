@@ -29,7 +29,7 @@ $charts_list = array(
 	array("name" => "GPU Driver", "order" => "drivers", "bundle_outside_top10" => 0),
 	array("name" => "GPU Driver (Nvidia)", "order" => "drivers", "bundle_outside_top10" => 0),
 	array("name" => "GPU Driver (AMD)", "order" => "drivers", "bundle_outside_top10" => 0),
-	array("name" => "Monitors", "bundle_outside_top10" => 0),
+	array("name" => "Number of monitors", "bundle_outside_top10" => 0),
 	array("name" => "Resolution", "bundle_outside_top10" => 1),
 	array("name" => "Main Gaming Machine", "bundle_outside_top10" => 0),
 	array("name" => "Main Gamepad", "bundle_outside_top10" => 1)

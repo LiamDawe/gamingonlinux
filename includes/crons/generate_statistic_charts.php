@@ -80,7 +80,7 @@ array ("name" => "GPU Driver", "db_field" => "p.gpu_driver"),
 array ("name" => "GPU Driver (Nvidia)", "db_field" => "p.gpu_driver", "gpu_vendor" => "Nvidia"),
 array ("name" => "GPU Driver (AMD)", "db_field" => "p.gpu_driver", "gpu_vendor" => "AMD"),
 array ("name" => "RAM", "db_field" => "p.ram_count"),
-array ("name" => "Monitors", "db_field" => "p.monitor_count"),
+array ("name" => "Number of monitors", "db_field" => "p.monitor_count"),
 array ("name" => "Resolution", "db_field" => "p.resolution"),
 array ("name" => "Main Gaming Machine", "db_field" => "p.gaming_machine_type"),
 array ("name" => "Main Gamepad", "db_field" => "p.gamepad")

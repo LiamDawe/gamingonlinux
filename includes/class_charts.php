@@ -1406,7 +1406,7 @@ class charts
 									var tooltip_extra = ". json_encode($tooltips) .";
 					var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 									var label = data.datasets[tooltipItem.datasetIndex].label;
-					return label + ' ' + value + '%' + ' (' + tooltip_extra[data.labels[tooltipItem.index]][label] + ')';
+					return label + ' - ' + value + '%' + ' (' + tooltip_extra[data.labels[tooltipItem.index]][label] + ')';
 						}
 						},
 						},

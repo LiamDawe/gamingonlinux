@@ -31,9 +31,11 @@ $lang_data = array(
 	'Russian' => array()
 );
 
+// for holding data on the overall language share across JUST Linux
 $lang_data_linux = array(
 	'English' => array(),
-	'Simplified Chinese' => array()
+	'Simplified Chinese' => array(),
+	'Russian' => array()
 );
 
 $linux_perc = [];
@@ -54,6 +56,7 @@ foreach ($data as $point)
 	// linux only
 	$lang_data_linux['English'][] = $point['linux_english_share'];
 	$lang_data_linux['Simplified Chinese'][] = $point['linux_chinese_share'];
+	$lang_data_linux['Russian'][] = $point['linux_russian_share'];
 
 	$linux_eng_only[] = round($point['linux_share'] * $point['linux_english_share'] / ($point['english_share']), 2);
 }

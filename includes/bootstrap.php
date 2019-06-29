@@ -19,7 +19,7 @@ $filecache = new file_cache($core);
 
 $user = new user($dbl, $core);
 
-$announcements_class = new announcements($dbl, $user);
+$announcements_class = new announcements($core, $dbl, $user);
 
 $bbcode = new bbcode($dbl, $core, $user);
 

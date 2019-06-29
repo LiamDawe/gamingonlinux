@@ -20,13 +20,15 @@ $forum_sql = "SELECT p.`forum_id` FROM `forum_permissions` p INNER JOIN `forums`
 // setup a cache
 $querykey = "KEY" . md5($forum_sql . serialize($user->user_groups));
 
-$forum_ids = unserialize(core::$redis->get($querykey)); // check cache
+
+
+$forum_ids = unserialize($core->get_dbcache($querykey)); // check cache
 
 if (!$forum_ids) // there's no cache
 {
 	// get the forum ids this user is actually allowed to view
 	$forum_ids = $dbl->run($forum_sql, $user->user_groups)->fetch_all(PDO::FETCH_COLUMN);
-	core::$redis->set($querykey, serialize($forum_ids), 21600); // cache for six hours
+	$core->set_dbcache($querykey, serialize($forum_ids), 21600); // cache for six hours
 }
 
 if ($forum_ids)

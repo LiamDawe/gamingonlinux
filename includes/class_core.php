@@ -32,7 +32,7 @@ class core
 	
 	public static $top_bar_links = [];
 
-	public static $redis;
+	public static $redis = NULL;
 
 	function __construct($dbl)
 	{	
@@ -44,17 +44,50 @@ class core
 		core::$ip = $this->get_client_ip();
 		$this->dbl = $dbl;
 
-		try 
+		$this->check_dbcache();
+	}
+
+	// check redis is installed and running
+	public function check_dbcache()
+	{
+		if (class_exists('Redis')) 
 		{
-			core::$redis = new Redis();
-			core::$redis->connect('127.0.0.1', 6379);
+			try 
+			{
+				core::$redis = new Redis();
+				core::$redis->connect('127.0.0.1', 6379);
+			}
+			catch (Exception $e) 
+			{
+				error_log($e->getMessage());
+			}
 		}
-		catch (Exception $e) 
+	}
+
+	public function get_dbcache($key)
+	{
+		if (!isset($redis))
 		{
-			error_log($e->getMessage());
+			return false;
+		}
+		else
+		{
+			return core::$redis->get($key);
 		}
 	}
 	
+	public function set_dbcache($key, $data, $expiry = NULL)
+	{
+		if (!isset($redis))
+		{
+			return false;
+		}
+		else
+		{
+			return core::$redis->set($key, $data, $expiry);
+		}	
+	}
+
 	// check in_array for a multidimensional array
 	public static function in_array_r($needle, $haystack) 
 	{
@@ -196,10 +229,13 @@ class core
 	// grab a config key
 	public function config($key)
 	{
-		if (($get_config = core::$redis->get('CONFIG_'.$key)) === false) // there's no cache
+		$get_config = $this->get_dbcache('CONFIG_'.$key);
+
+		if ($get_config === false) // there's no cache
 		{
 			$get_config = $this->dbl->run("SELECT `data_value` FROM config WHERE `data_key` = ?", array($key))->fetchOne();
-			core::$redis->set('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
+
+			$this->set_dbcache('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
 		}
 
 		// return the requested key with the value in place
@@ -211,8 +247,7 @@ class core
 	{
 		$this->dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
 
-		// invalidate the cache
-		core::$redis->set('CONFIG_'.$key, $value); // no expiry as config hardly ever changes
+		$this->set_dbcache('CONFIG_'.$key, $value); // no expiry as config hardly ever changes
 	}
 
 	function get_client_ip()

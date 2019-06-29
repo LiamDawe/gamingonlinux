@@ -158,10 +158,11 @@ $templating->block('left_end', 'mainpage');
 $templating->block('right', 'mainpage');
 
 /* get the blocks */
-if (($blocks = unserialize(core::$redis->get('index_blocks'))) === false) // there's no cache
+
+if (($blocks = unserialize($core->get_dbcache('index_blocks'))) === false) // there's no cache
 {
 	$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
-	core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
+	$core->set_dbcache('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 }
 
 foreach ($blocks as $block)

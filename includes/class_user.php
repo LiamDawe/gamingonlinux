@@ -827,11 +827,11 @@ class user
 	// helper function to get the data needed for sorting user_badges in the function below this one
 	public function grab_user_groups()
 	{
-		$get_groups = unserialize(core::$redis->get('user_group_list'));
+		$get_groups = unserialize($this->core->get_dbcache('user_group_list'));
 		if ($get_groups === false || $get_groups === null) // there's no cache
 		{
 			$groups_query = $this->db->run("SELECT `group_id`, `group_name`, `show_badge`, `badge_text`, `badge_colour` FROM `user_groups` ORDER BY `group_name` ASC")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
-			core::$redis->set('user_group_list', serialize($groups_query));
+			$this->core->set_dbcache('user_group_list', serialize($groups_query));
 		}
 		self::$user_group_list = $get_groups;
 	}

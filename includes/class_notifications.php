@@ -33,6 +33,11 @@ class notifications
 						$field1 = 'article_id';
 						$field2 = 'comment_id';
 					}
+					if ($extra_data['type'] == 'forum_reply')
+					{
+						$field1 = 'forum_topic_id';
+						$field2 = 'forum_reply_id';						
+					}
 					$this->dbl->run("INSERT INTO `user_notifications` SET `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `$field1` = ?, `$field2` = ?, `type` = 'quoted'", array($quoted_user_id, $author_id, $extra_data['thread_id'], $extra_data['post_id']));
 					$new_notification_id[$quoted_user_id] = $this->dbl->new_id();
 					$new_notification_id['quoted_username'] = $matches[1];

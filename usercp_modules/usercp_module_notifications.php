@@ -114,8 +114,18 @@ if (!isset($_GET['go']))
 					$link = '';
 					if ($note_list['type'] == 'quoted' || $note_list['type'] == 'article_comment' || $note_list['type'] == 'liked')
 					{
-						$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
-						$title = $note_list['title'];
+						if (isset($note_list['article_id']) && !empty($note_list['article_id']))
+						{
+							$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
+							$title = $note_list['title'];
+						}						
+
+						if (isset($note_list['forum_topic_id']) && !empty($note_list['forum_topic_id']))
+						{
+							$link = '/forum/topic/'.$note_list['forum_topic_id'].'/post_id='.$note_list['forum_reply_id'].'/clear_note='.$note_list['id'];
+							$title = $note_list['topic_title'];
+						}
+
 					}
 					if ($note_list['type'] == 'liked_forum_topic')
 					{

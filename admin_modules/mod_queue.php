@@ -143,7 +143,7 @@ if (isset($_POST['action']))
 
 		else if ($_POST['type'] == 'forum_reply')
 		{
-			$find_post = $dbl->run("SELECT `approved`, `reply_text` FROM `forum_replies` WHERE `post_id` = ?", array($_POST['post_id']))->fetch();
+			$find_post = $dbl->run("SELECT r.`approved`, r.`reply_text`, u.`username` FROM `forum_replies` r INNER JOIN `users` u ON u.user_id = r.author_id WHERE r.`post_id` = ?", array($_POST['post_id']))->fetch();
 			if ($find_post['approved'] == 0)
 			{
 				$dbl->run("UPDATE `forum_replies` SET `approved` = 1, `creation_date` = ? WHERE `post_id` = ?", array(core::$date, $_POST['post_id']));
@@ -160,6 +160,8 @@ if (isset($_POST['action']))
 
 				$core->new_admin_note(array('completed' => 1, 'content' => ' approved a forum reply in: <a href="/forum/topic/'.$_POST['topic_id'].'/post_id='.$_POST['post_id'].'">'.$topic_info['topic_title'].'</a>.'));
 
+				$new_notification_id = $notifications->quote_notification($find_post['reply_text'], $find_post['username'], $_POST['author_id'], array('type' => 'forum_reply', 'thread_id' => $_POST['topic_id'], 'post_id' => $_POST['post_id']));
+
 				// email anyone subscribed which isn't you
 				$email_res = $dbl->run("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']))->fetch_all();
 				$users_array = array();
@@ -173,8 +175,6 @@ if (isset($_POST['action']))
 					}
 				}
 
-				$author_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($_POST['author_id']))->fetch();
-
 				// send the emails
 				foreach ($users_array as $email_user)
 				{
@@ -186,14 +186,14 @@ if (isset($_POST['action']))
 					// message
 					$html_message = "
 					<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$author_username['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}\">{$topic_info['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+					<p><strong>{$find_post['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}\">{$topic_info['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 					<div>
 					<hr>
 					{$email_message}
 					<hr>
 					You can unsubscribe from this topic by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$_POST['topic_id']}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.";
 
-					$plain_message = "Hello {$email_user['username']}, {$author_username['username']} has replied to a forum topic you follow on titled \"{$topic_info['topic_title']}\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP. See this new message here: " . $core->config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}";
+					$plain_message = "Hello {$email_user['username']}, {$find_post['username']} has replied to a forum topic you follow on titled \"{$topic_info['topic_title']}\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP. See this new message here: " . $core->config('website_url') . "forum/topic/{$_POST['topic_id']}/post_id={$_POST['post_id']}";
 
 					// Mail it
 					if ($core->config('send_emails') == 1)

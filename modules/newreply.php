@@ -141,6 +141,8 @@ else
 							}
 						}
 
+						$new_notification_id = $notifications->quote_notification($message, $_SESSION['username'], $_SESSION['user_id'], array('type' => 'forum_reply', 'thread_id' => $topic_id, 'post_id' => $post_id));
+
 						// are we subscribing?
 						if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
 						{

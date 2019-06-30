@@ -114,7 +114,7 @@ if ($total_to_remove > 0)
 /* REMOVE COMPLETED ADMIN NOTES OLDER THAN ONE MONTH */
 $dbl->run("DELETE FROM `admin_notifications` WHERE `completed` = 1 AND created_date <= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))");
 
-/* REMOVE SEEN USER NOTIFICATIONS OLDER THAN SIX MONTH */
+/* REMOVE USER NOTIFICATIONS OLDER THAN SIX MONTHS */
 $dbl->run("DELETE FROM `user_notifications` WHERE last_date <= (now() - interval 6 month)");
 
 // remove pc info where the user hasn't updated the info for 2 years

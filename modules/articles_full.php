@@ -718,7 +718,7 @@ else if (isset($_GET['go']))
 								$article_class->subscribe($article_id, $emails);
 							}
 								
-							$new_notification_id = $article_class->quote_notification($comment, $_SESSION['username'], $_SESSION['user_id'], $article_id, $new_comment_id);
+							$new_notification_id = $notifications->quote_notification($comment, $_SESSION['username'], $_SESSION['user_id'], array('type' => 'article_comment', 'thread_id' => $article_id, 'post_id' => $new_comment_id));
 
 							/* gather a list of subscriptions for this article (not including yourself!)
 							- Make an array of anyone who needs an email now

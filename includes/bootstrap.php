@@ -10,6 +10,8 @@ $dbl = new db_mysql();
 $core = new core($dbl);
 define('url', $core->config('website_url'));
 
+$notifications = new notifications($dbl, $core);
+
 $message_map = new message_map();
 
 // setup the templating, if not logged in default theme, if logged in use selected theme

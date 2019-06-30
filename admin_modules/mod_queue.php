@@ -259,8 +259,8 @@ if (isset($_POST['action']))
 				// update their approved count and comment count
 				$dbl->run("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `comment_count` = (comment_count + 1) WHERE `user_id` = ?", [$_POST['author_id']]);
 
-				$new_notification_id = $article_class->quote_notification($approved['comment_text'], $approved['username'], $_POST['author_id'], $approved['article_id'], $_POST['post_id']);
-				
+				$new_notification_id = $notifications->quote_notification($approved['comment_text'], $approved['username'], $_POST['author_id'], array('type' => 'article_comment', 'thread_id' => $approved['article_id'], 'post_id' => $_POST['post_id']));
+
 				/* gather a list of subscriptions for this article (not including yourself!)
 				- Make an array of anyone who needs an email now
 				- Additionally, send a notification to anyone subscribed

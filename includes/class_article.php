@@ -1580,33 +1580,6 @@ class article
 		return $article_pagination;
 	}
 
-	// give a user a notification if their name was quoted in a comment
-	function quote_notification($text, $username, $author_id, $article_id, $comment_id)
-	{
-		$new_notification_id = '';
-		
-		/* gather a list of people quoted and let them know
-		do this first, so we can check if they have been notified already and not send another */
-		$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
-		preg_match($pattern, $text, $matches);
-
-		if (!empty($matches[1]))
-		{
-			if ($matches[1] != $username)
-			{
-				$quoted_user = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($matches[1]))->fetchOne();
-				if ($quoted_user)
-				{
-					$this->dbl->run("INSERT INTO `user_notifications` SET `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `type` = 'quoted'", array($quoted_user, $author_id, $article_id, $comment_id));
-					$new_notification_id[$quoted_user] = $this->dbl->new_id();
-					$new_notification_id['quoted_username'] = $matches[1];
-				}
-			}
-		}
-		
-		return $new_notification_id;
-	}
-
 	function delete_comment($comment_id)
 	{
 		$comment = $this->dbl->run("SELECT c.`author_id`, c.`comment_text`, c.`spam`, c.`article_id`, u.`username`, a.`title`, a.`slug` FROM `articles_comments` c LEFT JOIN `users` u ON u.`user_id` = c.`author_id` LEFT JOIN `articles` a ON a.`article_id` = c.`article_id` WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();

@@ -1583,35 +1583,27 @@ class article
 	// give a user a notification if their name was quoted in a comment
 	function quote_notification($text, $username, $author_id, $article_id, $comment_id)
 	{
+		$new_notification_id = '';
+		
 		/* gather a list of people quoted and let them know
 		do this first, so we can check if they have been notified already and not send another */
 		$pattern = '/\[quote\=(.+?)\](.+?)\[\/quote\]/is';
-		preg_match_all($pattern, $text, $matches);
+		preg_match($pattern, $text, $matches);
 
-		// we only want to notify them once on being quoted, so make sure each quote has a unique name
-		$quoted_usernames = array_values(array_unique($matches[1]));
-
-		$new_notification_id = [];
-
-		if (!empty($quoted_usernames))
+		if (!empty($matches[1]))
 		{
-			foreach($quoted_usernames as $match)
+			if ($matches[1] != $username)
 			{
-				// don't notify the person making this post, if a quote has their own name in it
-				if ($match != $username)
+				$quoted_user = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($matches[1]))->fetchOne();
+				if ($quoted_user)
 				{
-					$quoted_user = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($match))->fetchOne();
-					if ($quoted_user)
-					{
-						$this->dbl->run("INSERT INTO `user_notifications` SET `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `type` = 'quoted'", array($quoted_user, $author_id, $article_id, $comment_id));
-						$new_notification_id[$quoted_user] = $this->dbl->new_id();
-					}
+					$this->dbl->run("INSERT INTO `user_notifications` SET `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `type` = 'quoted'", array($quoted_user, $author_id, $article_id, $comment_id));
+					$new_notification_id[$quoted_user] = $this->dbl->new_id();
+					$new_notification_id['quoted_username'] = $matches[1];
 				}
 			}
 		}
-
-		$new_notification_id['quoted_usernames'] = $quoted_usernames;
-
+		
 		return $new_notification_id;
 	}
 

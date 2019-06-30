@@ -1,13 +1,13 @@
 [block: search]
 <div class="box">
 	<div class="body group">
-		<form method="post" action="admin.php?module=users&view=search">
+		<form class="gol-form" method="post" action="admin.php?module=users&view=search">
 		Search for a user to view and edit their details.
 		Username: <input type="text" name="username" /><button type="submit" name="search" class="button">Search Usernames</button>
 		</form>
 	</div>
 	<div class="body group">
-		<form method="post" action="admin.php?module=users&view=search">
+		<form class="gol-form" method="post" action="admin.php?module=users&view=search">
 		Search for a user via email to view and edit their details.
 		Email: <input type="text" name="email" /><button type="submit" name="search" class="button">Search Emails</button>
 		</form>
@@ -26,7 +26,7 @@
 [block: search_row]
 <div class="box">
 	<div class="body group">
-		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+		<form class="gol-form" method="post" action="admin.php?module=users&user_id={:user_id}">
 		<a href="admin.php?module=users&view=edituser&user_id={:user_id}">{:username}</a> - {:email}
 		</form>
 	</div>
@@ -40,7 +40,7 @@
 [block: premium_row]
 <div class="box">
 	<div class="body group">
-		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+		<form class="gol-form" method="post" action="admin.php?module=users&user_id={:user_id}">
 		<a href="admin.php?module=users&view=edituser&user_id={:user_id}">{:username}</a>
 		</form>
 	</div>
@@ -51,7 +51,7 @@
 <div class="box"><div class="head">Here you can edit {:username}'s details. <span class="fright"><a href="{:profile_link}">View live profile</a></span></div>
 	<div class="subhead">Profile</div>
 	<div class="body group">
-		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+		<form class="gol-form" method="post" action="admin.php?module=users&user_id={:user_id}">
 			Username: <input type="text" name="username" value="{:username}" /><br />
 			Email: <input type="text" name="email" value="{:email}" /><br />
 			Website: <input type="text" name="website" value="{:website}" /><br />
@@ -73,7 +73,7 @@
 <div class="box">
 	<div class="subhead">Admin Stuff</div>
 	<div class="body group">
-		<form method="post" action="admin.php?module=users&user_id={:user_id}">
+		<form class="gol-form" method="post" action="admin.php?module=users&user_id={:user_id}">
 			<strong>User Groups</strong><br />
 			<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen">{:groups_list}</select><br />
 			Supporter Type:
@@ -90,7 +90,7 @@
 [block: ipban]
 <div class="box">
 	<div class="body group">
-		<form method="post" action="admin.php?module=users">
+		<form class="gol-form" method="post" action="admin.php?module=users">
 			Here you can ban an IP Address from logging in or registering.
 			IP: <input type="text" name="ip" /><button type="submit" class="red-button">Ban IP</button>
 			<input type="hidden" name="act" value="ipban" />
@@ -102,7 +102,7 @@
 [block: iprow]
 <div class="box">
 	<div class="body group">
-		<form method="post" action="admin.php?module=users">
+		<form class="gol-form" method="post" action="admin.php?module=users">
 		IP: {:ip}<br />
 		Banned until: {:removal_date} <br /><button type="submit" class="button" name="act" value="unipban">UnBan</button> <button type="submit" class="button" name="act" value="editipban">Edit</button>
 		<input type="hidden" name="id" value="{:id}" />
@@ -115,7 +115,7 @@
 <div class="box">
 	<div class="head">Editing a banned IP address</div>
 	<div class="body group">
-		<form method="post" action="admin.php?module=users">
+		<form class="gol-form" method="post" action="admin.php?module=users">
 		IP: <input type="text" name="ip" value="{:ip}" /><br />
 		Banned until: {:removal_date} <br />
 		<button type="submit" class="button">Edit IP</button>

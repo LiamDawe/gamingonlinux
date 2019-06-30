@@ -66,7 +66,7 @@ class core
 
 	public function get_dbcache($key)
 	{
-		if (!isset($redis))
+		if (!isset(core::$redis))
 		{
 			return false;
 		}
@@ -78,7 +78,7 @@ class core
 	
 	public function set_dbcache($key, $data, $expiry = NULL)
 	{
-		if (!isset($redis))
+		if (!isset(core::$redis))
 		{
 			return false;
 		}

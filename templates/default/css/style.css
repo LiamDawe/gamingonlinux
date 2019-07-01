@@ -1818,6 +1818,7 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 .dark .table-stripes-tbody tbody tr:nth-child(even) {background: #333}
 .dark .table-stripes-tbody tbody tr:nth-child(odd) {background: #3f3f3f}
 .td-free-games-tags {padding-top: 0px;}
+.dark .table-stripes-tbody th {color: #eee;}
 
 /* calendar */
 .calendar-table {border-collapse: collapse;}

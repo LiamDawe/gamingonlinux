@@ -41,7 +41,7 @@ foreach ($crowdfunders as $item)
 	$notes = '';
 	if (!empty($item['notes']))
 	{
-		$notes = '<br /><em>'.$item['notes'].'</em>';
+		$notes = '<br /><em><small>'.$item['notes'].'</small></em>';
 	}
 	$templating->set('notes', $notes);
 

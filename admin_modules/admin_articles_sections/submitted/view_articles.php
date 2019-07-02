@@ -209,7 +209,7 @@ else if (isset($_GET['aid']))
 
 	$templating->block('full_editor', 'admin_modules/article_form');
 	$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
-	$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
+	$templating->set('main_formaction', '<form class="gol-form" id="article_editor" method="post" action="'.$core->config('website_url').'admin.php?module=articles" enctype="multipart/form-data">');
 	$templating->set('edit_state', $edit_state);
 	$templating->set('edit_state_textarea', $edit_state_textarea);
 

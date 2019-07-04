@@ -192,7 +192,7 @@ class bbcode
 		$text = preg_replace_callback("~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i",
 		function($matches)
 		{
-			return "<a href=\"".$matches[1]."\" target=\"_blank\" rel=\"noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a href=\"".$matches[1]."\" target=\"_blank\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
 		$text);
 
@@ -200,7 +200,7 @@ class bbcode
 		$text = preg_replace_callback("/\[img\](.+?)\[\/img\]/is",
 		function($matches)
 		{
-			return "<a data-fancybox=\"images\" rel=\"group\" href=\"".$matches[1]."\" rel=\"noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a data-fancybox=\"images\" rel=\"group\" href=\"".$matches[1]."\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
 		$text);		
 		
@@ -224,8 +224,8 @@ class bbcode
 		);
 
 		$replace = array(
-		"<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">$3</a>",
-		"<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">$1</a>"
+		"<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$3</a>",
+		"<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>"
 		);
 
 		$text = preg_replace($find, $replace, $text);

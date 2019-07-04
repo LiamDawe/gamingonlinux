@@ -125,6 +125,21 @@ if (isset($search_text) && !empty($search_text))
 			$templating->set('categories_list', $categories_display);
 		}
 		$templating->block('bottom', 'search');
+		$start_no = $core->start;
+		if ($core->start == 0)
+		{
+			$start_no = 1;
+		}
+		$templating->set('search_no_start', $start_no);
+
+		$end_no = $core->start + $per_page;
+		if ($end_no > $total)
+		{
+			$end_no = $total;
+		}
+		$templating->set('end_no', $end_no);
+
+		$templating->set('total', $total);
 		$templating->set('pagination', $pagination);
 	}
 	else

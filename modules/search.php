@@ -53,6 +53,21 @@ foreach ($search_array[0] as $item)
 // check there wasn't none found to prevent loops
 if (isset($search_text) && !empty($search_text))
 {
+	$page = core::give_page();
+	$per_page = 50;
+	$page_url = '/index.php?module=search&q='.$search_text.'&';
+
+	$total = $dbl->run("SELECT COUNT(*) FROM `articles` a LEFT JOIN `users` u ON a.`author_id` = u.`user_id` WHERE a.`active` = 1 AND a.`title` LIKE ? ORDER BY a.`date` DESC", array($search_through))->fetchOne();
+
+	$last_page = ceil($total/$per_page);
+		
+	if ($page > $last_page)
+	{
+		$page = $last_page;
+	}
+
+	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
+
 	// do the search query
 	$found_search = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
 	FROM `articles` a
@@ -60,7 +75,7 @@ if (isset($search_text) && !empty($search_text))
 	WHERE a.`active` = 1
 	AND a.`title` LIKE ?
 	ORDER BY a.`date` DESC
-	LIMIT 0 , 100", array($search_through))->fetch_all();
+	LIMIT $core->start , $per_page", array($search_through))->fetch_all();
 
 	if ($found_search)
 	{
@@ -109,6 +124,8 @@ if (isset($search_text) && !empty($search_text))
 
 			$templating->set('categories_list', $categories_display);
 		}
+		$templating->block('bottom', 'search');
+		$templating->set('pagination', $pagination);
 	}
 	else
 	{

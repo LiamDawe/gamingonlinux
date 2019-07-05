@@ -1,16 +1,10 @@
 <?php
-$file_dir = dirname( dirname(__FILE__) );
+define("APP_ROOT", dirname( dirname(__FILE__)) );
+define('golapp', TRUE);
 
-$db_conf = include $file_dir . '/includes/config.php';
+include(APP_ROOT . '/includes/header.php');
 
-include($file_dir. '/includes/class_db_mysql.php');
-$dbl = new db_mysql("mysql:host=".$db_conf['host'].";dbname=".$db_conf['database'],$db_conf['username'],$db_conf['password']);
-
-include($file_dir . '/includes/class_core.php');
-$core = new core($dbl, $file_dir);
-
-include($file_dir . '/includes/class_template.php');
-$templating = new template($core, $core->config('template'));
+$templating->block('left', 'mainpage');
 
 if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 {
@@ -18,11 +12,22 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 	$username = core::make_safe($_POST['username']);
 	$email = core::make_safe($_POST['email']);
 	$password = $_POST['password'];
+	$user_groups = $_POST['user_groups'];
 
 	$check_empty = core::mempty(compact('username', 'email', 'password'));
-	if ($check_empty != true)
+	if ($check_empty !== true)
 	{
-		header("Location: /make_user.php&message=missing&extra=".$check_empty);
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = $check_empty;
+		header("Location: /tools/make_user.php");
+		die();
+	}
+
+	if (empty($user_groups))
+	{
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'user groups';
+		header("Location: /tools/make_user.php");
 		die();
 	}
 
@@ -52,7 +57,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user')
 	$new_total = $dbl->run("SELECT `data_value` FROM `config` WHERE `data_key` = 'total_users'")->fetchOne();
 
 	// invalidate the cache
-	core::$redis->set('CONFIG_total_users', $new_total); // no expiry as config hardly ever changes
+	$core->set_dbcache('CONFIG_total_users', $new_total); // no expiry as config hardly ever changes
 
 	echo 'User <strong>' . $username . '</strong> created with password: ' . $_POST['password'];
 }
@@ -82,18 +87,16 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user_random')
 		echo 'User <strong>' . $username . '</strong> created with password: ' . $password;
 	}
 }
+if (isset($_SESSION['message']))
+{
+	$extra = NULL;
+	if (isset($_SESSION['message_extra']))
+	{
+		$extra = $_SESSION['message_extra'];
+	}
+	$message_map->display_message(core::$current_module['module_file_name'], $_SESSION['message'], $extra);
+}
 ?>
-<html lang="en">
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<title>GOL - User Creation</title>
-<link rel="stylesheet" type="text/css" href="../includes/jscripts/select2/select2.min.css">
-<script src="../includes/jscripts/jquery-3.2.1.min.js"></script>
-<script src="../includes/jscripts/select2/select2.min.js?v=1"></script>
-<script async type="text/javascript" src="../includes/jscripts/GOL/header.js?v=8.7.3"></script>
-</head>
-
-<body itemscope itemtype="http://schema.org/Article">
 <div style="margin: auto; width: 50%;">
 	You can use this form to make a new user in any user groups. This is not meant for a live site! It will display the plain text password that was given!<br />
 	<form method="post" action="make_user.php">
@@ -104,6 +107,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user_random')
 	<select tabindex="-1" multiple="" name="user_groups[]" class="call_user_groups" style="width:300px" class="populate select2-offscreen"></select><br />
 	<label>In moderation queue? <input type="checkbox" name="modqueue" /></label><br />
 	<button type="submit" name="act" value="reg_user">Create user</button>
+	</form>
 	<p>Or, you can make a bunch of random users all at once to test a feature:</p>
 	<form method="post" action="make_user.php">
 	<p><strong>Number of users</strong></p>
@@ -122,6 +126,5 @@ if (isset($_POST['act']) && $_POST['act'] == 'reg_user_random')
 	<button type="submit" name="act" value="reg_user_random">Create random users</button>		
 	</form>
 </div>
-</form>
-</body>
-</html>
+<?php 
+include(APP_ROOT . '/includes/footer.php');

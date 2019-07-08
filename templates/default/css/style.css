@@ -15,7 +15,7 @@ body {
  * ------------------------------
  */
 
-.gol-form textarea, .gol-form input[type="text"], .gol-form input[type="password"], .gol-form select {
+.gol-form textarea, .gol-form input[type="text"], .gol-form input[type="password"], .gol-form input[type="email"], .gol-form select {
 	width: 100%;
 } 
 input[type="button"]:disabled, input[type="submit"]:disabled, input[type="reset"]:disabled,

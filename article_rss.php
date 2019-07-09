@@ -146,7 +146,8 @@ if ($core->config('articles_rss') == 1)
 			}
 			else
 			{
-				$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
+				$random_id = core::random_id(15);
+				$text = $bbcode->rss_stripping($line['text'] . "<div id=\"{$random_id}\">Article from <a href=\"https://www.gamingonlinux.com/\">GamingOnLinux.com</a></div>", $tagline_bbcode, $bbcode_tagline_gallery);
 			}
 			
 			$xml->startElement('description');

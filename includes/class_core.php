@@ -831,7 +831,7 @@ class core
 
 	public static function random_id($length = 10)
 	{
-		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_()';
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_';
 		$characters_length = strlen($characters);
 		$random_string = '';
 		for ($i = 0; $i < $length; $i++)

@@ -750,7 +750,7 @@ else if (isset($_GET['go']))
 								}
 
 								// notify them, if they haven't been quoted and already given one
-								if ((isset($new_notification_id['quoted_username']) && $email_user['username'] != $new_notification_id['quoted_username']) || !isset($new_notification_id['quoted_username']))
+								if (!in_array($email_user['username'], $new_notification_id['quoted_usernames']))
 								{
 									$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `type` != 'liked' AND `type` != 'quoted'", array($article_id, $email_user['user_id']))->fetch();
 

@@ -6,17 +6,6 @@ CKEDITOR.on('instanceCreated', function(e) {
 		$(textarea).val(event.editor.getData().trim());
 		$(textarea.form).trigger('checkform.areYouSure');
 	});
-	/* MAY COME BACK TO THIS - trying to get CKEditor not to sort html tags alphabetically...
-	e.editor.on('mode', function() 
-	{
-		if (e.editor.mode === 'wysiwyg')
-		{
-			alert(e.editor.dataProcessor.writer.sortAttributes);
-			alert(e.editor.mode);
-			e.editor.dataProcessor.writer.sortAttributes = 0; // don't change the order of our input
-		}
-		alert(e.editor.dataProcessor.writer.sortAttributes);
-	});*/
 })
 
 editor = CKEDITOR.replace( 'ckeditor_gol', {

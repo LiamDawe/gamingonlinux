@@ -37,7 +37,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.bodyClass = 'article';
 
 	// Set the most common block elements.
-	config.format_tags = 'p;h1;h2;h3;pre';
+	config.format_tags = 'p;h1;h2;h3;h4;h5;pre';
 
 	// we don't want an empty <p></p> as content
 	config.ignoreEmptyParagraph = false;

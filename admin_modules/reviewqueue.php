@@ -150,7 +150,7 @@ else
 	$templating->set('max_filesize', core::readable_bytes($core->config('max_tagline_image_filesize')));
 	$templating->set('edit_state', $edit_state);
 	$templating->set('edit_state_textarea', $edit_state_textarea);
-	$templating->set('main_formaction', '<form id="article_editor" method="post" action="'.url.'admin.php?module=reviewqueue" enctype="multipart/form-data">');
+	$templating->set('main_formaction', '<form class="gol-form" id="article_editor" method="post" action="'.url.'admin.php?module=reviewqueue" enctype="multipart/form-data">');
 
 	// get categorys
 	$cur_res = $dbl->run("SELECT `category_id` FROM `article_category_reference` WHERE `article_id` = ?", array($article['article_id']))->fetch_all();

@@ -22,7 +22,7 @@
 [block: review_row]
 <div class="box">
 	<div class="body group">
-		<form method="post" role="form">
+		<form class="gol-form" method="post" role="form">
 			<strong>{:article_title}</strong> by {:username} submitted on {:date_submitted} <br />
 			<button type="submit" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}">View</button>
 			<button type="submit" formaction="{:url}admin.php?module=reviewqueue&aid={:article_id}#comments">Go to Comments ({:comment_count})</button>

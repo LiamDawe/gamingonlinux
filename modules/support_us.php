@@ -30,7 +30,7 @@ foreach ($res as $rowuser)
 	$supporter_link = '';
 	if (!empty($rowuser['supporter_link']))
 	{
-		$supporter_link = " | <a href=\"{$rowuser['supporter_link']}\">Website</a>";
+		$supporter_link = " | <a href=\"{$rowuser['supporter_link']}\">Link</a>";
 	}
 	$templating->set('supporter_link', $supporter_link);
 }

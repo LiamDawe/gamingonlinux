@@ -59,8 +59,19 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$thumb_url = $core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $image_name;
 
 					// thumbs
+					$img->fromFile($_FILES['media']['tmp_name'][$name]);
+
 					$thumb_newname = $thumbs_dir.$image_name;
-					$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(350, null)->toFile($thumb_newname);
+
+					// so we don't make a big thumbnail of a small image
+					if ($img->getWidth() <= 455)
+					{
+						$img->fromFile($_FILES['media']['tmp_name'][$name])->toFile($thumb_newname);
+					}
+					else
+					{
+						$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(455, null)->toFile($thumb_newname);
+					}
 
 					// if it's a gif, we need a static version to switch to a gif
 					if ($ext == 'gif')

@@ -203,9 +203,6 @@ if (!isset($_GET['go']))
 				
 				$facebook_share = '<a class="button small fnone" href="#" onclick="'.$fb_onclick.'" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/network-icons/facebook.svg" alt="" /></a>';
 				$templating->set('facebook_share', $facebook_share);
-				
-				$gplus_share = '<a class="button small fnone" href="https://plusone.google.com/_/+1/confirm?hl=en&url='.$share_url.'" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/network-icons/google-plus.svg" alt="" /></a>';
-				$templating->set('gplus_share', $gplus_share);
 
 				$article_link = $article_class->get_link($_GET['aid'], $nice_title);
 				

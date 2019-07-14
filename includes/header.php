@@ -55,12 +55,12 @@ $templating->set('url', $core->config('website_url'));
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
 // if using the dark theme
-$body_class = '';
+$dark_css = '';
 if ($theme == 'dark')
 {
-	$body_class = 'class="dark"';
+	$dark_css = '<link rel="stylesheet" type="text/css" href="'.$core->config('website_url').'templates/'.$core->config('template').'/css/shipping/dark.css" />';
 }
-$templating->set('body_class', $body_class);
+$templating->set('dark_css', $dark_css);
 
 $templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for GamingOnLinux" href="'.$core->config('website_url').'article_rss.php" />');
 

@@ -1,0 +1,432 @@
+body {
+  background: #151515;
+  color: #cccccc; }
+
+a, a:hover, a:active, a:link, a:visited {
+  color: #428BCA; }
+
+hr {
+  border-color: #111111; }
+
+strong {
+  color: #ffffff; }
+
+.bbcodeblock, code {
+  color: #ccc;
+  background-color: #383838; }
+
+pre {
+  background: #222; }
+
+.collapse_header {
+  background: #000; }
+
+.cke_dialog_contents textarea, .cke_dialog_contents input[type="text"], .cke_dialog_ui_input_select {
+  background-color: #151515 !important;
+  color: #cccccc; }
+
+.special_container {
+  color: #ccc;
+  background-color: #383838; }
+
+.article table {
+  border: 1px solid #eee; }
+
+/* comments */
+#comments-background {
+  background: #151515; }
+
+.comment {
+  border: 1px solid #444444;
+  background: #222; }
+
+/* youtube cookie acceptance */
+.hidden_video {
+  background: #191919; }
+
+.calendar-items tr:nth-child(even) {
+  background: #333; }
+
+.calendar-items tr:nth-child(odd) {
+  background: #3f3f3f; }
+
+/* free games page */
+.table-stripes-tbody tbody tr:nth-child(even) {
+  background: #333; }
+
+.table-stripes-tbody tbody tr:nth-child(odd) {
+  background: #3f3f3f; }
+
+.table-stripes-tbody th {
+  color: #eee; }
+
+/* sales page */
+.bundle-row:hover {
+  background-color: #202a35; }
+
+.sales-table th {
+  color: #eee; }
+
+.table-stripes tr:nth-child(even) {
+  background: #333; }
+
+.table-stripes tr:nth-child(odd) {
+  background: #3f3f3f; }
+
+/* badges */
+a.badge.blue {
+  color: #cccccc; }
+
+/* articles */
+.likes {
+  background: #383838;
+  background: linear-gradient(to left, rgba(56, 56, 56, 0), #383838); }
+
+.article_likes {
+  background: #383838;
+  background: linear-gradient(to left, rgba(56, 56, 56, 0), #383838); }
+
+/* Forum */
+.post_row {
+  background: #333333;
+  border-bottom: 1px solid #868686; }
+
+h1, h2, h3, h4, h5, h6 {
+  color: #428BCA;
+  font-weight: 600; }
+
+input[type="text"][readonly] {
+  background-color: #000000; }
+
+input, textarea, select {
+  background: #333;
+  border: 1px solid #444;
+  color: #ffffff; }
+
+.input-field {
+  background: #333;
+  border: 1px solid #444; }
+
+.input-field .addon {
+  text-shadow: none;
+  background: #474747; }
+
+.button, button, input[type=submit], input[type=reset], input[type=button] {
+  background: #428BCA;
+  border: 1px solid #357CB7;
+  color: #ffffff; }
+
+.button:hover, button:hover, input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover {
+  background: #357CB7;
+  color: #ffffff; }
+
+#wrapper #header {
+  background: #375A7F; }
+
+#navigation ul {
+  background: #375A7F;
+  border-color: #2F4E6D; }
+
+#navigation ul li {
+  border-color: #2F4E6D; }
+
+#navigation ul li > a {
+  border-color: #2F4E6D; }
+
+#navigation ul li.active > a, #navigation ul li:hover > a, #navigation ul li:active > a {
+  color: #111111; }
+
+#navigation ul li > div {
+  background: #375A7F;
+  border-color: #2F4E6D; }
+
+.box .body, .article, #ads {
+  background: #222222; }
+
+.box .head {
+  background: #383838; }
+
+.box .body.list ul li {
+  border-bottom: 1px solid #111111; }
+
+.article .info .desc {
+  border-top: 1px solid #111111; }
+
+.article.individual .info {
+  border-bottom: 1px solid #111111; }
+
+.article.individual .tags {
+  border-top: 1px solid #111111; }
+
+.article.individual.no-image .info {
+  background-color: #151515;
+  background-image: url("/templates/default/images/article-discussion-dark.png");
+  background-image: url("/templates/default/images/article-discussion-dark.svg"), none;
+  border: none; }
+
+.article.individual.no-image .info .bubble {
+  background: #222222; }
+
+.comment .comment-meta {
+  background: #333333;
+  border-color: #444444; }
+
+.comment .comment-meta .distro {
+  background: #b7b7b7; }
+
+.distro {
+  background: #b7b7b7;
+  width: 20px;
+  padding: 3px;
+  margin-right: 8px;
+  vertical-align: sub;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px; }
+
+.fancybox-slide > div {
+  background: #000000; }
+
+.comment .comment-social li a {
+  background: #333333; }
+
+.comment .comment-meta .comment-actions li a {
+  background: #222222; }
+
+.comment .comment-meta .comment-actions li a:hover, .comment .comment-social li a:hover {
+  background: #428BCA; }
+
+.octus-editor .styles {
+  background: #222222;
+  border-color: #333333; }
+
+.octus-editor .textarea {
+  border-color: #333333; }
+
+.octus-editor .textarea textarea {
+  background: #333333; }
+
+.octus-editor > .styles > ul > li {
+  background: #333333;
+  border-color: #444444;
+  color: #ffffff; }
+
+.octus-editor > .styles > ul > li.dropdown ul {
+  background: #333333;
+  border-color: #444444; }
+
+.octus-editor > .styles > ul > li.dropdown ul li {
+  border-color: #444444; }
+
+.octus-editor .textarea > textarea {
+  color: #ffffff; }
+
+.octus-editor a.button {
+  background: #333333;
+  border-color: #444444;
+  color: #ffffff; }
+
+ul.pagination li a {
+  border: solid 1px #32373b;
+  background: #3e4347;
+  box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.1);
+  color: #feffff;
+  text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5); }
+
+ul.pagination li:hover a {
+  background: #3d4f5d;
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#547085), to(#3d4f5d));
+  background: -moz-linear-gradient(0% 0% 270deg, #547085, #3d4f5d); }
+
+ul.pagination li.active a {
+  border: none;
+  background: #2f3237;
+  box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.1); }
+
+ul.pagination li.pagination-disabled a {
+  pointer-events: none;
+  background: #2f3237; }
+
+select.pagination {
+  border: solid 1px #32373b;
+  background: #3e4347;
+  box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.1);
+  color: #feffff;
+  text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5); }
+
+select.pagination:hover {
+  background: #3d4f5d;
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#547085), to(#3d4f5d));
+  background: -moz-linear-gradient(0% 0% 270deg, #547085, #3d4f5d); }
+
+select.pagination option {
+  background: #3e4347;
+  color: #feffff; }
+
+.box .subhead {
+  background-color: #4e4e4e; }
+
+.livestream {
+  background: #111111; }
+
+.livestream a {
+  color: #ffffff; }
+
+.livestream .next-time {
+  background: #222222; }
+
+.icon.website {
+  background-image: url("/templates/default/images/network-icons/white/website.svg"); }
+
+.icon.twitter {
+  background-image: url("/templates/default/images/network-icons/white/twitter.svg"); }
+
+.icon.google-plus {
+  background-image: url("/templates/default/images/network-icons/white/google-plus.svg"); }
+
+.icon.youtube {
+  background-image: url("/templates/default/images/network-icons/white/youtube.svg"); }
+
+.icon.facebook {
+  background-image: url("/templates/default/images/network-icons/white/facebook.svg"); }
+
+.icon.twitch {
+  background-image: url("/templates/default/images/network-icons/white/twitch.svg"); }
+
+.icon.steam {
+  background-image: url("/templates/default/images/network-icons/white/steam.svg"); }
+
+.icon.flag {
+  background-image: url("/templates/default/images/comments/white/flag.svg"); }
+
+.icon.link {
+  background-image: url("/templates/default/images/comments/white/link.svg"); }
+
+.icon.quote {
+  background-image: url("/templates/default/images/comments/white/quote.svg"); }
+
+.icon.like {
+  background-image: url("/templates/default/images/comments/white/like.svg"); }
+
+.icon.unlike {
+  background-image: url("/templates/default/images/comments/white/unlike.svg"); }
+
+.icon.edit {
+  background-image: url("/templates/default/images/comments/white/edit.svg"); }
+
+.icon.delete {
+  background-image: url("/templates/default/images/comments/white/delete.svg"); }
+
+.icon.block {
+  background-image: url("/templates/default/images/comments/white/block_user.svg"); }
+
+.icon.envelope {
+  background-image: url("/templates/default/images/comments/white/envelope.svg"); }
+
+.icon.envelope-open {
+  background-image: url("/templates/default/images/comments/white/envelope-open.svg"); }
+
+.icon.bookmark {
+  background-image: url("/templates/default/images/comments/white/bookmark.png"); }
+
+.bookmark-saved {
+  background-color: #A4A400 !important; }
+
+::selection {
+  background: #ffb7b7;
+  /* WebKit/Blink Browsers */ }
+
+::-moz-selection {
+  background: #ffb7b7;
+  /* Gecko Browsers */ }
+
+.article .bottom-meta ul li a {
+  background: #222222;
+  float: left;
+  padding: 5px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px; }
+
+.article .bottom-meta ul li a:hover {
+  background-color: #428BCA; }
+
+.select2-selection__rendered {
+  color: #fff !important; }
+
+/* items database */
+.database-extra {
+  background-color: #515151; }
+
+/* fancybox model */
+.modal-container .fancybox-close-small {
+  background: #383838;
+  border: none; }
+
+.modal-title {
+  background: #383838; }
+
+.modal-body {
+  background: #222; }
+
+/* announcement bars */
+div.announce:nth-of-type(odd) {
+  background: #609FA9;
+  margin-bottom: 7px;
+  color: #000; }
+
+div.announce:nth-of-type(even) {
+  background: #99CCFF;
+  margin-bottom: 7px;
+  color: #000; }
+
+.announce a {
+  color: #191919;
+  font-style: italic; }
+
+.announce a:link {
+  color: #191919;
+  font-style: italic; }
+
+div.gol_twitch .twitch_announce {
+  background-color: #4b367c;
+  color: #fff;
+  font-style: italic; }
+
+.breadcrumb {
+  background: #2E2E2E; }
+
+/* gol charts */
+.golsvg_header {
+  fill: #515151; }
+
+.golsvg_background {
+  fill: #000000; }
+
+svg text {
+  fill: white; }
+
+.golsvg_counters {
+  fill: white; }
+
+.select2-selection {
+  background-color: #515151 !important; }
+
+.select2-selection__choice {
+  background-color: #515151 !important; }
+
+.select2-results {
+  background-color: #515151 !important; }
+
+.vote_done {
+  color: white;
+  background-color: green; }
+
+#wrap strong {
+  color: black; }
+
+/*# sourceMappingURL=dark.css.map */

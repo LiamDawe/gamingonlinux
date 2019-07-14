@@ -36,28 +36,6 @@ a {
     padding : 5px;
 }
 
-/* Dark CSS */
-body.dark {
-	background: #151515;
-	color: #cccccc;
-}
-.dark a, .dark a:hover, .dark a:active {
-    color: #428BCA;
-}
-.dark hr {border-color: #111111;}
-
-.dark strong {color: #ffffff}
-
-.dark .bbcodeblock, .dark code {
-	color: #ccc;
-	background-color: #383838;
-}
-
-.dark pre {background:#222;}
-
-.dark .collapse_header {background: #000;}
-.dark .cke_dialog_contents textarea, .dark .cke_dialog_contents input[type="text"], .dark .cke_dialog_ui_input_select { background-color: #151515 !important; color: #cccccc}
-
 /* misc elements */
 .bbcodeblock, code {
 	margin: 0px;
@@ -84,15 +62,10 @@ body.dark {
 	border: 1px solid #b4b4b4;
 	text-align: left;
 }
-.dark .special_container
-{
-	color: #ccc;
-	background-color: #383838;
-}
+
 hr.content_split { 
 	background-color: #fff;
 	border-top: 2px dotted #8c8b8b;
 }
 
 .article table {border: 1px solid #2e2e2e;}
-.dark .article table {border: 1px solid #eee;}

@@ -64,13 +64,13 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$thumb_newname = $thumbs_dir.$image_name;
 
 					// so we don't make a big thumbnail of a small image
-					if ($img->getWidth() <= 455)
+					if ($img->getWidth() <= 450)
 					{
 						$img->fromFile($_FILES['media']['tmp_name'][$name])->toFile($thumb_newname);
 					}
 					else
 					{
-						$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(455, null)->toFile($thumb_newname);
+						$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(450, null)->toFile($thumb_newname);
 					}
 
 					// if it's a gif, we need a static version to switch to a gif

@@ -18,7 +18,7 @@ strong {
 pre {
   background: #222; }
 
-.collapse_header {
+.collapse_container .collapse_header {
   background: #000; }
 
 .cke_dialog_contents textarea, .cke_dialog_contents input[type="text"], .cke_dialog_ui_input_select {

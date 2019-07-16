@@ -23,6 +23,14 @@ Options +SymLinksifOwnerMatch
 </IfModule>
 # END EXPIRES
 
+# Extra Security Headers
+<IfModule mod_headers.c>
+	Header set X-XSS-Protection "1; mode=block"
+	Header always append X-Frame-Options SAMEORIGIN
+	Header set X-Content-Type-Options nosniff
+</IfModule>
+
+
   RewriteCond %{SCRIPT_FILENAME} !-d
 
   RewriteCond %{SCRIPT_FILENAME} !-f

@@ -30,7 +30,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Subscript,Superscript';
 
-	config.contentsCss = [ '/templates/default/css/content.css', '/templates/default/css/reset.css' ];
+	config.contentsCss = [ '/templates/default/css/shipping/content.css', '/templates/default/css/shipping/reset.css' ];
 
 	config.height = 500;
 

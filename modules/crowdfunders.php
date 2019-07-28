@@ -50,9 +50,9 @@ foreach ($crowdfunders as $item)
 	$templating->set('link', $item['crowdfund_link']);
 
 	$notes = '';
-	if (!empty($item['notes']))
+	if (!empty($item['crowdfund_notes']))
 	{
-		$notes = '<br /><em><small>'.$item['notes'].'</small></em>';
+		$notes = '<br /><em><small>'.$item['crowdfund_notes'].'</small></em>';
 	}
 	$templating->set('notes', $notes);
 

@@ -40,7 +40,7 @@ foreach ($crowdfunders as $item)
 	}
 	$templating->set('dev_name', $dev_name);
 
-	$templating->set('link', $item['link']);
+	$templating->set('link', $item['crowdfund_link']);
 
 	$notes = '';
 	if (!empty($item['notes']))

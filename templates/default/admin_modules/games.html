@@ -94,12 +94,16 @@
 					<em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label><br />
 					<label><input type="checkbox" name="is_hidden_steam" {:is_hidden_steam_check}/> Is the Linux version hidden on Steam currently? (Alpha, Beta - No SteamOS icon)</label><br />
 					<label><input type="checkbox" name="is_crowdfunded" {:is_crowdfunded_check}> Was this crowdfunded? Tick this to show up on the crowdfunding page.</label><br />
+					<br />
 					<strong>Crowdfunding Extras</strong><br />
 					<label><input type="checkbox" name="failed_linux" {:failed_linux_check}> Failed on the Linux support?</label><br />
 					<label><input type="checkbox" name="linux_stretch_goal" {:linux_stretch_goal_check}> Linux stretch-goal?</label><br />
 					<label><input type="checkbox" name="in_development" {:in_development_check}> In development?</label><br />
 					Crowdfunding Link:<br />
 					<input type="text" name="crowdfund_link" value="{:crowdfund_link}" /><br />
+					Crowdfunding Note:<br />
+					<em>A small note to include, like if the developer vanished for example.</em><br />
+					<input type="text" name="crowdfund_notes" value="{:crowdfund_notes}" /><br />
 					<br />
 					What is it?
 					<select name="type">

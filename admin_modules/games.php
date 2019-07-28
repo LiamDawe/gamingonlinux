@@ -73,7 +73,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'crowdfund_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'crowdfund_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name', 'crowdfund_notes');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');
@@ -251,6 +251,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					}
 					$templating->set($check.'_check', $status);
 				}
+
+				$crowdfund_notes = '';
+				if ($game['crowdfund_notes'] != NULL)
+				{
+					$crowdfund_notes = $game['crowdfund_notes'];
+				}
+				$templating->set('crowdfund_notes', $crowdfund_notes);
 
 				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
 				$type_options = '';
@@ -517,6 +524,7 @@ if (isset($_POST['act']))
 		$gog_link = trim($_POST['gog_link']);
 		$itch_link = trim($_POST['itch_link']);
 		$crowdfund_link = trim($_POST['crowdfund_link']);
+		$crowdfund_notes = trim($_POST['crowdfund_notes']);
 
 		if ($_POST['act'] == 'Edit' || $_POST['act'] == 'Approve')
 		{
@@ -635,7 +643,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Add')
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id));
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id, $crowdfund_notes));
 			$new_id = $dbl->new_id();
 	
 			$core->process_game_genres($new_id);
@@ -653,7 +661,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Edit')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id, $crowdfund_notes, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 	

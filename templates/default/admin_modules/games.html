@@ -12,13 +12,14 @@
 [block: search]
 <div class="box">
 	<div class="head">
-		Search for a specific game
+		Search for a specific item: Game, Emulator, Software etc
 	</div>
 	<div class="body group">
-		<form method="post" action="admin.php?module=games&view=search">
-			Game Name: <input id="all-games-search" type="text" name="q" value="{:search_text}" /><br />
+		<form class="gol-form" method="post" action="admin.php?module=games&view=search">
+			Game Name: <input id="all-games-search" type="text" name="q" value="{:search_text}" />
 			<button formaction="admin.php?module=games&view=search" name="search" value="Search" type="submit">Search</button>
 		</form>
+		Not found it? You can <a href="/admin.php?module=games&view=add_links">add it here</a>.
 	</div>
 </div>
 [/block: search]

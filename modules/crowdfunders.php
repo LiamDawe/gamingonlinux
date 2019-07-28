@@ -33,6 +33,13 @@ foreach ($crowdfunders as $item)
 	$templating->block('row');
 	$templating->set('name', $item['name']);
 
+	$edit = '';
+	if ($user->check_group([1,2,5]))
+	{
+		$edit = '<a href="/admin.php?module=games&view=edit&id='.$item['id'].'"><span class="icon edit edit-sale-icon"></span></a> ';
+	}
+	$templating->set('edit', $edit);
+
 	$dev_name = '';
 	if (isset($item['dev_name']))
 	{

@@ -29,13 +29,25 @@
 
 [block: search_items]
 <div class="body group">
-{:name} - <a href="admin.php?module=games&view=edit&id={:id}">Edit</a> - <a href="/index.php?module=items_database&amp;view=item&amp;id={:id}">View live</a>
+{:name} - <a href="admin.php?module=games&amp;view=edit&amp;id={:id}">Edit</a> - <a href="/index.php?module=items_database&amp;view=item&amp;id={:id}">View live</a>
 </div>
 [/block: search_items]
 
 [block: search_result_bottom]
 </div>
 [/block: search_result_bottom]
+
+[block: add_links]
+<div class="box">
+	<div class="head">Adding content to our games and software database</div>
+	<div class="body group">
+		<ul>
+			<li><a href="/admin.php?module=games&amp;view=add">Add Game/Emulator/Software</a></li>
+			<li><a href="/admin.php?module=games&amp;view=add_developer">Add Developer/Publisher</a></li>
+		</ul>
+	</div>
+</div>
+[/block: add_links]
 
 [block: add_top]
 <div class="box"><div class="head">Adding a game to the games database</div>
@@ -195,6 +207,24 @@
 </div>
 </div>
 [/block: submitted_bottom]
+
+[block: add_developer]
+<form method="post" action="/admin.php?module=games">
+<div class="box">
+	<div class="head">Add a developer to our list</div>
+	<div class="subhead">Required</div>
+	<div class="body group">
+		
+			Name: <input type="text" name="name" value="" />
+	</div>
+	<div class="subhead">Not Required</div>
+	<div class="body group">
+			Official website: <input type="text" name="link" value="{:link}" /><br />
+	</div>
+	<div class="body group"><button formaction="/admin.php?module=games" name="act" value="add_developer">Add Developer</button></div>
+</div>
+</form>
+[/block: add_developer]
 
 [block: submit_developer]
 <div class="box">

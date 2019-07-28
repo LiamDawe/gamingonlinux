@@ -10,6 +10,14 @@ $templating->load('admin_modules/games');
 
 if (isset($_GET['view']) && !isset($_POST['act']))
 {
+	// shows a list of things you can add
+	if ($_GET['view'] == 'add_links')
+	{
+		$templating->set_previous('meta_description', 'Select the type of item to add to the database', 1);
+		$templating->set_previous('title', 'Adding to the database', 1);
+
+		$templating->block('add_links');		
+	}
 	if ($_GET['view'] == 'search')
 	{
 		$templating->set_previous('meta_description', 'Search the entire games database', 1);
@@ -47,6 +55,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 
 	}
+	// adding an item to the database - game/software/emulator
 	if ($_GET['view'] == 'add')
 	{
 		if (!isset($message_map::$error) || $message_map::$error == 0)
@@ -90,6 +99,29 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$templating->block('add_bottom', 'admin_modules/games');
 	}
+	// add a developer/publisher to the database
+	if ($_GET['view'] == 'add_developer')
+	{
+		$templating->set_previous('meta_description', 'Adding a developer to the database', 1);
+		$templating->set_previous('title', 'Adding a developer to the database', 1);
+
+		$templating->block('add_developer');
+
+		$link = '';
+		if (!isset($message_map::$error) || $message_map::$error == 0)
+		{
+			unset($_SESSION['error_item_link']);	
+		}
+		else
+		{
+			if (isset($_SESSION['error_item_link']))
+			{
+				$link = $_SESSION['error_item_link'];
+			}
+		}
+		$templating->set('link', $link);
+	}
+	// approve or deny submitted game tags from users
 	if ($_GET['view'] == 'tag_suggestions')
 	{
 		$templating->block('quick_links');
@@ -829,6 +861,49 @@ if (isset($_POST['act']))
 		$_SESSION['message'] = 'submit_approved';
 		header("Location: /admin.php?module=games&view=submitted_list");
 	}
+
+	if ($_POST['act'] == 'add_developer')
+	{
+		// make sure its not empty
+		$name = trim($_POST['name']);
+		if (empty($name))
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = 'developer/publisher name';
+			$_SESSION['error_item_link'] = $_POST['link'];
+			header("Location: /admin.php?module=games&view=add_developer");
+			die();
+		}
+		
+		if (isset($_POST['link']))
+		{
+			$link = trim($_POST['link']);
+		}
+		else
+		{
+			$link = NULL;
+		}
+
+		$add_res = $dbl->run("SELECT `name` FROM `developers` WHERE `name` = ? AND `approved` = 1", array($name))->fetch();
+		if ($add_res)
+		{
+			$_SESSION['message'] = 'dev_approve_exists';
+			header("Location: /admin.php?module=games&view=add_developer");
+			die();
+		}
+
+		$dbl->run("INSERT INTO `developers` SET `approved` = 1, `name` = ?, `website` = ?", [$name, $link]);
+
+		unset($_SESSION['error_item_link']);
+	
+		// note who denied it
+		$core->new_admin_note(array('completed' => 1, 'content' => ' added a developer to the database: ' . $name . '.'));		
+
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'developer "'.$name.'"';
+		header("Location: /admin.php?module=games&view=add_developer");
+	}
+
 	if ($_POST['act'] == 'deny_dev')
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))

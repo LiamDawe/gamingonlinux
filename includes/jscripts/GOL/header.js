@@ -1897,7 +1897,7 @@ jQuery(document).ready(function()
 	/* GOTY Page */
 
 	var picker_url = 'games';
-
+	// this is also used for adding a game to the DB for the developer bit!
 	$(".game_picker").select2({
 	  selectOnClose: true,
 	  width: '100%',

@@ -6,10 +6,10 @@ if(!defined('golapp'))
 $templating->set_previous('title', 'Crowdfunded Linux games', 1);
 $templating->set_previous('meta_description', 'Crowdfunded Linux games', 1);
 
-$total_projects = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` ORDER BY `name` ASC")->fetchOne();
-$in_development = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` WHERE `in_development` = 1 ORDER BY `name` ASC")->fetchOne();
-$total = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` WHERE `failed_linux` IN (0,1,2) AND `in_development` IS NULL ORDER BY `name` ASC")->fetchOne();
-$total_failed = $dbl->run("SELECT COUNT(*) FROM `crowdfunders` WHERE `failed_linux` IN (1,2) ORDER BY `name` ASC")->fetchOne();
+$total_projects = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `is_crowdfunded` = 1 ORDER BY `name` ASC")->fetchOne();
+$in_development = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `in_development` = 1 AND `is_crowdfunded` = 1 ORDER BY `name` ASC")->fetchOne();
+$total = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `failed_linux` IN (0,1,2) AND `in_development` = 0 AND `is_crowdfunded` = 1 ORDER BY `name` ASC")->fetchOne();
+$total_failed = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `failed_linux` IN (1,2) AND `is_crowdfunded` = 1 ORDER BY `name` ASC")->fetchOne();
 
 $templating->load('crowdfunders');
 $templating->block('list_top');
@@ -26,7 +26,7 @@ $failed_percentage = round($total_failed/$total*100);
 $templating->set('success_rate', $succeed_percentage . '%');
 $templating->set('failed_percentage', $failed_percentage . '%');
 
-$crowdfunders = $dbl->run("SELECT c.*,d.name AS dev_name FROM `crowdfunders` c LEFT JOIN `developers` d ON d.id = c.developer_id ORDER BY c.`name` ASC")->fetch_all();
+$crowdfunders = $dbl->run("SELECT c.*,d.name AS dev_name FROM `calendar` c LEFT JOIN `developers` d ON d.id = c.developer_id WHERE c.`is_crowdfunded` = 1 ORDER BY c.`name` ASC")->fetch_all();
 
 foreach ($crowdfunders as $item)
 {

@@ -73,7 +73,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'crowdfund_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');
@@ -187,7 +187,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		else
 		{
-			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
+			$game = $dbl->run("SELECT c.*, d.name as developer_name, d.id as developer_id, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id LEFT JOIN `developers` d ON c.developer_id = d.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
 
 			if (!$game)
 			{
@@ -214,7 +214,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$return = $_GET['return'];
 				}
 
-				$stores = array('steam', 'gog', 'itch');
+				$stores = array('steam', 'gog', 'itch', 'crowdfund');
 				foreach ($stores as $store)
 				{
 					$templating->set($store . '_link', $game[$store . '_link']);
@@ -241,7 +241,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$date = new DateTime($game['date']);
 				$templating->set('date', $date->format('d-m-Y'));
 
-				$checkboxes_names = ['supports_linux', 'is_hidden_steam', 'best_guess', 'is_dlc', 'free_game'];
+				$checkboxes_names = ['supports_linux', 'is_hidden_steam', 'best_guess', 'is_dlc', 'free_game', 'is_crowdfunded', 'failed_linux', 'linux_stretch_goal', 'in_development'];
 				foreach ($checkboxes_names as $check)
 				{
 					$status = '';
@@ -277,6 +277,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$license_options .= '<option value="'.$license['license_name'].'" '.$selected.'>'.$license['license_name'].'</option>';
 				}
 				$templating->set('license_options', $license_options);
+
+				$developer_name = '';
+				if ($game['developer_id'] != NULL && $game['developer_id'] != 0)
+				{
+					$developer_name = '<option value="'.$game['developer_id'].'" selected>'.$game['developer_name'].'</option>';
+				}
+				$templating->set('developer_name', $developer_name);
 
 				$base_game = '';
 				if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
@@ -509,6 +516,7 @@ if (isset($_POST['act']))
 		$steam_link = trim($_POST['steam_link']);
 		$gog_link = trim($_POST['gog_link']);
 		$itch_link = trim($_POST['itch_link']);
+		$crowdfund_link = trim($_POST['crowdfund_link']);
 
 		if ($_POST['act'] == 'Edit' || $_POST['act'] == 'Approve')
 		{
@@ -573,7 +581,7 @@ if (isset($_POST['act']))
 			$sql_date = $date->format('Y-m-d');
 		}
 
-		$checkboxes_names = ['supports_linux', 'is_hidden_steam', 'best_guess', 'is_dlc', 'free_game'];
+		$checkboxes_names = ['supports_linux', 'is_hidden_steam', 'best_guess', 'is_dlc', 'free_game', 'is_crowdfunded', 'failed_linux', 'linux_stretch_goal', 'in_development'];
 		$checkboxes_sql = [];
 		foreach ($checkboxes_names as $check)
 		{
@@ -607,6 +615,12 @@ if (isset($_POST['act']))
 			$base_game = $_POST['game'];
 		}
 
+		$developer_id = NULL;
+		if (isset($_POST['developer']) && is_numeric($_POST['developer']))
+		{
+			$developer_id = $_POST['developer'];
+		}
+
 		$license = NULL;
 		if (!empty($_POST['license']))
 		{
@@ -621,7 +635,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Add')
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer));
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id));
 			$new_id = $dbl->new_id();
 	
 			$core->process_game_genres($new_id);
@@ -639,7 +653,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Edit')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 	

@@ -54,7 +54,6 @@
 [/block: add_top]
 
 [block: edit_top]
-<script src="includes/jscripts/jquery.form.min.js"></script>
 <div class="box">
 	<div class="head">
 		Edit the game - <a href="/index.php?module=items_database&amp;view=item&amp;id={:id}">View live</a>
@@ -77,7 +76,7 @@
 			</div>
 			<div class="subhead">Required</div>
 			<div class="body group">
-				<form method="post" action="admin.php?module=games">
+				<form class="gol-form" method="post" action="admin.php?module=games">
 					Game Name: <input type="text" name="name" value="{:name}" /><br />
 					<em>Games have to have <strong>at least one</strong> link at a minimum!</em><br />
 					Official website:<br />
@@ -90,8 +89,17 @@
 					<input type="text" name="gog_link" value="{:gog_link}" /><br />
 					itch.io Link:<br />
 					<input type="text" name="itch_link" value="{:itch_link}" /><br />
-					<label><input type="checkbox" name="supports_linux" {:supports_linux_check}/> Does it currently support Linux? <em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label>
-					<label><input type="checkbox" name="is_hidden_steam" {:is_hidden_steam_check}/> Is the Linux version hidden on Steam currently? (Alpha, Beta - No SteamOS icon)</label>
+					<label><input type="checkbox" name="supports_linux" {:supports_linux_check}/> Does it currently support Linux? <br />
+					<em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label><br />
+					<label><input type="checkbox" name="is_hidden_steam" {:is_hidden_steam_check}/> Is the Linux version hidden on Steam currently? (Alpha, Beta - No SteamOS icon)</label><br />
+					<label><input type="checkbox" name="is_crowdfunded" {:is_crowdfunded_check}> Was this crowdfunded? Tick this to show up on the crowdfunding page.</label><br />
+					<strong>Crowdfunding Extras</strong><br />
+					<label><input type="checkbox" name="failed_linux" {:failed_linux_check}> Failed on the Linux support?</label><br />
+					<label><input type="checkbox" name="linux_stretch_goal" {:linux_stretch_goal_check}> Linux stretch-goal?</label><br />
+					<label><input type="checkbox" name="in_development" {:in_development_check}> In development?</label><br />
+					Crowdfunding Link:<br />
+					<input type="text" name="crowdfund_link" value="{:crowdfund_link}" /><br />
+					<br />
 					What is it?
 					<select name="type">
 						<option value=""></option>
@@ -100,7 +108,7 @@
 			</div>
 			<div class="subhead">Not Required</div>
 			<div class="body group">
-					<label><input type="checkbox" name="free_game" {:free_game_check}/> Free (as in money)? <em>Tick if this is free/free to play</em></label>
+					<label><input type="checkbox" name="free_game" {:free_game_check}/> Free (as in money)? <em>Tick if this is free/free to play</em></label><br />
 					License <select name="license"><option value=""></option>{:license_options}</select><br />
 					Release Date: <br />
 					<input name="date" id="datepicker" type="text" value="{:date} "/>
@@ -109,8 +117,12 @@
 						field: document.getElementById('datepicker'),
 						format: "DD-MM-YYYY",
 						showTime: false
-					});</script>
+					});</script><br />
 					Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="best_guess" {:best_guess_check}/><br />
+					<br />
+					Developer Name:<br />
+					<select tabindex="-1" class="game_picker" data-picker="devs" name="developer" style="width:300px" class="populate select2-offscreen"><option value="0">None</option>{:developer_name}</select><br />
+					<em>Missing? <a href="/admin.php?module=games&view=add_developer">Add them here</a>.</em><br />
 					<br />
 					DLC <em>Tick if this is a DLC</em> <input type="checkbox" name="is_dlc" {:is_dlc_check}/><br />
 					Base game name <em>If it's a DLC, what game is it for?</em><br />

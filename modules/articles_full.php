@@ -430,6 +430,7 @@ if (!isset($_GET['go']))
 							{
 								$templating->load('login');
 								$templating->block('small');
+								$templating->set('current_page', core::current_page_url());
 								$templating->set('url', $core->config('website_url'));
 								
 								$twitter_button = '';

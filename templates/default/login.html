@@ -31,6 +31,7 @@
 					<div class="body group">
 						<p>Due to spam you need to <a href="{:url}register/">Register</a> and <a href="{:url}index.php?module=login">Login</a> to comment.</p>
 						<form class="gol-form" method="post" action="{:url}index.php?module=login">
+							<input type="hidden" name="current_page" value="{:current_page}" />
 							<input class="ays-ignore" name="username" type="text" value="" placeholder="Username or Email" />
 							<input class="ays-ignore" name="password" type="password" placeholder="Password" autocomplete="off" />
 							<label>

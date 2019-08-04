@@ -161,8 +161,31 @@ else if (isset($_POST['action']))
 		{
 			unset($_SESSION['login_error']);
 			unset($_SESSION['login_error_username']);
-			
-			header("Location: ".$core->config('website_url'));
+
+			// if the login form had a current page set, we need to check to see if we can redirect
+			if(isset($_POST['current_page'])) 
+			{
+				$parse_url = parse_url($_POST['current_page']);
+				if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_url'))
+				{
+					$extra = '';
+					if (isset($parse_url['query']) && !empty($parse_url['query']))
+					{
+						$extra .= '?'.$parse_url['query'];
+					}
+
+					$path = substr($parse_url['path'], 1); // remove the slash at the start so we don't double up
+					header("Location: ".$core->config('website_url').$path.$extra);
+				}
+				else
+				{
+					header("Location: ".$core->config('website_url'));
+				}
+			}
+			else
+			{
+				header("Location: ".$core->config('website_url'));
+			}
 		}
 
 		else

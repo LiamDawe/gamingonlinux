@@ -43,7 +43,24 @@ if ($core->config('articles_rss') == 1)
 	ORDER BY a.`date` DESC
 	LIMIT 1", $_GET['tags'])->fetchOne();
 
-	header('Content-Type: application/rss+xml; charset=utf-8');
+	// because firefox is fucking dumb and tries to download RSS instead of displaying, other browsers are fine
+	if (isset($_SERVER['HTTP_USER_AGENT']))
+	{
+		$agent = $_SERVER['HTTP_USER_AGENT'];
+		if (strlen(strstr($agent, 'Firefox')) > 0)
+		{
+			header('Content-Type: text/xml; charset=utf-8', true);
+		}
+		else
+		{
+			header('Content-Type: application/rss+xml; charset=utf-8', true);
+		}
+	}
+	else
+	{
+		header('Content-Type: application/rss+xml; charset=utf-8', true);
+	}
+	
 	header("Cache-Control: max-age=600");
 
 	$last_date = gmdate("D, d M Y H:i:s O", $last_time);

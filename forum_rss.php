@@ -8,7 +8,23 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 if ($core->config('forum_rss') == 1)
 {
-	header('Content-Type: text/xml; charset=utf-8', true);
+	// because firefox is fucking dumb and tries to download RSS instead of displaying, other browsers are fine
+	if (isset($_SERVER['HTTP_USER_AGENT']))
+	{
+		$agent = $_SERVER['HTTP_USER_AGENT'];
+		if (strlen(strstr($agent, 'Firefox')) > 0)
+		{
+			header('Content-Type: text/xml; charset=utf-8', true);
+		}
+		else
+		{
+			header('Content-Type: application/rss+xml; charset=utf-8', true);
+		}
+	}
+	else
+	{
+		header('Content-Type: application/rss+xml; charset=utf-8', true);
+	}
 	header("Cache-Control: max-age=3600");
 	
 	$now = date("D, d M Y H:i:s O");

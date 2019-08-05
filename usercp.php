@@ -13,6 +13,7 @@ if ($_SESSION['user_id'] == 0)
 
 	$templating->load('login');
 	$templating->block('small');
+	$templating->set('current_page', core::current_page_url());
 	$templating->set('url', $core->config('website_url'));
 	
 	$twitter_button = '';

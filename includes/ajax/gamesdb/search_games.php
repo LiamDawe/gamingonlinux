@@ -13,15 +13,15 @@ if(isset($_GET['q']) && isset($_GET['type']))
 
 	if (isset($_GET['type']) && $_GET['type'] == 'sales')
 	{
-		$sql = "SELECT DISTINCT c.`name` FROM `sales` s INNER JOIN `calendar` c ON c.id = s.game_id WHERE c.`name` LIKE ? ORDER BY c.`name` ASC";
+		$sql = "SELECT DISTINCT c.`name` FROM `sales` s INNER JOIN `calendar` c ON c.id = s.game_id WHERE c.`name` LIKE ? AND c.`id` NOT IN (SELECT `dupe_id` FROM `item_dupes`) ORDER BY c.`name` ASC";
 	}
 	if (isset($_GET['type']) && $_GET['type'] == 'free')
 	{
-		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `free_game` = 1 AND `is_application` = 0 AND `is_emulator` = 0 ORDER BY `name` ASC";		
+		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `free_game` = 1 AND `is_application` = 0 AND `is_emulator` = 0 AND `id` NOT IN (SELECT `dupe_id` FROM `item_dupes`) ORDER BY `name` ASC";		
 	}
 	if (isset($_GET['type']) && $_GET['type'] == 'all')
 	{
-		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL ORDER BY `name` ASC";	
+		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `id` NOT IN (SELECT `dupe_id` FROM `item_dupes`) ORDER BY `name` ASC ";	
 	}
 
 	$get_data = $dbl->run($sql, [$game_search])->fetch_all();

@@ -185,8 +185,72 @@ if (!isset($_GET['go']))
 				
 				$published_date_meta = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
 
+				if ($article['author_id'] == 0)
+				{
+					if (empty($article['guest_username']))
+					{
+						$username = 'Guest';
+					}
+
+					else
+					{
+						$username = $article['guest_username'];
+					}
+					$username_link = $username;
+				}
+
+				else
+				{
+					$username = $article['username'];
+					$username_link = "<a rel=\"author\" href=\"/profiles/{$article['author_id']}\">{$username}</a>";
+				}
+
+				// structured data for search engines
+				$structured_info = "<script type=\"application/ld+json\">
+				{
+					\"@context\": \"https://schema.org\",
+					\"@type\": \"NewsArticle\",
+					\"mainEntityOfPage\": {
+						\"@type\": \"WebPage\",
+						\"@id\": \"https://www.gamingonlinux.com/articles/{$article['article_id']}\"
+					},
+					\"headline\": \"{$article['title']}\",
+					\"image\": {
+						\"@type\": \"ImageObject\",
+						\"url\": \"$article_meta_image\"
+					},
+					\"author\": {
+					  \"@type\": \"Person\",
+					  \"name\": \"$username\"
+					},
+					\"datePublished\": \"$published_date_meta\",
+					\"description\": \"{$article['tagline']}\",
+					\"publisher\": {
+						\"@type\": \"Organization\",
+						\"name\": \"GamingOnLinux\",
+						\"url\": \"https://www.gamingonlinux.com/\",
+						\"logo\": {
+							\"@type\": \"ImageObject\",
+							\"url\": \"https://www.gamingonlinux.com/templates/default/images/icon.png\",
+							\"width\": 47,
+							\"height\": 55
+						}
+					}
+				}</script>";
+
 				// meta tags for g+, facebook and twitter images
-				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n<meta property=\"og:type\" content=\"article\">\n<meta property=\"og:title\" content=\"" . $html_title . "\" />\n<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n<meta property=\"og:url\" content=\"" . $article_class->get_link($article['article_id'], $nice_title) . "\" />\n<meta itemprop=\"image\" content=\"$article_meta_image\" />\n<meta itemprop=\"title\" content=\"" . $html_title . "\" />\n<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n$twitter_card", 1);
+				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n
+				<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n
+				<meta property=\"og:type\" content=\"article\">\n
+				<meta property=\"og:title\" content=\"" . $html_title . "\" />\n
+				<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n
+				<meta property=\"og:url\" content=\"" . $article_class->get_link($article['article_id'], $nice_title) . "\" />\n
+				<meta itemprop=\"image\" content=\"$article_meta_image\" />\n
+				<meta itemprop=\"title\" content=\"" . $html_title . "\" />\n
+				<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n
+				<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n
+				$twitter_card\n
+				$structured_info", 1);
 
 				// make date human readable
 				$date = $core->human_date($article['date']);
@@ -239,28 +303,7 @@ if (!isset($_GET['go']))
 
 				$templating->set('title', $article['title']);
 				$templating->set('user_id', $article['author_id']);
-
-				$view_more = '';
-				if ($article['author_id'] == 0)
-				{
-					if (empty($article['guest_username']))
-					{
-						$username = 'Guest';
-					}
-
-					else
-					{
-						$username = $article['guest_username'];
-					}
-				}
-
-				else
-				{
-					$username = "<a rel=\"author\" href=\"/profiles/{$article['author_id']}\"><span class=\"glyphicon glyphicon-user\"></span> {$article['username']}</a>";
-					$view_more = " | <a href=\"/index.php?module=search&amp;author_id={$article['author_id']}\">View more articles from {$article['username']}</a>";
-				}
-
-				$templating->set('username', $username);
+				$templating->set('username', $username_link);
 
 				$templating->set('date', $date);
 				$templating->set('machine_time', $published_date_meta);

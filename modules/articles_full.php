@@ -34,6 +34,7 @@ if (!isset($_GET['go']))
 				a.`text`,
 				a.`tagline`,
 				a.`date`,
+				a.`edit_date`,
 				a.`views`,
 				a.`date_submitted`,
 				a.`author_id`,
@@ -184,6 +185,14 @@ if (!isset($_GET['go']))
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
 				
 				$published_date_meta = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
+				if ($article['edit_date'] != NULL)
+				{
+					$edit_date_meta = date("Y-m-d\TH:i:s", strtotime($article['edit_date'])) . 'Z';
+				}
+				else
+				{
+					$edit_date_meta = $published_date_meta;
+				}
 
 				if ($article['author_id'] == 0)
 				{
@@ -224,6 +233,7 @@ if (!isset($_GET['go']))
 					  \"name\": \"$username\"
 					},
 					\"datePublished\": \"$published_date_meta\",
+					\"dateModified\": \"$edit_date_meta\",
 					\"description\": \"{$article['tagline']}\",
 					\"publisher\": {
 						\"@type\": \"Organization\",

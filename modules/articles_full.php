@@ -317,7 +317,7 @@ if (!isset($_GET['go']))
 				$templating->set('date', $date);
 				$templating->set('machine_time', $published_date_meta);
 				$templating->set('article_views', number_format($article['views']));
-				$templating->set('article_meta', "<meta itemprop=\"image\" content=\"$article_meta_image\" /> <script>var postdate=new Date('".date('c', $article['date'])."')</script>");
+				$templating->set('article_meta', "<script>var postdate=new Date('".date('c', $article['date'])."')</script>");
 
 				$tagline_bbcode = '';
 				$bbcode_tagline_gallery = NULL;

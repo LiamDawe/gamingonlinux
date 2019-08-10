@@ -171,18 +171,17 @@ if (!isset($_GET['go']))
 				$nice_title = core::nice_title($article['title']);
 
 				// twitter info card
-				$twitter_card = "<!-- twitter card -->\n";
-				$twitter_card .= '<meta name="twitter:card" content="summary_large_image">';
-				$twitter_card .= '<meta name="twitter:site" content="@'.$core->config('twitter_username').'">';
+				$twitter_card = '<meta name="twitter:card" content="summary_large_image">'.PHP_EOL;
+				$twitter_card .= '<meta name="twitter:site" content="@'.$core->config('twitter_username').'">'.PHP_EOL;
 				if (!empty($article['twitter_on_profile']))
 				{
-					$twitter_card .= '<meta name="twitter:creator" content="@'.$article['twitter_on_profile'].'">';
+					$twitter_card .= '<meta name="twitter:creator" content="@'.$article['twitter_on_profile'].'">'.PHP_EOL;
 				}
 
-				$twitter_card .= '<meta name="twitter:title" content="'.$html_title.'">';
-				$twitter_card .= '<meta name="twitter:description" content="'.$article['tagline'].'">';
-				$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">';
-				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">';
+				$twitter_card .= '<meta name="twitter:title" content="'.$html_title.'">'.PHP_EOL;
+				$twitter_card .= '<meta name="twitter:description" content="'.$article['tagline'].'">'.PHP_EOL;
+				$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">'.PHP_EOL;
+				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">'.PHP_EOL;
 				
 				$published_date_meta = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
 				if ($article['edit_date'] != NULL)

@@ -139,9 +139,12 @@ if (!isset($_GET['go']))
 
 			else if ($article['active'] == 0 && $article['preview_code'] == $_GET['preview_code'] || $article['active'] == 1)
 			{
-				$templating->set_previous('meta_description', $article['tagline'], 1);
+				$meta_description = str_replace('"', '', $article['tagline']);
+
+				$templating->set_previous('meta_description', $meta_description, 1);
 				
 				$html_title = htmlentities($article['title'], ENT_COMPAT);
+				
 
 				if (!isset($_GET['preview_code']))
 				{
@@ -179,7 +182,7 @@ if (!isset($_GET['go']))
 				}
 
 				$twitter_card .= '<meta name="twitter:title" content="'.$html_title.'">'.PHP_EOL;
-				$twitter_card .= '<meta name="twitter:description" content="'.$article['tagline'].'">'.PHP_EOL;
+				$twitter_card .= '<meta name="twitter:description" content="'.$meta_description.'">'.PHP_EOL;
 				$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">'.PHP_EOL;
 				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">'.PHP_EOL;
 				
@@ -214,6 +217,9 @@ if (!isset($_GET['go']))
 				}
 
 				// structured data for search engines
+				$json_title = json_encode($article['title'], JSON_HEX_QUOT);
+				$json_description = json_encode($article['tagline'], JSON_HEX_QUOT);
+
 				$structured_info = "<script type=\"application/ld+json\">
 				{
 					\"@context\": \"https://schema.org\",
@@ -222,7 +228,7 @@ if (!isset($_GET['go']))
 						\"@type\": \"WebPage\",
 						\"@id\": \"https://www.gamingonlinux.com/articles/{$article['article_id']}\"
 					},
-					\"headline\": \"{$article['title']}\",
+					\"headline\": $json_title,
 					\"image\": {
 						\"@type\": \"ImageObject\",
 						\"url\": \"$article_meta_image\"
@@ -233,7 +239,7 @@ if (!isset($_GET['go']))
 					},
 					\"datePublished\": \"$published_date_meta\",
 					\"dateModified\": \"$edit_date_meta\",
-					\"description\": \"{$article['tagline']}\",
+					\"description\": $json_description,
 					\"publisher\": {
 						\"@type\": \"Organization\",
 						\"name\": \"GamingOnLinux\",
@@ -252,11 +258,11 @@ if (!isset($_GET['go']))
 				<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n
 				<meta property=\"og:type\" content=\"article\">\n
 				<meta property=\"og:title\" content=\"" . $html_title . "\" />\n
-				<meta property=\"og:description\" content=\"{$article['tagline']}\" />\n
+				<meta property=\"og:description\" content=\"$meta_description\" />\n
 				<meta property=\"og:url\" content=\"" . $article_class->get_link($article['article_id'], $nice_title) . "\" />\n
 				<meta itemprop=\"image\" content=\"$article_meta_image\" />\n
 				<meta itemprop=\"title\" content=\"" . $html_title . "\" />\n
-				<meta itemprop=\"description\" content=\"{$article['tagline']}\" />\n
+				<meta itemprop=\"description\" content=\"$meta_description\" />\n
 				<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n
 				$twitter_card\n
 				$structured_info", 1);

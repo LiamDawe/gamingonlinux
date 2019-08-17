@@ -6,14 +6,21 @@ if(!defined('golapp'))
 $templating->load('blocks/block_article_categorys');
 $templating->block('menu');
 
-if (!$user->check_group([1,2,5]))
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
-	$submit_link = '/submit-article/';
-}
+	if (!$user->check_group([1,2,5]))
+	{
+		$submit_link = '<li><a href="/submit-article/">Submit Article</a></li>';
+	}
 
-else if ($user->check_group([1,2,5]))
+	else if ($user->check_group([1,2,5]))
+	{
+		$submit_link = '<li><a href="' . $core->config('website_url') . 'admin.php?module=add_article">Submit Article</a></li>';
+	}
+}
+else
 {
-	$submit_link = $core->config('website_url') . 'admin.php?module=add_article';
+	$submit_link = '';
 }
 
 $templating->set('submit_article_link', $submit_link);

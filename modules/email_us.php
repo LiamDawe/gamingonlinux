@@ -12,6 +12,13 @@ $templating->load('email_us');
 
 $templating->block('top');
 
+$submit_article_text = '';
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+{
+	$submit_article_text = 'If you are submitting a full article please use the <a href="/submit-article/">Submit Article area!</a> ';
+}
+$templating->set('submit_article_text', $submit_article_text);
+
 $captcha = 0;
 if (!$user->can('skip_contact_captcha'))
 {

@@ -122,7 +122,9 @@ $templating->set('url', url);
 
 if ($captcha == 1)
 {
-	$captcha_output = '<noscript><strong>You need Javascript turned on to see the captcha, otherwise you won\'t be able to email us!</strong></noscript><div class="g-recaptcha" data-sitekey="'.$core->config('recaptcha_public').'"></div>';
+	$captcha_output = '<strong>You must do a captcha to register</strong><br />
+	We use Google\'s reCAPTCHA, you must agree to their use of cookies to use it. This is to help us prevent spam!
+	<button id="accept_captcha" type="button" data-pub-key="'.$core->config('recaptcha_public').'">Accept & Show reCAPTCHA</button>';
 }
 
 else

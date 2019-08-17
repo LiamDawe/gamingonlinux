@@ -17,7 +17,6 @@ else
 
 	$templating->load('about_us');
 	$templating->block('top');
-	$templating->set('about_text', $core->config('about_text'));
 
 	$get_editors = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`article_bio` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE u.`user_id` != 1844 AND g.group_id = 1 OR g.group_id = 2 ORDER BY u.`user_id` = 1 DESC, u.`username` ASC")->fetch_all();
 

@@ -15,16 +15,19 @@ foreach ($get_editors as $editors)
 {
 	if (!empty($editors['article_bio']))
 	{
-		$templating->block('row');
+		if (isset($editors['author_picture']) && !empty($editors['author_picture']) && $editors['author_picture'] != NULL)
+		{
+			$author_pic = '/uploads/avatars/author_pictures/'.$editors['author_picture'];
+			$templating->block('row');
+			$templating->set('author_picture', $author_pic);
+		}
+		else
+		{
+			$templating->block('row_nopic');
+		}
 		$templating->set('user_id', $editors['user_id']);
 		$templating->set('username', $editors['username']);
 		$templating->set('bio', $bbcode->parse_bbcode($editors['article_bio']));
-		$author_pic = '/uploads/avatars/no_avatar.png';
-		if (isset($editors['author_picture']) && !empty($editors['author_picture']))
-		{
-			$author_pic = '/uploads/avatars/author_pictures/'.$editors['author_picture'];
-		}
-		$templating->set('author_picture', $author_pic);
 	}
 }
 
@@ -36,16 +39,19 @@ foreach ($get_editors as $editors)
 {
 	if (!empty($editors['article_bio']))
 	{
-		$templating->block('row');
+		if (isset($editors['author_picture']) && !empty($editors['author_picture']) && $editors['author_picture'] != NULL)
+		{
+			$author_pic = '/uploads/avatars/author_pictures/'.$editors['author_picture'];
+			$templating->block('row');
+			$templating->set('author_picture', $author_pic);
+		}
+		else
+		{
+			$templating->block('row_nopic');
+		}
 		$templating->set('user_id', $editors['user_id']);
 		$templating->set('username', $editors['username']);
 		$templating->set('bio', $bbcode->parse_bbcode($editors['article_bio']));
-		$author_pic = '/uploads/avatars/no_avatar.png';
-		if (isset($editors['author_picture']) && !empty($editors['author_picture']))
-		{
-			$author_pic = '/uploads/avatars/author_pictures/'.$editors['author_picture'];
-		}
-		$templating->set('author_picture', $author_pic);
 	}
 }
 

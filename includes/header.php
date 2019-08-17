@@ -92,13 +92,23 @@ $section_links = implode('', core::$top_bar_links);
 $templating->set('sections_links', $section_links);
 
 // sort the correct submit article link
-$submit_a = '/submit-article/';
-if ($user->check_group([1,2,5]))
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
-	$submit_a = $core->config('website_url') . 'admin.php?module=add_article';
-}
+	if (!$user->check_group([1,2,5]))
+	{
+		$submit_link = '<li><a href="/submit-article/">Submit Article</a></li>';
+	}
 
-$templating->set('submit_a', $submit_a);
+	else if ($user->check_group([1,2,5]))
+	{
+		$submit_link = '<li><a href="' . $core->config('website_url') . 'admin.php?module=add_article">Submit Article</a></li>';
+	}
+}
+else
+{
+	$submit_link = '';
+}
+$templating->set('submit_article_link', $submit_link);
 
 // sort out user box
 if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESSION['user_id'])))

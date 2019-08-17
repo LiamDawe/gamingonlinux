@@ -14,6 +14,12 @@ $templating->block('main');
 // sort out the avatar
 $avatar = $user->sort_avatar($user->user_details);
 $templating->set('current_avatar', $avatar);
+$current_author_pic = '/uploads/avatars/no_avatar.png';
+if (isset($user->user_details['author_picture']) && !empty($user->user_details['author_picture']))
+{
+	$current_author_pic = '/uploads/avatars/author_pictures/'.$user->user_details['author_picture'];
+}
+$templating->set('current_author_pic', $current_author_pic);
 
 $templating->set('width', $core->config('avatar_width'));
 $templating->set('height', $core->config('avatar_height'));
@@ -94,6 +100,41 @@ if (isset($_POST['action']))
 		}
 
 		$dbl->run("UPDATE `users` SET `avatar` = '', `avatar_uploaded` = 0, `avatar_gallery` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
+
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'avatar';
+		header("Location: /usercp.php?module=avatar");
+		die();
+	}
+
+	else if ($_POST['action'] == 'upload_author_pic')
+	{
+		if ($image_upload->avatar(1) == true)
+		{
+			$_SESSION['message'] = 'uploaded';
+			header("Location: /usercp.php?module=avatar");
+			die();
+		}
+
+		else
+		{
+			$_SESSION['message'] = image_upload::$return_message;
+			header("Location: /usercp.php?module=avatar");
+			die();
+		}
+	}
+
+	else if ($_POST['action'] == 'delete_author_pic')
+	{
+		// remove any old avatar if one was uploaded
+		$avatar = $dbl->run("SELECT `author_picture` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+
+		if (isset($avatar['author_picture']) && !empty($avatar['author_picture']))
+		{
+			unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/author_pictures/' . $avatar['author_picture']);
+		}
+
+		$dbl->run("UPDATE `users` SET `author_picture` = NULL WHERE `user_id` = ?", array($_SESSION['user_id']));
 
 		$_SESSION['message'] = 'deleted';
 		$_SESSION['message_extra'] = 'avatar';

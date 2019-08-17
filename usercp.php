@@ -6,7 +6,7 @@ include(APP_ROOT . '/includes/header.php');
 $templating->set_previous('title', ' - User Control Panel', 1);
 
 // what to show for the user text in the header
-if ($_SESSION['user_id'] == 0)
+if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 {
 	$templating->set_previous('title', 'No Access', 1);
 	$core->message('You do not have permissions to view this page! You need to be logged in.');

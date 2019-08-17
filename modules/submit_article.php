@@ -12,6 +12,54 @@ if ($get_ip)
 	die();
 }
 
+if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
+{
+    $templating->set_previous('title', 'No Access', 1);
+	$core->message('You do not have permissions to view this page! You need to be logged in to submit an article.');
+
+	$templating->load('login');
+	$templating->block('small');
+	$templating->set('current_page', core::current_page_url());
+	$templating->set('url', $core->config('website_url'));
+	
+	$twitter_button = '';
+	if ($core->config('twitter_login') == 1)
+	{	
+		$twitter_button = '<a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
+	}
+	$templating->set('twitter_button', $twitter_button);
+	
+	$steam_button = '';
+	if ($core->config('steam_login') == 1)
+	{
+		$steam_button = '<a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
+	}
+	$templating->set('steam_button', $steam_button);
+	
+	$google_button = '';
+	if ($core->config('google_login') == 1)
+	{
+		$client_id = $core->config('google_login_public'); 
+		$client_secret = $core->config('google_login_secret');
+		$redirect_uri = $core->config('website_url') . 'includes/google/login.php';
+		require_once ($core->config('path') . 'includes/google/libraries/Google/autoload.php');
+		$client = new Google_Client();
+		$client->setClientId($client_id);
+		$client->setClientSecret($client_secret);
+		$client->setRedirectUri($redirect_uri);
+		$client->addScope("email");
+		$client->addScope("profile");
+		$service = new Google_Service_Oauth2($client);
+		$authUrl = $client->createAuthUrl();
+		
+		$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
+	}
+	$templating->set('google_button', $google_button);
+
+	include(APP_ROOT . '/includes/footer.php');
+	die();
+}
+
 $templating->load('submit_article');
 
 require_once("includes/curl_data.php");
@@ -56,26 +104,6 @@ if (isset($_GET['view']))
             $_SESSION['image_rand'] = rand();
         }
 
-        // if they have done it before set guest name and email
-        $guest_username = '';
-        if (isset($_SESSION['aname']))
-        {
-            $guest_username = $_SESSION['aname'];
-        }
-
-        $guest_email = '';
-        if (isset($_SESSION['aemail']))
-        {
-            $guest_email = $_SESSION['aemail'];
-        }
-
-        $guest_fields = '';
-        if ($_SESSION['user_id'] == 0)
-        {
-            $guest_fields = $templating->block_store('guest_fields', 'submit_article');
-            $guest_fields = $templating->store_replace($guest_fields, array('guest_username' => $guest_username, 'guest_email' => $guest_email));
-		}
-
         // if they have done it before set text and tagline
         $title = '';
         $text = '';
@@ -91,7 +119,6 @@ if (isset($_GET['view']))
 
         $templating->block('submit', 'submit_article');
         $templating->set('url', $core->config('website_url'));
-        $templating->set('guest_fields', $guest_fields);
 		$templating->set('title', $title);
 
         $tagline_pic = '';
@@ -131,18 +158,6 @@ if (isset($_POST['act']))
 		$title = mb_convert_encoding($title, 'UTF-8');
         $text = trim($_POST['text']);
 
-        $name = '';
-        if (isset($_POST['name']))
-        {
-			$name = core::make_safe($_POST['name']);
-        }
-
-        $guest_email = '';
-        if (isset($_POST['email']))
-        {
-			$guest_email = core::make_safe($_POST['email']);
-		}
-
 		if ($core->config('captcha_disabled') == 0 && $captcha == 1)
 		{
 			if (isset($_POST['g-recaptcha-response']))
@@ -158,8 +173,6 @@ if (isset($_POST['act']))
 			{
 				$_SESSION['atitle'] = $title;
 				$_SESSION['atext'] = $text;
-				$_SESSION['aname'] = $name;
-				$_SESSION['aemail'] = $guest_email;
 
 				$_SESSION['message'] = 'captcha';
 				header("Location: " . $redirect);
@@ -171,8 +184,6 @@ if (isset($_POST['act']))
 		{
 			$_SESSION['atitle'] = $title;
 			$_SESSION['atext'] = $text;
-			$_SESSION['aname'] = $name;
-			$_SESSION['aemail'] = $guest_email;
 
 			$_SESSION['message'] = 'captcha';
 			header("Location: " . $redirect);
@@ -183,27 +194,11 @@ if (isset($_POST['act']))
 		{
 			$_SESSION['atitle'] = $title;
 			$_SESSION['atext'] = $text;
-			$_SESSION['aname'] = $name;
-			$_SESSION['aemail'] = $guest_email;
 
 			$_SESSION['message'] = 'spam_check_agree';
 			header("Location: ".$redirect);
 			die();
 		}
-
-        if ($_SESSION['user_id'] == 0 && empty($_POST['email']))
-        {
-            $_SESSION['atitle'] = $title;
-            $_SESSION['atext'] = $text;
-            $_SESSION['aname'] = $name;
-            $_SESSION['aemail'] = $guest_email;
-
-            $_SESSION['message'] = 'empty';
-            $_SESSION['message_extra'] = 'email address';
-
-            header("Location: " . $redirect);
-            die();
-        }
 
         $check_empty = core::mempty(compact('title', 'text'));
 
@@ -211,8 +206,6 @@ if (isset($_POST['act']))
         {
             $_SESSION['atitle'] = $title;
             $_SESSION['atext'] = $text;
-            $_SESSION['aname'] = $name;
-            $_SESSION['aemail'] = $guest_email;
 
 			$_SESSION['message'] = 'empty';
             $_SESSION['message_extra'] = $check_empty;
@@ -227,8 +220,6 @@ if (isset($_POST['act']))
 		{
             $_SESSION['atitle'] = $title;
             $_SESSION['atext'] = $text;
-            $_SESSION['aname'] = $name;
-            $_SESSION['aemail'] = $guest_email;
 
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = 'text';
@@ -242,36 +233,11 @@ if (isset($_POST['act']))
         // carry on and submit the article
         if (($core->config('captcha_disabled') == 0 && $captcha == 1 && $res['success']) || $captcha == 0 || $core->config('captcha_disabled') == 1)
         {
-            // setup category if empty
-            if (empty($_POST['category']) || !is_numeric($_POST['category']))
-            {
-                $category_sql = 0;
-            }
-
-            else
-            {
-                $category_sql = $_POST['category'];
-            }
-
-			if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || !isset($_SESSION['user_id']))
-			{
-				$username = 'Guest';
-				if (!empty($_POST['name']))
-				{
-					$username = core::make_safe($_POST['name']);
-				}
-			}
-
-			else
-			{
-				$username = $_SESSION['username'];
-			}
-
 			// make the slug
 			$title_slug = core::nice_title($_POST['title']);
 
 			// insert the article itself
-			$dbl->run("INSERT INTO `articles` SET `author_id` = ?, `guest_username` = ?, `guest_email` = ?, `guest_ip` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], $username, $guest_email, core::$ip, core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
+			$dbl->run("INSERT INTO `articles` SET `author_id` = ?, `date` = ?, `date_submitted` = ?, `title` = ?, `slug` = ?, `text` = ?, `active` = 0, `submitted_article` = 1, `submitted_unapproved` = 1, `preview_code` = ?", array($_SESSION['user_id'], core::$date, core::$date, $title, $title_slug, $text, core::random_id()));
 
 			$article_id = $dbl->new_id();
 
@@ -291,7 +257,7 @@ if (isset($_POST['act']))
 			// get all the editor and admin emails apart from sinead
 			$editor_emails = array();
 
-			$subject = "GamingOnLinux article submission from {$username}";
+			$subject = "GamingOnLinux article submission from {$_SESSION['username']}";
 
 			$email_groups = $user->get_group_ids('article_submission_emails');
 
@@ -305,10 +271,10 @@ if (isset($_POST['act']))
 				$submitted_link = $core->config('website_url') . "admin.php?module=articles&view=Submitted";
                 // message
                 $html_message = "<p>Hello {$get_emails['username']},</p>
-                <p>A new article has been submitted that needs reviewing titled <a href=\"$submitted_link\"><strong>{$title}</strong></a> from {$username}</p>
+                <p>A new article has been submitted that needs reviewing titled <a href=\"$submitted_link\"><strong>{$title}</strong></a> from {$_SESSION['username']}</p>
                 <p><a href=\"$submitted_link\">Click here to review it</a>";
 
-                $plain_message = PHP_EOL."Hello {$get_emails['username']}, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$username}, go here to review:  $submitted_link";
+                $plain_message = PHP_EOL."Hello {$get_emails['username']}, A new article has been submitted that needs reviewing titled '<strong>{$title}</strong>' from {$_SESSION['username']}, go here to review:  $submitted_link";
 
 				// Mail it
                 if ($core->config('send_emails') == 1)
@@ -322,8 +288,6 @@ if (isset($_POST['act']))
 
             unset($_SESSION['atitle']);
             unset($_SESSION['atext']);
-            unset($_SESSION['aname']);
-            unset($_SESSION['aemail']);
             unset($_SESSION['image_rand']);
 		}
 	}
@@ -343,20 +307,7 @@ if (isset($_POST['act']))
         $templating->set('title', strip_tags($_POST['title']));
         $templating->set('user_id', $_SESSION['user_id']);
 
-        if ($_SESSION['user_id'] == 0)
-        {
-            $username = 'Guest';
-            if (!empty($_POST['name']))
-            {
-                $username = core::make_safe($_POST['name']);
-            }
-        }
-
-        else
-        {
-            $username = "<a href=\"/profiles/{$_SESSION['user_id']}\">" . $_SESSION['username'] . '</a>';
-        }
-
+        $username = "<a href=\"/profiles/{$_SESSION['user_id']}\">" . $_SESSION['username'] . '</a>';
         $templating->set('username', $username);
 
         $templating->set('date', $date);
@@ -366,31 +317,8 @@ if (isset($_POST['act']))
         $templating->set('article_link', '#');
         $templating->set('comment_count', '0');
 
-        // setup guest fields again
-        $guest_username = '';
-        if (isset($_POST['name']))
-        {
-            $guest_username = $core->make_safe($_POST['name']);
-        }
-
-        $guest_email = '';
-        if (isset($_POST['email']))
-        {
-            $guest_email = $core->make_safe($_POST['email']);
-        }
-
-        $guest_fields = '';
-        if ($_SESSION['user_id'] == 0)
-        {
-            $guest_fields = "Your Name: <em>Not Required, you will be called \"Guest\" if you leave it blank.</em><br />
-            <input type=\"text\" name=\"name\" value=\"{$guest_username}\" /><br />
-            Your Email: <em><strong>Required</strong>, will not be published, so we can email you when it's denied/accepted!</em><br />
-            <input type=\"text\" name=\"email\" value=\"{$guest_email}\" /><br />";
-        }
-
         $templating->block('submit', 'submit_article');
         $templating->set('url', $core->config('website_url'));
-        $templating->set('guest_fields', $guest_fields);
         $templating->set('title', $core->make_safe($_POST['title']));
 
         $top_image = '';

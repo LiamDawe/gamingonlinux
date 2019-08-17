@@ -23,8 +23,7 @@
 						</div>
 						<form class="gol-form" action="{:url}index.php?module=submit_article" method="post">
 							<label class="control-label">Title</label>
-              <input type="text" name="title" class="ays-ignore" placeholder="Enter a title..." value="{:title}" /><br />
-							{:guest_fields}
+              				<input type="text" name="title" class="ays-ignore" placeholder="Enter a title..." value="{:title}" /><br />
 [/block: submit]
 
 [block: submit_bottom]
@@ -39,13 +38,6 @@
 					</div>
 				</div>
 [/block: submit_bottom]
-
-[block: guest_fields]
-<label>Your Name: <em>Not Required, you will be called "Guest" if you leave it blank.</em></label>
-<input type="text" class="ays-ignore" name="name" placeholder="Enter your name..." value="{:guest_username}" /><br />
-<label>Your Email: <em><strong>Required</strong>, will not be published, so we can email you when it's denied/accepted!</em></label>
-<input type="text" class="ays-ignore" name="email" placeholder="Enter your email address..." value="{:guest_email}" /><br />
-[/block: guest_fields]
 
 [block: preview_row]
 <script src="includes/jscripts/jquery.form.min.js"></script>

@@ -1002,7 +1002,11 @@ ul.social-networks li > a {
 .poll_content{padding: 4px;}
 
 /* Icons */
-.social_icons_search 
+.social_icons_search
+{
+	display: inline-block;
+}
+.social_icons_search ul
 {
 	display: inline;
 	list-style: none;

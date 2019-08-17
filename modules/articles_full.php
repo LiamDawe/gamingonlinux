@@ -48,7 +48,9 @@ if (!isset($_GET['go']))
 				t.`filename` as `gallery_tagline_filename`,
 				a.`comments_open`,
 				u.`username`,
-				u.`twitter_on_profile`
+				u.`twitter_on_profile`,
+				u.`article_bio`,
+				u.`author_picture`
 				FROM `articles` a
 				LEFT JOIN
 				`users` u on a.`author_id` = u.`user_id`
@@ -466,12 +468,29 @@ if (!isset($_GET['go']))
 
 				$templating->block('article_bottom', 'articles_full');
 
-				
 				// only show corrections box if logged in and it's not old
 				if ($_SESSION['user_id'] > 0 && $article['date'] >= strtotime('-1 year'))
 				{
 					$templating->block('corrections', 'articles_full');
 					$templating->set('article_id', $article['article_id']);
+				}
+
+				if (isset($article['article_bio']) && !empty($article['article_bio']))
+				{
+					if (isset($article['author_picture']) && !empty($article['author_picture']) && $article['author_picture'] != NULL)
+					{
+						$templating->block('about_author');
+						$author_pic = '/uploads/avatars/author_pictures/'.$article['author_picture'];
+						$templating->set('author_picture', $author_pic);
+					}
+					else
+					{
+						$templating->block('about_author_nopic');
+					}
+					
+					$templating->set('author_bio', $bbcode->parse_bbcode($article['article_bio']));
+					$templating->set('username', $username_link);
+					$templating->set('user_id', $article['author_id']);
 				}
 
 				// get the comments if we aren't in preview mode

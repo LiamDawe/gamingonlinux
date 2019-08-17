@@ -14,7 +14,7 @@ class image_upload
 		$this->dbl = $dbl;
 	}
 	
-	public function avatar()
+	public function avatar($author_photo = 0)
 	{
 		if (is_uploaded_file($_FILES['new_image']['tmp_name']))
 		{
@@ -43,7 +43,7 @@ class image_upload
 			}
 
 			// see if they currently have an avatar set
-			$avatar = $this->dbl->run("SELECT `avatar`, `avatar_uploaded` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+			$avatar = $this->dbl->run("SELECT `avatar`, `avatar_uploaded`, `author_picture` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 
 			$image_info = getimagesize($_FILES['new_image']['tmp_name']);
 			$image_type = $image_info[2];
@@ -71,18 +71,39 @@ class image_upload
 			$source = $_FILES['new_image']['tmp_name'];
 
 			// where to upload to
-			$target = $_SERVER['DOCUMENT_ROOT'] . "/uploads/avatars/" . $imagename;
+			if ($author_photo == 0)
+			{
+				$target = $_SERVER['DOCUMENT_ROOT'] . "/uploads/avatars/" . $imagename;
+			}
+			else if ($author_photo == 1)
+			{
+				$target = $_SERVER['DOCUMENT_ROOT'] . "/uploads/avatars/author_pictures/" . $imagename;
+			}
 
 			if (move_uploaded_file($source, $target))
 			{
-				// remove old avatar
-				if ($avatar['avatar_uploaded'] == 1)
+				if ($author_photo == 0)
 				{
-					unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $avatar['avatar']);
-				}
+					// remove old avatar
+					if ($avatar['avatar_uploaded'] == 1)
+					{
+						unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $avatar['avatar']);
+					}
 
-				$this->dbl->run("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
-				return true;
+					$this->dbl->run("UPDATE `users` SET `avatar` = ?, `avatar_uploaded` = 1, `avatar_gallery` = NULL WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
+					return true;
+				}
+				else if ($author_photo == 1)
+				{
+					// remove old avatar
+					if (isset($avatar['author_picture']) && !empty($avatar['author_picture']))
+					{
+						unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/author_pictures/' . $avatar['author_picture']);
+					}
+
+					$this->dbl->run("UPDATE `users` SET `author_picture` = ? WHERE `user_id` = ?", array($imagename, $_SESSION['user_id']));
+					return true;
+				}
 			}
 
 			else

@@ -5,7 +5,7 @@ body {
 a, a:hover, a:active, a:link, a:visited {
     color: #428BCA;
 }
-hr {border-color: #111111;}
+hr {border-color: #333333;}
 
 strong {color: #ffffff}
 
@@ -254,6 +254,10 @@ select.pagination option {background: #3e4347; color: #feffff;}
 }
 .livestream .next-time {
 	background: #222222;
+}
+.social_icons_search li a
+{
+	background: #333333;
 }
 .icon.website {
     background-image: url('/templates/default/images/network-icons/white/website.svg');

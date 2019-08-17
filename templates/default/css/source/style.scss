@@ -1002,6 +1002,31 @@ ul.social-networks li > a {
 .poll_content{padding: 4px;}
 
 /* Icons */
+.social_icons_search 
+{
+	display: inline;
+	list-style: none;
+	padding: 0;
+}
+.social_icons_search li
+{
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+.social_icons_search li a
+{
+	background: #ffffff;
+	padding: 3px;
+	margin-right: 3px;
+	margin-bottom: 3px;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
+	display: inline-block;
+}
 .icon {
     background-position: center center;
     background-repeat: no-repeat;

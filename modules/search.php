@@ -216,7 +216,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 				if (!empty($profile_fields_output))
 				{
-					$profile_fields_output = '<br /><br />Find me in these places: <div class="social_icons_search"><ul>' . $profile_fields_output . '</ul>';
+					$profile_fields_output = '<br /><br />Find me in these places: <div class="social_icons_search"><ul>' . $profile_fields_output . '</ul></div>';
 				}
 
 				$templating->set('profile_fields', $profile_fields_output);

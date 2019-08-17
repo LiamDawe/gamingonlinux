@@ -9,7 +9,7 @@ class user
 	public static $user_sql_fields = "`user_id`, `single_article_page`, `per-page`,
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
-	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gallery`,
+	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gallery`, `author_picture`, 
 	`display_comment_alerts`, `display_like_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`";
 
 	public $user_groups = [0 => 4]; // default for guests

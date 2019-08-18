@@ -60,7 +60,24 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 	die();
 }
 
+$templating->set_previous('meta_description', 'Submit an article to GamingOnLinux', 1);
+$templating->set_previous('title', 'Submit An Article', 1);
+
 $templating->load('submit_article');
+
+// check the user has their required details setup before allowing article submission
+if (!isset($user->user_details['author_picture']) || empty($user->user_details['author_picture']) || $user->user_details['author_picture'] == NULL)
+{
+    $templating->block('setup_profile');
+    include(APP_ROOT . '/includes/footer.php');
+	die();
+}
+if (!isset($user->user_details['article_bio']) || empty($user->user_details['article_bio']) || $user->user_details['article_bio'] == NULL)
+{
+    $templating->block('setup_profile');
+    include(APP_ROOT . '/includes/footer.php');
+	die();
+}
 
 require_once("includes/curl_data.php");
 
@@ -73,8 +90,8 @@ if (!$user->can('skip_submit_article_captcha'))
 $captcha_output = '';
 if ($core->config('captcha_disabled') == 0 && $captcha == 1)
 {
-	$captcha_output = '<strong>You must do a captcha as you are not registered and logged in. Not required to preview.</strong><br />
-	We use Google\'s reCAPTCHA, you must agree to their use of cookies to use it. This is to help us prevent spam!
+	$captcha_output = '<strong>You must do a captcha to help prevent spam.</strong><br />
+	We use Google\'s reCAPTCHA, you must agree to their use of cookies to use it.
 	<button id="accept_captcha" type="button" data-pub-key="'.$core->config('recaptcha_public').'">Accept & Show reCAPTCHA</button>';
 }
 
@@ -95,9 +112,6 @@ if (isset($_GET['view']))
             header_remove("Pragma");
             header_remove("Last-Modified");
         }
-
-        $templating->set_previous('meta_description', 'Submit an article to GamingOnLinux', 1);
-        $templating->set_previous('title', 'Submit An Article', 1);
 
         if (!isset($_GET['error']))
         {
@@ -149,8 +163,6 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'Submit')
 	{
-		$templating->set_previous('title', 'Submit An Article', 1);
-
 		$redirect = '/submit-article/';
 
 		$title = trim($_POST['title']);
@@ -294,9 +306,6 @@ if (isset($_POST['act']))
 
     if ($_POST['act'] == 'Preview')
     {
-        $templating->set_previous('meta_description', 'Previewing a submitted article to GamingOnLinux', 1);
-        $templating->set_previous('title', 'Submit An Article Preview', 1);
-
         // make date human readable
         $date = $core->human_date(core::$date);
 

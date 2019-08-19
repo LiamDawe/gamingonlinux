@@ -321,7 +321,8 @@ if (isset($_POST['act']))
 
             unset($_SESSION['atitle']);
             unset($_SESSION['atext']);
-            unset($_SESSION['image_rand']);
+			unset($_SESSION['image_rand']);
+			unset($_SESSION['uploads']['article_media']);
 		}
 	}
 }

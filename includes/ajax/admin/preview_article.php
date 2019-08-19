@@ -5,7 +5,7 @@ define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0 || !$user->check_group([1,2,5]))
+if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 {
 	die('You shouldn\'t be here.');
 }
@@ -41,6 +41,11 @@ if(isset($_POST))
 		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 		WHERE `article_id` = ?";
 		$article = $dbl->run($check_article_sql, array($_POST['article_id']))->fetch();
+
+		if (!$user->check_group([1,2,5]) && $_SESSION['id'] != $article['author_id'])
+		{
+			die('You shouldn\'t be here.');
+		}
 		
 		if ($article['draft'] == 1)
 		{

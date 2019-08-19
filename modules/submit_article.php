@@ -151,11 +151,20 @@ if (isset($_GET['view']))
             $subscribe_box = '<label>Subscribe to article to receive comment replies via email <input type="checkbox" name="subscribe" checked /></label><br />';
         }
 
-        $core->article_editor(['content' => '']);
+        $core->article_editor(['content' => $text]);
 
+        // sort out previously uploaded images
+        $previously_uploaded = '';
+        $previously_uploaded = $article_class->display_previous_uploads();
+
+        // the rest of the form stuff
         $templating->block('submit_bottom', 'submit_article');
+        $templating->set('hidden_upload_fields', $previously_uploaded['hidden']);
         $templating->set('captcha', $captcha_output);
         $templating->set('subscribe_box', $subscribe_box);
+
+        $templating->block('uploads', 'submit_article');
+        $templating->set('previously_uploaded', $previously_uploaded['output']);
     }
 }
 
@@ -168,7 +177,12 @@ if (isset($_POST['act']))
 		$title = trim($_POST['title']);
 		$title = strip_tags($title);
 		$title = mb_convert_encoding($title, 'UTF-8');
-        $text = trim($_POST['text']);
+		$text = trim($_POST['text']);
+		
+		if (isset($_POST['uploads']))
+		{
+			$_SESSION['uploads']['article_media'] = $_POST['uploads'];
+		}
 
 		if ($core->config('captcha_disabled') == 0 && $captcha == 1)
 		{
@@ -253,6 +267,14 @@ if (isset($_POST['act']))
 
 			$article_id = $dbl->new_id();
 
+			if (isset($_POST['uploads']))
+			{
+				foreach($_POST['uploads'] as $key)
+				{
+					$dbl->run("UPDATE `article_images` SET `article_id` = ? WHERE `id` = ?", array($article_id, $key));
+				}
+			}
+
 			$core->new_admin_note(array('content' => ' submitted a new article titled: <a href="/admin.php?module=articles&view=Submitted&aid='.$article_id.'">'.$title.'</a>.', 'type' => 'submitted_article', 'data' => $article_id));
 
 			// check if they are subscribing
@@ -279,7 +301,6 @@ if (isset($_POST['act']))
 
 			foreach ($grab_editors as $get_emails)
 			{
-				//print_r($get_emails);
 				$submitted_link = $core->config('website_url') . "admin.php?module=articles&view=Submitted";
                 // message
                 $html_message = "<p>Hello {$get_emails['username']},</p>
@@ -303,61 +324,4 @@ if (isset($_POST['act']))
             unset($_SESSION['image_rand']);
 		}
 	}
-
-    if ($_POST['act'] == 'Preview')
-    {
-        // make date human readable
-        $date = $core->human_date(core::$date);
-
-        // get the article row template
-        $templating->block('preview_row');
-        $templating->set('url',$core->config('website_url'));
-
-        $templating->set('title', strip_tags($_POST['title']));
-        $templating->set('user_id', $_SESSION['user_id']);
-
-        $username = "<a href=\"/profiles/{$_SESSION['user_id']}\">" . $_SESSION['username'] . '</a>';
-        $templating->set('username', $username);
-
-        $templating->set('date', $date);
-        $templating->set('submitted_date', 'Submitted ' . $date);
-
-        $templating->set('text_full', $_POST['text']);
-        $templating->set('article_link', '#');
-        $templating->set('comment_count', '0');
-
-        $templating->block('submit', 'submit_article');
-        $templating->set('url', $core->config('website_url'));
-        $templating->set('title', $core->make_safe($_POST['title']));
-
-        $top_image = '';
-        if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-        {
-            $top_image = '<img src="'.$core->config('website_url').'uploads/articles/tagline_images/temp/thumbnails/'.$_SESSION['uploads_tagline']['image_name'].'" alt="[articleimage]" class="imgList"><br />
-            BBCode: <input type="text" class="form-control input-sm" value="[img]tagline-image[/img]" /><br />';
-        }
-
-        $tagline_bbcode = '';
-        if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
-        {
-            $tagline_bbcode = '/temp/' . $_SESSION['uploads_tagline']['image_name'];
-        }
-        $templating->set('tagline_image', $top_image);
-
-        $templating->set('max_height', $core->config('article_image_max_height'));
-        $templating->set('max_width', $core->config('article_image_max_width'));
-
-        $subscribe_box = '';
-        if ($_SESSION['user_id'] != 0)
-        {
-            $subscribe_box = '<label>Subscribe to article to receive comment replies via email <input type="checkbox" name="subscribe" checked /></label><br />';
-
-        }
-
-        $core->article_editor(['content' => $_POST['text']]);
-
-        $templating->block('submit_bottom', 'submit_article');
-        $templating->set('captcha', $captcha_output);
-        $templating->set('subscribe_box', $subscribe_box);
-    }
 }

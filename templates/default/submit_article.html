@@ -16,6 +16,9 @@
 [/block: setup_profile]
 
 [block: submit]
+<a class="admin_preview_article button_link fleft" href="#preview">Preview</a>
+<hr />
+<div id="article_preview"></div>
         <script src="{:url}includes/jscripts/jquery.form.min.js"></script>
 			<!-- submit article page -->
 				<div class="box">
@@ -38,10 +41,29 @@
 						<div id='preview2'>
 							{:tagline_image}
 						</div>
-						<form class="gol-form" action="{:url}index.php?module=submit_article" method="post">
+						<form class="gol-form" id="article_editor" action="{:url}index.php?module=submit_article" method="post">
 							<label class="control-label">Title</label>
               				<input type="text" name="title" class="ays-ignore" placeholder="Enter a title..." value="{:title}" /><br />
 [/block: submit]
+
+[block: uploads]
+<div class="box">
+	<div class="body group">
+		<form class="gol-form" id="imageform" method="post" enctype="multipart/form-data" action='/includes/ajax/admin/article_media_upload.php' style="clear:both">
+			Upload your media, please keep sane file sizes! If it's a large (30mb+) video, use YouTube.
+			<div id='imageloadstatus' style='display:none'>
+				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>
+			</div>
+			<div id='imageloadbutton'>
+				<input type="file" name="media[]" id="photoimg" {:edit_state} multiple/>
+			</div>
+		</form>
+	</div>
+</div>
+<div id="uploaded_media" class="box uploads">
+{:previously_uploaded}
+</div>
+[/block: uploads]
 
 [block: submit_bottom]
 							<p>Please be aware that by submitting an article you agree to us making changes to it including spelling, grammar, rewording to fit the websites style.</p>
@@ -50,14 +72,42 @@
 							{:captcha}
 							<div id="hidden_captcha" class="hidden_captcha"></div><br />
 							{:subscribe_box}
-							<button type="submit" name="act" value="Submit" class="btn btn-primary">Submit</button> <button input type="submit" name="act" value="Preview" class="btn btn-info">Preview</button>
+							<button type="submit" name="act" value="Submit" class="btn btn-primary">Submit</button> <button class="admin_preview_article">Preview</button>
+							{:hidden_upload_fields}
 						</form>
 					</div>
 				</div>
 [/block: submit_bottom]
 
 [block: preview_row]
-<script src="includes/jscripts/jquery.form.min.js"></script>
+<h3>Preview</h3>
+<div class="admin_article_preview_box">
+		<div class="box">
+			<div class="head">Here is how it would look on the homepage</div>
+		</div>
+		<!-- Article -->
+		<div class="articles">
+				<div class="article group">
+					<div class="image group">
+						{:top_image_nobbcode}
+					</div>
+					<div class="info group">
+						<div class="title">{:title}</div>
+						<div class="meta">Posted by {:username}, {:date} (0 Comments)</div>
+						<div class="desc">{:tagline} </div>
+						<div class="tags">
+							<ul>
+								{:categories_list_preview}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="box">
+			<div class="head">Here is the full article</div>
+		</div>
+		<!-- article page -->
+
 				<div class="article individual no-image group">
 					<div class="image group">
 						<a href="#">
@@ -74,5 +124,11 @@
 					<div class="content group">
 						{:text_full}
 					</div>
+					<div class="tags group">
+						<ul>
+							{:categories_list_preview}
+						</ul>
+					</div>
 				</div>
+</div>
 [/block: preview_row]

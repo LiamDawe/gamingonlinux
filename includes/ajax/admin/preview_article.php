@@ -94,7 +94,12 @@ if(isset($_POST))
 	else
 	{
 		$title = strip_tags($_POST['title']);
-		$tagline = $_POST['tagline'];
+		
+		$tagline = ''; // submitted articles don't do taglines
+		if (isset($_POST['tagline']))
+		{
+			$tagline = $_POST['tagline'];
+		}
 		$text = $_POST['text'];
 	}
 	

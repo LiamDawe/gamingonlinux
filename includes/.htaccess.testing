@@ -1,0 +1,9 @@
+RewriteEngine on 
+
+RewriteCond %{REQUEST_URI} !^/includes/twitter/getTwitterData\.php$ 
+
+RewriteCond %{HTTP_REFERER} !^http://(www\.)?localhost [NC] 
+
+RewriteCond %{HTTP_REFERER} !^http://(www\.)?localhost.*$ [NC] 
+
+RewriteRule \.(php)$ - [F]

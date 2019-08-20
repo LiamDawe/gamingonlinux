@@ -1,0 +1,9 @@
+RewriteEngine on 
+
+RewriteCond %{REQUEST_URI} !^/includes/twitter/getTwitterData\.php$ 
+
+RewriteCond %{HTTP_REFERER} !^https://(www\.)?gamingonlinux [NC] 
+
+RewriteCond %{HTTP_REFERER} !^https://(www\.)?gamingonlinux.*$ [NC] 
+
+RewriteRule \.(php)$ - [F]

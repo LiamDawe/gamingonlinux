@@ -1,0 +1,21 @@
+{
+    "name": "patreon/patreon",
+    "description": "Interact with the Patreon API via OAuth",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Patreon",
+            "email": "platform-team@patreon.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.0",
+        "art4/json-api-client": "0.9.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Patreon": "src/"
+        }
+    }
+}

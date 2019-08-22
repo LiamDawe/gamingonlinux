@@ -1,6 +1,6 @@
 function twitch_check()
 {
-	var json_file = "/includes/crons/goltwitchcheck.json";
+	var json_file = "/uploads/goltwitchcheck.json";
 	$.getJSON(json_file, function(t) 
 	{
 		if (t["data"].length > 0 && t["data"][0].type == 'live')

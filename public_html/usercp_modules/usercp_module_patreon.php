@@ -18,8 +18,8 @@ require_once(APP_ROOT . '/includes/patreon/OAuth.php');
 use Patreon\API;
 use Patreon\OAuth;
 
-$client_id = 'G4YtuB4-KCp7UpQVqY96-901XUZIIJj6GOgtTC4nFD466fLLRtyy3JrwRFrE23vf';
-$client_secret = 'i0EXBXO84y-nt377FsIDy3ghVdMGl2edV_OB-S4TtSX-LHtPoerbTD8xCtCweR1a';
+$client_id = $core->config('patreon_client_id');
+$client_secret = $core->config('patreon_client_secret');
 
 // Set the redirect url where the user will land after oAuth. That url is where the access code will be sent as a _GET parameter. This may be any url in your app that you can accept and process the access code and login
 

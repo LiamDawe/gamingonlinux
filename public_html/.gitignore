@@ -1,6 +1,11 @@
 uploads/carousel/*
 !uploads/carousel/index.htm
-uploads/avatars
+uploads/avatars/*
+!uploads/avatars/index.htm
+!uploads/avatars/no_avatar.png
+!uploads/avatars/no_avatar_dark.png
+!uploads/avatars/gallery/
+!uploads/avatars/author_pictures/index.htm
 uploads/articles
 cache/default
 cache/youtube_thumbs/

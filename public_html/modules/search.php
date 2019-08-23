@@ -161,7 +161,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 	}
 
 	// check they actually exist
-	$user_details = $dbl->run("SELECT $db_grab_fields `username`, `article_bio` FROM `users` WHERE `user_id` = ?", array($_GET['author_id']))->fetch();
+	$user_details = $dbl->run("SELECT $db_grab_fields `username`, `user_id`, `article_bio` FROM `users` WHERE `user_id` = ?", array($_GET['author_id']))->fetch();
 	if ($user_details)
 	{
 		// paging for pagination
@@ -196,34 +196,33 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 
 		// do the search query
 		$found_search = $dbl->run("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, a.`show_in_menu`, u.`username` FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();
+		$templating->set_previous('title', 'Viewing articles by ' . $user_details['username'], 1);
+		$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $user_details['username'], 1);
+
+		// article author information
+		$templating->block('author_top');
+		$templating->set('username', $user_details['username']);
+		$templating->set('profile_link', $core->config('website_url') . 'profiles/' . $user_details['user_id']);
+
+		if (isset($user_details['article_bio']) && !empty($user_details['article_bio']))
+		{
+			$templating->block('about_author');
+			$templating->set('author_bio', $bbcode->parse_bbcode($user_details['article_bio']));
+
+			$profile_fields_output = user::user_profile_icons($profile_fields, $user_details);
+
+			if (!empty($profile_fields_output))
+			{
+				$profile_fields_output = '<br /><br />Find me in these places: <div class="social_icons_search"><ul>' . $profile_fields_output . '</ul></div>';
+			}
+
+			$templating->set('profile_fields', $profile_fields_output);
+		}
+
+		$templating->block('author_bottom');
 
 		if ($total > 0)
 		{
-			$templating->set_previous('title', 'Viewing articles by ' . $user_details['username'], 1);
-			$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $user_details['username'], 1);
-
-			// article author information
-			$templating->block('author_top');
-			$templating->set('username', $user_details['username']);
-			$templating->set('profile_link', $core->config('website_url') . 'profiles/' . $found_search[0]['author_id']);
-
-			if (isset($user_details['article_bio']) && !empty($user_details['article_bio']))
-			{
-				$templating->block('about_author');
-				$templating->set('author_bio', $bbcode->parse_bbcode($user_details['article_bio']));
-
-				$profile_fields_output = user::user_profile_icons($profile_fields, $user_details);
-
-				if (!empty($profile_fields_output))
-				{
-					$profile_fields_output = '<br /><br />Find me in these places: <div class="social_icons_search"><ul>' . $profile_fields_output . '</ul></div>';
-				}
-
-				$templating->set('profile_fields', $profile_fields_output);
-			}
-
-			$templating->block('author_bottom');
-
 			$article_id_array = array();
 
 			foreach ($found_search as $article)
@@ -265,13 +264,6 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		}
 		else
 		{
-			$templating->set_previous('title', 'Viewing articles by ' . $username, 1);
-			$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $username, 1);
-
-			$templating->block('author_top');
-			$templating->set('username', $username);
-			$templating->set('profile_link', $core->config('website_url') . 'profiles/' . $_GET['author_id']);
-
 			$core->message('They have posted no articles!');
 		}
 	}

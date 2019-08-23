@@ -26,10 +26,10 @@ class notifications
 			foreach ($matches[0] as $match)
 			{
 				//echo $match;
-				preg_match("~\[quote=(.*?)]~si", $match, $username);
-				if (!in_array($username[1], $quoted_users))
+				preg_match("~\[quote=(.*?)]~si", $match, $username_match);
+				if (!in_array($username_match[1], $quoted_users))
 				{
-					$quoted_users[] = $username[1];
+					$quoted_users[] = $username_match[1];
 				}
 			}
 

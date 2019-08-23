@@ -54,10 +54,9 @@ class notifications
 						$new_notification_id[$quoted_user_id] = $this->dbl->new_id();
 					}
 				}
+				$new_notification_id['quoted_usernames'] = $quoted_users;
 			}
 		}
-
-		$new_notification_id['quoted_usernames'] = $quoted_users;
 
 		return $new_notification_id;
 	}

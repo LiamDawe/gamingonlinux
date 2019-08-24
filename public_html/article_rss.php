@@ -34,9 +34,6 @@ if ($core->config('articles_rss') == 1)
 		$sql_addition .= ' AND c.`category_id` IN ( ' . $in . ' ) ';
 	}
 
-	// the total they can display at a time *not used yet*
-	$max_allowed = 50;
-
 	$last_time = $dbl->run("SELECT a.`date`
 	FROM `articles` a $sql_join
 	WHERE a.`active` = 1 $sql_addition
@@ -103,7 +100,7 @@ if ($core->config('articles_rss') == 1)
 		`users` u ON a.author_id = u.user_id $sql_join
 	WHERE a.`active` = 1 $sql_addition
 	ORDER BY a.`date` DESC
-	LIMIT 15", $_GET['tags'])->fetch_all();
+	LIMIT 50", $_GET['tags'])->fetch_all();
 
 	foreach ($articles as $line)
 	{

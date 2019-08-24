@@ -7,7 +7,8 @@
 [/block: comment_reports_bottom]
 
 [block: article_comments]
-<div class="box"><div class="body group">Article: <a href="/articles/{:article_link}">{:article_title}</a></div></div>
+<div class="box"><div class="body group">Article: <a href="/articles/{:article_link}">{:article_title}</a><br />
+Comment: <a href="/articles/{:article_link}/comment_id={:comment_id}">Click here to see</a></div></div>
 <div id="r{:comment_id}" class="comment group">
 	<div class="comment-meta group">
 		<div class="comment-post">
@@ -30,8 +31,8 @@
 	</div>
 </div>
 <form method="post" action="admin.php?module=articles">
-	<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=comment_reports&comment_id={:comment_id}" class="btn btn-warning" /><i class="icon-remove-sign"></i> Delete Report</button>
-	<button type="submit" formaction="/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={:comment_id}" class="btn btn-danger"><i class="icon-trash"></i> Delete Comment</button>
-	<button type="submit" formaction="/index.php?module=articles_full&amp;view=Edit&amp;comment_id={:comment_id}&page=1" class="btn btn-info"><i class="icon-pencil"></i> Edit</button
+	<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=comment_reports&comment_id={:comment_id}" class="btn btn-warning"> Delete Report</button>
+	<button type="submit" formaction="/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={:comment_id}" class="btn btn-danger"> Delete Comment</button>
+	<button type="submit" formaction="/index.php?module=edit_comment&view=Edit&comment_id={:comment_id}" class="btn btn-info"> Edit</button
 </form>
 [/block: article_comments]

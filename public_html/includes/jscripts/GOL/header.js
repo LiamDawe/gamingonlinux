@@ -620,7 +620,19 @@ jQuery(document).ready(function()
 				var total_likes_obj = likeobj.find('.total_likes');
 				var who_likes_obj = likeobj.find('.who-likes');
 
-				var wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+				if (returndata['type'] == 'comment')
+				{
+					var type_id = 'comment_id';
+				}
+				else if (returndata['type'] == 'forum_topic')
+				{
+					var type_id = 'topic_id';
+				}
+				else if (returndata['type'] == 'forum_reply')
+				{
+					var type_id = 'reply_id';	
+				}
+				var wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?'+type_id+'='+sid+'">Who?</a>';
 				total_likes_obj.text(returndata['total']);
 				who_likes_obj.html(wholikes);
 				

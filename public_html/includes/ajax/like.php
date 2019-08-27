@@ -9,6 +9,12 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 {
+	$types_allowed = array('comment', 'forum_topic', 'forum_reply', 'article');
+	if (!isset($_POST['type']) || !in_array($_POST['type'], $types_allowed))
+	{
+		die('Not allowed.');
+	}
+
 	if ($_POST['type'] == 'comment')
 	{
 		$item_id = $_POST['comment_id'];
@@ -101,7 +107,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			$dbl->run("UPDATE `$main_table` SET `total_likes` = (total_likes + 1) WHERE `$main_table_id_field` = ?", array($item_id));
 			$total_likes = $dbl->run("SELECT `total_likes` FROM `$main_table` WHERE `$main_table_id_field` = ?", array($item_id))->fetchOne();
 
-			echo json_encode(array("result" => 'liked', 'total' => $total_likes));
+			echo json_encode(array("result" => 'liked', 'total' => $total_likes, 'type' => $_POST['type']));
 			return true;
 		}
 		echo 2; //Bad Checknum

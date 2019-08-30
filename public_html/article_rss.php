@@ -69,6 +69,7 @@ if ($core->config('articles_rss') == 1)
 	$xml->startElement( 'rss' );
 	$xml->writeAttribute( 'version', '2.0' );
 	$xml->writeAttribute( 'xmlns:atom', 'http://www.w3.org/2005/Atom' );
+	$xml->writeAttribute( 'xmlns:dc', 'http://purl.org/dc/elements/1.1/' );
 
 	$xml->startElement('channel');
 	$xml->writeElement('title', 'GamingOnLinux Latest Articles');
@@ -119,7 +120,7 @@ if ($core->config('articles_rss') == 1)
 		{
 			$username = $line['username'];
 		}
-		$xml->writeElement('author', $core->config('contact_email') . " ($username)");
+		$xml->writeElement('dc:creator', $username);
 
 		// smaller function as found in class_article.php get_link (dont need the entire article class for this!)
 		$nice_title = core::nice_title($line['title']);

@@ -16,6 +16,14 @@ if ($core->config('articles_rss') == 1)
 }
 $templating->set('article_rss', $article_rss);
 
+// don't set the rel tag for GOL's Mastodon on user profiles
+$masto_rel = '';
+if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] == 'home')
+{
+	$masto_rel = 'rel="me"';
+}
+$templating->set('masto_rel', $masto_rel);
+
 $forum_rss = '';
 if ($core->config('forum_rss') == 1)
 {

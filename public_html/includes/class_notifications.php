@@ -15,7 +15,6 @@ class notifications
 	// give a user a notification if their name was quoted in a post somewhere
 	function quote_notification($text, $username, $author_id, $extra_data)
 	{
-		// $author_id, $article_id, $comment_id
 		$new_notification_id = array();
 		
 		preg_match_all("~\[(quote)(?:=*[^]]*)\](?>(?R)|.)*?\[/quote]~si", $text, $matches);
@@ -25,9 +24,8 @@ class notifications
 			$quoted_users = array();
 			foreach ($matches[0] as $match)
 			{
-				//echo $match;
 				preg_match("~\[quote=(.*?)]~si", $match, $username_match);
-				if (!in_array($username_match[1], $quoted_users))
+				if (isset($username_match[1]) && !in_array($username_match[1], $quoted_users))
 				{
 					$quoted_users[] = $username_match[1];
 				}
@@ -40,18 +38,21 @@ class notifications
 					if ($username != $_SESSION['username'])
 					{
 						$quoted_user_id = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ?", array($username))->fetchOne();
-						if ($extra_data['type'] == 'article_comment')
+						if($quoted_user_id)
 						{
-							$field1 = 'article_id';
-							$field2 = 'comment_id';
+							if ($extra_data['type'] == 'article_comment')
+							{
+								$field1 = 'article_id';
+								$field2 = 'comment_id';
+							}
+							if ($extra_data['type'] == 'forum_reply')
+							{
+								$field1 = 'forum_topic_id';
+								$field2 = 'forum_reply_id';						
+							}
+							$this->dbl->run("INSERT INTO `user_notifications` SET `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `$field1` = ?, `$field2` = ?, `type` = 'quoted'", array($quoted_user_id, $author_id, $extra_data['thread_id'], $extra_data['post_id']));
+							$new_notification_id[$quoted_user_id] = $this->dbl->new_id();
 						}
-						if ($extra_data['type'] == 'forum_reply')
-						{
-							$field1 = 'forum_topic_id';
-							$field2 = 'forum_reply_id';						
-						}
-						$this->dbl->run("INSERT INTO `user_notifications` SET `seen` = 0, `owner_id` = ?, `notifier_id` = ?, `$field1` = ?, `$field2` = ?, `type` = 'quoted'", array($quoted_user_id, $author_id, $extra_data['thread_id'], $extra_data['post_id']));
-						$new_notification_id[$quoted_user_id] = $this->dbl->new_id();
 					}
 				}
 				$new_notification_id['quoted_usernames'] = $quoted_users;

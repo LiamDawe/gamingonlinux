@@ -1,5 +1,5 @@
 <?php
-define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
 require APP_ROOT . "/includes/bootstrap.php";
 

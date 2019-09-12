@@ -51,7 +51,7 @@ if ($core->config('forum_rss') == 1)
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();
 
-	$fetch_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC LIMIT 15")->fetch_all();
+	$fetch_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date` FROM `forum_topics` WHERE `approved` = 1 ORDER BY `last_post_date` DESC LIMIT 30")->fetch_all();
 
 	foreach ($fetch_topics as $line)
 	{

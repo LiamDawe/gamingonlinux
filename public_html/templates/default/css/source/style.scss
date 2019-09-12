@@ -1565,7 +1565,7 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 	content: '';
 	position: absolute;
 	width: 6px;
-	background-color: black;
+	background-color: #efefef;
 	top: 0;
 	bottom: 0;
 	left: 50%;
@@ -1668,9 +1668,9 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
   /* Make sure that all arrows are pointing leftwards */
 	.timeline-container::before {
 	  left: 60px;
-	  border: medium solid black;
+	  border: medium solid #eee;
 	  border-width: 10px 10px 10px 0;
-	  border-color: transparent black transparent transparent;
+	  border-color: transparent #eee transparent transparent;
 	  box-sizing: border-box;
 	}
 

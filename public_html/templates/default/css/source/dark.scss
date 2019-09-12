@@ -377,3 +377,32 @@ svg text {fill: white;}
 
 .vote_done {color: white; background-color: green;}
 #wrap strong {color: black;}
+
+/* timeline */
+.container-content{background-color: #222222;}
+.container-left::before {
+	content: " ";
+	height: 0;
+	position: absolute;
+	top: 22px;
+	width: 0;
+	z-index: 1;
+	right: 30px;
+	border: medium solid #222222;
+	border-width: 10px 0 10px 10px;
+	border-color: transparent transparent transparent #222222;
+	box-sizing: border-box;
+  }
+  .container-right::before {
+	content: " ";
+	height: 0;
+	position: absolute;
+	top: 22px;
+	width: 0;
+	z-index: 1;
+	left: 30px;
+	border: medium solid #222222;
+	border-width: 10px 10px 10px 0;
+	border-color: transparent #222222 transparent transparent;
+	box-sizing: border-box;
+  }

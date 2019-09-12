@@ -25,6 +25,13 @@ foreach ($events_list as $event)
 {
 	$templating->block('row');
 
+	$image = '';
+	if (isset($event['image']) && !empty($event['image']))
+	{
+		$image = '<img style="display: block;margin-left: auto;margin-right: auto;" src="/uploads/timeline/'.$event['image'].'" alt="" />';
+	}
+	$templating->set('image', $image);
+
 	$this_year = date('Y', strtotime($event['date']));
 	$year_anchor_html = '';
 	if (!in_array($this_year, $year_anchors))
@@ -61,6 +68,7 @@ foreach ($events_list as $event)
 		$start_anchor = 'id="start"';
 	}
 	$templating->set('start_anchor', $start_anchor);
+	$templating->set('item_anchor', $counter . '_anchor');
 }
 
 $templating->block('timeline_bottom');

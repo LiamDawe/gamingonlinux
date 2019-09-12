@@ -22,24 +22,33 @@ command: 'spoiler',
 toolbar: 'insert',
 icon: '/templates/default/images/spoiler.png'
 });
-this.editor.on('instanceReady', function()
+CKEDITOR.on('instanceReady', function(evt)
 {
-// Note nested arrays
-// http://docs.ckeditor.com/#!/api/CKEDITOR.filter-method-addTransformations
-// This rule will add the target="_blank" attribute to all links that
-// do not have it.
-this.editor.filter.addTransformations([
-  [{
-	element: 'a',
-	left: function( el ) {
-	  return el.target !== '_blank';
-	},
-	right: function( el, tools ) {
-	  el.attributes.target = '_blank';
-	}
-  }]
-]);
-}.bind(this));
+	// Note nested arrays
+	// http://docs.ckeditor.com/#!/api/CKEDITOR.filter-method-addTransformations
+	// This rule will add the target="_blank" attribute to all links that
+	// do not have it.
+	evt.editor.filter.addTransformations([
+	[{
+		element: 'a',
+		left: function( el ) {
+			return el.target !== '_blank';
+		},
+		right: function( el, tools ) {
+			el.attributes.target = '_blank';
+		}
+	}],
+	[{
+		element: 'a',
+		left: function( el ) {
+			return el.attributes['class'].indexOf('article-link') !== -1;
+		},
+		right: function( el, tools ) {
+			el.attributes['class'] += ' article-link';
+		}
+	}]
+	]);
+});
 </script>
 [/block: ckeditor]
 

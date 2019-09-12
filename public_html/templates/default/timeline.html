@@ -1,5 +1,5 @@
 [block: timeline_top]
-<div id="timeline-adjust" class="box">
+<div class="box timeline-margin-adjust">
 	<div class="body group">
 		A timeline of interesting and notable events for Linux gaming. Have an event you want us to add? <a href="/email-us/">Email us!</a><br />
 		Nav: <a href="#start">Jump to the start</a>
@@ -11,8 +11,9 @@
 [block: row]
 	<div {:year_anchor} class="timeline-container container-{:position}">
 			<div {:start_anchor} class="container-content">
-				<h3>{:date}</h3>
-				<p>{:title}</p>
+				<h3><a id="{:item_anchor}" href="#{:item_anchor}">{:date}</a></h3>
+				<p class="timeline-margin-adjust">{:title}</p>
+				{:image}
 			</div>
 		</div>
 [/block: row]

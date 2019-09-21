@@ -88,15 +88,20 @@ function apiRequest($method, $parameters)
 	return exec_curl_request($handle);
 }
 
-function telegram($message)
+function telegram($message, $article_link)
 {
 	if (!empty(BOT_TOKEN))
 	{
 		// process incoming message
 		$chat_id = "@" . CHAT_ID;
+
+		$keyboard = array(
+			"inline_keyboard" => array(array(array("text" => "Read on GOL", "url" => 'https://www.gamingonlinux.com')))
+		);
+
 		if (isset($message))
 		{
-			apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $message));
+			apiRequest("sendMessage", array('chat_id' => $chat_id, "parse_mode" => "HTML", "text" => $message, 'reply_markup' => $keyboard));
 		}
 	}
 }

@@ -701,12 +701,16 @@ class article
 		$templating->set('history', $history);
 	}
 
-	public function get_link($id, $title, $additional = NULL)
+	public function get_link($id, $title = NULL, $additional = NULL)
 	{
-		$link = '';
-		$nice_title = core::nice_title($title);
+		$link = 'articles/';
+		if (isset($title))
+		{
+			$nice_title = core::nice_title($title);
+			$link = $link . $nice_title . '.';
+		}
 
-		$link = 'articles/'.$nice_title.'.'.$id;
+		$link = $link . $id;
 
 		if ($additional != NULL)
 		{
@@ -889,9 +893,10 @@ class article
 
 		include($this->core->config('path') . 'includes/telegram_poster.php');
 
-		$article_link = self::get_link($article_id, $checked['slug']);
+		$article_link = self::get_link($article_id);
+		$comments_link = self::get_link($article_id, NULL, '#comments');
 
-		telegram($checked['title'] . ' ' . $article_link);
+		telegram($checked['title'] . "\n\r\n\rLink: " . $article_link . "\n\rComments: " . $comments_link, $article_link);
 
 		if (!isset($_POST['show_block']))
 		{

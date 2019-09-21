@@ -96,7 +96,7 @@ function telegram($message, $article_link)
 		$chat_id = "@" . CHAT_ID;
 
 		$keyboard = array(
-			"inline_keyboard" => array(array(array("text" => "Read on GOL", "url" => 'https://www.gamingonlinux.com')))
+			"inline_keyboard" => array(array(array("text" => "Read on GOL", "url" => $article_link)))
 		);
 
 		if (isset($message))

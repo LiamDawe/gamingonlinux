@@ -57,7 +57,19 @@ if (isset($search_text) && !empty($search_text))
 	$per_page = 50;
 	$page_url = '/index.php?module=search&q='.$search_text.'&';
 
-	$total = $dbl->run("SELECT COUNT(*) FROM `articles` a LEFT JOIN `users` u ON a.`author_id` = u.`user_id` WHERE a.`active` = 1 AND a.`title` LIKE ? ORDER BY a.`date` DESC", array($search_through))->fetchOne();
+	// do the search query
+	$found_search = $dbl->run("SELECT a.`article_id`, a.`tagline`, a.`comment_count`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename
+	FROM `articles` a
+	LEFT JOIN `users` u ON a.`author_id` = u.`user_id`
+	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
+	WHERE a.`active` = 1
+	AND a.`title` LIKE ?
+	ORDER BY a.`date` DESC
+	LIMIT $core->start , $per_page", array($search_through))->fetch_all();
+
+	$total = count($found_search);
+
+	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
 
 	$last_page = ceil($total/$per_page);
 		
@@ -65,17 +77,6 @@ if (isset($search_text) && !empty($search_text))
 	{
 		$page = $last_page;
 	}
-
-	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
-
-	// do the search query
-	$found_search = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`
-	FROM `articles` a
-	LEFT JOIN `users` u ON a.`author_id` = u.`user_id`
-	WHERE a.`active` = 1
-	AND a.`title` LIKE ?
-	ORDER BY a.`date` DESC
-	LIMIT $core->start , $per_page", array($search_through))->fetch_all();
 
 	if ($found_search)
 	{
@@ -89,41 +90,11 @@ if (isset($search_text) && !empty($search_text))
 
 		$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
 
+		$templating->load('articles');
+
 		// loop through results
-		foreach ($found_search as $found)
-		{
-			$date = $core->human_date($found['date']);
+		$article_class->display_article_list($found_search, $get_categories);
 
-			$templating->block('row');
-
-			$templating->set('date', $date);
-			$templating->set('title', $found['title']);
-			$templating->set('article_link', $article_class->get_link($found['article_id'], $found['slug']));
-
-			if ($found['author_id'] == 0)
-			{
-				$username = $found['guest_username'];
-			}
-
-			else
-			{
-				$username = "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>';
-			}
-			$templating->set('username', $username);
-
-			$categories_display = '';
-			if ($article['show_in_menu'] == 1)
-			{
-				$categories_display = '<li><a href="#">Editors Pick</a></li>';
-			}
-
-			if (isset($get_categories[$found['article_id']]))
-			{
-				$categories_display .= $article_class->display_article_tags($get_categories[$found['article_id']]);
-			}
-
-			$templating->set('categories_list', $categories_display);
-		}
 		$templating->block('bottom', 'search');
 		$start_no = $core->start;
 		if ($core->start == 0)
@@ -195,7 +166,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		$pagination = $core->pagination_link($per_page, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
 		// do the search query
-		$found_search = $dbl->run("SELECT a.article_id, a.`title`, a.`slug`, a.author_id, a.`date`, a.guest_username, a.`show_in_menu`, u.`username` FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();
+		$found_search = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`tagline`, a.`date`, a.guest_username, a.`show_in_menu`, a.`comment_count`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();
 		$templating->set_previous('title', 'Viewing articles by ' . $user_details['username'], 1);
 		$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $user_details['username'], 1);
 
@@ -233,34 +204,10 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 	
 			$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
 
+			$templating->load('articles');
+
 			// loop through results
-			foreach ($found_search as $found)
-			{
-				$date = $core->human_date($found['date']);
-
-				$templating->block('row');
-
-				$templating->set('date', $date);
-				$templating->set('title', $found['title']);
-				$templating->set('article_link', $article_class->get_link($found['article_id'], $found['slug']));
-
-				$username_link = "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>';
-				
-				$templating->set('username', $username_link);
-
-				$categories_display = '';
-				if ($found['show_in_menu'] == 1)
-				{
-					$categories_display = '<li><a href="#">Editors Pick</a></li>';
-				}
-	
-				if (isset($get_categories[$found['article_id']]))
-				{
-					$categories_display .= $article_class->display_article_tags($get_categories[$found['article_id']]);
-				}
-	
-				$templating->set('categories_list', $categories_display);
-			}
+			$article_class->display_article_list($found_search, $get_categories);
 		}
 		else
 		{

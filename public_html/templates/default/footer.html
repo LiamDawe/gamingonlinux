@@ -37,7 +37,8 @@ CKEDITOR.on('instanceReady', function(evt)
 		right: function( el, tools ) {
 			el.attributes.target = '_blank';
 		}
-	}],
+	}]/* WAITING ON CKEDITOR BUGS FOR THIS
+	,
 	[{
 		element: 'a',
 		left: function( el ) {
@@ -46,7 +47,7 @@ CKEDITOR.on('instanceReady', function(evt)
 		right: function( el, tools ) {
 			el.attributes['class'] += ' article-link';
 		}
-	}]
+	}]*/
 	]);
 });
 </script>

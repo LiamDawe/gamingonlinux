@@ -503,6 +503,8 @@ class game_sales
 
 	function display_normal($filters = NULL)
 	{
+		$per_page = 50;
+
 		// for non-ajax requests
 		if (isset($_GET['option']) && is_array($_GET['option']) && $filters == NULL)
 		{
@@ -612,14 +614,23 @@ class game_sales
 		}
 
 		// paging for pagination
-		$page = isset($_GET['page'])?intval($_GET['page']-1):0;
+		$page = core::give_page();
+		if ($page >= 1) // slicing an array, starts from 0 not 1
+		{
+			$page = $page - 1;
+		}
 
 		$total_rows = count($sales_merged);
+		$lastpage = ceil($total_rows/$per_page) - 1;
+		if ($page > $lastpage)
+		{
+			$page = $lastpage;
+		}
 
 		$this->templating->set('total', $total_rows);
 
 		//foreach ($sales_merged as $name => $sales)
-		foreach (array_slice($sales_merged, $page*50, 50) as $name => $sales)
+		foreach (array_slice($sales_merged, $page*$per_page, $per_page) as $name => $sales)
 		{
 			$this->templating->block('sale_row', 'sales');
 			$this->templating->set('name', $name);
@@ -694,7 +705,7 @@ class game_sales
 			$link_extra = '&' . implode('&', $options_link);
 		}
 
-		$pagination = $this->core->pagination_link(50, $total_rows, '/sales.php?', $page + 1, $link_extra);
+		$pagination = $this->core->pagination_link($per_page, $total_rows, '/sales.php?', $page + 1, $link_extra);
 
 		if ($pagination != '')
 		{

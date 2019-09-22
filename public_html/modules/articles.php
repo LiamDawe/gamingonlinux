@@ -213,20 +213,7 @@ if (isset($view))
 
 			$article_id_sql = implode(', ', $article_id_array);
 
-			// this is required to properly count up the rank for the tags
-			$dbl->run("SET @rank=null, @val=null");
-
-			$category_tag_sql = "SELECT * FROM (
-				SELECT r.article_id, c.`category_name` , c.`category_id`,
-				@rank := IF( @val = r.article_id, @rank +1, 1 ) AS rank, @val := r.article_id
-				FROM  `article_category_reference` r
-				INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
-				WHERE r.article_id
-				IN ( $article_id_sql )
-				ORDER BY CASE WHEN ($cat_sql) THEN 0 ELSE 1 END, r.`article_id` ASC
-				) AS a
-				WHERE rank < 5";
-			$get_categories = $dbl->run($category_tag_sql, $safe_ids)->fetch_all();
+			$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
 
 			$article_class->display_article_list($articles_get, $get_categories);
 				

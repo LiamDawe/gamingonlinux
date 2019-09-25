@@ -475,7 +475,7 @@ if (!isset($_GET['go']))
 					$templating->set('article_id', $article['article_id']);
 				}
 
-				if (isset($article['article_bio']) && !empty($article['article_bio']))
+				if (isset($article['article_bio']) && !empty($article['article_bio']) && $article['author_id'] != 1844) // dont show for the gamingonlinux bot
 				{
 					if (isset($article['author_picture']) && !empty($article['author_picture']) && $article['author_picture'] != NULL)
 					{

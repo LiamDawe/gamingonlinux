@@ -157,7 +157,7 @@ else
 
 						// email anyone subscribed which isn't you
 						$users_array = array();
-						$fetch_subs = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1", array($topic_id))->fetch_all();
+						$fetch_subs = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1 AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($topic_id, $_SESSION['user_id']))->fetch_all();
 						
 						if ($fetch_subs)
 						{

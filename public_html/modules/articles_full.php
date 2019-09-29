@@ -799,7 +799,7 @@ else if (isset($_GET['go']))
 							- Make an array of anyone who needs an email now
 							- Additionally, send a notification to anyone subscribed
 							*/
-							$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($article_id, (int) $_SESSION['user_id']))->fetch_all();
+							$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($article_id, (int) $_SESSION['user_id'], (int) $_SESSION['user_id']))->fetch_all();
 							$users_array = array();
 							foreach ($users_to_email as $email_user)
 							{

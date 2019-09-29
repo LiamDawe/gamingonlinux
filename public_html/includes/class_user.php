@@ -13,7 +13,9 @@ class user
 	`display_comment_alerts`, `display_like_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`";
 
 	public $user_groups = [0 => 4]; // default for guests
-	public $blocked_users = [];
+	public $blocked_users = []; // associative array of blocked usernames/ids
+	public $blocked_user_ids = []; // just blocked user ids for simple uses
+	public $blocked_usernames = []; // just blocked usernames for simple uses
 	public $blocked_tags = [0 => 0];
 
 	public $cookie_length = 60*60*24*60; // 30 days
@@ -188,6 +190,15 @@ class user
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			$this->blocked_users = $this->db->run("SELECT u.`username`, b.`blocked_id` FROM `user_block_list` b INNER JOIN `users` u ON u.user_id = b.blocked_id WHERE b.`user_id` = ? ORDER BY u.`username` ASC", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+		}
+
+		if ($this->blocked_users)
+		{
+			foreach ($this->blocked_users as $username => $blocked_id)
+			{
+				$this->blocked_user_ids[] = $blocked_id[0];
+				$this->blocked_usernames[] = $username;
+			}
 		}
 	}
 

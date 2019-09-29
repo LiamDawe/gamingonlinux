@@ -1,0 +1,17 @@
+[block: main]
+<div class="box"><div class="head">Here you can change your username.</div></div>
+<div class="box">
+	<div class="body group">
+	<form class="gol-form" method="post" action="/usercp.php?module=username" role="form">
+	Current Username: {:current_username}<br />
+	<hr />
+	New Username: <input class="ays-ignore" type="text" name="new_username" /><br />
+	<em>Please only use alphanumeric characters, "-" and "_".</em><br />
+	<br />
+	Enter your password to confirm it's you doing this:<br />
+	<input type="password" class="ays-ignore" name="password" /><br />
+	<input type="submit" name="Update" value="Update" />
+	</form>
+	</div>
+</div>
+[/block: main]

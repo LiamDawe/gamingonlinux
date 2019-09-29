@@ -163,7 +163,7 @@ if (isset($_POST['action']))
 				$new_notification_id = $notifications->quote_notification($find_post['reply_text'], $find_post['username'], $_POST['author_id'], array('type' => 'forum_reply', 'thread_id' => $_POST['topic_id'], 'post_id' => $_POST['post_id']));
 
 				// email anyone subscribed which isn't you
-				$email_res = $dbl->run("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1", array($_POST['topic_id']))->fetch_all();
+				$email_res = $dbl->run("SELECT s.`user_id`, s.`emails`, u.`email`, u.`username` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.`user_id` = u.`user_id` WHERE s.`topic_id` = ? AND s.`send_email` = 1 AND s.`emails` = 1 AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($_POST['topic_id'], $_POST['author_id']))->fetch_all();
 				$users_array = array();
 				foreach ($email_res as $users)
 				{
@@ -265,7 +265,7 @@ if (isset($_POST['action']))
 				- Make an array of anyone who needs an email now
 				- Additionally, send a notification to anyone subscribed
 				*/
-				$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ?", array($approved['article_id'], $_POST['author_id']))->fetch_all();
+				$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($approved['article_id'], $_POST['author_id'], $_POST['author_id']))->fetch_all();
 				$users_array = array();
 				foreach ($users_to_email as $email_user)
 				{

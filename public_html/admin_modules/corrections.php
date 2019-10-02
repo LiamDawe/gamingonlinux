@@ -52,6 +52,7 @@ if ($res)
 		$templating->set('correction', $bbcode->parse_bbcode($corrections['correction_comment']));
 		$templating->set('correction_text_plain', $corrections['correction_comment']);
 		$templating->set('correction_id', $corrections['row_id']);
+		$templating->set('article_id', $corrections['article_id']);
 		$templating->set('reporter_id', $corrections['user_id']);
 	}
 
@@ -101,7 +102,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'delete')
 			die();
 		}
 		
-		$text = 'Your correction report was: [quote]'.$_POST['correction_text'].'[/quote]' . $text;
+		$text = "Your correction report on [i][url={$core->config('website_url')}articles/{$_POST['article_id']}]{$title}[/url][/i] was: [quote]{$_POST['correction_text']}[/quote]{$text}";
 
 		// make the new message
 		$dbl->run("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));

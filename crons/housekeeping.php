@@ -59,7 +59,7 @@ $upload_timeout = 86400; // 1 day
 $upload_stamp = time() - $upload_timeout;
 
 // grab all old article_images
-$grab_all = $dbl->run("SELECT `filename` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($upload_stamp))->fetch_all();
+$grab_all = $dbl->run("SELECT `filename` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0 OR `article_id` IS NULL", array($upload_stamp))->fetch_all();
 foreach ($grab_all as $grabber)
 {
 	$main = APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename'];

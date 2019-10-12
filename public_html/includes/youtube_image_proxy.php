@@ -1,5 +1,6 @@
 <?php
 session_cache_limiter('');
+session_start();
 
 header('Content-Type: text/plain');
 header('Cache-control: max-age='.(60*60*24*365));
@@ -9,12 +10,6 @@ define("APP_ROOT", dirname(dirname(__FILE__)));
 require APP_ROOT . "/includes/bootstrap.php";
 define("APP_URL", $core->config('website_url'));
 
-// some basic security, make sure the referring url is actually us - can be spoofed, but still a good idea
-if (!isset($_SERVER['HTTP_REFERER']))
-{
-	die("You should not be here!");
-}
-
 $parse_url = parse_url($_SERVER['HTTP_REFERER']);
 if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_url'))
 {
@@ -23,7 +18,7 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 		// only logged in accounts can do this too, it's only for articles
 		if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 		{
-			die('You shouldn\'t be here.');
+			die('You shouldn\'t be here. You need to be logged in.');
 		}
 
 		$article_id = NULL;

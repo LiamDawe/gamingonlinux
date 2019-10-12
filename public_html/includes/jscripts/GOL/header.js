@@ -235,24 +235,31 @@ $(function()
 		});
 	});
 });
-$(function(){
-    $(document).on('click','.trash_tagline',function(){
+$(function()
+{
+	$(document).on('click','.trash_tagline',function(e)
+	{
+		e.preventDefault();
         var image_id= $(this).attr('id');
-        $.ajax({
+        $.ajax(
+		{
             type:'POST',
             url:'/includes/ajax/delete_tagline_image.php',
             data:{'image_id':image_id},
-            success: function(data){
-              if(data=="YES"){
-			$("div[id='"+image_id+"']").replaceWith('<div class="col-md-12" style="background-color: #15e563; padding: 5px;">Image Deleted</div>');
-			$('html, body').animate({scrollTop: $("#preview2").offset().top}, 0);
-                 }else{
-                        alert("can't delete the row")
-                 }
-             }
-
-            });
+			success: function(data)
+			{
+				if(data=="YES")
+				{
+					$("div[id='"+image_id+"']").replaceWith('<div class="col-md-12" style="background-color: #15e563; padding: 5px;">Image Deleted</div>');
+					$("#imageform2").scrollMinimal();
+				}
+				else
+				{
+                    alert("can't delete the row");
+                }
+            }
         });
+    });
 });
 jQuery(document).ready(function()
 {  

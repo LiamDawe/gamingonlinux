@@ -178,7 +178,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 
 			echo "<div class=\"test\" id=\"{$imagename}\"><img src=\"".$core->config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$imagename}\"><br />";
 			echo "<input type=\"hidden\" name=\"image_name\" value=\"{$imagename}\" />";
-			echo 'Full Image Url: <a class="tagline-image" href="' . $core->config('website_url') . 'uploads/articles/tagline_images/temp/'.$imagename.'" target="_blank">Click Me</a> - <a href=\"#\" id=\"{$imagename}\" class=\"trash_tagline\">Delete Image</a>';
+			echo 'Full Image Url: <a class="tagline-image" href="' . $core->config('website_url') . 'uploads/articles/tagline_images/temp/'.$imagename.'" target="_blank">Click Me</a> - <a href="#" id="'.$imagename.'" class="trash_tagline">Delete Image</a>';
 			echo '<br /><button type="button" class="insert_tagline_image">Insert into editor</button></div>';
 		}
 

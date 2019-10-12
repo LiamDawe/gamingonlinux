@@ -324,9 +324,16 @@ function grab_youtube_image(el)
 			if (this.readyState == 4 && this.status == 200) 
 			{
 				var return_data = JSON.parse(this.responseText);
-				var preview_image = '<div class="box"><div class="body group"><div id="'+return_data.db_id+'">YouTube Image: <br /><img style="max-width: 450px;" src="'+return_data.file_url+'" class="imgList"><br />URL: <input id="img' +return_data.db_id+ '" type="text" value="' +return_data.file_url+ '" /> <button class="btn" data-clipboard-target="#img' +return_data.db_id+ '">Copy</button><button data-url="'+return_data.file_url+'" data-type="image" class="add_button">Insert</button><button id="' +return_data.db_id+ '" class="trash">Delete Media</button></div></div></div>';
+
+				// insert the new upload from the YouTube thumbnail into the uploaded media section
+				var preview_image = '<div class="box"><div class="body group"><div id="'+return_data.db_id+'">YouTube Thumbnail Image: <br /><img style="max-width: 450px;" src="'+return_data.file_url+'" class="imgList"><br />URL: <input id="img' +return_data.db_id+ '" type="text" value="' +return_data.file_url+ '" /> <button class="btn" data-clipboard-target="#img' +return_data.db_id+ '">Copy</button><button data-url="'+return_data.file_url+'" data-type="image" class="add_button">Insert</button><button id="' +return_data.db_id+ '" class="trash">Delete Media</button></div></div></div>';
 				var theDiv = document.getElementById("uploaded_media");
-				theDiv.insertAdjacentHTML('beforeend', preview_image)
+				theDiv.insertAdjacentHTML('beforeend', preview_image);
+
+				// insert the hidden form field, to tell our script we have a new file to work with when saving
+				var main_form = document.getElementById("article_editor");
+				var new_hidden_field = '<input class="uploads-'+return_data.db_id+'" type="hidden" name="uploads[]" value="'+return_data.db_id+'"></input>';
+				main_form.insertAdjacentHTML('beforeend',new_hidden_field);
 
 				inputbox.getContentElement('youtubePlugin', 'txtPreviewImage').setValue(return_data.file_url);
 			}

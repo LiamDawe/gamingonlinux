@@ -2,7 +2,7 @@
 session_cache_limiter('');
 session_start();
 
-header('Content-Type: text/plain');
+header('Content-Type: application/json');
 header('Cache-control: max-age='.(60*60*24*365));
 header('Expires: '.gmdate(DATE_RFC1123,time()+60*60*24*365));
 

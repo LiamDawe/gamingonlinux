@@ -52,7 +52,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 
-	config.extraPlugins = 'widget,widgetselection,lineutils,html5audio,youtube,html5video';
+	config.extraPlugins = 'widget,widgetselection,lineutils,html5audio,youtube,html5video,justify';
 	config.removePlugins = 'about';
 
 	config.youtube_responsive = true;

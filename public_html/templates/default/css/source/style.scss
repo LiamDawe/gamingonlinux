@@ -15,7 +15,7 @@ body {
  * ------------------------------
  */
 
-.gol-form textarea, .gol-form input[type="text"], .gol-form input[type="password"], .gol-form input[type="email"], .gol-form select {
+.gol-form textarea, .gol-form input[type="text"], .gol-form input[type="text"]:disabled, .gol-form input[type="password"], .gol-form input[type="email"], .gol-form select {
 	width: 100%;
 } 
 input[type="button"]:disabled, input[type="submit"]:disabled, input[type="reset"]:disabled
@@ -1244,7 +1244,7 @@ ul.social-networks li > a {
 }
 
 /* Above tablet */
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 806px) {
     .articles .article .image {
         float: left;
         width: 40%;
@@ -1258,7 +1258,7 @@ ul.social-networks li > a {
 }
 
 /* TABLET/NETBOOK */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 806px) {
 	.forum_post_info{width: 100%;}
 	.last_post{display: none;visibility: hidden;}
 	ul.pagination_small{display: none;visibility: hidden;}

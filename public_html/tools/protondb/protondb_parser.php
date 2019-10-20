@@ -2,7 +2,8 @@
 /* TODO
 Can probably check on individuals by CPU+GPU combination?
 */
-define('LAST_MONTH', '07');
+ini_set("memory_limit", "-1");
+define('LAST_MONTH', '09');
 define('CURRENT_YEAR', '2019');
 
 $file_dir = dirname (dirname( dirname(__FILE__) ));
@@ -36,6 +37,7 @@ $gpu = array('AMD' => 0, 'NVIDIA' => 0, 'Intel' => 0);
 $cpu = array('AMD' => 0, 'Intel' => 0);
 $reports_over_time = array();
 $platinum_reports = array();
+$gold_reports = array();
 $borked_reports = array();
 
 function contains($str, array $arr)
@@ -116,6 +118,19 @@ foreach ($json as $key => $value)
 				$platinum_reports[$clean_title] = 1;
 			}			
 		}
+
+		// find the most highly rated gold reports
+		if ($value['rating'] == 'Gold')
+		{
+			if (array_key_exists($clean_title, $gold_reports))
+			{
+				$gold_reports[$clean_title]++;
+			}
+			else
+			{
+				$gold_reports[$clean_title] = 1;
+			}
+		}		
 
 		// sort out the games
 		if (array_key_exists($clean_title, $games))
@@ -252,7 +267,9 @@ uksort($reports_over_time, function($a1, $a2)
 	return $time1 - $time2;
 });
 
-print_r($reports_over_time);
+echo '<pre>';
+//print_r($reports_over_time);
+echo '</pre>';
 
 echo "There were $this_month_reports for this month and there's $total_reports reports in total!";
 
@@ -264,28 +281,46 @@ foreach ($rating_name_order as $key)
     $ratings_sorted[$key] = $rating[$key];
 }
 
-print_r($ratings_sorted);
+echo '<pre>';
+//print_r($ratings_sorted);
+echo '</pre>';
 
 echo "\nThis month's highest games:\n";
 
 asort($games);
-$tenHighest = array_slice($games, -15, null, true);
+$tenHighest = array_slice($games, -20, null, true);
 arsort($tenHighest);
-print_r($tenHighest);
+
+function array_orderby()
+{
+    $args = func_get_args();
+    $data = array_shift($args);
+    foreach ($args as $n => $field) {
+        if (is_string($field)) {
+            $tmp = array();
+            foreach ($data as $key => $row)
+                $tmp[$key] = $row[$field];
+            $args[$n] = $tmp;
+            }
+    }
+    $args[] = &$data;
+    call_user_func_array('array_multisort', $args);
+    return array_pop($args);
+}
 
 echo "\nThis month's top Linux distros - RAW:\n";
 
-print_r($os_raw);
+//print_r($os_raw);
 
 echo "\nThis month's top Linux distros - Cleaner:\n";
 
 arsort($os_clean);
-print_r($os_clean);
+//print_r($os_clean);
 
 echo "\nThis month's lowest Linux distros:\n";
 
 $lower_distros = array_slice($os_clean, 10, null);
-print_r($lower_distros);
+//print_r($lower_distros);
 
 $total_lower = 0;
 foreach ($lower_distros as $key => $lower)
@@ -301,7 +336,7 @@ echo "\nCleaned distro list top 10\n";
 
 $highest_distros = array_slice($os_clean, 0, 10, true);
 
-print_r($highest_distros);
+//print_r($highest_distros);
 
 echo "\nThis month's top proton versions:\n";
 
@@ -311,11 +346,11 @@ print_r($proton_highest);
 
 echo "\nThis month's top GPUs\n";
 
-print_r($gpu);
+//print_r($gpu);
 
 echo "\nThis month's top CPUs\n";
 
-print_r($cpu);
+//print_r($cpu);
 
 echo "\nThis month's platinum reports\n";
 
@@ -325,136 +360,145 @@ print_r($top_plat);
 
 /* CHART GENERATION */
 
-// number of reports
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - July 2019', `sub_title` = 'Reports Over Time', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 0");
-$new_chart_id = $dbl->new_id();
-foreach ($reports_over_time as $key => $total)
+if (isset($_GET['makecharts']))
 {
-	$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
-	$new_label_id = $dbl->new_id();
-	$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
+	// number of reports
+	$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - September 2019', `sub_title` = 'Reports Over Time', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 0");
+	$new_chart_id = $dbl->new_id();
+	foreach ($reports_over_time as $key => $total)
+	{
+		$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
+		$new_label_id = $dbl->new_id();
+		$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
+	}
+
+	// ratings
+	$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - September 2019', `sub_title` = 'Steam Play Rating', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 0");
+	$new_chart_id = $dbl->new_id();
+	foreach ($ratings_sorted as $key => $total)
+	{
+		$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
+		$new_label_id = $dbl->new_id();
+		$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
+	}
+
+	// distros
+	$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - September 2019', `sub_title` = 'Most Used Linux Distributions - Top 10', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
+	$new_chart_id = $dbl->new_id();
+	foreach ($highest_distros as $key => $total)
+	{
+		$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
+		$new_label_id = $dbl->new_id();
+		$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
+	}
+
+	// gpu
+	$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - September 2019', `sub_title` = 'Most Used GPU Vendors', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
+	$new_chart_id = $dbl->new_id();
+	foreach ($gpu as $key => $total)
+	{
+		$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
+		$new_label_id = $dbl->new_id();
+		$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
+	}
+
+	// cpu
+	$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - September 2019', `sub_title` = 'Most Used CPU Vendors', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
+	$new_chart_id = $dbl->new_id();
+	foreach ($cpu as $key => $total)
+	{
+		$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
+		$new_label_id = $dbl->new_id();
+		$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
+	}
 }
 
-// ratings
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - July 2019', `sub_title` = 'Steam Play Rating', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 0");
-$new_chart_id = $dbl->new_id();
-foreach ($ratings_sorted as $key => $total)
-{
-	$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
-	$new_label_id = $dbl->new_id();
-	$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
-}
+/* HTML tables */
 
 // top games
 echo "<table class=\"table-stripes-tbody\">
 <thead>
 <tr>
 <th>Name</th>
-<th>Number of reports</th>
+<th>No. Total</th>
+<th>Plat</th>
+<th>Gold</th>
 </tr>
 <tbody>";
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - July 2019', `sub_title` = 'Most Rated Games', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 0");
-$new_chart_id = $dbl->new_id();
 foreach ($tenHighest as $key => $total)
 {
-	$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
-	$new_label_id = $dbl->new_id();
-	$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
-
-	echo "<tr><td>$key</td><td>$total</td></tr>";
+	$total_good = 0;
+	$plat = 0;
+	$gold = 0;
+	if (isset($platinum_reports[$key]))
+	{
+		$plat = $platinum_reports[$key];
+	}
+	if (isset($gold_reports[$key]))
+	{
+		$gold = $gold_reports[$key];
+	}	
+	echo "<tr><td>$key</td><td>$total</td><td>{$plat}</td><td>{$gold}</td></tr>";
 }
 echo "</tbody>
 </table>";
-
-// top platinum games reported
-echo "<table class=\"table-stripes-tbody\">
-<thead>
-<tr>
-<th>Name</th>
-<th>Number of platinum reports</th>
-</tr>
-<tbody>";
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - July 2019', `sub_title` = 'Top Titles Reported As Platinum', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
-$new_chart_id = $dbl->new_id();
-foreach ($top_plat as $key => $total)
-{
-	$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
-	$new_label_id = $dbl->new_id();
-	$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
-	echo "<tr><td>$key</td><td>$total</td></tr>";
-}
-echo "</tbody>
-</table>";
-
-// distros
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - July 2019', `sub_title` = 'Most Used Linux Distributions - Top 10', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
-$new_chart_id = $dbl->new_id();
-foreach ($highest_distros as $key => $total)
-{
-	$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
-	$new_label_id = $dbl->new_id();
-	$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
-}
-
-// gpu
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - July 2019', `sub_title` = 'Most Used GPU Vendors', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
-$new_chart_id = $dbl->new_id();
-foreach ($gpu as $key => $total)
-{
-	$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
-	$new_label_id = $dbl->new_id();
-	$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
-}
-
-// cpu
-$dbl->run("INSERT INTO `charts` SET `owner` = 1, `name` = 'ProtonDB Steam Play reports - July 2019', `sub_title` = 'Most Used CPU Vendors', `h_label` = 'Total number of reports', `enabled` = 1, `order_by_data` = 1");
-$new_chart_id = $dbl->new_id();
-foreach ($cpu as $key => $total)
-{
-	$dbl->run("INSERT INTO `charts_labels` SET `chart_id` = ?, `name` = ?", array($new_chart_id, $key));
-	$new_label_id = $dbl->new_id();
-	$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($new_chart_id, $new_label_id, $total));
-}
 
 // games and their dates
-//echo '<pre>';
-//print_r($game_dates);
-//echo '</pre>';
-
+echo '<p>games and their dates</p><pre>';
+print_r($game_dates);
+echo '</pre>';
+ 
 $new_month = array();
 
 foreach ($game_dates as $name => $data)
 {
+	$total_good = 0;
 	if (isset($data['Platinum']))
 	{
-		if (date('Y-m', strtotime($data['date'])) == '2019-07')
+		if (date('Y-m', strtotime($data['date'])) == CURRENT_YEAR.'-'.LAST_MONTH)
 		{
 			//echo $name . ' - ' . $data['date'] . '<br />';
 
-			$new_month[$name] = $data;
+			$total_good = $total_good + $data['Platinum'];
+			$new_month[$name]['Platinum'] = $data['Platinum'];
 		}
+	}
+	if (isset($data['Gold']))
+	{
+		if (date('Y-m', strtotime($data['date'])) == CURRENT_YEAR.'-'.LAST_MONTH)
+		{
+			//echo $name . ' - ' . $data['date'] . '<br />';
+			$total_good = $total_good + $data['Gold'];
+			$new_month[$name]['Gold'] = $data['Gold'];
+		}
+	}
+	if ($total_good > 0)
+	{
+		$new_month[$name]['total_good'] = $total_good;
 	}
 }
 
-//echo '<pre>';
-//print_r($new_month);
-//echo '</pre>';
+echo '<pre>';
+print_r($new_month);
+echo '</pre>';
+
+echo "<p>New entries with good reports</p>";
 
 echo "<table class=\"table-stripes-tbody\">
 <thead>
 <tr>
 <th>Name</th>
-<th>Platinum</th>
+<th>Total good</th>
 </tr>
 <tbody>";
 
-array_multisort( array_column($new_month, "Platinum"), SORT_DESC, $new_month );
+array_multisort( array_column($new_month, "total_good"), SORT_DESC, $new_month );
 
-$new_month = array_slice($new_month, 0, 10, true);
+$new_month = array_slice($new_month, 0, 15, true);
 
 foreach($new_month as $name => $new)
 {
-	echo "<tr><td>$name</td><td>{$new['Platinum']}</td></tr>";
+	echo "<tr><td>$name</td><td>{$new['total_good']}</td></tr>";
 }
 
 echo "</tbody>
@@ -468,7 +512,7 @@ foreach ($game_dates as $name => $data)
 {
 	if (isset($data['Borked']))
 	{
-		if (date('Y-m', strtotime($data['date'])) == '2019-07')
+		if (date('Y-m', strtotime($data['date'])) == CURRENT_YEAR.'-'.LAST_MONTH)
 		{
 			//echo $name . ' - ' . $data['date'] . '<br />';
 
@@ -481,7 +525,7 @@ foreach ($game_dates as $name => $data)
 //print_r($new_month);
 //echo '</pre>';
 
-echo "<p>The games getting the most Borked reports this month:</p> <table class=\"table-stripes-tbody\">
+echo "<p>New games getting the most Borked reports this month:</p> <table class=\"table-stripes-tbody\">
 <thead>
 <tr>
 <th>Name</th>

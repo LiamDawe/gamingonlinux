@@ -2,7 +2,7 @@
 <div class="box">
 	<div class="head">Add a new chart</div>
 	<div class="body group">
-		<form id="chart_form" method="post" action="admin.php?module=charts">
+		<form id="chart_form" class="gol-form" method="post" action="admin.php?module=charts">
 			Chart name: <input type="text" name="name" value="{:name}" /><br />
 			Sub title: <input type="text" name="sub_title" value="{:sub_title}" /><br />
 			<label><input type="checkbox" id="chart_grouped" name="grouped" /> Grouped chart? (for data comparisons like OpenGL vs Vulkan on different settings</label>
@@ -57,7 +57,7 @@
 	</div>
 	<div class="head">Edit</div>
 	<div class="body group">
-		<form id="chart_form" method="post" formaction="/admin.php?module=charts">
+		<form id="chart_form" class="gol-form" method="post" formaction="/admin.php?module=charts">
 			<label><input type="checkbox" name="enabled" {:enabled_check} />Chart enabled and viewable?</label>
 			Chart name:<br />
 			<input type="text" name="name" value="{:name}"/><br />

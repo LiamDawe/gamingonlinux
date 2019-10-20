@@ -115,7 +115,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			{
 				// update the topic
 				$message = core::make_safe($_POST['text']);
-				$dbl->run("UPDATE `forum_topics` SET `topic_title` = ? WHERE `topic_id` = ?", array($_POST['title'], $_GET['topic_id']));
+				$dbl->run("UPDATE `forum_topics` SET `topic_title` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `topic_id` = ?", array($_POST['title'], $_SESSION['user_id'], core::$sql_date_now, $_GET['topic_id']));
 
 				$dbl->run("UPDATE `forum_replies` SET `reply_text` = ? WHERE `topic_id` = ? AND `is_topic` = 1", array($message, $_GET['topic_id']));
 
@@ -148,7 +148,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'Edit')
 			{
 				// update the topic
 				$message = htmlspecialchars($_POST['text'], ENT_QUOTES);
-				$dbl->run("UPDATE `forum_replies` SET `reply_text` = ? WHERE `post_id` = ?", array($message, $_GET['post_id']));
+				$dbl->run("UPDATE `forum_replies` SET `reply_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `post_id` = ?", array($message, $_SESSION['user_id'], $core::$sql_date_now, $_GET['post_id']));
 
 				// get them to go back
 				header("Location: index.php?module=viewtopic&topic_id={$_POST['topic_id']}&page={$_POST['page']}");

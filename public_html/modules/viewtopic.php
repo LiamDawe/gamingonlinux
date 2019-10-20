@@ -117,10 +117,12 @@ else
 			u.`forum_posts`,
 			u.`game_developer`,
 			$db_grab_fields
-			f.`name` as `forum_name`
+			f.`name` as `forum_name`,
+			ul.username as username_edited
 			FROM `forum_topics` t
 			JOIN `forum_replies` p ON p.topic_id = t.topic_id AND p.is_topic = 1
 			LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
+			LEFT JOIN `users` ul ON ul.user_id = t.last_edited
 			INNER JOIN `forums` f ON t.`forum_id` = f.`forum_id`
 			WHERE t.`topic_id` = ? AND t.`approved` = 1", array($_GET['topic_id']))->fetch();
 		if (!$topic)
@@ -485,8 +487,14 @@ else
 					}
 					$templating->set('hidden_likes_class', $likes_hidden);
 
+					$last_edited = '';
+					if ($topic['last_edited'] != 0)
+					{
+						$last_edited = "\r\n\r\n[i]Last edited by " . $topic['username_edited'] . ' at ' . $core->human_date(strtotime($topic['last_edited_time'])) . '[/i]';
+					}
+
 					// do last to help prevent templating tags in user text getting replaced
-					$templating->set('post_text', $bbcode->parse_bbcode($topic['reply_text'], 0));
+					$templating->set('post_text', $bbcode->parse_bbcode($topic['reply_text'].$last_edited, 0));
 				}
 
 				$reply_count = 0;
@@ -532,7 +540,32 @@ else
 						$db_grab_fields .= "u.{$field['db_field']},";
 					}
 
-					$get_replies = $dbl->run("SELECT p.`post_id`, p.`author_id`, p.`reply_text`, p.`creation_date`, p.`total_likes`, u.user_id, u.pc_info_public, u.register_date, u.pc_info_filled, u.distro, u.username, u.avatar, u.avatar_uploaded, u.avatar_gallery, $db_grab_fields u.forum_posts, u.game_developer FROM `forum_replies` p LEFT JOIN `users` u ON p.author_id = u.user_id WHERE p.`topic_id` = ? AND p.is_topic = 0 AND p.`approved` = 1 ORDER BY p.`creation_date` ASC LIMIT ?,{$per_page}", array($_GET['topic_id'], $core->start))->fetch_all();
+					$get_replies = $dbl->run("SELECT 
+					p.`post_id`, 
+					p.`author_id`, 
+					p.`reply_text`, 
+					p.`creation_date`, 
+					p.`total_likes`, 
+					p.`last_edited`,
+					p.`last_edited_time`,
+					u.user_id, 
+					u.pc_info_public, 
+					u.register_date, 
+					u.pc_info_filled, 
+					u.distro, 
+					u.username, 
+					u.avatar, 
+					u.avatar_uploaded, 
+					u.avatar_gallery, 
+					$db_grab_fields 
+					u.forum_posts, 
+					u.game_developer,
+					ul.username as username_edited
+					FROM `forum_replies` p 
+					LEFT JOIN `users` u ON p.author_id = u.user_id 
+					LEFT JOIN `users` ul ON ul.user_id = p.last_edited
+					WHERE p.`topic_id` = ? AND p.is_topic = 0 AND p.`approved` = 1 
+					ORDER BY p.`creation_date` ASC LIMIT ?,{$per_page}", array($_GET['topic_id'], $core->start))->fetch_all();
 
 					// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 					$like_array = [];
@@ -721,7 +754,13 @@ else
 							$templating->set('post_link', '/forum/topic/' . $_GET['topic_id'] . '/post_id=' . $post['post_id']);
 
 							$reply_count++;
-							$templating->set('post_text', $bbcode->parse_bbcode($post['reply_text'], 0));
+
+							$last_edited = '';
+							if ($post['last_edited'] != 0)
+							{
+								$last_edited = "\r\n\r\n[i]Last edited by " . $post['username_edited'] . ' at ' . $core->human_date(strtotime($post['last_edited_time'])) . '[/i]';
+							}
+							$templating->set('post_text', $bbcode->parse_bbcode($post['reply_text'].$last_edited, 0));
 						}
 					}
 				}

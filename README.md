@@ -104,6 +104,8 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/datatables/ (https://datatables.net/ MIT)
 
+- /includes/jscripts/cocoen/ (https://github.com/koenoe/cocoen MIT)
+
 ## Misc
 
 If you want to know what you can put in a chart.js tooltip:  

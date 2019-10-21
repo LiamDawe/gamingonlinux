@@ -26,6 +26,14 @@ if (!isset($_GET['go']))
 	}
 	$templating->set('comments_check', $comments_check);
 
+	$quotes_check = '';
+	$user_quote_alerts = $user->user_details['display_quote_alerts'];
+	if ($user_quote_alerts == 1)
+	{
+		$quotes_check = 'checked';
+	}
+	$templating->set('quoted_check', $quotes_check);
+
 	$admin_comment_pref = '';
 	if ($user->check_group([1,2,5]))
 	{
@@ -37,7 +45,7 @@ if (!isset($_GET['go']))
 			$admin_comment_check = 'checked';
 		}
 
-		$admin_comment_pref = '<label><input type="checkbox" name="admin_comments" '.$admin_comment_check.'> Admin area comments</label>';
+		$admin_comment_pref = '<label><input type="checkbox" name="admin_comments" '.$admin_comment_check.'> Admin area comments</label><br />';
 	}
 	$templating->set('admin_comment_pref', $admin_comment_pref);
 
@@ -120,6 +128,12 @@ else if (isset($_GET['go']))
 			$comment_alerts = 1;
 		}
 
+		$quote_alerts = 0;
+		if (isset($_POST['quoted']))
+		{
+			$quote_alerts = 1;
+		}
+
 		// activate the notification area for likes
 		$likes_alerts = 0;
 		if (isset($_POST['likes']))
@@ -162,6 +176,7 @@ else if (isset($_GET['go']))
 
 		$dbl->run("UPDATE `users` SET
 			`display_comment_alerts` = ?,
+			`display_quote_alerts` = ?,
 			`display_like_alerts` = ?,
 			`auto_subscribe` = ?,
 			`auto_subscribe_new_article` = ?,
@@ -172,6 +187,7 @@ else if (isset($_GET['go']))
 			WHERE
 			`user_id` = ?",
 			array($comment_alerts,
+			$quote_alerts,
 			$likes_alerts,
 			$auto_subscribe,
 			$subscribe_article,

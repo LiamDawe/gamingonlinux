@@ -38,7 +38,7 @@ class notifications
 					if ($username != $_SESSION['username'])
 					{
 						// get the user_id of each quoted user if they haven't blocked the user quoting them
-						$quoted_user_id = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = users.user_id)", array($username, $_SESSION['user_id']))->fetchOne();
+						$quoted_user_id = $this->dbl->run("SELECT `user_id` FROM `users` WHERE `username` = ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = users.user_id) AND `display_quote_alerts` = 1", array($username, $_SESSION['user_id']))->fetchOne();
 						if($quoted_user_id)
 						{
 							if ($extra_data['type'] == 'article_comment')

@@ -1,12 +1,13 @@
 [block: main]
-<form method="post" action="/usercp.php?module=notification_preferences&amp;go=update">
+<form method="post" class="gol-form" action="/usercp.php?module=notification_preferences&amp;go=update">
 <div class="box">
   <div class="head">Update notification preferences</div>
 </div>
 <div class="box">
   <div class="body group">
       Turn on notification area for:<br />
-      <label><input type="checkbox" name="comments" {:comments_check}/> Comments</label>
+      <label><input type="checkbox" name="comments" {:comments_check}/> Comments</label><br />
+      <label><input type="checkbox" name="quoted" {:quoted_check}/> Being Quoted</label><br />
       {:admin_comment_pref}
       <label><input type="checkbox" name="likes" {:likes_check}/> Likes</label><br />
       <em>Personal message notifications in the navbar cannot be turned off, as they can be important, but you can turn off emails for them below.</em>

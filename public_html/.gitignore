@@ -11,3 +11,4 @@ cache/default
 cache/youtube_thumbs/
 includes/config.php
 /w
+error_log

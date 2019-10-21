@@ -263,6 +263,8 @@ $(function()
 });
 jQuery(document).ready(function()
 {  
+	$('.cocoen').cocoen(); // image comparison slider
+
 	// table sorting
 	$('#crowdfunded').dataTable( 
 	{

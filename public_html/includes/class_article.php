@@ -1358,7 +1358,7 @@ class article
 			$last_edited = '';
 			if ($comments['last_edited'] != 0)
 			{
-				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' at ' . $this->core->human_date($comments['last_edited_time']) . '[/i]';
+				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' on ' . $this->core->human_date($comments['last_edited_time']) . '[/i]';
 			}
 
 			$this->templating->set('article_id', $article_info['article']['article_id']);

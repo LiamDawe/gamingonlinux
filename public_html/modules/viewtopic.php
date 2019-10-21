@@ -490,7 +490,7 @@ else
 					$last_edited = '';
 					if ($topic['last_edited'] != 0)
 					{
-						$last_edited = "\r\n\r\n[i]Last edited by " . $topic['username_edited'] . ' at ' . $core->human_date(strtotime($topic['last_edited_time'])) . '[/i]';
+						$last_edited = "\r\n\r\n[i]Last edited by " . $topic['username_edited'] . ' on ' . $core->human_date(strtotime($topic['last_edited_time'])) . '[/i]';
 					}
 
 					// do last to help prevent templating tags in user text getting replaced
@@ -758,7 +758,7 @@ else
 							$last_edited = '';
 							if ($post['last_edited'] != 0)
 							{
-								$last_edited = "\r\n\r\n[i]Last edited by " . $post['username_edited'] . ' at ' . $core->human_date(strtotime($post['last_edited_time'])) . '[/i]';
+								$last_edited = "\r\n\r\n[i]Last edited by " . $post['username_edited'] . ' on ' . $core->human_date(strtotime($post['last_edited_time'])) . '[/i]';
 							}
 							$templating->set('post_text', $bbcode->parse_bbcode($post['reply_text'].$last_edited, 0));
 						}

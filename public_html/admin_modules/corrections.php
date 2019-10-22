@@ -102,7 +102,7 @@ if (isset($_POST['act']) && $_POST['act'] == 'delete')
 			die();
 		}
 		
-		$text = "Your correction report on [i][url={$core->config('website_url')}articles/{$_POST['article_id']}]{$title}[/url][/i] was: [quote]{$_POST['correction_text']}[/quote]{$text}";
+		$text = "Your correction report on [i][url={$core->config('website_url')}articles/{$_POST['article_id']}]". $_POST['correction_title'] ."[/url][/i] was: [quote]{$_POST['correction_text']}[/quote]{$text}";
 
 		// make the new message
 		$dbl->run("INSERT INTO `user_conversations_info` SET `title` = ?, `creation_date` = ?, `author_id` = ?, `owner_id` = ?, `last_reply_date` = ?, `replies` = 0, `last_reply_id` = ?", array($title, core::$date, $_SESSION['user_id'], $_SESSION['user_id'], core::$date, $_SESSION['user_id']));

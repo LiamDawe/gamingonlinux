@@ -57,6 +57,17 @@ if (isset($search_text) && !empty($search_text))
 	$per_page = 50;
 	$page_url = '/index.php?module=search&q='.$search_text.'&';
 
+	$total = $dbl->run("SELECT count(*) FROM `articles` WHERE `active` = 1 AND `title` LIKE ?",array($search_through))->fetchOne();
+
+	$last_page = ceil($total/$per_page);
+		
+	if ($page > $last_page)
+	{
+		$page = $last_page;
+	}
+
+	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
+
 	// do the search query
 	$found_search = $dbl->run("SELECT a.`article_id`, a.`tagline`, a.`comment_count`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename
 	FROM `articles` a
@@ -66,17 +77,6 @@ if (isset($search_text) && !empty($search_text))
 	AND a.`title` LIKE ?
 	ORDER BY a.`date` DESC
 	LIMIT $core->start , $per_page", array($search_through))->fetch_all();
-
-	$total = count($found_search);
-
-	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
-
-	$last_page = ceil($total/$per_page);
-		
-	if ($page > $last_page)
-	{
-		$page = $last_page;
-	}
 
 	if ($found_search)
 	{

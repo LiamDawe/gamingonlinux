@@ -15,12 +15,15 @@
 		<li class="active">Advanced Forum Search</li>
 	</ul>
 </div>
-				<div class="box">
-					<div class="head">Search the forum</div>
+				<div class="filter-box box">
+					<div class="filter-title head">Forum search <a class="filter-link fright"><span class="caret-down"></span> Hide</a></div>
+					<div class="filter-content">
+						<div class="subhead">Search by title (required) plus extra filtering options</div>
 					<div class="body group">
 						<form class="gol-form" method="get" action="{:url}index.php">
 							<input type="hidden" name="module" value="search_forum" />
-							<input type="text" name="q" placeholder="Enter search terms..." value="{:search_text}" /> <br />
+							<input type="hidden" name="go" value="1" />
+							<input type="text" name="q" placeholder="Enter topic title search terms..." value="{:search_text}" /> <br />
 							<strong>Search Options</strong><br />
 							<em>Pick a forum to search in:</em>
 							<select name="forums"><option value="all">Search all forums</option>{:forum_list_search}</select>
@@ -44,6 +47,7 @@
 						</form>
 					</div>
 				</div>
+			</div>
 [/block: top]
 
 [block: row]

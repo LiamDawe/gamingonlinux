@@ -89,11 +89,11 @@ $page = core::give_page();
 $per_page = 50;
 $page_url = '/index.php?module=search_forum';
 
-if (isset($search_text) && !empty($search_text) && !isset($_GET['single_user_forum_search']))
+if (isset($_GET['go']) && !empty($search_text) && !isset($_GET['single_user_forum_search']))
 {
 	$templating->set('user_search',$user_search);
 
-	$page_url .= '&amp;q=' . $search_text . '&amp;forums=' . $forum_id . '&amp;';
+	$page_url .= '&amp;q=' . $search_text . '&amp;go=1&amp;forums=' . $forum_id . '&amp;';
 
 	// count total
 	$total = $dbl->run("SELECT count(*) FROM `forum_topics` t WHERE t.approved = 1 AND t.`topic_title` LIKE ? $search_sql", array_merge([$search_through],$user_sql_data))->fetchOne();
@@ -144,6 +144,10 @@ if (isset($search_text) && !empty($search_text) && !isset($_GET['single_user_for
 	{
 		$core->message('Nothing was found with those search terms.');
 	}
+}
+else if (isset($_GET['go']) && empty($search_text))
+{
+	$core->message('You have to enter some title text to search for. Otherwise, search by a user in the second section.', 1);
 }
 
 if (isset($_GET['single_user_forum_search']) && isset($_GET['user_id']))
@@ -201,6 +205,10 @@ if (isset($_GET['single_user_forum_search']) && isset($_GET['user_id']))
 	{
 		$core->message('Nothing was found with those search terms.');
 	}
+}
+else if (isset($_GET['single_user_forum_search']) && !isset($_GET['user_id']))
+{
+	$core->message('You did not enter a username to look for posts.', 1);	
 }
 
 if (isset($found_search) && !empty($found_search))

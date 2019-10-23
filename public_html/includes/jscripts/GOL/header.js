@@ -1834,7 +1834,7 @@ jQuery(document).ready(function()
 		$content = $header.closest('.filter-box').find('.filter-content');
 		//open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
 		$content.slideToggle(500);
-		$header.closest('.filter-box').find('span').toggleClass("caret-down caret-right");
+		$header.first().find('span').toggleClass("caret-down caret-right");
 	});
 
 	// uploading a small pic

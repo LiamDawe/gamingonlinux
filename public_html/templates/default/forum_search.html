@@ -9,16 +9,38 @@
 [/block: small]
 
 [block: top]
+<div class="box">
+	<ul class="breadcrumb">
+		<li><a href="/forum/">Forum</a></li>
+		<li class="active">Advanced Forum Search</li>
+	</ul>
+</div>
 				<div class="box">
 					<div class="head">Search the forum</div>
 					<div class="body group">
-						<form method="get" action="{:url}index.php">
+						<form class="gol-form" method="get" action="{:url}index.php">
 							<input type="hidden" name="module" value="search_forum" />
-							<input type="text" name="q" value="{:search_text}" /> <br />
-							<button class="btn btn-primary">Search</button><br />
-							<br />
+							<input type="text" name="q" placeholder="Enter search terms..." value="{:search_text}" /> <br />
 							<strong>Search Options</strong><br />
+							<em>Pick a forum to search in:</em>
 							<select name="forums"><option value="all">Search all forums</option>{:forum_list_search}</select>
+							<em>Topic created by a specific user? Leave blank to search all:</em>
+							<select tabindex="-1" name="user_id" class="call_usernames main_user_search_forum" style="width:300px" class="populate select2-offscreen">{:user_search}</select><br />
+							<small><a href="#" class="clear-username">Clear username</a></small><br />
+							<button class="btn btn-primary">Search</button>
+						</form>
+					</div>
+					<div class="subhead">Want to search for all posts from a specific user without a title?</div>
+						<div class="body group">
+						<form class="gol-form" method="get" action="{:url}index.php">
+							<em>Username:</em>
+							<select tabindex="-1" name="user_id" class="call_usernames single_user_forum_search" style="width:300px" class="populate select2-offscreen">{:single_user_search}</select><br />
+							<strong>Search Options</strong><br />
+							<em>Pick a forum to search in:</em>
+							<select name="forums"><option value="all">Search all forums</option>{:forum_list_search}</select>							
+							<button class="btn btn-primary">Search</button>
+							<input type="hidden" name="module" value="search_forum" />
+							<input type="hidden" name="single_user_forum_search" value="1" />
 						</form>
 					</div>
 				</div>
@@ -26,10 +48,10 @@
 
 [block: row]
 			<div class="box">
-				<div class="body group"><a href="/forum/topic/{:topic_id}">{:title}</a> by {:username} {:date}</div>
+				<div class="body group"><a href="/forum/topic/{:topic_id}">{:title}</a> by {:username} {:date} in <a href="/forum/{:forum_id}">{:forum_name}</a></div>
 			</div>
 [/block: row]
 
 [block: bottom]
-{:pagination}
+<small class="fright">Showing {:search_no_start} to {:end_no} of {:total} entries found.</small> {:pagination}
 [/block: bottom]

@@ -1622,6 +1622,8 @@ jQuery(document).ready(function()
 		});
 	  
 	$(".clear-games").on("click", function (e) { e.preventDefault(); $gamesMulti.val(null).trigger("change"); });
+	$(".clear-username").on("click", function (e) { e.preventDefault(); $('.main_user_search_forum').val(null).trigger("change"); });
+
 	$(".genres_picker").select2({
 	selectOnClose: true,
 	width: '100%',

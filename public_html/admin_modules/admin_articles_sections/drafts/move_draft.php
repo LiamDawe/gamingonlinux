@@ -19,7 +19,7 @@ if ($grab_author['author_id'] == $_SESSION['user_id'])
 
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{
-			$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name']);
+			$core->move_temp_image($_POST['article_id'], $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 		}
 
 		$article_class->process_categories($_POST['article_id']);

@@ -14,6 +14,20 @@ $templating->load('statistics');
 $templating->block('top', 'statistics');
 $templating->set('total_users', $core->config('total_users'));
 
+$status_text = '';
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+{
+	$included = $dbl->run("SELECT `include_in_survey` FROM `user_profile_info` WHERE `user_id` = ?", array((int) $_SESSION['user_id']))->fetchOne();
+	if (isset($included))
+	{
+		if ($included == 0)
+		{
+			$status_text = '<br /><br />Your profile is currently set to <u>NOT</u> be included. You can <a href="/usercp.php?module=pcinfo">change this here</a> any time.<br />';
+		}
+	}
+}
+$templating->set('status', $status_text);
+
 $charts_list = array(
 	array("name" => "Linux Distributions (Combined)", "bundle_outside_top10" => 1),
 	array("name" => "Linux Distributions (Split)", "bundle_outside_top10" => 1),

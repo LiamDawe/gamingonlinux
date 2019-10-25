@@ -34,7 +34,7 @@ if(isset($user_id))
 			{
 				foreach ($pc_info as $k => $info)
 				{
-					if ($k != 'counter')
+					if ($k != 'counter' && $k != 'date_updated' && $k != 'include_in_survey')
 					{
 						$fields_output .= '<li>' . $info . '</li>';
 					}

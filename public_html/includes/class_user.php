@@ -612,6 +612,7 @@ class user
 			p.`gamepad`,
 			p.`vrheadset`,
 			p.`date_updated`,
+			p.`include_in_survey`,
 			u.`distro`,
 			g.`id` AS `gpu_id`,
 			g.`name` AS `gpu_model`
@@ -630,6 +631,9 @@ class user
 			{
 				$additionaldb[$key] = htmlspecialchars($value);
 			}
+
+			$pc_info['include_in_survey'] = $additionaldb['include_in_survey'];
+			$pc_info['date_updated'] = $additionaldb['date_updated'];
 
 			if (!empty($additionaldb['distro']) && $additionaldb['distro'] != 'Not Listed')
 			{

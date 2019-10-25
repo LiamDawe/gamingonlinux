@@ -545,6 +545,7 @@ class bbcode
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0 && is_numeric($_SESSION['user_id']))
 			{
 				$fields_output = '';
+				$included_note = '';
 				
 				$pc_info = $this->user->display_pc_info($_SESSION['user_id']);
 
@@ -553,29 +554,39 @@ class bbcode
 					$fields_output = '<ul style="list-style-type: none; margin: 0; padding: 0;">';
 					foreach ($pc_info as $k => $info)
 					{
-						if ($k != 'counter')
+						if ($k != 'counter' && $k != 'date_updated' && $k != 'include_in_survey')
 						{
 							$fields_output .= '<li>' . $info . '</li>';
 						}
 					}
 					$fields_output .= '</ul>';
+		
+					if ($pc_info['include_in_survey'] == 0)
+					{
+						$included_note = '<strong>Note:</strong> You currently have your profile set to <u>not</u> be included. You can <a href="/usercp.php?module=pcinfo">change this option here</a>.';
+					}
+					else
+					{
+						$included_note = '<strong>Note:</strong> Your PC info is currently included. You can <a href="/usercp.php?module=pcinfo">change this option here</a>.';
+					}
+
+					$included_note .= ' It\'s opt-in and you can uncheck it at any time to not be included again.';
 				}
 				else
 				{
 					$fields_output = "<em>You haven't filled yours in!</em>";
 				}
 
-				$update_info = $this->dbl->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-
-				if (!isset($update_info['date_updated']))
+				if (!isset($pc_info['date_updated']))
 				{
 					$date_updated = '<strong>Never</strong>!';
 				}
 				else
 				{
-					$date_updated = '<strong>' . date('d M, Y', strtotime($update_info['date_updated'])) . '</strong>';
+					$date_updated = '<strong>' . date('d M, Y', strtotime($pc_info['date_updated'])) . '</strong>';
 				}
-				$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . '. <br /><br />Here\'s what we have for you at the moment:' . $fields_output . '<br />', $body);
+
+				$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . '. <br /><br />'.$included_note.'<br /><br />Here\'s what we have for you at the moment:' . $fields_output . '<br />', $body);
 			}
 			else
 			{

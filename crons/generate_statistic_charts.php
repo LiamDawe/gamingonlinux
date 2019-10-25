@@ -1,5 +1,5 @@
 <?php
-define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) );
+define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
 require APP_ROOT . "/includes/bootstrap.php";
 
@@ -83,11 +83,14 @@ array ("name" => "RAM", "db_field" => "p.ram_count"),
 array ("name" => "Number of monitors", "db_field" => "p.monitor_count"),
 array ("name" => "Resolution", "db_field" => "p.resolution"),
 array ("name" => "Main Gaming Machine", "db_field" => "p.gaming_machine_type"),
-array ("name" => "Main Gamepad", "db_field" => "p.gamepad")
+array ("name" => "Main Gamepad", "db_field" => "p.gamepad"),
+array ("name" => "PC VR Headset", "db_field" => "p.vrheadset")
 );
 
 foreach ($charts as $chart)
 {
+	echo 'Generating ' . $chart['name'] . PHP_EOL;
+	
 	$table = 'user_profile_info p';
 	if (isset($chart['table']))
 	{

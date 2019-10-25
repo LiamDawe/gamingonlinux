@@ -610,6 +610,7 @@ class user
 			p.`steamplay`,
 			p.`wine`,
 			p.`gamepad`,
+			p.`vrheadset`,
 			p.`date_updated`,
 			u.`distro`,
 			g.`id` AS `gpu_id`,
@@ -723,6 +724,12 @@ class user
 			{
 				$pc_info['counter']++;
 				$pc_info['gamepad'] = '<strong>Gamepad:</strong> '.$additionaldb['gamepad'];
+			}
+
+			if ($additionaldb['vrheadset'] != NULL && !empty($additionaldb['vrheadset']))
+			{
+				$pc_info['counter']++;
+				$pc_info['vrheadset'] = '<strong>PC VR headset:</strong> '.$additionaldb['vrheadset'];
 			}
 		}
 		return $pc_info;

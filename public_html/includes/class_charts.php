@@ -108,7 +108,8 @@ class charts
 
 		$this->chart_options['special_colours'] = [
 		'OpenGL' => '#a6cee3',
-		'Vulkan' => '#e31a1c'
+		'Vulkan' => '#e31a1c',
+		'Steam Play' => '#1f78b4'
 		];
 
 		// sort out any custom options passed to us
@@ -202,6 +203,17 @@ class charts
 
 		$label_loop_counter = 0;
 
+		// this ensures that if we use special colours for named elements, we don't re-use that colour and cause confusion
+		foreach ($this->chart_options['special_colours'] as $key => $colour)
+		{
+			if (array_search($key, array_column($get_labels, 'data_series')))
+			{
+				$array_to_remove = array($colour);
+				$this->chart_options['colours'] = array_diff($this->chart_options['colours'],$array_to_remove);
+				$this->chart_options['colours'] = array_values($this->chart_options['colours']);
+			}
+		}
+
 		// make up the data array of labels for this chart
 		foreach ($get_labels as $label_loop)
 		{
@@ -246,6 +258,7 @@ class charts
 					{
 						$bar_colour = $this->chart_options['special_colours'][$label_loop['data_series']];
 					}
+					
 					$this->data_series[$label_loop['data_series']]['colour'] = $bar_colour;
 					$label_loop_counter++;
 				}
@@ -1101,7 +1114,7 @@ class charts
 
 				if (isset($label['min']) && $label['min'] != NULL && $label['min'] > 0)
 				{
-					$min_max_text = 'Min: '.$label['min'];
+					$min_max_text = '< '.$label['min'];
 				}
 				if (isset($label['max']) && $label['max'] != NULL && $label['max'] > 0)
 				{
@@ -1110,7 +1123,7 @@ class charts
 					{
 						$min_max_text .= ' | ';
 					}
-					$min_max_text .= 'Max: '.$label['max'];
+					$min_max_text .= '> '.$label['max'];
 				}
 
 				imagestring ($this->image,3,$min_max_x, $min_max_y,$min_max_text,$text_colour);
@@ -1173,16 +1186,16 @@ class charts
 
 					if (isset($data['min']) && $data['min'] != NULL && $data['min'] > 0)
 					{
-						$min_max_text = 'Min: '.$data['min'];
+						$min_max_text = '< '.$data['min'];
 					}
 					if (isset($data['max']) && $data['max'] != NULL && $data['max'] > 0)
 					{
 						// if we already have a min value, add a seperator
 						if ($min_max_text != NULL)
 						{
-							$min_max_text .= ' | ';
+							$min_max_text .= ' ';
 						}
-						$min_max_text .= 'Max: '.$data['max'] . '';
+						$min_max_text .= '> '.$data['max'] . '';
 					}
 
 					$mix_max_txt_length = imagefontwidth(2) * strlen($min_max_text);

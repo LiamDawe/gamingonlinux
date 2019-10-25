@@ -41,12 +41,13 @@ $resolution_options = array(
 
 $gaming_machine_types = array('Desktop', 'Laptop', 'Sofa/Console PC');
 $gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Switch Pro", "Other");
+$vrheadset = array('HTC Vive', 'HTC Vive Pro', 'Valve Index', 'Planning to get one', 'No plan to get one');
 
 if (!isset($_POST['act']))
 {
 	$usercpcp = $dbl->run("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();#
 
-	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`steamplay`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
+	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`steamplay`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`vrheadset`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
 	$additional = $dbl->run($additional_sql, array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
@@ -273,6 +274,18 @@ if (!isset($_POST['act']))
 		$gamepad_options .= '<option value="'.$gamepad.'" '.$selected.'>'.$gamepad.'</option>';
 	}
 	$templating->set('gamepad_options', $gamepad_options);
+
+	$vrheadset_options = '';
+	foreach ($vrheadset as $vr_option)
+	{
+		$selected = '';
+		if ($additional['vrheadset'] == $vr_option)
+		{
+			$selected = 'selected';
+		}
+		$vrheadset_options .= '<option value="'.$vr_option.'" '.$selected.'>'.$vr_option.'</option>';
+	}
+	$templating->set('vrheadset_options', $vrheadset_options);
 }
 else if (isset($_POST['act']))
 {
@@ -404,6 +417,10 @@ else if (isset($_POST['act']))
 		{
 			$_POST['pc_info']['gamepad'] = '';
 		}		
+		if (!in_array($_POST['pc_info']['vrheadset'], $vrheadset))
+		{
+			$_POST['pc_info']['vrheadset'] = '';
+		}	
 
 		// build the query of fields to update
 		$update_sql = "UPDATE `user_profile_info` SET ";

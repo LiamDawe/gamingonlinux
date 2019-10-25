@@ -6,7 +6,7 @@ if(!defined('golapp'))
 $templating->set_previous('title', 'User stats', 1);
 $templating->set_previous('meta_description', 'Statistics generated from the users of the GamingOnLinux website', 1);
 
-include($core->config('path') . '/includes/profile_fields.php');
+//include($core->config('path') . '/includes/profile_fields.php'); not sure why this is in there?
 
 $templating->load('statistics');
 
@@ -32,7 +32,8 @@ $charts_list = array(
 	array("name" => "Number of monitors", "bundle_outside_top10" => 0),
 	array("name" => "Resolution", "bundle_outside_top10" => 1),
 	array("name" => "Main Gaming Machine", "bundle_outside_top10" => 0),
-	array("name" => "Main Gamepad", "bundle_outside_top10" => 1)
+	array("name" => "Main Gamepad", "bundle_outside_top10" => 1),
+	array("name" => "PC VR Headset", "bundle_outside_top10" => 1)
 );
 
 if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')

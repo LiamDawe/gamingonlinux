@@ -272,6 +272,12 @@ jQuery(document).ready(function()
 		colReorder: true
 	});
 
+	$('#crowdfunded').on( 'page.dt', function () {
+		$('html, body').animate({
+			scrollTop: ($('.crowdfunded-page-top').offset().top)
+		},300);
+	} );
+
   // this will grab any url parameter like ?module=test and give you "test" if you search for "module"
   var getUrlParameter = function getUrlParameter(sParam) {
       var sPageURL = decodeURIComponent(window.location.search.substring(1)),

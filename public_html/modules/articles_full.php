@@ -394,6 +394,12 @@ if (!isset($_GET['go']))
 					$categories_display .= $article_class->display_article_tags($get_categories[$article['article_id']]);
 				}
 
+				$current_linked_games = $dbl->run("SELECT a.`game_id`, g.`name` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ?", array($article['article_id']))->fetch_all();
+				if ($current_linked_games)
+				{
+					$categories_display .= $article_class->display_game_tags($current_linked_games);
+				}
+
 				if (!empty($categories_display))
 				{
 					$templating->block('tags', 'articles_full');

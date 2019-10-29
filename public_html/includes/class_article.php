@@ -131,6 +131,19 @@ class article
 		return $categories_output;
 	}
 
+	public function display_game_tags($games_list)
+	{
+		$categories_output = '';
+		if (!empty($games_list))
+		{
+			foreach ($games_list as $tag)
+			{
+				$categories_output .= " <li><a href=\"/index.php?module=items_database&view=item&id=".$tag['game_id']."\">{$tag['name']}</a></li> ";
+			}
+		}
+		return $categories_output;
+	}
+
 	// if they have set a tagline image from the gallery, remove any existing images
 	public function gallery_tagline($data = NULL)
 	{

@@ -18,6 +18,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	$dbl->run("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ? WHERE `article_id` = ?", array($checked['title'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
 
 	$article_class->process_categories($_POST['article_id']);
+	$article_class->process_games($_POST['article_id']);
 
 	if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 	{

@@ -27,6 +27,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	}
 
 	$article_class->process_categories($article_id);
+	$article_class->process_games($article_id);
 
 	// force subscribe, so they don't lose editors comments
 	$secret_key = core::random_id(15);
@@ -39,17 +40,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	}
 
 	// article has been posted, remove any saved info from errors (so the fields don't get populated if you post again)
-	unset($_SESSION['atitle']);
-	unset($_SESSION['aslug']);
-	unset($_SESSION['atagline']);
-	unset($_SESSION['atext']);
-	unset($_SESSION['acategories']);
-	unset($_SESSION['uploads_tagline']);
-	unset($_SESSION['image_rand']);
-	unset($_SESSION['original_text']);
-	unset($_SESSION['gallery_tagline_id']);
-	unset($_SESSION['gallery_tagline_rand']);
-	unset($_SESSION['gallery_tagline_filename']);
+	$article_class->reset_sessions();
 	
 	$sql_replace = $user->get_group_ids('article_submission_emails');
                 

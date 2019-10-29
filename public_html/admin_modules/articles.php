@@ -170,6 +170,9 @@ if (isset($_GET['view']))
 
 			$templating->set('categories_list', $categorys_list);
 
+			$game_tag_list = $article_class->display_previous_games($article['article_id']);
+			$templating->set('games_list', $game_tag_list);
+
 			$text = $article['text'];
 			$previously_uploaded = '';
 			// if they have done it before set title, text and tagline
@@ -480,7 +483,7 @@ else if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'Edit')
 	{
-		if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=Edit&article_id={$_POST['article_id']}"))
+		if ($checked = $article_class->check_article_inputs("/admin.php?module=articles&view=Edit&aid={$_POST['article_id']}"))
 		{
 			$block = 0;
 			if (isset($_POST['show_block']))
@@ -502,6 +505,7 @@ else if (isset($_POST['act']))
 			$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0, `edit_date` = ? WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, core::$sql_date_now, $_POST['article_id']));
 
 			$article_class->process_categories($_POST['article_id']);
+			$article_class->process_games($_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{
@@ -527,6 +531,7 @@ else if (isset($_POST['act']))
 			unset($_SESSION['atagline']);
 			unset($_SESSION['atext']);
 			unset($_SESSION['acategories']);
+			unset($_SESSION['agames']);
 			unset($_SESSION['aactive']);
 			unset($_SESSION['uploads']);
 			unset($_SESSION['uploads_tagline']);

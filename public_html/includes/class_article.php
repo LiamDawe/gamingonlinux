@@ -19,7 +19,7 @@ class article
 	}
 
 	// clear out any left overs, since there's no error we don't need them, stop errors with them
-	// TO DO: Use an array of $_SESSION['article']['blah'] and just remove that, would much much cleaer
+	// TO DO: Use an array of $_SESSION['article']['blah'] and just remove that, would be much clearer and allow easy expansion/edits
 	function reset_sessions()
 	{
 		$_SESSION['image_rand'] = rand();
@@ -40,6 +40,7 @@ class article
 		unset($_SESSION['atagline']);
 		unset($_SESSION['atext']);
 		unset($_SESSION['acategories']);
+		unset($_SESSION['agames']);
 	}
 
 	public function tagline_image($data)
@@ -295,6 +296,68 @@ class article
 		}
 	}
 
+	public function process_games($article_id)
+	{
+		if (isset($article_id) && is_numeric($article_id))
+		{
+			// delete any existing categories that aren't in the final list for publishing
+			$current_linked_games = $this->dbl->run("SELECT `id`, `article_id`, `game_id` FROM `article_item_assoc` WHERE `article_id` = ?", array($article_id))->fetch_all();
+
+			if (!empty($current_linked_games))
+			{
+				foreach ($current_linked_games as $current_game)
+				{
+					if (!in_array($current_game['game_id'], $_POST['games']))
+					{
+						$this->dbl->run("DELETE FROM `article_item_assoc` WHERE `id` = ?", array($current_game['id']));
+					}
+				}
+			}
+			// get fresh list of categories, and insert any that don't exist
+			$current_linked_games = $this->dbl->run("SELECT `game_id` FROM `article_item_assoc` WHERE `article_id` = ?", array($article_id))->fetch_all(PDO::FETCH_COLUMN, 0);
+
+			if (isset($_POST['games']) && !empty($_POST['games']))
+			{
+				foreach($_POST['games'] as $game)
+				{
+					if (!in_array($game, $current_linked_games))
+					{
+						$this->dbl->run("INSERT INTO `article_item_assoc` SET `article_id` = ?, `game_id` = ?", array($article_id, $game));
+					}
+				}
+			}
+		}
+	}
+
+	function display_previous_games($article_id)
+	{
+		$game_tag_list = '';
+
+		if (isset($_SESSION['agames']) && !empty($_SESSION['agames']) && is_array($_SESSION['agames']))
+		{
+			$in  = str_repeat('?,', count($_SESSION['agames']) - 1) . '?';
+
+			$current_linked_games = $this->dbl->run("SELECT `name`,`id` FROM `calendar` WHERE `id` IN ($in)", $_SESSION['agames'])->fetch_all();
+
+			foreach ($current_linked_games as $game)
+			{
+				$game_tag_list .= "<option value=\"{$game['id']}\" selected>{$game['name']}</option>";
+			}
+			
+		}
+
+		else
+		{
+			$current_linked_games = $this->dbl->run("SELECT a.`game_id`, g.`name` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ?", array($article_id))->fetch_all();
+			foreach ($current_linked_games as $game)
+			{
+				$game_tag_list .= "<option value=\"{$game['game_id']}\" selected>{$game['name']}</option>";
+			}
+		}
+
+		return $game_tag_list;
+	}
+
 	function delete_article($article)
 	{
 		// get some details on the article first
@@ -441,6 +504,11 @@ class article
 		if (!empty($_POST['categories']))
 		{
 			$categories = $_POST['categories'];
+		}
+		$games = [];
+		if (!empty($_POST['games']))
+		{
+			$games = $_POST['games'];
 		}
 
 		// check its set, if not hard-set it based on the article title
@@ -592,6 +660,7 @@ class article
 			$_SESSION['atagline'] = $tagline;
 			$_SESSION['atext'] = $text;
 			$_SESSION['acategories'] = $categories;
+			$_SESSION['agames'] = $games;
 
 			if (isset($_POST['uploads']))
 			{
@@ -844,6 +913,8 @@ class article
 		}
 
 		$this->process_categories($article_id);
+
+		$this->process_games($article_id);
 
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])

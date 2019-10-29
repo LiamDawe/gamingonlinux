@@ -193,6 +193,9 @@ else
 
 	$templating->set('categories_list', $categorys_list);
 
+	$game_tag_list = $article_class->display_previous_games($article['article_id']);
+	$templating->set('games_list', $game_tag_list);
+
 	$templating->set('username', $article['username']);
 
 	// if they have done it before set title, text and tagline
@@ -323,6 +326,7 @@ if (isset($_POST['act']))
 			}
 
 			$article_class->process_categories($_POST['article_id']);
+			$article_class->process_games($_POST['article_id']);
 
 			if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 			{

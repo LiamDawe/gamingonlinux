@@ -28,6 +28,8 @@
 					<div class="body group">
 						Categories (<a href="/admin.php?module=categorys" target="_blank">Manage Categories</a>):<br />
 						<select tabindex="-1" multiple="" name="categories[]" id="articleCategories" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:categories_list}</select><br />
+						Games mentioned (<a href="/admin.php?module=games&view=add_links" target="_blank">Add missing</a>): <em>Not required but really nice to have!</em><br />
+						<select tabindex="-1" multiple="" name="games[]" id="articleGames" style="width:300px" class="populate select2-offscreen" {:edit_state}>{:games_list}</select><br />
 					</div>
 				</div>
 					<div class="box">

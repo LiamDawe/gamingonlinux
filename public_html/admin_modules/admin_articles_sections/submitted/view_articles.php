@@ -253,6 +253,9 @@ else if (isset($_GET['aid']))
 
 	$templating->set('categories_list', $categorys_list);
 
+	$game_tag_list = $article_class->display_previous_games($article['article_id']);
+	$templating->set('games_list', $game_tag_list);
+
 	if (empty($article['username']))
 	{
 		if (empty($article['guest_username']))

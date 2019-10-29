@@ -123,6 +123,9 @@ else
 
 	$templating->set('categories_list', $categorys_list);
 
+	$game_tag_list = $article_class->display_previous_games($article['article_id']);
+	$templating->set('games_list', $game_tag_list);
+
 	$templating->set('username', $article['username']);
 
 	$previously_uploaded = '';

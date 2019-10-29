@@ -178,7 +178,11 @@ if (isset($_GET['view']))
 					$genres_array[] = $genre['category_name'];
 				}
 				$genres_output .= implode(', ', $genres_array);
-				$genres_output .= '</li>';
+				
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				{
+					$genres_output .= ' - <a href="/index.php?module=items_database&view=suggest_tags&id='.$get_item['id'].'" target="_blank">Suggest Tags</a></li>';
+				}
 			}
 			$templating->set('genres', $genres_output);			
 

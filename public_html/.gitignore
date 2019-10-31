@@ -7,6 +7,7 @@ uploads/avatars/*
 !uploads/avatars/gallery/
 !uploads/avatars/author_pictures/index.htm
 uploads/articles
+uploads/gamesdb/small/
 cache/default
 cache/youtube_thumbs/
 includes/config.php

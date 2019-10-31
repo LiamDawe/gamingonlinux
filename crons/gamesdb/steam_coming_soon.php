@@ -1,12 +1,13 @@
 <?php
-define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
+define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
+define("THIS_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/crons');
 
 // http://simplehtmldom.sourceforge.net/
-include(APP_ROOT . '/includes/crons/sales/simple_html_dom.php');
+include(THIS_ROOT . '/simple_html_dom.php');
 
 require APP_ROOT . '/includes/bootstrap.php';
 
-require APP_ROOT . '/includes/cron_helpers.php';
+$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 echo "Steam Games Coming Soon Store importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -35,10 +36,10 @@ do
 		{
 			$link = $element->href;
 
-			$title = clean_title($element->find('span.title', 0)->plaintext);	
+			$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
 			$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database
-			$stripped_title = stripped_title($title);	
-			echo $title . "\n";
+			$stripped_title = $game_sales->stripped_title($title);	
+			echo $title . PHP_EOL;
 
 			$image = $element->find('div.search_capsule img', 0)->src;
 			echo $image . "\n";
@@ -49,12 +50,24 @@ do
 				$bundle = 1;
 			}
 
-			$release_date_raw = $element->find('div.search_released', 0)->plaintext;
-			$clean_release_date = steam_release_date($release_date_raw);
+			$release_date_raw = strtolower($element->find('div.search_released', 0)->plaintext);
 
 			if (empty(trim($release_date_raw)))
 			{
 				$release_date_raw = NULL;
+				$clean_release_date = NULL;
+			}
+			else
+			{
+				$clean_release_date = $game_sales->steam_release_date($release_date_raw);
+
+				echo 'Cleaned release date: ' . $clean_release_date . PHP_EOL;
+			}
+
+			$steam_id = NULL;
+			if (strpos($link, '/app/') !== false) 
+			{
+				$steam_id = preg_replace('~https:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
 			}
 			
 			// ADD IT TO THE GAMES DATABASE
@@ -72,7 +85,7 @@ do
 					
 			if (!$game_list && !$check_dupes && !$name_change)
 			{				
-				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1, `stripped_name` = ?, `soon_date` = ?", array($title, $clean_release_date, $link, $bundle, $stripped_title, $release_date_raw));
+				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `steam_id` = ?, `date` = ?, `steam_link` = ?, `bundle` = ?, `approved` = 1, `stripped_name` = ?, `soon_date` = ?", array($title, $steam_id, $clean_release_date, $link, $bundle, $stripped_title, $release_date_raw));
 					
 				$new_id = $dbl->new_id();
 
@@ -138,6 +151,7 @@ do
 					$dbl->run("UPDATE `calendar` SET " . implode(', ', $sql_updates) . " WHERE `id` = ?", $sql_data);
 				}
 			}
+			echo PHP_EOL;
 		}
 		// free up memory
 		$html->__destruct();

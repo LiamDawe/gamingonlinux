@@ -5,7 +5,7 @@ if(!defined('golapp'))
 }
 if (isset($_GET['today']))
 {
-	header("Location: /index.php?module=calendar#today");
+	header("Location: /index.php?module=calendar#calendar_today");
 }
 
 if (!isset($_GET['year']) || empty($_GET['year']))

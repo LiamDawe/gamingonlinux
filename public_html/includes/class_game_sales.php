@@ -37,7 +37,7 @@ class game_sales
 	function steam_release_date($data)
 	{
 		$clean_release_date = NULL;
-		$release_date_raw = $element->find('div.search_released', 0)->plaintext;
+		$release_date_raw = $data;
 		echo 'Raw release date: ' . $release_date_raw . "\n";
 		$trimmed_date = trim($release_date_raw);	
 		$remove_comma = str_replace(',', '', $trimmed_date);

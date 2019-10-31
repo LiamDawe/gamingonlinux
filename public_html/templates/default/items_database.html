@@ -59,7 +59,7 @@
 	<div class="body group">Here you can submit games, emulators and other software to be included in our database!</div>
 	<div class="head">Required</div>
 	<div class="body group">
-		<form method="post" action="/index.php?module=items_database">
+		<form class="gol-form" method="post" action="/index.php?module=items_database">
 			Name: <input type="text" name="name" value="{:name}" /><br />
 			<em>Items need to have <strong>at least one</strong> link at a minimum!</em><br />
 			Official website:<br />
@@ -70,8 +70,8 @@
 			<input type="text" name="gog_link" value="{:gog_link}" /><br />
 			itch.io Link:<br />
 			<input type="text" name="itch_link" value="{:itch_link}" /><br />
-			<label><input type="checkbox" name="supports_linux" {:supports_linux}/> Does it currently support Linux? <em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label>
-			<label><input type="checkbox" name="hidden_steam" {:hidden_steam}/> Is the Linux version hidden on Steam currently? (Alpha, Beta - No SteamOS icon)</label>
+			<label><input type="checkbox" name="supports_linux" {:supports_linux}/> Does it currently support Linux? <em>Untick this if it's coming in future, or if it's being added to a GOTY Award category for a wanted port (you get the idea).</em></label><br />
+			<label><input type="checkbox" name="hidden_steam" {:hidden_steam}/> Is the Linux version hidden on Steam currently? (Alpha, Beta - No SteamOS icon)</label><br />
 			What is it?<br />
 			<select name="type">
 				<option value=""></option>
@@ -80,12 +80,13 @@
 	</div>
 	<div class="head">Not Required</div>
 	<div class="body group">
-		<label><input type="checkbox" name="free" {:free}/> Free (as in money)? <em>Tick if this is free/free to play</em></label>
-		<label><input type="checkbox" name="dlc" {:dlc}/> DLC <em>Tick if this is a DLC</em></label>
+		<label><input type="checkbox" name="free" {:free}/> Free (as in money)? <em>Tick if this is free/free to play</em></label><br />
+		<label><input type="checkbox" name="dlc" {:dlc}/> DLC <em>Tick if this is a DLC</em></label><br />
 		If it's a DLC, enter the name of the game below:<br />
 		<select tabindex="-1" name="game" id="articleGames" class="populate select2-offscreen">{:game}</select><br />
 		<button class="clear-games">Clear game</button><br />
-		License <select name="license"><option value=""></option>{:license_options}</select><br />
+		License <br />
+		<select name="license"><option value=""></option>{:license_options}</select><br />
 		Tags<br />
 		<select tabindex="-1" multiple="" name="genre_ids[]" class="populate select2-offscreen genres_picker">{:genre_ids}</select>
 	</div>
@@ -100,7 +101,7 @@
 	<div class="body group">Are we missing a developer/publisher? Submit them to our database here!</div>
 	<div class="head">Required</div>
 	<div class="body group">
-		<form method="post" action="/index.php?module=items_database">
+		<form class="gol-form" method="post" action="/index.php?module=items_database">
 			Name: <input type="text" name="name" />
 	</div>
 	<div class="head">Not Required</div>

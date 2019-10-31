@@ -25,6 +25,7 @@ $dbl->run("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, 
 $article_id = $dbl->new_id();
 
 $article_class->process_categories($article_id);
+$article_class->process_games($article_id);
 
 // force subscribe, so they don't lose editors comments
 $secret_key = core::random_id(15);

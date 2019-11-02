@@ -529,7 +529,7 @@ if (isset($_POST['act']))
 		$gog_link = trim($_POST['gog_link']);
 		$itch_link = trim($_POST['itch_link']);
 		$crowdfund_link = trim($_POST['crowdfund_link']);
-		$crowdfund_notes = trim($_POST['crowdfund_notes']);
+		$crowdfund_notes = core::make_safe($_POST['crowdfund_notes']);
 
 		if ($_POST['act'] == 'Edit' || $_POST['act'] == 'Approve')
 		{
@@ -628,12 +628,6 @@ if (isset($_POST['act']))
 			$base_game = $_POST['game'];
 		}
 
-		$developer_id = NULL;
-		if (isset($_POST['developer']) && is_numeric($_POST['developer']))
-		{
-			$developer_id = $_POST['developer'];
-		}
-
 		$license = NULL;
 		if (!empty($_POST['license']))
 		{
@@ -648,7 +642,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Add')
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id, $crowdfund_notes));
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes));
 			$new_id = $dbl->new_id();
 	
 			$core->process_game_genres($new_id);
@@ -667,7 +661,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Edit')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id, $crowdfund_notes, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 			$games_database->process_developers($_POST['id']);

@@ -14,7 +14,7 @@ if (!isset($_POST['action']))
 {
 	if (!isset($_GET['forgot']) && !isset($_GET['reset']) && !isset($_GET['twitter']) && !isset($_GET['steam']))
 	{
-		if ($_SESSION['user_id'] == 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 		{
 			$templating->block('main', 'login');
 			$templating->set('url', $core->config('website_url'));

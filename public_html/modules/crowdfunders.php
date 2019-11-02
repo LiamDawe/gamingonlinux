@@ -26,7 +26,15 @@ $failed_percentage = round($total_failed/$total*100);
 $templating->set('success_rate', $succeed_percentage . '%');
 $templating->set('failed_percentage', $failed_percentage . '%');
 
-$crowdfunders = $dbl->run("SELECT c.*,d.name AS dev_name FROM `calendar` c LEFT JOIN `developers` d ON d.id = c.developer_id WHERE c.`is_crowdfunded` = 1 ORDER BY c.`name` ASC")->fetch_all();
+$crowdfunders = $dbl->run("SELECT * FROM `calendar` WHERE `is_crowdfunded` = 1 ORDER BY `name` ASC")->fetch_all();
+
+$game_id_array = array();
+foreach ($crowdfunders as $game)
+{
+	$game_id_array[] = $game['id'];
+}
+$in  = str_repeat('?,', count($game_id_array) - 1) . '?';
+$developers_list = $dbl->run("SELECT r.game_id,r.developer_id,d.name FROM `game_developer_reference` r LEFT JOIN `developers` d ON r.developer_id = d.id WHERE r.game_id IN ($in)", $game_id_array)->fetch_all(PDO::FETCH_GROUP);
 
 foreach ($crowdfunders as $item)
 {
@@ -40,12 +48,18 @@ foreach ($crowdfunders as $item)
 	}
 	$templating->set('edit', $edit);
 
-	$dev_name = '';
-	if (isset($item['dev_name']))
+	$dev_names = '';
+	if (isset($developers_list[$item['id']]) && !empty($developers_list[$item['id']]))
 	{
-		$dev_name = $item['dev_name'];
+		$dev_names = array();
+		foreach ($developers_list[$item['id']] as $developer)
+		{
+			$dev_names[] = '<a href="/index.php?module=items_database&amp;view=developer&amp;id='.$developer['developer_id'].'">'.$developer['name'] . '</a>';
+		}
+
+		$dev_names = implode(', ', $dev_names);
 	}
-	$templating->set('dev_name', $dev_name);
+	$templating->set('dev_name', $dev_names);
 
 	$templating->set('link', $item['crowdfund_link']);
 

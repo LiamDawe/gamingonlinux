@@ -187,7 +187,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		else
 		{
-			$game = $dbl->run("SELECT c.*, d.name as developer_name, d.id as developer_id, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id LEFT JOIN `developers` d ON c.developer_id = d.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
+			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
 
 			if (!$game)
 			{
@@ -285,12 +285,17 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('license_options', $license_options);
 
-				$developer_name = '';
-				if ($game['developer_id'] != NULL && $game['developer_id'] != 0)
+				// pull in any developers and publishers
+				$developers_list = '';
+				$grab_developers = $dbl->run("SELECT r.developer_id,d.name FROM `game_developer_reference` r LEFT JOIN `developers` d ON r.developer_id = d.id WHERE r.game_id = ?", array($game['id']))->fetch_all();
+				if ($grab_developers)
 				{
-					$developer_name = '<option value="'.$game['developer_id'].'" selected>'.$game['developer_name'].'</option>';
+					foreach ($grab_developers as $developer)
+					{
+						$developers_list .= '<option value="'.$developer['developer_id'].'" selected>'.$developer['name'].'</option>';
+					}
 				}
-				$templating->set('developer_name', $developer_name);
+				$templating->set('developer_name', $developers_list);
 
 				$base_game = '';
 				if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
@@ -647,6 +652,7 @@ if (isset($_POST['act']))
 			$new_id = $dbl->new_id();
 	
 			$core->process_game_genres($new_id);
+			$games_database->process_developers($new_id);
 	
 			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
 			{
@@ -664,6 +670,7 @@ if (isset($_POST['act']))
 			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `developer_id` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $developer_id, $crowdfund_notes, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
+			$games_database->process_developers($_POST['id']);
 	
 			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
 			{
@@ -681,6 +688,7 @@ if (isset($_POST['act']))
 			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `approved` = 1, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
+			$games_database->process_developers($_POST['id']);
 	
 			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
 			{

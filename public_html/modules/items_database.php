@@ -43,13 +43,13 @@ if (isset($_GET['view']))
 		$templating->set('dev_name', $check_dev);
 
 		// look for some games
-		$get_item = $dbl->run("select c.`name` from `calendar` c JOIN `game_developer_reference` d WHERE d.game_id = c.id AND d.developer_id = ?", array($_GET['id']))->fetch_all();
+		$get_item = $dbl->run("SELECT c.`name`,c.`id` FROM `calendar` c JOIN `game_developer_reference` d WHERE d.game_id = c.id AND d.developer_id = ?", array($_GET['id']))->fetch_all();
 		if ($get_item)
 		{
 			foreach ($get_item as $game)
 			{
 				$templating->block('dev_game_row');
-				$templating->set('name', $game['name']);
+				$templating->set('name', '<a href="/index.php?module=items_database&view=item&id='.$game['id'].'">'.$game['name'] . '</a>');
 			}
 		}	
 		else

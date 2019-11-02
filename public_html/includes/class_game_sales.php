@@ -884,4 +884,38 @@ class game_sales
 		}
 		$this->templating->set('pagination', $pagination);
 	}
+
+	// for editing a game in the database, adjust what genre's it's linked with
+	function process_developers($game_id)
+	{
+		if (isset($game_id) && is_numeric($game_id))
+		{
+			// delete any existing genres that aren't in the final list for publishing
+			$current_devs = $this->dbl->run("SELECT `ref_id`, `game_id`, `developer_id` FROM `game_developer_reference` WHERE `game_id` = ?", array($game_id))->fetch_all();
+			if (!empty($current_devs))
+			{
+				foreach ($current_devs as $current_dev)
+				{
+					if (!in_array($current_dev['developer_id'], $_POST['developers']))
+					{
+						$this->dbl->run("DELETE FROM `game_developer_reference` WHERE `developer_id` = ? AND `game_id` = ?", array($current_dev['developer_id'], $game_id));
+					}
+				}
+			}
+
+			// get fresh list of genres, and insert any that don't exist
+			$current_devs = $this->dbl->run("SELECT `developer_id` FROM `game_developer_reference` WHERE `game_id` = ?", array($game_id))->fetch_all(PDO::FETCH_COLUMN, 0);
+
+			if (isset($_POST['developers']) && !empty($_POST['developers']) && core::is_number($_POST['developers']))
+			{
+				foreach($_POST['developers'] as $developer_id)
+				{
+					if (!in_array($developer_id, $current_devs))
+					{
+						$this->dbl->run("INSERT INTO `game_developer_reference` SET `game_id` = ?, `developer_id` = ?", array($game_id, $developer_id));
+					}
+				}
+			}
+		}
+	}
 }

@@ -184,7 +184,21 @@ if (isset($_GET['view']))
 					$genres_output .= ' - <a href="/index.php?module=items_database&view=suggest_tags&id='.$get_item['id'].'" target="_blank">Suggest Tags</a></li>';
 				}
 			}
-			$templating->set('genres', $genres_output);			
+			$templating->set('genres', $genres_output);		
+			
+			$developers_list = $dbl->run("SELECT r.developer_id,d.name FROM `game_developer_reference` r LEFT JOIN `developers` d ON r.developer_id = d.id WHERE r.game_id = ?", array($get_item['id']))->fetch_all();
+			$dev_names = '';
+			if (isset($developers_list) && !empty($developers_list))
+			{
+				$dev_names = array();
+				foreach ($developers_list as $developer)
+				{
+					$dev_names[] = '<a href="/index.php?module=items_database&amp;view=developer&amp;id='.$developer['developer_id'].'">'.$developer['name'] . '</a>';
+				}
+		
+				$dev_names = '<li><strong>Who made this?</strong></li><li>' . implode(', ', $dev_names) . '</li>';
+			}
+			$templating->set('devs_list', $dev_names);
 
 			$description = '';
 			if (!empty($get_item['description']) && $get_item['description'] != NULL)

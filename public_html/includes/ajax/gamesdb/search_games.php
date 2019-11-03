@@ -9,7 +9,7 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 if(isset($_GET['q']) && isset($_GET['type']))
 {
-	$game_search = '%' . $_GET['q'] . '%';
+	$game_search = '%' . trim($_GET['q']) . '%';
 
 	if (isset($_GET['type']) && $_GET['type'] == 'sales')
 	{

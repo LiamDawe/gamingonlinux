@@ -7,7 +7,7 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 if(isset($_GET['q']))
 {
-	$get_data = $dbl->run("SELECT `id`, `name` FROM `developers` WHERE `name` LIKE ? ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();
+	$get_data = $dbl->run("SELECT `id`, `name` FROM `developers` WHERE `name` LIKE ? ORDER BY `name` ASC", array('%' . trim($_GET['q']) . '%'))->fetch_all();
 
 	// Make sure we have a result
 	if(count($get_data) > 0)

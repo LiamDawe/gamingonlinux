@@ -52,7 +52,7 @@ if ($user->check_group(1) && $core->config('show_debug') == 1)
 	<div class=\"head\">MySQL queries: {$total_queries}</div>";
 	foreach ($dbl->debug_queries as $key => $debug_query)
 	{
-		$debug .= '<div class="body group">(' . $key . ') ' . $debug_query . '</div>';
+		$debug .= '<div class="body group">(' . $key . ') ' . htmlentities($debug_query, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</div>';
 	}
 	//$debug .= print_r($dbl::$debug_queries, true);
 	$debug .= print_r($_SESSION, true);

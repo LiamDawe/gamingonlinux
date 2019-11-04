@@ -161,10 +161,10 @@ do
 					$dbl->run("UPDATE `calendar` SET `steam_id` = ? WHERE `id` = ?", [$steam_id, $game_id]);
 				}
 
-				// if we haven't checked if it's a bundle yet
-				if ($game_list['bundle'] == NULL || $game_list['bundle'] == '')
+				if ($game_list['bundle'] === 0 && $bundle == 1)
 				{
-					$dbl->run("UPDATE `calendar` SET `bundle` = ? WHERE `id` = ?", [$bundle, $game_id]);
+					echo 'Bundle was set to 0 but it is a bundle, changing status to 1.'. PHP_EOL;
+					$dbl->run("UPDATE `calendar` SET `bundle` = ? WHERE `id` = ?", [$bundle, $game_id]);					
 				}
 
 				// if it has no date

@@ -304,8 +304,6 @@ class game_sales
 			parse_str($filters, $filters_sort);
 		}
 
-		print_r($filters_sort);
-
 		$genre_ids = [];
 		$licenses = [];
 		$options_sql = '';
@@ -368,16 +366,16 @@ class game_sales
 
 			$merged_arrays = array_merge([$where], $genre_ids, $licenses);
 
-			$total_rows = $this->dbl->run("SELECT COUNT(Distinct id) FROM `calendar` c WHERE $sql_where AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 ORDER BY c.`name` ASC", [$where])->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/games_list.php?', $page, $link_extra);	
+			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c WHERE $sql_where c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 ORDER BY c.`name` ASC", [$where])->fetchOne();
+			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?', $page, $link_extra);	
 
-			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE $sql_where AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE $sql_where c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
 		}
 		else
 		{
 			$merged_arrays = array_merge($genre_ids, $licenses);
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 $options_sql ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/games_list.php?', $page, $link_extra);
+			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?', $page, $link_extra);
 
 			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
 		}

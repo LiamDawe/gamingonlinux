@@ -67,6 +67,8 @@ if (isset($_GET['view']))
 			die();
 		}
 		
+		$templating->block('full_db_search');
+
 		// make sure it exists
 		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
@@ -85,7 +87,7 @@ if (isset($_GET['view']))
 			}
 
 			$templating->block('item_view_top', 'items_database');
-			$templating->set('name', $get_item['name']);
+			$templating->set('name', htmlentities($get_item['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
 			// sort out price
 			$free_item = '';
@@ -133,6 +135,10 @@ if (isset($_GET['view']))
 					$best_guess = '<span class="badge blue">Best Guess Date!</span>';
 				}
 				$date = '<li>' . $get_item['date'] . ' ' . $best_guess . $unreleased . '</li>';
+			}
+			else
+			{
+				$date = '<li>Not currently known.</li>';
 			}
 			$templating->set('release-date', $date);
 

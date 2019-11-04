@@ -80,6 +80,7 @@ do
 			$name_change = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND `name` != ?", array($steam_id, $title))->fetchOne();
 			if ($name_change)
 			{
+				echo 'Name changed, not a new item.' . PHP_EOL;
 				$dbl->run("UPDATE `calendar` SET `name` = ? WHERE `id` = ?", array($title, $name_change));
 			}
 					

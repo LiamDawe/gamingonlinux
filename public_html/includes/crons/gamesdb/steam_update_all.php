@@ -125,12 +125,12 @@ do
 					$sql_data[] = $game_id . '.jpg';
 				}
 
-				// if we haven't checked if it's a bundle yet
-				if ($game_list['bundle'] == NULL || $game_list['bundle'] == '')
+				if ($game_list['bundle'] === 0 && $bundle == 1)
 				{
+					echo 'Bundle was set to 0 but it is a bundle, changing status to 1.'. PHP_EOL;
 					$update = 1;
 					$sql_updates[] = '`bundle` = ?';
-					$sql_data[] = $bundle;
+					$sql_data[] = 1;					
 				}
 				
 				// if it has no date

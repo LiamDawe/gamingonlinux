@@ -238,8 +238,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('trailer_link', $trailer_link);
 
-				$date = new DateTime($game['date']);
-				$templating->set('date', $date->format('d-m-Y'));
+				$date_output = '';
+				if (isset($game['date']) && !empty($game['date']))
+				{
+					$date = new DateTime($game['date']);
+					$date_output = $date->format('d-m-Y');
+				}
+
+				$templating->set('date', $date_output);
 
 				$checkboxes_names = ['supports_linux', 'is_hidden_steam', 'best_guess', 'is_dlc', 'free_game', 'is_crowdfunded', 'failed_linux', 'linux_stretch_goal', 'in_development'];
 				foreach ($checkboxes_names as $check)

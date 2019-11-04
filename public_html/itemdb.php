@@ -92,7 +92,7 @@ foreach ($genres_res as $genre)
 	{
 		$total = ' <small>('.$genre['total'].')</small>';
 	}
-	$genres_output .= '<label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label>';
+	$genres_output .= '<li><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
 }
 $templating->set('genres_output', $genres_output);
 
@@ -105,7 +105,7 @@ foreach ($licenses as $license)
 	{
 		$checked = 'checked';
 	}
-	$licenses_output .= '<label><input type="checkbox" name="licenses[]" value="'.$license.'" '.$checked.'> '.$license.'</label>';	
+	$licenses_output .= '<li><label><input type="checkbox" name="licenses[]" value="'.$license.'" '.$checked.'> '.$license.'</label></li>';	
 }
 $templating->set('licenses_output', $licenses_output);
 

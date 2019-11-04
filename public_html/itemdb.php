@@ -61,7 +61,7 @@ if (isset($_SESSION['message']))
 $templating->load('games_list');
 
 // count the total
-$total_games = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `supports_linux` = 1 AND `approved` = 1 AND `is_application` = 0 AND `also_known_as` IS NULL")->fetchOne();
+$total_games = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `supports_linux` = 1 AND `approved` = 1 AND `is_emulator` = 0 AND `is_application` = 0 AND `bundle` = 0 AND `also_known_as` IS NULL")->fetchOne();
 
 $templating->block('top', 'games_list');
 $templating->set('total', $total_games);

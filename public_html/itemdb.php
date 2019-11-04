@@ -78,7 +78,7 @@ foreach (range('A', 'Z') as $letter)
 $templating->set('alpha_filters', implode(' ', $filters));
 
 // genre checkboxes
-$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id from `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`free_game` = 1 group by cat.category_name, cat.category_id")->fetch_all();
+$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id FROM `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by cat.category_name, cat.category_id")->fetch_all();
 $genres_output = '';
 foreach ($genres_res as $genre)
 {

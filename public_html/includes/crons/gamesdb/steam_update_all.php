@@ -52,7 +52,7 @@ do
 			}
 			echo 'steam id is ' . $steam_id;
 
-			if (strpos($link, '/sub/') !== false) 
+			if (strpos($link, '/sub/') !== false || strpos($link, '/bundle/') !== false) 
 			{
 				$bundle = 1;
 			}
@@ -117,6 +117,7 @@ do
 				// if the game list has no picture, grab it and save it
 				if ($game_list['small_picture'] == NULL || $game_list['small_picture'] == '')
 				{
+					echo 'No small picture, updating.' . PHP_EOL;
 					$update = 1;
 					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_id . '.jpg';
 					$core->save_image($image, $saved_file);

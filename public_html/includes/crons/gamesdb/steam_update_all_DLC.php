@@ -44,7 +44,7 @@ do
 			echo $image . "\n";
 
 			$bundle = 0;
-			if (strpos($link, '/sub/') !== false) 
+			if (strpos($link, '/sub/') !== false || strpos($link, '/bundle/') !== false) 
 			{
 				$bundle = 1;
 			}

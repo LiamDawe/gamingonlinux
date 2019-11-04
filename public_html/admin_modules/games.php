@@ -227,7 +227,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set('small_pic', $small_pic);
 
 				$templating->set('id', $game['id']);
-				$templating->set('name', $game['name']);
+				$templating->set('name', htmlentities($game['name']));
 				$templating->set('link', $game['link']);
 				$templating->set('trailer', $game['trailer']);
 
@@ -1043,6 +1043,12 @@ if (isset($_POST['act']))
 
 			// delete any tags attached to it
 			$dbl->run("DELETE FROM `game_genres_reference` WHERE `game_id` = ?", [$_GET['id']]);
+
+			// remove game developer associations
+			$dbl->run("DELETE FROM `game_developer_reference` WHERE `game_id` = ?", [$_GET['id']]);
+
+			// remove article associations
+			$dbl->run("DELETE FROM `article_item_assoc` WHERE `game_id` = ?", [$_GET['id']]);
 
 			// note who deleted it
 			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted an item from the games database: ' . $info['name'] . '.'));	

@@ -113,7 +113,7 @@ do
 					$steam_id = preg_replace('~https:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $link);
 				}
 
-				if (strpos($link, '/sub/') !== false) 
+				if (strpos($link, '/sub/') !== false || strpos($link, '/bundle/') !== false) 
 				{
 					$bundle = 1;
 				}

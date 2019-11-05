@@ -1025,7 +1025,7 @@ else
 									$core->message('To reply you need to activate your account! You were sent an email with instructions on how to activate. <a href="/index.php?module=activate_user&redo=1">Click here to re-send a new activation key</a>');
 								}
 							}
-							else if ($check['count'] > 0)
+							else if ($check > 0)
 							{
 								$core->message('You currently have a post in the moderation queue for this forum topic, you must wait for that to be approved before you can post another reply here.', NULL, 2);
 							}

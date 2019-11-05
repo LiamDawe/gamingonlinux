@@ -19,5 +19,10 @@ return [
 	[
 		"text" => "You have %s the topic!",
 		"additions" => 1
+	],
+	"lock_timer" =>
+	[
+		"text" => "Someone is currently editing that post, please check back in 5 minutes.",
+		"error" => 1
 	]
 ];

@@ -21,5 +21,10 @@ return [
 	"comments_opened" =>
 	[
 		"text" => 'The comments are now open!'
+	],
+	"lock_timer" =>
+	[
+		"text" => "Someone is currently editing that comment, please check back in 5 minutes.",
+		"error" => 1
 	]
 ];

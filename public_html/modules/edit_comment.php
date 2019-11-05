@@ -19,7 +19,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 
 	$comment_id = strip_tags($_GET['comment_id']);
 
-	$comment = $dbl->run("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
+	$comment = $dbl->run("SELECT c.`author_id`, c.comment_id, c.`comment_text`, c.time_posted, c.`lock_timer`, c.`locked_by_id`, a.`title`, a.article_id FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
 
 	$nice_title = core::nice_title($comment['title']);
 
@@ -29,6 +29,15 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 		header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
 		die();
 	}
+
+	if (!is_null($comment['lock_timer']) && strtotime("-5 minutes") <= strtotime($comment['lock_timer']) && $comment['locked_by_id'] != $_SESSION['user_id'])
+	{
+		$_SESSION['message'] = 'lock_timer';
+		header("Location: /articles/$nice_title.{$comment['article_id']}");
+		die();
+	}
+
+	$dbl->run("UPDATE `articles_comments` SET `lock_timer` = ?, `locked_by_id` = ? WHERE `comment_id` = ?", array(core::$sql_date_now, $_SESSION['user_id'], $comment_id));
 
 	$templating->set_previous('meta_description', 'Editing a comment on GamingOnLinux', 1);
 	$templating->set_previous('title', 'Editing a comment', 1);
@@ -53,7 +62,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 	$templating->block('edit_comment_buttons', 'edit_comment');
 	$templating->set('comment_id', $comment['comment_id']);
 	$templating->set('url', $core->config('website_url'));
-		
+			
 	$cancel_action = $article_class->get_link($comment['article_id'], $nice_title);
 
 	$templating->set('cancel_action', $cancel_action);
@@ -61,13 +70,23 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 }
 if (isset($_POST['act']) && $_POST['act'] == 'editcomment')
 {
-	$comment = $dbl->run("SELECT c.`author_id`, c.`comment_text`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_POST['comment_id']))->fetch();
+	$comment = $dbl->run("SELECT c.`author_id`, c.`comment_text`, c.`lock_timer`, c.`locked_by_id`, a.`title`, a.`article_id`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_POST['comment_id']))->fetch();
+
+	$nice_title = core::nice_title($comment['title']);
+
+	if (!is_null($comment['lock_timer']) && strtotime("-5 minutes") <= strtotime($comment['lock_timer']) && $comment['locked_by_id'] != $_SESSION['user_id'])
+	{
+		$_SESSION['message'] = 'lock_timer';
+		header("Location: /articles/$nice_title.{$comment['article_id']}");
+		die();
+	}
 
 	// check if author or editor/admin
 	if ($_SESSION['user_id'] != $comment['author_id'] && $user->can('mod_edit_comments') == false || !isset($_SESSION['user_id']))
 	{
-		$nice_title = core::nice_title($comment['title']);
+		
 		header("Location: /articles/$nice_title.{$comment['article_id']}#comments");
+		die();
 	}
 
 	// do the edit since we are allowed
@@ -90,11 +109,12 @@ if (isset($_POST['act']) && $_POST['act'] == 'editcomment')
 		{
 			$comment_text = core::make_safe($comment_text);
 
-			$dbl->run("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ? WHERE `comment_id` = ?", array($comment_text, (int) $_SESSION['user_id'], core::$date, (int) $_POST['comment_id']));
+			$dbl->run("UPDATE `articles_comments` SET `comment_text` = ?, `last_edited` = ?, `last_edited_time` = ?, `locked_by_id` = NULL, `lock_timer` = NULL WHERE `comment_id` = ?", array($comment_text, (int) $_SESSION['user_id'], core::$date, (int) $_POST['comment_id']));
 				
 			$edit_redirect = $article_class->get_link($comment['article_id'], $comment['slug'], 'comment_id=' . $_POST['comment_id']);
 
 			header("Location: ".$edit_redirect);
+			die();
 		}
 	}
 }

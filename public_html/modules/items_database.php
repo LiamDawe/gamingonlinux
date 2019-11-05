@@ -78,7 +78,7 @@ if (isset($_GET['view']))
 
 			if ($get_item['supports_linux'] == 0)
 			{
-				$core->message("This item does not currently support Linux! It's here in case it ever does, or it may be included in a GOTY Award category for some form of port wishlist (you get the idea). If it shows up in any of our lists, please let us know (it shouldn't!).", 2);
+				$core->message("Note: This item does not currently support Linux!", 2);
 			}
 
 			if ($get_item['is_hidden_steam'] == 1)

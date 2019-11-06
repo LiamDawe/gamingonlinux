@@ -621,7 +621,7 @@ else if (isset($_GET['go']))
 	if ($_GET['go'] == 'correction')
 	{
 		// make sure news id is a number
-		if (!isset($_POST['article_id']) || !is_numeric($_POST['article_id']))
+		if (!isset($_POST['aid']) || !is_numeric($_POST['aid']))
 		{
 			$_SESSION['message'] = 'no_id';
 			$_SESSION['message_extra'] = 'Article ID';
@@ -642,14 +642,14 @@ else if (isset($_GET['go']))
 		else
 		{
 			// check empty
-			$correction = trim($_POST['correction']);
+			$correction = trim($_POST['text']);
 
 			$correction = core::make_safe($correction, ENT_QUOTES);
 
 			// get article name for the redirect
-			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['article_id']))->fetch();
+			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']))->fetch();
 			
-			$article_link = $article_class->get_link($_POST['article_id'], $title['slug']);
+			$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
 
 			if (empty($correction))
 			{
@@ -661,7 +661,7 @@ else if (isset($_GET['go']))
 				die();
 			}
 
-			$dbl->run("INSERT INTO `article_corrections` SET `article_id` = ?, `date` = ?, `user_id` = ?, `correction_comment` = ?", array((int) $_POST['article_id'], core::$date, $_SESSION['user_id'], $correction));
+			$dbl->run("INSERT INTO `article_corrections` SET `article_id` = ?, `date` = ?, `user_id` = ?, `correction_comment` = ?", array((int) $_POST['aid'], core::$date, $_SESSION['user_id'], $correction));
 
 			$correction_id = $dbl->new_id();
 

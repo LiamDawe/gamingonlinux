@@ -207,7 +207,7 @@
 		</label>
 		<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select><br />
 		<input type="hidden" name="aid" value="{:aid}" />
-		<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button>
+		<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button> <button formaction="/index.php?module=articles_full&go=correction" type="submit" title="Help us fix links, spelling and more instead of commenting.">Send Correction Report</button>
 	</div>
 </div>
 </form>

@@ -26,6 +26,16 @@ if (!isset($_POST['action']))
 			}
 
 			$templating->set('username', $username);
+
+			$current_page = '';
+			if (isset($_GET['redirect']))
+			{
+				if ($_GET['redirect'] == 'article' && is_numeric($_GET['aid']))
+				{
+					$current_page = $article_class->get_link($_GET['aid']);
+				}
+			}
+			$templating->set('current_page', $current_page);
 			
 			$twitter_button = '';
 			if ($core->config('twitter_login') == 1)

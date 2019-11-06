@@ -115,10 +115,16 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 {
 	$unread_counter = 0;
 
-	$templating->set('user_link', '<li><a href="/index.php?module=login">Login</a></li><li><a href="/index.php?module=register">Register</a></li>');
+	$redirect = '';
+	if (isset($_GET['module']) && $_GET['module'] == 'articles_full' && isset($_GET['aid']) && is_numeric($_GET['aid']))
+	{
+		$redirect = '&amp;redirect=article&amp;aid='.$_GET['aid'];
+	}
+
+	$templating->set('user_link', '<li><a href="/index.php?module=login'.$redirect.'">Login</a></li><li><a href="/index.php?module=register">Register</a></li>');
 
 	$login_menu = $templating->block_store('login_menu');
-	$login_menu = $templating->store_replace($login_menu, array('url' => $core->config('website_url')));
+	$login_menu = $templating->store_replace($login_menu, array('url' => $core->config('website_url'), 'redirect' => $redirect));
 
 	$templating->set('user_menu', $login_menu);
 	$templating->set('notifications_menu', '');
@@ -235,3 +241,4 @@ else if ($_SESSION['user_id'] > 0)
 
 	$templating->set('notifications_menu', $notifications_menu);
 }
+?>

@@ -72,8 +72,9 @@ $linux_share_data = "
 	borderWidth: 1
 }";
 
-$linuxonly = "<div class=\"chartjs-container\"><canvas id=\"linuxonly\" width=\"400\" height=\"200\"></canvas></div><script>
-var linuxonly = document.getElementById('linuxonly');
+$linuxonly = "<div class=\"chartjs-container\"><canvas id=\"linuxonly\" width=\"400\" height=\"200\"></canvas></div>";
+
+core::$user_chart_js .= "<script>var linuxonly = document.getElementById('linuxonly');
 var Chartlinuxonly = new Chart.Line(linuxonly, {
 type: 'line',
 data: {
@@ -197,8 +198,9 @@ foreach ($lang_data as $key => $data)
 	$counter++;
 }
 
-$languages = "<div class=\"chartjs-container\"><canvas id=\"languages\" width=\"400\" height=\"200\"></canvas></div><script>
-var languages = document.getElementById('languages');
+$languages = "<div class=\"chartjs-container\"><canvas id=\"languages\" width=\"400\" height=\"200\"></canvas></div>";
+
+core::$user_chart_js .= "<script>var languages = document.getElementById('languages');
 var Chartlanguages = new Chart.Line(languages, {
 type: 'line',
 data: {
@@ -261,8 +263,9 @@ foreach ($lang_data_linux as $key => $data)
 	$counter_linux++;
 }
 
-$languages_linux = "<div class=\"chartjs-container\"><canvas id=\"languages_linux\" width=\"400\" height=\"200\"></canvas></div><script>
-var languages_linux = document.getElementById('languages_linux');
+$languages_linux = "<div class=\"chartjs-container\"><canvas id=\"languages_linux\" width=\"400\" height=\"200\"></canvas></div>";
+
+core::$user_chart_js .= "<script>var languages_linux = document.getElementById('languages_linux');
 var Chartlanguages_linux = new Chart.Line(languages_linux, {
 type: 'line',
 data: {
@@ -320,8 +323,9 @@ $threesome_data = "
 	borderWidth: 1
 }";
 
-$threesome = "<div class=\"chartjs-container\"><canvas id=\"threesome\" width=\"400\" height=\"200\"></canvas></div><script>
-var threesome = document.getElementById('threesome');
+$threesome = "<div class=\"chartjs-container\"><canvas id=\"threesome\" width=\"400\" height=\"200\"></canvas></div>";
+
+core::$user_chart_js .= "<script>var threesome = document.getElementById('threesome');
 var Chartthreesome = new Chart.Line(threesome, {
 type: 'line',
 data: {

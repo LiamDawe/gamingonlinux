@@ -224,7 +224,7 @@ if (isset($_GET['user_id']))
 
 						$comment_posts = '';
 						$view_more_comments = '';
-						$comments_execute = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.approved = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC limit 5", array($_GET['user_id']))->fetch_all();
+						$comments_execute = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c FORCE INDEX(PRIMARY) INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.approved = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC limit 5", array($_GET['user_id']))->fetch_all();
 
 						if ($comments_execute)
 						{

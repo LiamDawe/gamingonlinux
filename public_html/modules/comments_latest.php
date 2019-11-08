@@ -31,7 +31,7 @@ else
 	$templating->block('more_comments');
 
 	$comment_posts = '';
-	$all_comments = $dbl->run("SELECT comment_id, c.author_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active, u.username FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id LEFT JOIN `users` u ON c.author_id = u.user_id WHERE c.`approved` = 1 AND a.active = 1 ORDER BY c.`comment_id` DESC LIMIT ?, 30", array($core->start))->fetch_all();
+	$all_comments = $dbl->run("SELECT comment_id, c.author_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active, u.username FROM `articles_comments` c FORCE INDEX (PRIMARY) INNER JOIN `articles` a ON c.article_id = a.article_id LEFT JOIN `users` u ON c.author_id = u.user_id WHERE c.`approved` = 1 AND a.active = 1 ORDER BY c.`comment_id` DESC LIMIT ?, 30", array($core->start))->fetch_all();
 						
 	// make an array of all comment ids to search for likes (instead of one query per comment for likes)
 	$like_array = [];

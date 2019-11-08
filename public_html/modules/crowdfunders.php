@@ -26,7 +26,7 @@ $failed_percentage = round($total_failed/$total*100);
 $templating->set('success_rate', $succeed_percentage . '%');
 $templating->set('failed_percentage', $failed_percentage . '%');
 
-$crowdfunders = $dbl->run("SELECT * FROM `calendar` WHERE `is_crowdfunded` = 1 ORDER BY `name` ASC")->fetch_all();
+$crowdfunders = $dbl->run("SELECT `id`, `name`, `crowdfund_notes`, `crowdfund_link`, `linux_stretch_goal`, `failed_linux`, `in_development` FROM `calendar` WHERE `is_crowdfunded` = 1 ORDER BY `name` ASC")->fetch_all();
 
 $game_id_array = array();
 foreach ($crowdfunders as $game)

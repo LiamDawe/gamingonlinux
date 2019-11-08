@@ -23,7 +23,7 @@ if (core::$current_module['module_file_name'] == 'home')
 
 	if ($total_featured == 1)
 	{
-		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' AND `end_date` > now()")->fetch();
+		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> '' AND `end_date` > now()")->fetch();
 	}
 	if ($total_featured > 1)
 	{
@@ -38,7 +38,7 @@ if (core::$current_module['module_file_name'] == 'home')
 			$last_featured_sql = 'AND a.article_id != ?';
 		}
 
-		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image, a.author_id, a.comment_count, u.username, u.user_id FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.active = 1 AND p.featured_image <> '' AND `end_date` > now() $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
+		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> '' AND p.`end_date` > now() $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
 
 		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
@@ -49,42 +49,10 @@ if (core::$current_module['module_file_name'] == 'home')
 		$templating->set('title', $featured['title']);
 		$templating->set('image', $featured['featured_image']);
 
-		if ($featured['author_id'] == 0)
-		{
-			if (empty($featured['guest_username']))
-			{
-				$username = 'Guest';
-			}
-
-			else
-			{
-				$username = $featured['guest_username'];
-			}
-		}
-
-		else
-		{
-			$username = "<a href=\"/profiles/{$featured['author_id']}\">" . $featured['username'] . '</a>';
-		}
-		$templating->set('username', $username);
-		$templating->set('comment_count', $featured['comment_count']);
-
 		$article_link = url . 'index.php?featured&amp;aid=' . $featured['article_id'];
 
 		$templating->set('article_link', $article_link);
 		$templating->set('url', url);
-
-		if ($user->check_group([1,2,5]) == true)
-		{
-			$templating->set('edit_link', "<a href=\"".url."admin.php?module=articles&amp;view=Edit&amp;article_id={$featured['article_id']}\"><strong>Edit</strong></a>");
-			$templating->set('editors_pick_link', " <a href=\"".url."index.php?module=home&amp;view=removeeditors&amp;article_id={$featured['article_id']}\"><strong>Remove Editors Pick</strong></a>");
-		}
-
-		else
-		{
-			$templating->set('edit_link', '');
-			$templating->set('editors_pick_link', '');
-		}
 	}
 }
 

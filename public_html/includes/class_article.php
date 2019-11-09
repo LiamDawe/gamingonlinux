@@ -192,7 +192,7 @@ class article
 				}
 				unset($_SESSION['uploads']['article_media']);
 				$in  = str_repeat('?,', count($image_ids) - 1) . '?';
-				$article_images = $this->dbl->run("SELECT `filename`,`id`,`filetype` FROM `article_images` WHERE `id` IN ($in) ORDER BY `id` ASC", $image_ids)->fetch_all();
+				$article_images = $this->dbl->run("SELECT `filename`,`id`,`filetype`,`youtube_cache` FROM `article_images` WHERE `id` IN ($in) ORDER BY `id` ASC", $image_ids)->fetch_all();
 			}
 		}
 		if ($article_images)

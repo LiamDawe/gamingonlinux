@@ -23,6 +23,8 @@ else
 		$templating->set('contact_email', $core->config('contact_email'));
 		$templating->set('mailer_email', $core->config('mailer_email'));
 
+		$templating->set('cookie_domain', $core->config('cookie_domain'));
+
 		// set the default module
 		$templating->set('default_module', $core->config('default_module'));
 
@@ -137,6 +139,8 @@ else
 		else
 		{
 			$core->set_config($_POST['contact_email'], 'contact_email');
+
+			$core->set_config($_POST['cookie_domain'], 'cookie_domain');
 
 			$core->set_config($_POST['default_module'], 'default_module');
 

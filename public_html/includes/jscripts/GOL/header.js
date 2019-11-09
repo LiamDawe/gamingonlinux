@@ -212,10 +212,11 @@ $(function()
     $(document).on('click','.trash',function()
 	{
 		var image_id= $(this).attr('id');
+		var type = $(this).attr("data-type");
         $.ajax({
             type:'POST',
             url:'/includes/ajax/delete_image.php',
-            data:{'image_id':image_id},
+            data:{'image_id':image_id, 'type':type},
             success: function(data)
 			{
 				if(data=="YES")
@@ -264,6 +265,8 @@ $(function()
 jQuery(document).ready(function()
 {  
 	$('.cocoen').cocoen(); // image comparison slider
+
+	$('.octus-editor .styles').show();
 
 	// table sorting
 	$('#crowdfunded').dataTable( 
@@ -573,6 +576,34 @@ jQuery(document).ready(function()
 		    $("#imageloadstatus").hide();
 		    $("#imageloadbutton").show();
 			resetFormElement($('#photoimg'));
+		}}).submit();
+	});
+
+	//itemdb media uploads
+	$('#itemdbuploadfield').off('click').on('change', function()
+	{
+		$("#itemdbmediaform").ajaxForm({
+		beforeSubmit:function(){
+		    $("#imageloadstatus").show();
+		     $("#imageloadbutton").hide();
+		},
+		success:function(data)
+		{
+			$.each(data.data, function(index) 
+			{
+				$("#uploaded_media").append(data.data[index].output);
+				$('#itemdbform').append('<input class="uploads-'+data.data[index].media_id+'" type="hidden" name="uploads[]" value="'+data.data[index].media_id+'" />');
+				$("#imageloadstatus").hide();
+				$("#imageloadbutton").show();
+				resetFormElement($('#itemdbuploadfield'));
+			});
+		},
+		error:function(data)
+		{
+			$("#uploaded_media").append(data);
+		    $("#imageloadstatus").hide();
+		    $("#imageloadbutton").show();
+			resetFormElement($('#itemdbuploadfield'));
 		}}).submit();
 	});
 

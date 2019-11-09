@@ -2,6 +2,7 @@
 	font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .octus-editor .styles {
+	display: none;
 	background: #f1f1f1;
 	border: 1px solid #cecfd1;
 	color: #a5a5a5;
@@ -213,9 +214,7 @@
 	width: 8px;
 }
 .octus-editor .no-script {
-	border-left: 1px solid #cecfd1;
-	border-right: 1px solid #cecfd1;
-	border-bottom: 1px solid #cecfd1;
+	border: 1px solid #cecfd1;
 	padding: 14px 14px 14px 49px;
 	position: relative;
 }

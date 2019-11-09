@@ -93,7 +93,16 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();
 
-	$articles = $dbl->run("SELECT a.*, t.`filename` as `gallery_tagline_filename`, u.username
+	$articles = $dbl->run("SELECT 
+	a.title,
+	a.article_id,
+	a.tagline_image,
+	a.gallery_tagline,
+	a.tagline,
+	a.date,
+	a.text,
+	t.`filename` as `gallery_tagline_filename`, 
+	u.username
 	FROM `articles` a 
 	LEFT JOIN
 		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` 

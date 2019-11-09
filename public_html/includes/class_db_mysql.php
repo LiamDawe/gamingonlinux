@@ -27,7 +27,7 @@ class db_mysql extends PDO
 			// if we don't find the mysql server, wait a bit and retry (down for updates? broken?)
 			if ($error->getCode() == '2002')
 			{
-				sleep(45); // give it 45 seconds to come back
+				sleep(30); // give it 45 seconds to come back
 				try
 				{
 					$options = [
@@ -41,13 +41,15 @@ class db_mysql extends PDO
 				catch (PDOException $error)
 				{
 					error_log('SQL ERROR ' . $error->getMessage());
-					die('SQL Error');					
+					include(dirname(dirname(__FILE__)).'/sql_error.html');
+					die();				
 				}
 			}
 			else
 			{
 				error_log('SQL ERROR ' . $error->getMessage());
-				die('SQL Error');
+				include(dirname(dirname(__FILE__)).'/sql_error.html');
+				die();	
 			}
         }
 	}

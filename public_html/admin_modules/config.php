@@ -13,6 +13,9 @@ if (!$user->check_group(1))
 
 else
 {
+	$templating->set_previous('title', 'Configuration', 1);
+	$templating->set_previous('meta_description', 'Configuration', 1);
+
 	if (!isset($_POST['Submit']))
 	{
 		$templating->load('admin_modules/config');
@@ -24,6 +27,7 @@ else
 		$templating->set('mailer_email', $core->config('mailer_email'));
 
 		$templating->set('cookie_domain', $core->config('cookie_domain'));
+		$templating->set('javascript_static', $core->config('javascript_static'));
 
 		// set the default module
 		$templating->set('default_module', $core->config('default_module'));
@@ -141,6 +145,8 @@ else
 			$core->set_config($_POST['contact_email'], 'contact_email');
 
 			$core->set_config($_POST['cookie_domain'], 'cookie_domain');
+
+			$core->set_config($_POST['javascript_static'], 'javascript_static');
 
 			$core->set_config($_POST['default_module'], 'default_module');
 

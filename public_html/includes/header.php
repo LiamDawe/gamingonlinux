@@ -52,6 +52,7 @@ else
 $templating->load('header');
 $templating->block('header', 'header');
 $templating->set('url', $core->config('website_url'));
+$templating->set('jsstatic', JSSTATIC);
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
 // if using the dark theme

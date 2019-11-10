@@ -203,6 +203,10 @@ do
 			}
 		}
 		$page++;
+		// free up memory
+		$html->__destruct();
+		unset($html);
+		$html = null;
 	}
 } while ($stop == 0);
 

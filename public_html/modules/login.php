@@ -173,10 +173,11 @@ else if (isset($_POST['action']))
 			unset($_SESSION['login_error_username']);
 
 			// if the login form had a current page set, we need to check to see if we can redirect
-			if(isset($_POST['current_page'])) 
+			if(!empty($_POST['current_page'])) 
 			{
 				$parse_url = parse_url($_POST['current_page']);
-				if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_url'))
+
+				if (!empty($parse_url['scheme']) && $parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_url'))
 				{
 					$extra = '';
 					if (isset($parse_url['query']) && !empty($parse_url['query']))

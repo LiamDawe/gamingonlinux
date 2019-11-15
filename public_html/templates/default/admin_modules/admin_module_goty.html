@@ -56,9 +56,10 @@
 <div class="box">
 	<div class="head">GOTY Config</div>
 	<div class="body group">
-	<form method="post">
-		<label>New games open? <input type="checkbox" name="games" {:games_check}/></label>
-		<label>Voting open? <input type="checkbox" name="voting" {:voting_check}/></label>
+	<form class="gol-form" method="post">
+		<label>Page Open? <input type="checkbox" name="page_open" {:page+check}/></label><br />
+		<label>New game submissions open? <input type="checkbox" name="games" {:games_check}/></label><br />
+		<label>Voting open? <input type="checkbox" name="voting" {:voting_check}/></label><br />
 		<button class="fnone" name="act" value="config">Edit</button> {:end_awards}
 	</form>
 	</div>

@@ -95,9 +95,14 @@ if (isset($_GET['view']))
 
 	if ($_GET['view'] == 'config')
 	{
+		$page = '';
 		$games = '';
 		$voting = '';
 
+		if ($core->config('goty_page_open') == 1)
+		{
+			$page = 'checked';
+		}
 		if ($core->config('goty_games_open') == 1)
 		{
 			$games = 'checked';
@@ -115,6 +120,7 @@ if (isset($_GET['view']))
 		}
 
 		$templating->block('config', 'admin_modules/admin_module_goty');
+		$templating->set('page_check', $page);
 		$templating->set('games_check', $games);
 		$templating->set('voting_check', $voting);
 		$templating->set('end_awards', $end_awards);
@@ -336,8 +342,14 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'config')
 	{
+		$page = 0;
 		$games = 0;
 		$voting = 0;
+
+		if (isset($_POST['page_open']))
+		{
+			$page = 1;
+		}
 		if (isset($_POST['games']))
 		{
 			$games = 1;
@@ -347,8 +359,9 @@ if (isset($_POST['act']))
 			$voting = 1;
 		}
 
-		$dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_games_open'", array($games));
-		$dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = 'goty_voting_open'", array($voting));
+		$core->set_config($page, 'goty_page_open');
+		$core->set_config($games, 'goty_games_open');
+		$core->set_config($voting, 'goty_voting_open');
 
 		// notify editors you did this
 		$core->new_admin_note(array('completed' => 1, 'content' => ' edited the GOTY awards settings.'));

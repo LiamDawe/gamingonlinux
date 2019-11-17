@@ -136,6 +136,30 @@ if (isset($_POST['act']))
 			die();
 		}
 	}
+
+	if ($_POST['act'] == 'remove_single_vote')
+	{
+		if ($core->config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			if (!empty($_POST['category_id']) && !empty($_POST['game_id']))
+			{
+				$check_vote = $dbl->run("SELECT `user_id` FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_POST['category_id'], $_SESSION['user_id']))->fetch();
+				if ($check_vote)
+				{
+					$dbl->run("DELETE FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ? AND `game_id` = ?", array($_POST['category_id'], $_SESSION['user_id'], $_POST['game_id']));
+
+					$_SESSION['message'] = 'goty_vote_deleted';
+					header("Location: /goty.php?module=category&category_id=".$_POST['category_id']);
+					die();
+				}
+			}
+		}
+		else
+		{
+			header("Location: /goty.php");
+			die();
+		}
+	}
 }
 
 $templating->block('bottom', 'goty');

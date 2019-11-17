@@ -87,10 +87,10 @@ $templating->set('alpha_filters', implode(' ', $filters));
 $reset_button = '';
 if ($core->config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
-	$grab_vote = $dbl->run("SELECT `user_id`, `id`, `game_id` FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_GET['category_id'], $_SESSION['user_id']))->fetch();
-	if ($grab_vote)
+	$grab_votes = $dbl->run("SELECT `game_id` FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_GET['category_id'], $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
+	if ($grab_votes)
 	{
-		$reset_button = '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Reset vote in current category</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$grab_vote['id'].'" /></form>';
+		$reset_button = '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Reset vote in current category</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /></form>';
 	}
 }
 
@@ -161,14 +161,13 @@ if ($games_get)
 
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
-			$count_votes = $dbl->run("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['category_id']))->fetchOne();
-			if (!$count_votes && $core->config('goty_voting_open') == 1)
+			if (!$grab_votes || count($grab_votes) < $core->config('goty_votes_per_category') && $core->config('goty_voting_open') == 1 && !in_array($game['id'], $grab_votes))
 			{
 				$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
 			}
-			else if ($core->config('goty_voting_open') == 1 && $count_votes && $game['id'] == $grab_vote['game_id'])
+			else if ($core->config('goty_voting_open') == 1 && $grab_votes && in_array($game['id'], $grab_votes))
 			{
-				$templating->set('vote_button', '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Remove Vote</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>');
+				$templating->set('vote_button', '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="remove_single_vote">Remove Vote</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>');
 			}
 			else
 			{

@@ -102,8 +102,18 @@ else
 		}
 
 		// get topic info/make sure it exists
-		$topic = $dbl->run("SELECT
-			t.*,
+		$topic = $dbl->run("SELECT 
+			t.`topic_id`,
+			t.`forum_id`,
+			t.`author_id`,
+			t.`topic_title`,
+			t.`is_locked`,
+			t.`is_sticky`,
+			t.`creation_date`,
+			t.`total_likes`,
+			t.`last_edited`,
+			t.`last_edited_time`,
+			t.`replys`,
 			p.`reply_text`,
 			u.`user_id`,
 			u.`distro`,

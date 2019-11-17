@@ -1017,7 +1017,12 @@ jQuery(document).ready(function()
 			}
 			else if (data.result == 3)
 			{
-				document.getElementById("wrap").innerHTML = "Sorry, but you have already voted in this category!";
+				document.getElementById("wrap").innerHTML = "Sorry, but you have already used your votes in this category!";
+				$.fancybox.open({src:'#wrap',type:'inline'})
+			}
+			else if (data.result == 4)
+			{
+				document.getElementById("wrap").innerHTML = "Sorry, but you have already voted for that game in that category!";
 				$.fancybox.open({src:'#wrap',type:'inline'})
 			}
 			else

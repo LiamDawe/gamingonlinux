@@ -1,5 +1,17 @@
 <?php
 $templating->block('top', 'goty');
+$templating->set('votes_per_category', $core->config('goty_votes_per_category'));
+
+if ($core->config('goty_votes_per_category') == 1)
+{
+	$vote_times_text = 'vote';
+}
+else if ($core->config('goty_votes_per_category') > 1)
+{
+	$vote_times_text = 'votes';
+}
+$templating->set('vote_times_text', $vote_times_text);
+
 $templating->set('total_votes', $core->config('goty_total_votes'));
 
 $voting_text = '';

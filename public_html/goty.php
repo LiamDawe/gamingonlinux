@@ -4,6 +4,13 @@ define('golapp', TRUE);
 
 include(APP_ROOT . '/includes/header.php');
 
+// TWITCH ONLINE INDICATOR
+if (!isset($_COOKIE['gol_announce_gol_twitch'])) // if they haven't dissmissed it
+{
+	$templating->load('twitch_bar');
+	$templating->block('main', 'twitch_bar');
+}
+
 if ($core->config('goty_page_open') == 0)
 {
 	if ($user->check_group([1,2,5]) == false)

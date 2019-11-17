@@ -95,9 +95,12 @@ if (isset($_GET['view']))
 
 	if ($_GET['view'] == 'config')
 	{
+		$templating->set_previous('title', 'GOTY Config', 1);
+		
 		$page = '';
 		$games = '';
 		$voting = '';
+		$votes_per_category = $core->config('goty_votes_per_category');
 
 		if ($core->config('goty_page_open') == 1)
 		{
@@ -123,6 +126,7 @@ if (isset($_GET['view']))
 		$templating->set('page_check', $page);
 		$templating->set('games_check', $games);
 		$templating->set('voting_check', $voting);
+		$templating->set('votes_per_category', $votes_per_category);
 		$templating->set('end_awards', $end_awards);
 	}
 
@@ -345,6 +349,7 @@ if (isset($_POST['act']))
 		$page = 0;
 		$games = 0;
 		$voting = 0;
+		$votes_per_category = 1;
 
 		if (isset($_POST['page_open']))
 		{
@@ -358,10 +363,15 @@ if (isset($_POST['act']))
 		{
 			$voting = 1;
 		}
+		if (isset($_POST['votes_per_category']) && is_numeric($_POST['votes_per_category']))
+		{
+			$votes_per_category = $_POST['votes_per_category'];
+		}
 
 		$core->set_config($page, 'goty_page_open');
 		$core->set_config($games, 'goty_games_open');
 		$core->set_config($voting, 'goty_voting_open');
+		$core->set_config($votes_per_category, 'goty_votes_per_category');
 
 		// notify editors you did this
 		$core->new_admin_note(array('completed' => 1, 'content' => ' edited the GOTY awards settings.'));

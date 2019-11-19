@@ -57,11 +57,11 @@ if ($checked = $article_class->check_article_inputs($return_page))
 	foreach ($users_array as $email_user)
 	{
 		$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-		<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}\">{$checked['title']}</a></strong>\".</p>
+		<p><strong>{$_SESSION['username']}</strong> has sent an article to be reviewed before publishing \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=reviewqueue&aid={$article_id}\">{$checked['title']}</a></strong>\".</p>
 		</body>
 		</html>";
 		
-		$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has sent an article to be reviewed before publishing on: " . $core->config('website_url') . " You can review it here: " . $core->config('website_url') . "admin.php?module=articles&view=adminreview&aid={$article_id}";
+		$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has sent an article to be reviewed before publishing on: " . $core->config('website_url') . " You can review it here: " . $core->config('website_url') . "admin.php?module=reviewqueue&aid={$article_id}";
 
 		if ($core->config('send_emails') == 1)
 		{

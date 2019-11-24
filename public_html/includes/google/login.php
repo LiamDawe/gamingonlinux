@@ -82,7 +82,7 @@ if (isset($_GET['code']))
 
 		if ($userdata['social_stay_cookie'] == 1)
 		{
-			setcookie('gol_session', $generated_session, time()+$cookie_length, '/', $core->config('cookie_domain'));
+			setcookie('gol_session', $generated_session, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1);
 		}
 
 		header("Location: /");

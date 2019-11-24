@@ -76,7 +76,7 @@ class steam_user
 
 					if ($userdata['social_stay_cookie'] == 1)
 					{
-						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'));
+						setcookie('gol_session', $generated_session, $this->user->expires_date->getTimestamp(), '/', $this->user->cookie_domain, 1);
 					}
 					
 					header("Location: {$_GET['real_return']}");

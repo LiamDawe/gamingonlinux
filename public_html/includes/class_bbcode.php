@@ -189,6 +189,14 @@ class bbcode
 
 	function parse_images($text)
 	{
+		// cocoen image compare bbcode support
+		$text = preg_replace_callback("~\[compare]\[img]([^[]+)\[/img]\[img]([^[]+)\[/img]\[/compare]~i",
+		function ($matches)
+		{
+			return "<div class=\"cocoen\"><img alt=\"\" src=\"".$matches[1]."\" /> <img alt=\"\" src=\"".$matches[2]."\" /></div>";
+		},
+		$text);
+
 		$text = preg_replace_callback("~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i",
 		function($matches)
 		{
@@ -596,11 +604,20 @@ class bbcode
 
 		return $body;
 	}
+
+	// NOT FINISHED
+	function display_polls($text, $poll_id)
+	{
+		// check poll exists
+		$this->dbl->run();
+		$text = preg_replace("/\[poll\]".$poll_id."\[\/giveaway\]/is", $key_claim, $text);
+
+		return $text;
+	}
 	
 	// convert helpers into the html for displaying on the site
 	function article_bbcode($text)
 	{
-		$text = $this->parse_links($text);
 		$text = $this->pc_info($text);
 		
 		$text = $this->do_charts($text);
@@ -614,6 +631,15 @@ class bbcode
 				$text = $this->replace_giveaways($text, $match);
 			}
 		}
+
+		/*
+		if (preg_match_all("/\[poll\](.+?)\[\/poll\]/is", $text, $poll_matches))
+		{
+			foreach ($poll_matches[1] as $match)
+			{
+				$text = $this->display_polls($text, $match);
+			}
+		}*/
 
 		$text = $this->youtube_privacy($text);
 

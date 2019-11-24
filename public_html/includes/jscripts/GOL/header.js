@@ -1172,10 +1172,12 @@ jQuery(document).ready(function()
 	$(document).on('click', "#preview_text_button", function() 
 	{
 		var text = $('.bbcode_editor').val();
-		$('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text}, function() {
-		$('.preview_pm').show();
-		$('#preview').scrollMinimal();
-		$('.preview_pm').highlight();
+		$('.pm_text_preview').load('/includes/ajax/call_bbcode.php', {'text':text}, function() 
+		{
+			$('.preview_pm').show();
+			$('.cocoen').cocoen();
+			$('#preview').scrollMinimal();
+			$('.preview_pm').highlight();
 		});
 	});
 	

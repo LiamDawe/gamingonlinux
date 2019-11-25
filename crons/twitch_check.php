@@ -6,7 +6,7 @@ Which then makes it super fast to query, since we're using a local copy.
 */
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/bootstrap.php";
+require APP_ROOT . "/includes/cron_bootstrap.php";
 
 // grab details of their stream, will be blank of they're not live (API limits ~30 per minute)
 $stream = core::file_get_contents_curl("https://api.twitch.tv/helix/streams?user_id=50905707", "GET", NULL, array("Client-ID: ". $core->config('twitch_dev_key')));

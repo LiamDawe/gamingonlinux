@@ -1,7 +1,7 @@
 <?php
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/bootstrap.php";
+require APP_ROOT . "/includes/cron_bootstrap.php";
 
 // get the last grouping_id, this is how we group together each new generation for easy edits and deletions
 $get_grouping_id = $dbl->run("SELECT `grouping_id` FROM `user_stats_charts` ORDER BY `id` DESC LIMIT 1")->fetch();

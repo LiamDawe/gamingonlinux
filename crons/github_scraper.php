@@ -6,7 +6,7 @@ TODO: Grab a list of Accounts to loop over, don't hardcode to one repo
 */
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/bootstrap.php";
+require APP_ROOT . "/includes/cron_bootstrap.php";
 
 echo "GitHub scraper started on " .date('d-m-Y H:m:s'). "\n";
 

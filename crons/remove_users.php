@@ -2,7 +2,7 @@
 // This cron is for when a user deletes their account, it will search for where they're quoted by another user and re-name them to "Guest"
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/bootstrap.php";
+require APP_ROOT . "/includes/cron_bootstrap.php";
 
 $get_users = $dbl->run("SELECT `user_id`, `username`, `remove_comments`, `remove_forum_posts` FROM `remove_users`")->fetch_all();
 if ($get_users)

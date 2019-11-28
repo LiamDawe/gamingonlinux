@@ -1,7 +1,7 @@
 <?php
 define("APP_ROOT", dirname(__FILE__));
 
-require APP_ROOT . "/includes/bootstrap.php";
+require APP_ROOT . "/includes/minimal_bootstrap.php";
 
 $charts = new charts($dbl);
 

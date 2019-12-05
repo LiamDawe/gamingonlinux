@@ -157,13 +157,12 @@ else
 
 						// email anyone subscribed which isn't you
 						$users_array = array();
-						$fetch_subs = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`secret_key`, u.email, u.username FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.send_email = 1 AND s.emails = 1 AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($topic_id, $_SESSION['user_id']))->fetch_all();
-						
+						$fetch_subs = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`display_comment_alerts` FROM `forum_topics_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`topic_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($topic_id, $_SESSION['user_id'], $_SESSION['user_id']))->fetch_all();
 						if ($fetch_subs)
 						{
 							foreach ($fetch_subs as $users_fetch)
 							{
-								if ($users_fetch['user_id'] != $_SESSION['user_id'] && $users_fetch['emails'] == 1)
+								if ($users_fetch['emails'] == 1 && $users_fetch['send_email'] == 1)
 								{
 									// use existing key, or generate any missing keys
 									if (empty($users_fetch['secret_key']))
@@ -180,40 +179,76 @@ else
 									$users_array[$users_fetch['user_id']]['username'] = $users_fetch['username'];
 									$users_array[$users_fetch['user_id']]['secret_key'] = $secret_key;
 								}
+
+								// notify them, if they haven't been quoted and already given one and they have comment notifications turned on
+								if ($users_fetch['display_comment_alerts'] == 1)
+								{
+									if (isset($new_notification_id['quoted_usernames']) && !in_array($users_fetch['username'], $new_notification_id['quoted_usernames']) || !isset($new_notification_id['quoted_usernames']))
+									{
+										$get_note_info = $dbl->run("SELECT `id`, `forum_topic_id`, `seen` FROM `user_notifications` WHERE `forum_topic_id` = ? AND `owner_id` = ? AND `type` != 'liked' AND `type` != 'quoted'", array($topic_id, $users_fetch['user_id']))->fetch();
+								
+										if (!$get_note_info)
+										{
+											$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `notifier_id` = ?, `forum_topic_id` = ?, `forum_reply_id` = ?, `total` = 1, `type` = 'forum_comment'", array($users_fetch['user_id'], (int) $_SESSION['user_id'], $topic_id, $post_id));
+											$new_notification_id[$users_fetch['user_id']] = $dbl->new_id();
+										}
+										else if ($get_note_info)
+										{
+											if ($get_note_info['seen'] == 1)
+											{
+												// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+												$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = 1, `seen_date` = NULL, `forum_reply_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$sql_date_now, $post_id, $get_note_info['id']));
+											}
+											else if ($get_note_info['seen'] == 0)
+											{
+												// they haven't seen the last one yet, so only update the time and date
+												$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$sql_date_now, $get_note_info['id']));
+											}
+								
+											$new_notification_id[$users_fetch['user_id']] = $get_note_info['id'];
+										}
+									}
+								}
 							}
 
 							// send the emails
-							foreach ($users_array as $email_user)
+							foreach ($users_array as $users_fetch)
 							{
+								$clear_note = '';
+								if (isset($new_notification_id[$users_fetch['user_id']]))
+								{
+									$clear_note = '/clear_note='.$new_notification_id[$users_fetch['user_id']];
+								}
+
 								$email_message = $bbcode->email_bbcode($message);
 
 								// subject
 								$subject = "New reply to forum post {$title['topic_title']} on GamingOnLinux.com";
 
 								// message
-								$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-								<p><strong>{$_SESSION['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "forum/topic/{$topic_id}/post_id={$post_id}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+								$html_message = "<p>Hello <strong>{$users_fetch['username']}</strong>,</p>
+								<p><strong>{$_SESSION['username']}</strong> has replied to a forum topic you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "forum/topic/{$topic_id}/post_id={$post_id}{$clear_note}\">{$title['topic_title']}</a></strong>\". There may be more replies after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 								<div>
 								<hr>
 								{$email_message}
 								<hr>
-								You can unsubscribe from this topic by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&topic_id={$topic_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.";
+								You can unsubscribe from this topic by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$users_fetch['user_id']}&topic_id={$topic_id}&email={$users_fetch['email']}&secret_key={$users_fetch['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.";
 								
-								$plain_message = "Hello {$email_user['username']}, {$_SESSION['username']} has replied to a forum topic you follow on titled {$title['topic_title']} find it here: " . $core->config('website_url') . 'forum/topic/' . $topic_id . '/post_id=' . $post_id;
+								$plain_message = "Hello {$users_fetch['username']}, {$_SESSION['username']} has replied to a forum topic you follow on titled {$title['topic_title']} find it here: " . $core->config('website_url') . 'forum/topic/' . $topic_id . '/post_id=' . $post_id . $clear_note;
 
 								// Mail it
 								if ($core->config('send_emails') == 1)
 								{
 									$mail = new mailer($core);
-									$mail->sendMail($email_user['email'], $subject, $html_message, $plain_message);
+									$mail->sendMail($users_fetch['email'], $subject, $html_message, $plain_message);
 								}
 
 								// remove anyones send_emails subscription setting if they have it set to email once
-								$update_sub = $dbl->run("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($email_user['user_id']))->fetch();
+								$update_sub = $dbl->run("SELECT `email_options` FROM `users` WHERE `user_id` = ?", array($users_fetch['user_id']))->fetch();
 
 								if ($update_sub['email_options'] == 2)
 								{
-									$dbl->run("UPDATE `forum_topics_subscriptions` SET `send_email` = 0 WHERE `topic_id` = ? AND `user_id` = ?", array($topic_id, $email_user['user_id']));
+									$dbl->run("UPDATE `forum_topics_subscriptions` SET `send_email` = 0 WHERE `topic_id` = ? AND `user_id` = ?", array($topic_id, $users_fetch['user_id']));
 								}
 							}
 						}

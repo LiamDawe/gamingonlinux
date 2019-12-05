@@ -12,6 +12,7 @@ $notification_types = [
 'editor_comment' => 	['text' => 'left a message in'],
 'editor_plan' => 		['text' => 'added a new article plan in'],
 'article_comment' => 	['text' => 'replied to'],
+'forum_comment' => 		['text' => 'replied to'],
 'liked' =>				['text' => 'liked your comment on'],
 'liked_forum_topic' =>  ['text' => 'liked your forum topic titled'],
 'liked_forum_reply' =>  ['text' => 'liked your forum post in the topic titled'],
@@ -110,7 +111,7 @@ if (!isset($_GET['go']))
 
 				// sort the actual link to the content
 				$link = '';
-				if ($note_list['type'] == 'quoted' || $note_list['type'] == 'article_comment' || $note_list['type'] == 'liked')
+				if ($note_list['type'] == 'quoted' || $note_list['type'] == 'article_comment' || $note_list['type'] == 'liked' || $note_list['type'] == 'forum_comment')
 				{
 					if (isset($note_list['article_id']) && !empty($note_list['article_id']))
 					{

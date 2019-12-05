@@ -805,7 +805,7 @@ else if (isset($_GET['go']))
 							- Make an array of anyone who needs an email now
 							- Additionally, send a notification to anyone subscribed
 							*/
-							$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($article_id, (int) $_SESSION['user_id'], (int) $_SESSION['user_id']))->fetch_all();
+							$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options`, u.`display_comment_alerts` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($article_id, (int) $_SESSION['user_id'], (int) $_SESSION['user_id']))->fetch_all();
 							$users_array = array();
 							foreach ($users_to_email as $email_user)
 							{
@@ -830,30 +830,33 @@ else if (isset($_GET['go']))
 									$users_array[$email_user['user_id']]['secret_key'] = $secret_key;
 								}
 
-								// notify them, if they haven't been quoted and already given one
-								if (isset($new_notification_id['quoted_usernames']) && !in_array($email_user['username'], $new_notification_id['quoted_usernames']) || !isset($new_notification_id['quoted_usernames']))
+								// notify them, if they haven't been quoted and already given one and they have comment notifications turned on
+								if ($email_user['display_comment_alerts'] == 1)
 								{
-									$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `type` != 'liked' AND `type` != 'quoted'", array($article_id, $email_user['user_id']))->fetch();
-
-									if (!$get_note_info)
+									if (isset($new_notification_id['quoted_usernames']) && !in_array($email_user['username'], $new_notification_id['quoted_usernames']) || !isset($new_notification_id['quoted_usernames']))
 									{
-										$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array($email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
-										$new_notification_id[$email_user['user_id']] = $dbl->new_id();
-									}
-									else if ($get_note_info)
-									{
-										if ($get_note_info['seen'] == 1)
-										{
-											// they already have one, refresh it as if it's literally brand new (don't waste the row id)
-											$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$sql_date_now, $new_comment_id, $get_note_info['id']));
-										}
-										else if ($get_note_info['seen'] == 0)
-										{
-											// they haven't seen the last one yet, so only update the time and date
-											$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$sql_date_now, $get_note_info['id']));
-										}
+										$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `type` != 'liked' AND `type` != 'quoted'", array($article_id, $email_user['user_id']))->fetch();
 
-										$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
+										if (!$get_note_info)
+										{
+											$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array($email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
+											$new_notification_id[$email_user['user_id']] = $dbl->new_id();
+										}
+										else if ($get_note_info)
+										{
+											if ($get_note_info['seen'] == 1)
+											{
+												// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+												$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$sql_date_now, $new_comment_id, $get_note_info['id']));
+											}
+											else if ($get_note_info['seen'] == 0)
+											{
+												// they haven't seen the last one yet, so only update the time and date
+												$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$sql_date_now, $get_note_info['id']));
+											}
+
+											$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
+										}
 									}
 								}
 							}

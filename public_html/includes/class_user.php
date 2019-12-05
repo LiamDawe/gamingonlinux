@@ -18,12 +18,36 @@ class user
 	public $blocked_usernames = []; // just blocked usernames for simple uses
 	public $blocked_tags = [0 => 0];
 
-	public $cookie_length = 60*60*24*60; // 30 days
+	public $cookie_domain = '';
+	public $cookie_days = 60;
+	public $expires_date = '';
 
 	function __construct($dbl, $core)
 	{
 		$this->db = $dbl;
 		$this->core = $core;
+
+		$this->expires_date = new DateTime('now');
+		$this->expires_date->add(new DateInterval('P'.$this->cookie_days.'D'));
+
+		if (empty($this->core->config('cookie_domain')))
+		{
+			$this->cookie_domain = NULL;
+		}
+		else
+		{
+			// if cookie is set to www., use NULL for cookie domain so it sets properly, otherwise cookie has a subdomain
+			$url = preg_replace("(^https?://)", "", $this->core->config('cookie_domain') );
+			if ($this->core->config('cookie_domain') == $url)
+			{
+				$this->cookie_domain = NULL;
+			}
+			else
+			{
+				$this->cookie_domain = $this->core->config('cookie_domain');
+			}
+		}
+
 		$this->grab_user_groups();
 		$this->check_session();
 		$this->block_list();
@@ -33,21 +57,16 @@ class user
 	// check their session is valid and register guest session if needed
 	function check_session()
 	{
-		$logout = 0;
-
 		if (!isset($_GET['Logout']))
 		{
 			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 			{
-				// we know it's numeric, but doubly be sure and don't allow any html
-				$safe_id = (int) $_SESSION['user_id'];
-
 				// check if they actually have any saved sessions, if they don't then logout to cancel everything
 				// this is also if we need to remove everyone being logged in due to any security issues
-				$session_exists = $this->db->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [$safe_id])->fetch();
+				$session_exists = $this->db->run("SELECT `user_id` FROM `saved_sessions` WHERE `user_id` = ?", [(int) $_SESSION['user_id']])->fetch();
 				if (!$session_exists)
 				{
-					$logout = 1;
+					$this->logout(0,1);
 				}
 				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
 
@@ -55,19 +74,13 @@ class user
 			}
 			else
 			{
-				if ($this->stay_logged_in() == false) // make a guest session if they aren't saved
+				if ($this->stay_logged_in() === false) // make a guest session if they aren't saved
 				{
 					$this->guest_session();
 				}
 			}
 
 			$this->user_groups = $this->get_user_groups();
-
-			if ($logout == 1)
-			{
-				$this->logout();
-				return;
-			}
 		}
 	}
 
@@ -93,25 +106,24 @@ class user
 				{
 					$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE (`username` = ? OR `email` = ?)", [$username, $username])->fetch();
 
-					$this->check_banned($this->user_details['user_id']);
+					$this->check_banned();
 
-					$generated_session = md5(time() . mt_rand() . $this->user_details['user_id']);
+					$lookup = base64_encode(random_bytes(9));
+					$validator = base64_encode(random_bytes(18));
 
 					// update IP address and last login
 					$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
 
-					$this->new_login($generated_session);
+					$this->new_login($lookup,$validator);
 
 					if ($stay == 1)
 					{
-						$cookie_domain = false; // allows cookies for localhost dev env
 						$secure = 0; // allows cookies for localhost dev env
 						if (!empty($this->core->config('cookie_domain')))
 						{
-							$cookie_domain = $this->core->config('cookie_domain');
 							$secure = 1;
 						}
-						setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain, $secure);
+						setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
 					}
 
 					return true;
@@ -171,6 +183,7 @@ class user
 		if (session_status() == PHP_SESSION_NONE) // not a bastard clue why it's not started sometimes for a few people
 		{
 			session_start();
+			error_log('Had to restart session; NEED TO FIX THIS. ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 		}
 		session_regenerate_id(true);
 
@@ -212,7 +225,6 @@ class user
 				$this->blocked_tags = [0 => 0];
 			}
 		}
-		//print_r($this->blocked_tags);
 	}
 
 	// return a list of group ids that have a particular permission
@@ -277,7 +289,7 @@ class user
 	}
 
 	// check if it's a new device, then set the session up
-	public function new_login($generated_session)
+	public function new_login($lookup, $validator)
 	{
 		// check if it's a new device straight away
 		$new_device = 0;
@@ -306,7 +318,7 @@ class user
 
 			if ($this->user_details['login_emails'] == 1 && $this->core->config('send_emails'))
 			{
-				setcookie('gol-device', $device_id, time()+$this->cookie_length, '/', $this->core->config('cookie_domain'), 1);
+				setcookie('gol-device', $device_id, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, 1, 1);
 
 				// send email about new device
 				$html_message = "<p>Hello <strong>" . $this->user_details['username'] . "</strong>,</p>
@@ -338,12 +350,8 @@ class user
 		}
 
 		// keeping a log of logins, to review at anytime
-		// TODO: need to implement user reviewing login history, would need to add login time for that, but easy as fook
-
-		$expires_date = new DateTime('now');
-		$expires_date->add(new DateInterval('P30D'));
-
-		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `session_id` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $generated_session, $user_agent, $device_id, date("Y-m-d"), $expires_date->format('Y-m-d H:i:s')));
+		// TODO: need to implement user reviewing login history, would need to add login time for that
+		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `lookup` = ?, `validator` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $lookup, hash('sha256', $validator), $user_agent, $device_id, date("Y-m-d"), $this->expires_date->format('Y-m-d H:i:s')));
 
 		$this->register_session();
 	}
@@ -353,76 +361,64 @@ class user
 	{
 		if (isset($_COOKIE['gol_session']))
 		{
-			$session_check = $this->db->run("SELECT `id`, `session_id`, `device-id`, `user_id`, `expires`, `browser_agent`, `date` FROM `saved_sessions` WHERE `session_id` = ? AND `expires` > NOW()", array($_COOKIE['gol_session']))->fetch();
-
-			if ($session_check)
+			if(strpos($_COOKIE['gol_session'], '.') !== false) 
 			{
-				// login then
-				$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($session_check['user_id']))->fetch();
+				$cookie_info = explode('.', $_COOKIE['gol_session']);
 
-				$this->check_banned();
+				$session_check = $this->db->run("SELECT `id`, `device-id`, `user_id`,`validator` FROM `saved_sessions` WHERE `lookup` = ? AND `expires` > NOW()", array($cookie_info[0]))->fetch();	
 
-				// update IP address and last login
-				$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
-
-				// update their stay logged in cookie with new details
-				$generated_session = md5(time() . mt_rand() . $this->user_details['user_id']);
-				$expires_date = new DateTime('now');
-				$expires_date->add(new DateInterval('P30D'));
-
-				$update_session_sql = "UPDATE
-				`saved_sessions`
-				SET
-				`session_id` = ?,
-				`expires` = ?,
-				`date` = ?
-				WHERE
-				`id` = ? AND `user_id` = ?";
-				$update_session_db = $this->db->run($update_session_sql, array($generated_session, $expires_date->format('Y-m-d H:i:s'), date("Y-m-d"), $session_check['id'], $session_check['user_id']));
-
-				$check_update = $update_session_db->rowcount();
-
-				// database was updated, so we can update the cookie
-				if($check_update == 1)
+				if ($session_check && hash_equals($session_check['validator'], hash('sha256', $cookie_info[1])))
 				{
-					$cookie_domain = false; // allows cookies for localhost dev env
-					$secure = 0; // allows cookies for localhost dev env
-					if (!empty($this->core->config('cookie_domain')))
+					// login then
+					$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($session_check['user_id']))->fetch();
+
+					$this->check_banned();
+
+					// update IP address and last login
+					$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
+
+					// update their stay logged in cookie with new details
+					$lookup = base64_encode(random_bytes(9));
+					$validator = base64_encode(random_bytes(18));
+
+					$update_session_sql = "UPDATE
+					`saved_sessions`
+					SET
+					`lookup` = ?,
+					`validator` = ?,
+					`expires` = ?,
+					`date` = ?
+					WHERE
+					`id` = ? AND `user_id` = ?";
+					$update_session_db = $this->db->run($update_session_sql, array($lookup, hash('sha256', $validator), $this->expires_date->format('Y-m-d H:i:s'), date("Y-m-d"), $session_check['id'], $session_check['user_id']));
+
+					$check_update = $update_session_db->rowcount();
+
+					// database was updated, so we can update the cookie
+					if($check_update == 1)
 					{
-						$cookie_domain = $this->core->config('cookie_domain');
-						$secure = 1;
+						$secure = 0; // allows cookies for localhost dev env
+						if (!empty($this->core->config('cookie_domain')))
+						{
+							$secure = 1;
+						}
+						setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
 					}
-					setcookie('gol_session', $generated_session, time()+$this->cookie_length, '/', $cookie_domain, $secure);
+
+					$this->register_session();
+
+					return true;
 				}
 				else
 				{
-					// let's be sure it didn't update in case of PHP/MySQL bugs
-					$true_check = $this->db->run("SELECT `session_id` FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($session_check['user_id'],$generated_session))->fetchOne();
+					setcookie('gol_session', "",  time()-60, '/');
+					setcookie('gol-device', "",  time()-60, '/');
 
-					if ($true_check)
-					{
-						$message = 'We did find that new session ID inserted. So this is a real bug, it was inserted and mysql told us it was not.';
-					}
-					else
-					{
-						$message = 'We did *not* find that new session ID inserted.';
-					}
-					
-					// get a list of all sessions for this user to look over
-					$see_all = $this->db->run("SELECT * FROM `saved_sessions` WHERE `user_id` = ?", array($session_check['user_id']))->fetch_all();
-
-					error_log("Couldn't update saved session for user_id " . $session_check['user_id'] . "\n" . "Current user session data: \n" . print_r($session_check, true) . "\nUser cookie data: " . $_COOKIE['gol_session'] . "\n Database info: " . print_r($update_session_db, true) . "\n" . $message . "\n" . "Here's their current session info from the DB" . "\n" . print_r($see_all, true));
+					return false;
 				}
-
-				$this->register_session();
-
-				return true;
 			}
 			else
 			{
-				setcookie('gol_session', "",  time()-60, '/');
-				setcookie('gol-device', "",  time()-60, '/');
-
 				return false;
 			}
 		}
@@ -437,9 +433,19 @@ class user
 	function logout($banned = 0, $redirect = 1)
 	{
 		// remove this specific session from the DB
-		if (isset($_SESSION['user_id']) && isset($_SESSION['session_id']))
+		if (isset($_SESSION['user_id']) && isset($_COOKIE['gol_session']))
 		{
-			$this->db->run("DELETE FROM `saved_sessions` WHERE `user_id` = ? AND `session_id` = ?", array($_SESSION['user_id'], $_SESSION['session_id']));
+			if(strpos($_COOKIE['gol_session'], '.') !== false) 
+			{
+				$cookie_info = explode('.', $_COOKIE['gol_session']);
+
+				$checker = $this->db->run("SELECT `id`, `validator` FROM `saved_sessions` WHERE `user_id` = ? AND `lookup` = ?", array($_SESSION['user_id'], $cookie_info[0]))->fetch();
+
+				if ($checker && hash_equals($checker['validator'], hash('sha256', $cookie_info[1])))
+				{
+					$this->db->run("DELETE FROM `saved_sessions` WHERE `id` = ?", array($checker['id']));
+				}
+			}
 		}
 
 		// remove all session information
@@ -458,8 +464,8 @@ class user
 
 		session_regenerate_id(true);
 
-		setcookie('gol_session', "", time()-60, '/', $this->core->config('cookie_domain'));
-		setcookie('gol-device', "", time()-60, '/', $this->core->config('cookie_domain'));
+		setcookie('gol_session', "", time()-60, '/', $this->cookie_domain);
+		setcookie('gol-device', "", time()-60, '/', $this->cookie_domain);
 
 		$this->user_details = [];
 

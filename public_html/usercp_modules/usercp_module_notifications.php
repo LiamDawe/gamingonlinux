@@ -34,178 +34,174 @@ if (!isset($_GET['go']))
 	$templating->block('top', 'usercp_modules/notifications');
 
 	$pagination = '';
-	$user_comment_alerts = $user->user_details['display_comment_alerts'];
-	if ($user_comment_alerts == 1)
+
+	// count how many there is in total
+	$total_notifications = $dbl->run("SELECT COUNT(`id`) FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `last_date`", array($_SESSION['user_id']))->fetchOne();
+
+	if ($total_notifications > 0)
 	{
-		// count how many there is in total
-		$total_notifications = $dbl->run("SELECT COUNT(`id`) FROM `user_notifications` WHERE `owner_id` = ? ORDER BY `seen`, `last_date`", array($_SESSION['user_id']))->fetchOne();
+		$pagination = $core->pagination_link(15, $total_notifications, "usercp.php?module=notifications&", $page);
 
-		if ($total_notifications > 0)
+		$unread_array = array();
+		$read_array = array();
+		// show the notifications here
+		$res_list = $dbl->run("SELECT
+		n.`id`,
+		n.`last_date`,
+		n.`article_id`,
+		n.`comment_id`,
+		n.`forum_topic_id`,
+		n.`forum_reply_id`,
+		n.`sale_game_id`,
+		n.`seen`,
+		n.`total`,
+		n.`type`,
+		u.`user_id`,
+		u.`username`,
+		u.`avatar_gallery`,
+		u.`avatar`,
+		u.`avatar_uploaded`,
+		a.`title`,
+		ft.`topic_title`,
+		c.`name`
+		FROM
+			`user_notifications` n
+		LEFT JOIN `users` u ON u.`user_id` = n.`notifier_id`
+		LEFT JOIN `articles` a ON n.`article_id` = a.`article_id`
+		LEFT JOIN `forum_topics` ft ON n.`forum_topic_id` = ft.`topic_id`
+		LEFT JOIN `calendar` c ON n.`sale_game_id` = c.id
+		WHERE n.`owner_id` = ?
+		ORDER BY n.`seen`, n.`last_date`
+		DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
+		foreach ($res_list as $note_list)
 		{
-			$pagination = $core->pagination_link(15, $total_notifications, "usercp.php?module=notifications&", $page);
-
-			$unread_array = array();
-			$read_array = array();
-			// show the notifications here
-			$res_list = $dbl->run("SELECT
-			n.`id`,
-			n.`last_date`,
-			n.`article_id`,
-			n.`comment_id`,
-			n.`forum_topic_id`,
-			n.`forum_reply_id`,
-			n.`sale_game_id`,
-			n.`seen`,
-			n.`total`,
-			n.`type`,
-			u.`user_id`,
-			u.`username`,
-			u.`avatar_gallery`,
-			u.`avatar`,
-			u.`avatar_uploaded`,
-			a.`title`,
-			ft.`topic_title`,
-			c.`name`
-			FROM
-				`user_notifications` n
-			LEFT JOIN `users` u ON u.`user_id` = n.`notifier_id`
-			LEFT JOIN `articles` a ON n.`article_id` = a.`article_id`
-			LEFT JOIN `forum_topics` ft ON n.`forum_topic_id` = ft.`topic_id`
-			LEFT JOIN `calendar` c ON n.`sale_game_id` = c.id
-			WHERE n.`owner_id` = ?
-			ORDER BY n.`seen`, n.`last_date`
-			DESC LIMIT ?, 15", array($_SESSION['user_id'], $core->start))->fetch_all();
-			foreach ($res_list as $note_list)
+			if ($note_list['seen'] == 0)
 			{
-				if ($note_list['seen'] == 0)
+				$icon = 'envelope';
+			}
+			else if ($note_list['seen'] == 1)
+			{
+				$icon = 'envelope-open';
+			}
+
+			if ($note_list['type'] != 'wishlist_sale')
+			{
+				if (!empty($note_list['username']))
 				{
-					$icon = 'envelope';
+					$username = $note_list['username'];
 				}
-				else if ($note_list['seen'] == 1)
-				{
-					$icon = 'envelope-open';
-				}
-
-				if ($note_list['type'] != 'wishlist_sale')
-				{
-					if (!empty($note_list['username']))
-					{
-						$username = $note_list['username'];
-					}
-					else
-					{
-						$username = 'Guest';
-					}
-
-					$avatar = $user->sort_avatar($note_list);
-
-					$additional_comments = '';
-					if ($note_list['total'] > 1)
-					{
-						$total = $note_list['total'] - 1;
-						$additional_comments = ' plus ' . $total . ' more';
-					}
-					else if ($note_list['total'] == 1 || $note_list['total'] == 0)
-					{
-						$additional_comments = '';
-					}
-
-					// sort the actual link to the content
-					$link = '';
-					if ($note_list['type'] == 'quoted' || $note_list['type'] == 'article_comment' || $note_list['type'] == 'liked')
-					{
-						if (isset($note_list['article_id']) && !empty($note_list['article_id']))
-						{
-							$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
-							$title = $note_list['title'];
-						}						
-
-						if (isset($note_list['forum_topic_id']) && !empty($note_list['forum_topic_id']))
-						{
-							$link = '/forum/topic/'.$note_list['forum_topic_id'].'/post_id='.$note_list['forum_reply_id'].'/clear_note='.$note_list['id'];
-							$title = $note_list['topic_title'];
-						}
-
-					}
-					if ($note_list['type'] == 'liked_forum_topic')
-					{
-						$link = '/forum/topic/'.$note_list['forum_topic_id'] . '/clear_note='.$note_list['id'];
-						$title = $note_list['topic_title'];
-					}
-					if ($note_list['type'] == 'liked_forum_reply')
-					{
-						$link = '/forum/topic/'.$note_list['forum_topic_id'] . '/post_id=' . $note_list['forum_reply_id'] . '/clear_note='.$note_list['id'];
-						$title = $note_list['topic_title'];
-					}
-					if ($note_list['type'] == 'admin_comment' || $note_list['type'] == 'editor_comment' || $note_list['type'] == 'editor_plan')
-					{
-						$link = '/admin.php?wipe_note=' . $note_list['id'];
-						$title = 'the admin area';
-					}
-
-					$note_row = $templating->block_store('plain_row', 'usercp_modules/notifications');
-
-					$note_row = $templating->store_replace($note_row, array(
-						'id' => $note_list['id'],
-						'icon' => $icon,
-						'link' => $link,
-						'avatar' => $avatar,
-						'username' => $username,
-						'profile_link' => '/profiles/' . $note_list['user_id'],
-						'action_text' => $notification_types[$note_list['type']]['text'],
-						'title' => $title,
-						'additional_comments' => $additional_comments,
-						'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
-				}
-
 				else
 				{
-					$note_row = $templating->block_store('wishlist_sale_row', 'usercp_modules/notifications');
-
-					$link = '/sales.php?game_id='.$note_list['sale_game_id'].'&amp;clear_note=' . $note_list['id'];
-					$title = $note_list['name'];
-
-					$note_row = $templating->store_replace($note_row, array(
-						'id' => $note_list['id'],
-						'icon' => $icon,
-						'link' => $link,
-						'action_text' => $notification_types[$note_list['type']]['text'],
-						'title' => $title,
-						'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
+					$username = 'Guest';
 				}
 
-				if ($note_list['seen'] == 0)
+				$avatar = $user->sort_avatar($note_list);
+
+				$additional_comments = '';
+				if ($note_list['total'] > 1)
 				{
-					$unread_array[] = $note_row;
+					$total = $note_list['total'] - 1;
+					$additional_comments = ' plus ' . $total . ' more';
 				}
-				else if ($note_list['seen'] == 1)
+				else if ($note_list['total'] == 1 || $note_list['total'] == 0)
 				{
-					$read_array[] = $note_row;
+					$additional_comments = '';
 				}
+
+				// sort the actual link to the content
+				$link = '';
+				if ($note_list['type'] == 'quoted' || $note_list['type'] == 'article_comment' || $note_list['type'] == 'liked')
+				{
+					if (isset($note_list['article_id']) && !empty($note_list['article_id']))
+					{
+						$link = '/index.php?module=articles_full&amp;aid=' . $note_list['article_id'] . '&amp;comment_id=' . $note_list['comment_id'] . '&amp;clear_note=' . $note_list['id'];
+						$title = $note_list['title'];
+					}						
+
+					if (isset($note_list['forum_topic_id']) && !empty($note_list['forum_topic_id']))
+					{
+						$link = '/forum/topic/'.$note_list['forum_topic_id'].'/post_id='.$note_list['forum_reply_id'].'/clear_note='.$note_list['id'];
+						$title = $note_list['topic_title'];
+					}
+
+				}
+				if ($note_list['type'] == 'liked_forum_topic')
+				{
+					$link = '/forum/topic/'.$note_list['forum_topic_id'] . '/clear_note='.$note_list['id'];
+					$title = $note_list['topic_title'];
+				}
+				if ($note_list['type'] == 'liked_forum_reply')
+				{
+					$link = '/forum/topic/'.$note_list['forum_topic_id'] . '/post_id=' . $note_list['forum_reply_id'] . '/clear_note='.$note_list['id'];
+					$title = $note_list['topic_title'];
+				}
+				if ($note_list['type'] == 'admin_comment' || $note_list['type'] == 'editor_comment' || $note_list['type'] == 'editor_plan')
+				{
+					$link = '/admin.php?wipe_note=' . $note_list['id'];
+					$title = 'the admin area';
+				}
+
+				$note_row = $templating->block_store('plain_row', 'usercp_modules/notifications');
+
+				$note_row = $templating->store_replace($note_row, array(
+					'id' => $note_list['id'],
+					'icon' => $icon,
+					'link' => $link,
+					'avatar' => $avatar,
+					'username' => $username,
+					'profile_link' => '/profiles/' . $note_list['user_id'],
+					'action_text' => $notification_types[$note_list['type']]['text'],
+					'title' => $title,
+					'additional_comments' => $additional_comments,
+					'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 			}
 
-			if (!empty($unread_array))
+			else
 			{
-				$templating->block('unread', 'usercp_modules/notifications');
-				$templating->set('unread_list', implode('', $unread_array));
+				$note_row = $templating->block_store('wishlist_sale_row', 'usercp_modules/notifications');
+				$link = '/sales.php?game_id='.$note_list['sale_game_id'].'&amp;clear_note=' . $note_list['id'];
+				$title = $note_list['name'];
+
+				$note_row = $templating->store_replace($note_row, array(
+					'id' => $note_list['id'],
+					'icon' => $icon,
+					'link' => $link,
+					'action_text' => $notification_types[$note_list['type']]['text'],
+					'title' => $title,
+					'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 			}
 
-			if (!empty($read_array))
+			if ($note_list['seen'] == 0)
 			{
-				$templating->block('read', 'usercp_modules/notifications');
-				$templating->set('read_list', implode('', $read_array));
+				$unread_array[] = $note_row;
+			}
+			else if ($note_list['seen'] == 1)
+			{
+				$read_array[] = $note_row;
 			}
 		}
-		else
+
+		if (!empty($unread_array))
 		{
-			$templating->block('none', 'usercp_modules/notifications');
+			$templating->block('unread', 'usercp_modules/notifications');
+			$templating->set('unread_list', implode('', $unread_array));
 		}
 
-		$templating->block('bottom', 'usercp_modules/notifications');
-
-		// sort out the pagination link
-		$templating->set('pagination', $pagination);
+		if (!empty($read_array))
+		{
+			$templating->block('read', 'usercp_modules/notifications');
+			$templating->set('read_list', implode('', $read_array));
+		}
 	}
+	else
+	{
+		$templating->block('none', 'usercp_modules/notifications');
+	}
+
+	$templating->block('bottom', 'usercp_modules/notifications');
+
+	// sort out the pagination link
+	$templating->set('pagination', $pagination);
 }
 
 else if (isset($_GET['go']))

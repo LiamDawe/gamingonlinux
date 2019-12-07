@@ -187,15 +187,18 @@ else if (isset($_POST['action']))
 
 					$path = substr($parse_url['path'], 1); // remove the slash at the start so we don't double up
 					header("Location: ".$core->config('website_url').$path.$extra);
+					die();
 				}
 				else
 				{
 					header("Location: ".$core->config('website_url'));
+					die();
 				}
 			}
 			else
 			{
 				header("Location: ".$core->config('website_url'));
+				die();
 			}
 		}
 
@@ -203,6 +206,7 @@ else if (isset($_POST['action']))
 		{
 			$_SESSION['login_error_username'] = htmlspecialchars($_POST['username']);
 			header("Location: ".$core->config('website_url')."index.php?module=login");
+			die();
 		}
 	}
 
@@ -213,6 +217,7 @@ else if (isset($_POST['action']))
 		if (!$check_res)
 		{
 			header("Location: ".$core->config('website_url')."index.php?module=login&forgot&bademail");
+			die();
 		}
 
 		else

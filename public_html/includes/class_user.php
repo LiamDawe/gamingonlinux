@@ -52,6 +52,17 @@ class user
 		$this->check_session();
 		$this->block_list();
 		$this->blocked_homepage_tags();
+
+		if (isset($_COOKIE['tracking_test']) && !isset($_COOKIE['gol_session']))
+		{
+			$ref = '';
+
+			if (isset($_SERVER['HTTP_REFERER']))
+			{
+				$ref = $_SERVER['HTTP_REFERER'];
+			}
+			error_log("SESSION COOKIE VANISHED: " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . ' REFERRING URL: ' . $ref);
+		}
 	}
 
 	// check their session is valid and register guest session if needed
@@ -124,6 +135,7 @@ class user
 							$secure = 1;
 						}
 						setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
+						setcookie('tracking_test', 'testing for login issues - ignore this', $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
 					}
 
 					return true;
@@ -411,9 +423,6 @@ class user
 				}
 				else
 				{
-					setcookie('gol_session', "",  time()-60, '/');
-					setcookie('gol-device', "",  time()-60, '/');
-
 					return false;
 				}
 			}
@@ -466,6 +475,7 @@ class user
 
 		setcookie('gol_session', "", time()-60, '/', $this->cookie_domain);
 		setcookie('gol-device', "", time()-60, '/', $this->cookie_domain);
+		setcookie('tracking_test', "", time()-60, '/', $this->cookie_domain);
 
 		$this->user_details = [];
 
@@ -564,20 +574,16 @@ class user
 	// give them a cake icon if they have been here for x years
 	public function cake_day($reg_date, $username)
 	{
-		global $core;
-
-		$this_year = date('Y');
-
-		// sort date to correct format
-		$reg_year = date('Y', $reg_date);
-		$reg_month = date('m', $reg_date);
-		$reg_day = date('d', $reg_date);
-
+		$date1 = new DateTime();
+		$date1->setTimestamp($reg_date);
+		
+		$date2 = new DateTime();
+		
 		$cake_icon = '';
-		if ($reg_month == date('m') && $reg_day == date('d') && $reg_year != date('Y'))
+		if ($date1->format('d-m') === $date2->format('d-m')) 
 		{
 			// calculate how many years
-			$total_years = date('Y') - $reg_year;
+			$total_years = $date1->diff($date2)->format('%y');
 
 			$cake_icon = '<img src="/templates/default/images/cake.png" alt="'.$total_years.' years" class="tooltip-top" title="'.$username.' has been here for '.$total_years.' years" />';
 		}

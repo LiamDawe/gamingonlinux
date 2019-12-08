@@ -2,7 +2,7 @@
 return [
 	"exists" => 
 	[
-		"text" => 'That game already exists, <a href="'.core::config('website_url').'index.php?module=game&game-id=%d">click here to view it.</a>',
+		"text" => 'That game already exists, <a href="/index.php?module=game&game-id=%d">click here to view it.</a>',
 		"additions" => 1,
 		"error" => 1
 	],

@@ -3,6 +3,8 @@ define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
 require APP_ROOT . "/includes/cron_bootstrap.php";
 
+$user = new user($dbl, $core);
+
 // TODO
 /*
 NEED TO ADJUST SUPPORTER PLUS, TO TAKE INTO ACCOUNT MULTIPLE PAYMENTS

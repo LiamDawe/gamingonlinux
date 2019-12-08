@@ -155,3 +155,5 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^articles/category/(.+?)/page\=([0-9]+)?$ /index.php?module=articles&view=cat&catid=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^articles/category/(.+?)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA]
+  
+  RewriteRule ^itemdb/([0-9]+)/?$ /index.php?module=items_database&view=item&id=$1 [N,NC,QSA]

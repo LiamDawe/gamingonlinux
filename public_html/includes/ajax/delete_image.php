@@ -13,35 +13,66 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 
 if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 {
-	$qry1 = "SELECT `id`, `filename`, `filetype`,`youtube_cache`, `uploader_id` FROM `article_images` WHERE `id` = ?";
+	if (isset($_POST['type']) && $_POST['type'] == 'itemdb')
+	{
+		$qry1 = "SELECT `filename`, `item_id` FROM `itemdb_images` WHERE `id` = ?";
+		$qry2 = "DELETE FROM `itemdb_images` WHERE `id` = ?";
+	}
+	else
+	{
+		$qry1 = "SELECT `id`, `filename`, `filetype`,`youtube_cache`, `uploader_id` FROM `article_images` WHERE `id` = ?";
+		$qry2 = "DELETE FROM `article_images` WHERE `id` = ?";
+	}
 	$grabber = $dbl->run($qry1, array($_POST['image_id']))->fetch();
-
-	$qry2 = "DELETE FROM `article_images` WHERE `id` = ?";
 	$result = $dbl->run($qry2, array($_POST['image_id']));
 	if(isset($result))
 	{
-		if ($grabber['youtube_cache'] == 0)
+		if (isset($_POST['type']) && $_POST['type'] == 'itemdb')
 		{
-			unlink(APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename']);
-
-			if ($grabber['filetype'] == 'gif')
+			if ($grabber['item_id'] > 0)
 			{
-				$static_filename = str_replace('.gif', '_static.jpg', $grabber['filename']);
-				unlink(APP_ROOT . '/uploads/articles/article_media/' . $static_filename);
+				$main = APP_ROOT . '/uploads/gamesdb/big/' . $grabber['item_id'] . '/' . $grabber['filename'];
+				$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/' . $grabber['item_id'] . '/' . $grabber['filename'];
 			}
-			if (file_exists(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']))
+			else
 			{
-				unlink(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']);
+				$main = APP_ROOT . '/uploads/gamesdb/big/tmp/' . $grabber['filename'];
+				$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/tmp/' . $grabber['filename'];				
+			}
+
+			if (file_exists($main))
+			{
+				unlink($main);
+			}
+			if (file_exists($thumb))
+			{
+				unlink($thumb);
 			}
 		}
 		else
 		{
-			if (file_exists(APP_ROOT . '/cache/youtube_thumbs/' . $grabber['filename']))
+			if ($grabber['youtube_cache'] == 0)
 			{
-				unlink(APP_ROOT . '/cache/youtube_thumbs/' . $grabber['filename']);
-			}				
+				unlink(APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename']);
+
+				if ($grabber['filetype'] == 'gif')
+				{
+					$static_filename = str_replace('.gif', '_static.jpg', $grabber['filename']);
+					unlink(APP_ROOT . '/uploads/articles/article_media/' . $static_filename);
+				}
+				if (file_exists(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']))
+				{
+					unlink(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']);
+				}
+			}
+			else
+			{
+				if (file_exists(APP_ROOT . '/cache/youtube_thumbs/' . $grabber['filename']))
+				{
+					unlink(APP_ROOT . '/cache/youtube_thumbs/' . $grabber['filename']);
+				}				
+			}
 		}
-		unset($_SESSION['uploads'][$grabber['id']]);
 		echo "YES";
 	}
 

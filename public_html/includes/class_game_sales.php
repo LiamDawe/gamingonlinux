@@ -978,9 +978,31 @@ class game_sales
 	{
 		foreach($uploads as $key)
 		{
-			echo $key;
 			$this->dbl->run("UPDATE `itemdb_images` SET `item_id` = ? WHERE `id` = ?", array($item_id, $key));
+
+			$filename = $this->dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `id` = ?", array($key))->fetchOne();
+
+			$uploaddir = APP_ROOT . "/uploads/gamesdb/big/" . $item_id;
+			$thumbs_dir = APP_ROOT . "/uploads/gamesdb/big/thumbs/" . $item_id;
+
+			if (!is_dir($uploaddir))
+			{
+				mkdir($uploaddir, 0777);
+			}
+		
+			if (!is_dir($thumbs_dir))
+			{
+				mkdir($thumbs_dir, 0777);
+			}
+
+			$tmp_full_file_big = APP_ROOT . "/uploads/gamesdb/big/tmp/" . $filename;
+			$full_file_big = $uploaddir . '/' . $filename;
+
+			$tmp_full_file_thumbnail = APP_ROOT . "/uploads/gamesdb/big/thumbs/tmp/" . $filename;
+			$full_file_thumbnail = $thumbs_dir . '/' . $filename;
+
+			rename($tmp_full_file_big, $full_file_big);
+			rename($tmp_full_file_thumbnail, $full_file_thumbnail);
 		}
-		die();
 	}
 }

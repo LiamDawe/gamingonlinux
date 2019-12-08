@@ -97,7 +97,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 		$core->article_editor(['content' => '']);
 
+		$previous_uploads = $games_database->display_previous_uploads(NULL);
+
 		$templating->block('add_bottom', 'admin_modules/games');
+		$templating->set('hidden_upload_fields', $previous_uploads['hidden']);
+
+		$templating->block('uploads', 'admin_modules/games');
+		$templating->set('item_id', 0);
+		$templating->set('previously_uploaded', $previous_uploads['output']);
 	}
 	// add a developer/publisher to the database
 	if ($_GET['view'] == 'add_developer')
@@ -318,9 +325,15 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 				$core->article_editor(['content' => $text]);
 
+				$previous_uploads = $games_database->display_previous_uploads($game['id']);
+
 				$templating->block('edit_bottom', 'admin_modules/games');
 				$templating->set('return', $return);
 				$templating->set('id', $game['id']);
+
+				$templating->block('uploads', 'admin_modules/games');
+				$templating->set('item_id', $game['id']);
+				$templating->set('previously_uploaded', $previous_uploads['output']);
 			}
 		}
 	}
@@ -527,6 +540,8 @@ if (isset($_POST['act']))
 	// for the action of adding, editing and approving new items
 	if ($_POST['act'] == 'Add' || $_POST['act'] == 'Edit' || $_POST['act'] == 'Approve')
 	{
+		$redirect_error = 0;
+
 		$name = trim($_POST['name']);
 		$description = trim($_POST['text']);
 		$date = trim($_POST['date']);
@@ -570,8 +585,7 @@ if (isset($_POST['act']))
 		{
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = $empty_check;
-			header("Location: $error_page");
-			die();
+			$redirect_error = 1;
 		}
 
 		if ($_POST['act'] == 'Add')
@@ -589,6 +603,16 @@ if (isset($_POST['act']))
 		if (empty($link) && empty($steam_link) && empty($gog_link) && empty($itch_link))
 		{
 			$_SESSION['message'] = 'one_link_needed';
+			$redirect_error = 1;
+		}
+
+		if ($redirect_error == 1)
+		{
+			if (isset($_POST['uploads']))
+			{
+				$_SESSION['itemdb']['uploads'] = $_POST['uploads'];
+			}
+
 			header("Location: $error_page");
 			die();
 		}
@@ -653,6 +677,12 @@ if (isset($_POST['act']))
 	
 			$core->process_game_genres($new_id);
 			$games_database->process_developers($new_id);
+
+			// attach uploaded media to this item id
+			if (isset($_POST['uploads']))
+			{
+				$games_database->move_tmp_media($_POST['uploads'], $new_id);
+			}
 	
 			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
 			{
@@ -703,6 +733,8 @@ if (isset($_POST['act']))
 		
 			$_SESSION['message'] = 'submit_approved';	
 		}
+
+		unset($_SESSION['itemdb']); // remove anything left from errors now we're done
 
 		header("Location: $finish_page");
 		die();
@@ -1012,6 +1044,7 @@ if (isset($_POST['act']))
 			else
 			{
 				header("Location: /index.php?module=calendar");
+				die();
 			}
 		}
 
@@ -1041,6 +1074,8 @@ if (isset($_POST['act']))
 
 			$dbl->run("DELETE FROM `calendar` WHERE `id` = ?", array($_GET['id']));
 
+			$dbl->run("DELETE FROM `itemdb_calendar` WHERE `item_id` = ?", array($_GET['id']));
+
 			// delete any tags attached to it
 			$dbl->run("DELETE FROM `game_genres_reference` WHERE `game_id` = ?", [$_GET['id']]);
 
@@ -1050,6 +1085,23 @@ if (isset($_POST['act']))
 			// remove article associations
 			$dbl->run("DELETE FROM `article_item_assoc` WHERE `game_id` = ?", [$_GET['id']]);
 
+			// remove uploaded media
+			$grab_all = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `item_id` = ?", array($_GET['id']))->fetch_all();
+			foreach ($grab_all as $grabber)
+			{
+				$main = APP_ROOT . '/uploads/gamesdb/big/' . $_GET['id'] . '/' . $grabber['filename'];
+				$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/' . $_GET['id'] . '/' . $grabber['filename'];
+				if (file_exists($main))
+				{
+					unlink($main);
+				}
+				if (file_exists($thumb))
+				{
+					unlink($thumb);
+				}	
+			}
+			$dbl->run("DELETE FROM `itemdb_images` WHERE `item_id` = ?", array($_GET['id']));
+
 			// note who deleted it
 			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted an item from the games database: ' . $info['name'] . '.'));	
 
@@ -1057,18 +1109,25 @@ if (isset($_POST['act']))
 			{
 				if ($_GET['return'] == 'submitted')
 				{
+					$_SESSION['message'] = 'deleted';
+					$_SESSION['message_extra'] = 'item';
 					header("Location: /admin.php?module=calendar&view=submitted&message=deleted");
 					die();
 				}
-				if ($_GET['return'] == 'game')
+				if ($_GET['return'] == 'game' || $_GET['return'] == 'view_item')
 				{
-					header("Location: /index.php?module=calendar&message=deleted");
+					$_SESSION['message'] = 'deleted';
+					$_SESSION['message_extra'] = 'item';
+					header("Location: /index.php?module=calendar");
 					die();
 				}
 			}
 			else
 			{
+				$_SESSION['message'] = 'deleted';
+				$_SESSION['message_extra'] = 'item';
 				header("Location: /index.php?module=calendar&message=deleted");
+				die();
 			}
 		}
 	}

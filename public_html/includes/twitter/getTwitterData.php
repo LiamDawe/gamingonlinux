@@ -68,13 +68,14 @@ if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUES
 
 			$user->check_banned($userdata['user_id']);
 
-			$generated_session = md5(mt_rand() . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+			$lookup = base64_encode(random_bytes(9));
+			$validator = base64_encode(random_bytes(18));
 
-			$user->new_login($generated_session);
+			$user->new_login($lookup,$validator);
 
 			if ($userdata['social_stay_cookie'] == 1)
 			{
-				setcookie('gol_session', $generated_session, time()+$cookie_length, '/', $core->config('cookie_domain'));
+				setcookie('gol_session', $validator . '.' . $validator, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1, 1);
 			}
 
 			header("Location: " . $core->config('website_url'));

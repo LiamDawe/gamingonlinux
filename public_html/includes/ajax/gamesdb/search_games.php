@@ -23,6 +23,10 @@ if(isset($_GET['q']) && isset($_GET['type']))
 	{
 		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `id` NOT IN (SELECT `dupe_id` FROM `item_dupes`) ORDER BY `name` ASC ";	
 	}
+	if (isset($_GET['type']) && $_GET['type'] == 'all_nodlc')
+	{
+		$sql = "SELECT `name` FROM `calendar` WHERE `name` LIKE ? AND `is_dlc` = 0 AND `id` NOT IN (SELECT `dupe_id` FROM `item_dupes`) ORDER BY `name` ASC ";	
+	}
 
 	$get_data = $dbl->run($sql, [$game_search])->fetch_all();
 

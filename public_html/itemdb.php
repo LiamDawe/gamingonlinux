@@ -58,55 +58,66 @@ if (isset($_SESSION['message']))
 	$message_map->display_message('sales_page', $_SESSION['message'], $extra);
 }
 
-$templating->load('games_list');
+$templating->load('itemdb');
+
+$templating->block('itemdb_navigation', 'itemdb');
 
 // count the total
 $total_games = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `supports_linux` = 1 AND `approved` = 1 AND `is_emulator` = 0 AND `is_application` = 0 AND `bundle` = 0 AND `also_known_as` IS NULL")->fetchOne();
-
-$templating->block('top', 'games_list');
 $templating->set('total', $total_games);
 
-$game_sales->display_all_games();
-
-$templating->block('filters', 'games_list');
-
-$filters = [];
-foreach (range('A', 'Z') as $letter) 
+// LANDING PAGE TODO - NEED TO UPDATE ALL SEARCHES TO $_GET['view'] == 'mainlist'
+if (!isset($_GET['view']))
 {
-    $filters[] = '<option value="'.$letter.'">' . $letter . '</option>';
+	$templating->block('featured', 'itemdb');
 }
-$templating->set('alpha_filters', implode(' ', $filters));
 
-// genre checkboxes
-$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id FROM `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by cat.category_name, cat.category_id")->fetch_all();
-$genres_output = '';
-foreach ($genres_res as $genre)
+if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 {
-	$checked = '';
-	if (isset($filters_sort['genres']) && in_array($genre['category_id'], $filters_sort['genres']))
-	{
-		$checked = 'checked';
-	}
-	$total = '';
-	if ($genre['total'] > 0)
-	{
-		$total = ' <small>('.$genre['total'].')</small>';
-	}
-	$genres_output .= '<li><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
-}
-$templating->set('genres_output', $genres_output);
+	$templating->block('top', 'itemdb');
+	
+	$game_sales->display_all_games();
 
-$licenses = ['BSD', 'GPL', 'MIT', 'Closed Source'];
-$licenses_output = '';
-foreach ($licenses as $license)
-{
-	$checked = '';
-	if (isset($filters_sort['license']) && in_array($license['id'], $filters_sort['license']))
+	$templating->block('filters', 'itemdb');
+
+	$filters = [];
+	foreach (range('A', 'Z') as $letter) 
 	{
-		$checked = 'checked';
+		$filters[] = '<option value="'.$letter.'">' . $letter . '</option>';
 	}
-	$licenses_output .= '<li><label><input type="checkbox" name="licenses[]" value="'.$license.'" '.$checked.'> '.$license.'</label></li>';	
+	$templating->set('alpha_filters', implode(' ', $filters));
+
+	// genre checkboxes
+	$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id FROM `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by cat.category_name, cat.category_id")->fetch_all();
+	$genres_output = '';
+	foreach ($genres_res as $genre)
+	{
+		$checked = '';
+		if (isset($filters_sort['genres']) && in_array($genre['category_id'], $filters_sort['genres']))
+		{
+			$checked = 'checked';
+		}
+		$total = '';
+		if ($genre['total'] > 0)
+		{
+			$total = ' <small>('.$genre['total'].')</small>';
+		}
+		$genres_output .= '<li><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
+	}
+	$templating->set('genres_output', $genres_output);
+
+	$licenses = ['BSD', 'GPL', 'MIT', 'Closed Source'];
+	$licenses_output = '';
+	foreach ($licenses as $license)
+	{
+		$checked = '';
+		if (isset($filters_sort['license']) && in_array($license['id'], $filters_sort['license']))
+		{
+			$checked = 'checked';
+		}
+		$licenses_output .= '<li><label><input type="checkbox" name="licenses[]" value="'.$license.'" '.$checked.'> '.$license.'</label></li>';	
+	}
+	$templating->set('licenses_output', $licenses_output);
 }
-$templating->set('licenses_output', $licenses_output);
 
 include(APP_ROOT . '/includes/footer.php');

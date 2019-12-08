@@ -77,6 +77,33 @@ foreach ($grab_all as $grabber)
 $dbl->run("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($stamp));
 
 /*
+REMOVE TEMP ITEMDB UPLOADS
+*/
+
+$itemdb_timeout = 86400; // 1 day
+
+$stamp = time() - $itemdb_timeout;
+
+$sql_date = date('Y/m/d H:i:s', $stamp);
+
+$grab_all = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `date_uploaded` < ? AND `item_id` = 0 OR `item_id` IS NULL", array($sql_date))->fetch_all();
+foreach ($grab_all as $grabber)
+{
+	$main = APP_ROOT . '/uploads/gamesdb/big/tmp/' . $grabber['filename'];
+	$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/tmp/' . $grabber['filename'];
+	if (file_exists($main))
+	{
+		unlink($main);
+	}
+	if (file_exists($thumb))
+	{
+		unlink($thumb);
+	}
+}
+
+$dbl->run("DELETE FROM `itemdb_images` WHERE `date_uploaded` < ? AND `item_id` = 0 OR `item_id` IS NULL", array($sql_date));
+
+/*
 REMOVE EXPIRED EDITOR PICKS
 */
 $featured = $dbl->run("SELECT p.`article_id`, p.`featured_image`, p.hits, a.date, a.title FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE p.`end_date` < now()")->fetch_all();

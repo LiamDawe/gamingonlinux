@@ -244,10 +244,11 @@ if ($core->config('allow_registrations') == 1)
 
 				// get the users info to log them in right away!
 				$user->user_details = $dbl->run("SELECT ".$user::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($last_id))->fetch();
+				
+				$lookup = base64_encode(random_bytes(9));
+				$validator = base64_encode(random_bytes(18));
 					
-				$generated_session = md5(mt_rand() . $last_id . $_SERVER['HTTP_USER_AGENT']);
-					
-				$user->new_login($generated_session);
+				$user->new_login($lookup,$validator);
 
 				// subject
 				$subject = 'Welcome to GamingOnLinux, activation needed!';

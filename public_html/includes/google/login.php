@@ -76,13 +76,14 @@ if (isset($_GET['code']))
 
 		$user->check_banned();
 
-		$generated_session = md5(mt_rand()  . $userdata['user_id'] . $_SERVER['HTTP_USER_AGENT']);
+		$lookup = base64_encode(random_bytes(9));
+		$validator = base64_encode(random_bytes(18));
 
-		$user->new_login($generated_session);
+		$user->new_login($lookup,$validator);
 
 		if ($userdata['social_stay_cookie'] == 1)
 		{
-			setcookie('gol_session', $generated_session, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1);
+			setcookie('gol_session', $lookup . '.' . $validator, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1);
 		}
 
 		header("Location: /");

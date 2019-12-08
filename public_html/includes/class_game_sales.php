@@ -289,9 +289,9 @@ class game_sales
 	// free games list needs merging with this, to have free games auto ticked - less code dupe, only place for all
 	function display_all_games($filters = NULL)
 	{
-		$this->templating->load('games_list');
+		$this->templating->load('itemdb');
 
-		$this->templating->block('list_top', 'games_list');
+		$this->templating->block('list_top', 'itemdb');
 
 		// for non-ajax requests
 		if (isset($_GET['option']) && is_array($_GET['option']) && $filters == NULL)
@@ -367,7 +367,7 @@ class game_sales
 			$merged_arrays = array_merge([$where], $genre_ids, $licenses);
 
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c WHERE $sql_where c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 ORDER BY c.`name` ASC", [$where])->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?', $page, $link_extra);	
+			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?view=mainlist&', $page, $link_extra);	
 
 			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE $sql_where c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 AND c.`supports_linux` = 1 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
 		}
@@ -375,7 +375,7 @@ class game_sales
 		{
 			$merged_arrays = array_merge($genre_ids, $licenses);
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 AND c.`supports_linux` = 1 $options_sql ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
-			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?', $page, $link_extra);
+			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?view=mainlist&', $page, $link_extra);
 
 			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
 		}
@@ -474,7 +474,7 @@ class game_sales
 			$this->core->message("We aren't finding any games at the moment, try a different filtering option? Or come back soon!");
 		}
 
-		$this->templating->block('bottom', 'games_list');
+		$this->templating->block('bottom', 'itemdb');
 		if ($pagination != '')
 		{
 			$pagination = '<div class="games-pagination">'.$pagination.'</div>';
@@ -915,5 +915,72 @@ class game_sales
 				}
 			}
 		}
+	}
+
+	function display_previous_uploads($item_id = NULL)
+	{
+		$previously_uploaded['output'] = '';
+		$previously_uploaded['hidden'] = '';
+		$item_images = NULL;
+		if ($item_id != NULL)
+		{
+			// add in uploaded images from database
+			$item_images = $this->dbl->run("SELECT `filename`,`id`,`filetype`,`item_id` FROM `itemdb_images` WHERE `item_id` = ? ORDER BY `id` ASC", array($item_id))->fetch_all();
+		}
+		else
+		{
+			if (isset($_SESSION['itemdb']['uploads']))
+			{
+				$image_ids = [];
+				foreach ($_SESSION['itemdb']['uploads'] as $id)
+				{
+					$image_ids[] = $id;
+				}
+				unset($_SESSION['itemdb']['uploads']);
+				$in  = str_repeat('?,', count($image_ids) - 1) . '?';
+				$item_images = $this->dbl->run("SELECT `filename`,`id`,`filetype` FROM `itemdb_images` WHERE `id` IN ($in) ORDER BY `id` ASC", $image_ids)->fetch_all();
+			}
+		}
+		if ($item_images)
+		{
+			foreach($item_images as $value)
+			{
+				if ($item_id == NULL)
+				{
+					$previously_uploaded['hidden'] .= '<input class="uploads-'.$value['id'].'" type="hidden" name="uploads[]" value="'.$value['id'].'" />';
+					$item_dir = 'tmp/';
+				}
+				else
+				{
+					$item_dir = $item_id . '/';
+				}
+
+				$thumbs_dir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/gamesdb/big/thumbs/" . $item_dir;
+
+				$main_url = $this->core->config('website_url') . 'uploads/gamesdb/big/' . $item_dir . $value['filename'];
+				$thumb_url = $this->core->config('website_url') . 'uploads/gamesdb/big/thumbs/' . $item_dir . $value['filename'];
+
+				$preview_file = '<a data-fancybox="images" href="'.$main_url.'" target="_blank"><img src="' . $thumb_url . '" class="imgList"></a><br />';
+
+				$previously_uploaded['output'] .= '<div class="box">
+				<div class="body group">
+				<div id="'.$value['id'].'">'.$preview_file.'
+				<button id="' . $value['id'] . '" class="trash" data-type="itemdb">Delete Media</button>
+				</div>
+				</div>
+				</div>';
+			}
+		}
+		return $previously_uploaded;
+	}
+
+	function move_tmp_media($uploads, $item_id)
+	{
+		foreach($uploads as $key)
+		{
+			echo $key;
+			$this->dbl->run("UPDATE `itemdb_images` SET `item_id` = ? WHERE `id` = ?", array($item_id, $key));
+		}
+		die();
 	}
 }

@@ -120,6 +120,32 @@ if (isset($_GET['view']))
 
 			$templating->block('main-info', 'items_database');
 
+			// get uploaded media
+			$display_media = '';
+			$uploaded_media = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `item_id` = ?", array($get_item['id']))->fetch_all();
+			if ($uploaded_media)
+			{
+				$display_media .= '<div class="itemdb-media-container">';
+				$total_counter = 0;
+				foreach ($uploaded_media as $media)
+				{
+					$total_counter++;
+
+					if ($total_counter <= 2)
+					{
+						$display_media .= '<a data-caption="'.$get_item['name'].'" data-fancybox="images" href="/uploads/gamesdb/big/'.$get_item['id'].'/'.$media['filename'].'"><img src="/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/'.$media['filename'].'" /></a>';
+					}
+
+					if ($total_counter > 2)
+					{
+						$display_media .= '<a data-caption="'.$get_item['name'].'" data-fancybox="images" href="/uploads/gamesdb/big/'.$get_item['id'].'/'.$media['filename'].'"></a>';
+					}
+				}
+				$display_media .= '</div>';
+			}
+
+			$templating->set('uploaded_media',$display_media);
+
 			// parse the release date, with any info tags about it
 			$date = '';
 			if (!empty($get_item['date']))

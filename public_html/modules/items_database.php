@@ -122,7 +122,7 @@ if (isset($_GET['view']))
 
 			// get uploaded media
 			$display_media = '';
-			$uploaded_media = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `item_id` = ?", array($get_item['id']))->fetch_all();
+			$uploaded_media = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `item_id` = ? AND `featured` = 0", array($get_item['id']))->fetch_all();
 			if ($uploaded_media)
 			{
 				$display_media .= '<div class="itemdb-media-container">';

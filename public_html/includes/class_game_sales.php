@@ -925,7 +925,7 @@ class game_sales
 		if ($item_id != NULL)
 		{
 			// add in uploaded images from database
-			$item_images = $this->dbl->run("SELECT `filename`,`id`,`filetype`,`item_id` FROM `itemdb_images` WHERE `item_id` = ? ORDER BY `id` ASC", array($item_id))->fetch_all();
+			$item_images = $this->dbl->run("SELECT `filename`,`id`,`filetype`,`item_id` FROM `itemdb_images` WHERE `item_id` = ? AND `featured` = 0 ORDER BY `id` ASC", array($item_id))->fetch_all();
 		}
 		else
 		{

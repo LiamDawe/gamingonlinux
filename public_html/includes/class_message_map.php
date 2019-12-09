@@ -45,7 +45,7 @@ class message_map
 				$error = $this->messages[$key]['error'];
 			}
 	
-			$stored_message = sprintf($this->messages[$key]['text'], $extras_output);
+			$stored_message = vsprintf($this->messages[$key]['text'], $extras_output);
 		}
 		else
 		{

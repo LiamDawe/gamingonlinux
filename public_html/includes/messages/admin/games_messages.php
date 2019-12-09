@@ -41,6 +41,11 @@ return [
 	[
 		"text" => "You didn't select the type of item you're submitting!",
 		"error" => 1
+	],
+	"itemdb_added" =>
+	[
+		"text" => "You have saved %s. <a href=\"/itemdb/%d\">Click here to view it live</a>.",
+		"additions" => 1
 	]
 ];
 ?>

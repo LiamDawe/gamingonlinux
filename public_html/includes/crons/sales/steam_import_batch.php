@@ -128,11 +128,25 @@ do
 
 					// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 					$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
+
+					// check for name change, insert different name into dupes table and keep original name
+					$name_change = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND `name` != ?", array($steam_id, $title))->fetchOne();
+					if ($name_change)
+					{
+						$exists = $dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND `name` = ?", array($name_change, $title))->fetchOne();
+						if (!$exists)
+						{
+							$dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+						}		
+					}
 					
-					if (!$game_list && !$check_dupes)
+					if (!$game_list && !$check_dupes && !$name_change)
 					{
 						$dbl->run("INSERT INTO `calendar` SET `name` = ?, `stripped_name` = ?, `date` = ?, `steam_link` = ?, `steam_id` = ?, `bundle` = ?, `approved` = 1", array($title, $stripped_title, $clean_release_date, $link, $steam_id, $bundle));
-					
+						$new_id = $dbl->new_id();
+						
+						$dbl->run("INSERT INTO `itemdb_calendar` SET `item_id` = ?, `store_id` = 6, `release_date` = ?", array($new_id, $clean_release_date));
+
 						// need to grab it again
 						$game_list = $dbl->run($select_sql, array($title))->fetch();
 					
@@ -144,6 +158,11 @@ do
 						if ($check_dupes)
 						{
 							$game_id = $check_dupes['real_id'];
+						}
+
+						if ($name_change)
+						{
+							$game_id = $name_change;
 						}
 					
 						$dbl->run("UPDATE `calendar` SET `steam_link` = ? WHERE `id` = ?", array($link, $game_id));

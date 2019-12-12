@@ -584,8 +584,10 @@ class user
 		{
 			// calculate how many years
 			$total_years = $date1->diff($date2)->format('%y');
-
-			$cake_icon = '<img src="/templates/default/images/cake.png" alt="'.$total_years.' years" class="tooltip-top" title="'.$username.' has been here for '.$total_years.' years" />';
+			if ($total_years > 0)
+			{
+				$cake_icon = '<img src="/templates/default/images/cake.png" alt="'.$total_years.' years" class="tooltip-top" title="'.$username.' has been here for '.$total_years.' years" />';
+			}
 		}
 		return $cake_icon;
 	}

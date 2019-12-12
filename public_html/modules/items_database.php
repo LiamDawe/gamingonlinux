@@ -225,7 +225,7 @@ if (isset($_GET['view']))
 				$dev_names = array();
 				foreach ($developers_list as $developer)
 				{
-					$dev_names[] = '<a href="/index.php?module=items_database&amp;view=developer&amp;id='.$developer['developer_id'].'">'.$developer['name'] . '</a>';
+					$dev_names[] = '<a href="/itemdb/developer/'.$developer['developer_id'].'">'.$developer['name'] . '</a>';
 				}
 		
 				$dev_names = '<li><strong>Who made this?</strong></li><li>' . implode(', ', $dev_names) . '</li>';

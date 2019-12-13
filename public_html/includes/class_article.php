@@ -138,7 +138,7 @@ class article
 		{
 			foreach ($games_list as $tag)
 			{
-				$categories_output .= " <li><a href=\"/index.php?module=items_database&view=item&id=".$tag['game_id']."\">{$tag['name']}</a></li> ";
+				$categories_output .= " <li><a href=\"/itemdb/".$tag['game_id']."\">{$tag['name']}</a></li> ";
 			}
 		}
 		return $categories_output;

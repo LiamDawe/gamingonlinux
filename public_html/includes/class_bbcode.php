@@ -8,12 +8,17 @@ class bbcode
 	private $dbl;
 	// the requred core class
 	private $core;
-	
+
+	private $allowed_link_protocols = array('http:\/\/', 'https:\/\/', 'ftp:\/\/', 'ftps:\/\/', 'mailto:', 'irc:\/\/', 'ircs:\/\/');
+	private $protocols = '';
+
 	function __construct($dbl, $core, $user)
 	{
 		$this->dbl = $dbl;
 		$this->core = $core;
 		$this->user = $user;
+
+		$this->protocols = implode('|',$this->allowed_link_protocols);
 	}
 	
 	function do_charts($body)
@@ -219,7 +224,7 @@ class bbcode
 	{
 		$URLRegex = '/(?:(?<!(\[\/url\]|\[\/url=))(\s|^))'; // No [url]-tag in front and is start of string, or has whitespace in front
 		$URLRegex.= '(';                                    // Start capturing URL
-		$URLRegex.= '(https?|ftps?|ircs?):\/\/';            // Protocol
+		$URLRegex.= '('.$this->protocols.')';            // Protocol
 		$URLRegex.= '[\w\d\.\/#\_\-\?:=&;]+';                 // Any non-space character
 		$URLRegex.= ')';                                    // Stop capturing URL
 		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
@@ -227,8 +232,8 @@ class bbcode
 		$text = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $text);
 
 		$find = array(
-		"/\[url\=((http[s]?|ftp):\/\/.+?)\](.+?)\[\/url\]/is",
-		"/\[url\]((http[s]?|ftp):\/\/.+?)\[\/url\]/is"
+		"/\[url\=(($this->protocols).+?)\](.+?)\[\/url\]/is",
+		"/\[url\](($this->protocols).+?)\[\/url\]/is"
 		);
 
 		$replace = array(
@@ -238,6 +243,9 @@ class bbcode
 
 		$text = preg_replace($find, $replace, $text);
 		
+		// markdown link support
+		$text = preg_replace("/\[([^]]+?)\]\((($this->protocols).+?)\)/is", "<a href=\"$2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text);
+
 		return $text;
 	}
 

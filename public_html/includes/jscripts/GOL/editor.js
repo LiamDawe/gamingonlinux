@@ -75,12 +75,12 @@ function gol_editor(editor_id)
         snippet(this.dataset.snippet);
     }
      
-     function list(text)
-	 {
+	function list(text)
+	{
 		text = '[li]' + text.replace(/\r\n/g, "\r\n[/li]").replace(/[\r\n]/g, '[/li]\r\n[li]') + '[/li]';
 		list_nospaces = text.replace(/\[li\] +/gm, '[li]');
 		return list_nospaces;
-	 }
+	}
 
     /*
 	 * bbcode()
@@ -91,7 +91,6 @@ function gol_editor(editor_id)
 	{
         var selected,
             ins,
-            sel,
             popUpData;
         // Add a sub tag?
         if (typeof subtag != 'undefined') 
@@ -130,9 +129,17 @@ function gol_editor(editor_id)
         }
         tag      = popUpData[0];
         subtag   = popUpData[1];
-        selected = popUpData[2];
+		selected = popUpData[2];
 		
-        ins = '[' + tag + '' + subtag + ']' + selected + '[/' + tag +']';
+		if (tag == 'url')
+		{
+			ins = '[' + selected + ']' + '(' + subtag + ')';
+		}
+		else
+		{
+			ins = '[' + tag + '' + subtag + ']' + selected + '[/' + tag +']';
+		}
+
         if (!document.execCommand("insertText", false, ins)) 
 		{
             this_editor.value = this_editor.value.slice(0, this_editor.selectionStart) + ins + this_editor.value.slice(this_editor.selectionEnd);
@@ -169,7 +176,8 @@ function gol_editor(editor_id)
         }
         tag      = popUpData[0];
         selected = popUpData[1];
-        ins = tag + selected;
+		ins = tag + selected;
+
         if (!document.execCommand("insertText", false, ins)) 
 		{
             this_editor.value = this_editor.value.slice(0, this_editor.selectionStart) + ins + this_editor.value.slice(this_editor.selectionEnd);
@@ -235,10 +243,6 @@ function gol_editor(editor_id)
 			{
                 return null;
             } 
-            else 
-			{
-                subtag = '=' + subtag;
-            }
         } 
         else if(tag == 'url' && selected === "") 
 		{
@@ -247,10 +251,7 @@ function gol_editor(editor_id)
 			{
                 return null;
             } 
-            else 
-			{
-                subtag = '=' + subtag;
-            }
+
             selected = window.prompt('URL link text');
             if(selected === null || selected === '') 
 			{
@@ -266,7 +267,6 @@ function gol_editor(editor_id)
     /*
 	 * Allow keyboard shortcut
 	 *
-	 * All people to use keyboard shortcut
 	 */
     document.onkeydown = function(e) 
 	{

@@ -978,9 +978,23 @@ class game_sales
 	{
 		foreach($uploads as $key)
 		{
-			$this->dbl->run("UPDATE `itemdb_images` SET `item_id` = ? WHERE `id` = ?", array($item_id, $key));
+			$this->dbl->run("UPDATE `itemdb_images` SET `item_id` = ?, `approved` = 1 WHERE `id` = ?", array($item_id, $key));
 
-			$filename = $this->dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `id` = ?", array($key))->fetchOne();
+			$file = $this->dbl->run("SELECT `filename`, `featured` FROM `itemdb_images` WHERE `id` = ?", array($key))->fetch();
+
+			// feature item, check if there's an older one and remove it
+			if ($file['featured'] == 1)
+			{
+				$check_featured = $this->dbl->run("SELECT `id`, `filename` FROM `itemdb_images` WHERE `id` != ? AND `featured` = 1 AND `item_id` = ?", array($key, $item_id))->fetch_all();
+				if ($check_featured)
+				{
+					foreach ($check_featured as $old_featured)
+					{
+						unlink(APP_ROOT . "/uploads/gamesdb/big/" . $item_id . '/' . $old_featured['filename']);
+					}
+					$this->dbl->run("DELETE FROM `itemdb_images` WHERE `featured` = 1 AND `item_id` = ? AND `id` != ?", array($item_id, $key));
+				}
+			}
 
 			$uploaddir = APP_ROOT . "/uploads/gamesdb/big/" . $item_id;
 			$thumbs_dir = APP_ROOT . "/uploads/gamesdb/big/thumbs/" . $item_id;
@@ -995,14 +1009,40 @@ class game_sales
 				mkdir($thumbs_dir, 0777);
 			}
 
-			$tmp_full_file_big = APP_ROOT . "/uploads/gamesdb/big/tmp/" . $filename;
-			$full_file_big = $uploaddir . '/' . $filename;
+			$tmp_full_file_big = APP_ROOT . "/uploads/gamesdb/big/tmp/" . $file['filename'];
+			$full_file_big = $uploaddir . '/' . $file['filename'];
 
-			$tmp_full_file_thumbnail = APP_ROOT . "/uploads/gamesdb/big/thumbs/tmp/" . $filename;
-			$full_file_thumbnail = $thumbs_dir . '/' . $filename;
+			$tmp_full_file_thumbnail = APP_ROOT . "/uploads/gamesdb/big/thumbs/tmp/" . $file['filename'];
+			$full_file_thumbnail = $thumbs_dir . '/' . $file['filename'];
 
 			rename($tmp_full_file_big, $full_file_big);
 			rename($tmp_full_file_thumbnail, $full_file_thumbnail);
 		}
+	}
+
+	// when updating an item, this will remove older featured images left when a new one is put up as we only keep one
+	function update_featured($item_id)
+	{
+		$check_featured = $this->dbl->run("SELECT `id`, `filename` FROM `itemdb_images` WHERE `featured` = 1 AND `item_id` = ? ORDER BY `id` ASC", array($item_id))->fetch_all();
+		$count_featured = count($check_featured);
+		if ($check_featured && $count_featured > 1)
+		{
+			$current = 0;
+			$picture_ids = [];
+			foreach ($check_featured as $old_featured)
+			{
+				$current++;
+
+				if ($current != $count_featured)
+				{
+					unlink(APP_ROOT . "/uploads/gamesdb/big/" . $item_id . '/' . $old_featured['filename']);
+					$picture_ids[] = $old_featured['id'];
+				}
+			}
+
+			$in  = str_repeat('?,', count($picture_ids) - 1) . '?';
+			$this->dbl->run("DELETE FROM `itemdb_images` WHERE `featured` = 1 AND `item_id` = ? AND `id` IN ($in)", array_merge([$item_id], $picture_ids));
+		}
+		$this->dbl->run("UPDATE `itemdb_images` SET `approved` = 1 WHERE `featured` = 1 AND `item_id` = ?", array($item_id));
 	}
 }

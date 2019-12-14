@@ -64,15 +64,30 @@
 [block: item]
 			<script src="includes/jscripts/jquery.form.min.js"></script>
 			<div class="body group">
-				<form id="small_pic" method="post" enctype="multipart/form-data" action='includes/ajax/gamesdb/ajax_small_pic.php' style="clear:both">
-					Small pic to show in lists 120x45.<br />
-					<div id='imageloadstatus2' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
-					<div id='imageloadbutton2'>
-					<input type="file" name="photos2" id="photoimg2" multiple="true" {:edit_state}/>
+				<div style="float:left;">
+					<form id="small_pic" method="post" enctype="multipart/form-data" action='includes/ajax/gamesdb/ajax_small_pic.php' style="clear:both">
+						Small pic to show in lists 120x45.<br />
+						<div id='imageloadstatus2' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
+						<div id='imageloadbutton2'>
+						<input type="file" name="photos2" id="photoimg2" {:edit_state}/>
+						</div>
+					</form>
+					<div id='preview2'>
+						{:small_pic}
 					</div>
-				</form>
-				<div id='preview2'>
-					{:small_pic}
+				</div>
+				<div style="float:left;">
+					<form id="featured_pic" method="post" enctype="multipart/form-data" action='includes/ajax/gamesdb/mediaupload.php?type=featured' style="clear:both">
+						Featured pic 460x215.<br />
+						<div id='featured-load-status' style='display:none'><img src="/templates/default/images/loader2.gif" alt="Uploading...."/></div>
+						<div id='featured-load-button'>
+							<input type="file" name="media[]" id="featured_file" {:edit_state}/>
+						</div>
+						<input type="hidden" name="item_id" value="{:id}" />
+					</form>
+					<div id='featured-preview'>
+						{:featured_pic}
+					</div>
 				</div>
 			</div>
 			<div class="subhead">Required</div>
@@ -159,7 +174,7 @@
 [block: uploads]
 <div class="box">
 	<div class="body group">
-		<form class="gol-form" id="itemdbmediaform" method="post" enctype="multipart/form-data" action='/includes/ajax/gamesdb/mediaupload.php' style="clear:both;">
+		<form class="gol-form" id="itemdbmediaform" method="post" enctype="multipart/form-data" action='/includes/ajax/gamesdb/mediaupload.php?type=bigmedia' style="clear:both;">
 			Screenshots, no bigger than 1MB!
 			<div id='imageloadstatus' style='display:none'>
 				<img src="/templates/default/images/loader2.gif" alt="Uploading...."/>

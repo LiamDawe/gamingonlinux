@@ -71,7 +71,7 @@ class db_mysql extends PDO
         catch (PDOException $error)
         {
 			$trace = $error->getTrace();
-			error_log('SQL ERROR ' . $error->getMessage() . "\n" . 'Full SQL: ' . $sql . "\nURL: " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+			error_log(PHP_EOL . 'SQL ERROR ' . $error->getMessage() . PHP_EOL . 'Full SQL: ' . PHP_EOL . '=========' . PHP_EOL . $sql . PHP_EOL . "Replaced Query: " . PHP_EOL . '==============' . PHP_EOL . $this->replaced_query($sql, $data) . PHP_EOL .  "URL: " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],3,dirname(dirname(__FILE__)).'/error_log');
 			include(dirname(dirname(__FILE__)).'/sql_error.html');
 			die();
         }

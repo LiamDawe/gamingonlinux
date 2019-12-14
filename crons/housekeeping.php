@@ -80,6 +80,7 @@ $dbl->run("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_i
 REMOVE TEMP ITEMDB UPLOADS
 */
 
+// normal uploads
 $itemdb_timeout = 86400; // 1 day
 
 $stamp = time() - $itemdb_timeout;
@@ -102,6 +103,25 @@ foreach ($grab_all as $grabber)
 }
 
 $dbl->run("DELETE FROM `itemdb_images` WHERE `date_uploaded` < ? AND `item_id` = 0 OR `item_id` IS NULL", array($sql_date));
+
+// featured uploads
+$grab_all = $dbl->run("SELECT `filename`,`item_id` FROM `itemdb_images` WHERE `date_uploaded` < ? AND `approved` = 0", array($sql_date))->fetch_all();
+foreach ($grab_all as $grabber)
+{
+	$main = APP_ROOT . '/uploads/gamesdb/big/' . $grabber['item_id'] . '/' . $grabber['filename'];
+	$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/' . $grabber['item_id'] . '/' . $grabber['filename'];
+
+	if (file_exists($main))
+	{
+		unlink($main);
+	}
+	if (file_exists($thumb))
+	{
+		unlink($thumb);
+	}
+}
+
+$dbl->run("DELETE FROM `itemdb_images` WHERE `date_uploaded` < ? AND `approved` = 0", array($sql_date));
 
 /*
 REMOVE EXPIRED EDITOR PICKS

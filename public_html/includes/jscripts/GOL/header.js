@@ -1905,6 +1905,34 @@ jQuery(document).ready(function()
     }).submit();
 	});
 
+	// this is the id of the form
+	$('#featured_pic').off('click').on('change', function(e)
+	{
+		$("#featured-load-status").show();
+		$("#featured-load-button").hide();
+
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+
+		var form = $(this)[0];
+		var url = $(this).attr('action');
+
+		$.ajax({
+			type: "POST",
+			url: url,
+			processData: false,
+			contentType: false,
+			dataType: 'json',
+			data: new FormData(form), // serializes the form's elements.
+			success: function(data)
+			{
+				$("#featured-load-status").hide();
+				$("#featured-load-button").show();
+				$('#featured-preview').html(data.data[0].output);
+				$('#itemdbform').append('<input class="uploads-'+data.data[0].media_id+'" type="hidden" name="uploads[]" value="'+data.data[0].media_id+'" />');
+			}
+		});
+	});
+
 	/* free/all games page */
 
 	// pagination ajax

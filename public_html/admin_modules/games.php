@@ -73,7 +73,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'crowdfund_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name', 'crowdfund_notes');
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'crowdfund_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name', 'crowdfund_notes', 'featured_pic');
 		foreach ($set_empty as $make_empty)
 		{
 			$templating->set($make_empty, '');
@@ -194,7 +194,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		else
 		{
-			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
+			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id, i.filename as featured_pic FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id LEFT JOIN `itemdb_images` i ON i.featured = 1 AND i.item_id = c.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
 
 			if (!$game)
 			{
@@ -202,9 +202,15 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
+				$text = $game['description'];
+
 				if (!isset($message_map::$error) || $message_map::$error == 0)
 				{
 					$_SESSION['gamesdb_image_rand'] = rand();
+				}
+				else if ($message_map::$error == 1)
+				{
+					$text = $_SESSION['item_error']['description'];
 				}
 
 				$templating->set_previous('meta_description', 'Editing: '.$game['name'], 1);
@@ -232,6 +238,13 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$small_pic = '<img src="/uploads/gamesdb/small/'.$game['small_picture'].'" alt="" />';
 				}
 				$templating->set('small_pic', $small_pic);
+
+				$featured_pic = '';
+				if ($game['featured_pic'] != NULL && $game['featured_pic'] != '')
+				{
+					$featured_pic = '<img src="/uploads/gamesdb/big/'.$game['id'] . '/' .$game['featured_pic'].'" alt="" />';
+				}
+				$templating->set('featured_pic', $featured_pic);
 
 				$templating->set('id', $game['id']);
 				$templating->set('name', htmlentities($game['name']));
@@ -274,14 +287,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
 				$type_options = '';
-				foreach ($types as $value => $text)
+				foreach ($types as $value => $option_text)
 				{
 					$selected = '';
 					if ($game[$value] == 1)
 					{
 						$selected = 'selected';
 					}
-					$type_options .= '<option value="'.$value.'" '.$selected.'>'.$text.'</option>';
+					$type_options .= '<option value="'.$value.'" '.$selected.'>'.$option_text.'</option>';
 				}
 				$templating->set('type_options', $type_options);
 
@@ -320,8 +333,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				// sort out genre tags
 				$genre_list = $core->display_game_genres($game['id']);
 				$templating->set('genre_list', $genre_list);
-
-				$text = $game['description'];
 
 				$core->article_editor(['content' => $text]);
 
@@ -401,9 +412,15 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
+				$text = $game['description'];
+
 				if (!isset($message_map::$error) || $message_map::$error == 0)
 				{
 					$_SESSION['gamesdb_image_rand'] = rand();
+				}
+				else if ($message_map::$error == 1)
+				{
+					$text = $_SESSION['item_error']['description'];
 				}
 
 				$templating->set_previous('meta_description', 'Editing: '.$game['name'], 1);
@@ -468,14 +485,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 				$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
 				$type_options = '';
-				foreach ($types as $value => $text)
+				foreach ($types as $value => $option_text)
 				{
 					$selected = '';
 					if ($game[$value] == 1)
 					{
 						$selected = 'selected';
 					}
-					$type_options .= '<option value="'.$value.'" '.$selected.'>'.$text.'</option>';
+					$type_options .= '<option value="'.$value.'" '.$selected.'>'.$option_text.'</option>';
 				}
 				$templating->set('type_options', $type_options);
 
@@ -524,8 +541,6 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$genre_list = $core->display_game_genres($game['id']);
 				$templating->set('genre_list', $genre_list);
 
-				$text = $game['description'];
-
 				$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'game_text']);
 
 				$templating->block('submitted_bottom', 'admin_modules/games');
@@ -547,6 +562,16 @@ if (isset($_POST['act']))
 		$date = trim($_POST['date']);
 		$link = trim($_POST['link']);
 		$steam_link = trim($_POST['steam_link']);
+
+		$steam_appid = NULL;
+		if (!empty($steam_link))
+		{
+			if (strpos($steam_link, '/app/') !== false) 
+			{
+				$steam_appid = preg_replace('~https?:\/\/store\.steampowered\.com\/app\/([0-9]*)\/.*~', '$1', $steam_link);
+			}
+		}
+
 		$gog_link = trim($_POST['gog_link']);
 		$itch_link = trim($_POST['itch_link']);
 		$crowdfund_link = trim($_POST['crowdfund_link']);
@@ -606,8 +631,21 @@ if (isset($_POST['act']))
 			$redirect_error = 1;
 		}
 
+		$types = ['is_game', 'is_application', 'is_emulator'];
+		$sql_type = '';
+		if (!in_array($_POST['type'], $types))
+		{
+			$_SESSION['message'] = 'no_item_type';
+			$redirect_error = 1;
+		}
+		else
+		{
+			$sql_type = '`'.$_POST['type'].'` = 1, ';
+		}
+
 		if ($redirect_error == 1)
 		{
+			$_SESSION['item_error']['description'] = $description;
 			if (isset($_POST['uploads']))
 			{
 				$_SESSION['itemdb']['uploads'] = $_POST['uploads'];
@@ -639,19 +677,6 @@ if (isset($_POST['act']))
 		}
 		$checkboxes_sql_insert = implode(', ', $checkboxes_sql);
 
-		$types = ['is_game', 'is_application', 'is_emulator'];
-		$sql_type = '';
-		if (!in_array($_POST['type'], $types))
-		{
-			$_SESSION['message'] = 'no_item_type';
-			header("Location: $error_page");
-			die();
-		}
-		else
-		{
-			$sql_type = '`'.$_POST['type'].'` = 1, ';
-		}
-
 		$base_game = NULL;
 		if (isset($_POST['game']) && is_numeric($_POST['game']))
 		{
@@ -672,7 +697,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Add')
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes));
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes));
 			$new_id = $dbl->new_id();
 	
 			$core->process_game_genres($new_id);
@@ -691,13 +716,13 @@ if (isset($_POST['act']))
 
 			$core->new_admin_note(array('completed' => 1, 'content' => ' added a new game to the database - <a href="/index.php?module=items_database&view=item&id='.$new_id.'">'.$name.'</a>.'));
 	
-			$_SESSION['message'] = 'saved';
-			$_SESSION['message_extra'] = 'game';
+			$_SESSION['message'] = 'itemdb_added';
+			$_SESSION['message_extra'] = [$name,$new_id];
 		}
 
 		if ($_POST['act'] == 'Edit')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 			$games_database->process_developers($_POST['id']);
@@ -706,6 +731,8 @@ if (isset($_POST['act']))
 			{
 				$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
 			}
+
+			$games_database->update_featured($_POST['id']);
 
 			$core->new_admin_note(array('completed' => 1, 'content' => ' edited a game in the database - <a href="/index.php?module=items_database&view=item&id='.$_POST['id'].'">'.$name.'</a>.'));
 
@@ -724,6 +751,8 @@ if (isset($_POST['act']))
 			{
 				$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
 			}
+
+			$games_database->update_featured($_POST['id']);
 	
 			// update the original notification to clear it
 			$core->update_admin_note(array('type' => 'item_database_addition', 'data' => $_POST['id']));

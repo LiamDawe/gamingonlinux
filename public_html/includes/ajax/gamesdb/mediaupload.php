@@ -38,8 +38,10 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 
 	$item_id = 0;
 	$item_dir = 'tmp/';
+	$approved = 0;
 	if (isset($_POST['item_id']) && is_numeric($_POST['item_id']) && $_POST['item_id'] > 0)
 	{
+		$approved = 1;
 		$item_id = $_POST['item_id'];
 		$item_dir = $_POST['item_id'] . '/';
 	}
@@ -50,11 +52,13 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 	if (!is_dir($uploaddir))
 	{
 		mkdir($uploaddir, 0777);
+		chmod($uploaddir, 0777);
 	}
 
 	if (!is_dir($thumbs_dir))
 	{
 		mkdir($thumbs_dir, 0777);
+		chmod($thumbs_dir, 0777);
 	}
 
 	$return_data = [];
@@ -78,33 +82,69 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 					$main_newname = $uploaddir.$image_name;
 
 					$main_url = $core->config('website_url') . 'uploads/gamesdb/big/' . $item_dir . $image_name;
-					$gif_static_button = '';
-					$thumbnail_button = '';
-					$data_type = '';
 
-					$thumb_url = $core->config('website_url') . 'uploads/gamesdb/big/thumbs/' . $item_dir . $image_name;
+					$uploaded = 0;
 
-					// thumbs
-					$img->fromFile($_FILES['media']['tmp_name'][$name]);
-
-					$thumb_newname = $thumbs_dir.$image_name;
-
-					// so we don't make a big thumbnail of a small image
-					if ($img->getWidth() <= 450)
+					if (isset($_GET['type']) && $_GET['type'] == 'bigmedia')
 					{
-						$img->fromFile($_FILES['media']['tmp_name'][$name])->toFile($thumb_newname);
+						$thumb_url = $core->config('website_url') . 'uploads/gamesdb/big/thumbs/' . $item_dir . $image_name;
+
+						// thumbs
+						$img->fromFile($_FILES['media']['tmp_name'][$name]);
+
+						$thumb_newname = $thumbs_dir.$image_name;
+
+						// so we don't make a big thumbnail of a small image
+						if ($img->getWidth() <= 450)
+						{
+							$img->fromFile($_FILES['media']['tmp_name'][$name])->toFile($thumb_newname);
+						}
+						else
+						{
+							$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(450, null)->toFile($thumb_newname);
+						}
+
+						$preview_file = '<a data-fancybox="images" href="'.$main_url.'" target="_blank"><img src="' . $thumb_url . '" class="imgList"></a><br />';
+
+						if (move_uploaded_file($_FILES['media']['tmp_name'][$name], $main_newname))
+						{
+							$uploaded = 1;
+						}
 					}
-					else
+					else if (isset($_GET['type']) && $_GET['type'] == 'featured')
 					{
-						$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(450, null)->toFile($thumb_newname);
+						$img->fromFile($_FILES['media']['tmp_name'][$name]);
+
+						if ($img->getWidth() != 460 || $img->getHeight() != 215)
+						{
+							if($img->fromFile($_FILES['media']['tmp_name'][$name])->resize(460, 215)->toFile($main_newname))
+							{
+								$uploaded = 1;
+							}
+						}
+						else
+						{
+							if (move_uploaded_file($_FILES['media']['tmp_name'][$name], $main_newname))
+							{
+								$uploaded = 1;
+							}
+						}
+
+						$preview_file = '<img src="' . $main_url . '" class="imgList"><br />';
 					}
 
-					$preview_file = '<a data-fancybox="images" href="'.$main_url.'" target="_blank"><img src="' . $thumb_url . '" class="imgList"></a><br />';
 					$data_type = 'image';
-					
-					if (move_uploaded_file($_FILES['media']['tmp_name'][$name], $main_newname))
+
+					if ($uploaded == 1)
 					{
-						$new_image = $dbl->run("INSERT INTO `itemdb_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `item_id` = ?, `filetype` = ?", [$image_name, $_SESSION['user_id'], core::$sql_date_now, $item_id, $ext]);
+						$featured = 0;
+						if (isset($_GET['type']) && $_GET['type'] == 'featured')
+						{
+							$approved = 0; // set to zero for featured, to help with regular cleanup in housekeeping cron
+							$featured = 1;
+						}
+
+						$new_image = $dbl->run("INSERT INTO `itemdb_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `item_id` = ?, `filetype` = ?, `featured` = ?, `approved` = ?", [$image_name, $_SESSION['user_id'], core::$sql_date_now, $item_id, $ext, $featured, $approved]);
 						$media_db_id = $new_image->new_id();
 
 						$html_output = '<div class="box">
@@ -120,7 +160,7 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 
 					else
 					{
-						echo '<span class="imgList">You have exceeded the size limit! so moving unsuccessful! </span>';
+						echo '<span class="imgList">Couldn\'t upload image!</span>';
 					}
 
 				}

@@ -229,19 +229,7 @@ class bbcode
 		$URLRegex.= ')';                                    // Stop capturing URL
 		$URLRegex.= '(?:(?<![.,;!?:\"\'()-])(\/|\[|\s|\.?$))/i';      // Doesn't end with punctuation and is end of string, or has whitespace after
 
-		$text = preg_replace($URLRegex,"$2[url=$3]$3[/url]$5", $text);
-
-		$find = array(
-		"/\[url\=(($this->protocols).+?)\](.+?)\[\/url\]/is",
-		"/\[url\](($this->protocols).+?)\[\/url\]/is"
-		);
-
-		$replace = array(
-		"<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$3</a>",
-		"<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>"
-		);
-
-		$text = preg_replace($find, $replace, $text);
+		$text = preg_replace($URLRegex,"$2[$3]($3)$5", $text);
 		
 		// markdown link support
 		$text = preg_replace("/\[([^]]+?)\]\((($this->protocols).+?)\)/is", "<a href=\"$2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text);

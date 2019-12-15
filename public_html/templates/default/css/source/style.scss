@@ -1839,3 +1839,34 @@ input:checked + .slider:before
 }
 
 .itemdb-media-container {text-align: center;}
+
+.gamesdbbutton 
+{
+	padding: 5px 10px;
+	border-radius: 2px;
+	font-weight: bold;
+	outline: none;
+	width: 100%; 
+	color: white;
+	background: #4c8ffb;
+	border: 1px #3079ed solid;
+	box-shadow: inset 0 1px 0 #80b0fb;
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.gamesdbbutton a {display: block;}
+.gamesdbbutton a:link, .gamesdbbutton a:visited, .gamesdbbutton a:active {color: white;}
+
+.gamesdbbutton:hover 
+{
+	border: 1px #2f5bb7 solid;
+	box-shadow: 0 1px 1px #eaeaea, inset 0 1px 0 #5a94f1;
+	background: #3f83f1;
+	color: white;
+}
+  
+.gamesdbbutton:active 
+{
+	box-shadow: inset 0 2px 5px #2370fe;
+}

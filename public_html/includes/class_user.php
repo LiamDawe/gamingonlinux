@@ -52,17 +52,6 @@ class user
 		$this->check_session();
 		$this->block_list();
 		$this->blocked_homepage_tags();
-
-		if (isset($_COOKIE['tracking_test']) && !isset($_COOKIE['gol_session']))
-		{
-			$ref = '';
-
-			if (isset($_SERVER['HTTP_REFERER']))
-			{
-				$ref = $_SERVER['HTTP_REFERER'];
-			}
-			error_log("SESSION COOKIE VANISHED: " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . ' REFERRING URL: ' . $ref);
-		}
 	}
 
 	// check their session is valid and register guest session if needed
@@ -135,7 +124,6 @@ class user
 							$secure = 1;
 						}
 						setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
-						setcookie('tracking_test', 'testing for login issues - ignore this', $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
 					}
 
 					return true;
@@ -192,7 +180,7 @@ class user
 
 	public function register_session()
 	{
-		if (session_status() == PHP_SESSION_NONE) // not a bastard clue why it's not started sometimes for a few people
+		if (session_status() == PHP_SESSION_NONE)
 		{
 			session_start();
 			error_log('Had to restart session; NEED TO FIX THIS. ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
@@ -475,7 +463,6 @@ class user
 
 		setcookie('gol_session', "", time()-60, '/', $this->cookie_domain);
 		setcookie('gol-device', "", time()-60, '/', $this->cookie_domain);
-		setcookie('tracking_test', "", time()-60, '/', $this->cookie_domain);
 
 		$this->user_details = [];
 

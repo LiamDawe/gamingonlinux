@@ -1794,6 +1794,7 @@ input:checked + .slider:before
 	transform: translateX(26px);
 }
 .hidden_comment {display: none;}
+.filter-content .hidden {display: none;}
 
 .comments-pip {
     position: relative;

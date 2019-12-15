@@ -607,6 +607,13 @@ jQuery(document).ready(function()
 		}}).submit();
 	});
 
+	$(document).on('click', '.show_all_filter_list', function(e)
+	{
+		e.preventDefault();
+		$(this).parent().parent('ul').children('li').removeClass('hidden');
+		$(this).parent().hide();
+	});
+
 	// article tagline image
 	$('#photoimg2').off('click').on('change', function()
 	{

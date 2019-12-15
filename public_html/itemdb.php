@@ -69,7 +69,19 @@ $templating->set('total', $total_games);
 // LANDING PAGE TODO - NEED TO UPDATE ALL SEARCHES TO $_GET['view'] == 'mainlist'
 if (!isset($_GET['view']))
 {
+	$featured = $dbl->run("SELECT i.`item_id`, i.`filename`, c.`name` FROM `itemdb_images` i JOIN `calendar` c ON c.id = i.item_id WHERE i.`featured` = 1 ORDER BY RAND() LIMIT 6")->fetch_all();
+
 	$templating->block('featured', 'itemdb');
+
+	$featured_output = '<ul style="text-align: center; padding: 0;">';
+	foreach ($featured as $item)
+	{
+		$featured_output .= '<li style="display:inline;"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img src="/uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" /></a></li>';
+	}
+
+	$featured_output .= '</ul>';
+
+	$templating->set('featured', $featured_output);
 }
 
 if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
@@ -90,6 +102,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 	// genre checkboxes
 	$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id FROM `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by cat.category_name, cat.category_id")->fetch_all();
 	$genres_output = '';
+	$counter = 0;
 	foreach ($genres_res as $genre)
 	{
 		$checked = '';
@@ -102,7 +115,17 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 		{
 			$total = ' <small>('.$genre['total'].')</small>';
 		}
-		$genres_output .= '<li><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
+		$hidden = '';
+		if ($counter > 4)
+		{
+			$hidden = 'class="hidden"';
+		}
+		$genres_output .= '<li '.$hidden.'><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
+		$counter++;
+	}
+	if ($counter > 4)
+	{
+		$genres_output .= '<li><a class="show_all_filter_list" href="#">Show All</a></li>';
 	}
 	$templating->set('genres_output', $genres_output);
 

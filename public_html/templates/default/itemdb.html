@@ -16,7 +16,7 @@
 		</div>
 		<div class="box">
 			<div class="body group">
-				<form id="all-search-form" action="/itemdb.php"><input id="all-games-search" class="ays-ignore" name="q" type="search" placeholder="Search for a game by title..." /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
+				<form id="all-search-form" action="/itemdb.php"><input type="hidden" name="view" value="mainlist" /><input id="all-games-search" class="ays-ignore" name="q" type="search" placeholder="Search for a game by title..." /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
 			</div>
 		</div>
 	</div>
@@ -25,6 +25,8 @@
 [block: featured]
 	<div class="col-12">
 		<div class="head">Random Featured</div>
+		<div style="text-align: center; padding: 5px;">These randomised featured items are games we believe work well, <u>support Linux</u> and are worth trying!</div>
+		{:featured}
 	</div>
 [/block: featured]
 

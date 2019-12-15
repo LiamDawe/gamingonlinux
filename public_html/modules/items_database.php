@@ -3,6 +3,10 @@ if(!defined('golapp'))
 {
 	die('Direct access not permitted');
 }
+include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
+use claviska\SimpleImage;
+$img = new SimpleImage();
+
 $templating->set_previous('title', 'Linux Games & Software List', 1);
 $templating->set_previous('meta_description', 'Linux Games & Software List', 1);
 
@@ -70,7 +74,7 @@ if (isset($_GET['view']))
 		$templating->block('full_db_search');
 
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
@@ -122,25 +126,54 @@ if (isset($_GET['view']))
 
 			// get uploaded media
 			$display_media = '';
+
+			$trailer_id = NULL;
+			if (!empty($get_item['trailer']))
+			{
+				preg_match("/^(?:http(?:s)?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:(?:watch)?\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\/))([^\?&\"'>]+)/", $get_item['trailer'], $trailer_id);
+			}
+
 			$uploaded_media = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `item_id` = ? AND `featured` = 0", array($get_item['id']))->fetch_all();
-			if ($uploaded_media)
+			if ($uploaded_media || $trailer_id)
 			{
 				$display_media .= '<div class="itemdb-media-container">';
+				$max_images = 2;
+
+				if ($trailer_id)
+				{
+					$trailer_thumbnail = '<img class src="/templates/default/images/youtube_cache_default.png" />';
+					if ($uploaded_media)
+					{
+						if (!file_exists($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg'))
+						{
+							$img->fromFile($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/'.$uploaded_media[0]['filename'])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg', 'image/jpeg');
+						}
+						
+						$trailer_thumbnail = '<img src="/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
+					}
+					$display_media .= '<a data-caption="'.$get_item['name'].'" data-fancybox="images" href="https://www.youtube-nocookie.com/embed/'.$trailer_id[1].'">'.$trailer_thumbnail.'</a>';
+					$max_images = 1;
+				}
+
 				$total_counter = 0;
-				foreach ($uploaded_media as $media)
+
+				$flipped = array_reverse($uploaded_media);
+				
+				foreach ($flipped as $media)
 				{
 					$total_counter++;
 
-					if ($total_counter <= 2)
+					if ($total_counter <= $max_images)
 					{
 						$display_media .= '<a data-caption="'.$get_item['name'].'" data-fancybox="images" href="/uploads/gamesdb/big/'.$get_item['id'].'/'.$media['filename'].'"><img src="/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/'.$media['filename'].'" /></a>';
 					}
 
-					if ($total_counter > 2)
+					if ($total_counter > $max_images)
 					{
 						$display_media .= '<a data-caption="'.$get_item['name'].'" data-fancybox="images" href="/uploads/gamesdb/big/'.$get_item['id'].'/'.$media['filename'].'"></a>';
 					}
 				}
+
 				$display_media .= '</div>';
 			}
 

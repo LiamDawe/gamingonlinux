@@ -185,7 +185,7 @@ else
 								{
 									if (isset($new_notification_id['quoted_usernames']) && !in_array($users_fetch['username'], $new_notification_id['quoted_usernames']) || !isset($new_notification_id['quoted_usernames']))
 									{
-										$get_note_info = $dbl->run("SELECT `id`, `forum_topic_id`, `seen` FROM `user_notifications` WHERE `forum_topic_id` = ? AND `owner_id` = ? AND `type` != 'liked' AND `type` != 'quoted'", array($topic_id, $users_fetch['user_id']))->fetch();
+										$get_note_info = $dbl->run("SELECT `id`, `forum_topic_id`, `seen` FROM `user_notifications` WHERE `forum_topic_id` = ? AND `owner_id` = ? AND `type` = 'forum_comment'", array($topic_id, $users_fetch['user_id']))->fetch();
 								
 										if (!$get_note_info)
 										{

@@ -157,7 +157,7 @@ if (isset($_GET['view']))
 
 				$total_counter = 0;
 
-				$flipped = array_reverse($uploaded_media);
+				$flipped = array_reverse($uploaded_media); // so we don't see the same image used for trailer right next to it
 				
 				foreach ($flipped as $media)
 				{

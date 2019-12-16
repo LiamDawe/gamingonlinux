@@ -128,6 +128,18 @@ if (isset($_GET['view']))
 		$templating->set('voting_check', $voting);
 		$templating->set('votes_per_category', $votes_per_category);
 		$templating->set('end_awards', $end_awards);
+
+		// categories managing
+		$templating->block('config_category_top');
+
+		$getcats = $dbl->run("SELECT `category_id`, `category_name`, `description` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
+		foreach ($getcats as $cat)
+		{
+			$templating->block('config_category_row');
+			$templating->set('category', $cat['category_name']);
+			$templating->set('description', $cat['description']);
+			$templating->set('cat_id', $cat['category_id']);
+		}
 	}
 
 	if ($_GET['view'] == 'top10')
@@ -377,6 +389,100 @@ if (isset($_POST['act']))
 		$core->new_admin_note(array('completed' => 1, 'content' => ' edited the GOTY awards settings.'));
 
 		header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=config");
+		die();
+	}
+
+	if ($_POST['act'] == 'add_category')
+	{
+		$name = trim($_POST['category']);
+		$description = trim($_POST['description']);
+
+		// make sure its not empty
+		$empty_check = core::mempty(compact('title', 'description'));
+		if ($empty_check !== true)
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $empty_check;
+			header("Location: /admin.php?module=goty&view=config");
+			die();
+		}
+
+		// check if it exists
+		$check = $dbl->run("SELECT `category_id` FROM `goty_category` WHERE `category_name` = ?", array($name))->fetch();
+		if ($check)
+		{
+			$_SESSION['message'] = 'category_exists';
+			header("Location: /admin.php?module=goty&view=config");
+			die();
+		}
+
+		// add it
+		$dbl->run("INSERT INTO `goty_category` SET `category_name` = ?, `description` = ?", array($name, $description));
+		$core->new_admin_note(array('completed' => 1, 'content' => ' Added a new category to the GOTY Awards.'));
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'category';
+		header("Location: /admin.php?module=goty&view=config");
+		die();			
+	}
+
+	if ($_POST['act'] == 'edit_category')
+	{
+		$name = trim($_POST['category']);
+		$description = trim($_POST['description']);
+		$category_id = $_POST['cat_id'];
+
+		// make sure its not empty
+		$empty_check = core::mempty(compact('title', 'description', 'category_id'));
+		if ($empty_check !== true)
+		{
+			$_SESSION['message'] = 'empty';
+			$_SESSION['message_extra'] = $empty_check;
+			header("Location: /admin.php?module=goty&view=config");
+			die();
+		}	
+		
+		// make sure we don't double up categories
+		$check = $dbl->run("SELECT `category_id` FROM `goty_category` WHERE `category_name` = ? AND `category_id` != ?", array($name, $category_id))->fetch();
+		if ($check)
+		{
+			$_SESSION['message'] = 'category_exists';
+			header("Location: /admin.php?module=goty&view=config");
+			die();
+		}
+
+		// edit it
+		$dbl->run("UPDATE `goty_category` SET `category_name` = ?, `description` = ? WHERE `category_id` = ?", array($name, $description, $category_id));
+		$core->new_admin_note(array('completed' => 1, 'content' => ' Edited a category in the GOTY Awards.'));
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'category';
+		header("Location: /admin.php?module=goty&view=config");
+		die();				
+	}
+
+	if ($_POST['act'] == 'delete_category')
+	{
+		$return = '/admin.php?module=goty&view=config';
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Deleting a GOTY category', 1);
+			$core->confirmation(array('title' => 'Are you sure you want to delete that GOTY category?', 'text' => 'Category: '.$_POST['category']. '.<br /> This cannot be undone! It will NOT remove any games from the GOTY Award, their category will need to be changed.', 'action_url' => '/admin.php?module=goty&cat_id='.$_POST['cat_id'], 'act' => 'delete_category'));
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$dbl->run("DELETE FROM `goty_category` WHERE `category_id` = ?", array($_GET['cat_id']));
+			$core->new_admin_note(array('completed' => 1, 'content' => ' Deleted a category from the GOTY Awards.'));
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'category';
+			header('Location: ' . $return);
+			die();
+		}		
 	}
 
 	if ($_POST['act'] == 'end')

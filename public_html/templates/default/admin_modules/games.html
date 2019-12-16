@@ -64,6 +64,7 @@
 [block: item]
 			<script src="includes/jscripts/jquery.form.min.js"></script>
 			<div class="body group">
+				<div class="subhead" style="clear:both;">Only give it a Featured picture if it works well on Linux, as it will be automatically added to the ItemDB featured rotation!</div>
 				<div style="float:left;">
 					<form id="small_pic" method="post" enctype="multipart/form-data" action='includes/ajax/gamesdb/ajax_small_pic.php' style="clear:both">
 						Small pic to show in lists 120x45.<br />
@@ -99,6 +100,7 @@
 					<input type="text" name="link" value="{:link}" /><br />
 					Trailer<br />
 					<input type="text" name="trailer" value="{:trailer}" /> {:trailer_link}<br />
+					<em>A YouTube trailer will automatically use the first uploaded Media as the thumbnail. If no media, a YouTube logo will be used.</em><br />
 					Steam Link:<br />
 					<input type="text" name="steam_link" value="{:steam_link}" /><br />
 					GOG Link:<br />

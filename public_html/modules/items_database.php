@@ -53,7 +53,7 @@ if (isset($_GET['view']))
 		}
 
 		// look for some games
-		$get_item = $dbl->run("SELECT c.`name`,c.`id` FROM `calendar` c JOIN `game_developer_reference` d WHERE d.game_id = c.id AND d.developer_id = ?", array($_GET['id']))->fetch_all();
+		$get_item = $dbl->run("SELECT c.`name`,c.`id` FROM `calendar` c JOIN `game_developer_reference` d WHERE d.game_id = c.id AND d.developer_id = ? ORDER BY `name` ASC", array($_GET['id']))->fetch_all();
 		if ($get_item)
 		{
 			foreach ($get_item as $game)

@@ -31,7 +31,7 @@ if (isset($_GET['view']))
 		}
 		
 		// make sure they exist
-		$check_dev = $dbl->run("SELECT `name` FROM `developers` WHERE `id` = ?", array($_GET['id']))->fetchOne();
+		$check_dev = $dbl->run("SELECT `name`,`website` FROM `developers` WHERE `id` = ?", array($_GET['id']))->fetch();
 		if (!$check_dev)
 		{
 			$_SESSION['message'] = 'none_found';
@@ -40,11 +40,17 @@ if (isset($_GET['view']))
 			die();			
 		}
 
-		$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$check_dev, 1);
-		$templating->set_previous('title', $check_dev, 1);	
+		$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$check_dev['name'], 1);
+		$templating->set_previous('title', $check_dev['name'], 1);	
 
 		$templating->block('developer_list_top');
-		$templating->set('dev_name', $check_dev);
+		$templating->set('dev_name', $check_dev['name']);
+
+		if (!empty($check_dev['website']))
+		{
+			$templating->block('developer_website');
+			$templating->set('link', '<a href="'.$check_dev['website'].'">'.$check_dev['website'].'</a>');
+		}
 
 		// look for some games
 		$get_item = $dbl->run("SELECT c.`name`,c.`id` FROM `calendar` c JOIN `game_developer_reference` d WHERE d.game_id = c.id AND d.developer_id = ?", array($_GET['id']))->fetch_all();
@@ -328,7 +334,7 @@ if (isset($_GET['view']))
 			}
 
 			$get_item['name'] = trim($get_item['name']);
-			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC", array($get_item['name']))->fetch_all();
+			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC LIMIT 5", array($get_item['name']))->fetch_all();
 			if ($articles_res)
 			{
 				$article_list = '';
@@ -348,6 +354,10 @@ if (isset($_GET['view']))
 					}
 
 					$article_list .= '<li><a href="' . $article_link . '">'.$articles['title'].'</a> by '.$username.'</li>';
+				}
+				if (count($articles_res) == 5)
+				{
+					$article_list .= '<li><a href="/index.php?module=search&appid='.$get_item['id'].'">View all tagged articles</a>.</li>';
 				}
 				$templating->set('articles', $article_list);
 			}

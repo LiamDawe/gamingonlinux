@@ -63,8 +63,8 @@ $templating->load('itemdb');
 $templating->block('itemdb_navigation', 'itemdb');
 
 // count the total
-$total_games = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `supports_linux` = 1 AND `approved` = 1 AND `is_emulator` = 0 AND `is_application` = 0 AND `bundle` = 0 AND `also_known_as` IS NULL")->fetchOne();
-$templating->set('total', $total_games);
+$total_games = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `supports_linux` = 1 AND `approved` = 1 AND `is_application` = 0 AND `bundle` = 0 AND `also_known_as` IS NULL")->fetchOne();
+$templating->set('total', number_format($total_games));
 
 // LANDING PAGE TODO - NEED TO UPDATE ALL SEARCHES TO $_GET['view'] == 'mainlist'
 if (!isset($_GET['view']))

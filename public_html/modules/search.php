@@ -21,7 +21,7 @@ if (isset($_GET['q']))
 }
 $templating->set('search_text', htmlspecialchars($search_text));
 
-if (!isset($_GET['q']) && !isset($_GET['author_id']))
+if (!isset($_GET['q']) && !isset($_GET['author_id']) && !isset($_GET['appid']))
 {
 	$templating->load('articles');
 	$templating->block('multi', 'articles');
@@ -218,6 +218,100 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 	{
 		$templating->set_previous('title', 'No user found!', 1);
 		$core->message("That user doesn't exist!");
+	}
+
+	$templating->block('bottom', 'search');
+	$start_no = $core->start;
+	if ($core->start == 0)
+	{
+		$start_no = 1;
+	}
+	$templating->set('search_no_start', $start_no);
+
+	$end_no = $core->start + $per_page;
+	if ($end_no > $total)
+	{
+		$end_no = $total;
+	}
+	$templating->set('end_no', $end_no);
+
+	$templating->set('total', $total);
+	$templating->set('pagination', $pagination);
+}
+
+if (isset($_GET['appid']) && is_numeric($_GET['appid']))
+{
+	$pagination = '';
+
+	// check they actually exist
+	$exists = $dbl->run("SELECT `id` FROM `calendar` WHERE `id` = ?", array($_GET['appid']))->fetch();
+	if ($exists)
+	{
+		// paging for pagination
+		$page = core::give_page();
+		
+		// count how many there is in total
+		$total = $dbl->run("SELECT COUNT(ia.`article_id`) FROM `article_item_assoc` ia JOIN `articles` a ON ia.article_id = a.article_id WHERE ia.`game_id` = ? AND a.`active` = 1", array($_GET['appid']))->fetchOne();
+
+		$per_page = 15;
+		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
+		{
+			$per_page = $_SESSION['per-page'];
+		}
+
+		//lastpage is = total found / items per page, rounded up.
+		if ($total <= 10)
+		{
+			$lastpage = 1;
+		}
+		else
+		{
+			$lastpage = ceil($total/$per_page);
+		}
+
+		if ($page > $lastpage)
+		{
+			$page = $lastpage;
+		}
+
+		// sort out the pagination link
+		$pagination = $core->pagination_link($per_page, $total, "/index.php?module=search&appid={$_GET['appid']}&", $page);
+
+		// do the search query
+		$found_search = $dbl->run("SELECT ia.`article_id`, c.`name`, a.`title`, a.`slug`, a.`author_id`, a.`tagline`, a.`date`, a.guest_username, a.`show_in_menu`, a.`comment_count`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `article_item_assoc` ia JOIN `calendar` c ON ia.`game_id` = c.`id` JOIN `articles` a ON ia.`article_id` = a.`article_id` LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.active = 1 and ia.`game_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['appid'], $core->start))->fetch_all();
+		$templating->set_previous('title', 'Linux gaming articles tagged for ' . $found_search[0]['name'], 1);
+		$templating->set_previous('meta_description', 'Linux gaming articles on GamingOnLinux tagged for ' . $found_search[0]['name'], 1);
+
+		$templating->block('game_top');
+		$templating->set('appid', $_GET['appid']);
+		$templating->set('app_title', $found_search[0]['name']);
+
+		if ($total > 0)
+		{
+			$article_id_array = array();
+
+			foreach ($found_search as $article)
+			{
+				$article_id_array[] = $article['article_id'];
+			}
+			$article_id_sql = implode(', ', $article_id_array);
+	
+			$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
+
+			$templating->load('articles');
+
+			// loop through results
+			$article_class->display_article_list($found_search, $get_categories);
+		}
+		else
+		{
+			$core->message('They have posted no articles!');
+		}
+	}
+	else
+	{
+		$templating->set_previous('title', 'App not found!', 1);
+		$core->message("Sorry, that app ID doesn't seem to exist.");
 	}
 
 	$templating->block('bottom', 'search');

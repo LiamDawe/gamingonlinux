@@ -92,7 +92,7 @@ do {
 				echo $image . '<br />';
 
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `small_picture` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `small_picture` FROM `calendar` WHERE `name` = ? OR `gog_link` = ? OR `gog_link` = ?", array($games['title'], $website, $games['short_link']))->fetch();
 
 				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 				$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($games['title']))->fetch();
@@ -100,6 +100,9 @@ do {
 				if (!$game_list && !$check_dupes)
 				{
 					$dbl->run("INSERT INTO `calendar` SET `name` = ?, `date` = ?, `gog_link` = ?, `approved` = 1", array($games['title'], $games['original_release_date'], $website));
+					$new_id = $dbl->new_id();
+					
+					$dbl->run("INSERT INTO `itemdb_calendar` SET `item_id` = ?, `store_id` = 5, `release_date` = ?", array($new_id, $games['original_release_date']));
 
 					// need to grab it again
 					$game_list = $dbl->run("SELECT `id`, `small_picture` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();

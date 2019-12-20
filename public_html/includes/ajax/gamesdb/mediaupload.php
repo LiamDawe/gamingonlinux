@@ -27,14 +27,6 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 	header('Content-Type: application/json');
 
 	define ("MAX_SIZE",2*1024*1024); // 2MB
-	function getExtension($str)
-	{
-		$i = strrpos($str,".");
-		if (!$i) { return ""; }
-		$l = strlen($str) - $i;
-		$ext = substr($str,$i+1,$l);
-		return $ext;
-	}
 
 	$item_id = 0;
 	$item_dir = 'tmp/';
@@ -66,13 +58,11 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 	if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 	{
 		foreach ($_FILES['media']['name'] as $name => $value)
-		{
+		{	
 			$filename = stripslashes($_FILES['media']['name'][$name]);
 			$size=filesize($_FILES['media']['tmp_name'][$name]);
-			//get the extension of the file in a lower case format
-			$ext = getExtension($filename);
-			$ext = strtolower($ext);
-
+			$ext = pathinfo($filename, PATHINFO_EXTENSION);
+			
 			if(in_array($ext,$valid_formats))
 			{
 				if ($size < (MAX_SIZE))

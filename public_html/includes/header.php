@@ -79,7 +79,7 @@ $templating->set('url', $core->config('website_url'));
 
 $branding['icon'] = 'icon.svg';
 // christmas
-if (date('m') == '12')
+if (date('m') == '12' && date('d') <= 26)
 {
 	$branding['icon'] = 'icon_xmas.png';
 }

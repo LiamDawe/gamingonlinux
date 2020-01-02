@@ -4,6 +4,8 @@ define('golapp', TRUE);
 include(APP_ROOT . '/includes/header.php');
 
 $templating->set_previous('title', 'GamingOnLinux Image Comparison', 1);
+$templating->set_previous('meta_description', 'GamingOnLinux Image Comparison', 1);
+
 
 if (!isset($_GET['1']) || !isset($_GET['2']))
 {

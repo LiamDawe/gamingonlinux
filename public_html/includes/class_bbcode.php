@@ -202,6 +202,14 @@ class bbcode
 		},
 		$text);
 
+		// markdown image as a link
+		$text = preg_replace_callback("~\[\[img\](($this->protocols).+?)\[\/img\]\]\((($this->protocols).+?)\)~is",
+		function($matches)
+		{
+			return "<a href=\"".$matches[3]."\" target=\"_blank\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+		},
+		$text);
+
 		$text = preg_replace_callback("~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i",
 		function($matches)
 		{
@@ -215,7 +223,7 @@ class bbcode
 		{
 			return "<a data-fancybox=\"images\" rel=\"group\" href=\"".$matches[1]."\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
-		$text);		
+		$text);
 		
 		return $text;
 	}
@@ -237,10 +245,19 @@ class bbcode
 		return $text;
 	}
 
+	function parse_lists($text)
+	{
+		$list_types = array('-', '*');
+
+		$text = preg_replace();
+
+		return $text;
+	}
+
 	function parse_bbcode($body, $article = 1)
 	{
 		//  get rid of empty BBCode, is there a point in having excess markup?
-		$body = preg_replace("`\[(b|i|s|u|url|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|url|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
+		$body = preg_replace("`\[(b|i|s|u|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
 
 		// Array for tempory storing codeblock contents
 		$codeBlocks = [];

@@ -303,7 +303,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				foreach ($licenses as $license)
 				{
 					$selected = '';
-					if ($game['license'] == $license)
+					if ($game['license'] == $license['license_name'])
 					{
 						$selected = 'selected';
 					}

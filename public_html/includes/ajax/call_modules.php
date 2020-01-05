@@ -20,7 +20,7 @@ if(isset($_GET['q']))
 	}
 	else
 	{
-		$data[] = array('id' => '0', 'text' => 'No modules found that match!');
+		$data[] = array('text' => 'No modules found that match!');
 	}
 	echo json_encode($data);
 }

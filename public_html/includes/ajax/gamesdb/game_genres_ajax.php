@@ -19,7 +19,7 @@ if(isset($_GET['q']))
 	}
 	else
 	{
-		$data[] = array('id' => '0', 'text' => 'No categories found that match!');
+		$data[] = array('text' => 'No categories found that match!');
 	}
 	echo json_encode($data);
 }

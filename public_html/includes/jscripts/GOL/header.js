@@ -371,7 +371,7 @@ jQuery(document).ready(function()
 
 	if ( $.isFunction($.fn.select2) ) 
 	{
-		$("#articleCategories").select2({
+		$(".articleCategories").select2({
 			selectOnClose: true,
 			width: '100%',
 			ajax: {

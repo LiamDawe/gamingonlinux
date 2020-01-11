@@ -381,29 +381,29 @@ if (!isset($_GET['go']))
 
 				$templating->set('paging', $article_pagination);
 
-				$categories_display = '';
+				$categories_display = array();
 				if ($article['show_in_menu'] == 1)
 				{
-					$categories_display = '<li><a href="#">Editors Pick</a></li>';
+					$categories_display[] = '<a href="#">Editors Pick</a>';
 				}
 
 				$get_categories = $article_class->find_article_tags(array('article_ids' => $article['article_id']));
 	
 				if ($get_categories)
 				{
-					$categories_display .= $article_class->display_article_tags($get_categories[$article['article_id']]);
+					$categories_display = array_merge($categories_display, $article_class->display_article_tags($get_categories[$article['article_id']], 'array_plain'));
 				}
 
 				$current_linked_games = $dbl->run("SELECT a.`game_id`, g.`name` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ?", array($article['article_id']))->fetch_all();
 				if ($current_linked_games)
 				{
-					$categories_display .= $article_class->display_game_tags($current_linked_games);
+					$categories_display = array_merge($categories_display, $article_class->display_game_tags($current_linked_games, 'array_plain'));
 				}
 
 				if (!empty($categories_display))
 				{
 					$templating->block('tags', 'articles_full');
-					$templating->set('categories_list', $categories_display);
+					$templating->set('categories_list', 'Tags: ' . implode(', ', $categories_display));
 				}
 
 				// article meta for bookmarking, likes etc

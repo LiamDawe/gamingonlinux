@@ -105,40 +105,69 @@ class article
 		return $get_categories;
 	}
 
-	public function display_article_tags($categories_list)
+	public function display_article_tags($categories_list, $style = 'list')
 	{
-		$categories_output = '';
+		if ($style == 'list')
+		{
+			$categories_output = '';
+		}
+		if ($style == 'array_plain')
+		{
+			$categories_output = array();
+		}
+		
 		if (!empty($categories_list))
 		{
 			foreach ($categories_list as $tag)
 			{
 				$category_link = $this->tag_link($tag['category_name']);
 
+				$class = '';
 				if ($tag['category_id'] == 60)
 				{
-					$categories_output .= " <li class=\"ea\"><a href=\"$category_link\">{$tag['category_name']}</a></li> ";
+					$class = 'class="ea"';
 				}
 				else if ($tag['category_name'] == 'Steam Play')
 				{
-					$categories_output .= " <li class=\"steamplay\"><a href=\"$category_link\">{$tag['category_name']}</a></li> ";
+					$class = 'class="steamplay"';
 				}
-				else
+
+				if ($style == 'list')
 				{
-					$categories_output .= " <li><a href=\"$category_link\">{$tag['category_name']}</a></li> ";
+					$categories_output .= " <li ".$class."><a href=\"$category_link\">{$tag['category_name']}</a></li> ";
+				}
+				if ($style == 'array_plain')
+				{
+					$categories_output[] = "<a ".$class." href=\"$category_link\">{$tag['category_name']}</a>";
 				}
 			}
 		}
 		return $categories_output;
 	}
 
-	public function display_game_tags($games_list)
+	public function display_game_tags($games_list, $style = 'list')
 	{
-		$categories_output = '';
+		if ($style == 'list')
+		{
+			$categories_output = '';
+		}
+		if ($style == 'array_plain')
+		{
+			$categories_output = array();
+		}
+
 		if (!empty($games_list))
 		{
 			foreach ($games_list as $tag)
 			{
-				$categories_output .= " <li><a href=\"/itemdb/".$tag['game_id']."\">{$tag['name']}</a></li> ";
+				if ($style == 'list')
+				{
+					$categories_output .= " <li><a href=\"/itemdb/".$tag['game_id']."\">{$tag['name']}</a></li> ";
+				}
+				if ($style == 'array_plain')
+				{
+					$categories_output[] = "<a href=\"/itemdb/".$tag['game_id']."\">{$tag['name']}</a>";
+				}
 			}
 		}
 		return $categories_output;
@@ -824,7 +853,7 @@ class article
 
 	public function tag_link($name)
 	{
-		$name = urlencode($name);
+		$name = rawurlencode($name);
 		$link = 'articles/category/'.$name;
 		return $this->core->config('website_url') . $link;
 	}

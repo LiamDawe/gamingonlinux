@@ -402,8 +402,13 @@ if (!isset($_GET['go']))
 
 				if (!empty($categories_display))
 				{
+					$suggest_link = '';
+					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+					{
+						$suggest_link = ' (<a href="/index.php?module=article_tag_suggest&amp;article_id='.$article['article_id'].'">Suggest more</a>) ';
+					}
 					$templating->block('tags', 'articles_full');
-					$templating->set('categories_list', 'Tags: ' . implode(', ', $categories_display));
+					$templating->set('categories_list', 'Tags'.$suggest_link.': ' . implode(', ', $categories_display));
 				}
 
 				// article meta for bookmarking, likes etc

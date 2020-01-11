@@ -98,7 +98,38 @@ if (isset($_GET['view']))
 		}
 	}
 
-	if (!$topics && !$replies && !$comments)
+	/* article tag suggestions */
+	$tag_suggest = $dbl->run("SELECT s.`article_id`, c.`category_name`, c.category_id, s.`suggested_by_id`, a.`title` FROM `article_category_suggestions` s INNER JOIN `articles_categorys` c ON s.category_id = c.category_id JOIN `articles` a ON a.article_id = s.article_id GROUP BY s.suggested_by_id, s.`article_id`, c.category_id")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
+
+	if ($tag_suggest)
+	{		
+		foreach ($tag_suggest as $id => $tags)
+		{
+			$templating->block('suggest_tags');
+			$templating->set('title', $tags[0]['title']);
+			$templating->set('article_id', $id);
+
+			$current_genres = 'None!';
+			$get_categories = $article_class->find_article_tags(array('article_ids' => $id));
+			$get_genres = $article_class->display_article_tags($get_categories[$id], 'array_plain');
+			if (is_array($get_genres))
+			{
+				$current_genres = implode(', ', $get_genres);
+			}
+			$templating->set('current_tags', $current_genres);
+
+			$suggested_list = '';
+			foreach ($tags as $tag)
+			{
+				$suggested_list .= '<option value="'.$tag['category_id'].'" selected>'.$tag['category_name'].'</option>';
+			}
+			$templating->set('suggested_list', $suggested_list);
+			$templating->set('time', core::$sql_date_now);
+			$templating->set('suggested_by_id', $tags[0]['suggested_by_id']);
+		}
+
+	}
+	if (!$topics && !$replies && !$comments && !$tag_suggest)
 	{
 		$core->message("Nothing to approve!");
 	}
@@ -464,6 +495,99 @@ if (isset($_POST['action']))
 		$_SESSION['message_extra'] = 'post';
 		header("Location: /admin.php?module=mod_queue&view=manage");
 		die();
+	}
+
+	if ($_POST['action'] == 'deny_tags')
+	{
+		if (empty($_POST['article_id']) || !is_numeric($_POST['article_id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'article';
+			header("Location: /admin.php?module=mod_queue&view=manage");
+			die();
+		}
+
+		// delete all suggested tags for this game, that were suggested up until we saw them (so we don't deny submissions we haven't seen since coming here)
+		$dbl->run("DELETE FROM `article_category_suggestions` WHERE `article_id` = ? AND `suggested_time` <= ?", [$_POST['article_id'], $_POST['current_time']]);
+
+		// update the original notification to clear it
+		$core->update_admin_note(array('type' => 'submitted_article_tag_suggestion', 'data' => $_POST['article_id'], 'sql_where' => array('fields' => 'created_date <= ?', 'values' => core::$date)));
+	
+		// note who approved this item for the database and note the new tags
+		$core->new_admin_note(array('completed' => 1, 'content' => ' denied submitted tags for an article.'));
+
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'tag suggestions';
+		header("Location: /admin.php?module=mod_queue&view=manage");
+	}
+
+	if ($_POST['action'] == 'approve_tags')
+	{
+		if (empty($_POST['article_id']) || !is_numeric($_POST['article_id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'game';
+			header("Location: /admin.php?module=mod_queue&view=manage");
+			die();
+		}
+
+		if (isset($_POST['categories']) && !empty($_POST['categories']))
+		{
+			$to_remove = [];
+			// find the difference between the accepted tags and the last submitted items we saw
+			$suggestions_seen = $dbl->run("SELECT `category_id` FROM `article_category_suggestions` WHERE `suggested_time` <= ?", [$_POST['current_time']])->fetch_all(PDO::FETCH_COLUMN, 0);
+
+			// remove suggested tags we have hit the little x on when approving, to remove them and approve what was left
+			foreach ($suggestions_seen as $suggest)
+			{
+				if (!in_array($suggest, $_POST['categories']))
+				{
+					$to_remove[] = $suggest;
+				}
+			}
+			if (!empty($to_remove))
+			{
+				$in  = str_repeat('?,', count($to_remove) - 1) . '?';
+				$merged_array = array_merge([$_POST['article_id']], $to_remove);
+				$dbl->run("DELETE FROM `article_category_suggestions` WHERE `article_id` = ? AND `category_id` IN ($in)", $merged_array);
+			}
+
+			$category_ids_list = [];
+			foreach ($_POST['categories'] as $category_id)
+			{
+				// ensure it isn't already tagged (perhaps an editor recently added it manually?)
+				$check_exists = $dbl->run("SELECT `ref_id` FROM `article_category_reference` WHERE `article_id` = ? AND `category_id` = ?", [$_POST['article_id'], $category_id])->fetchOne();
+				if (!$check_exists)
+				{
+					$dbl->run("INSERT INTO `article_category_reference` SET `article_id` = ?, `category_id` = ?", [$_POST['article_id'], $category_id]);
+					$category_ids_list[] = $category_id;
+				}
+				
+				// no matter what, if we actually approved it, or silently ignored it (due to the above) - remove the suggestion
+				$dbl->run("DELETE FROM `article_category_suggestions` WHERE `article_id` = ? AND `category_id` = ?", [$_POST['article_id'], $category_id]);
+			}
+
+			// get the name for the admin note
+			$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetchOne();
+
+			// get the tag names for the admin note
+			$in = str_repeat('?,', count($category_ids_list) - 1) . '?';
+			$tag_names = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_id` IN ($in)", $category_ids_list)->fetch_all(PDO::FETCH_COLUMN);
+
+			// update the original notification to clear it
+			$core->update_admin_note(array('type' => 'submitted_article_tag_suggestion', 'data' => $_POST['article_id'], 'sql_where' => array('fields' => 'created_date <= ?', 'values' => strtotime($_POST['current_time']))));
+	
+			// note who approved this item for the database and note the new tags
+			$core->new_admin_note(array('completed' => 1, 'content' => ' approved submitted tags for an article - <a href="/articles/'.$_POST['article_id'].'">'.$title.'</a>. New tags: ' . implode(', ', $tag_names) . '.'));
+
+			$_SESSION['message'] = 'saved';
+			$_SESSION['message_extra'] = 'list of tags';
+			header("Location: /admin.php?module=mod_queue&view=manage");
+		}
+		else
+		{
+			header("Location: /admin.php?module=mod_queue&view=manage");
+		}
 	}
 }
 ?>

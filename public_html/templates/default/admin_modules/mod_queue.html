@@ -36,3 +36,23 @@
 [block: bottom]
 
 [/block: bottom]
+
+[block: suggest_tags]
+<script src="includes/jscripts/jquery.form.min.js"></script>
+<div class="box">
+	<div class="head">
+		Suggested tags for <a href="/articles/{:article_id}">{:title}</a>
+	</div>
+	<div class="body group">
+		<form method="post">
+			<strong>Current tags:</strong> {:current_tags}<br />
+			<strong>Suggested tags</strong> (you can add more, hit the cross to approve only a few):<br />
+			<select tabindex="-1" multiple="" name="categories[]" class="populate select2-offscreen articleCategories">{:suggested_list}</select><br />
+			<input type="hidden" name="article_id" value="{:article_id}" />
+			<input type="hidden" name="current_time" value="{:time}" />
+			<input type="hidden" name="suggested_by_id" value="{:suggested_by_id}" />
+			<button formaction="admin.php?module=mod_queue" name="action" value="approve_tags" type="submit">Approve tags</button> <button formaction="admin.php?module=mod_queue" name="action" value="deny_tags" type="submit">Deny all tags</button>
+		</form>
+	</div>
+</div>
+[/block: suggest_tags]

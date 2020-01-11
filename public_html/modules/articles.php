@@ -152,7 +152,7 @@ if (isset($view))
 		}
 		
 		// otherwise, pick articles that have any of the selected tags
-		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql AND a.`active` = 1 $all_sql", $safe_ids)->fetchOne();
+		$total_items = $dbl->run("SELECT COUNT(*) FROM (SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql AND a.`active` = 1 $all_sql) AS `total`", $safe_ids)->fetchOne();
 		
 		if ($total_items > 0)
 		{
@@ -170,7 +170,7 @@ if (isset($view))
 				$page = $last_page;
 			}
 
-			$paging_url = "/index.php?module=articles&view=multiple&" . $for_url;
+			$paging_url = "/index.php?module=articles&view=multiple&amp;" . $for_url . '&amp;type=' . $type . '&amp;';
 			
 			// sort out the pagination link
 			$pagination = $core->pagination_link($articles_per_page, $total_items, $paging_url, $page);
@@ -202,24 +202,21 @@ if (isset($view))
 			$all_sql
 			ORDER BY a.`date` DESC LIMIT {$core->start}, $articles_per_page", $safe_ids)->fetch_all();
 
-		if ($total_items > 0)
+		$article_id_array = array();
+
+		foreach ($articles_get as $article)
 		{
-			$article_id_array = array();
-
-			foreach ($articles_get as $article)
-			{
-				$article_id_array[] = $article['article_id'];
-			}
-
-			$article_id_sql = implode(', ', $article_id_array);
-
-			$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
-
-			$article_class->display_article_list($articles_get, $get_categories);
-				
-			$templating->block('bottom');
-			$templating->set('pagination', $pagination);
+			$article_id_array[] = $article['article_id'];
 		}
+
+		$article_id_sql = implode(', ', $article_id_array);
+
+		$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
+		
+		$article_class->display_article_list($articles_get, $get_categories);
+				
+		$templating->block('bottom');
+		$templating->set('pagination', $pagination);
 	}
 	else
 	{

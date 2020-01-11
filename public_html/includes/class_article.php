@@ -853,6 +853,7 @@ class article
 
 	public function tag_link($name)
 	{
+		$name = str_replace(' ', '_', $name);
 		$name = rawurlencode($name);
 		$link = 'articles/category/'.$name;
 		return $this->core->config('website_url') . $link;

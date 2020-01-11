@@ -65,6 +65,7 @@ if (isset($view))
 		}
 
 		$safe_category = mb_convert_encoding(strip_tags($_GET['catid']),'UTF-8');
+		$safe_category = str_replace('_', ' ', $safe_category);
 		$get_category = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` WHERE `category_name` = ?", array($safe_category))->fetch();
 		if (!$get_category)
 		{

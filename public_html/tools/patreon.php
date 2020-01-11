@@ -125,12 +125,22 @@ if (isset($_POST['go']))
 		unset($their_groups);
 	}
 
-	// okay, now we need to remove anyone not in that list
-	$in = str_repeat('?,', count($user_id_list) - 1) . '?';
+	if (!isset($_POST['test_run']))
+	{
+		// okay, now we need to remove anyone not in that list
+		$in = str_repeat('?,', count($user_id_list) - 1) . '?';
 
-	$remove_sql = "DELETE g FROM `user_group_membership` g INNER JOIN `users` u ON u.`user_id` = g.`user_id` WHERE u.`user_id` NOT IN ($in) AND g.group_id IN (9,6,13) AND u.`lifetime_supporter` = 0 AND u.`supporter_type` = 'patreon'";
-	$dbl->run($remove_sql, $user_id_list);
+		$remove_sql = "DELETE g FROM `user_group_membership` g INNER JOIN `users` u ON u.`user_id` = g.`user_id` WHERE u.`user_id` NOT IN ($in) AND g.group_id IN (9,6,13) AND u.`lifetime_supporter` = 0 AND u.`supporter_type` = 'patreon'";
+		$dbl->run($remove_sql, $user_id_list);
 
-	$dbl->run("UPDATE `users` SET `supporter_type` = NULL WHERE `supporter_type` = 'patreon' AND `user_id` NOT IN ($in)", $user_id_list);
+		$removed = $dbl->rowcount();
+
+		if ($removed > 0)
+		{
+			echo PHP_EOL . $removed . ' total usrs removed as supporters.';
+		}
+
+		$dbl->run("UPDATE `users` SET `supporter_type` = NULL WHERE `supporter_type` = 'patreon' AND `user_id` NOT IN ($in)", $user_id_list);
+	}
 }
 ?>

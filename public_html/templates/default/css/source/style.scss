@@ -534,16 +534,24 @@ select.pagination {
 	margin: 0 7px 7px 0;
 }
 .article .tags ul li.ea {
-	background: #ca8142;
+	background: #ac6a30;
 	float: left;
 	padding: 2px 0;
 	margin: 0 7px 7px 0;
 }
 .article .tags ul li.steamplay {
-	background: #b8b159;
+	background: #928d44;
 	float: left;
 	padding: 2px 0;
 	margin: 0 7px 7px 0;
+}
+.article .tags > a.ea
+{
+	color: #ac6a30;
+}
+.article .tags > a.steamplay
+{
+	color: #928d44;
 }
 .article .tags ul li a {
 	color: #ffffff;
@@ -627,6 +635,7 @@ select.pagination {
 .article.individual .tags {
 	border-top: 1px solid #cccccc;
 	padding: 14px;
+	font-size: 12px;
 }
 .article.individual.no-image .info {
 	padding: 0px 0px 27px 170px;
@@ -1513,7 +1522,7 @@ background: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 .likes_hidden{display:none;}
 .article_likes
 {
-	font-size: .85rem;
+	font-size: 12px;
 	padding: 4px 7px;
 	clear: both;
 	background: #DFDFDF; /* For browsers that do not support gradients */

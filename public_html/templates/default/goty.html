@@ -126,19 +126,27 @@ Direct link: <a href="{:url}goty.php?module=direct&amp;game_id={:game_id}&amp;ca
 <div class="goty">
 [/block: category_top]
 
-[block: category_row]
-<div class="col-4">
+[block: group]
+<div class="box"><div class="subhead">{:group_name}</div></div>
+[/block: group]
+
+[block: goty_categories]
+<div class="goty_categories">
+[/block: goty_categories]
+
+[block: category_column]
+<div class="goty_column">
 	<div class="box">
 		<div class="body group">
 			<a href="/goty.php?module=category&amp;category_id={:category_id}">{:category_name}</a>{:tick}
 		</div>
 	</div>
 </div>
-[/block: category_row]
+[/block: category_column]
 
-[block: category_bottom]
+[block: goty_categories_end]
 </div>
-[/block: category_bottom]
+[/block: goty_categories_end]
 
 [block: games_bottom]
 </div>

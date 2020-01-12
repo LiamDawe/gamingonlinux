@@ -131,14 +131,47 @@ if (isset($_GET['view']))
 
 		// categories managing
 		$templating->block('config_category_top');
+		$options = '';
+		$groups = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` WHERE `is_group` = 1 ORDER BY `category_name` ASC")->fetch_all();
+		foreach ($groups as $group)
+		{
+			$options .= '<option value="'.$group['category_id'].'">'.$group['category_name'].'</option>';
+		}
+		$templating->set('group_options', $options);
 
-		$getcats = $dbl->run("SELECT `category_id`, `category_name`, `description` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
+		$getcats = $dbl->run("SELECT `category_id`, `category_name`, `description`, `is_group`, `group_id` FROM `goty_category` ORDER BY `is_group` DESC, `category_name` ASC")->fetch_all();
 		foreach ($getcats as $cat)
 		{
 			$templating->block('config_category_row');
 			$templating->set('category', $cat['category_name']);
 			$templating->set('description', $cat['description']);
 			$templating->set('cat_id', $cat['category_id']);
+
+			$group_check = '';
+			if ($cat['is_group'] == 1)
+			{
+				$group_check = 'checked';
+			}
+			$templating->set('group_check', $group_check);
+
+			$options = '';
+			$options .= '<option value="0" '.$none.'>None</option>';
+			foreach ($groups as $group)
+			{
+				$none = '';
+				if($cat['group_id'] == 0)
+				{
+					$none = 'selected';
+				}
+			
+				$selected = '';
+				if ($cat['group_id'] == $group['category_id'])
+				{
+					$selected = 'selected';
+				}
+				$options .= '<option value="'.$group['category_id'].'" '.$selected.'>'.$group['category_name'].'</option>';
+			}
+			$templating->set('group_options', $options);
 		}
 	}
 
@@ -416,8 +449,20 @@ if (isset($_POST['act']))
 			die();
 		}
 
+		$is_group = 0;
+		if (isset($_POST['is_group']))
+		{
+			$is_group = 1;
+		}
+
+		$group_id = 0;
+		if ($_POST['group_id'] != 0 && is_numeric($_POST['group_id']))
+		{
+			$group_id = $_POST['group_id'];
+		}
+
 		// add it
-		$dbl->run("INSERT INTO `goty_category` SET `category_name` = ?, `description` = ?", array($name, $description));
+		$dbl->run("INSERT INTO `goty_category` SET `category_name` = ?, `description` = ?, `is_group` = ?, `group_id` = ?", array($name, $description, $is_group, $group_id));
 		$core->new_admin_note(array('completed' => 1, 'content' => ' Added a new category to the GOTY Awards.'));
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'category';
@@ -450,8 +495,20 @@ if (isset($_POST['act']))
 			die();
 		}
 
+		$is_group = 0;
+		if (isset($_POST['is_group']))
+		{
+			$is_group = 1;
+		}
+
+		$group_id = 0;
+		if ($_POST['group_id'] != 0 && is_numeric($_POST['group_id']))
+		{
+			$group_id = $_POST['group_id'];
+		}
+
 		// edit it
-		$dbl->run("UPDATE `goty_category` SET `category_name` = ?, `description` = ? WHERE `category_id` = ?", array($name, $description, $category_id));
+		$dbl->run("UPDATE `goty_category` SET `category_name` = ?, `description` = ?, `is_group` = ?, `group_id` = ? WHERE `category_id` = ?", array($name, $description, $is_group, $group_id, $category_id));
 		$core->new_admin_note(array('completed' => 1, 'content' => ' Edited a category in the GOTY Awards.'));
 		$_SESSION['message'] = 'saved';
 		$_SESSION['message_extra'] = 'category';

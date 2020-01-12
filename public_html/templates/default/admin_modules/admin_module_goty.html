@@ -74,6 +74,9 @@
 		<form method="post">
 			Name: <input type="text" name="category" /><br />
 			Description: <input type="text" name="description" /><br />
+			<label><input type="checkbox" name="is_group" /> Make it a group?</label><br />
+			<em>This will make it a top-level category for others to be inside.</em><br />
+			Group: <select name="group_id"><option value="0">None</option>{:group_options}</select><br />
 			<button name="act" value="add_category" formaction="/admin.php?module=goty" type="submit">Add Category</button>
 		</form>
 	</div>
@@ -88,6 +91,9 @@
 			<form method="post">
 				Name: <input type="text" name="category" value="{:category}" /><br />
 				Description: <input type="text" name="description" value="{:description}" /><br />
+				<label><input type="checkbox" name="is_group" {:group_check} /> Make it a group?</label><br />
+				<em>This will make it a top-level category for others to be inside.</em><br />
+				Group: <select name="group_id">{:group_options}</select><br />
 				<input type="hidden" name="cat_id" value="{:cat_id}" />
 				<button name="act" value="edit_category" formaction="/admin.php?module=goty" type="submit">Edit Category</button> <button name="act" value="delete_category" formaction="/admin.php?module=goty" type="submit">Delete Category</button>
 		</form>

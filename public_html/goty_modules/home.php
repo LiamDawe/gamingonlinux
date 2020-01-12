@@ -40,24 +40,51 @@ $templating->set('voting_text', $voting_text);
 $templating->block('category_top', 'goty');
 $templating->set('category_status_text', $category_status_text);
 
-$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
-foreach ($cats as $cat)
-{
-	$templating->block('category_row', 'goty');
-	$templating->set('category_id', $cat['category_id']);
-	$templating->set('category_name', $cat['category_name']);
+$get_all_cats = $dbl->run("SELECT `category_id`, `category_name`, `is_group`, `group_id` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
 
-	$tick = '';
-	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+// sort them into top level groups and then voting categories
+$groups = array();
+$categories = array();
+
+foreach ($get_all_cats as $sort_cat)
+{
+	if ($sort_cat['is_group'] == 1)
 	{
-		$check_voted = $dbl->run("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $cat['category_id']))->fetch();
-		if ($check_voted)
-		{
-			$tick = '&#10004;';
-		}
+		$groups[] = $sort_cat;
 	}
-	$templating->set('tick', $tick);
+	else
+	{
+		$categories[] = $sort_cat;
+	}
 }
 
-$templating->block('category_bottom', 'goty');
+foreach ($groups as $group)
+{
+	$templating->block('group');
+	$templating->set('group_name', $group['category_name']);
+	
+	$templating->block('goty_categories');
+
+	foreach ($categories as $cat)
+	{
+		if ($cat['group_id'] == $group['category_id'])
+		{
+			$templating->block('category_column', 'goty');
+			$templating->set('category_id', $cat['category_id']);
+			$templating->set('category_name', $cat['category_name']);
+
+			$tick = '';
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			{
+				$check_voted = $dbl->run("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $cat['category_id']))->fetch();
+				if ($check_voted)
+				{
+					$tick = '&#10004;';
+				}
+			}
+			$templating->set('tick', $tick);
+		}
+	}
+	$templating->block('goty_categories_end','goty');
+}
 ?>

@@ -941,17 +941,16 @@ ul.social-networks li > a {
 .input-field:hover {border: 1px solid #05c9f0;}
 
 /* GOTY */
-.goty .col-4 {
-  width: 32.666666666666666666666666666667%;
-  margin: 0;
-}
-
-.goty .col-4:nth-child(3n+1){
-    clear: both;
-}
-
-.goty .col-4:nth-child(3n+2) {
-    margin: 0 1%;
+.goty_categories 
+{
+	width: 100%; 
+	display: grid;
+	/* Define Auto Row size */
+	grid-auto-rows: auto; 
+	/*Define our columns */
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+	grid-gap: 1em;
+	box-sizing: border-box;
 }
 
 .box .votebutton {
@@ -1347,6 +1346,10 @@ ul.social-networks li > a {
 	.header-navbar>.gol-icon>a {
 		line-height: 0;
 		padding: 9px 3px !important;
+	}
+	.goty_categories 
+	{
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
 	}
 }
 /* LANDSCAPE ORIENTATION */

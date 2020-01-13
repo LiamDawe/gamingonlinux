@@ -108,6 +108,12 @@ do
 					$game_id = $name_change;
 				}
 
+				// it has a date and not the one we have, add to email for new date
+				if (isset($game_list['date']) && $game_list['date'] != NULL && isset($clean_release_date) && $clean_release_date != $game_list['date'])
+				{
+					$new_games[] = array('release_date' => $clean_release_date, 'name' => $title . ' | NEW RELEASE DATE ', 'link' => $link);
+				}
+
 				$dbl->run("UPDATE `calendar` SET `date` = ? WHERE `id` = ?", array($clean_release_date, $game_id));
 
 				// update rows as needed that are empty

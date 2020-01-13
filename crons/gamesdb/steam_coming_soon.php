@@ -71,7 +71,7 @@ do
 			}
 			
 			// ADD IT TO THE GAMES DATABASE
-			$game_list = $dbl->run("SELECT `id`, `small_picture`, `bundle`, `date`, `steam_link`, `stripped_name`, `soon_date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `steam_id`, `small_picture`, `bundle`, `date`, `steam_link`, `stripped_name`, `soon_date` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
 
 			// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 			$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
@@ -119,6 +119,13 @@ do
 					$update = 1;
 					$sql_updates[] = '`steam_link` = ?';
 					$sql_data[] = $link;
+				}
+
+				if ($game_list['steam_id'] == NULL || $game_list['steam_id'] == '')
+				{
+					$update = 1;
+					$sql_updates[] = '`steam_id` = ?';
+					$sql_data[] = $steam_id;
 				}
 
 				if ($game_list['stripped_name'] == NULL || $game_list['stripped_name'] == '')

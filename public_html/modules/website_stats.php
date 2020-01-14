@@ -6,15 +6,6 @@ if(!defined('golapp'))
 $templating->set_previous('title', 'Website stats', 1);
 $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux website', 1);
 
-if ($filecache->check_cache('website_stats', 3600))
-{
-	$templating->get_cache('website_stats');
-}
-else // otherwise generate the page and make a cache from it
-{
-	echo $templating->output();
-
-	$filecache->init();
 
 	$templating->load('website_stats');
 
@@ -153,6 +144,55 @@ else // otherwise generate the page and make a cache from it
 	}
 	$templating->set('article_list', $liked_list);
 
+	// user numbers
+	$templating->block('user_numbers');
+
+	$user_count = $dbl->run("SELECT `total`, `date` FROM `stats_registered_users` ORDER BY `date` ASC")->fetch_all();
+	$user_dates = array();
+	$user_counts = array();
+	foreach ($user_count as $data)
+	{
+		$user_dates[] = '"' . date('d-m-y', strtotime($data['date'])) . '"';
+		$user_counts[] = $data['total'];
+	}
+
+	$userdatachart = "<div class=\"chartjs-container\"><canvas id=\"userdata\" width=\"400\" height=\"200\"></canvas></div>";
+
+	core::$user_chart_js .= "<script>var userdata = document.getElementById('userdata');
+	var Chartuserdata = new Chart.Line(userdata, {
+	type: 'line',
+	data: {
+	labels: [".implode(',', $user_dates)."],
+	datasets: [{
+		label: 'Users',
+		fill: false,
+		data: [".implode(', ', $user_counts)."],
+		backgroundColor: '#a6cee3',
+		borderColor: '#a6cee3',
+		borderWidth: 1
+	}]
+		},
+		options: {
+			legend: {
+				display: false
+			},responsive: true, maintainAspectRatio: false,
+	scales: {
+	yAxes: [{
+		ticks: {
+		beginAtZero:false
+		},
+					scaleLabel: {
+				display: true,
+				labelString: 'Registered users on GamingOnLinux'
+			}
+	}]
+	}
+	}
+	});
+	</script>";
+
+	$templating->set('user_chart', $userdatachart);
+
 	// a yearly total of articles, not including the bot account
 	$templating->block('yearly_articles');
 
@@ -171,9 +211,4 @@ else // otherwise generate the page and make a cache from it
 	$monthly_registrations = $dbl->run("SELECT date_format(FROM_UNIXTIME(register_date), '%Y-%m') as `name`, Count(*) as `data` FROM users WHERE year(FROM_UNIXTIME(register_date)) = $year_selector GROUP BY date_format(FROM_UNIXTIME(register_date), '%Y-%m')")->fetch_all();
 	$monthly_reg_chart = $charts->render(['filetype' => 'png'], ['name' => 'User registrations per month', 'grouped' => 0, 'data' => $monthly_registrations, 'h_label' => 'Total Users']);
 	$templating->set('monthly_registrations', $monthly_reg_chart);
-
-	echo $templating->output();
-
-	$filecache->write('website_stats');
-}
 ?>

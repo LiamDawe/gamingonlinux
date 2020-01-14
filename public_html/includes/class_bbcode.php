@@ -51,12 +51,12 @@ class bbcode
 			}
 
 			// they have a key already
-			if ($your_key['counter'] == 1)
+			if (isset($your_key['game_key']))
 			{
 				$key_claim .= '<strong>Grab a key</strong><br />You already claimed one: ' . $your_key['game_key'];
 			}
 			// they do not have a key
-			else if ($your_key['counter'] == 0)
+			else
 			{
 				$can_claim = 1; // start off by allowing them and removing as needed
 

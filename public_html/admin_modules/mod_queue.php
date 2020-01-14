@@ -290,13 +290,13 @@ if (isset($_POST['action']))
 				// update their approved count and comment count
 				$dbl->run("UPDATE `users` SET `mod_approved` = (mod_approved + 1), `comment_count` = (comment_count + 1) WHERE `user_id` = ?", [$_POST['author_id']]);
 
+				// run quote and reply notifications to anyone who needs them
+				$notifications->notify_users($approved['title'], $approved['comment_text'], $_POST['author_id'], $approved['username'], 'article_comment', $approved['article_id'], $_POST['post_id']);
+
+				/*
 				$new_notification_id = $notifications->quote_notification($approved['comment_text'], $approved['username'], $_POST['author_id'], array('type' => 'article_comment', 'thread_id' => $approved['article_id'], 'post_id' => $_POST['post_id']));
 
-				/* gather a list of subscriptions for this article (not including yourself!)
-				- Make an array of anyone who needs an email now
-				- Additionally, send a notification to anyone subscribed
-				*/
-				$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($approved['article_id'], $_POST['author_id'], $_POST['author_id']))->fetch_all();
+				$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options`, u.`display_comment_alerts` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($approved['article_id'], $_POST['author_id'], $_POST['author_id']))->fetch_all();
 				$users_array = array();
 				foreach ($users_to_email as $email_user)
 				{
@@ -382,7 +382,9 @@ if (isset($_POST['action']))
 					{
 						$dbl->run("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($approved['article_id'], $email_user['user_id']));
 					}
-				}
+				}*/
+
+
 
 				// notify editors this was done
 				$core->update_admin_note(array('type' => 'mod_queue_comment', 'data' => $_POST['post_id']));

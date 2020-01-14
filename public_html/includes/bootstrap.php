@@ -10,8 +10,6 @@ $dbl = new db_mysql();
 $core = new core($dbl);
 define('url', $core->config('website_url'));
 
-$notifications = new notifications($dbl, $core);
-
 $message_map = new message_map();
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
@@ -24,5 +22,7 @@ $user = new user($dbl, $core);
 $announcements_class = new announcements($core, $dbl, $user);
 
 $bbcode = new bbcode($dbl, $core, $user);
+
+$notifications = new notifications($dbl, $core, $bbcode);
 
 $article_class = new article($dbl, $core, $user, $templating, $bbcode);

@@ -63,6 +63,8 @@ if (!isset($_GET['view']))
 			$in = '?';
 			$user->blocked_tags = [0 => 0];
 			$pagination_target = '/all-articles/';
+
+			$templating->block('view_all');
 		}
 
 		// sort out the pagination link

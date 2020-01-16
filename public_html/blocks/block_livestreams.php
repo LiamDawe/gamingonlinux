@@ -32,22 +32,46 @@ else
 }
 
 // community streams
-$count_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 ORDER BY `date` ASC LIMIT 1";
-$get_info = $dbl->run($count_query)->fetch();
+$count_total = $dbl->run("SELECT COUNT(*) FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 AND `accepted` = 1 ORDER BY `date` ASC")->fetchOne();
+
+$more_text = '';
+if ($count_total <= 3)
+{
+	$more_text = 'Add your own livestream here.';
+}
+else if ($count_total > 3)
+{
+	$total = $count_total - 3;
+
+	$more_text = 'See all, there\'s ' . $total . ' more!';
+}
+
+$templating->set('more_text', $more_text);
+
+$livestream_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 AND `accepted` = 1 ORDER BY `date` ASC LIMIT 3";
+$get_info = $dbl->run($livestream_query)->fetch_all();
 
 if ($get_info)
 {
-	if ($get_info['date'] <= date('Y-m-d H:i:s'))
+	$community = $templating->block_store('community_streams');
+
+	$community_output = '';
+	foreach ($get_info as $info)
 	{
-		$countdown = 'Happening now!';
-	}
-	else
-	{
-		$countdown = '<noscript>'.$get_info['date'].' UTC</noscript><span id="livestream'.$get_info['row_id'].'"></span><script type="text/javascript">var livestream' . $get_info['row_id'] . ' = moment.tz("'.$get_info['date'].'", "UTC"); $("#livestream'.$get_info['row_id'].'").countdown(livestream'.$get_info['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+		if ($info['date'] <= date('Y-m-d H:i:s'))
+		{
+			$countdown = 'Happening now!';
+		}
+		else
+		{
+			$countdown = '<noscript>'.$info['date'].' UTC</noscript><span id="livestream'.$info['row_id'].'"></span><script type="text/javascript">var livestream' . $info['row_id'] . ' = moment.tz("'.$info['date'].'", "UTC"); $("#livestream'.$info['row_id'].'").countdown(livestream'.$info['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+		}
+
+		$community_output .= '<li><a href="'.$info['stream_url'].'" target="_blank">'.$info['title'].'</a><br />
+		<small>'.$countdown.'</small>';
 	}
 
-	$community = $templating->block_store('community_streams');
-	$community = $templating->store_replace($community, array('title' => $get_info['title'], 'date' => $countdown, 'url' => $get_info['stream_url']));
+	$community = $templating->store_replace($community, array('community_list' => $community_output));
 	$templating->set('community', $community);
 }
 else

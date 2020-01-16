@@ -32,10 +32,26 @@ You should really have these set, to make cookies more secure:
 - session.use_only_cookies = 1
 - session.cookie_secure = 1 (If you have an SSL cert)
 
-## Setting up a dev enviroment
+## Installing / Setting up a dev enviroment
 
-Setup apache, PHP and MySQL to serve up PHP pages as with any other. Adjust `includes/config.php` as needed for your Mysql installation.  
+Setup apache, PHP and MySQL to serve up PHP pages as with any other. 
+
+Create `includes/config.php` with this (fill your details):
+
+```
+<?php
+define("DB", 
+[
+    "DB_HOST_NAME" => "",
+    "DB_USER_NAME" => "",
+    "DB_PASSWORD" => "",
+    "DB_DATABASE" => ""
+]);
+```
+ 
 Import the development SQL database from the stripped SQL file `tools/SQL.sql`  
+
+Eventually I will do an actual installer...
 
 ## Apache rewrite
 

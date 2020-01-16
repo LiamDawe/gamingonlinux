@@ -8,6 +8,8 @@ uploads/avatars/*
 !uploads/avatars/author_pictures/index.htm
 uploads/articles
 uploads/gamesdb/small/
+uploads/tagline_gallery
+!uploads/tagline_gallery/index.htm
 cache/default
 cache/youtube_thumbs/
 includes/config.php

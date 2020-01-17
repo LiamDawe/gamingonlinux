@@ -74,21 +74,16 @@ class article
 		// setting a limit on the amount of tags per article
 		if (isset($options['limit']))
 		{
-			$category_tag_sql = "SELECT * FROM
-			(
-				SELECT a.article_id, a.`category_name`, a.`category_id`,
-				@rank1 := IF( @val = a.article_id, @rank1 +1, 1 ) AS rank1,
-				@val := a.article_id
-				FROM
-				(
-					SELECT r.article_id, c.`category_name`, c.`category_id`
-					FROM  `article_category_reference` r
-					INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
-					WHERE r.article_id IN ("  . $options['article_ids'] . ")
-					ORDER BY r.`article_id`,CASE WHEN (c.`show_first` = 1) THEN 0 ELSE 1 END ASC, c.category_name ASC
-				) AS a
-			)as Z
-			WHERE Z.rank1 < " . $options['limit'];
+			$category_tag_sql = "WITH CTE AS (
+				SELECT r.article_id, c.`category_name`, c.`category_id`,
+					   ROW_NUMBER() OVER (PARTITION BY r.`article_id` ORDER BY c.show_first DESC, c.category_name) AS rn
+				FROM  `article_category_reference` r
+				INNER JOIN  `articles_categorys` c ON c.category_id = r.category_id
+				WHERE r.article_id IN ("  . $options['article_ids'] . ")
+			)
+			SELECT article_id, category_name, category_id
+			FROM CTE
+			WHERE rn < " . $options['limit'];
 		}
 		// no limit, display all tags
 		else

@@ -10,6 +10,8 @@ $bbcode = new bbcode($dbl, $core, $user);
 
 if ($core->config('articles_rss') == 1)
 {
+	$rss_title = 'GamingOnLinux Latest Articles';
+
 	$sql_join = '';
 	$sql_addition = '';
 	if (isset($_GET['section']) && $_GET['section'] == 'overviews')
@@ -23,11 +25,17 @@ if ($core->config('articles_rss') == 1)
 	{
 		if (!is_array($_GET['tags']))
 		{
-			die("Tags list needs to be an array if tags!");
+			die("Tags list needs to be an array of tags!");
 		}
 		if (!core::is_number($_GET['tags']))
 		{
-			die("Tags list needs to be an array if tags!");
+			die("Tags have to be an ID number.");
+		}
+
+		if (count($_GET['tags']) == 1)
+		{
+			$name = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_id` = ?", $_GET['tags'])->fetchOne();
+			$rss_title = 'GamingOnLinux Article RSS For: ' . $name;
 		}
 		$sql_join .= " INNER JOIN `article_category_reference` c ON a.article_id = c.article_id ";
 		$in  = str_repeat('?,', count($_GET['tags']) - 1) . '?';
@@ -72,7 +80,7 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute( 'xmlns:dc', 'http://purl.org/dc/elements/1.1/' );
 
 	$xml->startElement('channel');
-	$xml->writeElement('title', 'GamingOnLinux Latest Articles');
+	$xml->writeElement('title', $rss_title);
 	$xml->writeElement('link', $core->config('website_url'));
 	$xml->writeElement('description', 'The latest articles from GamingOnLinux');
 	$xml->writeElement('pubDate', $last_date);

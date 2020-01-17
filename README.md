@@ -14,7 +14,7 @@ I will consider rewarding people who properly report security issues with games 
 
 ## Requirements
 
-This site requires atleast PHP 7, Mysql 5.6 or MariaDB 10.0 and apache 2.4.  
+This site requires atleast PHP 7, Mysql 8 or MariaDB 10.2.2 and apache 2.4.  
 It is also required to have the following php extentions available: 
 
 - BC Math

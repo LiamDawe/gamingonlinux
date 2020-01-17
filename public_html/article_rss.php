@@ -6,11 +6,12 @@ require dirname(__FILE__) . "/includes/loader.php";
 include dirname(__FILE__) . '/includes/config.php';
 $dbl = new db_mysql();
 $core = new core($dbl);
-$bbcode = new bbcode($dbl, $core, $user);
+$bbcode = new bbcode($dbl, $core, NULL);
 
 if ($core->config('articles_rss') == 1)
 {
 	$rss_title = 'GamingOnLinux Latest Articles';
+	$tags = NULL;
 
 	$sql_join = '';
 	$sql_addition = '';
@@ -23,22 +24,24 @@ if ($core->config('articles_rss') == 1)
 	// viewing specific tags only
 	if (isset($_GET['tags']))
 	{
-		if (!is_array($_GET['tags']))
+		$tags = $_GET['tags'];
+
+		if (!is_array($tags))
 		{
 			die("Tags list needs to be an array of tags!");
 		}
-		if (!core::is_number($_GET['tags']))
+		if (!core::is_number($tags))
 		{
 			die("Tags have to be an ID number.");
 		}
 
-		if (count($_GET['tags']) == 1)
+		if (count($tags) == 1)
 		{
-			$name = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_id` = ?", $_GET['tags'])->fetchOne();
+			$name = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_id` = ?", $tags)->fetchOne();
 			$rss_title = 'GamingOnLinux Article RSS For: ' . $name;
 		}
 		$sql_join .= " INNER JOIN `article_category_reference` c ON a.article_id = c.article_id ";
-		$in  = str_repeat('?,', count($_GET['tags']) - 1) . '?';
+		$in  = str_repeat('?,', count($tags) - 1) . '?';
 		$sql_addition .= ' AND c.`category_id` IN ( ' . $in . ' ) ';
 	}
 
@@ -46,7 +49,7 @@ if ($core->config('articles_rss') == 1)
 	FROM `articles` a $sql_join
 	WHERE a.`active` = 1 $sql_addition
 	ORDER BY a.`date` DESC
-	LIMIT 1", $_GET['tags'])->fetchOne();
+	LIMIT 1", $tags)->fetchOne();
 
 	// because firefox is fucking dumb and tries to download RSS instead of displaying, other browsers are fine
 	if (isset($_SERVER['HTTP_USER_AGENT']))
@@ -118,7 +121,7 @@ if ($core->config('articles_rss') == 1)
 		`users` u ON a.author_id = u.user_id $sql_join
 	WHERE a.`active` = 1 $sql_addition
 	ORDER BY a.`date` DESC
-	LIMIT 50", $_GET['tags'])->fetch_all();
+	LIMIT 50", $tags)->fetch_all();
 
 	foreach ($articles as $line)
 	{

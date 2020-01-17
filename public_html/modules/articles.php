@@ -80,6 +80,7 @@ if (isset($view))
 
 		$templating->block('category');
 		$templating->set('category', $get_category['category_name']);
+		$templating->set('category_id', $get_category['category_id']);
 		
 		$article_class->display_category_picker();
 		

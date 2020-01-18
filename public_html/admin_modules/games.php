@@ -1114,6 +1114,8 @@ if (isset($_POST['act']))
 			// remove article associations
 			$dbl->run("DELETE FROM `article_item_assoc` WHERE `game_id` = ?", [$_GET['id']]);
 
+			$dbl->run("DELETE FROM `user_wishlist` WHERE `game_id` = ?", array($_GET['id']));
+
 			// remove uploaded media
 			$grab_all = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `item_id` = ?", array($_GET['id']))->fetch_all();
 			foreach ($grab_all as $grabber)

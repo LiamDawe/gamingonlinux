@@ -81,7 +81,7 @@ if (isset($_POST['act']))
 						$core->new_admin_note(array('type' => 'goty_game_submission', 'data' => $game_id, 'content' => ' submitted a new game to the <a href="/admin.php?module=goty&view=submitted">GOTY awards</a>.'));
 
 						$_SESSION['message'] = 'goty_game_submitted';
-						header("Location: " . $core->config('website_url') . "goty.php");
+						header("Location: " . $core->config('website_url') . "goty.php?module=category&category_id=".$_POST['category']);
 					}
 					else if ($user->check_group([1,2,5]) == true)
 					{
@@ -91,33 +91,33 @@ if (isset($_POST['act']))
 						$core->new_admin_note(array('completed' => 1, 'type' => 'goty_game_added', 'data' => $game_id, 'content' => ' added a new game to the GOTY awards.'));
 
 						$_SESSION['message'] = 'goty_added_editor';
-						header("Location: " . $core->config('website_url') . "goty.php");
+						header("Location: " . $core->config('website_url') . "goty.php?module=category&category_id=".$_POST['category']);
 					}
 				}
 
 				else if ($check['accepted'] == 1)
 				{
 					$_SESSION['message'] = 'game_exists';
-					header("Location: " . $core->config('website_url') . "goty.php");
+					header("Location: " . $core->config('website_url') . "goty.php?module=category&category_id=".$_POST['category']);
 				}
 
 				else if ($check['accepted'] == 0)
 				{
 					$_SESSION['message'] = 'game_exists_not_approved';
-					header("Location: " . $core->config('website_url') . "goty.php");
+					header("Location: " . $core->config('website_url') . "goty.php?module=category&category_id=".$_POST['category']);
 				}
 			}
 			else
 			{
 				$_SESSION['message'] = 'empty';
 				$_SESSION['message_extra'] = 'game name';
-				header("Location: " . $core->config('website_url') . "goty.php");
+				header("Location: " . $core->config('website_url') . "goty.php?module=category&category_id=".$_POST['category']);
 			}
 		}
 
 		else
 		{
-			header("Location: " . $core->config('website_url') . "goty.php");
+			header("Location: " . $core->config('website_url') . "goty.php?module=category&category_id=".$_POST['category']);
 		}
 	}
 

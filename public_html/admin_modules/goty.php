@@ -218,7 +218,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		foreach ($get_games as $games)
 		{
 			$templating->block('submitted_row', 'admin_modules/admin_module_goty');
-			$templating->set('game_name', $games['name']);
+			$templating->set('game_name', '<a href="/itemdb/'.$games['id'].'">'.$games['name'] . '</a>');
 			$templating->set('category_name', $games['category_name']);
 			$templating->set('category_id', $games['category_id']);
 			$templating->set('url', $core->config('website_url'));

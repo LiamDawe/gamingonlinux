@@ -48,7 +48,7 @@ else if ($count_total > 3)
 
 $templating->set('more_text', $more_text);
 
-$livestream_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 AND `accepted` = 1 ORDER BY `date` ASC LIMIT 3";
+$livestream_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 AND `accepted` = 1 GROUP BY `author_id` ORDER BY `date` ASC LIMIT 3";
 $get_info = $dbl->run($livestream_query)->fetch_all();
 
 if ($get_info)

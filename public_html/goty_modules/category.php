@@ -84,14 +84,17 @@ foreach (range('A', 'Z') as $letter)
 }
 $templating->set('alpha_filters', implode(' ', $filters));
 
+$grab_votes = NULL;
 $reset_button = '';
 if ($core->config('goty_voting_open') == 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
+	$current_votes = 0;
 	$grab_votes = $dbl->run("SELECT `game_id` FROM `goty_votes` WHERE `category_id` = ? AND `user_id` = ?", array($_GET['category_id'], $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
 	if ($grab_votes)
 	{
 		$reset_button = '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="reset_category_vote">Reset vote in current category</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /></form>';
-	}
+		$current_votes = count($grab_votes);
+	}	
 }
 
 $templating->set('reset_button', $reset_button);
@@ -159,13 +162,13 @@ if ($games_get)
 		$templating->set('game_id', $game['id']);
 		$templating->set('url', $core->config('website_url'));
 
-		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0 && $core->config('goty_voting_open') == 1)
 		{
-			if (!$grab_votes || count($grab_votes) < $core->config('goty_votes_per_category') && $core->config('goty_voting_open') == 1 && !in_array($game['id'], $grab_votes))
+			if (($grab_votes && $current_votes < $core->config('goty_votes_per_category') && !in_array($game['id'], $grab_votes)) || !$grab_votes)
 			{
 				$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
 			}
-			else if ($core->config('goty_voting_open') == 1 && $grab_votes && in_array($game['id'], $grab_votes))
+			else if ($grab_votes && in_array($game['id'], $grab_votes))
 			{
 				$templating->set('vote_button', '<form method="post"><button formaction="/goty.php" name="act" class="remove_vote" value="remove_single_vote">Remove Vote</button><input type="hidden" name="category_id" value="'.$_GET['category_id'].'" /><input type="hidden" name="game_id" value="'.$game['id'].'" /></form>');
 			}
@@ -180,7 +183,7 @@ if ($games_get)
 		}
 
 		$leaderboard = '';
-		// show leaderboard if voting is open, or voting is closed because it's finished
+		// show top three if goty is over
 		if ($core->config('goty_voting_open') == 0 && $core->config('goty_finished') == 1)
 		{
 			// work out the games total %

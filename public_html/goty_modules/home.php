@@ -58,6 +58,11 @@ foreach ($get_all_cats as $sort_cat)
 	}
 }
 
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+{
+	$current_votes = $dbl->run("select `category_id`, count(*) FROM `goty_votes` WHERE `user_id` = ? group by `category_id`", array($_SESSION['user_id']))->fetch_all(PDO::FETCH_KEY_PAIR);
+}
+
 foreach ($groups as $group)
 {
 	$templating->block('group');
@@ -74,12 +79,12 @@ foreach ($groups as $group)
 			$templating->set('category_name', $cat['category_name']);
 
 			$tick = '';
-			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			if ($current_votes && array_key_exists($cat['category_id'], $current_votes))
 			{
-				$check_voted = $dbl->run("SELECT `user_id` FROM `goty_votes` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $cat['category_id']))->fetch();
-				if ($check_voted)
+				$tick = '<br /><em>Your votes: ('.$current_votes[$cat['category_id']].'/'.$core->config('goty_votes_per_category').')</em>';
+				if ($core->config('goty_votes_per_category') == $current_votes[$cat['category_id']])
 				{
-					$tick = '&#10004;';
+					$tick .= '&#10004;';
 				}
 			}
 			$templating->set('tick', $tick);

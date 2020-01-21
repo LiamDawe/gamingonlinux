@@ -61,7 +61,7 @@
 		<label>New game submissions open? <input type="checkbox" name="games" {:games_check}/></label><br />
 		<label>Voting open? <input type="checkbox" name="voting" {:voting_check}/></label><br />
 		<label>Votes per category <input type="number" name="votes_per_category" value="{:votes_per_category}" /><br /></label>
-		<button class="fnone" name="act" value="config">Edit</button> {:end_awards}
+		<button class="fnone" name="act" value="config">Edit</button> <button type="submit" name="act" value="reset_goty">Reset GOTY</button> {:end_awards}
 	</form>
 	</div>
 </div>

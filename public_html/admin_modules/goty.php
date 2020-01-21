@@ -6,7 +6,7 @@ if(!defined('golapp'))
 
 $templating->load('admin_modules/admin_module_goty');
 
-if (isset($_GET['view']))
+if (isset($_GET['view']) && !isset($_POST['act']))
 {
 	if ($_GET['view'] == 'add')
 	{
@@ -154,16 +154,16 @@ if (isset($_GET['view']))
 			}
 			$templating->set('group_check', $group_check);
 
+			$none = '';
+			if($cat['group_id'] == 0)
+			{
+				$none = 'selected';
+			}
+
 			$options = '';
 			$options .= '<option value="0" '.$none.'>None</option>';
 			foreach ($groups as $group)
 			{
-				$none = '';
-				if($cat['group_id'] == 0)
-				{
-					$none = 'selected';
-				}
-			
 				$selected = '';
 				if ($cat['group_id'] == $group['category_id'])
 				{
@@ -229,6 +229,33 @@ if (isset($_GET['view']))
 
 if (isset($_POST['act']))
 {
+	if ($_POST['act'] == 'reset_goty')
+	{
+		$return = '/admin.php?module=goty&view=config';
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Reset the awards?', 1);
+			$core->confirmation(array('title' => 'Are you absolutely sure you wish to reset the awards?', 'text' => 'This will remove all votes! Do not do this unless you have been told to do so, this resets everything!', 'action_url' => '/admin.php?module=goty', 'act' => 'reset_goty'));
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+			$dbl->run("TRUNCATE TABLE `goty_votes`");
+			$core->set_config('0','goty_finished');
+			$core->set_config('0','goty_total_votes');
+
+			$core->new_admin_note(array('completed' => 1, 'content' => ' Reset the entire GOTY awards.'));
+			$_SESSION['message'] = 'goty_reset';
+			header('Location: ' . $return);
+			die();
+		}			
+	}
 	if ($_POST['act'] == 'add')
 	{
 		if (!empty($_POST['name']))

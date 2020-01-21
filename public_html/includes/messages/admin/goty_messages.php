@@ -13,6 +13,10 @@ return [
 	[
 		"text" => "That category already exists!",
 		"error" => 1
+	],
+	"goty_reset" =>
+	[
+		"text" => "The GOTY Awards have been reset!"
 	]
 ];
 ?>

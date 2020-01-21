@@ -56,12 +56,38 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		{
 			$templating->block('manage_category', 'admin_modules/admin_module_goty');
 
-			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
-			foreach( $cats as $category )
+			$get_all_cats = $dbl->run("SELECT `category_id`, `category_name`, `is_group`, `group_id` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
+
+			// sort them into top level groups and then voting categories
+			$groups = array();
+			$categories = array();
+			
+			foreach ($get_all_cats as $sort_cat)
 			{
-				$templating->block('category_manage_row', 'admin_modules/admin_module_goty');
-				$templating->set('category_id', $category['category_id']);
-				$templating->set('category_name', $category['category_name']);
+				if ($sort_cat['is_group'] == 1)
+				{
+					$groups[] = $sort_cat;
+				}
+				else
+				{
+					$categories[] = $sort_cat;
+				}
+			}
+
+			foreach ($groups as $group)
+			{
+				$templating->block('group_row');
+				$templating->set('category_name', $group['category_name']);
+
+				foreach ($categories as $cat)
+				{
+					if ($cat['group_id'] == $group['category_id'])
+					{
+						$templating->block('category_manage_row');
+						$templating->set('category_id', $cat['category_id']);
+						$templating->set('category_name', $cat['category_name']);
+					}
+				}
 			}
 		}
 		else if (isset($_GET['id']))

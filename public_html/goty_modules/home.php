@@ -65,10 +65,10 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 
 foreach ($groups as $group)
 {
-	$templating->block('group');
+	$templating->block('group', 'goty');
 	$templating->set('group_name', $group['category_name']);
 	
-	$templating->block('goty_categories');
+	$templating->block('goty_categories', 'goty');
 
 	foreach ($categories as $cat)
 	{

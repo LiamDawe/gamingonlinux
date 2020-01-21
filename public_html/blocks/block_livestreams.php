@@ -41,9 +41,7 @@ if ($count_total <= 3)
 }
 else if ($count_total > 3)
 {
-	$total = $count_total - 3;
-
-	$more_text = 'See all, there\'s ' . $total . ' more!';
+	$more_text = 'See all, there\'s ' . $count_total . '!';
 }
 
 $templating->set('more_text', $more_text);

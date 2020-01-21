@@ -21,7 +21,7 @@ if ($core->config('goty_games_open') == 1)
 {
 	$templating->block('add', 'goty');
 	$picker = 'games';
-	if ($_GET['category_id'] == 16)
+	if ($_GET['category_id'] == 3)
 	{
 		$picker = 'devs';
 	}
@@ -30,7 +30,7 @@ if ($core->config('goty_games_open') == 1)
 }
 
 $item_table = '';
-if ($_GET['category_id'] == 16)
+if ($_GET['category_id'] == 3)
 {
 	$item_table = 'developers';
 }

@@ -238,6 +238,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 	if ($_GET['view'] == 'submitted')
 	{
+		$templating->set_previous('title', 'GOTY Submissions', 1);
+
 		$templating->block('submitted_top', 'admin_modules/admin_module_goty');
 
 		$get_games = $dbl->run("SELECT coalesce(cl.name, d.name) name, g.`id`, g.`game_id`, c.`category_name`, g.`category_id` FROM `goty_games` g left outer join `calendar` cl ON cl.id = g.game_id and g.category_id != 3 left outer join `developers` d ON d.id = g.game_id and g.category_id = 3 LEFT JOIN `goty_category` c ON c.category_id = g.category_id WHERE g.`accepted` = 0")->fetch_all();

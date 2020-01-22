@@ -202,6 +202,16 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
+				if (!is_null($game['lock_timer']) && strtotime("-10 minutes") <= strtotime($game['lock_timer']) && $game['locked_by_id'] != $_SESSION['user_id'])
+				{
+					$_SESSION['message'] = 'locked';
+					$_SESSION['message_extra'] = 'item';
+					header("Location: /admin.php?module=games&view=search");
+					die();
+				}
+			
+				$dbl->run("UPDATE `calendar` SET `lock_timer` = ?, `locked_by_id` = ? WHERE `id` = ?", array(core::$sql_date_now, $_SESSION['user_id'], $game['id']));
+
 				$text = $game['description'];
 
 				if (!isset($message_map::$error) || $message_map::$error == 0)
@@ -412,6 +422,16 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			else
 			{
+				if (!is_null($game['lock_timer']) && strtotime("-10 minutes") <= strtotime($game['lock_timer']) && $game['locked_by_id'] != $_SESSION['user_id'])
+				{
+					$_SESSION['message'] = 'locked';
+					$_SESSION['message_extra'] = 'submission';
+					header("Location: /admin.php?module=games&view=submitted_list");
+					die();
+				}
+			
+				$dbl->run("UPDATE `calendar` SET `lock_timer` = ?, `locked_by_id` = ? WHERE `id` = ?", array(core::$sql_date_now, $_SESSION['user_id'], $game['id']));
+
 				$text = $game['description'];
 
 				if (!isset($message_map::$error) || $message_map::$error == 0)
@@ -595,7 +615,7 @@ if (isset($_POST['act']))
 		}
 		if ($_POST['act'] == 'Edit')
 		{
-			$finish_page = '/admin.php?module=games&view=edit&id=' . $_POST['id'];
+			$finish_page = '/admin.php?module=games&view=search';
 			$error_page = $finish_page;
 		}
 		if ($_POST['act'] == 'Approve')
@@ -722,7 +742,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Edit')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `lock_timer` = NULL, `locked_by_id` = NULL, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 			$games_database->process_developers($_POST['id']);
@@ -742,7 +762,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Approve')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `approved` = 1, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `lock_timer` = NULL, `locked_by_id` = NULL, `approved` = 1, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 			$games_database->process_developers($_POST['id']);

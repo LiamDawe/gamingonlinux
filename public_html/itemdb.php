@@ -129,16 +129,22 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 	}
 	$templating->set('genres_output', $genres_output);
 
-	$licenses = ['BSD', 'GPL', 'MIT', 'Closed Source'];
+	$licenses_res = $dbl->run("select count(*) as `total`, i.license_name, i.license_id FROM `item_licenses` i INNER JOIN `calendar` c ON c.license = i.license_name where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by i.license_name, i.license_id ")->fetch_all();
 	$licenses_output = '';
-	foreach ($licenses as $license)
+	$counter = 0;
+	foreach ($licenses_res as $license)
 	{
 		$checked = '';
-		if (isset($filters_sort['license']) && in_array($license['id'], $filters_sort['license']))
+		if (isset($filters_sort['license']) && in_array($license['license_id'], $filters_sort['license']))
 		{
 			$checked = 'checked';
 		}
-		$licenses_output .= '<li><label><input type="checkbox" name="licenses[]" value="'.$license.'" '.$checked.'> '.$license.'</label></li>';	
+		$total = '';
+		if ($license['total'] > 0)
+		{
+			$total = ' <small>('.$license['total'].')</small>';
+		}
+		$licenses_output .= '<li><label><input type="checkbox" name="licenses[]" value="'.$license['license_name'].'" '.$checked.'> '.$license['license_name'].$total.'</label></li>';	
 	}
 	$templating->set('licenses_output', $licenses_output);
 }

@@ -148,8 +148,8 @@
 					<br />
 					DLC <em>Tick if this is a DLC</em> <input type="checkbox" name="is_dlc" {:is_dlc_check}/><br />
 					Base game name <em>If it's a DLC, what game is it for?</em><br />
-					<select tabindex="-1" name="game" id="articleGames" style="width:300px" class="populate select2-offscreen"><option value="0">None</option>{:base_game}</select><br />
-					<button class="clear-games">Clear game</button><br />
+					<select tabindex="-1" name="game" id="DLC_pick" class="game_picker" data-picker="games" data-type="all_nodlc" style="width:300px" class="populate select2-offscreen"><option value="0">None</option>{:base_game}</select><br />
+					<button class="clear-games" data-field-id="DLC_pick">Clear game</button><br />
 					<br />
 					Genres<br />
 					<select tabindex="-1" multiple="" name="genre_ids[]" class="populate select2-offscreen genres_picker">{:genre_list}</select><br />

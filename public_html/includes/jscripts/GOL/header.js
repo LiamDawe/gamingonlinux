@@ -268,6 +268,12 @@ jQuery(document).ready(function()
 
 	$('.octus-editor .styles').show();
 
+	$(document).on('click','.highlight-element',function(e)
+	{
+		var item = $(this).data('highlight-class');
+		$('.'+item).highlight();
+	});
+
 	// table sorting
 	$('#crowdfunded').dataTable( 
 	{

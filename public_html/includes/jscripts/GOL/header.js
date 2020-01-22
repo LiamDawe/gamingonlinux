@@ -1672,7 +1672,13 @@ jQuery(document).ready(function()
 		minimumInputLength: 2
 		});
 	  
-	$(".clear-games").on("click", function (e) { e.preventDefault(); $gamesMulti.val(null).trigger("change"); });
+	$(".clear-games").on("click", function (e) 
+	{ 
+		e.preventDefault(); 
+		var to_clear = $(this).data('field-id');
+		$("#"+to_clear).val(null).trigger("change"); 
+	});
+
 	$(".clear-username").on("click", function (e) { e.preventDefault(); $('.main_user_search_forum').val(null).trigger("change"); });
 
 	$(".genres_picker").select2({

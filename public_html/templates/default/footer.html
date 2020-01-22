@@ -98,7 +98,7 @@ CKEDITOR.on('instanceReady', function(evt)
 
 	var sale_search_options = {
 		url: function(phrase) { 
-				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&type=sales&format=json";    
+				return "/includes/ajax/gamesdb/search_games.php?return_type=text&q=" + phrase + "&type=sales&format=json";    
 		},
 
 		getValue: "data",
@@ -117,7 +117,7 @@ CKEDITOR.on('instanceReady', function(evt)
 
 	var free_search_options = {
 		url: function(phrase) { 
-				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&type=free&format=json";    
+				return "/includes/ajax/gamesdb/search_games.php?return_type=text&q=" + phrase + "&type=free&format=json";    
 		},
 
 		getValue: "data",
@@ -136,7 +136,7 @@ CKEDITOR.on('instanceReady', function(evt)
 
 	var all_search_options = {
 		url: function(phrase) { 
-				return "/includes/ajax/gamesdb/search_games.php?q=" + phrase + "&type=all&format=json";    
+				return "/includes/ajax/gamesdb/search_games.php?return_type=text&q=" + phrase + "&type=all&format=json";    
 		},
 
 		getValue: "data",

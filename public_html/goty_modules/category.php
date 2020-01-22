@@ -6,7 +6,7 @@ if (!core::is_number($_GET['category_id']))
 	header('Location: /goty.php');
 	die();
 }
-$cat = $dbl->run("SELECT `category_name`, `description` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']))->fetch();
+$cat = $dbl->run("SELECT `category_name`, `description`, `is_dev` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']))->fetch();
 
 $templating->block('category_bread', 'goty');
 $templating->set('category_name', $cat['category_name']);
@@ -30,7 +30,7 @@ if ($core->config('goty_games_open') == 1)
 }
 
 $item_table = '';
-if ($_GET['category_id'] == 3)
+if ($cat['is_dev'] == 1)
 {
 	$item_table = 'developers';
 }
@@ -141,7 +141,7 @@ if (isset($_GET['filter']))
 
 else
 {
-	$games_get = $dbl->run("SELECT g.`id`, c.`name`, g.`votes` FROM `goty_games` g INNER JOIN `$item_table` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['category_id']))->fetch_all();
+	$games_get = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, c.`name` FROM `goty_games` g INNER JOIN `$item_table` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['category_id']))->fetch_all();
 }
 if ($games_get)
 {
@@ -149,7 +149,14 @@ if ($games_get)
 	{
 		$templating->block('game_row', 'goty');
 		$templating->set('category_id', $_GET['category_id']);
-		$templating->set('game_name', $game['name']);
+
+		$dev_url = NULL;
+		if ($cat['is_dev'] == 1)
+		{
+			$dev_url = 'developer/';
+		}
+
+		$templating->set('game_name', '<a href="/itemdb/'.$dev_url.$game['game_id'].'">'.$game['name'] . '</a>');
 
 		$votes = '';
 		// show leaderboard if voting is open, or voting is closed because it's finished
@@ -162,8 +169,10 @@ if ($games_get)
 		$templating->set('game_id', $game['id']);
 		$templating->set('url', $core->config('website_url'));
 
+		$direct_vote_link = '';
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0 && $core->config('goty_voting_open') == 1)
 		{
+			$direct_vote_link = 'Direct voting link: <a href="/goty.php?module=direct&amp;game_id='.$game['id'].'&amp;category_id='.$_GET['category_id'].'">Click me</a>.';
 			if (($grab_votes && $current_votes < $core->config('goty_votes_per_category') && !in_array($game['id'], $grab_votes)) || !$grab_votes)
 			{
 				$templating->set('vote_button', '<button name="votebutton" class="votebutton" data-category-id="'.$_GET['category_id'].'" data-game-id="'.$game['id'].'">Vote</button>');
@@ -181,6 +190,7 @@ if ($games_get)
 		{
 			$templating->set('vote_button', '');
 		}
+		$templating->set('direct_vote_link', $direct_vote_link);
 
 		$leaderboard = '';
 		// show top three if goty is over

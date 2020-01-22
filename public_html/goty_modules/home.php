@@ -79,7 +79,7 @@ foreach ($groups as $group)
 			$templating->set('category_name', $cat['category_name']);
 
 			$tick = '';
-			if ($current_votes && array_key_exists($cat['category_id'], $current_votes))
+			if (isset($current_votes) && array_key_exists($cat['category_id'], $current_votes))
 			{
 				$tick = '<br /><em>Your votes: ('.$current_votes[$cat['category_id']].'/'.$core->config('goty_votes_per_category').')</em>';
 				if ($core->config('goty_votes_per_category') == $current_votes[$cat['category_id']])

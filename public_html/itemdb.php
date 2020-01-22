@@ -131,7 +131,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 
 	$licenses_res = $dbl->run("select count(*) as `total`, i.license_name, i.license_id FROM `item_licenses` i INNER JOIN `calendar` c ON c.license = i.license_name where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by i.license_name, i.license_id ")->fetch_all();
 	$licenses_output = '';
-	$counter = 0;
+	$license_counter = 0;
 	foreach ($licenses_res as $license)
 	{
 		$checked = '';
@@ -144,7 +144,17 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 		{
 			$total = ' <small>('.$license['total'].')</small>';
 		}
-		$licenses_output .= '<li><label><input type="checkbox" name="licenses[]" value="'.$license['license_name'].'" '.$checked.'> '.$license['license_name'].$total.'</label></li>';	
+		$hidden = '';
+		if ($license_counter > 4)
+		{
+			$hidden = 'class="hidden"';
+		}
+		$licenses_output .= '<li '.$hidden.'><label><input type="checkbox" name="licenses[]" value="'.$license['license_name'].'" '.$checked.'> '.$license['license_name'].$total.'</label></li>';	
+		$license_counter++;
+	}
+	if ($license_counter > 4)
+	{
+		$licenses_output .= '<li><a class="show_all_filter_list" href="#">Show All</a></li>';
 	}
 	$templating->set('licenses_output', $licenses_output);
 }

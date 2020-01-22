@@ -1652,7 +1652,7 @@ jQuery(document).ready(function()
 		selectOnClose: true,
 		width: '100%',
 		ajax: {
-		  url: "/includes/ajax/games_ajax.php",
+		  url: "/includes/ajax/gamesdb/search_games.php?return_type=option&type=all",
 		  dataType: 'json',
 		  delay: 250,
 		  data: function (params) {
@@ -1702,7 +1702,7 @@ jQuery(document).ready(function()
 	selectOnClose: true,
 	width: '100%',
 	ajax: {
-    url: "/includes/ajax/games_ajax.php",
+    url: "/includes/ajax/games_ajax.php?return_type=option&type=games_only",
     dataType: 'json',
     delay: 250,
     data: function (params) {
@@ -2010,9 +2010,9 @@ jQuery(document).ready(function()
 				  var search_type = null;
 				  if (typeof $(this).data('type') !== 'undefined') 
 				  {
-					search_type = '?type=' + $(this).data('type');
+					search_type = '&type=' + $(this).data('type');
 				  }
-				return "/includes/ajax/games_ajax.php" + search_type;
+				return "/includes/ajax/gamesdb/search_games.php?return_type=option" + search_type;
 			  } 
 			  else if ($(this).data('picker') == 'devs') 
 			  {

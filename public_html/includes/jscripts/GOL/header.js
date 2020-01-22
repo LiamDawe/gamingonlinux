@@ -2007,7 +2007,12 @@ jQuery(document).ready(function()
 		  url: function() {
 			  if ($(this).data('picker') == 'games') 
 			  {
-				return "/includes/ajax/games_ajax.php"
+				  var search_type = null;
+				  if (typeof $(this).data('type') !== 'undefined') 
+				  {
+					search_type = '?type=' + $(this).data('type');
+				  }
+				return "/includes/ajax/games_ajax.php" + search_type;
 			  } 
 			  else if ($(this).data('picker') == 'devs') 
 			  {

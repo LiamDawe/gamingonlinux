@@ -7,7 +7,14 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 if(isset($_GET['q']))
 {
-	$get_data = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();
+	if (!isset($_GET['type']) || isset($_GET['type']) && $_GET['type'] == 'all')
+	{
+		$get_data = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();
+	}
+	else if (isset($_GET['type']) && $_GET['type'] == 'games_only')
+	{
+		$get_data = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? AND `also_known_as` IS NULL AND `is_game` = 1 ORDER BY `name` ASC", array('%' . $_GET['q'] . '%'))->fetch_all();
+	}
 
 	// Make sure we have a result
 	if(count($get_data) > 0)

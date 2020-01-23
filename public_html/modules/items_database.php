@@ -80,7 +80,7 @@ if (isset($_GET['view']))
 		$templating->block('full_db_search');
 
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
@@ -148,7 +148,11 @@ if (isset($_GET['view']))
 				if ($trailer_id)
 				{
 					$trailer_thumbnail = '<img class src="/templates/default/images/youtube_cache_default.png" />';
-					if ($uploaded_media)
+					if (isset($get_item['trailer_thumb']) && !empty($get_item['trailer_thumb']))
+					{
+						$trailer_thumbnail = '<img src="/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
+					}
+					else if ($uploaded_media)
 					{
 						if (!file_exists($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg'))
 						{

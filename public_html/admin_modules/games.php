@@ -1137,20 +1137,8 @@ if (isset($_POST['act']))
 			$dbl->run("DELETE FROM `user_wishlist` WHERE `game_id` = ?", array($_GET['id']));
 
 			// remove uploaded media
-			$grab_all = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `item_id` = ?", array($_GET['id']))->fetch_all();
-			foreach ($grab_all as $grabber)
-			{
-				$main = APP_ROOT . '/uploads/gamesdb/big/' . $_GET['id'] . '/' . $grabber['filename'];
-				$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/' . $_GET['id'] . '/' . $grabber['filename'];
-				if (file_exists($main))
-				{
-					unlink($main);
-				}
-				if (file_exists($thumb))
-				{
-					unlink($thumb);
-				}	
-			}
+			$core->delete_folder(APP_ROOT. '/uploads/gamesdb/big/' . $_GET['id'] . '/');
+			$core->delete_folder(APP_ROOT. '/uploads/gamesdb/big/thumbs/' . $_GET['id'] . '/');
 			$dbl->run("DELETE FROM `itemdb_images` WHERE `item_id` = ?", array($_GET['id']));
 
 			// note who deleted it

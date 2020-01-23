@@ -51,6 +51,26 @@ function recaptchacallback()
 	});
 }
 
+    /*
+	 * getYouTubeID()
+	 *
+	 * Get YouTube ID
+	 */
+	function getYouTubeID(input)
+	{
+	   var video_id;
+
+		video_id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
+		 if(video_id === null) 
+		{
+		   return null;
+		}
+		else
+		 {
+		   return video_id[1];
+		 }
+   }
+
 // scroll to an element if it's not in view, all other ways I could find completely sucked
 jQuery.fn.scrollMinimal = function(smooth)
 {
@@ -1044,6 +1064,24 @@ jQuery(document).ready(function()
 				setTimeout(function(){ button.removeAttr('disabled') }, 2000);
 			}
 		});
+	});
+
+	// grabbing youtube media for itemdb
+	$(document).on('click', '.grab-yt-thumb', function(e)
+	{
+		e.preventDefault();
+		var item_id = $(this).data('itemid');
+		var youtube_id = getYouTubeID($("input[name=trailer]").val());
+		$.ajax({
+			type: "GET",
+			url: '/includes/youtube_image_proxy.php',
+			dataType:"json",
+			data: {'aid': item_id,'id':youtube_id, 'type':'itemdb'}, 
+			success: function(return_data)
+			{
+				$('.youtube-thumb-url').val(return_data.file_url);
+			}
+		});	
 	});
 
 	$('#generate_preview').click(function()

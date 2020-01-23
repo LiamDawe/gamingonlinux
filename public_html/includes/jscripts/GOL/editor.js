@@ -215,8 +215,7 @@ function gol_editor(editor_id)
 		else
 		{
 			return null;
-		}
-        
+		} 
     }
 
     /*

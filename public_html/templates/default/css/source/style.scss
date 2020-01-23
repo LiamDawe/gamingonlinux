@@ -963,6 +963,8 @@ ul.social-networks li > a {
 
 .goty-category-desc {text-align: center;}
 
+#submit-goty-game:target + div.box > div.head {background-color: #428BCA;}
+
 /* Support us page */
 .flex-columns  {
 	display: flex;

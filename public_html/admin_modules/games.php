@@ -569,6 +569,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					$base_game = '<option value="'.$game['base_game_id'].'" selected>'.$game['base_game_name'].'</option>';
 				}
 				$templating->set('base_game', $base_game);
+				$templating->set('youtube-thumb', '');
 				
 				// sort out genre tags
 				$genre_list = $core->display_game_genres($game['id']);

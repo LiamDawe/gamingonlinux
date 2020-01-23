@@ -61,6 +61,11 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		if (!isset($message_map::$error) || $message_map::$error == 0)
 		{
 			$_SESSION['gamesdb_image_rand'] = rand();
+			unset($_SESSION['item_error']);
+			if (file_exists(APP_ROOT.'/uploads/gamesdb/big/thumbs/tmp/trailer_thumb_tmp_'.$_SESSION['user_id'].'.jpg'))
+			{
+				unlink(APP_ROOT.'/uploads/gamesdb/big/thumbs/tmp/trailer_thumb_tmp_'.$_SESSION['user_id'].'.jpg');
+			}
 		}
 
 		$templating->set_previous('meta_description', 'Adding a new game', 1);
@@ -73,10 +78,17 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'crowdfund_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name', 'crowdfund_notes', 'featured_pic');
-		foreach ($set_empty as $make_empty)
+		$set_empty = array('id', 'name', 'link', 'steam_link', 'gog_link', 'itch_link', 'crowdfund_link', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name', 'crowdfund_notes', 'featured_pic', 'item_id', 'youtube-thumb');
+		foreach ($set_empty as $field_name)
 		{
-			$templating->set($make_empty, '');
+			if (!isset($_SESSION['item_error'][$field_name]))
+			{
+				$templating->set($field_name, '');
+			}
+			else
+			{
+				$templating->set($field_name, $_SESSION['item_error'][$field_name]);
+			}
 		}
 
 		$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
@@ -260,6 +272,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set('name', htmlentities($game['name']));
 				$templating->set('link', $game['link']);
 				$templating->set('trailer', $game['trailer']);
+				$templating->set('youtube-thumb', $game['trailer_thumb']);
 
 				$trailer_link = '';
 				if ($game['trailer'] != NULL && $game['trailer'] != '')
@@ -596,6 +609,16 @@ if (isset($_POST['act']))
 		$itch_link = trim($_POST['itch_link']);
 		$crowdfund_link = trim($_POST['crowdfund_link']);
 		$crowdfund_notes = core::make_safe($_POST['crowdfund_notes']);
+		$trailer = NULL;
+		if (!empty(trim($_POST['trailer'])))
+		{
+			$trailer = $_POST['trailer'];
+		}
+		$trailer_thumb = NULL;
+		if (!empty(trim($_POST['youtube-thumb'])))
+		{
+			$trailer_thumb = $_POST['youtube-thumb'];
+		}
 
 		if ($_POST['act'] == 'Edit' || $_POST['act'] == 'Approve')
 		{
@@ -665,6 +688,8 @@ if (isset($_POST['act']))
 
 		if ($redirect_error == 1)
 		{
+			$_SESSION['item_error']['trailer'] = $trailer;
+			$_SESSION['item_error']['youtube-thumb'] = $trailer_thumb;
 			$_SESSION['item_error']['description'] = $description;
 			if (isset($_POST['uploads']))
 			{
@@ -709,12 +734,6 @@ if (isset($_POST['act']))
 			$license = $_POST['license'];
 		}
 
-		$trailer = NULL;
-		if (!empty(trim($_POST['trailer'])))
-		{
-			$trailer = $_POST['trailer'];
-		}
-
 		if ($_POST['act'] == 'Add')
 		{
 			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes));
@@ -727,6 +746,11 @@ if (isset($_POST['act']))
 			if (isset($_POST['uploads']))
 			{
 				$games_database->move_tmp_media($_POST['uploads'], $new_id);
+			}
+
+			if (isset($_POST['youtube-thumb']) && !empty($_POST['youtube-thumb']))
+			{
+				$games_database->sort_yt_thumb($trailer_thumb, $new_id);
 			}
 	
 			if (isset($_SESSION['gamesdb_smallpic']) && $_SESSION['gamesdb_smallpic']['image_rand'] == $_SESSION['gamesdb_image_rand'])
@@ -752,6 +776,11 @@ if (isset($_POST['act']))
 				$games_database->move_small($_POST['id'], $_SESSION['gamesdb_smallpic']['image_name']);
 			}
 
+			if (isset($_POST['youtube-thumb']) && !empty($_POST['youtube-thumb']))
+			{
+				$games_database->sort_yt_thumb($trailer_thumb, $_POST['id']);
+			}
+
 			$games_database->update_featured($_POST['id']);
 
 			$core->new_admin_note(array('completed' => 1, 'content' => ' edited a game in the database - <a href="/index.php?module=items_database&view=item&id='.$_POST['id'].'">'.$name.'</a>.'));
@@ -773,6 +802,11 @@ if (isset($_POST['act']))
 			}
 
 			$games_database->update_featured($_POST['id']);
+
+			if (isset($_POST['youtube-thumb']) && !empty($_POST['youtube-thumb']))
+			{
+				$games_database->sort_yt_thumb($trailer_thumb, $_POST['id']);
+			}
 	
 			// update the original notification to clear it
 			$core->update_admin_note(array('type' => 'item_database_addition', 'data' => $_POST['id']));

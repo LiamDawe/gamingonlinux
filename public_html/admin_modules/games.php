@@ -615,7 +615,7 @@ if (isset($_POST['act']))
 		}
 		if ($_POST['act'] == 'Edit')
 		{
-			$finish_page = '/admin.php?module=games&view=search';
+			$finish_page = '/itemdb/'.$_POST['id'];
 			$error_page = $finish_page;
 		}
 		if ($_POST['act'] == 'Approve')

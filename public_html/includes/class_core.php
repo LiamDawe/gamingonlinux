@@ -1120,5 +1120,21 @@ class core
 		}
 		$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` $type_search $type_value AND `data` = ? $extra_sql_where", array_merge([core::$date], $options['type'], [$options['data']], $extra_values));
 	}
+
+    function delete_folder($dir)
+    { 
+		if (empty($dir) || $dir == NULL || $dir == '/')
+		{
+			return false;
+		}
+		
+        $files = array_diff(scandir($dir), array('.', '..')); 
+
+        foreach ($files as $file) { 
+            (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file"); 
+        }
+
+        return rmdir($dir); 
+    } 
 }
 ?>

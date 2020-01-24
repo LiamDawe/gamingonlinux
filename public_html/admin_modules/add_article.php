@@ -24,6 +24,7 @@ $templating->set('max_filesize', core::readable_bytes($core->config('max_tagline
 
 // get categorys if we need to
 $categorys_list = '';
+$games_list = '';
 if ((isset($message_map::$error) && $message_map::$error == 1 || $message_map::$error == 2))
 {
 	$res = $dbl->run("SELECT * FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
@@ -34,6 +35,7 @@ if ((isset($message_map::$error) && $message_map::$error == 1 || $message_map::$
 			$categorys_list .= "<option value=\"{$categorys['category_id']}\" selected>{$categorys['category_name']}</option>";
 		}
 	}
+	$games_list = $article_class->display_previous_games();
 }
 
 // if they have done it before set text and tagline
@@ -62,6 +64,7 @@ $templating->set('tagline', $tagline);
 $templating->set('text', $text);
 
 $templating->set('categories_list', $categorys_list);
+$templating->set('games_list', $games_list);
 $templating->set('max_height', $core->config('article_image_max_height'));
 $templating->set('max_width', $core->config('article_image_max_width'));
 

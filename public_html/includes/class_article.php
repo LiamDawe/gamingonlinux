@@ -366,7 +366,7 @@ class article
 		}
 	}
 
-	function display_previous_games($article_id)
+	function display_previous_games($article_id = NULL)
 	{
 		$game_tag_list = '';
 
@@ -383,7 +383,7 @@ class article
 			
 		}
 
-		else
+		else if (isset($article_id))
 		{
 			$current_linked_games = $this->dbl->run("SELECT a.`game_id`, g.`name` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ?", array($article_id))->fetch_all();
 			foreach ($current_linked_games as $game)

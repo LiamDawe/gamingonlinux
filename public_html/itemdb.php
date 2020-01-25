@@ -76,7 +76,7 @@ if (!isset($_GET['view']))
 	$featured_output = '<ul style="text-align: center; padding: 0;">';
 	foreach ($featured as $item)
 	{
-		$featured_output .= '<li style="display:inline;"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img src="/uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" /></a></li>';
+		$featured_output .= '<li style="display:inline;"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img src="'.$core->config('website_url').'uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" /></a></li>';
 	}
 
 	$featured_output .= '</ul>';

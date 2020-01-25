@@ -11,23 +11,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 	die('You shouldn\'t be here. You need to be logged in.');
 }
 
-if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
+if (isset($_POST['image_id']) && is_numeric($_POST['image_id']) && isset($_POST['type']))
 {
-	if (isset($_POST['type']) && $_POST['type'] == 'itemdb')
+	switch($_POST['type'])
 	{
-		$qry1 = "SELECT `filename`, `item_id` FROM `itemdb_images` WHERE `id` = ?";
-		$qry2 = "DELETE FROM `itemdb_images` WHERE `id` = ?";
+		case 'itemdb':
+		case 'itemdb_featured':
+			$qry1 = "SELECT `filename`, `item_id` FROM `itemdb_images` WHERE `id` = ?";
+			$qry2 = "DELETE FROM `itemdb_images` WHERE `id` = ?";				
+		break;
+		case 'article':
+			$qry1 = "SELECT `id`, `filename`, `filetype`, `youtube_cache`, `uploader_id` FROM `article_images` WHERE `id` = ?";
+			$qry2 = "DELETE FROM `article_images` WHERE `id` = ?";
+		break;
 	}
-	else
-	{
-		$qry1 = "SELECT `id`, `filename`, `filetype`,`youtube_cache`, `uploader_id` FROM `article_images` WHERE `id` = ?";
-		$qry2 = "DELETE FROM `article_images` WHERE `id` = ?";
-	}
+
 	$grabber = $dbl->run($qry1, array($_POST['image_id']))->fetch();
 	$result = $dbl->run($qry2, array($_POST['image_id']));
 	if(isset($result))
 	{
-		if (isset($_POST['type']) && $_POST['type'] == 'itemdb')
+		if (isset($_POST['type']) && ($_POST['type'] == 'itemdb' || $_POST['type'] == 'itemdb_featured'))
 		{
 			if ($grabber['item_id'] > 0)
 			{
@@ -80,5 +83,9 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']))
 	{
 		echo "NO";
 	}
+}
+else
+{
+	echo "NO";
 }
 ?>

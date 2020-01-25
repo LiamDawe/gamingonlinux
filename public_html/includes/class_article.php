@@ -292,7 +292,7 @@ class article
 				$previously_uploaded['output'] .= '<div class="box">
 				<div class="body group">
 				<div id="'.$value['id'].'">'.$youtube_thumb.$preview_file.'
-				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" data-type="'.$data_type.'" class="add_button">Insert</button> '.$thumbnail_button.' <button id="' . $value['id'] . '" class="trash">Delete Media</button>
+				URL: <input id="img' . $value['id'] . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $value['id'] . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" data-type="'.$data_type.'" class="add_button">Insert</button> '.$thumbnail_button.' <button id="' . $value['id'] . '" class="trash" data-type="article">Delete Media</button>
 				</div>
 				</div></div>';
 			}

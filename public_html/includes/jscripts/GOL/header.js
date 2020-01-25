@@ -242,7 +242,7 @@ $(function()
 				if(data=="YES")
 				{
 					$("div[id='"+image_id+"']").replaceWith('<div class="col-md-12" style="background-color: #15e563; padding: 5px;">Image Deleted</div>');
-					if($('.uploads-'+image_id).val())
+					if($('.uploads-'+image_id).val()) // this is to remove the hidden post field
 					{
 						$('.uploads-'+image_id).remove();
 					}

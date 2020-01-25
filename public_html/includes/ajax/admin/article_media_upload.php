@@ -123,7 +123,7 @@ if ($parse_url['scheme'].'://'.$parse_url['host'].'/' == $core->config('website_
 						$html_output = '<div class="box">
 						<div class="body group">
 						<div id="'.$media_db_id.'">'.$preview_file.'
-						URL: <input id="img' . $media_db_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $media_db_id . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" data-type="'.$data_type.'" class="add_button">Insert</button> '.$thumbnail_button.' <button id="' . $media_db_id . '" class="trash">Delete Media</button>
+						URL: <input id="img' . $media_db_id . '" type="text" value="' . $main_url . '" /> <button class="btn" data-clipboard-target="#img' . $media_db_id . '">Copy</button> '.$gif_static_button.' <button data-url="'.$main_url.'" data-type="'.$data_type.'" class="add_button">Insert</button> '.$thumbnail_button.' <button id="' . $media_db_id . '" class="trash" data-type="article">Delete Media</button>
 						</div>
 						</div>
 						</div>';

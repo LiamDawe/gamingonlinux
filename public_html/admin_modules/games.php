@@ -206,7 +206,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		else
 		{
-			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id, i.filename as featured_pic FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id LEFT JOIN `itemdb_images` i ON i.featured = 1 AND i.item_id = c.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
+			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id, i.filename as featured_pic, i.id as featured_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id LEFT JOIN `itemdb_images` i ON i.featured = 1 AND i.item_id = c.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
 
 			if (!$game)
 			{
@@ -262,11 +262,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set('small_pic', $small_pic);
 
 				$featured_pic = '';
+				$featured_removal_button = '';
 				if ($game['featured_pic'] != NULL && $game['featured_pic'] != '')
 				{
-					$featured_pic = '<img src="/uploads/gamesdb/big/'.$game['id'] . '/' .$game['featured_pic'].'" alt="" />';
+					$featured_pic = '<div id="'.$game['featured_id'].'"><img src="/uploads/gamesdb/big/'.$game['id'] . '/' .$game['featured_pic'].'" alt="" /></div>';
+					$featured_removal_button = '<br /><button id="' . $game['featured_id'] . '" class="trash" data-type="itemdb_featured">Delete Media</button>';
 				}
 				$templating->set('featured_pic', $featured_pic);
+				$templating->set('delete_featured_button', $featured_removal_button);
 
 				$templating->set('id', $game['id']);
 				$templating->set('name', htmlentities($game['name']));

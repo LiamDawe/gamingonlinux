@@ -1,4 +1,6 @@
 <?php
+use claviska\SimpleImage;
+
 class game_sales
 {
 	protected $templating;
@@ -1044,5 +1046,30 @@ class game_sales
 			$this->dbl->run("DELETE FROM `itemdb_images` WHERE `featured` = 1 AND `item_id` = ? AND `id` IN ($in)", array_merge([$item_id], $picture_ids));
 		}
 		$this->dbl->run("UPDATE `itemdb_images` SET `approved` = 1 WHERE `featured` = 1 AND `item_id` = ?", array($item_id));
+	}
+
+	function sort_yt_thumb($filename, $item_id)
+	{
+		include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
+		$img = new SimpleImage();
+
+		if (strpos($filename, 'youtube_cache_default') !== false) // we don't want to touch the standard fallback image
+		{
+			return false;
+		}
+
+		if (!is_dir(APP_ROOT.'/uploads/gamesdb/big/thumbs/'.$item_id))
+		{
+			mkdir(APP_ROOT.'/uploads/gamesdb/big/thumbs/'.$item_id, 0777);
+			chmod(APP_ROOT.'/uploads/gamesdb/big/thumbs/'.$item_id, 0777);
+		}
+
+		$save_as = '/uploads/gamesdb/big/thumbs/'.$item_id.'/trailer_thumb.jpg';
+
+		$filename = '/'.str_replace($this->core->config('website_url'),'',$filename);
+
+		$img->fromFile($_SERVER['DOCUMENT_ROOT'].$filename)->resize(450, null)->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($_SERVER['DOCUMENT_ROOT'].$save_as, 'image/jpeg');
+
+		$this->dbl->run("UPDATE `calendar` SET `trailer_thumb` = ? WHERE `id` = ?", array($this->core->config('website_url') . $save_as, $item_id));
 	}
 }

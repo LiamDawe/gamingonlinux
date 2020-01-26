@@ -47,7 +47,8 @@ $charts_list = array(
 	array("name" => "Resolution", "bundle_outside_top10" => 1),
 	array("name" => "Main Gaming Machine", "bundle_outside_top10" => 0),
 	array("name" => "Main Gamepad", "bundle_outside_top10" => 1),
-	array("name" => "PC VR Headset", "bundle_outside_top10" => 1)
+	array("name" => "PC VR Headset", "bundle_outside_top10" => 1),
+	array("name" => "Session Type", "bundle_outside_top10" => 0)
 );
 
 if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')

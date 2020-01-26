@@ -84,7 +84,8 @@ array ("name" => "Number of monitors", "db_field" => "p.monitor_count"),
 array ("name" => "Resolution", "db_field" => "p.resolution"),
 array ("name" => "Main Gaming Machine", "db_field" => "p.gaming_machine_type"),
 array ("name" => "Main Gamepad", "db_field" => "p.gamepad"),
-array ("name" => "PC VR Headset", "db_field" => "p.vrheadset")
+array ("name" => "PC VR Headset", "db_field" => "p.vrheadset"),
+array ("name" => "Session Type", "db_field" => "p.session_type")
 );
 
 foreach ($charts as $chart)

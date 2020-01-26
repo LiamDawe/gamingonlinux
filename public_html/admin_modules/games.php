@@ -643,7 +643,7 @@ if (isset($_POST['act']))
 		if ($_POST['act'] == 'Edit')
 		{
 			$finish_page = '/itemdb/'.$_POST['id'];
-			$error_page = $finish_page;
+			$error_page = '/admin.php?module=games&view=edit&id='.$_POST['id'];
 		}
 		if ($_POST['act'] == 'Approve')
 		{

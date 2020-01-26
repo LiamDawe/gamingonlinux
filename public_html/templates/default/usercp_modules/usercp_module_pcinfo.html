@@ -57,6 +57,9 @@
 		<select name="pc_info[gamepad]"><option value=""></option>{:gamepad_options}</select><br />
 		<strong>If you own a PC VR device, which one do you have?</strong>
 		<select name="pc_info[vrheadset]"><option value=""></option>{:vrheadset_options}</select><br />
+		<strong>Session Type</strong><br />
+		<em>Don't know? You can try "echo $XDG_SESSION_TYPE" in terminal and it should tell you.</em><br />
+		<select name="pc_info[session_type]"><option value=""></option>{:session_type}</select>
 	</div>
 	<button type="submit" name="act" value="Update" formaction="{:url}usercp.php?module=pcinfo">Update</button> <button type="submit" name="act" value="wipe" formaction="{:url}usercp.php?module=pcinfo">Wipe PC Info</button><br />
 	<br />

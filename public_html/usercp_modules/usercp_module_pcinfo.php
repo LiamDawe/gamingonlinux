@@ -6,16 +6,18 @@ if(!defined('golapp'))
 $templating->set_previous('title', 'PC Info' . $templating->get('title', 1)  , 1);
 $templating->load('usercp_modules/usercp_module_pcinfo');
 
+$answers = array();
 // get the lists of everything we need, so we can validate input when saving as well as displaying for picking
-$get_distros = $dbl->run("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
-$get_desktops = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
-$bits_allowed = array('32bit', '64bit');
+$distributions = $dbl->run("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
+$answers['desktop_environment'] = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
+$answers['what_bits'] = array('32bit', '64bit');
 $dual_boot_systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other", "No");
 $steamplay_options = array("I will not use it", "Waiting on a specific game working", "In the last month", "In the last six months", "More than six months ago");
 $wine_options = array("In the last month", "In the last three months", "In the last six months", "Over six months ago", "I never use it");
 $cpu_vendors = array('Intel', 'AMD');
 $gpu_vendors = array('Intel', 'AMD', 'Nvidia');
 $gpu_driver_options = array('Open Source', 'Proprietary');
+$answers['session_type'] = array('x11','Wayland');
 $ram_numbers = array();
 for ($i = 1; $i <= 128; $i++)
 {
@@ -47,7 +49,7 @@ if (!isset($_POST['act']))
 {
 	$usercpcp = $dbl->run("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();#
 
-	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`steamplay`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`vrheadset`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
+	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`what_bits`, p.`dual_boot`, p.`steamplay`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`vrheadset`, p.`session_type`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
 	$additional = $dbl->run($additional_sql, array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
@@ -88,7 +90,7 @@ if (!isset($_POST['act']))
 
 	// display distros
 	$distro_list = '';
-	foreach ($get_distros as $distros)
+	foreach ($distributions as $distros)
 	{
 		$selected = '';
 		if ($usercpcp['distro'] == $distros)
@@ -101,7 +103,7 @@ if (!isset($_POST['act']))
 
 	// Desktop environment
 	$desktop_list = '';
-	foreach ($get_desktops as $desktops)
+	foreach ($answers['desktop_environment'] as $desktops)
 	{
 		$selected = '';
 		if ($additional['desktop_environment'] == $desktops)
@@ -114,7 +116,7 @@ if (!isset($_POST['act']))
 
 	// distribution architecture 32/64bit
 	$bits_options = '';
-	foreach ($bits_allowed as $bitsy)
+	foreach ($answers['what_bits'] as $bitsy)
 	{
 		$selected = '';
 		if ($additional['what_bits'] == $bitsy)
@@ -286,6 +288,18 @@ if (!isset($_POST['act']))
 		$vrheadset_options .= '<option value="'.$vr_option.'" '.$selected.'>'.$vr_option.'</option>';
 	}
 	$templating->set('vrheadset_options', $vrheadset_options);
+
+	$session_output = '';
+	foreach ($answers['session_type'] as $session)
+	{
+		$selected = '';
+		if ($additional['session_type'] == $session)
+		{
+			$selected = 'selected';
+		}
+		$session_output .= '<option value="'.$session.'" '.$selected.'>'.$session.'</option>';
+	}
+	$templating->set('session_type', $session_output);
 }
 else if (isset($_POST['act']))
 {
@@ -302,7 +316,7 @@ else if (isset($_POST['act']))
 		else if (isset($_POST['yes']))
 		{
 			$empty_sql = [];
-			$fields = ['date_updated', 'desktop_environment', 'what_bits', 'dual_boot', 'wine', 'ram_count', 'cpu_vendor', 'cpu_model', 'gpu_vendor', 'gpu_model', 'gpu_driver', 'monitor_count', 'resolution', 'gaming_machine_type', 'gamepad'];
+			$fields = ['date_updated', 'desktop_environment', 'what_bits', 'dual_boot', 'wine', 'ram_count', 'cpu_vendor', 'cpu_model', 'gpu_vendor', 'gpu_model', 'gpu_driver', 'monitor_count', 'resolution', 'gaming_machine_type', 'gamepad', 'session_type'];
 			foreach ($fields as $field)
 			{
 				$empty_sql[] = ' `'.$field.'` = NULL ';
@@ -356,18 +370,19 @@ else if (isset($_POST['act']))
 
 		// make sure they match what's actually allowed
 		// need to make this prettier one day...
-		if (!in_array($_POST['distribution'], $get_distros))
+		if (!in_array($_POST['distribution'], $distributions))
 		{
 			$_POST['distribution'] = '';
 		}
-		if (!in_array($_POST['pc_info']['desktop_environment'], $get_desktops))
+
+		foreach($answers as $key => $field)
 		{
-			$_POST['pc_info']['desktop_environment'] = '';
+			if (!in_array($_POST['pc_info'][$key], $answers[$key]))
+			{
+				$_POST['pc_info'][$key] = NULL;
+			}
 		}
-		if (!in_array($_POST['pc_info']['what_bits'], $bits_allowed))
-		{
-			$_POST['pc_info']['what_bits'] = '';
-		}
+
 		if (!in_array($_POST['pc_info']['dual_boot'], $dual_boot_systems))
 		{
 			$_POST['pc_info']['dual_boot'] = '';
@@ -420,7 +435,7 @@ else if (isset($_POST['act']))
 		if (!in_array($_POST['pc_info']['vrheadset'], $vrheadset))
 		{
 			$_POST['pc_info']['vrheadset'] = '';
-		}	
+		}
 
 		// build the query of fields to update
 		$update_sql = "UPDATE `user_profile_info` SET ";

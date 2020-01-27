@@ -1123,7 +1123,7 @@ class core
 
     function delete_folder($dir)
     { 
-		if (empty($dir) || $dir == NULL || $dir == '/')
+		if (empty($dir) || $dir == NULL || $dir == '/' || !is_dir($dir))
 		{
 			return false;
 		}

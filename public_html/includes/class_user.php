@@ -612,6 +612,7 @@ class user
 			p.`wine`,
 			p.`gamepad`,
 			p.`vrheadset`,
+			p.`session_type`,
 			p.`date_updated`,
 			p.`include_in_survey`,
 			u.`distro`,
@@ -735,6 +736,11 @@ class user
 			{
 				$pc_info['counter']++;
 				$pc_info['vrheadset'] = '<strong>PC VR headset:</strong> '.$additionaldb['vrheadset'];
+			}
+			if ($additionaldb['session_type'] != NULL && !empty($additionaldb['session_type']))
+			{
+				$pc_info['counter']++;
+				$pc_info['session_type'] = '<strong>Session Type:</strong> '.$additionaldb['session_type'];
 			}
 		}
 		return $pc_info;

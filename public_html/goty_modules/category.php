@@ -1,5 +1,5 @@
 <?php
-if (!core::is_number($_GET['category_id']))
+if (!isset($_GET['category_id']) || !core::is_number($_GET['category_id']))
 {
 	$_SESSION['message'] = 'no_id';
 	$_SESSION['message_extra'] = 'category';
@@ -8,33 +8,15 @@ if (!core::is_number($_GET['category_id']))
 }
 $cat = $dbl->run("SELECT `category_name`, `description`, `is_dev`, `games_only` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']))->fetch();
 
-$templating->block('category_bread', 'goty');
+$templating->block('category_header', 'goty');
 $templating->set('category_name', $cat['category_name']);
-
-if (!empty($cat['description']))
-{
-	$templating->block('description', 'goty');
-	$templating->set('category_description', $cat['description']);
-}
+$templating->set('category_description', $cat['description']);
 
 // info to send to ajax search box
 $data_type = 'all';
 if ($cat['games_only'] == 1)
 {
 	$data_type = 'games_only';
-}
-
-if ($core->config('goty_games_open') == 1)
-{
-	$templating->block('add', 'goty');
-	$picker = 'games';
-	if ($cat['is_dev'] == 1)
-	{
-		$picker = 'devs';
-	}
-	$templating->set('picker', $picker);
-	$templating->set('category', $_GET['category_id']);
-	$templating->set('data_type', $data_type);
 }
 
 // sort what table to use for the info
@@ -227,4 +209,17 @@ else
 }
 
 $templating->block('games_bottom', 'goty');
+
+if ($core->config('goty_games_open') == 1)
+{
+	$templating->block('add', 'goty');
+	$picker = 'games';
+	if ($cat['is_dev'] == 1)
+	{
+		$picker = 'devs';
+	}
+	$templating->set('picker', $picker);
+	$templating->set('category', $_GET['category_id']);
+	$templating->set('data_type', $data_type);
+}
 ?>

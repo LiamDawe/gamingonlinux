@@ -121,17 +121,15 @@ if (isset($view))
 
 		$templating->block('multi', 'articles');
 
-		if (isset($_GET['catid']) || !isset($_GET['catid']))
+		if (isset($_GET['catid']) && !is_array($_GET['catid']) || !isset($_GET['catid']))
 		{
-			if (!is_array($_GET['catid']))
-			{
-				$_SESSION['message'] = 'none_found';
-				$_SESSION['message_extra'] = 'categories';
-				header("Location: /index.php?module=search");
-				die();
-			}
-			$categorys_ids = $_GET['catid'];
+			$_SESSION['message'] = 'none_found';
+			$_SESSION['message_extra'] = 'categories';
+			header("Location: /index.php?module=search");
+			die();
 		}
+
+		$categorys_ids = $_GET['catid'];
 		
 		$article_class->display_category_picker($categorys_ids);
 		

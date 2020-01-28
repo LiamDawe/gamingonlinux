@@ -316,7 +316,7 @@ else if (isset($_POST['act']))
 		else if (isset($_POST['yes']))
 		{
 			$empty_sql = [];
-			$fields = ['date_updated', 'desktop_environment', 'what_bits', 'dual_boot', 'wine', 'ram_count', 'cpu_vendor', 'cpu_model', 'gpu_vendor', 'gpu_model', 'gpu_driver', 'monitor_count', 'resolution', 'gaming_machine_type', 'gamepad', 'session_type'];
+			$fields = ['date_updated', 'desktop_environment', 'what_bits', 'dual_boot', 'wine', 'ram_count', 'cpu_vendor', 'cpu_model', 'gpu_vendor', 'gpu_model', 'gpu_driver', 'monitor_count', 'resolution', 'gaming_machine_type', 'gamepad', 'session_type','vrheadset', 'steamplay'];
 			foreach ($fields as $field)
 			{
 				$empty_sql[] = ' `'.$field.'` = NULL ';

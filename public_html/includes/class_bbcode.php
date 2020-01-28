@@ -572,10 +572,15 @@ class bbcode
 
 				if ($pc_info['counter'] > 0)
 				{
-					$fields_output = '<ul style="list-style-type: none; margin: 0; padding: 0;">';
+					if ($pc_info['empty'] > 0)
+					{
+						$fields_output .= '<br /><p>You currently have <u><strong>' . $pc_info['empty'] . '</strong></u> fields not filled out.</p>';
+					}
+
+					$fields_output .= '<ul style="list-style-type: none; margin: 0; padding: 0;">';
 					foreach ($pc_info as $k => $info)
 					{
-						if ($k != 'counter' && $k != 'date_updated' && $k != 'include_in_survey')
+						if ($k != 'counter' && $k != 'date_updated' && $k != 'include_in_survey' && $k != 'empty')
 						{
 							$fields_output .= '<li>' . $info . '</li>';
 						}
@@ -595,7 +600,7 @@ class bbcode
 				}
 				else
 				{
-					$fields_output = "<em>You haven't filled yours in!</em>";
+					$fields_output = "<em>You haven't filled yours in! You can <a href=\"/usercp.php?module=pcinfo\">do so here any time</a>.</em>";
 				}
 
 				if (!isset($pc_info['date_updated']))

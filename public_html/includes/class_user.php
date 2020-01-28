@@ -594,7 +594,7 @@ class user
 
 	public function display_pc_info($user_id)
 	{
-		$pc_info = ['counter' => 0];
+		$pc_info = ['counter' => 0, 'empty' => 0];
 
 		$additionaldb = $this->db->run("SELECT
 			p.`desktop_environment`,
@@ -632,6 +632,10 @@ class user
 			foreach ($additionaldb as $key => $value)
 			{
 				$additionaldb[$key] = htmlspecialchars($value);
+				if (!isset($value) || empty($value))
+				{
+					$pc_info['empty']++;
+				}
 			}
 
 			$pc_info['include_in_survey'] = $additionaldb['include_in_survey'];

@@ -93,7 +93,7 @@ if (isset($_POST['act']))
 		if (!core::validateDate($_POST['end_date']))
 		{
 			$_SESSION['message'] = 'invalid_end_date';
-			header("Location: /admin.php?module=featured&view=add&article_id=181");
+			header("Location: /admin.php?module=featured&view=add&article_id=".$_POST['article_id']);
 			die();
 		}
 
@@ -102,7 +102,7 @@ if (isset($_POST['act']))
 		if ($_POST['end_date'] < $current_time)
 		{
 			$_SESSION['message'] = 'end_date_wrong';
-			header("Location: /admin.php?module=featured&view=add&article_id=181");
+			header("Location: /admin.php?module=featured&view=add&article_id=".$_POST['article_id']);
 			die();
 		}
 

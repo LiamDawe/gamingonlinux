@@ -93,12 +93,19 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		else if (isset($_GET['id']))
 		{
 			$templating->block('manage_top', 'admin_modules/admin_module_goty');
+
+			$cats = $dbl->run("SELECT `category_id`, `category_name`, `is_dev` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
 			
+			if ($cats[$_GET['id']]['is_dev'] == 0)
+			{
+				$get_games = $dbl->run("SELECT c.`name`, g.`id`, g.`category_id` FROM `goty_games` g INNER JOIN `calendar` c ON c.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['id']))->fetch_all();
+			}
+			else if ($cats[$_GET['id']]['is_dev'] == 1)
+			{
+				$get_games = $dbl->run("SELECT d.`name`, g.`id`, g.`category_id` FROM `goty_games` g INNER JOIN `developers` d ON d.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY d.`name` ASC", array($_GET['id']))->fetch_all();
+			}
 
-			$get_games = $dbl->run("SELECT c.`name`, g.`id`, g.`category_id` FROM `goty_games` g INNER JOIN `calendar` c ON c.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['id']))->fetch_all();
-			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all(PDO::FETCH_KEY_PAIR);
-
-			$templating->set('category_name', $cats[$_GET['id']]);
+			$templating->set('category_name', $cats[$_GET['id']]['category_name']);
 
 			foreach ($get_games as $games)
 			{
@@ -111,7 +118,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 					{
 						$selected = 'SELECTED';
 					}
-					$category_list .= '<option value="' . $key . '" ' . $selected . '>' . $category . '</option>';
+					$category_list .= '<option value="' . $key . '" ' . $selected . '>' . $category['category_name'] . '</option>';
 				}
 				$templating->block('manage_row', 'admin_modules/admin_module_goty');
 				$templating->set('game_name', $games['name']);
@@ -216,15 +223,22 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		if (isset($_GET['category_id']))
 		{
-			$cat = $dbl->run("SELECT `category_name` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']))->fetch();
+			$cat = $dbl->run("SELECT `category_name`,`is_dev` FROM `goty_category` WHERE `category_id` = ?", array($_GET['category_id']))->fetch();
 
 			$templating->block('game_list', 'admin_modules/admin_module_goty');
 			$templating->set('name', $cat['category_name']);
 
-			$games_top = $dbl->run("SELECT coalesce(cl.name, d.name) name, g.`votes` as data FROM `goty_games` g left outer join `calendar` cl ON cl.id = g.game_id and g.category_id != 16 left outer join `developers` d ON d.id = g.game_id and g.category_id = 16 WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
+			if ($cat['is_dev'] == 0)
+			{
+				$games_top = $dbl->run("SELECT cl.name, g.`votes` as `data` FROM `goty_games` g JOIN `calendar` cl ON cl.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
+			}
+			else if ($cat['is_dev'] == 1)
+			{
+				$games_top = $dbl->run("SELECT d.name, g.`votes` as `data` FROM `goty_games` g JOIN `developers` d ON d.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
+			}
 
 			$charts = new charts($dbl);
-			$top_chart = $charts->render(NULL, ['name' => $cat['category_name'], 'grouped' => 0, 'data' => $games_top, 'h_label' => 'Total Votes']);
+			$top_chart = $charts->render(['filetype' => 'png'], ['name' => $cat['category_name'], 'grouped' => 0, 'data' => $games_top, 'h_label' => 'Total Votes']);
 
 			$templating->block('topchart', 'admin_modules/admin_module_goty');
 			$templating->set('chart', $top_chart);

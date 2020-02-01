@@ -120,6 +120,13 @@
 
 [block: game_list]
 <div class="box">
+	<ul class="breadcrumb">
+		<li>Quick Links:</li>
+		<li><a href="/admin.php?module=goty&view=config">GOTY Config</a></li>
+		<li><a href="/admin.php?module=goty&view=manage">Manage Games</a></li>
+	</ul>
+</div>
+<div class="box">
 	<div class="head">Here's the current top10 for {:name}</div>
 </div>
 <div class="goty">
@@ -142,4 +149,5 @@
 
 [block: topchart]
 {:chart}
+{:table}
 [/block: topchart]

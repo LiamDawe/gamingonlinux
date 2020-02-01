@@ -33,13 +33,8 @@ $game = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes`, g.`category_id`, c.`ca
 $templating->block('direct_top', '/goty_modules/direct');
 $templating->set('category_id', $game['category_id']);
 $templating->set('category_name', $game['category_name']);
+$templating->set('category_description',$game['description']);
 $templating->set('game_name', $game['name']);
-
-if (!empty($game['description']))
-{
-	$templating->block('description', 'goty');
-	$templating->set('category_description', $game['description']);
-}
 
 if ($core->config('goty_voting_open') == 0)
 {

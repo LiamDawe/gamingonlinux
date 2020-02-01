@@ -209,17 +209,10 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 	{
 		if (!isset($_GET['category_id']))
 		{
-			$templating->block('category_top', 'admin_modules/admin_module_goty');
-
-			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
-			foreach ($cats as $cat)
-			{
-				$templating->block('category_row', 'admin_modules/admin_module_goty');
-				$templating->set('category_id', $cat['category_id']);
-				$templating->set('category_name', $cat['category_name']);
-			}
-
-			$templating->block('category_bottom', 'admin_modules/admin_module_goty');
+			$_SESSION['message'] = 'missing';
+			$_SESSION['message_extra'] = 'category_id';
+			header("Location: /admin.php?module=goty&view=manage");
+			die();
 		}
 		if (isset($_GET['category_id']))
 		{

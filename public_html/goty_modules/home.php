@@ -12,7 +12,8 @@ else if ($core->config('goty_votes_per_category') > 1)
 }
 $templating->set('vote_times_text', $vote_times_text);
 
-$templating->set('total_votes', $core->config('goty_total_votes'));
+$total_votes = $dbl->run("SELECT COUNT(*) FROM `goty_votes`")->fetchOne();
+$templating->set('total_votes', number_format($total_votes));
 
 $voting_text = '';
 $category_status_text = '';

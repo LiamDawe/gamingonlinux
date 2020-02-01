@@ -40,7 +40,7 @@
 [block: category_manage_row]
 <div class="box">
 	<div class="body group">
-		<a href="/admin.php?module=goty&view=manage&id={:category_id}">{:category_name}</a>
+		<a href="/admin.php?module=goty&view=manage&id={:category_id}">{:category_name}</a> - <a href="/admin.php?module=goty&view=top10&category_id={:category_id}">View Top 10</a>
 	</div>
 </div>
 [/block: category_manage_row]
@@ -117,25 +117,6 @@
 	</div>
 </div>
 [/block: config_category_row]
-
-[block: category_top]
-<div class="box">
-	<div class="head">Pick your category!</div>
-</div>
-<div class="goty">
-[/block: category_top]
-
-[block: category_row]
-<div class="box">
-	<div class="body group">
-		<a href="/admin.php?module=goty&view=top10&category_id={:category_id}">{:category_name}</a>
-	</div>
-</div>
-[/block: category_row]
-
-[block: category_bottom]
-</div>
-[/block: category_bottom]
 
 [block: game_list]
 <div class="box">

@@ -93,22 +93,25 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		else if (isset($_GET['id']))
 		{
 			$templating->block('manage_top', 'admin_modules/admin_module_goty');
+			
 
 			$get_games = $dbl->run("SELECT c.`name`, g.`id`, g.`category_id` FROM `goty_games` g INNER JOIN `calendar` c ON c.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY c.`name` ASC", array($_GET['id']))->fetch_all();
-			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all();
+			$cats = $dbl->run("SELECT `category_id`, `category_name` FROM `goty_category` ORDER BY `category_name` ASC")->fetch_all(PDO::FETCH_KEY_PAIR);
+
+			$templating->set('category_name', $cats[$_GET['id']]);
 
 			foreach ($get_games as $games)
 			{
 				$category_list = '';
 				
-				foreach( $cats as $category )
+				foreach( $cats as $key => $category )
 				{
 					$selected = '';
-					if ($games['category_id'] == $category['category_id'])
+					if ($games['category_id'] == $key)
 					{
 						$selected = 'SELECTED';
 					}
-					$category_list .= '<option value="' . $category['category_id'] . '" ' . $selected . '>' . $category['category_name'] . '</option>';
+					$category_list .= '<option value="' . $key . '" ' . $selected . '>' . $category . '</option>';
 				}
 				$templating->block('manage_row', 'admin_modules/admin_module_goty');
 				$templating->set('game_name', $games['name']);

@@ -46,7 +46,14 @@
 [/block: category_manage_row]
 
 [block: manage_top]
-<div class="box"><div class="head">A list of all the accepted GOTY nominations</div></div>
+<div class="box">
+	<ul class="breadcrumb">
+		<li>Quick Links:</li>
+		<li><a href="/admin.php?module=goty&view=config">GOTY Config</a></li>
+		<li><a href="/admin.php?module=goty&view=manage">Manage Games</a></li>
+	</ul>
+</div>
+<div class="box"><div class="head">Accepted games for: {:category_name}</div></div>
 [/block: manage_top]
 
 [block: manage_row]

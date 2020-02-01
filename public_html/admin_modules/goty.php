@@ -228,13 +228,16 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->block('game_list', 'admin_modules/admin_module_goty');
 			$templating->set('name', $cat['category_name']);
 
+			$link = '';
 			if ($cat['is_dev'] == 0)
 			{
-				$games_top = $dbl->run("SELECT cl.name, g.`votes` as `data` FROM `goty_games` g JOIN `calendar` cl ON cl.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
+				$link = 'itemdb/';
+				$games_top = $dbl->run("SELECT cl.id, cl.name, g.`votes` as `data` FROM `goty_games` g JOIN `calendar` cl ON cl.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
 			}
 			else if ($cat['is_dev'] == 1)
 			{
-				$games_top = $dbl->run("SELECT d.name, g.`votes` as `data` FROM `goty_games` g JOIN `developers` d ON d.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
+				$link = 'itemdb/developer/';
+				$games_top = $dbl->run("SELECT d.id, d.name, g.`votes` as `data` FROM `goty_games` g JOIN `developers` d ON d.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
 			}
 
 			$charts = new charts($dbl);
@@ -242,6 +245,15 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 			$templating->block('topchart', 'admin_modules/admin_module_goty');
 			$templating->set('chart', $top_chart);
+
+			$table = '<table class="table-stripes-tbody"><thead><tr><td>Name</td><td>Votes</td></tr></thead><tbody>';
+			foreach ($games_top as $top)
+			{
+				$table .= '<tr><td><a href="'.$core->config('website_url').$link.$top['id'].'">'.$top['name'].'</a></td><td>'.$top['data'].'</td></tr>';
+			}
+			$table .= '</tbody></table>';
+
+			$templating->set('table', $table);
 
 			$templating->block('games_bottom', 'admin_modules/admin_module_goty');
 		}

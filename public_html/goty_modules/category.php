@@ -67,6 +67,7 @@ if ($core->config('goty_finished') == 1)
 }
 
 // games list
+$submit_link = '';
 $templating->block('filters_list', 'goty');
 $filters = [];
 foreach (range('A', 'Z') as $letter) 
@@ -74,6 +75,11 @@ foreach (range('A', 'Z') as $letter)
     $filters[] = '<a href="/goty.php?module=category&amp;filter='.$letter.'&amp;category_id='.$_GET['category_id'].'">' . $letter . '</a>';
 }
 $templating->set('alpha_filters', implode(' ', $filters));
+if ($core->config('goty_games_open') == 1)
+{
+	$submit_link = '<span class="fright"><span class="badge blue"><a class="highlight-element" data-highlight-class="submit-goty-game" href="#submit-goty-game">Submit Game</a></span>';
+}
+$templating->set('submit_game_link', $submit_link);
 
 $grab_votes = NULL;
 $reset_button = '';

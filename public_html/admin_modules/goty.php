@@ -114,6 +114,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set('game_name', $games['name']);
 				$templating->set('url', $core->config('website_url'));
 				$templating->set('id', $games['id']);
+				$templating->set('category_id', $games['category_id']);
 				$templating->set('options', $category_list);
 			}
 		}
@@ -328,7 +329,7 @@ if (isset($_POST['act']))
 
 				$_SESSION['message'] = 'deleted';
 				$_SESSION['message_extra'] = 'GOTY game';
-				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage");
+				header("Location: " . $core->config('website_url') . "admin.php?module=goty&view=manage&id=".$_POST['category_id']);
 			}
 
 			else

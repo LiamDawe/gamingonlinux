@@ -56,6 +56,7 @@
 			<strong>Name:</strong> {:game_name} <br />
 			Category: <select name="category">{:options}</select> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="edit" class="fnone">Edit</button> <button type="submit" formaction="{:url}admin.php?module=goty" name="act" value="delete" class="fnone">Delete</button>
 			<input type="hidden" name="id" value="{:id}" />
+			<input type="hidden" name="category_id" value="{:category_id}" />
 		</form>
 	</div>
 </div>

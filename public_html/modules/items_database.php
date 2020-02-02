@@ -150,7 +150,7 @@ if (isset($_GET['view']))
 					$trailer_thumbnail = '<img class src="/templates/default/images/youtube_cache_default.png" />';
 					if (isset($get_item['trailer_thumb']) && !empty($get_item['trailer_thumb']))
 					{
-						$trailer_thumbnail = '<img src="/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
+						$trailer_thumbnail = '<img src="'.$core->config('website_url').'uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
 					}
 					else if ($uploaded_media)
 					{
@@ -159,7 +159,7 @@ if (isset($_GET['view']))
 							$img->fromFile($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/'.$uploaded_media[0]['filename'])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg', 'image/jpeg');
 						}
 						
-						$trailer_thumbnail = '<img src="/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
+						$trailer_thumbnail = '<img src='.$core->config('website_url').'"uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
 					}
 					$display_media .= '<a data-caption="'.$get_item['name'].'" data-fancybox="images" href="https://www.youtube-nocookie.com/embed/'.$trailer_id[1].'">'.$trailer_thumbnail.'</a>';
 					$max_images = 1;
@@ -338,7 +338,7 @@ if (isset($_GET['view']))
 			}
 
 			$get_item['name'] = trim($get_item['name']);
-			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC LIMIT 5", array($get_item['name']))->fetch_all();
+			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC LIMIT 5", array($get_item['name']))->fetch_all();
 			if ($articles_res)
 			{
 				$article_list = '';
@@ -357,7 +357,8 @@ if (isset($_GET['view']))
 						$username = "<a href=\"/profiles/{$articles['author_id']}\">" . $articles['username'] . '</a>';
 					}
 
-					$article_list .= '<li><a href="' . $article_link . '">'.$articles['title'].'</a> by '.$username.'</li>';
+					$article_list .= '<li><a href="' . $article_link . '">'.$articles['title'].'</a> by '.$username.'<br />
+					<small>'.$core->human_date($articles['date']).'</small></li>';
 				}
 				if (count($articles_res) == 5)
 				{

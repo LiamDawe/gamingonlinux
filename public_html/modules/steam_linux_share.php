@@ -12,8 +12,8 @@ $templating->block('top');
 $data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` > '2016-04-01' ORDER BY `date` ASC")->fetch_all();
 
 $colours = array(
-	'#a6cee3',
-	'#b2df8a',
+	'#3999cc',
+	'#548c22',
 	'#fb9a99',
 	'#e31a1c',
 	'#fdbf6f',

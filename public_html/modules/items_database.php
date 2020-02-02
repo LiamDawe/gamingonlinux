@@ -159,7 +159,7 @@ if (isset($_GET['view']))
 							$img->fromFile($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/'.$uploaded_media[0]['filename'])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($_SERVER['DOCUMENT_ROOT'].'/uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg', 'image/jpeg');
 						}
 						
-						$trailer_thumbnail = '<img src='.$core->config('website_url').'"uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
+						$trailer_thumbnail = '<img src="'.$core->config('website_url').'uploads/gamesdb/big/thumbs/'.$get_item['id'].'/trailer_thumb.jpg" />';
 					}
 					$display_media .= '<a data-caption="'.$get_item['name'].'" data-fancybox="images" href="https://www.youtube-nocookie.com/embed/'.$trailer_id[1].'">'.$trailer_thumbnail.'</a>';
 					$max_images = 1;

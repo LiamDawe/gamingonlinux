@@ -308,6 +308,7 @@ class game_sales
 
 		$genre_ids = [];
 		$licenses = [];
+		$engines = [];
 		$options_sql = '';
 		$genre_join = '';
 		if (isset($filters_sort) && is_array($filters_sort))
@@ -334,6 +335,18 @@ class game_sales
 				$in  = str_repeat('?,', count($licenses) - 1) . '?';
 				$options_sql .= ' AND c.license IN ('.$in.') ';
 			}
+
+			if (isset($filters_sort['engines']))
+			{
+				foreach ($filters_sort['engines'] as $engine)
+				{
+					$engines[] = $engine;
+					$options_link[] = 'engines[]=' . $engine;
+				}
+				$in  = str_repeat('?,', count($engines) - 1) . '?';
+				$options_sql .= ' AND c.game_engine_id IN ('.$in.') ';
+			}
+
 			if (isset($filters_sort['misc']))
 			{
 				foreach ($filters_sort['misc'] as $misc)
@@ -366,7 +379,7 @@ class game_sales
 			$where = '%'.$search_query.'%';
 			$sql_where = ' c.`name` LIKE ? AND ';
 
-			$merged_arrays = array_merge([$where], $genre_ids, $licenses);
+			$merged_arrays = array_merge([$where], $genre_ids, $licenses, $engines);
 
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c WHERE $sql_where c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 ORDER BY c.`name` ASC", [$where])->fetchOne();
 			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?view=mainlist&', $page, $link_extra);	
@@ -375,7 +388,7 @@ class game_sales
 		}
 		else
 		{
-			$merged_arrays = array_merge($genre_ids, $licenses);
+			$merged_arrays = array_merge($genre_ids, $licenses, $engines);
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct c.id) FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND c.bundle = 0 AND c.`supports_linux` = 1 $options_sql ORDER BY c.`name` ASC", $merged_arrays)->fetchOne();
 			$pagination = $this->core->pagination_link(50, $total_rows, '/itemdb.php?view=mainlist&', $page, $link_extra);
 
@@ -398,7 +411,7 @@ class game_sales
 
 			foreach ($games_res as $game)
 			{
-				$this->templating->block('row', 'free_games');
+				$this->templating->block('row');
 
 				$small_pic = '';
 				if ($game['small_picture'] != NULL && $game['small_picture'] != '')

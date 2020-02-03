@@ -157,6 +157,35 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 		$licenses_output .= '<li><a class="show_all_filter_list" href="#">Show All</a></li>';
 	}
 	$templating->set('licenses_output', $licenses_output);
+
+	$engines_res = $dbl->run("select count(*) as `total`, e.engine_name, e.engine_id FROM `game_engines` e INNER JOIN `calendar` c ON c.game_engine_id = e.engine_id WHERE c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by e.`engine_name`, e.`engine_id`")->fetch_all();
+	$engines_output = '';
+	$engines_counter = 0;
+	foreach ($engines_res as $engine)
+	{
+		$checked = '';
+		if (isset($filters_sort['engine']) && in_array($engine['license_id'], $filters_sort['engine']))
+		{
+			$checked = 'checked';
+		}
+		$total = '';
+		if ($engine['total'] > 0)
+		{
+			$total = ' <small>('.$engine['total'].')</small>';
+		}
+		$hidden = '';
+		if ($engines_counter > 4)
+		{
+			$hidden = 'class="hidden"';
+		}
+		$engines_output .= '<li '.$hidden.'><label><input type="checkbox" name="engines[]" value="'.$engine['engine_id'].'" '.$checked.'> '.$engine['engine_name'].$total.'</label></li>';	
+		$engines_counter++;
+	}
+	if ($engines_counter > 4)
+	{
+		$engines_output .= '<li><a class="show_all_filter_list" href="#">Show All</a></li>';
+	}
+	$templating->set('engines_output', $engines_output);
 }
 
 include(APP_ROOT . '/includes/footer.php');

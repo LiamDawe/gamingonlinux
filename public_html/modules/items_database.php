@@ -369,8 +369,12 @@ if (isset($_GET['view']))
 
 			if ($user->check_group([1,2,5]))
 			{
-				$templating->block('main_info_bottom', 'items_database');
+				$templating->block('editor_bottom', 'items_database');
 				$templating->set('edit-link', $edit_link);
+			}
+			else
+			{
+				$templating->block('user_bottom', 'items_database');
 			}
 		}
 		else

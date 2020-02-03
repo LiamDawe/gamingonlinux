@@ -2,9 +2,10 @@
 <div class="box">
 	<ul class="breadcrumb">
 		<li class="active">Quick Links</li>
-		<li><a href="https://www.gamingonlinux.com">Home</a></li>
+		<li><a href="/">News Home</a></li>
+		<li><a href="/itemdb.php">Database Home</a></li>
 		<li><a href="/sales.php">Sales Page</a></li>
-		<li><a href="/free_games.php">Free Games Page</a></li>
+		<li><a href="/itemdb.php?view=mainlist">View All</a></li>
 	</ul>
 </div>
 [/block: quick_links]
@@ -41,9 +42,15 @@
 
 [block: developer_list_top]
 <div class="box">
-		<div class="head">Viewing Linux games from {:dev_name}</div>
+	<div class="head">Viewing Linux games from {:dev_name}</div>
 </div>
 [/block: developer_list_top]
+
+[block: developer_website]
+<div class="box">
+	<div class="body group">Official site: {:link}</div>
+</div>
+[/block: developer_website]
 
 [block: dev_game_row]
 <div class="box">
@@ -95,8 +102,8 @@
 		<label><input type="checkbox" name="free" {:free}/> Free (as in money)? <em>Tick if this is free/free to play</em></label><br />
 		<label><input type="checkbox" name="dlc" {:dlc}/> DLC <em>Tick if this is a DLC</em></label><br />
 		If it's a DLC, enter the name of the game below:<br />
-		<select tabindex="-1" name="game" id="articleGames" class="populate select2-offscreen">{:game}</select><br />
-		<button class="clear-games">Clear game</button><br />
+		<select tabindex="-1" name="game" id="DLC_pick" class="game_picker" data-picker="games" data-type="all_nodlc" style="width:300px" class="populate select2-offscreen"><option value="0">None</option>{:base_game}</select><br />
+		<button class="clear-games" data-field-id="DLC_pick">Clear game</button><br />
 		License <br />
 		<select name="license"><option value=""></option>{:license_options}</select><br />
 		Tags<br />
@@ -125,15 +132,16 @@
 [/block: submit_developer]
 
 [block: item_view_top]
-<div class="box"><div class="head">{:free_item} {:dlc} {:name} {:edit-link}</div></div>
+<div class="box">
+	<div class="head">{:free_item} {:dlc} {:name} {:edit-link}</div>
 [/block: item_view_top]
 
 [block: base_game]
-<div class="box"><div class="body group">This is a DLC for <a href="/index.php?module=items_database&amp;view=item&amp;id={:base_game_id}">{:base_game_name}</a></div></div>
+	<div class="body group">This is a DLC for <a href="/index.php?module=items_database&amp;view=item&amp;id={:base_game_id}">{:base_game_name}</a></div>
 [/block: base_game]
 
 [block: main-info]
-<div class="box">
+
 	{:uploaded_media}
 	<div class="database-extra">
 		<ul>
@@ -149,34 +157,34 @@
 	<div class="body group">
 		{:description}
 	</div>
-</div>
 [/block: main-info]
 
 [block: dlc]
-<div class="box">
 	<div class="head">DLC</div>
 	<div class="body group">{:dlc_names}</div>
-</div>
 [/block: dlc]
 
 [block: associations]
-<div class="box"><div class="body group">Also known as: {:games}</div></div>
+<div class="body group">Also known as: {:games}</div>
 [/block: associations]
 
-[block: main_info_bottom]
-<div class="box"><div class="body group">{:edit-link}</div></div>
-[/block: main_info_bottom]
-
 [block: articles]
-<div class="box">
   <div class="head">GOL Articles</div>
   <div class="body list"><ul>{:articles}</ul></div>
-</div>
 [/block: articles]
 
 [block: sales]
-<div class="box">
 		<div class="head">It's on sale!</div>
 		<div class="body list"><ul>{:sales_list}</ul></div>
-	  </div>
 [/block: sales]
+
+[block: editor_bottom]
+</div>
+<div class="box">
+	<div class="body group">{:edit-link}</div>
+</div>
+[/block: editor_bottom]
+
+[block: user_bottom]
+</div>
+[/block: user_bottom]

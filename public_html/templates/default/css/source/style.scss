@@ -1854,7 +1854,13 @@ input:checked + .slider:before
 	max-width: 90%;
 }
 
-.itemdb-media-container {text-align: center;}
+.itemdb-media-container {
+	background-color: #383838;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	line-height: 0;
+}
 
 .gamesdbbutton 
 {

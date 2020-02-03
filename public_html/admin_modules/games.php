@@ -107,6 +107,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		$templating->set('license_options', $license_options);
 
+		$engines = $dbl->run("SELECT `engine_id`,`engine_name` FROM `game_engines` ORDER BY `engine_name` ASC")->fetch_all();
+		$engine_options = '';
+		foreach ($engines as $engine)
+		{
+			$engine_options .= '<option value="'.$engine['engine_id'].'">'.$engine['engine_name'].'</option>';
+		}
+		$templating->set('engine_options', $engine_options);
+
 		$core->article_editor(['content' => '']);
 
 		$previous_uploads = $games_database->display_previous_uploads(NULL);
@@ -337,6 +345,19 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('license_options', $license_options);
 
+				$engines = $dbl->run("SELECT `engine_id`,`engine_name` FROM `game_engines` ORDER BY `engine_name` ASC")->fetch_all();
+				$engine_options = '';
+				foreach ($engines as $engine)
+				{
+					$selected = '';
+					if ($engine['engine_id'] == $game['game_engine_id'])
+					{
+						$selected = 'selected';
+					}
+					$engine_options .= '<option value="'.$engine['engine_id'].'" '.$selected.'>'.$engine['engine_name'].'</option>';
+				}
+				$templating->set('engine_options', $engine_options);
+
 				// pull in any developers and publishers
 				$developers_list = '';
 				$grab_developers = $dbl->run("SELECT r.developer_id,d.name FROM `game_developer_reference` r LEFT JOIN `developers` d ON r.developer_id = d.id WHERE r.game_id = ?", array($game['id']))->fetch_all();
@@ -566,6 +587,19 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				}
 				$templating->set('license_options', $license_options);
 
+				$engines = $dbl->run("SELECT `engine_id`,`engine_name` FROM `game_engines` ORDER BY `engine_name` ASC")->fetch_all();
+				$engine_options = '';
+				foreach ($engines as $engine)
+				{
+					$selected = '';
+					if ($engine['engine_id'] == $game['game_engine_id'])
+					{
+						$selected = 'selected';
+					}
+					$engine_options .= '<option value="'.$engine['engine_id'].'" '.$selected.'>'.$engine['engine_name'].'</option>';
+				}
+				$templating->set('engine_options', $engine_options);
+
 				$base_game = '';
 				if ($game['base_game_id'] != NULL && $game['base_game_id'] != 0)
 				{
@@ -599,6 +633,12 @@ if (isset($_POST['act']))
 		$date = trim($_POST['date']);
 		$link = trim($_POST['link']);
 		$steam_link = trim($_POST['steam_link']);
+
+		$game_engine = NULL;
+		if (!empty($_POST['game_engine']))
+		{
+			$game_engine = $_POST['game_engine'];
+		}
 
 		$steam_appid = NULL;
 		if (!empty($steam_link))
@@ -740,7 +780,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Add')
 		{
-			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes));
+			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `approved` = 1, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `game_engine_id` = ?, `crowdfund_notes` = ?, $checkboxes_sql_insert", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $game_engine, $crowdfund_notes));
 			$new_id = $dbl->new_id();
 	
 			$core->process_game_genres($new_id);
@@ -770,7 +810,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Edit')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `lock_timer` = NULL, `locked_by_id` = NULL, `crowdfund_notes` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `steam_id` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `crowdfund_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `lock_timer` = NULL, `locked_by_id` = NULL, `crowdfund_notes` = ?, `game_engine_id` = ?, $checkboxes_sql_insert WHERE `id` = ?", array($name, $steam_appid, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $crowdfund_link, $base_game, $license, $trailer, $crowdfund_notes, $game_engine, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 			$games_database->process_developers($_POST['id']);
@@ -795,7 +835,7 @@ if (isset($_POST['act']))
 
 		if ($_POST['act'] == 'Approve')
 		{
-			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `lock_timer` = NULL, `locked_by_id` = NULL, `approved` = 1, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $_POST['id']));
+			$dbl->run("UPDATE `calendar` SET `name` = ?, `description` = ?, `date` = ?, `link` = ?, `steam_link` = ?, `gog_link` = ?, `itch_link` = ?, `base_game_id` = ?, $sql_type `license` = ?, `trailer` = ?, `lock_timer` = NULL, `locked_by_id` = NULL, `game_engine_id` = ?, `approved` = 1, $checkboxes_sql_insert WHERE `id` = ?", array($name, $description, $sql_date, $_POST['link'], $_POST['steam_link'], $_POST['gog_link'], $_POST['itch_link'], $base_game, $license, $trailer, $game_engine, $_POST['id']));
 		
 			$core->process_game_genres($_POST['id']);
 			$games_database->process_developers($_POST['id']);

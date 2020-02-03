@@ -80,7 +80,7 @@ if (isset($_GET['view']))
 		$templating->block('full_db_search');
 
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
@@ -274,6 +274,13 @@ if (isset($_GET['view']))
 				$dev_names = '<li><strong>Who made this?</strong></li><li>' . implode(', ', $dev_names) . '</li>';
 			}
 			$templating->set('devs_list', $dev_names);
+
+			$game_engine = '';
+			if (isset($get_item['engine_id']) && is_numeric($get_item['engine_id']))
+			{
+				$game_engine = '<li><strong>Made With</strong></li><li>'.$get_item['engine_name'].'</li>';
+			}
+			$templating->set('game_engine', $game_engine);
 
 			$description = '';
 			if (!empty($get_item['description']) && $get_item['description'] != NULL)

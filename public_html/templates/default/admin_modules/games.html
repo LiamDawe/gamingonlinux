@@ -133,7 +133,9 @@
 			</div>
 			<div class="subhead">Not Required</div>
 			<div class="body group">
-					<label><input type="checkbox" name="free_game" {:free_game_check}/> Free (as in money)? <em>Tick if this is free/free to play</em></label><br />
+					<strong>Game Engine</strong><br />
+					<select name="game_engine"><option value=""></option>{:engine_options}</select><br />
+				<label><input type="checkbox" name="free_game" {:free_game_check}/> Free (as in money)? <em>Tick if this is free/free to play</em></label><br />
 					License <select name="license"><option value=""></option>{:license_options}</select><br />
 					Release Date: <br />
 					<input name="date" id="datepicker" type="text" value="{:date} "/>

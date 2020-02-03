@@ -296,9 +296,10 @@ class game_sales
 		$this->templating->block('list_top', 'itemdb');
 
 		// for non-ajax requests
-		if (isset($_GET['option']) && is_array($_GET['option']) && $filters == NULL)
+		if (isset($_GET['filters']) && $filters == NULL)
 		{
-			$filters_sort = ['option' => $_GET['option']];
+			$filters_sort = array();
+			parse_str($_GET['filters'], $filters_sort);
 		}
 		else if ($filters)
 		{
@@ -395,7 +396,7 @@ class game_sales
 			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`link`, c.`gog_link`, c.`steam_link`, c.`itch_link`, c.`license`, c.`small_picture`, c.`trailer`, c.`is_dlc` FROM `calendar` c $genre_join WHERE c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND c.`bundle` = 0 AND c.`supports_linux` = 1 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();	
 		}
 
-		$this->templating->set('filter_total', $total_rows);
+		$this->templating->set('filter_total', number_format($total_rows));
 
 		if ($games_res)
 		{

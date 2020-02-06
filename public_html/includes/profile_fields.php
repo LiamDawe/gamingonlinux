@@ -9,15 +9,15 @@ $profile_fields['steam']['name'] = 'Steam ID:';
 $profile_fields['steam']['description'] = 'You need to have set a custom id/url on your Steam profile for this to work!';
 $profile_fields['steam']['db_field'] = 'steam';
 $profile_fields['steam']['span'] = '<span class="inline icon steam">Steam</span>';
-$profile_fields['steam']['base_link'] = 'http://steamcommunity.com/id/';
+$profile_fields['steam']['base_link'] = 'https://steamcommunity.com/id/';
 $profile_fields['steam']['base_link_required'] = 1;
 $profile_fields['steam']['link'] = 1;
-$profile_fields['steam']['preinput'] = 'http://steamcommunity.com/id/';
+$profile_fields['steam']['preinput'] = 'https://steamcommunity.com/id/';
 
 $profile_fields['twitter']['name'] = 'Twitter:';
 $profile_fields['twitter']['description'] = 'Just your Twitter username!';
 $profile_fields['twitter']['db_field'] = 'twitter_on_profile';
-$profile_fields['twitter']['base_link'] = 'http://www.twitter.com/';
+$profile_fields['twitter']['base_link'] = 'https://www.twitter.com/';
 $profile_fields['twitter']['base_link_required'] = 1;
 $profile_fields['twitter']['span'] = '<span class="inline icon twitter">Twitter</span>';
 $profile_fields['twitter']['link'] = 1;
@@ -46,7 +46,7 @@ $profile_fields['facebook']['base_link_required'] = 0;
 $profile_fields['facebook']['link'] = 1;
 
 $profile_fields['twitch']['name'] = 'Twitch:';
-$profile_fields['twitch']['description'] = 'Enter your <strong>full</strong> twitch channel, like this: http://www.twitch.tv/gamingonlinux (not your profile or anything else)';
+$profile_fields['twitch']['description'] = 'Enter your <strong>full</strong> twitch channel, like this: https://www.twitch.tv/gamingonlinux (not your profile or anything else)';
 $profile_fields['twitch']['db_field'] = 'twitch';
 $profile_fields['twitch']['span'] = '<span class="inline icon twitch">twitch</span>';
 $profile_fields['twitch']['base_link'] = NULL;

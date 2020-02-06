@@ -363,8 +363,8 @@ yAxes: [{
 
 $templating->set('threesome', $threesome);
 
-// total number of monthly active steam accounts, currently a guess it could easily be higher
-$total_steam_active = 90000000;
+// total number of monthly active steam accounts
+$total_steam_active = 95000000;
 
 $linux_user_total = $total_steam_active/100 * $linux_perc[count($linux_perc)-1];
 

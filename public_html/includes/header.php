@@ -90,6 +90,12 @@ $templating->set('icon', $branding['icon'] );
 $core->load_modules(['db_table' => 'modules']);
 
 $section_links = implode('', core::$top_bar_links);
+
+if ($core->config('goty_page_open') == 1)
+{
+	$section_links .= '<li><a href="'.$core->config('website_url').'goty.php">GOTY Awards</a></li>';
+}
+
 $templating->set('sections_links', $section_links);
 
 // sort the correct submit article link

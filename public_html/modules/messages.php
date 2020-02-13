@@ -832,7 +832,7 @@ else
 			if (!isset($_POST['yes']) && !isset($_POST['no']))
 			{
 				$templating->set_previous('title', 'Deleting PM', 1);
-				$core->yes_no('Are you sure you want to delete that Personal Messaging thread?', "index.php?module=messages", 'Delete', $conversation_id, 'conversation_id');
+				$core->yes_no('Are you sure you want to delete that Personal Messaging thread? This only removes it for you.', "index.php?module=messages", 'Delete', $conversation_id, 'conversation_id');
 			}
 
 			else if (isset($_POST['no']))

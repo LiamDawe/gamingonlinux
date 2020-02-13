@@ -35,6 +35,52 @@ if (isset($_GET['user_id']))
 			}
 			else
 			{
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				{
+					$templating->block('top', 'profile');
+
+					$user_action_links = [];
+
+					// give them an edit link if it's their profile
+					if ($_SESSION['user_id'] == $_GET['user_id'])
+					{
+						$user_action_links[] = '<a href="/usercp.php">Click here to edit your profile</a>';						
+					}
+
+					// get blocked id's
+					$blocked_ids = [];
+					if (count($user->blocked_users) > 0)
+					{
+						foreach ($user->blocked_users as $username => $blocked_id)
+						{
+							$blocked_ids[] = $blocked_id[0];
+						}
+					}		
+					
+					if ($_SESSION['user_id'] != $_GET['user_id'])
+					{
+						$block = '<a href="/index.php?module=block_user&block='.$_GET['user_id'].'">Block/Ignore User</a>';
+						if (in_array($_GET['user_id'], $blocked_ids))
+						{
+							$block = '<a href="/index.php?module=block_user&unblock='.$_GET['user_id'].'">UnBlock User</a>';
+						}
+
+						$user_action_links[] = $block;
+					}
+
+					$templating->set('user_actions', implode(' | ', $user_action_links));
+
+					$templating->set('username', $profile['username']);
+
+					$cake_bit = $user->cake_day($profile['register_date'], $profile['username']);
+					$templating->set('cake_icon', $cake_bit);
+					
+					$their_groups = $user->post_group_list([$profile['user_id']]);
+					$profile['user_groups'] = $their_groups[$profile['user_id']];
+					$badges = user::user_badges($profile);
+					$templating->set('badges', implode(' ', $badges));
+				}
+
 				// check blocked list
 				$blocked = $dbl->run("SELECT `blocked_id` FROM `user_block_list` WHERE `user_id` = ? AND `blocked_id` = ?", array($profile_id, $_SESSION['user_id']))->fetchOne();
 				if (($blocked || $profile['private_profile'] == 1) && !$user->check_group([1,2]) && (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $profile_id))
@@ -57,53 +103,7 @@ if (isset($_GET['user_id']))
 
 						$templating->set_previous('meta_description', "Viewing {$profile['username']} profile on GamingOnLinux.com", 1);
 
-						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
-						{
-							$templating->block('top', 'profile');
-
-							$user_action_links = [];
-
-							// give them an edit link if it's their profile
-							if ($_SESSION['user_id'] == $_GET['user_id'])
-							{
-								$user_action_links[] = '<a href="/usercp.php">Click here to edit your profile</a>';						
-							}
-
-							// get blocked id's
-							$blocked_ids = [];
-							if (count($user->blocked_users) > 0)
-							{
-								foreach ($user->blocked_users as $username => $blocked_id)
-								{
-									$blocked_ids[] = $blocked_id[0];
-								}
-							}		
-							
-							if ($_SESSION['user_id'] != $_GET['user_id'])
-							{
-								$block = '<a href="/index.php?module=block_user&block='.$_GET['user_id'].'">Block/Ignore User</a>';
-								if (in_array($_GET['user_id'], $blocked_ids))
-								{
-									$block = '<a href="/index.php?module=block_user&unblock='.$_GET['user_id'].'">UnBlock User</a>';
-								}
-
-								$user_action_links[] = $block;
-							}
-
-							$templating->set('user_actions', implode(' | ', $user_action_links));
-						}
-
 						$templating->block('main', 'profile');
-
-						$templating->set('username', $profile['username']);
-
-						$cake_bit = $user->cake_day($profile['register_date'], $profile['username']);
-						$templating->set('cake_icon', $cake_bit);
-						
-						$their_groups = $user->post_group_list([$profile['user_id']]);
-						$profile['user_groups'] = $their_groups[$profile['user_id']];
-						$badges = user::user_badges($profile);
-						$templating->set('badges', implode(' ', $badges));
 
 						$registered_date = $core->human_date($profile['register_date']);
 						$templating->set('registered_date', $registered_date);

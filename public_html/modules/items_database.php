@@ -88,7 +88,7 @@ if (isset($_GET['view']))
 
 			if ($get_item['supports_linux'] == 0)
 			{
-				$core->message("Note: This item does not currently support Linux!", 2);
+				$core->message("Note: This item does not currently support Linux. You can try Steam Play Proton (<a href=\"https://www.gamingonlinux.com/articles/a-simple-guide-to-steam-play-valves-technology-for-playing-windows-games-on-linux.14552\">Guide</a>) or Wine.", 2);
 			}
 
 			if ($get_item['is_hidden_steam'] == 1)
@@ -100,19 +100,16 @@ if (isset($_GET['view']))
 			$templating->set('name', htmlentities($get_item['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
 			// sort out price
-			$free_item = '';
+			$top_badges = [];
 			if ($get_item['free_game'] == 1)
 			{
-				$free_item = '<span class="badge blue">FREE</span>';
+				$top_badges[] = '<span class="badge blue">FREE</span>';
 			}
-			$templating->set('free_item', $free_item);
-
-			$dlc = '';
 			if ($get_item['is_dlc'] == 1)
 			{
-				$dlc = '<span class="badge yellow">DLC</span>';
+				$top_badges[] = '<span class="badge yellow">DLC</span>';
 			}
-			$templating->set('dlc', $dlc);
+			$templating->set('top_badges', implode(' ', $top_badges));
 
 			$edit_link = '';
 			if ($user->check_group([1,2,5]))
@@ -196,12 +193,12 @@ if (isset($_GET['view']))
 				$unreleased = '';
 				if ($get_item['date'] > date('Y-m-d'))
 				{
-					$unreleased = '<span class="badge blue">Unreleased!</span>';
+					$unreleased = '<br /><span class="badge blue">Unreleased!</span>';
 				}
 				$best_guess = '';
 				if ($get_item['best_guess'] == 1)
 				{
-					$best_guess = '<span class="badge blue">Best Guess Date!</span>';
+					$best_guess = '<span class="badge blue">Best Guess</span>';
 				}
 				$date = '<li>' . $get_item['date'] . ' ' . $best_guess . $unreleased . '</li>';
 			}

@@ -7,6 +7,8 @@ include(THIS_ROOT . '/simple_html_dom.php');
 
 require APP_ROOT . '/includes/cron_bootstrap.php';
 
+/* driver support info */
+
 $save_file = dirname(__FILE__) . '/nvidialist.txt';
 
 if (!file_exists($save_file))
@@ -40,5 +42,43 @@ if ($current_info != $new_info)
 	{
 		$mail = new mailer($core);
 		$mail->sendMail($to, $subject, "Detected change in NVIDIA driver support info: <a href=\"https://nvidia.custhelp.com/app/answers/detail/a_id/3142/\">https://nvidia.custhelp.com/app/answers/detail/a_id/3142/</a>");
+	}
+}
+
+/* vulkan beta driver */
+
+$vksave_file = dirname(__FILE__) . '/nvidiavulkanbeta.txt';
+
+if (!file_exists($vksave_file))
+{
+	$myfile = fopen($vksave_file, "w") or die("Unable to open file!");
+	fwrite($myfile, $new_info);
+	fclose($myfile);
+}
+
+$vkcurrent_info = file_get_contents($vksave_file);
+
+$url = "https://developer.nvidia.com/vulkan-driver";
+$html = file_get_html($url . $page);
+$vkpage_info = $html->find('div[id=wrapper] div[id=content-background] div[id=content]',0);
+
+$vknew_info = md5($vkpage_info->outertext);
+
+if ($vkcurrent_info != $vknew_info)
+{
+	echo 'Vulkan Beta CHANGE DETECTED';
+
+	$myfile = fopen($vksave_file, "w") or die("Unable to open file!");
+	fwrite($myfile, $vknew_info);
+	fclose($myfile);
+
+	$to = $core->config('contact_email');
+	$subject = 'GOL NVIDIA Vulkan Beta Scraper New';
+
+	// Mail it
+	if ($core->config('send_emails') == 1)
+	{
+		$mail = new mailer($core);
+		$mail->sendMail($to, $subject, "Detected change in NVIDIA Vulkan beta driver page: <a href=\"https://developer.nvidia.com/vulkan-driver\">https://developer.nvidia.com/vulkan-driver</a>");
 	}
 }

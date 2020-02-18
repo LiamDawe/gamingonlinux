@@ -57,7 +57,8 @@ if (isset($_GET['user_id']) && !empty($_GET['user_id']))
 	{
 		$_SESSION['message'] = 'no_id';
 		$_SESSION['message_extra'] = 'forum';
-		header("Location: /index.php?module=search_forum&q=".$_GET['q']);		
+		header("Location: /index.php?module=search_forum&q=".$_GET['q']);
+		die();
 	}
 	$fsearch_user_id = (int) $_GET['user_id'];
 	$user_sql_data[] = (int) $_GET['user_id'];

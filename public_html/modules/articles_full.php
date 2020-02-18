@@ -908,6 +908,7 @@ else if (isset($_GET['go']))
 							$article_link = $article_class->get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
 
 							header("Location: " . $article_link);
+							die();
 						}
 						else if ($approved == 0)
 						{
@@ -925,6 +926,7 @@ else if (isset($_GET['go']))
 							$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
 					
 							header("Location: " . $article_link);
+							die();
 						}
 					}
 				}
@@ -1038,6 +1040,7 @@ else if (isset($_GET['go']))
 			$article_link = $article_class->get_link($article_id, $title['slug'], '#comments');
 
 			header("Location: ".$article_link);
+			die();
 		}
 
 		else
@@ -1059,6 +1062,7 @@ else if (isset($_GET['go']))
 			$_SESSION['message_extra'] = 'comment';
 
 			header("Location: ".$article_link);
+			die();
 		}
 	}
 
@@ -1077,12 +1081,14 @@ else if (isset($_GET['go']))
 
 			$_SESSION['message'] = 'comments_opened';
 			header("Location: ".$article_link);
+			die();
 		}
 
 		else
 		{
 			$_SESSION['message'] = 'no_permission';
 			header("Location: ".$article_link);
+			die();
 		}
 	}
 

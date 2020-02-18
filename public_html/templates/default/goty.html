@@ -50,23 +50,22 @@ This is for supported Linux games only.
 [block: top_games]
 <div class="box">
 	<div class="head">Winners in {:category_name} | <a href="goty.php?view=top10&category_id={:category_id}">View top 10 games</a></div>
+	<div class="box"><div class="body group">
 [/block: top_games]
 
 [block: top_row]
 	<div class="col-4">
 		<div>
-		<form method="post" action="{:url}goty.php?game_id={:game_id}&category_id={:category_id}">
-		{:vote_button}
 		{:game_name}<br />
 		Votes: {:game_counter}<br />
 		{:leaderboard}
-		Direct link: <a href="{:url}goty.php?module=direct&amp;game_id={:game_id}&amp;category_id={:category_id}">Click me</a>.
-		</form>
 		</div>
 	</div>
 [/block: top_row]
 
 [block: top_end]
+</div>
+</div>
 </div>
 <div class="clearer"></div>
 [/block: top_end]

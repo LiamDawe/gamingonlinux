@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 {
 	$_SESSION['message'] = "no_forum_reply_permission";
 	header("Location: /forum/");
+	die();
 }
 else
 {
@@ -273,6 +274,7 @@ else
 						$_SESSION['message'] = 'mod_queue';
 
 						header("Location: " . $core->config('website_url') . "index.php?module=viewtopic&topic_id={$topic_id}");
+						die();
 					}
 				}
 			}

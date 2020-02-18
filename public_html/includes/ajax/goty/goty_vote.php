@@ -17,7 +17,7 @@ if($_POST)
 		{
 			if (!in_array($_POST['game_id'], $check_vote))
 			{
-				$dbl->run("UPDATE `goty_games` SET `votes` = (votes + 1) WHERE `id` = ?", array($_POST['game_id']));
+				$dbl->run("UPDATE `goty_games` SET `votes` = (votes + 1) WHERE `category_id` = ? AND `game_id` = ?", array($_POST['category_id'], $_POST['game_id']));
 
 				$dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'goty_total_votes'");
 

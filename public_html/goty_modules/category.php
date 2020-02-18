@@ -33,19 +33,14 @@ else
 // if finished, show top 3 games from this category
 if ($core->config('goty_finished') == 1)
 {
+	// work out the games total %
+	$category_total_votes = $dbl->run("SELECT SUM(`votes`) FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']))->fetchOne();
+
 	$templating->block('top_games', 'goty');
 	$templating->set('category_id', $_GET['category_id']);
 	$templating->set('category_name', $cat['category_name']);
 
-	$games_top = $dbl->run("SELECT coalesce(cl.name, d.name) name, g.`votes` as data, g.`id` FROM `goty_games` g left outer join `calendar` cl ON cl.id = g.game_id and g.category_id != 16 left outer join `developers` d ON d.id = g.game_id and g.category_id = 16 WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 3", array($_GET['category_id']))->fetch_all();
-
-	// work out the games total %
-	$category_total_votes = 0;
-	$total_res = $dbl->run("SELECT `votes` FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']))->fetch_all();
-	foreach ($total_res as $total)
-	{
-		$category_total_votes = $category_total_votes + $total['votes'];
-	}
+	$games_top = $dbl->run("SELECT g.`id`, g.`game_id`, g.`votes` as `data`, c.`name` FROM `goty_games` g INNER JOIN `$item_table` c ON g.game_id = c.id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 3", array($_GET['category_id']))->fetch_all();
 
 	foreach ($games_top as $game)
 	{
@@ -55,11 +50,16 @@ if ($core->config('goty_finished') == 1)
 		$templating->set('game_counter', $game['data']);
 		$templating->set('game_id', $game['id']);
 		$templating->set('url', $core->config('website_url'));
-		$templating->set('vote_button', '');
 
-		$total_perc = round($game['data'] / $category_total_votes * 100);
-
-		$leaderboard = 'Leaderboard: <div style="background:#CCCCCC; border:1px solid #666666;"><div style="padding-left: 5px; background: #28B8C0; width:'.$total_perc.'%;">'.$total_perc.'%</div></div>';
+		if ($game['data'] > 0)
+		{
+			$total_perc = round($game['data'] / $category_total_votes * 100);
+		}
+		else
+		{
+			$total_perc = 0;
+		}
+		$leaderboard = 'Leaderboard: <div style="position: relative; background:#CCCCCC; border:1px solid #666666; height: 25px;"><div style="position: absolute; padding-left: 5px; background: #28B8C0; width:'.$total_perc.'%; box-sizing: border-box; height: 25px;">&nbsp;</div><span style="position: absolute; left: 5px;">'.$total_perc.'%</span></div>';
 
 		$templating->set('leaderboard', $leaderboard);
 	}
@@ -193,18 +193,15 @@ if ($games_get)
 		// show top three if goty is over
 		if ($core->config('goty_voting_open') == 0 && $core->config('goty_finished') == 1)
 		{
-			// work out the games total %
-			$total = $dbl->run("SELECT `votes` FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']))->fetch_all();
-
-			$total_votes = 0;
-			foreach ($total as $votes)
+			if ($game['votes'] > 0)
 			{
-				$total_votes = $total_votes + $votes['votes'];
+				$total_perc = round($game['votes'] / $category_total_votes * 100);
 			}
-
-			$total_perc = round($game['votes'] / $total_votes * 100);
-
-			$leaderboard = 'Leaderboard: <div style="background:#CCCCCC; border:1px solid #666666;"><div style="padding-left: 5px; background: #28B8C0; width:'.$total_perc.'%;">'.$total_perc.'%</div></div>';
+			else
+			{
+				$total_perc = 0;
+			}
+			$leaderboard = 'Leaderboard: <div style="position: relative; background:#CCCCCC; border:1px solid #666666; height: 25px;"><div style="position: absolute; padding-left: 5px; background: #28B8C0; width:'.$total_perc.'%; box-sizing: border-box; height: 25px;">&nbsp;</div><span style="position: absolute; left: 5px;">'.$total_perc.'%</span></div>';
 		}
 		$templating->set('leaderboard', $leaderboard);
 	}

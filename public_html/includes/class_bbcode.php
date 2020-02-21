@@ -240,7 +240,7 @@ class bbcode
 		$text = preg_replace($URLRegex,"$2[$3]($3)$5", $text);
 		
 		// markdown link support
-		$text = preg_replace("/\[([^]]+?)\]\((($this->protocols).+?)\)/is", "<a href=\"$2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text);
+		$text = preg_replace("/\[([^]]+?)\]\((($this->protocols)([^ ]+))\)/is", "<a href=\"$2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text);
 
 		return $text;
 	}

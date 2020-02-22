@@ -131,13 +131,29 @@ if (isset($view))
 
 		$categorys_ids = $_GET['catid'];
 		
-		$article_class->display_category_picker($categorys_ids);
+		$safe_ids = array();
 		
-		// sanitize, force to int as that's what we require
 		foreach ($categorys_ids as $k => $make_safe)
 		{
-			$safe_ids[$k] = (int) $make_safe;
+			if (!is_numeric($make_safe) || $make_safe < 0)
+			{
+				unset($categorys_ids[$k]);
+			}
+			else
+			{
+				$safe_ids[$k] = (int) $make_safe;
+			}
 		}
+
+		if (empty($safe_ids))
+		{
+			$_SESSION['message'] = 'none_found';
+			$_SESSION['message_extra'] = 'categories';
+			header("Location: /index.php?module=search");
+			die();
+		}
+
+		$article_class->display_category_picker($categorys_ids);
 		
 		// this is really ugly, but I can't think of a better way to do it
 		$count_array = count($safe_ids);
@@ -152,7 +168,7 @@ if (isset($view))
 		}
 		
 		// otherwise, pick articles that have any of the selected tags
-		$total_items = $dbl->run("SELECT COUNT(*) FROM (SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql AND a.`active` = 1 $all_sql) AS `total`", $safe_ids)->fetchOne();
+		$total_items = $dbl->run("SELECT COUNT(r.`article_id`) FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` WHERE $cat_sql AND a.`active` = 1 $all_sql", $safe_ids)->fetchOne();
 		
 		if ($total_items > 0)
 		{
@@ -212,7 +228,7 @@ if (isset($view))
 		$article_id_sql = implode(', ', $article_id_array);
 
 		$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
-		
+
 		$article_class->display_article_list($articles_get, $get_categories);
 				
 		$templating->block('bottom');

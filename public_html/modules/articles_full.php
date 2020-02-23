@@ -215,7 +215,8 @@ if (!isset($_GET['go']))
 				else
 				{
 					$username = $article['username'];
-					$username_link = "<a class=\"u-url\" rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
+					$username_top = "<a rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
+					$username_bio = "<a class=\"p-name u-url\" rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
 				}
 
 				// structured data for search engines
@@ -320,7 +321,7 @@ if (!isset($_GET['go']))
 
 				$templating->set('title', $article['title']);
 				$templating->set('user_id', $article['author_id']);
-				$templating->set('username', $username_link);
+				$templating->set('username', $username_top);
 
 				$templating->set('date', $date);
 				$templating->set('machine_time', $published_date_meta);
@@ -500,7 +501,7 @@ if (!isset($_GET['go']))
 					}
 					
 					$templating->set('author_bio', $bbcode->parse_bbcode($article['article_bio']));
-					$templating->set('username', $username_link);
+					$templating->set('username', $username_bio);
 					$templating->set('user_id', $article['author_id']);
 				}
 

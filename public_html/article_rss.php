@@ -186,7 +186,7 @@ if ($core->config('articles_rss') == 1)
 			}
 			
 			$xml->startElement('description');
-			$xml->writeCData('<p>Tags: ' . implode(', ', $tag_list) . '</p><p>' . $text . '</p>');
+			$xml->writeCData('<p>' . $text . '</p>');
 			$xml->endElement();
 		}
 		

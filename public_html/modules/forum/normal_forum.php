@@ -159,35 +159,20 @@ if ($forum_ids)
 
 	// lastest posts block below forums
 	$forum_posts = '';
-	$grab_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date`, `replys` FROM `forum_topics` WHERE `approved` = 1 AND forum_id IN (".$forum_id_in.") ORDER BY `last_post_date` DESC limit 7", $forum_ids)->fetch_all();
+	$grab_topics = $dbl->run("SELECT `topic_id`, `topic_title`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `approved` = 1 AND forum_id IN (".$forum_id_in.") ORDER BY `last_post_date` DESC limit 7", $forum_ids)->fetch_all();
 	if ($grab_topics)
 	{
 		foreach ($grab_topics as $topics)
 		{
 			$date = $core->human_date($topics['last_post_date']);
 
-			$post_count = $topics['replys'];
-			// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-			if ($post_count <= $_SESSION['per-page'])
+			$last_post = '';
+			if ($topics['last_post_id'] != NULL)
 			{
-				// it will be the first page
-				$postPage = 1;
-				$postNumber = 1;
+				$last_post = 'post_id=' . $topics['last_post_id'];
 			}
 
-			// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-			if ($post_count >= $_SESSION['per-page'])
-			{
-				$rows_per_page = $_SESSION['per-page'];
-
-				// page we are going to
-				$postPage = ceil($post_count / $rows_per_page);
-
-				// the post we are going to
-				$postNumber = (($post_count - 1) % $rows_per_page) + 1;
-			}
-
-			$forum_posts .= "<a href=\"/forum/topic/{$topics['topic_id']}?page={$postPage}\"><i class=\"icon-comment\"></i> {$topics['topic_title']}</a> {$date}<br />";
+			$forum_posts .= "<a href=\"/forum/topic/{$topics['topic_id']}/$last_post\"><i class=\"icon-comment\"></i> {$topics['topic_title']}</a> {$date}<br />";
 		}
 	}
 	else

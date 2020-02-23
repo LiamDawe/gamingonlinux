@@ -61,8 +61,8 @@
 [/block: corrections]
 
 [block: about_author]
-<div class="box comment h-card">
-	<div class="subhead"><strong>About the author - <span class="p-author">{:username}</span></strong></div>
+<div class="box comment">
+	<div class="subhead"><strong>About the author - <span class="h-card p-author">{:username}</span></strong></div>
 	<div class="body group">
 		<div class="comment-author hide-xsmall">
 			<img class="avatar u-photo" alt="" src="{:author_picture}" />
@@ -74,7 +74,7 @@
 
 [block: about_author_nopic]
 <div class="box">
-	<div class="subhead"><strong>About the author - {:username}</strong></div>
+	<div class="subhead"><strong>About the author - <span class="h-card p-author">{:username}</span></strong></div>
 	<div class="body group">
 		{:author_bio} <br /><span class="badge blue"><a href="/index.php?module=search&author_id={:user_id}">See more from me</a></span>
 		</div>

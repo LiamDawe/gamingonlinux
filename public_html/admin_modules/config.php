@@ -75,6 +75,9 @@ else
 		$templating->set('debug_check', $debug_check);
 
 		$templating->set('url', $core->config('website_url'));
+
+		// META
+		$templating->set('home_meta_desc', $core->config('meta_description'));
 		
 		// SOCIAL
 		$templating->set('twitter', $core->config('twitter_username'));
@@ -167,6 +170,9 @@ else
 			$core->set_config($forum_rss, 'forum_rss');
 			
 			$core->set_config($_POST['mailer_email'], 'mailer_email');
+
+			// META
+			$core->set_config($_POST['home_meta_desc'], 'meta_description');
 			
 			// SOCIAL
 			$core->set_config($_POST['twitter'], 'twitter_username');

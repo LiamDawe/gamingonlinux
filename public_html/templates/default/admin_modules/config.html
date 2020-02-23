@@ -2,7 +2,7 @@
 <div class="box">
 	<div class="head">Here you can change the main configuration of your website.</div>
 	<div class="body group">
-		<form method="post" action="{:form_url}admin.php?module=config">
+		<form class="gol-form" method="post" action="{:form_url}admin.php?module=config">
 		Website Url<br />
 		<input type="text" name="url" value="{:url}" /><br />
 		Admin Contact Email<br />
@@ -36,6 +36,11 @@
 		<label class="checkbox">
 			<input type="checkbox" name="debug" {:debug_check}/> Show debug info?
 		</label>
+	</div>
+	<div class="head">Meta</div>
+	<div class="body group">
+		Homepage Meta Description:<br />
+		<textarea rows="2" style="width: 90%;" name="home_meta_desc">{:home_meta_desc}</textarea>
 	</div>
 	<div class="head">Social</div>
 	<div class="body group">

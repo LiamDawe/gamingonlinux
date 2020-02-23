@@ -215,7 +215,7 @@ if (!isset($_GET['go']))
 				else
 				{
 					$username = $article['username'];
-					$username_link = "<a rel=\"author\" href=\"/profiles/{$article['author_id']}\">{$username}</a>";
+					$username_link = "<a class=\"u-url\" rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
 				}
 
 				// structured data for search engines

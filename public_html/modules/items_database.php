@@ -83,6 +83,74 @@ if (isset($_GET['view']))
 		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
+			// sort out the external links we have for it
+			$external_links = '';
+			$links_array = [];
+			$link_types = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];
+			foreach ($link_types as $key => $text)
+			{
+				if (!empty($get_item[$key]))
+				{
+					$links_array[$key] = '<a href="'.$get_item[$key].'">'.$text.'</a>';
+				}
+			}
+
+			// sort out license
+			$license_name = 'Not Listed';
+			if (!empty($get_item['license']) || $get_item['license'] != NULL)
+			{
+				$license_name = $get_item['license'];
+			}
+			$license_output = '<li><strong>License</strong></li><li>' . $license_name . '</li>';
+
+			$get_item['name'] = trim($get_item['name']);
+			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC LIMIT 5", array($get_item['name']))->fetch_all();
+			if ($articles_res)
+			{
+				$article_list = '';
+				$article_json = array();
+				
+				foreach ($articles_res as $articles)
+				{
+					$article_link = $article_class->get_link($articles['article_id'], $articles['slug']);
+
+					if ($articles['author_id'] == 0)
+					{
+						$username = $articles['guest_username'];
+					}
+
+					else
+					{
+						$username = "<a href=\"/profiles/{$articles['author_id']}\">" . $articles['username'] . '</a>';
+					}
+
+					$article_list .= '<li><a href="' . $article_link . '">'.$articles['title'].'</a> by '.$username.'<br />
+					<small>'.$core->human_date($articles['date']).'</small></li>';
+					$article_json[] = $article_link;
+
+				}
+				if (count($articles_res) == 5)
+				{
+					$article_list .= '<li><a href="/index.php?module=search&appid='.$get_item['id'].'">View all tagged articles</a>.</li>';
+				}
+			}
+
+			if (isset($_GET['json']))
+			{
+				header('Content-Type: application/json; charset=utf-8');
+
+				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'license' => $license_name);
+
+				$data['links'] = $links_array;
+
+				if (isset($article_json) && !empty($article_json))
+				{
+					$data['recent_articles'] = $article_json;
+				}
+
+				echo json_encode($data);
+				die();
+			}
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
 			$templating->set_previous('title', $get_item['name'], 1);
 
@@ -208,29 +276,7 @@ if (isset($_GET['view']))
 			}
 			$templating->set('release-date', $date);
 
-			// sort out license
-			$license = '';
-			if (!empty($get_item['license']) || $get_item['license'] != NULL)
-			{
-				$license = $get_item['license'];
-			}
-			if (!empty($license))
-			{
-				$license = '<li><strong>License</strong></li><li>' . $license . '</li>';
-			}
-			$templating->set('license', $license);
-
-			// sort out the external links we have for it
-			$external_links = '';
-			$links_array = [];
-			$link_types = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];
-			foreach ($link_types as $key => $text)
-			{
-				if (!empty($get_item[$key]))
-				{
-					$links_array[] = '<a href="'.$get_item[$key].'">'.$text.'</a>';
-				}
-			}
+			$templating->set('license', $license_output);
 
 			if (!empty($links_array))
 			{
@@ -341,33 +387,9 @@ if (isset($_GET['view']))
 				$templating->set('sales_list', $sales_list);
 			}
 
-			$get_item['name'] = trim($get_item['name']);
-			$articles_res = $dbl->run("SELECT a.`author_id`, a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`guest_username`, u.`username` FROM `article_item_assoc` g LEFT JOIN `calendar` c ON c.id = g.game_id LEFT JOIN `articles` a ON a.article_id = g.article_id LEFT JOIN `users` u ON u.user_id = a.author_id WHERE c.name = ? AND a.active = 1 ORDER BY a.article_id DESC LIMIT 5", array($get_item['name']))->fetch_all();
 			if ($articles_res)
 			{
-				$article_list = '';
 				$templating->block('articles', 'items_database');
-				foreach ($articles_res as $articles)
-				{
-					$article_link = $article_class->get_link($articles['article_id'], $articles['slug']);
-
-					if ($articles['author_id'] == 0)
-					{
-						$username = $articles['guest_username'];
-					}
-
-					else
-					{
-						$username = "<a href=\"/profiles/{$articles['author_id']}\">" . $articles['username'] . '</a>';
-					}
-
-					$article_list .= '<li><a href="' . $article_link . '">'.$articles['title'].'</a> by '.$username.'<br />
-					<small>'.$core->human_date($articles['date']).'</small></li>';
-				}
-				if (count($articles_res) == 5)
-				{
-					$article_list .= '<li><a href="/index.php?module=search&appid='.$get_item['id'].'">View all tagged articles</a>.</li>';
-				}
 				$templating->set('articles', $article_list);
 			}
 

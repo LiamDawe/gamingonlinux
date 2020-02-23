@@ -50,11 +50,17 @@ foreach ($search_array[0] as $item)
 	$search_through .= '%'.$item.'%';
 }
 
+$per_page = 15;
+if (isset($_SESSION['articles-per-page']) && is_numeric($_SESSION['articles-per-page']) && $_SESSION['articles-per-page'] > 0)
+{
+	$per_page = $_SESSION['articles-per-page'];
+}
+
 // check there wasn't none found to prevent loops
 if (isset($search_text) && !empty($search_text))
 {
 	$page = core::give_page();
-	$per_page = 50;
+	
 	$page_url = '/index.php?module=search&q='.$search_text.'&';
 
 	$total = $dbl->run("SELECT count(*) FROM `articles` WHERE `active` = 1 AND `title` LIKE ?",array($search_through))->fetchOne();
@@ -140,12 +146,6 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		
 		// count how many there is in total
 		$total = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE active = 1 AND `author_id` = ?", array($_GET['author_id']))->fetchOne();
-
-		$per_page = 15;
-		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
-		{
-			$per_page = $_SESSION['per-page'];
-		}
 
 		//lastpage is = total found / items per page, rounded up.
 		if ($total <= 10)
@@ -252,12 +252,6 @@ if (isset($_GET['appid']) && is_numeric($_GET['appid']))
 		
 		// count how many there is in total
 		$total = $dbl->run("SELECT COUNT(ia.`article_id`) FROM `article_item_assoc` ia JOIN `articles` a ON ia.article_id = a.article_id WHERE ia.`game_id` = ? AND a.`active` = 1", array($_GET['appid']))->fetchOne();
-
-		$per_page = 15;
-		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
-		{
-			$per_page = $_SESSION['per-page'];
-		}
 
 		//lastpage is = total found / items per page, rounded up.
 		if ($total <= 10)

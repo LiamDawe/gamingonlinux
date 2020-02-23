@@ -39,6 +39,7 @@
 					<ul class="dropdown-menu">
 						<li><a href="/email-us/">Email Us</a></li>
 						{:submit_article_link}
+						<li><a href="/about-us/">Meet The Team</a></li>
 					</ul>
 				</li>
 				<li class="hide-small"><a href="/forum/">Forum</a></li>
@@ -47,7 +48,7 @@
 			</ul>
 			<div class="right-menu">
 				<div id="search-button-nav" class="toggle-nav search-box">
-					<a href="#"><img src="{:this_template}/images/search.png" alt=""/></a>
+					<a href="#"><img src="{:this_template}/images/search.png" alt="search articles"/></a>
 					<div class="toggle-content">
 							<form method="get" action="{:url}index.php?module=search">
 								<input type="hidden" name="module" value="search" />
@@ -76,7 +77,7 @@
 
 [block: user_menu]
 <div class="toggle-nav user-box hide-small">
-	<a href="#"><div class="avatar-container"><img id="nav-avatar" src="{:avatar}" alt="" width="35" height="35"></div></a>
+	<a href="#"><div class="avatar-container"><img id="nav-avatar" src="{:avatar}" alt="your avatar" width="35" height="35"></div></a>
 	<div class="toggle-content">
 		<ul>
 			<li style="padding:5px;"><strong>{:username}</strong></li>
@@ -93,7 +94,7 @@
 
 [block: notifications]
 <div id="alert_box" class="toggle-nav alerts-box right alerts-box-{:alert_box_type}">
-	<a href="#" id="notifications_total">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.png" alt=""/></a>
+	<a href="#" id="notifications_total">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.png" alt="notifications"/></a>
 	<div class="toggle-content">
 		<ul>
 			{:admin_line}
@@ -120,7 +121,7 @@
         <div class="col-12">
             <div class="article group">
                 <div class="featured-image group">
-                    <a href="{:article_link}"><img alt="" src="{:url}uploads/carousel/{:image}" /></a>
+                    <a href="{:article_link}"><img alt="featured image" src="{:url}uploads/carousel/{:image}" /></a>
 					<div class="featured-title"><div class="featured-title-text"><a href="{:article_link}">{:title}</a></div></div>
                 </div>
             </div>

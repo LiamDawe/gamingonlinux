@@ -126,7 +126,7 @@ if (isset($_GET['view']))
 
 					$article_list .= '<li><a href="' . $article_link . '">'.$articles['title'].'</a> by '.$username.'<br />
 					<small>'.$core->human_date($articles['date']).'</small></li>';
-					$article_json[] = $article_link;
+					$article_json[] = url . 'articles/' . $articles['article_id'];
 
 				}
 				if (count($articles_res) == 5)
@@ -135,11 +135,18 @@ if (isset($_GET['view']))
 				}
 			}
 
+			$game_engine_name = 'Not Listed';
+			if (isset($get_item['engine_id']) && is_numeric($get_item['engine_id']))
+			{
+				$game_engine_name = $get_item['engine_name'];
+			}
+			$game_engine_output = '<li><strong>Made With</strong></li><li>'.$game_engine_name.'</li>';
+
 			if (isset($_GET['json']))
 			{
 				header('Content-Type: application/json; charset=utf-8');
 
-				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'license' => $license_name);
+				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'license' => $license_name, 'game_engine' => $game_engine_name);
 
 				$data['links'] = $links_array;
 
@@ -283,6 +290,7 @@ if (isset($_GET['view']))
 				$external_links = implode(', ', $links_array);
 			}
 			$templating->set('external_links', $external_links);
+			$templating->set('game_engine', $game_engine_output);
 
 			// sort out genres
 			$genres_output = '';
@@ -317,13 +325,6 @@ if (isset($_GET['view']))
 				$dev_names = '<li><strong>Who made this?</strong></li><li>' . implode(', ', $dev_names) . '</li>';
 			}
 			$templating->set('devs_list', $dev_names);
-
-			$game_engine = '';
-			if (isset($get_item['engine_id']) && is_numeric($get_item['engine_id']))
-			{
-				$game_engine = '<li><strong>Made With</strong></li><li>'.$get_item['engine_name'].'</li>';
-			}
-			$templating->set('game_engine', $game_engine);
 
 			$description = '';
 			if (!empty($get_item['description']) && $get_item['description'] != NULL)

@@ -48,7 +48,9 @@ $charts_list = array(
 	array("name" => "Main Gaming Machine", "bundle_outside_top10" => 0),
 	array("name" => "Main Gamepad", "bundle_outside_top10" => 1),
 	array("name" => "PC VR Headset", "bundle_outside_top10" => 1),
-	array("name" => "Session Type", "bundle_outside_top10" => 0)
+	array("name" => "Session Type", "bundle_outside_top10" => 0),
+	array("name" => "Wayland Desktops", "bundle_outside_top10" => 0),
+	array("name" => "x11 Desktops", "bundle_outside_top10" => 0)
 );
 
 if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
@@ -152,8 +154,16 @@ if (isset($_GET['view']) && $_GET['view'] == 'trends')
 		$grab_chart = $charts->trends_charts($chart['name'], $order);
 
 		$templating->block('trend_chart');
-		$templating->set('title', $chart['name']);
-		$templating->set('graph', '<div style="text-align:center; width: 100%;">' . $grab_chart['graph'] . '</div>');
+		if (isset($grab_chart['graph']))
+		{
+			$templating->set('title', $chart['name']);
+			$templating->set('graph', '<div style="text-align:center; width: 100%;">' . $grab_chart['graph'] . '</div>');
+		}
+		else
+		{
+			$templating->set('title', $chart['name']);
+			$templating->set('graph', 'Chart not generated yet.');
+		}	
 	}
 	$templating->block('trends_bottom', 'statistics');
 }

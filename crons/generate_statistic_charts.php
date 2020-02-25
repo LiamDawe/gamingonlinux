@@ -144,7 +144,7 @@ foreach ($charts as $chart)
 		$dbl->run("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($new_chart_id, $set_label_id, $dat));
 		$set_label_id++;
 		$total_dat = $total_dat + $dat;
-		echo "Data $dat added!<br />";
+		echo "Data $dat added!<br />" . PHP_EOL;
 	}
 
 	$dbl->run("UPDATE `user_stats_charts` SET `total_answers` = $total_dat WHERE `id` = $new_chart_id");
@@ -157,4 +157,47 @@ foreach ($charts as $chart)
 	unset($dat);
 }
 
+/* specials */
+
+// x11/wayland desktop environments
+echo 'Generating Wayland Desktops' . PHP_EOL;
+
+$desktops_session_wayland = $dbl->run("SELECT COUNT(*) as `data`, `desktop_environment` FROM `user_profile_info` WHERE `desktop_environment` IS NOT NULL AND `session_type` = 'wayland' AND `include_in_survey` = 1 GROUP BY desktop_environment")->fetch_all();
+
+$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Percentage of users', 'Wayland Desktops'));
+$wayland_chart_id = $dbl->new_id();
+
+$total_wayland_data = 0;
+foreach ($desktops_session_wayland as $wayland)
+{
+	$dbl->run("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($wayland_chart_id, $wayland['desktop_environment']));
+	$label_id = $dbl->new_id();
+	$dbl->run("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($wayland_chart_id, $label_id, $wayland['data']));
+
+	$total_wayland_data = $total_wayland_data + $wayland['data'];
+}
+
+$dbl->run("UPDATE `user_stats_charts` SET `total_answers` = $total_wayland_data WHERE `id` = $wayland_chart_id");
+
+echo 'Generating x11 Desktops' . PHP_EOL;
+$desktops_session_x11 = $dbl->run("SELECT COUNT(*) as `data`, `desktop_environment` FROM `user_profile_info` WHERE `desktop_environment` IS NOT NULL AND `session_type` = 'x11' AND `include_in_survey` = 1 GROUP BY desktop_environment")->fetch_all();
+
+$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Percentage of users', 'x11 Desktops'));
+$x11_chart_id = $dbl->new_id();
+
+$total_x11_data = 0;
+foreach ($desktops_session_x11 as $x11)
+{
+	$dbl->run("INSERT INTO `user_stats_charts_labels` SET `chart_id` = ?, `name` = ?, `grouping_id` = $grouping_id", array($x11_chart_id, $x11['desktop_environment']));
+	$label_id = $dbl->new_id();
+	$dbl->run("INSERT INTO `user_stats_charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?, `grouping_id` = $grouping_id", array($x11_chart_id, $label_id, $x11['data']));
+
+	$total_x11_data = $total_x11_data + $x11['data'];
+}
+
+$dbl->run("UPDATE `user_stats_charts` SET `total_answers` = $total_x11_data WHERE `id` = $x11_chart_id");
+
 $dbl->run("INSERT INTO `user_stats_grouping` SET `grouping_id` = ?", array($grouping_id));
+
+echo PHP_EOL . 'Chart generation done.' . PHP_EOL;
+?>

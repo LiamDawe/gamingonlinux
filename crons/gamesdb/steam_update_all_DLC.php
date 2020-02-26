@@ -16,7 +16,7 @@ $updated_list = [];
 $page = 1;
 $stop = 0;
 
-$url = "http://store.steampowered.com/search/?sort_by=Released_DESC&tags=-1&category1=21&os=linux&page=1";
+$url = "http://store.steampowered.com/search/results?sort_by=Released_DESC&tags=-1&category1=21&os=linux&page=1";
 
 do
 {

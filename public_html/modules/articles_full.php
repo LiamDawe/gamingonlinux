@@ -209,7 +209,7 @@ if (!isset($_GET['go']))
 					{
 						$username = $article['guest_username'];
 					}
-					$username_link = $username;
+					$username_top = $username;
 				}
 
 				else

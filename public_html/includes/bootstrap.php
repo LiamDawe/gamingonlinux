@@ -10,14 +10,14 @@ $dbl = new db_mysql();
 $core = new core($dbl);
 define('url', $core->config('website_url'));
 
+$user = new user($dbl, $core);
+
 $message_map = new message_map();
 
 // setup the templating, if not logged in default theme, if logged in use selected theme
 $templating = new template($core, $core->config('template'));
 
 $filecache = new file_cache($core);
-
-$user = new user($dbl, $core);
 
 $announcements_class = new announcements($core, $dbl, $user);
 

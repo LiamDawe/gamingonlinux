@@ -73,6 +73,8 @@ if ($core->config('articles_rss') == 1)
 
 	$last_date = gmdate("D, d M Y H:i:s O", $last_time);
 
+	$year = date('Y');
+
 	$xml = new XMLWriter();
 	$xml->openMemory();
 	$xml->startDocument('1.0', 'UTF-8' );
@@ -89,6 +91,7 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeElement('pubDate', $last_date);
 	$xml->writeElement('language', 'en-us');
 	$xml->writeElement('lastBuildDate', $last_date);
+	$xml->writeElement('copyright', 'All articles are Copyright ' . $year . ' GamingOnLinux.com do not reproduce without consent.');
 
 	$xml->startElement('atom:link');
 	if (!isset($_GET['mini']))
@@ -182,7 +185,7 @@ if ($core->config('articles_rss') == 1)
 			else
 			{
 				$random_id = core::random_id(15);
-				$text = $bbcode->rss_stripping($line['text'] . "<div id=\"{$random_id}\">Article from <a href=\"https://www.gamingonlinux.com/\">GamingOnLinux.com</a> - do not reproduce this article without permission.</div>", $tagline_bbcode, $bbcode_tagline_gallery);
+				$text = $bbcode->rss_stripping($line['text'] . "<div id=\"{$random_id}\">Article from <a href=\"https://www.gamingonlinux.com/\">GamingOnLinux.com</a> - do not reproduce this article without permission. This RSS feed is intended for readers, not scrapers.</div>", $tagline_bbcode, $bbcode_tagline_gallery);
 			}
 			
 			$xml->startElement('description');

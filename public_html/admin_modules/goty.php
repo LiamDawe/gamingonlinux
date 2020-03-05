@@ -240,8 +240,14 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$games_top = $dbl->run("SELECT d.id, d.name, g.`votes` as `data` FROM `goty_games` g JOIN `developers` d ON d.id = g.game_id WHERE g.`accepted` = 1 AND g.`category_id` = ? ORDER BY g.`votes` DESC LIMIT 10", array($_GET['category_id']))->fetch_all();
 			}
 
+			$use_percentages = 0;
+			if ($_GET['percent'] == 1)
+			{
+				$use_percentages = 1;
+			}
+
 			$charts = new charts($dbl);
-			$top_chart = $charts->render(['filetype' => 'png'], ['name' => $cat['category_name'], 'grouped' => 0, 'data' => $games_top, 'h_label' => 'Total Votes']);
+			$top_chart = $charts->render(['filetype' => 'png', 'use_percentages' => $use_percentages], ['name' => $cat['category_name'], 'grouped' => 0, 'data' => $games_top, 'h_label' => 'Total Votes']);
 
 			$templating->block('topchart', 'admin_modules/admin_module_goty');
 			$templating->set('chart', $top_chart);
@@ -253,7 +259,18 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			}
 			$table .= '</tbody></table>';
 
-			$templating->set('table', $table);
+			/* percentage */
+			$category_total_votes = $dbl->run("SELECT SUM(`votes`) FROM `goty_games` WHERE `category_id` = ?", array($_GET['category_id']))->fetchOne();
+
+			$perc_table = '<table class="table-stripes-tbody"><thead><tr><td>Name</td><td>Vote %</td></tr></thead><tbody>';
+			foreach ($games_top as $top)
+			{
+				$total_perc = round($top['data'] / $category_total_votes * 100);
+				$perc_table .= '<tr><td><a href="'.$core->config('website_url').$link.$top['id'].'">'.$top['name'].'</a></td><td>'.$total_perc.'%</td></tr>';
+			}
+			$perc_table .= '</tbody></table>';
+
+			$templating->set('table', $table.$perc_table);
 
 			$templating->block('games_bottom', 'admin_modules/admin_module_goty');
 		}
@@ -624,11 +641,12 @@ if (isset($_POST['act']))
 	{
 		if ($core->config('goty_finished') == 0)
 		{
-			$dbl->run("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_games_open'");
-			$dbl->run("UPDATE `config` SET `data_value` = 0 WHERE `data_key` = 'goty_voting_open'");
-			$dbl->run("UPDATE `config` SET `data_value` = 1 WHERE `data_key` = 'goty_finished'");
+			$core->set_config('0','goty_games_open');
+			$core->set_config('0','goty_voting_open');
+			$core->set_config('1','goty_finished');
 
-			// make the chart for each category
+			// make the chart for each category - needs redoing for hardcoded dev category
+			/*
 			$result = $dbl->run("SELECT `category_name`, `category_id` FROM `goty_category` ORDER BY `category_id` ASC")->fetch_all();
 			foreach ($result as $category)
 			{
@@ -643,7 +661,7 @@ if (isset($_POST['act']))
 
 					$dbl->run("INSERT INTO `charts_data` SET `chart_id` = ?, `label_id` = ?, `data` = ?", array($chart_key, $game_key, $game['data']));
 				}
-			}
+			}*/
 
 			// notify editors you did this
 			$core->new_admin_note(array('completed' => 1, 'content' => ' closed the GOTY awards.'));

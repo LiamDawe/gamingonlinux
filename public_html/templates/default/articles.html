@@ -1,8 +1,12 @@
 [block: category]
 <div class="box">
-	<div class="head"><a href="/article_rss.php?tags[]={:category_id}"><img src="/templates/default/images/network-icons/white/rss.svg" alt="RSS" class="fright rss-home" width="23"></a> Category: {:category}</div>
+	<div class="head"><a href="/article_rss.php?tags[]={:category_id}"><img src="/templates/default/images/network-icons/white/rss.svg" alt="RSS" class="fright rss-home" width="23"></a> Category: {:category} {:tag_option}</div>
 </div>
 [/block: category]
+
+[block: blocked_tag]
+<div class="box"><div class="subhead">&#9762; You currently have this tag blocked from showing articles on the home page.</div></div>
+[/block: blocked_tag]
 
 [block: multi]
 <div class="box">

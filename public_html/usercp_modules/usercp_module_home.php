@@ -11,6 +11,34 @@ $templating->load('usercp_modules/usercp_module_home');
 
 include('includes/profile_fields.php');
 
+if (isset($_GET['blocktag']) && isset($_GET['tagid']) && is_numeric($_GET['tagid']))
+{
+	// check it's not blocked already
+	$check = $dbl->run("SELECT `ref_id` FROM `user_tags_bar` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['tagid']))->fetch();
+
+	if (!$check)
+	{
+		$dbl->run("INSERT INTO `user_tags_bar` SET `user_id` = ?, `category_id` = ?", array($_SESSION['user_id'], $_GET['tagid']));
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'set of excluded article tags';
+		header("Location: " . $core->config('website_url') . "usercp.php");
+	}
+}
+
+if (isset($_GET['unblocktag']) && isset($_GET['tagid']) && is_numeric($_GET['tagid']))
+{
+	// check it's actually blocked already
+	$check = $dbl->run("SELECT `ref_id` FROM `user_tags_bar` WHERE `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['tagid']))->fetch();
+
+	if ($check)
+	{
+		$dbl->run("DELETE FROM `user_tags_bar` WHERE  `user_id` = ? AND `category_id` = ?", array($_SESSION['user_id'], $_GET['tagid']));
+		$_SESSION['message'] = 'saved';
+		$_SESSION['message_extra'] = 'set of excluded article tags';
+		header("Location: " . $core->config('website_url') . "usercp.php");
+	}
+}
+
 if (!isset($_POST['act']))
 {
 	$db_grab_fields = '';

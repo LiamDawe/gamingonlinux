@@ -75,12 +75,26 @@ if (isset($view))
 			die();
 		};
 
-		$templating->set_previous('meta_description', 'GamingOnLinux viewing Linux gaming news from the '.$get_category['category_name'].' category', 1);
+		$templating->set_previous('meta_description', 'Linux gaming news from the '.$get_category['category_name'].' category', 1);
 		$templating->set_previous('title', 'Article category: ' . $get_category['category_name'], 1);
+
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0 && !empty($user->blocked_tags))
+		{
+			if (in_array($get_category['category_id'], $user->blocked_tags))
+			{
+				$templating->block('blocked_tag');
+				$tag_option = ' | <span class="badge blue"><a class="tooltip-top" title="UnBlock tag from homepage" href="'.url.'usercp.php?module=home&unblocktag&tagid='.$get_category['category_id'].'">UnBlock Tag</a></span>';
+			}
+			else
+			{
+				$tag_option = ' | <span class="badge blue"><a class="tooltip-top" title="Block tag from homepage" href="'.url.'usercp.php?module=home&blocktag&tagid='.$get_category['category_id'].'">Block Tag</a></span>';
+			}
+		}
 
 		$templating->block('category');
 		$templating->set('category', $get_category['category_name']);
 		$templating->set('category_id', $get_category['category_id']);
+		$templating->set('tag_option', $tag_option);
 		
 		$article_class->display_category_picker();
 		

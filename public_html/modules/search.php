@@ -166,7 +166,7 @@ if (isset($_GET['author_id']) && is_numeric($_GET['author_id']))
 		$pagination = $core->pagination_link($per_page, $total, "/index.php?module=search&author_id={$_GET['author_id']}&", $page);
 
 		// do the search query
-		$found_search = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`tagline`, a.`date`, a.guest_username, a.`show_in_menu`, a.`comment_count`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['author_id'], $core->start))->fetch_all();
+		$found_search = $dbl->run("SELECT a.`article_id`, a.`title`, a.`slug`, a.`author_id`, a.`tagline`, a.`date`, a.guest_username, a.`show_in_menu`, a.`comment_count`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.active = 1 and a.`author_id` = ? ORDER BY a.date DESC LIMIT ?, ?", array($_GET['author_id'], $core->start, $per_page))->fetch_all();
 		$templating->set_previous('title', 'Viewing articles by ' . $user_details['username'], 1);
 		$templating->set_previous('meta_description', 'Viewing articles on GamingOnLinux written by ' . $user_details['username'], 1);
 
@@ -272,7 +272,7 @@ if (isset($_GET['appid']) && is_numeric($_GET['appid']))
 		$pagination = $core->pagination_link($per_page, $total, "/index.php?module=search&appid={$_GET['appid']}&", $page);
 
 		// do the search query
-		$found_search = $dbl->run("SELECT ia.`article_id`, c.`name`, a.`title`, a.`slug`, a.`author_id`, a.`tagline`, a.`date`, a.guest_username, a.`show_in_menu`, a.`comment_count`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `article_item_assoc` ia JOIN `calendar` c ON ia.`game_id` = c.`id` JOIN `articles` a ON ia.`article_id` = a.`article_id` LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.active = 1 and ia.`game_id` = ? ORDER BY a.date DESC LIMIT ?, 15", array($_GET['appid'], $core->start))->fetch_all();
+		$found_search = $dbl->run("SELECT ia.`article_id`, c.`name`, a.`title`, a.`slug`, a.`author_id`, a.`tagline`, a.`date`, a.guest_username, a.`show_in_menu`, a.`comment_count`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename, u.`username` FROM `article_item_assoc` ia JOIN `calendar` c ON ia.`game_id` = c.`id` JOIN `articles` a ON ia.`article_id` = a.`article_id` LEFT JOIN `users` u on a.author_id = u.user_id LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.active = 1 and ia.`game_id` = ? ORDER BY a.date DESC LIMIT ?, ?", array($_GET['appid'], $core->start, $per_page))->fetch_all();
 		$templating->set_previous('title', 'Linux gaming articles tagged for ' . $found_search[0]['name'], 1);
 		$templating->set_previous('meta_description', 'Linux gaming articles on GamingOnLinux tagged for ' . $found_search[0]['name'], 1);
 

@@ -26,16 +26,30 @@ $colours = array(
 
 // for holding data on the overall language share across all platforms
 $lang_data = array(
-	'English' => array(),
-	'Simplified Chinese' => array(),
-	'Russian' => array()
-);
-
-// for holding data on the overall language share across JUST Linux
-$lang_data_linux = array(
-	'English' => array(),
-	'Simplified Chinese' => array(),
-	'Russian' => array()
+	'English' => array(
+		'db_field' => 'english_share',
+		'data' => array(),
+		'linux_db_field' => 'linux_english_share',
+		'linux_data' => array()
+	),
+	'Simplified Chinese' => array(
+		'db_field' => 'chinese_share',
+		'data' => array(),
+		'linux_db_field' => 'linux_chinese_share',
+		'linux_data' => array()
+	),
+	'Russian' => array(
+		'db_field' => 'russian_share',
+		'data' => array(),
+		'linux_db_field' => 'linux_russian_share',
+		'linux_data' => array()
+	),
+	'Spanish - Spain' => array(
+		'db_field' => 'spanish_spain_share',
+		'data' => array(),
+		'linux_db_field' => 'linux_spanish_spain',
+		'linux_data' => array()
+	)
 );
 
 $linux_perc = [];
@@ -48,15 +62,28 @@ foreach ($data as $point)
 
 	$linux_perc[] = $point['linux_share'];
 
-	// overall share
-	$lang_data['English'][] = $point['english_share'];
-	$lang_data['Simplified Chinese'][] = $point['chinese_share'];
-	$lang_data['Russian'][] = $point['russian_share'];
+	foreach($lang_data as $lang => $val)
+	{
+		// all
+		if (isset($point[$val['db_field']]))
+		{
+			$lang_data[$lang]['data'][] = $point[$val['db_field']];
+		}
+		else
+		{
+			$lang_data[$lang]['data'][] = NULL;
+		}
 
-	// linux only
-	$lang_data_linux['English'][] = $point['linux_english_share'];
-	$lang_data_linux['Simplified Chinese'][] = $point['linux_chinese_share'];
-	$lang_data_linux['Russian'][] = $point['linux_russian_share'];
+		// linux only
+		if (isset($point[$val['linux_db_field']]))
+		{
+			$lang_data[$lang]['linux_data'][] = $point[$val['linux_db_field']];
+		}
+		else
+		{
+			$lang_data[$lang]['linux_data'][] = NULL;
+		}
+	}
 
 	$linux_eng_only[] = round($point['linux_share'] * $point['linux_english_share'] / ($point['english_share']), 2);
 }
@@ -184,7 +211,7 @@ foreach ($lang_data as $key => $data)
 	$languages_data .= "{
 		label: '".$key."',
 		fill: false,
-		data: [".implode(', ', $data)."],
+		data: [".implode(', ', $data['data'])."],
 		backgroundColor: '".$colours[$counter]."',
 		borderColor: '".$colours[$counter]."',
 		borderWidth: 1
@@ -242,14 +269,14 @@ $templating->set('languages', $languages);
 
 $languages_linux_data = '';
 $counter_linux = 0;
-$total_languages_linux = count($lang_data_linux);
-foreach ($lang_data_linux as $key => $data)
+$total_languages_linux = count($lang_data);
+foreach ($lang_data as $key => $data)
 {
 	//print_r($data);
 	$languages_linux_data .= "{
 		label: '".$key."',
 		fill: false,
-		data: [".implode(', ', $data)."],
+		data: [".implode(', ', $data['linux_data'])."],
 		backgroundColor: '".$colours[$counter_linux]."',
 		borderColor: '".$colours[$counter_linux]."',
 		borderWidth: 1

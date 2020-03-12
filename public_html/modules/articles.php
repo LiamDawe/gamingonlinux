@@ -78,6 +78,7 @@ if (isset($view))
 		$templating->set_previous('meta_description', 'Linux gaming news from the '.$get_category['category_name'].' category', 1);
 		$templating->set_previous('title', 'Article category: ' . $get_category['category_name'], 1);
 
+		$tag_option = '';
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0 && !empty($user->blocked_tags))
 		{
 			if (in_array($get_category['category_id'], $user->blocked_tags))

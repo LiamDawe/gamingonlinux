@@ -164,5 +164,45 @@ class notifications
 			}
 		}
 	}
+
+	function load_admin_notifications($last_id = NULL)
+	{
+		// normal load
+		if ($last_id == NULL)
+		{
+			$grab_notes = $this->dbl->run("SELECT n.*, u.username FROM `admin_notifications` n LEFT JOIN `users` u ON n.user_id = u.user_id ORDER BY n.`id` DESC LIMIT 50")->fetch_all();
+		}
+		// ajax load more
+		else
+		{
+			$grab_notes = $this->dbl->run("SELECT n.*, u.username FROM `admin_notifications` n LEFT JOIN `users` u ON n.user_id = u.user_id WHERE `id` < ? ORDER BY `id` DESC LIMIT 50", array($_GET['last_id']))->fetch_all();
+		}
+
+		$notification_rows = array();
+
+		foreach ($grab_notes as $tracking)
+		{
+			$completed_indicator = '&#10004;';
+			if ($tracking['completed'] == 0)
+			{
+				$completed_indicator = '<span class="badge badge-important">!</span>';
+			}
+	
+			if (isset($tracking['user_id']) && $tracking['user_id'] > 0)
+			{
+				$username = '<a href="/profiles/'.$tracking['user_id'].'">' . $tracking['username'] . '</a>';
+			}
+			else
+			{
+				$username = 'Guest ' . $options['content'];
+			}
+
+			$notification_rows[] = '<li data-id="'.$tracking['id'].'">' . $completed_indicator . ' ' . $username . ' ' . $tracking['content'] . ' When: ' . $this->core->human_date($tracking['created_date']) . '</li>';
+	
+			$last_id = $tracking['id'];
+		}
+
+		return array('rows' => $notification_rows, 'last_id' => $last_id);
+	}
 }
 ?>

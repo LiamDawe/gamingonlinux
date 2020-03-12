@@ -275,7 +275,7 @@ if (isset($_POST['act']))
 				}
 			}
 
-			$core->new_admin_note(array('content' => ' submitted a new article titled: <a href="/admin.php?module=articles&view=Submitted&aid='.$article_id.'">'.$title.'</a>.', 'type' => 'submitted_article', 'data' => $article_id));
+			$core->new_admin_note(array('content' => ' submitted <a href="/admin.php?module=articles&view=Submitted&aid='.$article_id.'">a new article</a>.', 'type' => 'submitted_article', 'data' => $article_id));
 
 			// check if they are subscribing
 			if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)

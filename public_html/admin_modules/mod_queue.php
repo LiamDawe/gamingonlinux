@@ -19,7 +19,7 @@ if (isset($_GET['view']))
 		SELECT n.id, ids.user_id, n.created_date, u.username as 'author_username', ids.type, ids.item_id, ids.post_title, ids.post_text, ids.reported_by_id, r.username as 'reporter_username'
 		FROM admin_notifications n 
 		JOIN (
-			(SELECT t.author_id as 'user_id', t.topic_title AS post_title, t.topic_text as post_text, t.topic_id AS item_id, 'mod_queue' AS type, NULL as 'reported_by_id' FROM `forum_topics` t WHERE t.approved = 0)
+			(SELECT t.author_id as 'user_id', t.topic_title AS post_title, r.reply_text as post_text, t.topic_id AS item_id, 'mod_queue' AS type, NULL as 'reported_by_id' FROM `forum_topics` t INNER JOIN `forum_replies` r ON t.topic_id = r.reply_id WHERE t.approved = 0 AND r.is_topic = 1)
 		UNION
 			(SELECT p.author_id as 'user_id', t.topic_title AS post_title, p.reply_text as post_text, p.post_id AS item_id, 'mod_queue_reply' AS type, NULL as 'reported_by_id' FROM `forum_replies` p LEFT JOIN `forum_topics` t ON p.topic_id = t.topic_id WHERE p.approved = 0)
 		UNION

@@ -134,21 +134,17 @@ if (!isset($_GET['view']))
 	$templating->block('editor_tracking', 'admin_modules/admin_home');
 
 	$last_id = 0;
-	$get_notifications = $dbl->run("SELECT * FROM `admin_notifications` ORDER BY `id` DESC LIMIT 50")->fetch_all();
-	foreach ($get_notifications as $tracking)
+	$grab_notes = $notifications->load_admin_notifications(NULL);
+		
+	foreach ($grab_notes['rows'] as $tracking)
 	{
 		$templating->block('tracking_row', 'admin_modules/admin_home');
 
-		$completed_indicator = '&#10004;';
-		if ($tracking['completed'] == 0)
-		{
-			$completed_indicator = '<span class="badge badge-important">!</span>';
-		}
-
-		$templating->set('editor_action', '<li data-id="'.$tracking['id'].'">' . $completed_indicator . ' ' . $tracking['content'] . ' When: ' . $core->human_date($tracking['created_date']) . '</li>');
-
-		$last_id = $tracking['id'];
+		$templating->set('editor_action', $tracking);
 	}
+
+	$last_id = $grab_notes['last_id'];
+
 	$templating->block('tracking_bottom', 'admin_modules/admin_home');
 
 	$total_notifications = $dbl->run("SELECT COUNT(*) FROM `admin_notifications`")->fetchOne();

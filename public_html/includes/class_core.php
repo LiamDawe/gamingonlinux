@@ -1069,15 +1069,6 @@ class core
 			$completed_date = core::$date;
 		}
 
-		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
-		{
-			$options['content'] = '<a href="/profiles/'.$_SESSION['user_id'].'">' . $_SESSION['username'] . '</a> ' . $options['content'];
-		}
-		else
-		{
-			$options['content'] = 'Guest ' . $options['content'];
-		}
-
 		$type = NULL;
 		if (isset($options['type']))
 		{

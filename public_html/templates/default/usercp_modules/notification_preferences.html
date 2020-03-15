@@ -17,14 +17,14 @@
   <div class="body group">
     <strong>Articles &amp; Forum posts</strong><br />
     <label class="checkbox">
-      Auto subscribe when replying? <input type="checkbox" name="auto_subscribe" {:subscribe_check} />
-    </label>
-    <label class="checkbox">
-      Auto subscribe when creating an article? <input type="checkbox" name="subscribe_article" {:subscribe_article_check} />
+      <input type="checkbox" name="auto_subscribe" {:subscribe_check} /> Auto subscribe when replying? 
     </label><br />
     <label class="checkbox">
-      Get email replies when subscribed? <input type="checkbox" name="emails" {:subscribe_email_check} />
-    </label>
+      <input type="checkbox" name="subscribe_article" {:subscribe_article_check} /> Auto subscribe when creating an article? 
+    </label><br />
+    <label class="checkbox">
+      <input type="checkbox" name="emails" {:subscribe_email_check} /> Get email replies when subscribed? 
+    </label><br />
     <label><em>Email options for replies</em><br />
     <select name="email_options">
       {:email_options}
@@ -35,7 +35,7 @@
   <div class="body group">
       <strong>Personal Messages</strong><br />
       <label class="checkbox">
-        Get email's when receiving a Personal Message? <input type="checkbox" name="emailpm" {:email_on_pm} />
+        <input type="checkbox" name="emailpm" {:email_on_pm} /> Get email's when receiving a Personal Message? 
       </label>
     </div>
 </div>
@@ -43,7 +43,7 @@
   <div class="body group">
       <strong>Security</strong><br />
       <label class="checkbox">
-        Get an email when we detect a new device logging in? <input type="checkbox" name="emaillogin" {:email_on_login} />
+        <input type="checkbox" name="emaillogin" {:email_on_login} />  Get an email when we detect a new device logging in? 
       </label>
     </div>
   </div>

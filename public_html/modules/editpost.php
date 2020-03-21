@@ -96,7 +96,7 @@ if (!isset($_POST['act']))
 			$templating->set('page', $_GET['page']);
 			$templating->set('topic_id', $post['topic_id']);
 			$templating->set('action', 'index.php?module=editpost&amp;post_id=' . $post['post_id'] . '&reported=' . $reported);
-			$templating->set('cancel_action', '/forum/topic/' . $post['topic_id']);
+			$templating->set('cancel_action', '/forum/topic/' . $post['topic_id'] . '/post_id=' . $post['post_id']);
 			$templating->block('preview', 'editpost');
 		}
 		else

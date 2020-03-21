@@ -63,7 +63,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 	$templating->set('comment_id', $comment['comment_id']);
 	$templating->set('url', $core->config('website_url'));
 			
-	$cancel_action = $article_class->get_link($comment['article_id'], $nice_title);
+	$cancel_action = $article_class->get_link($comment['article_id'], $nice_title, 'comment_id='.$comment_id);
 
 	$templating->set('cancel_action', $cancel_action);
 	$templating->block('preview', 'edit_comment');

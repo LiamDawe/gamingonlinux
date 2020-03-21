@@ -48,13 +48,13 @@ class core
 
 		// determin if JS is being served from a static subdomain or not
 		$js_location = '';
-		if (!empty($this->config('javascript_static')))
+		if (!empty($this->config('javascript_static')) && $this->config('javascript_static') != '')
 		{
 			$js_location = $this->config('javascript_static');
 		}
 		else
 		{
-			$js_location = $this->config('website_url') . '/includes/jscripts';
+			$js_location = $this->config('website_url') . 'includes/jscripts';
 		}
 		define ('JSSTATIC', $js_location);
 	}

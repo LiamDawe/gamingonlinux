@@ -11,26 +11,23 @@
 [/block: main_top]
 
 [block: pinned]
-	<div class="box"><div class="subhead">Pinned Topics</div></div>
+	<div class="box"><div class="subhead"> &#x1F4CC; Pinned Topics</div></div>
 [/block: pinned]
 
 [block: normal_posts]
-	<div class="box"><div class="post_row subhead">Normal Topics</div></div>
+	<div class="box"><div class="subhead">Normal Topics</div></div>
 [/block: normal_posts]
 
 [block: post_row]
 	<div class="post_row">
-		<div class="forum_avatar_holder">
-				<img src="{:avatar}" class="index_avatar" alt="avatar" height="50" width="50" />
+		<div class="forum_avatar_holder">{:avatar}</div>
+		<div class="forum_post_info">
+			{:is_locked}<a href="{:link}">{:title}</a> <br />
+			<small>By <a href="{:profile_link}">{:post_author}</a><br />
+			{:replies} replies {:pagination_post}</small>
 		</div>
-		<div class="post_info_container">
-			<div class="forum_post_info">
-					<span style="padding-left: 2px; vertical-align: middle; display: table-cell;">{:is_locked}<a href="{:topic_link}">{:title}</a> {:replies} {:pagination_post}<br />
-					<em>By <a href="{:profile_link}">{:post_author}</a> {:post_date}</em> </span>
-			</div>
-			<div class="forum_last_post last_post"><img width="15" height="15" src="/templates/default/images/last_post.png" alt="" />{:last_post}</div>
-		</div>
-	</div>
+		<div class="forum_last_post last_post">Last post by <a href="{:profile_last_link}">{:last_username}</a><br /><a href="{:last_link}"><abbr title="{:tzdate}" class="timeago">on {:last_date}</abbr></a></div>
+</div>
 [/block: post_row]
 
 [block: main_bottom]

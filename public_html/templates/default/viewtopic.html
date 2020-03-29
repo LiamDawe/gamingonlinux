@@ -49,7 +49,7 @@
 								</div>
 							</div>
 							<div class="comment-author hide-xsmall">
-								<img class="avatar" alt="" src="{:avatar}" />
+								<div class="avatar">{:avatar}</div>
 								<ul class="comment-badges">
 									{:badges}
 									{:user_info_extra}
@@ -85,7 +85,7 @@
 								</div>
 							</div>
 							<div class="comment-author hide-xsmall">
-								<img class="avatar" alt="" src="{:avatar}" />
+								<div class="avatar">{:avatar}</div>
 								<ul class="comment-badges">
 									{:badges}
 									{:user_info_extra}
@@ -134,7 +134,7 @@
 		</div>
 	</div>
 	<div class="comment-author hide-xsmall">
-		<img class="avatar" alt="" src="{:avatar}" />
+		<div class="avatar">{:avatar}</div>
 		<ul class="comment-badges">
 			{:badges}
 			{:user_info_extra}
@@ -157,6 +157,10 @@
 {:pagination}
 				</div>
 [/block: bottom]
+
+[block: rules]
+<div class="box"><strong>Make sure your post <a href="{:url}index.php?module=rules" target="_blank">follows our rules</a>.</strong></div>
+[/block: rules]
 
 [block: reply_top]
 <form method="post" formaction="{:url}index.php?module=newreply&amp;topic_id={:topic_id}&amp;forum_id={:forum_id}">

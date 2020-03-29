@@ -29,7 +29,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Subscript,Superscript';
 
-	config.contentsCss = [ '/templates/default/css/shipping/content.css', '/templates/default/css/shipping/reset.css' ];
+	config.contentsCss = [ '/templates/default/css/shipping/style.css', '/templates/default/css/shipping/content.css', '/templates/default/css/shipping/reset.css' ];
 
 	config.height = 500;
 
@@ -52,7 +52,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 
-	config.extraPlugins = 'widget,widgetselection,lineutils,html5audio,youtube,html5video,justify';
+	config.extraPlugins = 'divarea,widget,widgetselection,lineutils,html5audio,youtube,html5video,justify';
 	config.removePlugins = 'about';
 
 	config.youtube_responsive = true;

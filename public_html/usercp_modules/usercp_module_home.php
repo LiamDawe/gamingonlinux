@@ -299,7 +299,7 @@ if (!isset($_POST['act']))
 			$service = new Google_Service_Oauth2($client);
 			$authUrl = $client->createAuthUrl();
 				
-			$google_button = '<div class="box"><div class="body group"><a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/google-plus.png" /> </span>Link your <b>Google</b> account</a></div></div>';
+			$google_button = '<div class="box"><div class="body group"><a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/google.svg" /> </span>Link your <b>Google</b> account</a></div></div>';
 				
 		}
 	}

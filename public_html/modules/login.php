@@ -67,7 +67,7 @@ if (!isset($_POST['action']))
 				$service = new Google_Service_Oauth2($client);
 				$authUrl = $client->createAuthUrl();
 				
-				$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img alt="" src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
+				$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img alt="" src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/google.svg" /> </span>Sign in with <b>Google</b></a>';
 			}
 			$templating->set('google_button', $google_button);
 		}

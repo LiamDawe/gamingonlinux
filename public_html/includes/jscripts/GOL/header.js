@@ -1,3 +1,36 @@
+//determines if the user has a set theme
+var website_theme = 'light';
+function detectColorScheme()
+{
+	if (document.documentElement.hasAttribute("data-theme"))
+	{
+		website_theme = document.documentElement.getAttribute("data-theme");
+	}
+	//local storage is used to override OS theme settings
+	else 
+	{
+		if(localStorage.getItem("theme"))
+		{
+			if (localStorage.getItem("theme") == "dark")
+			{
+				website_theme = "dark";
+			}
+		}
+		else if(window.matchMedia("(prefers-color-scheme: dark)").matches) 
+		{
+			//OS theme setting detected as dark
+			website_theme = "dark";
+		}
+
+		//dark theme preferred, set document with a `data-theme` attribute
+		if (website_theme == "dark") 
+		{
+			document.documentElement.setAttribute("data-theme", "dark");
+		}
+	}
+}
+detectColorScheme();
+
 // for the quote function, so we don't end up with garbled html and get the proper output instead
 function decodeEntities(encodedString) {
     var textArea = document.createElement('textarea');
@@ -284,6 +317,34 @@ $(function()
 });
 jQuery(document).ready(function()
 {  
+	//identify the toggle switch HTML element
+	const toggleSwitch = document.querySelector('#theme-switch input[type="checkbox"]');
+
+	//function that changes the theme, and sets a localStorage variable to track the theme between page loads
+	function switchTheme(e) 
+	{
+		if (e.target.checked) 
+		{
+			localStorage.setItem('theme', 'dark');
+			document.documentElement.setAttribute('data-theme', 'dark');
+			toggleSwitch.checked = true;
+		} 
+		else 
+		{
+			localStorage.setItem('theme', 'light');
+			document.documentElement.setAttribute('data-theme', 'light');
+			toggleSwitch.checked = false;
+		}    
+	}
+
+	//pre-check the dark-theme checkbox if dark-theme is set
+	if (document.documentElement.getAttribute("data-theme") == "dark"){
+		toggleSwitch.checked = true;
+	}
+
+	//listener for changing themes
+	toggleSwitch.addEventListener('change', switchTheme, false);
+
 	$('.cocoen').cocoen(); // image comparison slider
 
 	$('.octus-editor .styles').show();

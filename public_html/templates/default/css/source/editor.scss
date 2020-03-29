@@ -3,8 +3,8 @@
 }
 .octus-editor .styles {
 	display: none;
-	background: #f1f1f1;
-	border: 1px solid #cecfd1;
+	background: var(--bbcode-editor-background);
+	border: 1px solid var(--bbcode-editor-border);
 	color: #a5a5a5;
 	padding: 14px 14px 7px 14px;
 }
@@ -15,8 +15,8 @@
 	padding: 0;
 }
 .octus-editor > .styles > ul > li {
-	background: #ffffff;
-	border: 1px solid #ddd;
+	background: var(--bbcode-editor-styles-li-background);
+	border: 1px solid var(--bbcode-editor-styles-li-border);
 	cursor: pointer;
 	float: left;
 	padding: 5px 14px;
@@ -125,10 +125,10 @@
 }
 .octus-editor > .styles > ul > li.dropdown ul {
 	display: none;
-	background: #ffffff;
-	border-left: 1px solid #dddddd;
-	border-right: 1px solid #dddddd;
-	border-bottom: 1px solid #dddddd;
+	background: var(--bbcode-editor-dropdown-ul-bg-color);
+	border-left: 1px solid var(--bbcode-editor-dropdown-ul-border-color);
+	border-right: 1px solid var(--bbcode-editor-dropdown-ul-border-color);
+	border-bottom: 1px solid var(--bbcode-editor-dropdown-ul-border-color);
 	position: absolute;
 	margin: 0px;
 	padding: 0px;
@@ -141,7 +141,7 @@
 	display: inherit;
 }
 .octus-editor > .styles > ul > li.dropdown ul li {
-	border-bottom: 1px solid #dddddd;
+	border-bottom: 1px solid var(--bbcode-editor-dropdown-ul-li-border-color);
 	padding: 5px;
 	margin: 0;
 }
@@ -242,17 +242,14 @@
 	left: 23px;
 }
 .octus-editor .textarea {
-	background: #ffffff;
-	border-left: 1px solid #ddd;
-	border-right: 1px solid #ddd;
-	border-bottom: 1px solid #ddd;
-}
-.dark .octus-editor .textarea {
-	background: #222222;
+	background: var(--bbcode-editor-background);
+	border-left: 1px solid var(--bbcode-editor-border);
+	border-right: 1px solid var(--bbcode-editor-border);
+	border-bottom: 1px solid var(--bbcode-editor-border);
 }
 .octus-editor .textarea > textarea {
 	border: none;
-	color: #444444;
+	color: var(--bbcode-editor-font-color);
 	line-height: 1.5em;
 	padding: 21px;
 	resize: vertical;

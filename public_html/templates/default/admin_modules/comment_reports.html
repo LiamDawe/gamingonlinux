@@ -19,7 +19,7 @@ Comment: <a href="/articles/{:article_link}/comment_id={:comment_id}">Click here
 		</div>
 	</div>
 	<div class="comment-author">
-		<img class="avatar" alt="" src="{:comment_avatar}" />
+		<div class="avatar">{:comment_avatar}</div>
 		<ul class="comment-badges">
 			{:badges}
 		</ul>
@@ -33,6 +33,6 @@ Comment: <a href="/articles/{:article_link}/comment_id={:comment_id}">Click here
 <form method="post" action="admin.php?module=articles">
 	<button type="submit" name="act" value="delete_spam_report" formaction="/admin.php?module=comment_reports&comment_id={:comment_id}" class="btn btn-warning"> Delete Report</button>
 	<button type="submit" formaction="/index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={:comment_id}" class="btn btn-danger"> Delete Comment</button>
-	<button type="submit" formaction="/index.php?module=edit_comment&view=Edit&comment_id={:comment_id}" class="btn btn-info"> Edit</button
+	<button type="submit" formaction="/index.php?module=edit_comment&view=Edit&comment_id={:comment_id}" class="btn btn-info"> Edit</button>
 </form>
 [/block: article_comments]

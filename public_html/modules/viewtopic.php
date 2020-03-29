@@ -943,6 +943,9 @@ else
 									$_SESSION['activated'] = $get_active['activated'];
 								}
 
+								$templating->block('rules', 'viewtopic');
+								$templating->set('url', $core->config('website_url'));
+
 								$templating->block('reply_top', 'viewtopic');
 								$templating->set('url', $core->config('website_url'));
 								$templating->set('topic_id', $_GET['topic_id']);

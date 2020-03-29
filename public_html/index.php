@@ -43,7 +43,7 @@ if (core::$current_module['module_file_name'] == 'home')
 		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
 
-	if ($total_featured >= 1)
+	if ($total_featured >= 1 && $featured)
 	{
 		$templating->block('featured', 'mainpage');
 		$templating->set('title', $featured['title']);

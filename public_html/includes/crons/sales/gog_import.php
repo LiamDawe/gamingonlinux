@@ -58,6 +58,7 @@ do {
 			if ($games['linux_compatible'] == 1 && $games['discount_raw'] > 0)
 			{
 				$website = $games['short_link'] . '/?pp=b2a10a6c3dcadb10c8ffd734c1bab896d55cf0ec';
+				$website2 = $games['short_link'] . '?pp=b2a10a6c3dcadb10c8ffd734c1bab896d55cf0ec';
 				$image = $games['img_cover'];
 				$current_price =  $games['price_raw']/100; //LoL what, ['price_raw'] is the discounted price
 				$original_price = round( $games['price_raw'] / (100 - $games['discount']), 2);  //Looks like ['discount'] is a % discount
@@ -92,7 +93,7 @@ do {
 				echo $image . '<br />';
 
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `small_picture`, `gog_link` FROM `calendar` WHERE `name` = ? OR `gog_link` = ? OR `gog_link` = ?", array($games['title'], $website, $games['short_link']))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `small_picture`, `gog_link` FROM `calendar` WHERE `name` = ? OR `gog_link` = ? OR `gog_link` = ? OR `gog_link` = ?", array($games['title'], $website, $games['short_link'], $website2))->fetch();
 
 				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
 				$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($games['title']))->fetch();

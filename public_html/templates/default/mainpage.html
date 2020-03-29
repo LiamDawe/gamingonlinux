@@ -1,6 +1,7 @@
 [block: top]
 	<nav class="navigation-main">
 		<div class="container group">
+			<div class="col-12">
 			<div id="navigation-mobile" class="toggle-nav">
 				<a href="#" onclick="return false;"></a>
 				<div class="toggle-content" id="nav-hidden">
@@ -17,6 +18,10 @@
 						<li><a href="https://discord.gg/0rxBtcSOonvGzXr4">Discord</a></li>
 						<li><a href="/index.php?module=search">Search</a></li>
 						<li><a href="/index.php?module=user_search">User search</a></li>
+						<li style="padding:5px;"><div id="theme-slider1" class="theme-slider-container"><div>Theme:</div> <label class="theme-switch">
+							<input type="checkbox">
+							<span class="theme-slider"></span>
+						</label></div></li>
 					</ul>
 				</div>
 			</div>
@@ -48,7 +53,7 @@
 			</ul>
 			<div class="right-menu">
 				<div id="search-button-nav" class="toggle-nav search-box">
-					<a href="#"><img src="{:this_template}/images/search.png" alt="search articles"/></a>
+					<a href="#"><img src="{:this_template}/images/search.svg" alt="search articles"/></a>
 					<div class="toggle-content">
 							<form method="get" action="{:url}index.php?module=search">
 								<input type="hidden" name="module" value="search" />
@@ -61,8 +66,8 @@
 				{:notifications_menu}
 				{:user_menu}
 			</div>
-			<ul class="header-navbar fright header-search">
-				<li>
+			<ul class="header-navbar fright">
+				<li class="header-search">
 					<form method="get" action="{:url}index.php?module=search">
 					<input type="hidden" name="module" value="search" />
 					<input type="text" class="search-field ays-ignore" name="q" placeholder="Search Articles…" />
@@ -71,13 +76,14 @@
 				</li>
 			</ul>
 		</div>
+	</div>
 	</nav>
 	<div id="body" class="smooth group">
 [/block: top]
 
 [block: user_menu]
 <div class="toggle-nav user-box hide-small">
-	<a href="#"><div class="avatar-container"><img id="nav-avatar" src="{:avatar}" alt="your avatar" width="35" height="35"></div></a>
+	<a href="#"><div class="avatar-container"><div id="nav-avatar">{:avatar}</div></div></a>
 	<div class="toggle-content">
 		<ul>
 			<li style="padding:5px;"><strong>{:username}</strong></li>
@@ -87,6 +93,10 @@
 			<li><a href="{:url}usercp.php?module=bookmarks">Bookmarks</a></li>
 			{:admin_link}
 			<li><a class="logout_link" href="{:url}index.php?Logout">Logout</a></li>
+			<li style="padding:5px;"><div id="theme-slider2" class="theme-slider-container"><div>Theme:</div> <label class="theme-switch">
+				<input type="checkbox">
+				<span class="theme-slider"></span>
+			</label></div></li>
 		</ul>
 	</div>
 </div>
@@ -94,7 +104,7 @@
 
 [block: notifications]
 <div id="alert_box" class="toggle-nav alerts-box right alerts-box-{:alert_box_type}">
-	<a href="#" id="notifications_total">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.png" alt="notifications"/></a>
+	<a href="#" id="notifications_total">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.svg" alt="notifications"/></a>
 	<div class="toggle-content">
 		<ul>
 			{:admin_line}
@@ -106,12 +116,20 @@
 [/block: notifications]
 
 [block: login_menu]
-<div class="login-box hide-small">
-	<ul>
-		<li class="pull-right"><a href="{:url}index.php?module=login{:redirect}">Login</a></li>
-		<li class="pull-right">Or</li>
-		<li class="pull-right"><a href="{:url}index.php?module=register">Register</a></li>
-	</ul>
+<div class="toggle-nav user-box hide-small">
+	<a href="#"><div class="avatar-container"><div id="nav-avatar">{:avatar}</div></div></a>
+	<div class="toggle-content">
+		<ul>
+			<li><a href="{:url}index.php?module=login{:redirect}">Login</a></li>
+			<li class="divider"></li>
+			<li><a href="{:url}index.php?module=register">Register</a></li>
+			<li class="divider"></li>
+			<li style="padding:5px;"><div id="theme-slider2" class="theme-slider-container"><div>Theme:</div> <label class="theme-switch">
+				<input type="checkbox">
+				<span class="theme-slider"></span>
+			</label></div></li>
+		</ul>
+	</div>
 </div>
 [/block: login_menu]
 

@@ -47,7 +47,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `steam_id`, `steam_username`, `google_email`, `forum_type`, `timezone`, `email_articles`, `mailing_list_key`, `social_stay_cookie`, `supporter_end_date`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `steam_id`, `steam_username`, `google_email`, `timezone`, `email_articles`, `mailing_list_key`, `social_stay_cookie`, `supporter_end_date`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 	
 	// make sure they have a mailing_list_key
 	// if they unsubscribe it's wiped, but if they stay subscribed/make a new sub = use new or existing key
@@ -104,16 +104,17 @@ if (!isset($_POST['act']))
 	$templating->set('tags_list', $tags_list);
 
 	$theme_options = '';
-	if ($usercpcp['theme'] == 'dark')
-	{
-		$theme_options .= '<option value="dark" selected>dark</option>';
-		$theme_options .= '<option value="default">default</option>';
-	}
+	$theme_list = ['', 'light', 'dark'];
 
-	else
+	foreach ($theme_list as $theme)
 	{
-		$theme_options .= '<option value="dark">dark</option>';
-		$theme_options .= '<option value="default" selected>default</option>';
+		$selected = '';
+		if ($usercpcp['theme'] == $theme)
+		{
+			$selected = 'selected';
+		}
+		
+		$theme_options .= '<option value="'.$theme.'" '.$selected.'>'.$theme.'</option>';
 	}
 
 	$templating->set('theme_options', $theme_options);
@@ -162,21 +163,6 @@ if (!isset($_POST['act']))
 	}
 
 	$templating->set('profile_fields', $profile_fields_output);
-	
-	$normal_set = '';
-	$flat_set = '';
-	if ($usercpcp['forum_type'] == 'normal_forum')
-	{
-		$normal_set = 'selected';
-	}
-	if ($usercpcp['forum_type'] == 'flat_forum')
-	{
-		$flat_set = 'selected';
-	}
-
-	$forum_types = '<option value="normal_forum" '.$normal_set.'>Category view with forums</option><option value="flat_forum" '.$flat_set.'>A list of all topics, a "flat forum"</option>';
-	$templating->set('forum_types', $forum_types);
-
 
 	$submission_emails = '';
 	if ($user->check_group([1,2,5]) == true)
@@ -365,12 +351,6 @@ else if (isset($_POST['act']))
 			}
 		}
 		
-		$forum_type_sql = $_POST['forum_type'];
-		if ($_POST['forum_type'] != 'normal_forum' && $_POST['forum_type'] != 'flat_forum')
-		{
-			$forum_type_sql = 'normal_forum';
-		}
-		
 		$daily_articles = NULL;
 		$mailing_list_key = NULL;
 		if (isset($_POST['daily_news']))
@@ -381,7 +361,7 @@ else if (isset($_POST['act']))
 
 		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
 
-		$dbl->run("UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `forum_type` = ?, `theme` = ? WHERE `user_id` = ?", array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $forum_type_sql, $_POST['theme'], $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `theme` = ? WHERE `user_id` = ?", array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $_POST['theme'], $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;

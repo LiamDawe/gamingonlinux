@@ -1,35 +1,31 @@
-//determines if the user has a set theme
-var website_theme = 'light';
-function detectColorScheme()
-{
-	if (document.documentElement.hasAttribute("data-theme"))
-	{
-		website_theme = document.documentElement.getAttribute("data-theme");
+// to insert text in a textarea at the cursor position
+jQuery.fn.extend({
+	insertAtCaret: function(myValue){
+	  return this.each(function(i) {
+		if (document.selection) {
+		  //For browsers like Internet Explorer
+		  this.focus();
+		  var sel = document.selection.createRange();
+		  sel.text = myValue;
+		  this.focus();
+		}
+		else if (this.selectionStart || this.selectionStart == '0') {
+		  //For browsers like Firefox and Webkit based
+		  var startPos = this.selectionStart;
+		  var endPos = this.selectionEnd;
+		  var scrollTop = this.scrollTop;
+		  this.value = this.value.substring(0, startPos)+myValue+this.value.substring(endPos,this.value.length);
+		  this.focus();
+		  this.selectionStart = startPos + myValue.length;
+		  this.selectionEnd = startPos + myValue.length;
+		  this.scrollTop = scrollTop;
+		} else {
+		  this.value += myValue;
+		  this.focus();
+		}
+	  });
 	}
-	//local storage is used to override OS theme settings
-	else 
-	{
-		if(localStorage.getItem("theme"))
-		{
-			if (localStorage.getItem("theme") == "dark")
-			{
-				website_theme = "dark";
-			}
-		}
-		else if(window.matchMedia("(prefers-color-scheme: dark)").matches) 
-		{
-			//OS theme setting detected as dark
-			website_theme = "dark";
-		}
-
-		//dark theme preferred, set document with a `data-theme` attribute
-		if (website_theme == "dark") 
-		{
-			document.documentElement.setAttribute("data-theme", "dark");
-		}
-	}
-}
-detectColorScheme();
+});
 
 // for the quote function, so we don't end up with garbled html and get the proper output instead
 function decodeEntities(encodedString) {
@@ -317,8 +313,8 @@ $(function()
 });
 jQuery(document).ready(function()
 {  
-	//identify the toggle switch HTML element
-	const toggleSwitch = document.querySelector('#theme-switch input[type="checkbox"]');
+	const toggleSwitch1 = document.querySelector('#theme-slider1 input[type="checkbox"]');
+	const toggleSwitch2 = document.querySelector('#theme-slider2 input[type="checkbox"]');
 
 	//function that changes the theme, and sets a localStorage variable to track the theme between page loads
 	function switchTheme(e) 
@@ -327,27 +323,117 @@ jQuery(document).ready(function()
 		{
 			localStorage.setItem('theme', 'dark');
 			document.documentElement.setAttribute('data-theme', 'dark');
-			toggleSwitch.checked = true;
+			toggleSwitch1.checked = true;
+			toggleSwitch2.checked = true;
 		} 
 		else 
 		{
 			localStorage.setItem('theme', 'light');
 			document.documentElement.setAttribute('data-theme', 'light');
-			toggleSwitch.checked = false;
+			toggleSwitch1.checked = false;
+			toggleSwitch2.checked = false;
 		}    
 	}
 
 	//pre-check the dark-theme checkbox if dark-theme is set
-	if (document.documentElement.getAttribute("data-theme") == "dark"){
-		toggleSwitch.checked = true;
+	if (document.documentElement.getAttribute("data-theme") == "dark")
+	{
+		if (typeof toggleSwitch1 !== 'undefined')
+		{
+			toggleSwitch1.checked = true;
+		}
+		if (typeof toggleSwitch2 !== 'undefined')
+		{
+			toggleSwitch2.checked = true;
+		}
 	}
 
 	//listener for changing themes
-	toggleSwitch.addEventListener('change', switchTheme, false);
+	if (typeof toggleSwitch1 !== 'undefined')
+	{
+		toggleSwitch1.addEventListener('change', switchTheme, false);
+	}
+	if (typeof toggleSwitch2 !== 'undefined')
+	{
+		toggleSwitch2.addEventListener('change', switchTheme, false);
+	}
 
 	$('.cocoen').cocoen(); // image comparison slider
 
 	$('.octus-editor .styles').show();
+
+	/* bbcode editor */
+    function urlhelper(selected) 
+	{
+        var data;
+
+        if(selected != "") 
+		{
+            entered_url = window.prompt('Enter a valid URL');
+            if(entered_url === null || entered_url === '') 
+			{
+                return null;
+            } 
+        } 
+        else if(selected === "") 
+		{
+            entered_url = window.prompt('Enter a valid URL');
+            if(entered_url === null || entered_url === '') 
+			{
+                return null;
+            } 
+
+            selected = window.prompt('URL link text');
+            if(selected === null || selected === '') 
+			{
+                selected = 'link';
+            }
+        }
+
+        data = [entered_url, selected];
+
+        return data;
+	}
+	
+	$(document).on('click','.octus-editor .styles .bb-button',function(e)
+	{
+		var this_textarea = $(this).closest('div.octus-editor').find('.bbcode_editor');
+		var start = this_textarea.prop('selectionStart');
+		var end = this_textarea.prop('selectionEnd');
+		var selected = '';
+
+		if ($(this).data('snippet'))
+		{
+			this_textarea.insertAtCaret($(this).data('snippet'));
+		}
+		else if ($(this).data('tag'))
+		{
+			if (start != end) 
+			{
+				selected = this_textarea.val().slice(start, end);
+			}
+			if ($(this).data('tag') == 'ul')
+			{
+				selected = '[li]' + selected.replace(/\r\n/g, "\r\n[/li]").replace(/[\r\n]/g, '[/li]\r\n[li]') + '[/li]';
+				selected = selected.replace(/\[li\] +/gm, '[li]');
+			}
+			if ($(this).data('tag') == 'url')
+			{
+				popUpData = urlhelper(selected);
+				entered_url   = popUpData[0];
+				selected = popUpData[1];
+				ins = '[' + selected + ']' + '(' + entered_url + ')';
+
+				this_textarea.insertAtCaret(ins);
+			}
+			else
+			{
+				this_textarea.insertAtCaret('[' + $(this).data('tag') + ']' + selected + '[/' + $(this).data('tag') + ']');	
+			}
+		}
+	});
+
+	/* end bbcode editor */
 
 	$(document).on('click','.highlight-element',function(e)
 	{

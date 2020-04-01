@@ -4,16 +4,41 @@
 		<article class="h-entry">
 				<div class="article individual no-image group">
 					<div class="info group">
-						<div class="bubble">
 							<h1 class="title p-name"><a class="u-url" href="{:article_link}">{:title}</a></h1>
-							<div class="meta">Posted by <strong>{:username}</strong>, <time class="dt-published" datetime="{:machine_time}">{:date}</time> | Views: {:article_views} {:edit_link}</div>
-						</div>
-					</div>
-					<div class="share group">
-						<span><img src="{:this_template}/images/network-icons/white/share.svg" alt="" /> <span>Share</span></span>
-						{:twitter_share}
-						{:facebook_share}
-						<a class="button small fnone" href="{:url}article_rss.php" target="_blank"><img src="{:this_template}/images/network-icons/rss.svg" alt="" /></a>
+							<div class="meta">By <strong>{:username}</strong> - <time class="dt-published" datetime="{:machine_time}">{:date}</time> | Views: {:article_views} {:edit_link}
+								<div class="share group">
+									<div class="just-share-container gol-share-button">
+										<span class="just-share">
+											<span class="text-container">Share</span>
+										</span>
+									</div>
+									<div class="gol-share-button twitter">
+										<a href="https://twitter.com/intent/tweet?text={:share_title}%20%23Linux&amp;url={:share_url}&amp;via=gamingonlinux" target="_blank">
+											<img src="/templates/default/images/network-icons/twitter.svg" alt="" />
+										</a>
+									</div>
+									<div class="gol-share-button reddit">
+										<a href="https://www.reddit.com/submit?url={:share_url}&amp;title={:share_title}" target="_blank">
+											<img src="/templates/default/images/network-icons/reddit.png" alt="" />
+										</a>
+									</div>
+									<div class="gol-share-button facebook">
+										<a href="https://www.facebook.com/sharer/sharer.php?u={:share_url}" target="_blank">
+											<img src="/templates/default/images/network-icons/facebook.svg" alt="" />
+										</a>
+									</div>
+									<div class="gol-share-button telegram">
+										<a href="https://telegram.me/share/url?url={:share_url}&amp;text={:share_title}" target="_blank">
+											<img src="/templates/default/images/network-icons/telegram.svg" alt="" />
+										</a>
+									</div>
+									<div class="gol-share-button rss">
+										<a href="{:url}article_rss.php" target="_blank">
+										<img src="/templates/default/images/network-icons/rss.svg" alt="" />
+										</a>
+									</div>
+								</div>
+							</div>
 					</div>
 					<div class="content group e-content">
 						{:text}
@@ -35,7 +60,7 @@
 [/block: article_meta]
 
 [block: article_bottom]
-	<div class="box affiliate_meta"><div class="body group"><small>We do often include affiliate links to earn us some pennies. We are currently affiliated with GOG, Humble Store and Paradox Interactive. See more information <a href="/ethics.html">here</a>.</small></div></div>
+	<div class="box affiliate_meta"><div class="body group"><small>We do often include affiliate links to earn us some pennies. We are currently affiliated with GOG, Humble Store and Paradox Interactive. See <a href="/ethics.html">more here</a>.</small></div></div>
 </div>
 [/block: article_bottom]
 
@@ -65,7 +90,7 @@
 	<div class="subhead"><strong>About the author - {:username}</strong></div>
 	<div class="body group">
 		<div class="comment-author hide-xsmall">
-			<img class="avatar u-photo" alt="" src="{:author_picture}" />
+			<div class="avatar">{:author_picture}</div>
 		</div>
 		<div class="comment-body">{:author_bio} <br /><span class="badge blue"><a href="/index.php?module=search&author_id={:user_id}">See more from me</a></span></div>
 	</div>
@@ -105,7 +130,7 @@
 								</div>
 							</div>
 							<div class="comment-author hide-xsmall">
-								<img class="avatar" alt="" src="{:comment_avatar}" />
+								<div class="avatar">{:comment_avatar}</div>
 								{:user_info_extra}
 								<ul class="comment-badges">
 									{:badges}
@@ -192,6 +217,10 @@
 </div>
 [/block: patreon_comments]
 
+[block: rules]
+<div class="box"><strong>Make sure your post <a href="{:url}index.php?module=rules" target="_blank">follows our rules</a>. If you need technical support, it may be better to <a href="{:url}forum/">use the GOL Forum</a>.</strong></div>
+[/block: rules]
+
 [block: comments_box_top]
 <form id="comment_form" method="post" action="{:url}index.php?module=articles_full&amp;go=comment" enctype="multipart/form-data">
 [/block: comments_box_top]
@@ -227,13 +256,13 @@
 						<div id="r{:comment_id}" class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									You are about to report this comment
+									You are about to report this comment from {:username}
 								</div>
 								<div class="comment-actions">
 								</div>
 							</div>
 							<div class="comment-author">
-								<img class="avatar" alt="" src="{:comment_avatar}" />
+								<div class="avatar">{:comment_avatar}</div>
 							</div>
 							<div class="comment-body">
 								<div>

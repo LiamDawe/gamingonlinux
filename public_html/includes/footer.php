@@ -61,14 +61,6 @@ if ($user->check_group(1) && $core->config('show_debug') == 1)
 }
 $templating->set('debug', $debug);
 
-// editor js
-$editor_js = '';
-if (!empty(core::$editor_js) || isset(core::$editor_js))
-{
-	$editor_js = '<script type="text/javascript">' . implode("\n", core::$editor_js) . '</script>';
-}
-$templating->set('editor_js', $editor_js);
-
 // user stat trending charts
 $svg_js = '';
 if (!empty(core::$user_chart_js) || isset(core::$user_chart_js))

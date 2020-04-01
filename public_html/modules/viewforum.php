@@ -200,7 +200,7 @@ else
 		$templating->set('is_locked', $locked);
 
 		$topic_link = $forum_class->get_link($post['topic_id']);
-		$templating->set('topic_link', $topic_link);
+		$templating->set('link', $topic_link);
 		$templating->set('topic_id', $post['topic_id']);
 		$poll_title = '';
 		if ($post['has_poll'] == 1)
@@ -225,17 +225,9 @@ else
 		
 		$templating->set('pagination_post', $pagination_post);
 
-		$last_post = 'No replies!';
-		if ($post['replys'] > 0)
-		{
-			$date = $core->human_date($post['last_post_date']);
-			$tzdate = date('c',$post['last_post_date']);
-			$last_post_link = $forum_class->get_link($post['topic_id'], 'post_id='.$post['last_post_id']);
-			$last_post = 'Latest by <a href="/profiles/'.$post['user_id_last'].'">'.$post['username_last'].'</a><br />
-			<a href="'.$last_post_link.'"><abbr title="'.$tzdate.'" class="timeago">'.$date.'</abbr></a>';
-		}
-
-		$templating->set('last_post', $last_post);
+		$last_date = $core->human_date($post['last_post_date']);
+		$templating->set('tzdate', date('c',$post['last_post_date']) );
+		$templating->set('last_username', $post['username_last']);
 	}
 
 	$templating->block('main_bottom', 'viewforum');
@@ -279,7 +271,7 @@ else
 			$service = new Google_Service_Oauth2($client);
 			$authUrl = $client->createAuthUrl();
 			
-			$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img alt="" src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/google-plus.png" /> </span>Sign in with <b>Google</b></a>';
+			$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img alt="" src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/google.svg" /> </span>Sign in with <b>Google</b></a>';
 		}
 		$templating->set('google_button', $google_button);
 	}

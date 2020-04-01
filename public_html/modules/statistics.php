@@ -55,13 +55,18 @@ $charts_list = array(
 
 if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 {
+	if (isset($_GET['picker']) && is_numeric($_GET['picker']))
+	{
+		header("Location: ".url."users/statistics/statid=".$_GET['picker']);
+		die();
+	}
 	$templating->block('monthly_top');
 	$options = '';
 	$query_list = $dbl->run("SELECT `grouping_id`, `generated_date` FROM `user_stats_grouping` ORDER BY `grouping_id` DESC LIMIT 24")->fetch_all();
 	foreach ($query_list as $get_list)
 	{
 		$selected = '';
-		if (isset($_POST['picker']) && is_numeric($_POST['picker']) && $_POST['picker'] == $get_list['grouping_id'])
+		if (isset($_GET['statid']) && is_numeric($_GET['statid']) && $_GET['statid'] == $get_list['grouping_id'])
 		{
 			$selected = 'selected';
 		}
@@ -72,13 +77,13 @@ if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 
 	$counter = 0;
 
-	if (isset($_POST['picker']) && is_numeric($_POST['picker']))
+	if (isset($_GET['statid']) && is_numeric($_GET['statid']))
 	{
-		$grouping_id = core::make_safe($_POST['picker']);
+		$grouping_id = core::make_safe($_GET['statid']);
 	}
 	else
 	{
-		$grouping_id = $dbl->run("SELECT grouping_id FROM user_stats_grouping ORDER BY `grouping_id` DESC LIMIT 1")->fetchOne();
+		$grouping_id = $dbl->run("SELECT `grouping_id` FROM user_stats_grouping ORDER BY `grouping_id` DESC LIMIT 1")->fetchOne();
 	}
 
 	// Check if the cached file is still fresh. If it is, just pull it in and that's it done

@@ -154,6 +154,8 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^profiles/([0-9]+)/comments/page\=([0-9]+)?$ /index.php?module=profile&view=more-comments&user_id=$1&page=$2 [N,NC,QSA]
 
   RewriteRule ^users/statistics/?$ /index.php?module=statistics [N,NC,QSA]
+  
+  RewriteRule ^users/statistics/statid=([0-9]+)?$ /index.php?module=statistics&statid=$1&act=pick [N,NC,QSA]
 
   RewriteRule ^articles/category/(.+?)/page\=([0-9]+)?$ /index.php?module=articles&view=cat&catid=$1&page=$2 [N,NC,QSA,B]
 

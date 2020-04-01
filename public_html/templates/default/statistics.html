@@ -19,7 +19,8 @@
 <div class="box">
   <div class="head">Pick which date to display</div>
   <div class="body group">
-    <form method="post">
+    <form method="get">
+      <input type="hidden" name="module" value="statistics" />
       <select name="picker">{:options}</select> <button type="submit" name="act" value="pick" formaction="/index.php?module=statistics">Change</button>
     </form>
   </div>

@@ -711,6 +711,8 @@ ul.pagination_small > :first-child
 .head-list select {padding: 3px; margin: 0; border: 0; background: #474747; color: #eee; border: 1px solid #666;}
 .head-list-position {float: right;}
 
+.articles .box .head {overflow: auto;}
+
 /* Universal Box */
 .box {
 	margin-bottom: 7px;
@@ -1776,7 +1778,7 @@ ul.social-networks li > a {
 }
 
 /* Above tablet */
-@media only screen and (min-width: 807px) {
+@media only screen and (min-width: 815px) {
     .articles .article .image {
 		width: 40%;
     }
@@ -1788,7 +1790,7 @@ ul.social-networks li > a {
 }
 
 /* TABLET/NETBOOK */
-@media only screen and (max-width: 806px) {
+@media only screen and (max-width: 814px) {
 	.article.group.h-entry
 	{
 		flex-direction: column;

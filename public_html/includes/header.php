@@ -38,16 +38,6 @@ if (isset($_GET['clear_note']) && isset($_SESSION['user_id']))
 
 $forum_class = new forum($dbl, $core, $user);
 
-if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
-{
-	$theme = $user->user_details['theme'];
-}
-
-else
-{
-	$theme = 'default';
-}
-
 // get the header template html
 $templating->load('header');
 $templating->block('header', 'header');
@@ -55,13 +45,14 @@ $templating->set('url', $core->config('website_url'));
 $templating->set('jsstatic', JSSTATIC);
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
-// if using the dark theme
-$dark_css = '';
-if ($theme == 'dark')
+// forced theming
+$force_theme = '';
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0 && $user->user_details['theme'] != '' && $user->user_details['theme'] != NULL)
 {
-	$dark_css = '<link rel="stylesheet" type="text/css" href="'.$core->config('website_url').'templates/'.$core->config('template').'/css/shipping/dark.css" />';
+	$force_theme = 'data-theme="'.$user->user_details['theme'].'"';
 }
-$templating->set('dark_css', $dark_css);
+
+$templating->set('force_theme', $force_theme);
 
 $templating->set('rss_link', '<link rel="alternate" type="application/rss+xml" title="RSS feed for GamingOnLinux" href="'.$core->config('website_url').'article_rss.php" />');
 
@@ -131,7 +122,7 @@ if ((isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0) || (!isset($_SESS
 	$templating->set('user_link', '<li><a href="/index.php?module=login'.$redirect.'">Login</a></li><li><a href="/index.php?module=register">Register</a></li>');
 
 	$login_menu = $templating->block_store('login_menu');
-	$login_menu = $templating->store_replace($login_menu, array('url' => $core->config('website_url'), 'redirect' => $redirect));
+	$login_menu = $templating->store_replace($login_menu, array('url' => $core->config('website_url'), 'redirect' => $redirect, 'avatar' => '<img src="'.url.'templates/default/images/blank_user.svg" alt="" />'));
 
 	$templating->set('user_menu', $login_menu);
 	$templating->set('notifications_menu', '');

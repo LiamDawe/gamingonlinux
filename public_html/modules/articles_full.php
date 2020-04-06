@@ -273,22 +273,15 @@ if (!isset($_GET['go']))
 				// make date human readable
 				$date = $core->human_date($article['date']);
 
-				$templating->block('article', 'articles_full');
-				$templating->set('url', $core->config('website_url'));
-				
-				$share_url = $article_class->get_link($_GET['aid'], $nice_title);
-				
-				$twitter_share = '<a class="button small fnone" href="https://twitter.com/intent/tweet?text='.urlencode($article['title']).'%20%23Linux&amp;url='.$share_url.'&amp;via=gamingonlinux" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/network-icons/twitter.svg" alt="" /></a>';
-				$templating->set('twitter_share', $twitter_share);
-
-				$fb_onclick = "window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('$share_url'), 'height=279, width=575'); return false;";
-				
-				$facebook_share = '<a class="button small fnone" href="#" onclick="'.$fb_onclick.'" target="_blank"><img src="'.$core->config('website_url') . 'templates/' . $core->config('template') .'/images/network-icons/facebook.svg" alt="" /></a>';
-				$templating->set('facebook_share', $facebook_share);
-
 				$article_link = $article_class->get_link($_GET['aid'], $nice_title);
-				
+
+				$templating->block('article', 'articles_full');
 				$templating->set('article_link', $article_link);
+
+				$share_url = $article_class->get_link($_GET['aid'], $nice_title);
+				$templating->set('share_url', urlencode($share_url));
+				$templating->set('share_title', urlencode($article['title']));
+				$templating->set('url', $core->config('website_url'));
 
 				$templating->set('rules', $core->config('rules'));
 
@@ -367,8 +360,6 @@ if (!isset($_GET['go']))
 					$article_body = str_replace('<*PAGE*>', '', $article['text']);
 					$article_page_count = 1;
 				}
-				
-				$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 
 				$templating->set('text', $bbcode->article_bbcode($article_body));
 
@@ -492,7 +483,7 @@ if (!isset($_GET['go']))
 					if (isset($article['author_picture']) && !empty($article['author_picture']) && $article['author_picture'] != NULL)
 					{
 						$templating->block('about_author');
-						$author_pic = '/uploads/avatars/author_pictures/'.$article['author_picture'];
+						$author_pic = '<img class="u-photo" src="'.url.'uploads/avatars/author_pictures/'.$article['author_picture'] . '" alt="author picture" />';
 						$templating->set('author_picture', $author_pic);
 					}
 					else
@@ -585,6 +576,10 @@ if (!isset($_GET['go']))
 										{
 											$comment = $_SESSION['acomment'];
 										}
+
+										$templating->block('rules', 'articles_full');
+										$templating->set('url', $core->config('website_url'));
+
 										$templating->block('comments_box_top', 'articles_full');
 										$templating->set('url', $core->config('website_url'));
 										$templating->set('article_id', $_GET['aid']);
@@ -1022,14 +1017,15 @@ else if (isset($_GET['go']))
 			$templating->set_previous('title', 'Reporting a comment', 1);
 
 			// show the comment they are reporting
-			$comment = $dbl->run("SELECT c.`comment_text`, u.`user_id` FROM `articles_comments` c LEFT JOIN `users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
+			$comment = $dbl->run("SELECT c.`comment_text`, u.`user_id`, u.`avatar`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`username` FROM `articles_comments` c LEFT JOIN `users` u ON u.user_id = c.author_id WHERE c.`comment_id` = ?", array((int) $comment_id))->fetch();
 			$templating->block('report', 'articles_full');
 			$templating->set('text', $bbcode->parse_bbcode($comment['comment_text']));
 
 			// sort out the avatar
-			$comment_avatar = $user->sort_avatar($comment['user_id']);
+			$comment_avatar = $user->sort_avatar($comment);
 
 			$templating->set('comment_avatar', $comment_avatar);
+			$templating->set('username', $comment['username']);
 
 			$core->yes_no('Are you sure you wish to report that comment?', url."index.php?module=articles_full&go=report_comment&article_id=$article_id&comment_id=$comment_id", "");
 		}

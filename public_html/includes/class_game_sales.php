@@ -56,6 +56,65 @@ class game_sales
 		return null;
 	}
 
+	function get_correct_info($title, $steam_id = NULL, $update_naming = 0)
+	{
+		// first check using basic name, binary to ensure correct against accent letters and so on
+		$check_name = $this->dbl->run("SELECT `id` FROM `calendar` WHERE BINARY `name` = ?", array($title))->fetchOne();
+
+		// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
+		$duplicate = $this->dbl->run("SELECT `real_id` FROM `item_dupes` WHERE BINARY `name` = ?", array($title))->fetchOne();
+
+		// for if steam importing, check over steam id
+		if ($steam_id)
+		{
+			// check for name change, insert different name into dupes table and keep original name
+			$name_change = $this->dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND BINARY `name` != ?", array($steam_id, $title))->fetchOne();
+			if ($name_change)
+			{
+				echo PHP_EOL . 'Detected name changed.'; 
+
+				if ($update_naming == 0)
+				{
+					echo PHP_EOL . 'Leaving original name in place - adding new duplicate name.' . PHP_EOL;
+					$exists = $this->dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND `name` = ?", array($name_change, $title))->fetchOne();
+					if (!$exists)
+					{
+						$this->dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+					}
+				}
+				else if ($update_naming == 1)
+				{
+					echo PHP_EOL . 'Name changed, not a new item.' . PHP_EOL;
+					$this->dbl->run("UPDATE `calendar` SET `name` = ? WHERE `id` = ?", array($title, $name_change));
+				}
+			}
+		}
+
+		if ($check_name)
+		{
+			$game_id = $check_name;
+		}
+		if ($duplicate)
+		{
+			$game_id = $duplicate;
+		}
+		if ($name_change)
+		{
+			$game_id = $name_change;
+		}
+
+		if (isset($game_id))
+		{
+			$details = $this->dbl->run("SELECT `id`, `small_picture`, `steam_id`, `bundle`, `date`, `stripped_name` FROM `calendar` WHERE `id` = ?", array($game_id))->fetch();
+
+			return $details;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	// move previously uploaded tagline image to correct directory
 	function move_small($game_id, $file)
 	{

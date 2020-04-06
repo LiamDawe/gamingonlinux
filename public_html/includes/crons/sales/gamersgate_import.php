@@ -76,10 +76,10 @@ foreach ($xml->item as $game)
 	if ($game->price != "-" && $game->price > 0)
 	{
 		// first check it exists based on the normal name
-		$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE `name` = ?", array($new_title))->fetchOne();
+		$game_list = $dbl->run("SELECT `id` FROM `calendar` WHERE BINARY `name` = ?", array($new_title))->fetchOne();
 
 		// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
-		$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($new_title))->fetch();
+		$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE BINARY `name` = ?", array($new_title))->fetch();
 			
 		if (!$game_list && !$check_dupes)
 		{

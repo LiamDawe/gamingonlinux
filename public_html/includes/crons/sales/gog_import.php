@@ -93,10 +93,10 @@ do {
 				echo $image . '<br />';
 
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `small_picture`, `gog_link` FROM `calendar` WHERE `name` = ? OR `gog_link` = ? OR `gog_link` = ? OR `gog_link` = ?", array($games['title'], $website, $games['short_link'], $website2))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `small_picture`, `gog_link` FROM `calendar` WHERE BINARY `name` = ? OR `gog_link` = ? OR `gog_link` = ? OR `gog_link` = ?", array($games['title'], $website, $games['short_link'], $website2))->fetch();
 
 				// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
-				$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($games['title']))->fetch();
+				$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE BINARY `name` = ?", array($games['title']))->fetch();
 
 				if (!$game_list && !$check_dupes)
 				{

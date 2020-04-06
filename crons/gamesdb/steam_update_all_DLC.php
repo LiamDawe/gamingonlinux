@@ -61,16 +61,16 @@ do
 			$clean_release_date = $game_sales->steam_release_date($release_date_raw);
 
 			// ADD IT TO THE GAMES DATABASE
-			$game_list = $dbl->run("SELECT `id`, `small_picture`, `bundle`, `date`, `stripped_name`, `steam_link`, `is_dlc`, `steam_id` FROM `calendar` WHERE `name` = ?", array($title))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `small_picture`, `bundle`, `date`, `stripped_name`, `steam_link`, `is_dlc`, `steam_id` FROM `calendar` WHERE BINARY `name` = ?", array($title))->fetch();
 
 			// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
-			$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($title))->fetch();
+			$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE BINARY `name` = ?", array($title))->fetch();
 
 			// check for name change, insert different name into dupes table and keep original name
-			$name_change = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND `name` != ?", array($steam_id, $title))->fetchOne();
+			$name_change = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND BINARY `name` != ?", array($steam_id, $title))->fetchOne();
 			if ($name_change)
 			{
-				$exists = $dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND `name` = ?", array($name_change, $title))->fetchOne();
+				$exists = $dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND BINARY `name` = ?", array($name_change, $title))->fetchOne();
 				if (!$exists)
 				{
 					$dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));

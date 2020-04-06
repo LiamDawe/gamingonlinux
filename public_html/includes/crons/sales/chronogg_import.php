@@ -53,17 +53,17 @@ if (!empty($game))
 		$website = $game->unique_url;
 					
 		// ADD IT TO THE GAMES DATABASE
-		$game_list = $dbl->run("SELECT `id`, `supports_linux` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
+		$game_list = $dbl->run("SELECT `id`, `supports_linux` FROM `calendar` WHERE BINARY `name` = ?", array($sane_name))->fetch();
 
 		// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use
-		$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE `name` = ?", array($sane_name))->fetch();
+		$check_dupes = $dbl->run("SELECT `real_id` FROM `item_dupes` WHERE BINARY `name` = ?", array($sane_name))->fetch();
 			
 		if (!$game_list && !$check_dupes)
 		{
 			$dbl->run("INSERT INTO `calendar` SET `name` = ?, `approved` = 1", array($sane_name));
 			
 			// need to grab it again
-			$game_list = $dbl->run("SELECT `id`, `supports_linux` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `supports_linux` FROM `calendar` WHERE BINARY `name` = ?", array($sane_name))->fetch();
 		}
 
 		$game_id = $game_list['id'];
@@ -72,7 +72,7 @@ if (!empty($game))
 			$game_id = $check_dupes['real_id'];
 			
 			// need to grab it again
-			$game_list = $dbl->run("SELECT `id`, `supports_linux` FROM `calendar` WHERE `name` = ?", array($sane_name))->fetch();
+			$game_list = $dbl->run("SELECT `id`, `supports_linux` FROM `calendar` WHERE BINARY `name` = ?", array($sane_name))->fetch();
 		}
 
 		if ($game_list['supports_linux'] == 1)

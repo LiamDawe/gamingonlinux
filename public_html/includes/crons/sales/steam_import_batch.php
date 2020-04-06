@@ -123,7 +123,7 @@ do
 					echo 'SteamID: ' . $steam_id . "\n";
 
 					// ADD IT TO THE GAMES DATABASE
-					$select_sql = "SELECT `id`, `small_picture`, `steam_id`, `bundle`, `date`, `stripped_name` FROM `calendar` WHERE `name` = ?";
+					$select_sql = "SELECT `id`, `small_picture`, `steam_id`, `bundle`, `date`, `stripped_name` FROM `calendar` WHERE BINARY `name` = ?";
 					$game_list = $dbl->run($select_sql, array($title))->fetch();
 
 					// check for a parent game, if this game is also known as something else, and the detected name isn't the one we use

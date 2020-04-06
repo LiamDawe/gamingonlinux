@@ -74,7 +74,7 @@ do
 				$release_date = date('Y-m-d', $games['release_date']);
 
 				// ADD IT TO THE GAMES DATABASE
-				$game_list = $dbl->run("SELECT `id`, `also_known_as` FROM `calendar` WHERE `name` = ?", array($games['title']))->fetch();
+				$game_list = $dbl->run("SELECT `id`, `also_known_as` FROM `calendar` WHERE BINARY `name` = ?", array($games['title']))->fetch();
 
 				if (!$game_list)
 				{

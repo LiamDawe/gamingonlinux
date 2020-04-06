@@ -8,7 +8,7 @@ $templating->set_previous('meta_description', 'The latest article comments on Ga
 
 $page = core::give_page();
 
-if(core::$redis->exists('latest_comments_feed'.$page))
+if($core->get_dbcache('latest_comments_feed'.$page))
 {
 	echo $templating->output();
 	echo core::$redis->get('latest_comments_feed'.$page);

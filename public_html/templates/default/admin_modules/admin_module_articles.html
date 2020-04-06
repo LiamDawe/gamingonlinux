@@ -88,30 +88,21 @@
 			</div>
 [/block: manage_cat]
 
-[block: manage_row]
-		<!-- Article -->
-		<div class="box">
-			<div class="head"><a href="/articles/{:article_link}">{:title}</a></div>
-		</div>
-		<div class="box">
-			<div class="body group">
-				<p class="small muted">by {:username} {:date}</p>
-				<p>
-					{:text}
-					{:categories_list}
-					<p class="small muted"><a href="/articles/{:article_link}/#comments"><span class="glyphicon glyphicon-comment"></span> {:comment_count} Comments</a></p>
-				</p>
+[block: manage_row_top]
+<div class="box"><div class="head">Viewing articles in {:category_name}</div></div>
+[/block: manage_row_top]
 
-			</div>
-		</div>
-		<div class="box">
-			<div class="body group">
-			<form class="gol-form" method="post" action="admin.php?module=articles">
-			<button type="submit" formaction="admin.php?module=articles&view=Edit&article_id={:article_id}">Edit</button>
-			<button type="submit" name="act" value="Delete" formaction="admin.php?module=articles&article_id={:article_id}{:inactive}">Delete</button>
-			</form>
-			</div>
-		</div>
+[block: manage_row]
+<div class="box">
+	<div class="subhead"><strong><a href="{:article_link}">{:title}</a></strong></div>
+	<div class="body group">
+		<form method="post" role="form">
+			By {:username} created {:date} <br />
+			<button type="submit" formaction="{:formaction}">View</button>
+			{:delete_button}
+		</form>
+	</div>
+</div>
 [/block: manage_row]
 
 [block: manage_bottom]

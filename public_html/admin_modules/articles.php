@@ -117,11 +117,11 @@ if (isset($_GET['view']))
 			$lock_button = '';
 			if ($article['locked'] == 0)
 			{
-				$lock_button = '<a class="button_link fleft" href="/admin.php?module=articles&view=Edit&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
+				$lock_button = '<a class="button fleft" href="/admin.php?module=articles&view=Edit&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
 			}
 			else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 			{
-				$lock_button = '<a class="button_link fleft" href="/admin.php?module=articles&view=Edit&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
+				$lock_button = '<a class="button fleft" href="/admin.php?module=articles&view=Edit&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
 			}
 			$templating->set('lock_button', $lock_button);
 
@@ -313,20 +313,25 @@ if (isset($_GET['view']))
 			{
 				$active = 0;
 				$paginate_link = "admin.php?module=articles&view=manage&category=inactive&";
-				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.author_id, a.title, a.tagline, a.date, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 0 AND `admin_review` = 0 AND `draft` = 0 AND `submitted_unapproved` = 0";
+				$category_name = 'Inactive Articles';
 			}
 
 			else if ($_GET['category'] == 'all')
 			{
 				$active = 1;
 				$paginate_link = "admin.php?module=articles&view=manage&category=all&";
-				$article_query = "SELECT a.article_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.views, u.username FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.author_id, a.title, a.tagline, a.date, u.username FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT COUNT(`article_id`) FROM `articles`";
+				$category_name = 'All Articles';
 			}
 
 			// count how many there is in total
 			$total = $dbl->run($count_query)->fetchOne();
+
+			$templating->block('manage_row_top');
+			$templating->set('category_name', $category_name);
 
 			if ($total == 0)
 			{
@@ -353,30 +358,35 @@ if (isset($_GET['view']))
 						$inactive = '&inactive=1';
 					
 					}
-					$templating->set('inactive', $inactive);
 
-					// sort out the categories (tags)
-					$categories_list = '';
-					$cat_res = $dbl->run("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? LIMIT 4", array($article['article_id']))->fetch_all();
-					foreach ($cat_res as $get_categories)
-					{
-						$categories_list .= " <a href=\"/articles/category/{$get_categories['category_id']}\"><span class=\"label label-info\">{$get_categories['category_name']}</span></a> ";
-					}
-
-					if (!empty($categories_list))
-					{
-						$categories_list = '<p class="small muted">In: ' . $categories_list . '</p>';
-					}
-					$templating->set('categories_list', $categories_list);
+					$formaction = url.'admin.php?module=articles&view=Edit&aid='.$article['article_id'];
+					$delete_action = url.'admin.php?module=articles&article_id='.$article['article_id'].$inactive;
 
 					$templating->set('title', $article['title']);
-					$templating->set('username', $article['username']);
+
+					if ($article['author_id'] == 0)
+					{
+						if (empty($article['guest_username']))
+						{
+							$username = 'Guest';
+						}
+		
+						else
+						{
+							$username = $article['guest_username'];
+						}
+					}
+		
+					else
+					{
+						$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
+					}
+
+					$templating->set('username', $username);
 					$templating->set('date', $date);
-					$templating->set('text', $bbcode->parse_bbcode($article['tagline']));
-					$templating->set('article_id', $article['article_id']);
-					$templating->set('comment_count', $article['comment_count']);
-					$templating->set('views', $article['views']);
 					$templating->set('article_link', core::nice_title($article['title']) . '.' . $article['article_id']);
+					$templating->set('formaction', $formaction);
+					$templating->set('delete_button', '<button type="submit" name="act" value="Delete" formaction="'.$delete_action.'">Delete</button>');
 				}
 
 				$templating->block('manage_bottom');
@@ -399,48 +409,66 @@ if (isset($_GET['view']))
 			}
 
 			// count how many there is in total
-			$total_pages = $dbl->run("SELECT COUNT(`article_id`) FROM `articles`")->fetchOne();
+			$total_pages = $dbl->run("SELECT COUNT(c.article_id) FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id WHERE c.category_id = ? AND a.active = 1", array($_GET['category_id']))->fetchOne();
 
-			// sort out the pagination link
-			$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=articles&view=manage&category_id={$_GET['category_id']}&", $page);
+			$category_name = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['category_id']))->fetchOne();
 
-			$article_get = $dbl->run("SELECT c.article_id, a.author_id, a.title, a.tagline, a.text, a.date, a.comment_count, a.guest_username, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start))->fetch_all();
+			$templating->block('manage_row_top');
+			$templating->set('category_name', $category_name);
 
-			foreach ($article_get as $article)
+			if ($total_pages == 0)
 			{
-				// make date human readable
-				$date = $core->human_date($article['date']);
-
-				// get the article row template
-				$templating->block('manage_row');
-				$templating->set('inactive', '');
-
-				// sort out the categories (tags)
-				$categories_list = '';
-				$cat_res = $dbl->run("SELECT c.`category_name`, c.`category_id` FROM `articles_categorys` c INNER JOIN `article_category_reference` r ON c.category_id = r.category_id WHERE r.article_id = ? LIMIT 4", array($article['article_id']))->fetch_all();
-				foreach ($cat_res as $get_categories)
-				{
-					$categories_list .= " <a href=\"/articles/category/{$get_categories['category_id']}\"><span class=\"label label-info\">{$get_categories['category_name']}</span></a> ";
-				}
-
-				if (!empty($categories_list))
-				{
-					$categories_list = '<p class="small muted">In: ' . $categories_list . '</p>';
-				}
-				$templating->set('categories_list', $categories_list);
-
-				$templating->set('title', $article['title']);
-				$templating->set('username', $article['username']);
-				$templating->set('date', $date);
-				$templating->set('text', $bbcode->parse_bbcode($article['tagline']));
-				$templating->set('article_id', $article['article_id']);
-				$templating->set('comment_count', $article['comment_count']);
-				$templating->set('views', $article['views']);
-				$templating->set('article_link', core::nice_title($article['title']) . '.' . $article['article_id']);
+				$core->message('Category empty!');
 			}
 
-			$templating->block('manage_bottom');
-			$templating->set('pagination', $pagination);
+			else
+			{
+				// sort out the pagination link
+				$pagination = $core->pagination_link(9, $total_pages, "admin.php?module=articles&view=manage&category_id={$_GET['category_id']}&", $page);
+
+				$article_get = $dbl->run("SELECT c.article_id, a.author_id, a.title, a.tagline, a.date, a.guest_username, a.show_in_menu, a.views, u.username FROM `article_category_reference` c JOIN `articles` a ON a.article_id = c.article_id LEFT JOIN `users` u on a.author_id = u.user_id WHERE c.category_id = ? AND a.active = 1 ORDER BY a.`date` DESC LIMIT ?, 9", array($_GET['category_id'], $core->start))->fetch_all();
+
+				foreach ($article_get as $article)
+				{
+					// make date human readable
+					$date = $core->human_date($article['date']);
+
+					// get the article row template
+					$templating->block('manage_row');
+
+					$formaction = url.'admin.php?module=articles&view=Edit&aid='.$article['article_id'];
+					$delete_action = url.'admin.php?module=articles&article_id='.$article['article_id'];
+
+					$templating->set('title', $article['title']);
+
+					if ($article['author_id'] == 0)
+					{
+						if (empty($article['guest_username']))
+						{
+							$username = 'Guest';
+						}
+		
+						else
+						{
+							$username = $article['guest_username'];
+						}
+					}
+		
+					else
+					{
+						$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
+					}
+
+					$templating->set('username', $username);
+					$templating->set('date', $date);
+					$templating->set('article_link', core::nice_title($article['title']) . '.' . $article['article_id']);
+					$templating->set('formaction', $formaction);
+					$templating->set('delete_button', '<button type="submit" name="act" value="Delete" formaction="'.$delete_action.'">Delete</button>');
+				}
+
+				$templating->block('manage_bottom');
+				$templating->set('pagination', $pagination);
+			}
 		}
 	}
 
@@ -460,7 +488,7 @@ if (isset($_GET['view']))
 }
 
 // this section will load the correct module for what action has been requested
-else if (isset($_POST['act']))
+if (isset($_POST['act']))
 {
 	/*
 
@@ -576,7 +604,7 @@ else if (isset($_POST['act']))
 		}
 		else
 		{
-			$post_page = $return_page = "/admin.php?module=articles&article_id={$_GET['article_id']}";
+			$post_page = $return_page = "/admin.php?module=articles&view=manage";
 		}
 
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
@@ -589,17 +617,18 @@ else if (isset($_POST['act']))
 				$core->message("WARNING: You are about to delete a live article!", 1);
 			}
 
-			$core->yes_no('Are you sure you want to delete that article?', $post_page, "Delete");
+			$core->confirmation(['title' => 'Are you sure you want to delete that article?', 'text' => 'This cannot be undone!', 'action_url' => $post_page, 'act' => 'Delete', 'act_2_name' => 'article_id', 'act_2_value' => $_GET['article_id']]);
 		}
 
 		else if (isset($_POST['no']))
 		{
 			header("Location: $return_page");
+			die();
 		}
 
 		else if (isset($_POST['yes']))
 		{
-			if (!is_numeric($_GET['article_id']))
+			if (!is_numeric($_POST['article_id']))
 			{
 				$core->message('That is not a correct id!');
 			}
@@ -607,7 +636,7 @@ else if (isset($_POST['act']))
 			else
 			{
 				// check post exists
-				$check = $dbl->run("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image' FROM `articles` WHERE `article_id` = ?", array($_GET['article_id']))->fetch();
+				$check = $dbl->run("SELECT `article_id`, `date`, `author_id`, `title`, 'tagline_image' FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
 				if (!$check)
 				{
@@ -620,6 +649,7 @@ else if (isset($_POST['act']))
 					if ($check['author_id'] == 1 && $_SESSION['user_id'] != 1)
 					{
 						header("Location: $return_page");
+						die();
 					}
 
 					else
@@ -629,6 +659,7 @@ else if (isset($_POST['act']))
 						$_SESSION['message'] = 'deleted';
 						$_SESSION['message_extra'] = 'article';
 						header("Location: $return_page");
+						die();
 					}
 				}
 			}

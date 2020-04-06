@@ -171,11 +171,11 @@ else if (isset($_GET['aid']))
 	$lock_button = '';
 	if ($article['locked'] == 0)
 	{
-		$lock_button = '<a class="button_link fleft" href="'.$core->config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
+		$lock_button = '<a class="button fleft" href="'.$core->config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&lock=1">Lock For Editing</a>';
 	}
 	else if ($article['locked'] == 1 && $article['locked_by'] == $_SESSION['user_id'])
 	{
-		$lock_button = '<a class="button_link fleft" href="'.$core->config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
+		$lock_button = '<a class="button fleft" href="'.$core->config('website_url').'admin.php?module=articles&view=Submitted&aid=' . $article['article_id'] . '&unlock=1">Unlock Article For Others</a>';
 	}
 	$templating->set('lock_button', $lock_button);
 

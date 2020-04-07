@@ -221,7 +221,7 @@ class bbcode
 		$text = preg_replace_callback("/\[img\](.+?)\[\/img\]/is",
 		function($matches)
 		{
-			return "<a data-fancybox=\"images\" rel=\"group\" href=\"".$matches[1]."\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a data-fancybox rel=\"group\" href=\"".$matches[1]."\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
 		},
 		$text);
 		

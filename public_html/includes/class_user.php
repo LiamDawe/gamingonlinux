@@ -54,6 +54,20 @@ class user
 		$this->blocked_homepage_tags();
 	}
 
+	function getcookie($name) {
+		$cookies = [];
+		$headers = headers_list();
+		// see http://tools.ietf.org/html/rfc6265#section-4.1.1
+		foreach($headers as $header) {
+			if (strpos($header, 'Set-Cookie: ') === 0) {
+				$value = str_replace('&', urlencode('&'), substr($header, 12));
+				parse_str(current(explode(';', $value, 1)), $pair);
+				$cookies = array_merge_recursive($cookies, $pair);
+			}
+		}
+		return $cookies[$name];
+	}
+
 	// check their session is valid and register guest session if needed
 	function check_session()
 	{
@@ -89,7 +103,7 @@ class user
 		$_SESSION['user_id'] = 0;
 		$_SESSION['per-page'] = $this->core->config('default-comments-per-page');
 		$_SESSION['articles-per-page'] = 15;
-		$this->user_details = ['theme' => 'default', 'timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gallery' => NULL];
+		$this->user_details = ['timezone' => 'UTC', 'single_article_page' => 0, 'user_id' => 0, 'forum_type' => 'normal', 'avatar_gallery' => NULL];
 	}
 
 	// normal login form
@@ -351,7 +365,7 @@ class user
 
 		// keeping a log of logins, to review at anytime
 		// TODO: need to implement user reviewing login history, would need to add login time for that
-		$this->db->run("INSERT INTO `saved_sessions` SET `user_id` = ?, `lookup` = ?, `validator` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $lookup, hash('sha256', $validator), $user_agent, $device_id, date("Y-m-d"), $this->expires_date->format('Y-m-d H:i:s')));
+		$this->db->run("INSERT INTO `saved_sessions` SET `uuid` = UUID(), `user_id` = ?, `lookup` = ?, `validator` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $lookup, hash('sha256', $validator), $user_agent, $device_id, date("Y-m-d"), $this->expires_date->format('Y-m-d H:i:s')));
 
 		$this->register_session();
 	}
@@ -381,28 +395,34 @@ class user
 					$lookup = base64_encode(random_bytes(9));
 					$validator = base64_encode(random_bytes(18));
 
-					$update_session_sql = "UPDATE
-					`saved_sessions`
-					SET
-					`lookup` = ?,
-					`validator` = ?,
-					`expires` = ?,
-					`date` = ?
-					WHERE
-					`id` = ? AND `user_id` = ?";
-					$update_session_db = $this->db->run($update_session_sql, array($lookup, hash('sha256', $validator), $this->expires_date->format('Y-m-d H:i:s'), date("Y-m-d"), $session_check['id'], $session_check['user_id']));
-
-					$check_update = $update_session_db->rowcount();
-
-					// database was updated, so we can update the cookie
-					if($check_update == 1)
+					if (isset($_SERVER['HTTP_USER_AGENT']))
 					{
-						$secure = 0; // allows cookies for localhost dev env
-						if (!empty($this->core->config('cookie_domain')))
-						{
-							$secure = 1;
-						}
-						setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
+						$user_agent = $_SERVER['HTTP_USER_AGENT'];
+					}
+					else
+					{
+						$user_agent = 'empty';
+					}
+
+					$this->db->run("INSERT INTO `saved_sessions` SET `uuid` = UUID(), `user_id` = ?, `lookup` = ?, `validator` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $lookup, hash('sha256', $validator), $user_agent, $session_check['device-id'], date("Y-m-d"), $this->expires_date->format('Y-m-d H:i:s')));
+
+					$secure = 0; // allows cookies for localhost dev env
+					if (!empty($this->core->config('cookie_domain')))
+					{
+						$secure = 1;
+					}
+
+					// TESTING FOR COOKIE NOT UPDATING
+					if (headers_sent())
+					{
+						error_log("Headers were already sent - setcookie won't work." . PHP_EOL . print_r(getallheaders(), true) . PHP_EOL . core::current_page_url());
+					}
+
+					setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
+
+					if ($this->user_details['user_id'] == 1)
+					{
+						error_log('liam login cookie should be - ' . $lookup . '.' . $validator . ' (with hash - '.hash('sha256', $validator).') - cookie actually was being set to: ' . $this->getcookie('gol_session'));
 					}
 
 					$this->register_session();
@@ -524,38 +544,28 @@ class user
 	// helper function to display the correct avatar, for the given user data
 	public function sort_avatar($data)
 	{
-		$your_theme = 'default';
-		if (isset($this->user_details['theme']))
-		{
-			$your_theme = $this->user_details['theme']; // should always be set, but somehow sometimes it isn't *shrugs* couldn't figure out why
-		}
-
-		if ($your_theme == 'dark')
-		{
-			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar_dark.png";
-		}
-		else if ($your_theme == 'default')
-		{
-			$default_avatar = $this->core->config('website_url') . "uploads/avatars/no_avatar.png";
-		}
-
-		$avatar = $default_avatar;
+		$avatar_return = NULL;
 
 		if (!empty($data))
 		{
 			if ($data['avatar_gallery'] != NULL)
 			{
-				$avatar = $this->core->config('website_url') . "uploads/avatars/gallery/{$data['avatar_gallery']}.png";
+				$avatar = "uploads/avatars/gallery/{$data['avatar_gallery']}.png";
 			}
 
 			// either uploaded or linked an avatar
 			else if (!empty($data['avatar']) && $data['avatar_uploaded'] == 1)
 			{
-				$avatar = $this->core->config('website_url') . "uploads/avatars/{$data['avatar']}";
+				$avatar =  "uploads/avatars/{$data['avatar']}";
+			}
+
+			if (isset($avatar) && file_exists($this->core->config('path') . $avatar))
+			{
+				$avatar_return = '<img src="'.$this->core->config('website_url').$avatar.'" alt=""/>';
 			}
 		}
 
-		return $avatar;
+		return $avatar_return;
 	}
 
 	// give them a cake icon if they have been here for x years
@@ -774,15 +784,30 @@ class user
 			$check_current_sub = $this->db->run("SELECT `$sql_id_field`, `emails`, `send_email` FROM `$sql_table` WHERE `user_id` = ? AND `$sql_id_field` = ?", array($_SESSION['user_id'], $data_id))->fetch();
 
 			$subscribe_check['auto_subscribe'] = '';
-			if ($check_current_sub || $_SESSION['auto_subscribe'] == 1)
+			$subscribe_check['emails'] = '';
+
+			// if their overall session has it on, turn it on to begin with
+			if ($_SESSION['auto_subscribe'] == 1)
 			{
 				$subscribe_check['auto_subscribe'] = 'checked';
 			}
-
-			$subscribe_check['emails'] = '';
-			if (isset($check_current_sub) && $check_current_sub['emails'] == 1 || !$check_current_sub && $_SESSION['auto_subscribe_email'] == 1)
+			if ($_SESSION['auto_subscribe_email'] == 1)
 			{
 				$subscribe_check['emails'] = 'selected';
+			}
+
+			// now if they're subbed to this one already, change as needed
+			if ($check_current_sub)
+			{
+				$subscribe_check['auto_subscribe'] = 'checked';
+				if ($check_current_sub['emails'] == 0)
+				{
+					$subscribe_check['emails'] = '';
+				}
+				if ($check_current_sub['emails'] == 1)
+				{
+					$subscribe_check['emails'] = 'selected';
+				}
 			}
 
 			return $subscribe_check;

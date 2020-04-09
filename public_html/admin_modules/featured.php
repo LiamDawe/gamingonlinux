@@ -111,7 +111,7 @@ if (isset($_POST['act']))
 		{
 			// update cache
 			$new_featured_total = $core->config('total_featured') + 1;
-			core::$redis->set('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
+			$core->set_dbcache('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
 
 			// note who deleted it
 			$core->new_admin_note(array('completed' => 1, 'content' => ' added a new featured article.'));

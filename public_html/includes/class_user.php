@@ -379,7 +379,7 @@ class user
 			{
 				$cookie_info = explode('.', $_COOKIE['gol_session']);
 
-				$session_check = $this->db->run("SELECT `uuid`, `device-id`, `user_id`,`validator` FROM `saved_sessions` WHERE `lookup` = ? AND `expires` > NOW()", array($cookie_info[0]))->fetch();	
+				$session_check = $this->db->run("SELECT `device-id`, `user_id`,`validator` FROM `saved_sessions` WHERE `lookup` = ? AND `expires` > NOW()", array($cookie_info[0]))->fetch();	
 
 				if ($session_check && hash_equals($session_check['validator'], hash('sha256', $cookie_info[1])))
 				{

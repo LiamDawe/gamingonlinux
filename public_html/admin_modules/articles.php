@@ -384,7 +384,7 @@ if (isset($_GET['view']))
 
 					$templating->set('username', $username);
 					$templating->set('date', $date);
-					$templating->set('article_link', core::nice_title($article['title']) . '.' . $article['article_id']);
+					$templating->set('article_link', $article_class->get_link($article['article_id']));
 					$templating->set('formaction', $formaction);
 					$templating->set('delete_button', '<button type="submit" name="act" value="Delete" formaction="'.$delete_action.'">Delete</button>');
 				}
@@ -461,7 +461,7 @@ if (isset($_GET['view']))
 
 					$templating->set('username', $username);
 					$templating->set('date', $date);
-					$templating->set('article_link', core::nice_title($article['title']) . '.' . $article['article_id']);
+					$templating->set('article_link', $article_class->get_link($article['article_id']));
 					$templating->set('formaction', $formaction);
 					$templating->set('delete_button', '<button type="submit" name="act" value="Delete" formaction="'.$delete_action.'">Delete</button>');
 				}

@@ -727,7 +727,8 @@ jQuery(document).ready(function()
 	// article media uploader (the bottom form)
 	$('#photoimg').off('click').on('change', function()
 	{
-		$("#imageform").ajaxForm({
+		$("#imageform").ajaxForm(
+		{
 		beforeSubmit:function(){
 		    $("#imageloadstatus").show();
 		     $("#imageloadbutton").hide();
@@ -811,7 +812,9 @@ jQuery(document).ready(function()
     }).submit();
 	});
 
-    $(".like-button").show();
+	/* like button */
+	// container for like button - only shown if user has JS turned on
+    $(".lb-container").show();
 
 	$(document).on('click', '.likebutton', function()
 	{

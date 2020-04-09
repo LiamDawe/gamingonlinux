@@ -73,10 +73,12 @@ for($i=0; $i<count($temp)/11; $i++)
 
 $user_id_list = array();
 
+$ignore_emails = array('support@patreon.com', 'payments@humblebundle.com', 'liamdawe@gmail.com', 'contact@gamingonlinux.com');
+
 foreach ($returned_array as $payment)
 {
 	// ignore patreon
-	if (isset($payment['email']) && $payment['email'] != 'support@patreon.com' && $payment['email'] != 'payments@humblebundle.com')
+	if (isset($payment['email']) && !empty($payment['email']) && !in_array($payment['email'], $ignore_emails))
 	{
 		echo '<pre>';
 		print_r($payment);
@@ -89,11 +91,12 @@ foreach ($returned_array as $payment)
 			if ($payment['amt'] >= 3)
 			{
 				$supporter_status = 1;
-				$total_months = round($payment['amt'] / 3);
+				$total_months = floor($payment['amt'] / 3);
 			}
 			if ($payment['amt'] >= 5.50)
 			{
 				$supporter_plus = 1;
+				$total_plus_months = floor($payment['amt'] / 5.50);
 			}
 		}
 		if ($payment['currency_code'] == 'USD')
@@ -101,11 +104,12 @@ foreach ($returned_array as $payment)
 			if ($payment['amt'] >= 4)
 			{
 				$supporter_status = 1;
-				$total_months = round($payment['amt'] / 4);
+				$total_months = floor($payment['amt'] / 4);
 			}
 			if ($payment['amt'] >= 7)
 			{
 				$supporter_plus = 1;
+				$total_plus_months = floor($payment['amt'] / 7);
 			}
 		}
 		if ($payment['currency_code'] == 'EUR')
@@ -113,11 +117,12 @@ foreach ($returned_array as $payment)
 			if ($payment['amt'] >= 3.50)
 			{
 				$supporter_status = 1;
-				$total_months = round($payment['amt'] / 3.50);
+				$total_months = floor($payment['amt'] / 3.50);
 			}
 			if ($payment['amt'] >= 6.20)
 			{
 				$supporter_plus = 1;
+				$total_plus_months = floor($payment['amt'] / 6.20);
 			}
 		}
 
@@ -150,7 +155,7 @@ foreach ($returned_array as $payment)
 				{
 					$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 6", [$user_info['user_id']]);
 
-					//echo "\nGiven Supporter status\n\n";
+					echo "\nGiven Supporter status\n\n";
 				}
 
 				// they're not currently set as a supporter plus, give them the status
@@ -159,22 +164,22 @@ foreach ($returned_array as $payment)
 					if (!in_array(9, $their_groups[$user_info['user_id']]))
 					{
 						$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 9", [$user_info['user_id']]);
+
+						echo "\nGiven Supporter Plus status\n\n";
 					}
 
-					if ($user_info['supporter_plus_end '] == NULL || $user_info['supporter_plus_end '] < $plus_end_date)
+					if ($user_info['supporter_plus_end'] == NULL || $user_info['supporter_plus_end'] < $plus_end_date)
 					{
 						$paypal_sql_text[] = "`supporter_plus_end` = ?";
 						$paypal_sql_data[] = $plus_end_date;
 					}
-
-					//echo "\nGiven Supporter Plus status\n\n";
 				}
 
 				// payment wasn't enough for Supporter Plus, remove it if time is up
 				if ($supporter_plus == 0)
 				{
 					$remove_plus = 0;
-					if ($user_info['supporter_plus_end '] != NULL)
+					if ($user_info['supporter_plus_end'] != NULL)
 					{
 						$plus_expires = new DateTime($user_info['supporter_plus_end']);
 						$now = new DateTime();
@@ -193,7 +198,7 @@ foreach ($returned_array as $payment)
 					{
 						$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ? AND `group_id` = 9", [$user_info['user_id']]);
 
-						//echo "\Removed Supporter Plus status\n\n";
+						echo "\nRemoved Supporter Plus status\n\n";
 					}
 				}
 
@@ -225,14 +230,22 @@ foreach ($returned_array as $payment)
 
 				if ($user_info['supporter_last_paid_date'] < $last_paid_date)
 				{
-					$dbl->run("UPDATE `users` SET `supporter_last_paid_date` = ? WHERE `user_id` = ?", array($last_paid_date, $user_info['user_id']));
-
 					// now deal with people topping it up, we need to add more months to their existing sub to extend it (not replace it if they paid a lot before)
 					// say they paid 10 months, now 2 months in they paid another 1 month, need to add it on top
 					if ($user_info['supporter_end_date'] > $end_date)
 					{
 						$new_end_date = date('Y-m-d H:i:s', strtotime("+".$total_months." months", strtotime($user_info['supporter_end_date'])));
 						$dbl->run("UPDATE `users` SET `supporter_end_date` = ? WHERE `user_id` = ?", array($new_end_date, $user_info['user_id']));
+
+						echo "\nExtended Supporter end date\n";
+					}
+
+					if ($supporter_plus == 1 && $user_info['supporter_plus_end'] > $plus_end_date)
+					{
+						$new_plus_end_date = date('Y-m-d H:i:s', strtotime("+".$total_plus_months." months", strtotime($user_info['supporter_plus_end'])));
+						$dbl->run("UPDATE `users` SET `supporter_plus_end` = ? WHERE `user_id` = ?", array($new_plus_end_date, $user_info['user_id']));
+
+						echo "\nExtended Supporter Plus+ end date\n";
 					}
 				}
 			}

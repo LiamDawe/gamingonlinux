@@ -368,12 +368,13 @@ else
 					$usercp = "&amp;usercp";
 				}
 
-				$core->yes_no('Are you sure you want to delete that block?', "admin.php?module=blocks&amp;block_id={$_POST['block_id']}{$usercp}", "Delete");
+				$core->confirmation(['title' => 'Are you sure you want to delete that block?', 'text' => 'This cannot be undone!', 'action_url' => "admin.php?module=blocks&amp;block_id={$_POST['block_id']}{$usercp}", 'act' => "Delete"]);
 			}
 
 			else if (isset($_POST['no']))
 			{
 				header("Location: admin.php?module=blocks&view=manage");
+				die();
 			}
 
 			else if (isset($_POST['yes']))
@@ -409,13 +410,16 @@ else
 						if (!isset($_GET['usercp']))
 						{
 							$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
-							core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
+							$core->set_dbcache('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 						}
 
 						// note who did it
 						$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a website sidebar block named: '.$check_res['block_name'].'.'));
 
-						$core->message('That block has now been deleted! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=manage">Manage another block</a>?');
+						$_SESSION['message'] = 'deleted';
+						$_SESSION['message_extra'] = 'block';
+						header("Location: admin.php?module=blocks&view=manage");
+						die();
 					}
 				}
 			}

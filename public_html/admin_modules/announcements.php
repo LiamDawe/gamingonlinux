@@ -125,7 +125,7 @@ if (isset($_POST['act']))
 
 		$dbl->run("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ?", array($text, $_SESSION['user_id'], $user_groups, $_POST['type'], $modules, $dismiss));
 
-		core::$redis->delete('index_announcements');
+		$core->delete_dbcache('index_announcements');
 
 		// note who did it
 		$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website announcement bar.'));
@@ -173,7 +173,7 @@ if (isset($_POST['act']))
 
 		$dbl->run("UPDATE `announcements` SET `text` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ? WHERE `id` = ?", array($text, $user_groups, $_POST['type'], $modules, $dismiss, $_POST['id']));
 
-		core::$redis->delete('index_announcements');
+		$core->delete_dbcache('index_announcements');
 
 		// note who did it
 		$core->new_admin_note(array('completed' => 1, 'content' => ' edited a website announcement bar.'));
@@ -188,7 +188,7 @@ if (isset($_POST['act']))
 	{
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
-			$core->yes_no('Are you sure you want to delete that announcement?', '/admin.php?module=announcements&id='.$_POST['id'], "delete");
+			$core->confirmation(['title' => 'Are you sure you want to delete that announcement?', 'text' => 'This cannot be undone!', 'action_url' => '/admin.php?module=announcements&id='.$_POST['id'], 'act' => "delete"]);
 		}
 		else if (isset($_POST['no']))
 		{
@@ -198,7 +198,7 @@ if (isset($_POST['act']))
 		{
 			$dbl->run("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
 
-			core::$redis->delete('index_announcements');
+			$core->delete_dbcache('index_announcements');
 
 			// note who did it
 			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a website announcement bar.'));

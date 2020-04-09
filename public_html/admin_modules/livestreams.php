@@ -275,6 +275,7 @@ if (isset($_POST['act']))
 		$core->new_admin_note(array('completed' => 1, 'content' => ' edited a livestream event on the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 		header("Location: /admin.php?module=livestreams&view=manage&message=edited");
+		die();
 	}
 	if ($_POST['act'] == 'Delete')
 	{
@@ -282,22 +283,13 @@ if (isset($_POST['act']))
 		{
 			$title = $dbl->run("SELECT `title` FROM `livestreams` WHERE `row_id` = ?", array($_POST['id']))->fetchOne();
 
-			$return = '';
-			if (isset($_GET['return']) && !empty($_GET['return']))
-			{
-				$return = $_GET['return'];
-			}
-
-			$core->yes_no('Are you sure you want to delete ' . $title . ' from the livestream event list?', "admin.php?module=livestreams&id={$_POST['id']}", "Delete");
+			$core->confirmation(['title' => 'Are you sure you want to delete ' . $title . ' from the livestream event list?', 'text' => 'This cannot be undone!', 'action_url' => "admin.php?module=livestreams&id={$_POST['id']}", 'act' => "Delete"]);
 		}
 
 		else if (isset($_POST['no']))
 		{
-			if (isset($_GET['return']) && !empty($_GET['return']))
-			{
-				header("Location: /index.php?module=livestreams");
-				die();
-			}
+			header("Location: /admin.php?module=livestreams&view=manage");
+			die();
 		}
 
 		else if (isset($_POST['yes']))
@@ -308,7 +300,10 @@ if (isset($_POST['act']))
 
 			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a livestream event from the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
+			$_SESSION['message'] = 'deleted';
+			$_SESSION['message_extra'] = 'livestream';
 			header("Location: /admin.php?module=livestreams&view=manage&message=deleted");
+			die();
 		}
 	}
 
@@ -362,6 +357,7 @@ if (isset($_POST['act']))
 			$core->new_admin_note(array('completed' => 1, 'content' => ' denied a new livestream submission event on the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 			header("Location: /admin.php?module=livestreams&view=submitted&message=denied");
+			die();
 		}
 	}
 
@@ -419,5 +415,6 @@ if (isset($_POST['act']))
 		$core->new_admin_note(array('completed' => 1, 'content' => ' approved a new livestream submission event on the <a href="/index.php?module=livestreams">schedule page</a>.'));
 
 		header("Location: /admin.php?module=livestreams&view=submitted&message=approved");
+		die();
 	}
 }

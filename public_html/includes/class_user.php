@@ -379,7 +379,7 @@ class user
 			{
 				$cookie_info = explode('.', $_COOKIE['gol_session']);
 
-				$session_check = $this->db->run("SELECT `id`, `device-id`, `user_id`,`validator` FROM `saved_sessions` WHERE `lookup` = ? AND `expires` > NOW()", array($cookie_info[0]))->fetch();	
+				$session_check = $this->db->run("SELECT `uuid`, `device-id`, `user_id`,`validator` FROM `saved_sessions` WHERE `lookup` = ? AND `expires` > NOW()", array($cookie_info[0]))->fetch();	
 
 				if ($session_check && hash_equals($session_check['validator'], hash('sha256', $cookie_info[1])))
 				{
@@ -456,11 +456,11 @@ class user
 			{
 				$cookie_info = explode('.', $_COOKIE['gol_session']);
 
-				$checker = $this->db->run("SELECT `id`, `validator` FROM `saved_sessions` WHERE `user_id` = ? AND `lookup` = ?", array($_SESSION['user_id'], $cookie_info[0]))->fetch();
+				$checker = $this->db->run("SELECT `uuid`, `validator` FROM `saved_sessions` WHERE `user_id` = ? AND `lookup` = ?", array($_SESSION['user_id'], $cookie_info[0]))->fetch();
 
 				if ($checker && hash_equals($checker['validator'], hash('sha256', $cookie_info[1])))
 				{
-					$this->db->run("DELETE FROM `saved_sessions` WHERE `id` = ?", array($checker['id']));
+					$this->db->run("DELETE FROM `saved_sessions` WHERE `uuid` = ? AND `user_id` = ?", array($checker['uuid'], $_SESSION['user_id']));
 				}
 			}
 		}

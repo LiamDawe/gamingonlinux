@@ -100,6 +100,18 @@ class core
 		}	
 	}
 
+	public function delete_dbcache($key)
+	{
+		if (!isset(core::$redis))
+		{
+			return false;
+		}
+		else
+		{
+			return core::$redis->delete($key);
+		}		
+	}
+
 	// check in_array for a multidimensional array
 	public static function in_array_r($needle, $haystack) 
 	{
@@ -245,9 +257,9 @@ class core
 
 		if ($get_config === false) // there's no cache
 		{
-			$get_config = $this->dbl->run("SELECT `data_value` FROM config WHERE `data_key` = ?", array($key))->fetchOne();
+				$get_config = $this->dbl->run("SELECT `data_value` FROM config WHERE `data_key` = ?", array($key))->fetchOne();
 
-			$this->set_dbcache('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
+				$this->set_dbcache('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
 		}
 
 		// return the requested key with the value in place
@@ -345,54 +357,38 @@ class core
 		$pagination = "";
 		if($lastpage > 1)
 		{
-			$pagination .= "<div class=\"fnone\"><ul class=\"pagination\">";
+			$pagination .= "<div class=\"fnone pagination\">";
 
 			//previous button
 			if ($page > 1)
 			{
-				$pagination.= "<li class=\"previouspage\"><a data-page=\"{$prev}\" href=\"{$targetpage}page=$prev$extra\">&laquo;</a></li>";
+				$pagination.= "<a class=\"live\" data-page=\"{$prev}\" href=\"{$targetpage}page=$prev$extra\">&laquo;</a>";
 			}
 
 			// current page
-			$pagination .= "<li class=\"active\"><a href=\"#\">$page</a></li>";
+			$pagination .= "<a class=\"active\" href=\"#\">$page</a>";
 
 			// seperator
-			$pagination .= "<li class=\"pagination-disabled\"><a href=\"#\">/</a></li>";
+			$pagination .= "<a class=\"seperator\" href=\"#\">/</a>";
 
 			// sort out last page link, no link if on last page
 			if ($page == $lastpage)
 			{
-				$pagination .= "<li class=\"pagination-disabled\"><a href=\"#\">{$lastpage}</a></li>";
+				$pagination .= "<a class=\"live\" href=\"#\">{$lastpage}</a>";
 			}
 
 			else
 			{
-				$pagination .= "<li><a data-page=\"{$lastpage}\" href=\"{$targetpage}page={$lastpage}$extra\">{$lastpage}</a></li>";
+				$pagination .= "<a class=\"live\" data-page=\"{$lastpage}\" href=\"{$targetpage}page={$lastpage}$extra\">{$lastpage}</a>";
 			}
 
 			// next button
 			if ($page < $lastpage)
 			{
-				$pagination .= "<li class=\"nextpage\"><a data-page=\"{$next}\" href=\"{$targetpage}page=$next$extra\">&raquo;</a></li>";
+				$pagination .= "<a class=\"live\" data-page=\"{$next}\" href=\"{$targetpage}page=$next$extra\">&raquo;</a>";
 			}
 
-			$pagination .= "</ul>";
-
-			$pagination .= "</div> <div class=\"fnone\">
-			<form name=\"form2\" class=\"form-inline\">
-			 &nbsp; Go to: <select class=\"wrap ays-ignore pagination\" name=\"jumpmenu\">";
-
-			for ($i = 1; $i <= $lastpage; $i++)
-			{
-				$selected = '';
-				if ($page == $i)
-				{
-					$selected = 'selected';
-				}
-				$pagination .= "<option data-page=\"{$i}\" value=\"{$targetpage}page={$i}{$extra}\" $selected>$i</option>";
-			}
-
-			$pagination .= '</select></form></div>';
+			$pagination .= '</div>';
 		}
 
 		return $pagination;
@@ -760,8 +756,6 @@ class core
 		$templating->set('limit_youtube', $this->config('limit_youtube'));
 		
 		$templating->set('editor_id', $editor['editor_id']);
-		
-		core::$editor_js[] = 'gol_editor(\''.$editor['editor_id'].'\');';
 	}
 	
 	/* For generating a bbcode editor form, options are:

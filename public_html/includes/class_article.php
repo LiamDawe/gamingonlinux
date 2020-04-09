@@ -48,15 +48,15 @@ class article
 		$tagline_image = '';
 		if (!empty($data['tagline_image']))
 		{
-			$tagline_image = "<img alt src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+			$tagline_image = "<img alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
 		}
 		if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
 		{
-			$tagline_image = "<img alt src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
+			$tagline_image = "<img alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
 		}
 		if (empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
 		{
-			$tagline_image = "<img alt src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
+			$tagline_image = "<img alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
 		}
 		return $tagline_image;
 	}
@@ -781,7 +781,7 @@ class article
 				}
 
 				// check over their email options on this new subscription
-				if ($emails == NULL)
+				if ($emails === NULL)
 				{
 					// find how they like to normally subscribe
 					$get_email_type = $this->dbl->run("SELECT `auto_subscribe_email` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
@@ -792,6 +792,7 @@ class article
 				{
 					$sql_emails = (int) $emails;
 				}
+				
 				$this->dbl->run("UPDATE `articles_subscriptions` SET `secret_key` = ?, `emails` = ?, `send_email` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $sql_emails, $sql_emails, $_SESSION['user_id'], $article_id));
 			}
 		}
@@ -1057,31 +1058,25 @@ class article
 			// get the article row template
 			$this->templating->block('article_row', 'articles');
 
+			$special_links = '';
 			if ($this->user->check_group([1,2,5]))
 			{
-				$this->templating->set('edit_link', "<p><a href=\"/admin.php?module=articles&amp;view=Edit&amp;aid={$article['article_id']}\"> <strong>Edit</strong></a>");
+				$special_links .= '<span class="article-list-special-links">';
+				$special_links .= " <a href=\"/admin.php?module=articles&amp;view=Edit&amp;aid={$article['article_id']}\"><strong>Edit</strong></a> ";
 				if ($article['show_in_menu'] == 0)
 				{
 					if ($this->core->config('total_featured') < 5)
 					{
-						$this->templating->set('editors_pick_link', " <a href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><strong>Make Editors Pick</strong></a></p>");
-					}
-					else if ($this->core->config('total_featured') == 5)
-					{
-						$this->templating->set('editors_pick_link', "");
+						$special_links .= " <a href=\"".url."index.php?module=home&amp;view=editors&amp;article_id={$article['article_id']}\"><strong>Make Editors Pick</strong></a> ";
 					}
 				}
 				else if ($article['show_in_menu'] == 1)
 				{
-					$this->templating->set('editors_pick_link', " <a href=\"/index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><strong>Remove Editors Pick</strong></a></p>");
+					$special_links .= " <a href=\"/index.php?module=home&amp;view=removeeditors&amp;article_id={$article['article_id']}\"><strong>Remove Editors Pick</strong></a> ";
 				}
+				$special_links .= '</span>';
 			}
-
-			else
-			{
-				$this->templating->set('edit_link', '');
-				$this->templating->set('editors_pick_link', '');
-			}
+			$this->templating->set('special_links', $special_links);
 
 			$this->templating->set('title', $article['title']);
 			$this->templating->set('user_id', $article['author_id']);

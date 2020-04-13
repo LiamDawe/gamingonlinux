@@ -66,7 +66,7 @@ foreach ($crowdfunders as $item)
 	$notes = '';
 	if (!empty($item['crowdfund_notes']))
 	{
-		$notes = '<br /><em><small>'.$item['crowdfund_notes'].'</small></em>';
+		$notes = '<br /><em><small>'.htmlspecialchars_decode($item['crowdfund_notes'], ENT_QUOTES).'</small></em>';
 	}
 	$templating->set('notes', $notes);
 

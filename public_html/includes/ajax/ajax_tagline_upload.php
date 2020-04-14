@@ -158,6 +158,9 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 
 		// make the thumbnail, nice and small
 		$img->fromFile($_FILES['photos2']['tmp_name'])->resize(350, null)->toFile($core->config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename);
+
+		// make the blurry placeholder for lazy loading support
+		$img->fromFile($_FILES['photos2']['tmp_name'])->resize(30, null)->blur('gaussian',5)->toFile($core->config('path') . "uploads/articles/tagline_images/temp/thumbnails/" . $imagename . '_tiny', NULL, 60);
 		
 		if (move_uploaded_file($source, $target))
 		{

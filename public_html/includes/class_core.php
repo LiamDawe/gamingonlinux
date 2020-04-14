@@ -360,6 +360,11 @@ class core
 			$pagination .= "<div class=\"fnone pagination\">";
 
 			//previous button
+			if ($page >= 3)
+			{
+				$pagination.= "<a title=\"First Page\" class=\"live\" data-page=\"{$prev}\" href=\"{$targetpage}page=1\">&laquo; 1</a>";
+			}
+
 			if ($page > 1)
 			{
 				$pagination.= "<a class=\"live\" data-page=\"{$prev}\" href=\"{$targetpage}page=$prev$extra\">&laquo;</a>";
@@ -374,7 +379,7 @@ class core
 			// sort out last page link, no link if on last page
 			if ($page == $lastpage)
 			{
-				$pagination .= "<a class=\"live\" href=\"#\">{$lastpage}</a>";
+				$pagination .= "<a class=\"active\" href=\"#\">{$lastpage}</a>";
 			}
 
 			else
@@ -649,19 +654,19 @@ class core
 			// give the image a random file name
 			$imagename = rand() . 'id' . $article_id . 'gol.' . $file_ext;
 
-			// the actual image
+			// set the main image directory
 			$source = $full_file_big;
-
-			// where to upload to
 			$target = $this->config('path') . "uploads/articles/tagline_images/" . $imagename;
 
-			// the actual image
+			// set thumbnail directory
 			$source_thumbnail = $full_file_thumbnail;
-
-			// where to upload to
 			$target_thumbnail = $this->config('path') . "uploads/articles/tagline_images/thumbnails/" . $imagename;
 
-			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail))
+			// set the tiny image directory
+			$source_tiny = $full_file_thumbnail . '_tiny';
+			$target_tiny = $this->config('path') . "uploads/articles/tagline_images/thumbnails/" . $imagename . '_tiny';			
+
+			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail) && rename($source_tiny, $target_tiny))
 			{
 				$image = $this->dbl->run("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
 
@@ -672,6 +677,7 @@ class core
 					{
 						unlink($this->config('path') . 'uploads/articles/tagline_images/' . $image['tagline_image']);
 						unlink($this->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $image['tagline_image']);
+						unlink($this->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $image['tagline_image'] . '_tiny');
 					}
 				}
 				

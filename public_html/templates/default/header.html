@@ -1,9 +1,10 @@
 [block: header]
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" {:force_theme}>
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <title>{:title} | GamingOnLinux</title>
+<script>var website_theme='light';if(document.documentElement.hasAttribute("data-theme")){website_theme=document.documentElement.getAttribute("data-theme")}else{if(localStorage.getItem("theme")){if(localStorage.getItem("theme")=="dark"){website_theme="dark"}}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){website_theme="dark"}if(website_theme=="dark"){document.documentElement.setAttribute("data-theme","dark")}}</script>
 <meta name="keywords" content="linux, steamos, gaming, linux gaming, linux games, linux game reviews, linux game news, games, reviews, interviews" />
 <meta name="description" content="{:meta_description}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +17,6 @@
 <!--JS Files-->
 <script src="{:jsstatic}/jquery-3.4.1.min.js"></script>
 <script src="{:jsstatic}/cookies.js"></script>
-<script src="{:jsstatic}/GOL/editor.min.js"></script>
 <script src="{:jsstatic}/jquery.are-you-sure.js"></script>
 <script src="{:jsstatic}/jquery.countdown.min.js"></script>
 <script src="{:jsstatic}/select2/js/select2.min.js?v=4"></script>
@@ -42,10 +42,7 @@
 <!-- Custom CSS Styles -->
 <link rel="stylesheet" href="{:jsstatic}/fancybox/jquery.fancybox.css?v=3" type="text/css" media="screen" />
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/cocoen/css/cocoen.min.css">
-<link rel="stylesheet" type="text/css" href="{:this_template}/css/shipping/editor.css?v=2.1.1" />
-<link rel="stylesheet" type="text/css" href="{:this_template}/css/shipping/content.css?v=1.3.4" />
-<link rel="stylesheet" type="text/css" href="{:this_template}/css/shipping/style.css?v=1.4.14" />
-{:dark_css}
+<link rel="stylesheet" type="text/css" href="{:this_template}/css/shipping/style.css?v=1.5.5" />
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/select2/css/select2.min.css">
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/datatables/datatables.min.css">
 <!-- Qtip2 -->
@@ -60,7 +57,7 @@
 <!-- fancybox for images -->
 <script async src="{:jsstatic}/fancybox/jquery.fancybox.min.js?v=3"></script>
 {:rss_link}
-<script async src="{:jsstatic}/GOL/header.min.js?v=1.5.53"></script>
+<script async src="{:jsstatic}/GOL/header.min.js?v=2.4"></script>
 </head>
 
 <body>

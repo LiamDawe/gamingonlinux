@@ -1,12 +1,13 @@
 [block: top]
-				<ul class="breadcrumb">
-					<li><a href="{:forum_index}">Forum</a></li>
-					<li><a href="/forum/{:forum_id}/">{:forum_name}</a></li>
-					<li class="active">{:notice} {:topic_title}</li>
-				</ul>
-				{:pagination}
-				<div id="comments-background" class="box comments group">
-				<div class="head">{:topic_title} <span class="link_button">{:subscribe_link}</span></div>
+<div class="box">
+	<ul class="breadcrumb">
+		<li><a href="{:forum_index}">Forum</a></li>
+		<li><a href="/forum/{:forum_id}/">{:forum_name}</a></li>
+		<li class="active">{:notice} {:topic_title}</li>
+	</ul>
+</div>
+<div id="comments-background" class="box comments group">
+<div class="head">{:topic_title} <span class="link_button">{:subscribe_link}</span> <div class="head-list-position head-list">{:pagination_head}</div></div>
 [/block: top]
 
 [block: poll_vote]
@@ -36,7 +37,7 @@
 						<div class="comment group">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:topic_date}</abbr>
+									{:username} {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:topic_date}</abbr>
 								</div>
 								<div class="comment-actions">
 									<ul>
@@ -72,7 +73,7 @@
 						<div class="comment group r{:post_id}">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:reply_date}</abbr>
+									{:username} {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:reply_date}</abbr>
 								</div>
 								<div class="comment-actions">
 									<ul>
@@ -121,7 +122,7 @@
 <div class="hidden_comment comment group r{:post_id}">
 	<div class="comment-meta group">
 		<div class="comment-post">
-			{:username} {:cake_icon} commented <abbr title="{:tzdate}" class="timeago">on {:reply_date}</abbr>
+			{:username} {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:reply_date}</abbr>
 		</div>
 		<div class="comment-actions">
 			<ul>

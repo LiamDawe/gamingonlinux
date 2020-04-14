@@ -637,6 +637,7 @@ margin-bottom: -3px;
 	color: #ffffff;
 	font-weight: bold;
 	padding: 7px 10px;
+	overflow: auto;
 }
 
 .head a {
@@ -1889,11 +1890,8 @@ th, td { vertical-align: top; }
     background: #474747;
     color: #ffffff;
     padding: 3px;
-    -webkit-border-radius: 3px;
-     -khtml-border-radius: 3px;
-       -moz-border-radius: 3px;
-         -o-border-radius: 3px;
-            border-radius: 3px;
+	border-radius: 3px;
+	display: inline-block;
 }
 
 div.announce:nth-of-type(odd) {background: #609FA9; margin-bottom: 7px; color: #000}

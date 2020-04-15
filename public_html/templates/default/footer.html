@@ -1,15 +1,24 @@
 [block: ckeditor]
 <script>	
-CKEDITOR.on('instanceCreated', function(e) {
-	e.editor.on('change', function(event) {
+CKEDITOR.on('instanceCreated', function(e) 
+{
+	e.editor.on('change', function(event) 
+	{
 		var textarea = event.editor.element.$;
 		$(textarea).val(event.editor.getData().trim());
 		$(textarea.form).trigger('checkform.areYouSure');
 	});
 })
+var ckeditor_skin = 'moono-lisa';
+if(localStorage.getItem("theme")){
+		if(localStorage.getItem("theme") == "dark")
+		{
+			ckeditor_skin = 'moono-dark';
+        }
+} 
 
 editor = CKEDITOR.replace( 'ckeditor_gol', {
-customConfig: '/includes/jscripts/ckeditor_config.js',
+customConfig: '/includes/jscripts/ckeditor_config.js', skin: ckeditor_skin
 });
 editor.addCommand("spoiler", {
 	exec: function(edt) {
@@ -163,7 +172,6 @@ $("#all-games-search").easyAutocomplete(all_search_options);
 <script src="{:url}includes/jscripts/sorttable.min.js"></script> 
 <script src="{:url}includes/jscripts/clipboard/clipboard.min.js"></script>
 {:ckeditor_js}
-{:editor_js}
 {:user_chart_js}
 </body>
 </html>{:debug}

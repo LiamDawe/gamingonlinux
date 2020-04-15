@@ -1893,7 +1893,7 @@ th, td { vertical-align: top; }
     color: #ffffff;
     padding: 3px;
 	border-radius: 3px;
-	display: inline-block;
+	white-space: nowrap;
 }
 
 div.announce:nth-of-type(odd) {background: #609FA9; margin-bottom: 7px; color: #000}

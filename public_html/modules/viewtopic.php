@@ -231,13 +231,15 @@ else
 
 				// sort out the pagination link
 				$pagination = $core->pagination_link($per_page, $total_replies, "/forum/topic/{$_GET['topic_id']}/", $page);
+				$pagination_head = $core->head_pagination($per_page, $total_replies, "/forum/topic/{$_GET['topic_id']}/", $page);
+
 
 				// get the template, sort out the breadcrumb
 				$templating->block('top', 'viewtopic');
-				$templating->set('pagination', $pagination);
 				$templating->set('forum_id', $topic['forum_id']);
 				$templating->set('forum_name', $topic['forum_name']);
 				$templating->set('subscribe_link', $subscribe_link);
+				$templating->set('pagination_head', $pagination_head);
 
 				$templating->set('forum_index', '/forum/');
 

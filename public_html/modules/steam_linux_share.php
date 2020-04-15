@@ -102,7 +102,7 @@ $linux_share_data = "
 $linuxonly = "<div class=\"chartjs-container\"><canvas id=\"linuxonly\" width=\"400\" height=\"200\"></canvas></div>";
 
 core::$user_chart_js .= "<script>var linuxonly = document.getElementById('linuxonly');
-var Chartlinuxonly = new Chart.Line(linuxonly, {
+var Chartlinuxonly = new Chart(linuxonly, {
 type: 'line',
 data: {
 labels: [".implode(',', $dates)."],
@@ -164,7 +164,7 @@ $linux_daily_data = "
 
 $dailyactive = "<div class=\"chartjs-container\"><canvas id=\"dailyshare\" width=\"400\" height=\"200\"></canvas></div><script>
 var dailyshare = document.getElementById('dailyshare');
-var Chartdailyshare = new Chart.Line(dailyshare, {
+var Chartdailyshare = new Chart(dailyshare, {
 type: 'line',
 data: {
 labels: [".implode(',', $daily_dates)."],
@@ -228,7 +228,7 @@ foreach ($lang_data as $key => $data)
 $languages = "<div class=\"chartjs-container\"><canvas id=\"languages\" width=\"400\" height=\"200\"></canvas></div>";
 
 core::$user_chart_js .= "<script>var languages = document.getElementById('languages');
-var Chartlanguages = new Chart.Line(languages, {
+var Chartlanguages = new Chart(languages, {
 type: 'line',
 data: {
 labels: [".implode(',', $dates)."],
@@ -293,7 +293,7 @@ foreach ($lang_data as $key => $data)
 $languages_linux = "<div class=\"chartjs-container\"><canvas id=\"languages_linux\" width=\"400\" height=\"200\"></canvas></div>";
 
 core::$user_chart_js .= "<script>var languages_linux = document.getElementById('languages_linux');
-var Chartlanguages_linux = new Chart.Line(languages_linux, {
+var Chartlanguages_linux = new Chart(languages_linux, {
 type: 'line',
 data: {
 labels: [".implode(',', $dates)."],
@@ -353,7 +353,7 @@ $threesome_data = "
 $threesome = "<div class=\"chartjs-container\"><canvas id=\"threesome\" width=\"400\" height=\"200\"></canvas></div>";
 
 core::$user_chart_js .= "<script>var threesome = document.getElementById('threesome');
-var Chartthreesome = new Chart.Line(threesome, {
+var Chartthreesome = new Chart(threesome, {
 type: 'line',
 data: {
 labels: [".implode(',', $dates)."],

@@ -109,6 +109,7 @@
 	// svg
 	--gol-svg-background-color: #F2f2f2;
 	--svg-text-color: #222222;
+	--svg-bar-total: #000000;
 }
 //dark theme variables
 [data-theme="dark"] {
@@ -219,6 +220,7 @@
 	// svg
 	--gol-svg-background-color: #000000;
 	--svg-text-color: white;
+	--svg-bar-total: white;;
 }
 
 body {
@@ -1790,7 +1792,7 @@ ul.social-networks li > a {
     .articles .article .info {
         width: 55%;
     }
-    .quick-nav-slider {display: none;}
+    .link_button.quick-nav-slider {display: none;}
     .tag-slider {display: none;}
 }
 
@@ -1904,14 +1906,14 @@ div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: 
 .golgraph{display: block; margin-left:auto; margin-right:auto;}
 
 .golsvg_title {fill: white;}
-.golsvg_subtitle{fill: black;}
+.golsvg_subtitle{fill: var(--svg-text-color);}
 
 svg text {fill: var(--svg-text-color);}
 
 .golsvg_header {fill: #515151;}
 .golsvg_background {fill: var(--gol-svg-background-color);}
 
-.golsvg_counters {fill: black}
+.golsvg-bar-total {fill: var(--svg-bar-total)}
 .golsvg_minmax {fill: white; stroke: none;}
 .trend-legend {margin-bottom: 15px;}
 

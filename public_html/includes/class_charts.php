@@ -87,7 +87,7 @@ class charts
 		$this->chart_options['bar_thickness'] = 30;
 		$this->chart_options['padding_bottom'] = 10;
 		$this->chart_options['padding_right'] = 50;
-		$this->chart_options['bar_counter_left_padding'] = 3;
+		$this->chart_options['bar_counter_left_padding'] = 5;
 		$this->chart_options['counter_font_size'] = 15;
 		$this->chart_options['tick_font_size'] = 15;
 		$this->chart_options['subtitle_font_size'] = 16;
@@ -576,7 +576,7 @@ class charts
 					$this_counter_x = $bar_width + $this->chart_bar_start_x + $this->chart_options['bar_counter_left_padding'] + $this->chart_options['label_left_padding'];
 					$this_counter_y = $this_bar_y + 21;
 
-					$this->counter_array[] = '<text class="golsvg_counters" x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$label['total'].'</text>';
+					$this->counter_array[] = '<text class="golsvg-bar-total" x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$label['total'].'</text>';
 				}
 			}
 			else
@@ -613,7 +613,7 @@ class charts
 						$force_counter_colour = 'fill="'.$this->chart_options['counter_colour'].'"';
 					}
 
-					$this->counter_array[] = '<text class="golsvg_counters" '.$force_counter_colour.' x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data['data'].'</text>';
+					$this->counter_array[] = '<text class="golsvg-bar-total" '.$force_counter_colour.' x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data['data'].'</text>';
 
 					$data_series_counter++;
 					$last_bar_y = $this_bar_y;
@@ -801,7 +801,7 @@ class charts
 				$force_counter_colour = 'fill="'.$this->chart_options['counter_colour'].'"';
 			}
 
-			$this->counter_array[] = '<text class="golsvg_counters" '.$force_counter_colour.' x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data['percent'].'%</text>';
+			$this->counter_array[] = '<text class="golsvg-bar-total" '.$force_counter_colour.' x="'.$this_counter_x.'" y="'.$this_counter_y.'" font-size="'.$this->chart_options['counter_font_size'].'">'.$data['percent'].'%</text>';
 
 			$label_counter++;
 		}
@@ -1340,7 +1340,7 @@ class charts
 				$graph_name = str_replace(' ', '', $name); // Replaces all spaces with hyphens.
 				$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
 
-				$get_graph['graph'] = '<div id="'.$graph_name.'-legends"></div><canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
+				$get_graph['graph'] = '<div id="'.$graph_name.'-legends" class="trend-legend"></div><canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
 
 				$total_array = count($labels);
 

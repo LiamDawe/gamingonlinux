@@ -164,7 +164,7 @@ if (isset($_GET['view']))
         $templating->set('subscribe_box', $subscribe_box);
 
         $templating->block('uploads', 'submit_article');
-        $templating->set('previously_uploaded', $previously_uploaded['output']);
+		$templating->set('previously_uploaded', $previously_uploaded['output']);
     }
 }
 

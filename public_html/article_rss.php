@@ -21,6 +21,7 @@ if ($core->config('articles_rss') == 1)
 		$sql_addition = ' AND c.`category_id` = 63';
 	}
 
+	$url_addition = '';
 	// viewing specific tags only
 	if (isset($_GET['tags']))
 	{
@@ -43,6 +44,8 @@ if ($core->config('articles_rss') == 1)
 		$sql_join .= " INNER JOIN `article_category_reference` c ON a.article_id = c.article_id ";
 		$in  = str_repeat('?,', count($tags) - 1) . '?';
 		$sql_addition .= ' AND c.`category_id` IN ( ' . $in . ' ) ';
+
+		$url_addition = '?tags%5B%5D='.$tags[0];
 	}
 
 	$last_time = $dbl->run("SELECT a.`date`
@@ -96,7 +99,7 @@ if ($core->config('articles_rss') == 1)
 	$xml->startElement('atom:link');
 	if (!isset($_GET['mini']))
 	{
-		$xml->writeAttribute('href', $core->config('website_url') . 'article_rss.php');
+		$xml->writeAttribute('href', $core->config('website_url') . 'article_rss.php' . $url_addition);
 	}
 	else
 	{

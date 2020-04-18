@@ -46,9 +46,16 @@ class article
 	public function tagline_image($data)
 	{
 		$tagline_image = '';
+
+		$tiny = '';
+		if (file_exists($this->core->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image'] . '_tiny'))
+		{
+			$tiny = 'data-tiny="'.$this->core->config('website_url') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image'] . '_tiny'.'"';
+		}
+
 		if (!empty($data['tagline_image']))
 		{
-			$tagline_image = "<img alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+			$tagline_image = "<img class=\"tagline_image\" alt $tiny loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
 		}
 		if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
 		{

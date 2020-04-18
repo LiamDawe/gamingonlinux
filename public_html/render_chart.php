@@ -32,11 +32,11 @@ if (isset($_GET['type']))
 		if (isset($_GET['download']))
 		{
 			$info = $dbl->run("SELECT `name` FROM `user_stats_charts` WHERE `id` = ?", array($id))->fetch();
-			$file = $info['name'] . '.svg';
+			$file = str_replace(' ', '-', $info['name']) . '.svg';
 			header('Content-type: image/svg+xml');
 			header("Content-Disposition: attachment; filename=$file");
 		}
-		$options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC', 'title_colour' => '#FFFFFF', 'counter_colour' => '#000000'];
+		$options = ['padding_right' => 70, 'show_top_10' => 1, 'order' => 'ASC', 'title_colour' => '#FFFFFF', 'counter_colour' => '#000000', 'standalone' => 1];
 		echo $charts->stat_chart($id, NULL, $options)['graph'];
 	}
 }

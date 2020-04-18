@@ -674,7 +674,7 @@ class charts
 
 	function stat_chart($id, $last_id = '', $custom_options)
 	{
-		global $db;
+		$get_graph['graph'] = '';
 
 		$this->setup($custom_options);
 
@@ -694,70 +694,142 @@ class charts
 		// set the right labels to the right data (This months data)
 		$this->get_labels(['id' => $id], 'stat_chart');
 
-		// this is for the full info expand box, as charts only show 10 items, this expands to show them all
-		$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
-
-		foreach ($this->labels_raw_data as $k => $all_labels)
+		if (!isset($custom_options['standalone']) || isset($custom_options['standalone']) && $custom_options['standalone'] == 0)
 		{
-			$icon = '';
-			if ($this->chart_info['name'] == "Linux Distributions (Split)")
+			// this is for the full info expand box, as charts only show 10 items, this expands to show them all
+			$full_info = '<div class="collapse_container"><div class="collapse_header"><span>Click for full statistics</span></div><div class="collapse_content">';
+
+			foreach ($this->labels_raw_data as $k => $all_labels)
 			{
-				$icon = '<img class="distro" src="/templates/default/images/distros/'.$all_labels['name'].'.svg" alt="distro-icon" width="20" height="20" /> ';
-			}
-			if ($this->chart_info['name'] == "Linux Distributions (Combined)")
-			{
-				if ($all_labels['name'] == 'Ubuntu-based')
+				$icon = '';
+				if ($this->chart_info['name'] == "Linux Distributions (Split)")
 				{
-					$icon_name = 'Ubuntu';
+					$icon = '<img class="distro" src="/templates/default/images/distros/'.$all_labels['name'].'.svg" alt="distro-icon" width="20" height="20" /> ';
 				}
-				else if ($all_labels['name'] == 'Arch-based')
+				if ($this->chart_info['name'] == "Linux Distributions (Combined)")
 				{
-					$icon_name = 'Arch';
+					if ($all_labels['name'] == 'Ubuntu-based')
+					{
+						$icon_name = 'Ubuntu';
+					}
+					else if ($all_labels['name'] == 'Arch-based')
+					{
+						$icon_name = 'Arch';
+					}
+					else
+					{
+						$icon_name = $all_labels['name'];
+					}
+					$icon = '<img class="distro" src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
+				}
+
+				// work out the percentage difference for each item against the previous month
+				$percent = round(($all_labels['data'] / $this->chart_info['total_answers']) * 100, 2);
+				if (core::is_number($last_id))
+				{
+					$old_info = '';
+					foreach ($this->get_labels_old as $all_old)
+					{
+						if ($all_old['name'] == $all_labels['name'])
+						{
+							$difference_people = $all_labels['data'] - $all_old['data'];
+
+							$difference_number = $difference_people / $all_old['data'];
+
+							$difference_percentage = round($difference_number * 100,2);
+
+							if (strpos($difference_percentage, '-') === FALSE)
+							{
+								$difference_percentage = '+' . $difference_percentage;
+							}
+
+							if ($difference_people > 0)
+							{
+								$difference_people = '+' . $difference_people;
+							}
+							$old_info = ' Difference: (' . $difference_percentage . '% overall, ' . $difference_people .' people)';
+						}
+					}
+
+					$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)' . $old_info . '<br />';
 				}
 				else
 				{
-					$icon_name = $all_labels['name'];
+					$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)<br />';
 				}
-				$icon = '<img class="distro" src="/templates/default/images/distros/'.$icon_name.'.svg" alt="distro-icon" width="20" height="20" /> ';
 			}
+			$full_info .= '</div></div>';
 
-			// work out the percentage difference for each item against the previous month
-			$percent = round(($all_labels['data'] / $this->chart_info['total_answers']) * 100, 2);
-			if (core::is_number($last_id))
+			$get_graph['full_info'] = $full_info;
+
+			$graph_name = str_replace(' ', '', $this->chart_info['name']); // Replaces all spaces with hyphens.
+			$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
+
+			$total_array = count($this->labels);
+
+			$labels_array = array();
+			$totals_array = array();
+			$colors_array = array();
+			foreach ($this->labels as $key => $data)
 			{
-				$old_info = '';
-				foreach ($this->get_labels_old as $all_old)
+				$labels_array[] = '"'. $data['name'] .'"';
+				$data_array[] = $data['percent'];
+				$totals_array[] = $data['total'];
+				
+
+				$colour = $this->rand_color();
+				if ($data['name'] == 'Intel')
 				{
-					if ($all_old['name'] == $all_labels['name'])
-					{
-						$difference_people = $all_labels['data'] - $all_old['data'];
-
-						$difference_number = $difference_people / $all_old['data'];
-
-						$difference_percentage = round($difference_number * 100,2);
-
-						if (strpos($difference_percentage, '-') === FALSE)
-						{
-							$difference_percentage = '+' . $difference_percentage;
-						}
-
-						if ($difference_people > 0)
-						{
-							$difference_people = '+' . $difference_people;
-						}
-						$old_info = ' Difference: (' . $difference_percentage . '% overall, ' . $difference_people .' people)';
-					}
+					$colour = "#1f78b4";
+				}
+				if ($data['name'] == 'AMD' || $data['name'] == 'Proprietary')
+				{
+					$colour = "#e31a1c";
+				}
+				if ($data['name'] == 'Nvidia' || $data['name'] == 'Open Source')
+				{
+					$colour = "#33a02c";
 				}
 
-				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)' . $old_info . '<br />';
+				$colors_array[] = '"'.$colour.'"';
 			}
-			else
-			{
-				$full_info .= $icon . '<strong>' . $all_labels['name'] . $label_add . '</strong>: ' . $all_labels['data'] . ' (' . $percent . '%)<br />';
-			}
-		}
-		$full_info .= '</div></div>';
+			
+			core::$user_chart_js .= "<script>
+			var ".$graph_name." = document.getElementById('".$graph_name."');
+			var Chart".$graph_name." = new Chart(".$graph_name.", {
+			type: 'horizontalBar',
+			data:{
+				labels: [".implode(',', $labels_array)."],
+				datasets: [{
+					label: 'Dataset 1',
+					data: [".implode(',', $data_array)."],
+					backgroundColor: [".implode(',', $colors_array)."]
+				}]
 
+			},
+			options: {
+				legend: { display: false },
+				scales: {xAxes: [{ticks: {beginAtZero:true}, scaleLabel: {display: true, labelString: 'Percentage of users'}}]},
+				tooltips: {
+					enabled: true,
+					mode: 'single',
+					callbacks: {
+						label: function(tooltipItems, data) 
+						{
+							var tooltip_extra = ". json_encode($totals_array) .";
+
+							return tooltipItems.xLabel + '% (' + tooltip_extra[tooltipItems.index] + ')';
+						}
+					}
+				},
+			}
+			});
+			</script>";
+
+			$get_graph['graph'] = '<canvas id="'.$graph_name.'" width="400" height="200"></canvas><noscript>';
+		}
+
+		/* now for the SVG non-JS fallback & download option */
 		$max_data = $this->labels[0]['percent'];
 
 		self::chart_sizing();
@@ -806,9 +878,13 @@ class charts
 			$label_counter++;
 		}
 
-		$get_graph['graph'] = $this->build_svg();
+		$get_graph['graph'] .= $this->build_svg();
 
-		$get_graph['full_info'] = $full_info;
+		if (!isset($custom_options['standalone']) || isset($custom_options['standalone']) && $custom_options['standalone'] == 0)
+		{
+			$get_graph['graph'] .= '</noscript>';
+		}
+
 		$get_graph['date'] = $this->chart_info['generated_date'];
 
 		$total_difference = '';

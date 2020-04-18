@@ -172,6 +172,10 @@ $("#all-games-search").easyAutocomplete(all_search_options);
 <script src="{:url}includes/jscripts/sorttable.min.js"></script> 
 <script src="{:url}includes/jscripts/clipboard/clipboard.min.js"></script>
 {:ckeditor_js}
+<script>
+var style = getComputedStyle(document.body);
+var textcolor = style.getPropertyValue('--svg-text-color');
+Chart.defaults.global.defaultFontColor = textcolor;</script>
 {:user_chart_js}
 </body>
 </html>{:debug}

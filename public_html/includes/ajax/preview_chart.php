@@ -118,4 +118,6 @@ if (isset($_POST['counters_inside']))
 	$counters_inside = 1;
 }
 
-echo $charts->render(['filetype' => 'png'], ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data, 'h_label' => $_POST['h_label'], 'counters_inside' => $counters_inside]);
+echo '<div class="box"><div class="head">SVG</div><div class="body group">' . $charts->render(['filetype' => 'svg'], ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data, 'h_label' => $_POST['h_label'], 'counters_inside' => $counters_inside]) . '</div></div>';
+
+echo '<div class="box"><div class="head">PNG</div><div class="body group">' . $charts->render(['filetype' => 'png'], ['name' => $_POST['name'], 'sub_title' => $_POST['sub_title'], 'grouped' => $grouped, 'data' => $preview_data, 'h_label' => $_POST['h_label'], 'counters_inside' => $counters_inside]) . '</div></div>';

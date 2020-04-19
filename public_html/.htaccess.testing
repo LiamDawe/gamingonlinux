@@ -82,6 +82,10 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^forum/?$ /index.php?module=forum [N]
 
+  RewriteRule ^forum/latest?$ /index.php?module=forum&type=latest [N,NC,QSA]
+  
+  RewriteRule ^forum/categories?$ /index.php?module=forum&type=categories [N,NC,QSA]  
+  
   RewriteRule ^about-us/?$ /index.php?module=about_us [N]
 
   RewriteRule ^private-messages/?$ /index.php?module=messages [N]
@@ -163,3 +167,7 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^itemdb/developer/([0-9]+)/?$ /index.php?module=items_database&view=developer&id=$1 [N,NC,QSA]
   
   RewriteRule ^steam-tracker/?$ index.php?module=steam_linux_share [N,NC,QSA]
+  
+  RewriteRule ^steamplay/?$ steamplay.php [N,NC,QSA]
+  
+  RewriteRule ^steamplay/reports/([0-9]+)/?$ steamplay_reports.php?id=$1 [N,NC,QSA]

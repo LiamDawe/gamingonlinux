@@ -106,7 +106,7 @@
 	--bbcode-editor-dropdown-ul-li-border-color: #dddddd;
 	// itemdb
 	--itemdb-extrabox-bg-color: #D7D7D7;
-	// svg
+	// svg / charts
 	--gol-svg-background-color: #F2f2f2;
 	--svg-text-color: #222222;
 	--svg-bar-total: #000000;
@@ -217,7 +217,7 @@
 	--bbcode-editor-dropdown-ul-li-border-color: #444444;
 	// itemdb
 	--itemdb-extrabox-bg-color: #515151;
-	// svg
+	// svg / charts
 	--gol-svg-background-color: #000000;
 	--svg-text-color: white;
 	--svg-bar-total: white;;
@@ -1895,6 +1895,22 @@ th, td { vertical-align: top; }
 	border-radius: 3px;
 	white-space: nowrap;
 }
+
+.forum_top_option{ list-style: none; padding: 0;}
+
+.forum_top_option li {display: inline-block; vertical-align: middle;}
+
+.forum_button {
+    color: var(--font-color);
+    padding: 7px;
+	border-radius: 3px;
+	white-space: nowrap;
+	background: #006EA1;
+}
+
+.forum_button.active {background: #dba12c;}
+
+a.forum_button {color: #fff}
 
 div.announce:nth-of-type(odd) {background: #609FA9; margin-bottom: 7px; color: #000}
 div.announce:nth-of-type(even) {background: #99CCFF; margin-bottom: 7px; color: #000}

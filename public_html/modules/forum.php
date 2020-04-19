@@ -299,16 +299,16 @@ else
 					$templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 	
 					// get the correct forum icon
-					$forum_icon = 'forum_icon.png';
+					$forum_icon = 'forum_icon.svg';
 					if (isset($last_read))
 					{
 						if (isset($last_read[$forum['id']][0]) && $last_read[$forum['id']][0] >= $forum['last_post_time'])
 						{
-							$forum_icon = 'forum_icon_read.png';
+							$forum_icon = 'forum_icon_read.svg';
 						}
 						else
 						{
-							$forum_icon = 'forum_icon.png';
+							$forum_icon = 'forum_icon.svg';
 						}
 					}
 					$templating->set('forum_icon', $forum_icon);

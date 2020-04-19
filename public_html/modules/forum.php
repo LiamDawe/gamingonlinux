@@ -315,7 +315,7 @@ else
 					$templating->set('forum_link', '/forum/' . $forum['id'] . '/');
 					$templating->set('forum_name', $forum['name']);
 					$templating->set('forum_description', $forum['description']);
-					$templating->set('forum_posts', $forum['posts']);
+					$templating->set('forum_posts', number_format($forum['posts']));
 	
 					$last_title = '';
 					$last_username = 'No one has posted yet!';

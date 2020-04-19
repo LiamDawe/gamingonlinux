@@ -203,6 +203,8 @@ else
 		$templating->block('options', 'forum');
 		$templating->set('new_topic', $new_topic);
 		$templating->set('forum_list', $forum_list);
+		$templating->set('latest_active', $latest_active);
+		$templating->set('categories_active', $categories_active);
 
 		$templating->block('bottom', 'forum');
 		$templating->set('pagination', $pagination);

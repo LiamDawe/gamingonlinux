@@ -9,10 +9,10 @@
 <div class="box">
 	<div class="group">
 			<ul class="forum_top_option">
-				<li><a class="forum_button {:latest_active}" href="/forum/latest">Latest</a></li>
-				<li><a class="forum_button {:categories_active}" href="/forum/categories">Categories</a></li>
+				<li class="{:latest_active}"><a class="forum_button" href="/forum/latest">Latest</a></li>
+				<li class="{:categories_active}"><a class="forum_button" href="/forum/categories">Categories</a></li>
 				{:new_topic}
-				<li><select class="wrap ays-ignore" name="category" onchange="window.open(this.options[this.selectedIndex].value, '_self')"><option value="">Jump to a category</option>{:forum_list}</select></li>
+				<li class="jump-list"><select class="wrap ays-ignore" name="category" onchange="window.open(this.options[this.selectedIndex].value, '_self')"><option value="">Jump to a category</option>{:forum_list}</select></li>
 			</ul>	
 	</div>
 </div>
@@ -43,12 +43,12 @@
 
 [block: forum_row]
 	<tr>
-		<td width="60px" id="forum-post"><img src="{:this_template}/images/{:forum_icon}" alt="icon" /></td>
-		<td width="425px" id="forum-post"><a href="{:forum_link}" class="strong">{:forum_name}</a><br />
+		<td width="60px" class="hide-small" style="text-align: center;"><img src="{:this_template}/images/{:forum_icon}" alt="icon" /></td>
+		<td width="425px"><a href="{:forum_link}" class="strong">{:forum_name}</a><br />
 		{:forum_description}<br />
 		Posts: {:forum_posts}</td>
-		<td width="35px" id="forum-post"><img src="{:this_template}/images/last_post.png" alt="" /></td>
-		<td width="200px" id="forum-post"valign="top">Last Post: {:last_post_title}<br />
+		<td width="35px" class="hide-small"><img src="{:this_template}/images/last_post.png" alt="" /></td>
+		<td width="200px" valign="top">Last Post: {:last_post_title}<br />
 		by {:last_post_username} <br />
 		{:last_post_time}</td>
 	</tr>
@@ -60,7 +60,7 @@
 [/block: category_bottom]
 
 [block: latest]
-				<div class="box">
+				<div class="box hide-small">
 					<div class="body group">
 						<img src="/templates/default/images/forum_icon_read.png"> No new posts since last visit <img src="/templates/default/images/forum_icon.png"> New posts since last visit!
 					</div>

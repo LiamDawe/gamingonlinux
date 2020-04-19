@@ -876,6 +876,11 @@ pre {
 	box-shadow: var(--share-icon-shadow-color);
 	transition: all 200ms ease-out;
 }
+.gol-share-button.rss:hover
+{
+	background: #FF6600;
+	transition: all 700ms ease-out;
+}
 .gol-share-button a:hover
 {
 	filter: invert(100%);
@@ -894,10 +899,6 @@ pre {
 .gol-share-button.facebook
 {
 	background: #8b9dc3;
-}
-.gol-share-button.rss
-{
-	background: #FF6600;
 }
 .gol-share-button.twitter 
 {
@@ -920,12 +921,8 @@ pre {
 
 .gol-share-button.just-share-container
 {
-	background: #1da1f2;
-	background-image: url('/templates/default/images/network-icons/share.svg');
-	background-repeat: no-repeat;
-	background-size: 50% 75%;
-	background-position-y: center;
-	width: 75px;
+	color: var(--font-color);
+	width: 50px;
 	vertical-align: top;
 }
 
@@ -948,10 +945,8 @@ pre {
 .gol-share-button .just-share .text-container
 {
 	height: 18px;
-	margin-left: 22px;
 	line-height: 17px;
 	font-weight: bold;
-	color: black;
 	pointer-events: none;
 }
 
@@ -1169,7 +1164,7 @@ a.button {
 }
 .featured-title-text {padding: 5px; font-weight: bold;}
 .featured-title a {color: #fff; display: block;}
-.rss-home {padding-left:5px;}
+.rss-home {margin-left:5px;}
 
 /* Individual Article Page */
 .article.individual .info {
@@ -1894,21 +1889,23 @@ th, td { vertical-align: top; }
     padding: 3px;
 	border-radius: 3px;
 	white-space: nowrap;
+	box-sizing: border-box;
 }
 
 .forum_top_option{ list-style: none; padding: 0;}
 
-.forum_top_option li {display: inline-block; vertical-align: middle;}
+.forum_top_option li {height: 33px; border-radius: 3px; background: #006EA1; display: inline-block; vertical-align: middle; clear: both; box-sizing: border-box;} 
+.forum_top_option li a {padding: 5px; display:block;}
+.forum_top_option li.jump-list {background: none;}
+
+.forum_top_option select {height: 33px; font-size: 1em; padding: 0;}
 
 .forum_button {
     color: var(--font-color);
-    padding: 7px;
-	border-radius: 3px;
 	white-space: nowrap;
-	background: #006EA1;
 }
 
-.forum_button.active {background: #dba12c;}
+.forum_top_option li.active {background: #dba12c;}
 
 a.forum_button {color: #fff}
 

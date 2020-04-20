@@ -387,9 +387,10 @@ if (!isset($_GET['go']))
 				}
 
 				$current_linked_games = $dbl->run("SELECT a.`game_id`, g.`name` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ?", array($article['article_id']))->fetch_all();
+				$games_display = '';
 				if ($current_linked_games)
 				{
-					$categories_display = array_merge($categories_display, $article_class->display_game_tags($current_linked_games, 'array_plain'));
+					$games_display = ' | Apps: ';
 				}
 
 				if (!empty($categories_display))
@@ -400,7 +401,7 @@ if (!isset($_GET['go']))
 						$suggest_link = ' (<a href="/index.php?module=article_tag_suggest&amp;article_id='.$article['article_id'].'">Suggest more</a>) ';
 					}
 					$templating->block('tags', 'articles_full');
-					$templating->set('categories_list', 'Tags'.$suggest_link.': ' . implode(', ', $categories_display));
+					$templating->set('categories_list', 'Tags'.$suggest_link.': ' . implode(', ', $categories_display) . $games_display . implode(', ', $article_class->display_game_tags($current_linked_games, 'array_plain')));
 				}
 
 				// article meta for bookmarking, likes etc

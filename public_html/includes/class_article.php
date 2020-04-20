@@ -351,9 +351,16 @@ class article
 			{
 				foreach ($current_linked_games as $current_game)
 				{
-					if (!in_array($current_game['game_id'], $_POST['games']))
+					if (!empty($_POST['games']))
 					{
-						$this->dbl->run("DELETE FROM `article_item_assoc` WHERE `id` = ?", array($current_game['id']));
+						if (!in_array($current_game['game_id'], $_POST['games']))
+						{
+							$this->dbl->run("DELETE FROM `article_item_assoc` WHERE `id` = ?", array($current_game['id']));
+						}
+					}
+					else // totally empty, no tags = delete any stored
+					{
+						$this->dbl->run("DELETE FROM `article_item_assoc` WHERE `article_id` = ?", array($article_id));
 					}
 				}
 			}

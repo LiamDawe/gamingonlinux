@@ -50,17 +50,16 @@ do
 				$bundle = 1;
 			}
 
+			$clean_release_date = NULL;
 			$release_date_raw = strtolower($element->find('div.search_released', 0)->plaintext);
 
 			if (empty(trim($release_date_raw)))
 			{
 				$release_date_raw = NULL;
-				$clean_release_date = NULL;
 			}
 			else
 			{
 				$clean_release_date = $game_sales->steam_release_date($release_date_raw);
-
 				echo 'Cleaned release date: ' . $clean_release_date . PHP_EOL;
 			}
 

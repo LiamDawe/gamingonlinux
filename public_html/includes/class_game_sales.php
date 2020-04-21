@@ -29,7 +29,7 @@ class game_sales
 	*/
 	function stripped_title($string)
 	{
-		$string = str_replace(' ', '', $string); // Replaces all spaces with hyphens.
+		$string = str_replace(' ', '', $string);
 		$string = trim($string);
 		$string = strtolower($string);
 		return preg_replace('/[^A-Za-z0-9]/', '', $string); // Removes special chars.
@@ -43,9 +43,15 @@ class game_sales
 		echo 'Raw release date: ' . $release_date_raw . "\n";
 		$trimmed_date = trim($release_date_raw);	
 		$remove_comma = str_replace(',', '', $trimmed_date);
+
+		// ensure there's a numeric year in it, otherwise it's not an exact proper date
+		if (preg_match("/[0-9]{4}/", $remove_comma) == 0)
+		{
+			return NULL;
+		}
+
 		$parsed_release_date = strtotime($remove_comma);
-		// so we can get rid of items that only have the year nice and simple
-		$length = strlen($remove_comma);
+		$length = strlen($remove_comma); // so we can get rid of items that only have the year nice and simple
 		$parsed_release_date = date("Y-m-d", $parsed_release_date);
 		$has_day = DateTime::createFromFormat('F Y', $remove_comma);
 			
@@ -71,21 +77,26 @@ class game_sales
 			$name_change = $this->dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ? AND BINARY `name` != ?", array($steam_id, $title))->fetchOne();
 			if ($name_change)
 			{
-				echo PHP_EOL . 'Detected name changed.'; 
+				echo PHP_EOL . 'Detected name changed from what we store in the DB.'; 
 
-				if ($update_naming == 0)
+				// only enter a dupe, if there's not another item going by this name (because stores let games be the exact same name <_<)
+				$check_conflict = $this->dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` != ? AND BINARY `name` = ?", array($steam_id, $title))->fetchOne();
+				if (!$check_conflict)
 				{
-					echo PHP_EOL . 'Leaving original name in place - adding new duplicate name.' . PHP_EOL;
-					$exists = $this->dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND `name` = ?", array($name_change, $title))->fetchOne();
-					if (!$exists)
+					if ($update_naming == 0)
 					{
-						$this->dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+						echo PHP_EOL . 'Leaving original name in place - adding new duplicate name.' . PHP_EOL;
+						$exists = $this->dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND BINARY `name` = ?", array($name_change, $title))->fetchOne();
+						if (!$exists)
+						{
+							$this->dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
+						}
 					}
-				}
-				else if ($update_naming == 1)
-				{
-					echo PHP_EOL . 'Name changed, not a new item.' . PHP_EOL;
-					$this->dbl->run("UPDATE `calendar` SET `name` = ? WHERE `id` = ?", array($title, $name_change));
+					else if ($update_naming == 1)
+					{
+						echo PHP_EOL . 'Name changed, not a new item.' . PHP_EOL;
+						$this->dbl->run("UPDATE `calendar` SET `name` = ? WHERE `id` = ?", array($title, $name_change));
+					}
 				}
 			}
 		}

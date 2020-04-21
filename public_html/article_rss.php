@@ -187,8 +187,16 @@ if ($core->config('articles_rss') == 1)
 			}
 			else
 			{
-				$random_id = core::random_id(15);
-				$text = $bbcode->rss_stripping($line['text'] . "<div id=\"{$random_id}\">Article from <a href=\"https://www.gamingonlinux.com/\">GamingOnLinux.com</a> - do not reproduce this article without permission. This RSS feed is intended for readers, not scrapers.</div>", $tagline_bbcode, $bbcode_tagline_gallery);
+				if (!isset($_GET['special']))
+				{
+					$random_id = core::random_id(15);
+					$text = $bbcode->rss_stripping($line['text'] . "<div id=\"{$random_id}\">Article from <a href=\"https://www.gamingonlinux.com/\">GamingOnLinux.com</a> - do not reproduce this article without permission. This RSS feed is intended for readers, not scrapers.</div>", $tagline_bbcode, $bbcode_tagline_gallery);
+				}
+				else
+				{
+					$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
+				}
+				
 			}
 			
 			$xml->startElement('description');

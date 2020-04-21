@@ -49,15 +49,15 @@ class article
 
 		if (!empty($data['tagline_image']))
 		{
-			$tagline_image = "<img class=\"tagline_image\" alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+			$tagline_image = "<img class=\"tagline_image\" alt height=\"420\" width=\"740\" loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
 		}
 		if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
 		{
-			$tagline_image = "<img alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
+			$tagline_image = "<img alt loading=\"lazy\" height=\"420\" width=\"740\" src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$data['gallery_tagline_filename']}\">";
 		}
 		if (empty($data['tagline_image']) && $data['gallery_tagline'] == 0)
 		{
-			$tagline_image = "<img alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
+			$tagline_image = "<img alt loading=\"lazy\" height=\"420\" width=\"740\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png\">";
 		}
 		return $tagline_image;
 	}

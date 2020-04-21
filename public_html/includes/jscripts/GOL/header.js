@@ -367,8 +367,8 @@ jQuery(document).ready(function()
 				'box-sizing': 'border-box',
 				'background-image': 'url(' + $(this).data('tiny') + ')',
 				'background-repeat': 'no-repeat',
-				'background-size': '100% auto',
-				'background-position': 'center center'
+				'background-size': 'contain',
+				'background-position': 'top top'
 			});
 		}
 	});

@@ -36,11 +36,11 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 			// has to be at least 550 to work on social media websites for the image to be auto-included in posts like on G+ and Facebook
 			// Do this by itself first, so that we can try to preserve aspect ratio!
 			*/
-			if ($img->getWidth() < 550)
+			if ($img->getWidth() != 740 || $img->getHeight() != 420)
 			{
 				if ( $img->getMimeType() == 'image/jpeg' || $img->getMimeType() == 'image/png' )
 				{
-					$img->resize(550, null)->toFile($_FILES['photos2']['tmp_name']);
+					$img->resize(740, 420)->toFile($_FILES['photos2']['tmp_name']);
 				}
 
 				// don't mess with the gif man
@@ -53,59 +53,13 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				clearstatcache();
 			}
 
-			/* RECHECK DIMENSIONS AFTER SCALING
-			It will now be the correct width, but we need to be sure on the height
-			*/
-
-			if ($img->getHeight() < 250)
-			{
-				echo '<span class="imgList">Image is just too short!</span>';
-				return;
-			}
-
 			/* CHECK FILE SIZE
 			So we now know for sure it has the correct minimum dimensions, but is the filesize okay?
 			*/
 			if (filesize($_FILES['photos2']['tmp_name']) > $core->config('max_tagline_image_filesize'))
 			{
-				// okay, so it's a rather big image you're trying to put up as a tagline image, let's make it no bigger than GOL's content area, as that would be utterly pointless
-				if ($img->getWidth() > 950)
-				{
-					if( $img->getMimeType() == 'image/jpeg' || $img->getMimeType() == 'image/png' )
-					{
-						$img->resize(950, null)->toFile($_FILES['photos2']['tmp_name']);
-					}
-
-					// again, don't mess with the gif bro
-					else if( $img->getMimeType() == 'image/gif' )
-					{
-						echo '<span class="imgList">File size too big!</span>';
-						return;
-					}
-					
-					clearstatcache();
-
-					// if it's still too big, we should try compressing it
-					if (filesize($_FILES['photos2']['tmp_name']) > $core->config('max_tagline_image_filesize'))
-					{
-						if( $img->getMimeType() == 'image/jpeg' || $img->getMimeType() == 'image/png' )
-						{
-							$img->toFile($_FILES['photos2']['tmp_name'], NULL, 80);
-						}
-						
-						clearstatcache();
-						
-						// if it's still too big, we should try compressing it
-						if (filesize($_FILES['photos2']['tmp_name']) > $core->config('max_tagline_image_filesize'))
-						{
-							echo '<span class="imgList">File size too big, tried compressing it, but still too big!</span>';
-							return;
-						}
-					}
-				}
-
 				// okay, so width is good, let's try compressing directly instead then
-				else if ($img->getWidth() <= 950)
+				if ($img->getWidth() == 740)
 				{
 					if( $img->getMimeType() == 'image/jpeg' || $img->getMimeType() == 'image/png' )
 					{

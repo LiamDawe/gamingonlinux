@@ -363,8 +363,6 @@ class bbcode
 
 	function email_bbcode($body)
 	{
-		$body = $this->parse_links($body);
-
 		// remove the new line after quotes, stop massive spacing
 		$body = str_replace("[/quote]\r\n", '[/quote]', $body);
 
@@ -443,8 +441,6 @@ class bbcode
 		'Code:<br /><code>$1</code>',
 		'SPOILER: View the website if you wish to see it.'
 		);
-
-		$body = $this->emoticons($body);
 
 		$body = preg_replace($find, $replace, $body);
 

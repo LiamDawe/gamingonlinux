@@ -47,15 +47,9 @@ class article
 	{
 		$tagline_image = '';
 
-		$tiny = '';
-		if (file_exists($this->core->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image'] . '_tiny'))
-		{
-			$tiny = 'data-tiny="'.$this->core->config('website_url') . 'uploads/articles/tagline_images/thumbnails/' . $data['tagline_image'] . '_tiny'.'"';
-		}
-
 		if (!empty($data['tagline_image']))
 		{
-			$tagline_image = "<img class=\"tagline_image\" alt $tiny loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
+			$tagline_image = "<img class=\"tagline_image\" alt loading=\"lazy\" src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/{$data['tagline_image']}\">";
 		}
 		if ($data['gallery_tagline'] > 0 && !empty($data['gallery_tagline_filename']))
 		{
@@ -501,29 +495,29 @@ class article
 			}
 		}
 
-    if (isset(message_map::$error) && message_map::$error == 1 || message_map::$error == 2)
-    {
-      if ($_GET['temp_tagline'] == 1)
-      {
-        if (isset($_SESSION['uploads_tagline']))
-        {
-          $file = $this->core->config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
+		if (isset(message_map::$error) && message_map::$error == 1 || message_map::$error == 2)
+		{
+			if ($_GET['temp_tagline'] == 1)
+			{
+				if (isset($_SESSION['uploads_tagline']))
+				{
+				$file = $this->core->config('path') . 'uploads/articles/tagline_images/temp/' . $_SESSION['uploads_tagline']['image_name'];
 
-          if (file_exists($file))
-          {
-            $tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
-            <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
-            <a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
-          }
-        }
+				if (file_exists($file))
+				{
+					$tagline_image = "<div class=\"test\" id=\"{$_SESSION['uploads_tagline']['image_name']}\"><img src=\"".$this->core->config('website_url')."uploads/articles/tagline_images/temp/thumbnails/{$_SESSION['uploads_tagline']['image_name']}\" class='imgList'><br />
+					<input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['uploads_tagline']['image_name']}\" />
+					<a href=\"#\" id=\"{$_SESSION['uploads_tagline']['image_name']}\" class=\"trash_tagline\">Delete Image</a></div>";
+				}
+				}
 
-        if (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] = $_SESSION['image_rand'])
-        {
-          $tagline_image = "<div class=\"test\" id=\"{$_SESSION['gallery_tagline_filename']}\"><img src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$_SESSION['gallery_tagline_filename']}\" class='imgList'><br />
-          <input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['gallery_tagline_filename']}\" /></div>";
-        }
-      }
-    }
+				if (isset($_SESSION['gallery_tagline_rand']) && $_SESSION['gallery_tagline_rand'] = $_SESSION['image_rand'])
+				{
+				$tagline_image = "<div class=\"test\" id=\"{$_SESSION['gallery_tagline_filename']}\"><img src=\"".$this->core->config('website_url')."uploads/tagline_gallery/{$_SESSION['gallery_tagline_filename']}\" class='imgList'><br />
+				<input type=\"hidden\" name=\"image_name\" value=\"{$_SESSION['gallery_tagline_filename']}\" /></div>";
+				}
+			}
+		}
 
 		return $tagline_image;
 	}

@@ -358,38 +358,6 @@ jQuery(document).ready(function()
 		toggleSwitch2.addEventListener('change', switchTheme, false);
 	}
 
-	/* if an article has a temp tiny fuzzy image, use it to show something before lazy loading */
-	$('.tagline_image').each(function () 
-	{
-		if ($(this).data('tiny')) 
-		{
-			$(this).parent().parent().css({
-				'box-sizing': 'border-box',
-				'background-image': 'url(' + $(this).data('tiny') + ')',
-				'background-repeat': 'no-repeat',
-				'background-size': 'contain',
-				'background-position': 'top top'
-			});
-		}
-	});
-	$('.tagline_image').each(function () 
-	{
-		if($(this).width())
-		{
-			if ($(this).data('tiny')) 
-			{
-				$(this).parent().parent().removeAttr( 'style' );
-			}		
-		}
-	});	
-	$('.tagline_image').on('load',function()
-	{
-		if ($(this).data('tiny')) 
-		{
-			$(this).parent().parent().removeAttr( 'style' );
-		}
-	});
-
 	$('.cocoen').cocoen(); // image comparison slider
 
 	$('.octus-editor .styles').show();

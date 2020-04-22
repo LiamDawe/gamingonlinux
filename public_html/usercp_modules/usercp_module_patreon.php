@@ -94,6 +94,7 @@ if ( isset($_GET['code']) && $_GET['code'] != '' )
 
 	$templating->block('response');
 	$last_charge_month = date('m', strtotime($patron_response['included'][0]['attributes']['last_charge_date']));
+	$joined_date = date('m-Y', strtotime($patron_response['included'][0]['attributes']['pledge_relationship_start']));
 	if ($patron_response['data']['attributes']['last_charge_status'] = 'Paid' && $last_charge_month == date('m'))
 	{
 		$their_groups = $user->post_group_list([$_SESSION['user_id']]);
@@ -177,6 +178,11 @@ if ( isset($_GET['code']) && $_GET['code'] != '' )
 	}
 	else if ($patron_response['data']['attributes']['last_charge_status'] != 'Paid')
 	{
-		$templating->set('text', 'Sorry but it seems your last payment has not been paid. We suggest you <a href="https://www.patreon.com/">head on over to Patreon</a> to take a look. We don\'t handle the payments directly, so you need to fix it there. Thank you!');
+		$new_patron = '';
+		if ($joined_date == date('m-Y'))
+		{
+			$new_patron = '<p>Our records show you started pledging on <u>' . $joined_date . '</u> - Payments are taken <strong>once a month</strong>, at the start of each month so your pledge is due next month.</p>';
+		}
+		$templating->set('text', 'Sorry but it seems your last payment has not been paid. We suggest you <a href="https://www.patreon.com/">head on over to Patreon</a> to take a look. We don\'t handle the payments directly, so you need to fix it there. Thank you!' . $new_patron);
 	}
 }

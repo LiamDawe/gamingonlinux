@@ -18,7 +18,7 @@
 [block: plain_row]
 <div id="note-{:id}" class="box">
 	<div class="body group">
-		<span class="fright"><a href="#" class="delete_notification" title="Remove Notification" data-note-id="{:id}">&#10799;</a></span><img class="{:icon}" src="{:this_template}/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"><img src="{:avatar}" height="20" width="20" alt="" /> {:username}</a> {:action_text} <a href="{:link}">{:title}</a> {:additional_comments}
+		<span class="fright"><a href="#" class="delete_notification" title="Remove Notification" data-note-id="{:id}">&#10799;</a></span><img class="{:icon}" src="{:this_template}/images/comments/{:icon}.png" alt="" /> <a href="{:profile_link}"> <span class="notification-avatar">{:avatar}</span> {:username}</a> {:action_text} <a href="{:link}">{:title}</a> {:additional_comments}
 	</div>
 </div>
 [/block: plain_row]

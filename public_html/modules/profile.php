@@ -118,14 +118,14 @@ if (isset($_GET['user_id']))
 
 						foreach ($profile_fields as $field)
 						{
-							if (!empty($profile[$field['db_field']]))
+							if (!empty($profile[$field['db_field']]) && $field['name'] != 'Distro')
 							{
 								$profile[$field['db_field']] = htmlspecialchars($profile[$field['db_field']]);
-								
+
 								if ($field['db_field'] == 'website')
 								{
-									$profile[$field['db_field']] = core::check_url($profile[$field['db_field']]);
-									
+									$profile[$field['db_field']] = str_replace('https://', '', $profile[$field['db_field']]);
+									$profile[$field['db_field']] = str_replace('http://', '', $profile[$field['db_field']]);
 								}
 								
 								$url = '';
@@ -145,13 +145,8 @@ if (isset($_GET['user_id']))
 								{
 									$span = $field['span'];
 								}
-								$into_output = '';
-								if ($field['name'] != 'Distro')
-								{
-									$into_output .= "$image$span {$field['name']} <a href=\"$url{$profile[$field['db_field']]}\" target=\"_blank\">$url{$profile[$field['db_field']]}</a><br />";
-								}
-
-								$profile_fields_output .= $into_output;
+							
+								$profile_fields_output .= "$image$span {$field['name']} <a href=\"$url{$profile[$field['db_field']]}\" target=\"_blank\">$url{$profile[$field['db_field']]}</a><br />";
 							}
 						}
 

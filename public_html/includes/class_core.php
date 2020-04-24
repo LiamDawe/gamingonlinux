@@ -21,8 +21,6 @@ class core
 	public $error_message;
 
 	public static $user_chart_js = NULL;
-	
-	public static $editor_js;
 
 	public static $config = [];
 	
@@ -234,7 +232,10 @@ class core
 		}
 	}
 
-	// quickly grab and save an image
+	/* 
+	Quickly grab and save an image
+	Currently used for steam/gog game importing
+	*/
 	function save_image($img,$fullpath){
 		$ch = curl_init ($img);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -599,17 +600,6 @@ class core
 		$clean = preg_replace("/[\/_|+ -]+/", '-', $clean);
 
 		return $clean;
-	}
-	
-	public static function check_url($link)
-	{
-		$url = parse_url($link);
-		if((!isset($url['scheme'])) || (isset($url['scheme']) && $url['scheme'] != 'https' && $url['scheme'] != 'http'))
-		{
-			$link = 'http://' . $link;
-		}
-		
-		return $link;
 	}
 
 	// move previously uploaded tagline image to correct directory

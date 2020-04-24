@@ -398,6 +398,12 @@ else if (isset($_POST['act']))
 			{
 				$sanatized = trim(strip_tags($_POST[$field['db_field']]));
 
+				if ($field['db_field'] == 'website')
+				{
+					$sanatized = str_replace('https://', '', $sanatized);
+					$sanatized = str_replace('http://', '', $sanatized);
+				}
+
 				if (!empty($sanatized))
 				{
 					$check_link = $sanatized;

@@ -25,10 +25,11 @@ $profile_fields['twitter']['preinput'] = 'https://twitter.com/';
 
 $profile_fields['website']['name'] = 'Website:';
 $profile_fields['website']['db_field'] = 'website';
+$profile_fields['website']['base_link'] = 'http://';
+$profile_fields['website']['base_link_required'] = 1;
 $profile_fields['website']['span'] = '<span class="inline icon website">Website</span>';
-$profile_fields['website']['base_link'] = NULL;
-$profile_fields['website']['base_link_required'] = 0;
 $profile_fields['website']['link'] = 1;
+$profile_fields['website']['preinput'] = 'http://';
 
 $profile_fields['youtube']['name'] = 'Youtube:';
 $profile_fields['youtube']['description'] = 'Enter your <strong>full</strong> Youtube channel, like this: https://www.youtube.com/gamingonlinux';
@@ -69,6 +70,14 @@ $profile_fields['gog']['base_link'] = 'https://www.gog.com/u/';
 $profile_fields['gog']['base_link_required'] = 1;
 $profile_fields['gog']['link'] = 1;
 $profile_fields['gog']['preinput'] = 'https://www.gog.com/u/';
+
+/*
+$profile_fields['stadia']['name'] = 'Stadia:';
+$profile_fields['stadia']['description'] = 'Enter your Stadia username';
+$profile_fields['stadia']['db_field'] = 'stadia_username';
+$profile_fields['stadia']['span'] = '<span class="inline icon stadia">stadia</span>';
+$profile_fields['stadia']['base_link_required'] = 0;
+$profile_fields['stadia']['link'] = 0;*/
 
 return $profile_fields;
 ?>

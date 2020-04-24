@@ -660,13 +660,9 @@ class core
 
 			// set thumbnail directory
 			$source_thumbnail = $full_file_thumbnail;
-			$target_thumbnail = $this->config('path') . "uploads/articles/tagline_images/thumbnails/" . $imagename;
+			$target_thumbnail = $this->config('path') . "uploads/articles/tagline_images/thumbnails/" . $imagename;		
 
-			// set the tiny image directory
-			$source_tiny = $full_file_thumbnail . '_tiny';
-			$target_tiny = $this->config('path') . "uploads/articles/tagline_images/thumbnails/" . $imagename . '_tiny';			
-
-			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail) && rename($source_tiny, $target_tiny))
+			if (rename($source, $target) && rename($source_thumbnail, $target_thumbnail))
 			{
 				$image = $this->dbl->run("SELECT `tagline_image` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
 
@@ -677,7 +673,6 @@ class core
 					{
 						unlink($this->config('path') . 'uploads/articles/tagline_images/' . $image['tagline_image']);
 						unlink($this->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $image['tagline_image']);
-						unlink($this->config('path') . 'uploads/articles/tagline_images/thumbnails/' . $image['tagline_image'] . '_tiny');
 					}
 				}
 				

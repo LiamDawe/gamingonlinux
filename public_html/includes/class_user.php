@@ -814,6 +814,7 @@ class user
 		}
 	}
 
+	// To show profile icons for website and social networks on comments/forum posts
 	public static function user_profile_icons($profile_fields, $data)
 	{
 		$profile_fields_output = '';
@@ -830,11 +831,8 @@ class user
 
 				if ($field['db_field'] == 'website')
 				{
-					$url = parse_url($data[$field['db_field']]);
-					if((!isset($url['scheme'])) || (isset($url['scheme']) && $url['scheme'] != 'https' && $url['scheme'] != 'http'))
-					{
-						$data[$field['db_field']] = 'http://' . $data[$field['db_field']];
-					}
+					$data[$field['db_field']] = str_replace('https://', '', $data[$field['db_field']]);
+					$data[$field['db_field']] = str_replace('http://', '', $data[$field['db_field']]);
 				}
 
 				$url = '';

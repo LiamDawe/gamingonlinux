@@ -43,7 +43,7 @@ $resolution_options = array(
 
 $gaming_machine_types = array('Desktop', 'Laptop', 'Sofa/Console PC');
 $gamepads = array("None", "Steam Controller", "Xbox 360", "Xbox One", "PS4", "PS3", "Logitech", "Switch Pro", "Other");
-$vrheadset = array('HTC Vive', 'HTC Vive Pro', 'Valve Index', 'Planning to get one', 'No plan to get one');
+$vrheadset = array('HTC Vive', 'HTC Vive Pro', 'Valve Index', 'Oculus Rift', 'Oculus Rift S', 'Planning to get one', 'No plan to get one');
 
 if (!isset($_POST['act']))
 {

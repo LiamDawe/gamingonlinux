@@ -32,7 +32,6 @@ $charts_list = array(
 	array("name" => "Linux Distributions (Combined)", "bundle_outside_top10" => 1),
 	array("name" => "Linux Distributions (Split)", "bundle_outside_top10" => 1),
 	array("name" => "Desktop Environment", "bundle_outside_top10" => 1),
-	array("name" => "Distro Architecture", "bundle_outside_top10" => 0),
 	array("name" => "Dual Booting", "bundle_outside_top10" => 0),
 	array("name" => "Steam Play Use", "bundle_outside_top10" => 0),
 	array("name" => "Wine Use", "bundle_outside_top10" => 0),

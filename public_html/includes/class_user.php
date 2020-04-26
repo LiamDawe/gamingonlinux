@@ -608,7 +608,6 @@ class user
 
 		$additionaldb = $this->db->run("SELECT
 			p.`desktop_environment`,
-			p.`what_bits`,
 			p.`cpu_vendor`,
 			p.`cpu_model`,
 			p.`gpu_vendor`,
@@ -660,12 +659,6 @@ class user
 			{
 				$pc_info['counter']++;
 				$pc_info['desktop'] = '<strong>Desktop Environment:</strong> ' . $additionaldb['desktop_environment'];
-			}
-
-			if ($additionaldb['what_bits'] != NULL && !empty($additionaldb['what_bits']))
-			{
-				$pc_info['counter']++;
-				$pc_info['what_bits'] = '<strong>Distribution Architecture:</strong> '.$additionaldb['what_bits'];
 			}
 
 			if ($additionaldb['dual_boot'] != NULL && !empty($additionaldb['dual_boot']))

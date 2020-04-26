@@ -69,7 +69,6 @@ unset($dat);
 $charts = array (
 array ("name" => "Linux Distributions (Split)", "db_field" => "u.distro", "table" => 'users u INNER JOIN user_profile_info p ON u.user_id = p.user_id'),
 array ("name" => "Desktop Environment", "db_field" => "p.desktop_environment"),
-array ("name" => "Distro Architecture", "db_field" => "p.what_bits"),
 array ("name" => "Dual Booting", "db_field" => "p.dual_boot"),
 array ("name" => "Steam Play Use", "db_field" => "p.steamplay"),
 array ("name" => "Wine Use", "db_field" => "p.wine"),

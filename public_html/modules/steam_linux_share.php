@@ -96,7 +96,12 @@ $linux_share_data = "
 	data: [".implode(', ', $linux_perc)."],
 	backgroundColor: '".$colours[1]."',
 	borderColor: '".$colours[1]."',
-	borderWidth: 1
+	borderWidth: 1,
+	trendlineLinear: {
+		style: '#FF0000',
+		lineStyle: 'dotted',
+		width: 2
+	}
 }";
 
 $linuxonly = "<div class=\"chartjs-container\"><canvas id=\"linuxonly\" width=\"400\" height=\"200\"></canvas></div>";

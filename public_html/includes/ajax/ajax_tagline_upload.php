@@ -11,6 +11,12 @@ include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 $img = new SimpleImage();
 
+// only logged in accounts can do this too, it's only for articles
+if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
+{
+	die('You shouldn\'t be here.');
+}
+
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 {
 	if (isset($_FILES['photos2']) && $_FILES['photos2']['error'] == 0)

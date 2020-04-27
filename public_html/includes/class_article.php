@@ -1564,7 +1564,7 @@ class article
 					}
 				}
 
-				$logged_in_options = $this->templating->store_replace($logged_in_options, array('post_id' => $comments['comment_id'], 'like_button' => $like_button));
+				$logged_in_options = $this->templating->store_replace($logged_in_options, array('post_id' => $comments['comment_id'], 'like_button' => $like_button, 'article_id' => $article_info['article']['article_id']));
 			}
 			$this->templating->set('logged_in_options', $logged_in_options);
 			$this->templating->set('bookmark', $bookmark_comment);

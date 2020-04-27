@@ -458,7 +458,7 @@ else
 						{
 							$bookmark = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="forum_topic" data-id="'.$_GET['topic_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
 						}
-						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$topic['topic_id']."\" data-type=\"forum_topic\"><span class=\"icon quote\">Quote</span></a></li>";
+						$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reporttopic&topic_id={$topic['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$topic['topic_id']."\" data-type=\"forum_topic\" href=\"/index.php?module=newreply&qid=".$topic['topic_id']."&topic_id=".$topic['topic_id']."&forum_id=".$topic['forum_id']."&type=topic\"><span class=\"icon quote\">Quote</span></a></li>";
 
 						// see if the user has liked the forum topic
 						$get_user_like = $dbl->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` = ? AND `type` = 'forum_topic'", array($_SESSION['user_id'], $topic['topic_id']))->fetchOne();
@@ -730,7 +730,7 @@ else
 							$bookmark_reply = '';
 							if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 							{
-								$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\"><span class=\"icon quote\">Quote</span></a></li>";
+								$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\" href=\"/index.php?module=newreply&qid=".$post['post_id']."&topic_id=".$topic['topic_id']."&forum_id=".$topic['forum_id']."&type=reply\"><span class=\"icon quote\">Quote</span></a></li>";
 								// sort bookmark icon out
 								if (in_array($post['post_id'], $bookmarks_array))
 								{

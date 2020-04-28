@@ -61,6 +61,7 @@
 	--likes-bg-color: #DFDFDF;
 	--likes-bg-gradient: linear-gradient(to left, rgba(223,223,223,0), rgba(223,223,223,1));
 	--bottom-meta-button-color: #ffffff;
+	--info-box-shadow: rgb(179, 179, 179);
 	// comments
 	--comments-main-background-color: #fff;
 	--comment-box-border: 1px solid #dbdbdb;
@@ -171,6 +172,7 @@
 	--likes-bg-color: #383838;
 	--likes-bg-gradient: linear-gradient(to left, rgba(56,56,56,0), rgba(56,56,56,1));
 	--bottom-meta-button-color: #414141;
+	--info-box-shadow: #333;
 	// comments
 	--comments-main-background-color: #151515;
 	--comment-box-border: 1px solid #444444;
@@ -986,6 +988,17 @@ a.button {
 }
 
 /* Articles */
+.info_box{
+	max-width: 90%;
+	box-shadow: 10px 10px var(--info-box-shadow); 
+	border: 1px solid grey;
+	padding: 5px;
+	margin-bottom: 1.5rem;
+	padding-right: 1.5rem;
+	box-sizing: border-box;
+	margin: 0 auto;
+	margin-bottom: 10px;
+}
 .article {
 	background: var(--article-main-background);
 	margin: 0 0 9px 0;
@@ -2518,7 +2531,7 @@ span.select2-container--default.select2-container--disabled .select2-selection--
 
 .select2-results {background-color: var(--select2-picked-hover-bg);}
 
-div.cke_wysiwyg_div {background-color: var(--input-field-background); padding: 5px;}
+div.cke_wysiwyg_div {background-color: var(--article-main-background); padding: 5px;}
 
 textarea.cke_source {background: var(--input-field-background); white-space: pre-wrap;}
 

@@ -653,7 +653,7 @@ class user
 			if (!empty($additionaldb['distro']) && $additionaldb['distro'] != 'Not Listed')
 			{
 				$pc_info['counter']++;
-				$pc_info['distro'] = "<strong>Distribution:</strong> <img class=\"distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$additionaldb['distro']}.svg\" alt=\"{$additionaldb['distro']}\" /> {$additionaldb['distro']}";
+				$pc_info['distro'] = "<strong>Distribution:</strong> <img class=\"pc-info-distro\" height=\"20px\" width=\"20px\" src=\"/templates/default/images/distros/{$additionaldb['distro']}.svg\" alt=\"{$additionaldb['distro']}\" /> {$additionaldb['distro']}";
 			}
 			if (!empty($additionaldb['desktop_environment']))
 			{

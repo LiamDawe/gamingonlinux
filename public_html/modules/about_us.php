@@ -41,7 +41,7 @@ foreach ($get_editors as $editors)
 	{
 		if (isset($editors['author_picture']) && !empty($editors['author_picture']) && $editors['author_picture'] != NULL)
 		{
-			$author_pic = '/uploads/avatars/author_pictures/'.$editors['author_picture'];
+			$author_pic = '<img src="'.url.'uploads/avatars/author_pictures/'.$editors['author_picture'].'" />';
 			$templating->block('row');
 			$templating->set('author_picture', $author_pic);
 		}

@@ -46,7 +46,7 @@ if (!isset($_POST['act']))
 		}
 	}
 
-	$grab_streams = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC")->fetch_all();
+	$grab_streams = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url`, `author_id` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC")->fetch_all();
 	if ($grab_streams)
 	{
 		foreach ($grab_streams as $streams)
@@ -100,7 +100,21 @@ if (!isset($_POST['act']))
 			}
 			
 			$templating->set('profile_links', $streamer_list);
-	}
+
+			$options = '';
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			{
+				if ($_SESSION['user_id'] == $streams['author_id'] || $user->check_group([1,2]) == true)
+				{
+					$options = '<input type="hidden" name="livestream_id" value="'.$streams['row_id'].'" /><button formaction="/index.php?module=livestreams" value="Delete" name="act">Delete</button>';
+				}
+			}
+			if (!empty($options))
+			{
+				$options = '<form method="post">' . $options . '</form>';
+			}
+			$templating->set('options', $options);
+		}
 	}
 	else
 	{
@@ -174,6 +188,7 @@ if (isset($_POST['act']))
 		else if (isset($_POST['no']))
 		{
 			header("Location: /index.php?module=livestreams");
+			die();
 		}
 
 		else if (isset($_POST['yes']))
@@ -207,6 +222,45 @@ if (isset($_POST['act']))
 
 			unset($_SESSION['live_info']);
 			header("Location: /index.php?module=livestreams");
+			die();
+		}
+	}
+	if ($_POST['act'] == 'Delete')
+	{
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$core->confirmation(['title' => 'Are you sure you wish to delete that livestream?', 'text' => 'This cannot be undone!', 'act' => 'Delete', 'action_url' => '/index.php?module=livestreams', 'act_2_name' => 'livestream_id', 'act_2_value' => $_POST['livestream_id']]);
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: /index.php?module=livestreams");
+			die();
+		}
+		else if (isset($_POST['yes']))
+		{
+			if (!isset($_POST['livestream_id']))
+			{
+				header("Location: /index.php?module=livestreams");
+				die();
+			}
+
+			$checkid = $dbl->run("SELECT `author_id` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC")->fetchOne();
+			if ($checkid)
+			{
+				if ($checkid != $_SESSION['user_id'] && $user->check_group([1,2]) != true)
+				{
+					header("Location: /index.php?module=livestreams");
+					die();				
+				}
+				$dbl->run("DELETE FROM `livestreams` WHERE `row_id` = ? AND `author_id` = ?", array($_POST['livestream_id'], $checkid));
+
+				$_SESSION['message'] = 'deleted';
+				$_SESSION['message_extra'] = 'livestream entry';
+				header("Location: /index.php?module=livestreams");
+				die();
+			}
+
 		}
 	}
 }

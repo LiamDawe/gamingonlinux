@@ -1,0 +1,30 @@
+[block: main_top]
+<div class="box">
+	<div class="head">Manage Subscriptions</div>
+	<div class="body group"><a href="/usercp.php?module=subscriptions&go=unsubscribe&all=1">Remove all subscriptions</a></div>
+</div>
+[/block: main_top]
+
+[block: post_row]
+	<div class="box">
+		<div class="body group">
+			<strong><a href="{:item_link}">{:title}</a></strong><br />
+			by <a href="/profiles/{:author_id}">{:author}</a> on {:date}<br />
+			<br />
+			<form method="post">
+				Adjust your subscription:<br />
+				<select name="subscribe-type">
+					<option value="sub-only" {:no_emails}>Subscribe without emails</option>
+					<option value="sub-emails" {:get_emails}>Subscribe and get emailed</option>
+				</select><br />
+				<input type="hidden" name="type" value="{:type}" />
+				<input type="hidden" name="item_id" value="{:item_id}" />
+				<button type="submit" formaction="/usercp.php?module=subscriptions&go=update">Update Subscription</button> <button type="submit" formaction="/usercp.php?module=subscriptions&go=unsubscribe&item_id={:item_id}">Unsubscribe</button>
+			</form>
+		</div>
+	</div>
+[/block: post_row]
+
+[block: main_bottom]
+{:pagination}
+[/block: main_bottom]

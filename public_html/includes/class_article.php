@@ -1481,7 +1481,7 @@ class article
 			$who_likes_link = '';
 			if ($comments['total_likes'] > 0)
 			{
-				$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
+				$who_likes_link = ', <a class="who_likes" href="/index.php?module=who_likes&amp;comment_id='.$comments['comment_id'].'" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
 			}
 			$this->templating->set('who_likes_link', $who_likes_link);
 

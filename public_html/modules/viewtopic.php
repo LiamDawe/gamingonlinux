@@ -488,7 +488,7 @@ else
 					$who_likes_link = '';
 					if ($topic['total_likes'] > 0)
 					{
-						$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?topic_id='.$topic['topic_id'].'">Who?</a>';
+						$who_likes_link = ', <a class="who_likes" href="/index.php?module=who_likes&amp;topic_id='.$topic['topic_id'].'" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?topic_id='.$topic['topic_id'].'">Who?</a>';
 					}
 					$templating->set('who_likes_link', $who_likes_link);
 
@@ -715,7 +715,7 @@ else
 							$who_likes_link = '';
 							if ($post['total_likes'] > 0)
 							{
-								$who_likes_link = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?reply_id='.$post['post_id'].'">Who?</a>';
+								$who_likes_link = ', <a class="who_likes" href="/index.php?module=who_likes&amp;reply_id='.$post['post_id'].'" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?reply_id='.$post['post_id'].'">Who?</a>';
 							}
 							$templating->set('who_likes_link', $who_likes_link);
 

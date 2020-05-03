@@ -45,6 +45,7 @@ if(isset($_GET['comment_id']) || isset($_GET['article_id']) || isset($_GET['topi
 		$templating->load('who_likes');
 
 		$templating->block('top');
+		$templating->set('modal-standalone', '');
 
 		foreach($grab_users as $user_who)
 		{

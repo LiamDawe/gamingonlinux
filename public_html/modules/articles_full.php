@@ -427,7 +427,7 @@ if (!isset($_GET['go']))
 				$who_likes_alink = '';
 				if ($article['total_likes'] > 0)
 				{
-					$who_likes_alink = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?article_id='.$article['article_id'].'">Who?</a>';
+					$who_likes_alink = ', <a class="who_likes" href="/index.php?module=who_likes&amp;article_id='.$article['article_id'].'" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?article_id='.$article['article_id'].'">Who?</a>';
 				}
 				$templating->set('who_likes_alink', $who_likes_alink);
 

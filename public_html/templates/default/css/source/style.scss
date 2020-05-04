@@ -762,6 +762,9 @@ ul.pagination_small > :first-child
 	background: var(--box-body-background);
 	padding: 10px;
 }
+.box .body-plain {
+	padding: 10px;
+}
 .box .body.list, .box .body.no-pad {
 	padding: 0;
 }

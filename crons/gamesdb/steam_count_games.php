@@ -18,7 +18,7 @@ class looper
 	public $last_page = 0;
 	public $page = 1;
 	
-	public function do_loop($start_page = 1)
+	public function do_loop($start_page = 1, $game_sales)
 	{
 		if ($start_page != 1)
 		{
@@ -65,7 +65,7 @@ class looper
 				else
 				{
 					echo 'LOOPING, NOT LAST PAGE' . PHP_EOL;
-					$this->do_loop($this->page - 1);
+					$this->do_loop($this->page - 1, 1, $game_sales);
 				}
 			}
 			else
@@ -80,13 +80,13 @@ class looper
 					{
 						$link = $element->href;
 
-						$title = clean_title($element->find('span.title', 0)->plaintext);	
+						$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
 						$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
-						$stripped_title = stripped_title($title);
+						$stripped_title = $game_sales->stripped_title($title);
 						echo $title . "\n";
 
 						$release_date_raw = $element->find('div.search_released', 0)->plaintext;
-						$clean_release_date = strtotime(steam_release_date($release_date_raw));
+						$clean_release_date = strtotime($game_sales->steam_release_date($release_date_raw));
 
 						if (!in_array($title, $this->games_done)) // prevent dupes
 						{
@@ -115,7 +115,7 @@ class looper
 
 $steamloop = new looper();
 
-$steamloop->do_loop(); // let's do it!
+$steamloop->do_loop(1, $game_sales); // let's do it!
 
 ksort($steamloop->games_months);
 

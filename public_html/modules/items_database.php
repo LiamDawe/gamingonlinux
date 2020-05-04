@@ -161,9 +161,9 @@ if (isset($_GET['view']))
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
 			$templating->set_previous('title', $get_item['name'], 1);
 
-			if ($get_item['supports_linux'] == 0)
+			if ($get_item['supports_linux'] == 0 && !empty($get_item['steam_link']))
 			{
-				$core->message("Note: This item does not currently support Linux. You can try Steam Play Proton (<a href=\"https://www.gamingonlinux.com/articles/a-simple-guide-to-steam-play-valves-technology-for-playing-windows-games-on-linux.14552\">Guide</a>) or Wine.", 2);
+				$core->message("Note: This item does not currently support Linux. You can try <a href=\"https://www.gamingonlinux.com/steamplay/\">Steam Play Proton</a> or Wine.", 2);
 			}
 
 			if ($get_item['is_hidden_steam'] == 1)
@@ -393,6 +393,8 @@ if (isset($_GET['view']))
 				$templating->block('articles', 'items_database');
 				$templating->set('articles', $article_list);
 			}
+
+			$templating->block('help_info');
 
 			if ($user->check_group([1,2,5]))
 			{

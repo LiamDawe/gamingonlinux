@@ -162,6 +162,8 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^articles/category/(.+?)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA,B]
   
+  RewriteRule ^itemdb/?$ /itemdb.php [N,NC,QSA]
+  
   RewriteRule ^itemdb/([0-9]+)/?$ /index.php?module=items_database&view=item&id=$1 [N,NC,QSA]
 
   RewriteRule ^itemdb/developer/([0-9]+)/?$ /index.php?module=items_database&view=developer&id=$1 [N,NC,QSA]

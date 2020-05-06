@@ -394,7 +394,7 @@ if (isset($_GET['view']))
 				$templating->set('articles', $article_list);
 			}
 
-			$templating->block('help_info');
+			$templating->block('help_info', 'items_database');
 
 			if ($user->check_group([1,2,5]))
 			{

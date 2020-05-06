@@ -111,6 +111,9 @@ if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 				}
 
 				$templating->block('chart_section', 'statistics');
+				$chart_id_link = str_replace(' ', '', $chart['name']); // Replaces all spaces with hyphens.
+				$chart_id_link = preg_replace('/[^A-Za-z0-9\-]/', '', $chart_id_link); // Removes special chars.
+				$templating->set('title_id', $chart_id_link); 
 				$templating->set('title', $chart['name']);
 				$templating->set('graph', $grab_chart['graph']);
 				$download_link = '';
@@ -142,15 +145,20 @@ if (isset($_GET['view']) && $_GET['view'] == 'trends')
 		$charts = new charts($dbl);
 		$grab_chart = $charts->trends_charts($chart['name'], $order);
 
+		$chart_id_link = str_replace(' ', '', $chart['name']); // Replaces all spaces with hyphens.
+		$chart_id_link = preg_replace('/[^A-Za-z0-9\-]/', '', $chart_id_link); // Removes special chars.
+
 		$templating->block('trend_chart');
 		if (isset($grab_chart['graph']))
 		{
 			$templating->set('title', $chart['name']);
+			$templating->set('title_id', $chart_id_link); 
 			$templating->set('graph', '<div style="text-align:center; width: 100%;">' . $grab_chart['graph'] . '</div>');
 		}
 		else
 		{
 			$templating->set('title', $chart['name']);
+			$templating->set('title_id', $chart_id_link); 
 			$templating->set('graph', 'Chart not generated yet.');
 		}	
 	}

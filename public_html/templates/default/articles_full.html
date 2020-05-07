@@ -202,6 +202,10 @@
 </article>
 [/block: bottom]
 
+[block: top-articles-bottom]
+<div class="box"><div class="info_box_top_articles">Some popular articles from the last month: <ul>{:top_articles}</ul></div></div>
+[/block: top-articles-bottom]
+
 [block: patreon_comments]
 <div class="box patreon_comments">
 	<div class="body group">
@@ -224,7 +228,7 @@
 <div class="box">
 	<div class="body group">
 		<strong>Subscribe to article comments?</strong><br />
-		<em>You can <a href="/usercp.php?module=article_subscriptions">see all watched articles here</a>.</em><br />
+		<em>You can <a href="/usercp.php?module=subscriptions">see all watched articles here</a>.</em><br />
 		<label class="checkbox">
 			<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to comments
 		</label>

@@ -612,6 +612,27 @@ if (!isset($_GET['go']))
 					{
 						$core->message('Commenting is currently down for maintenance.');
 					}
+
+					// below everything else
+
+					/*
+					// top articles this month
+					*/
+					$top_article_query = "SELECT `article_id`, `title` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND `views` > ? AND `show_in_menu` = 0 ORDER BY RAND() DESC LIMIT 3";
+
+					$fetch_top3 = $dbl->run($top_article_query, array($core->config('hot-article-viewcount')))->fetch_all();
+					
+					if (is_array($fetch_top3) && count($fetch_top3) === 3)
+					{
+						$templating->block('top-articles-bottom', 'articles_full');
+						$hot_articles = '';
+						foreach ($fetch_top3 as $top_articles)
+						{
+							$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a></li>';
+						}
+
+						$templating->set('top_articles', $hot_articles);
+					}
 				}
 			}
 		}

@@ -85,10 +85,11 @@ class game_sales
 				{
 					if ($update_naming == 0)
 					{
-						echo PHP_EOL . 'Leaving original name in place - adding new duplicate name.' . PHP_EOL;
+						echo PHP_EOL . 'Leaving original name in place.' . PHP_EOL;
 						$exists = $this->dbl->run("SELECT 1 FROM `item_dupes` WHERE `real_id` = ? AND BINARY `name` = ?", array($name_change, $title))->fetchOne();
 						if (!$exists)
 						{
+							echo PHP_EOL . 'Adding new duplicate name.' . PHP_EOL;
 							$this->dbl->run("INSERT IGNORE INTO `item_dupes` SET `real_id` = ?, `name` = ?", array($name_change, $title));
 						}
 					}

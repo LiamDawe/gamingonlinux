@@ -54,16 +54,17 @@ foreach($locked as $row)
 /*
 REMOVE OLD ARTICLE IMAGE UPLOADS THAT AREN'T ATTACHED TO AN ARTICLE
 */
-$upload_timeout = 86400; // 1 day
+$upload_timeout = 1; // 1 day
 
 $upload_stamp = time() - $upload_timeout;
 
 // grab all old article_images
-$grab_all = $dbl->run("SELECT `filename` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0 OR `article_id` IS NULL", array($upload_stamp))->fetch_all();
+$grab_all = $dbl->run("SELECT `filename`, `filetype` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0 OR `article_id` IS NULL", array($upload_stamp))->fetch_all();
 foreach ($grab_all as $grabber)
 {
 	$main = APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename'];
 	$thumb = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename'];
+	
 	if (file_exists($main))
 	{
 		unlink($main);
@@ -71,6 +72,18 @@ foreach ($grab_all as $grabber)
 	if (file_exists($thumb))
 	{
 		unlink($thumb);
+	}
+
+	if ($grabber['filetype'] == 'gif')
+	{
+		$static_filename = str_replace('.gif', '', $grabber['filename']);
+
+		$static_fullname = APP_ROOT . '/uploads/articles/article_media/' . $static_filename .'_static.jpg';
+
+		if (file_exists($static_fullname))
+		{
+			unlink($static_fullname);
+		}
 	}
 }
 

@@ -3,6 +3,10 @@ define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
 require APP_ROOT . "/includes/cron_bootstrap.php";
 
+require APP_ROOT . '/includes/aws/aws-autoloader.php';
+
+use Aws\S3\S3Client;
+
 /*
 REMOVE LIVESTREAMS THAT HAVE FINISHED
 */
@@ -54,40 +58,79 @@ foreach($locked as $row)
 /*
 REMOVE OLD ARTICLE IMAGE UPLOADS THAT AREN'T ATTACHED TO AN ARTICLE
 */
-$upload_timeout = 1; // 1 day
+$upload_timeout = 86400; // 1 day
 
 $upload_stamp = time() - $upload_timeout;
 
-// grab all old article_images
-$grab_all = $dbl->run("SELECT `filename`, `filetype` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0 OR `article_id` IS NULL", array($upload_stamp))->fetch_all();
+// grab all old article_images and remove them if not used
+$key = $core->config('do_space_key_uploads');
+$secret = $core->config('do_space_key_private_uploads');
+
+$client = new Aws\S3\S3Client([
+        'version' => 'latest',
+        'region'  => 'am3',
+        'endpoint' => 'https://ams3.digitaloceanspaces.com',
+        'credentials' => [
+                'key'    => $key,
+                'secret' => $secret,
+            ],
+]);
+
+$grab_all = $dbl->run("SELECT `filename`, `filetype`, `location` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0 OR `article_id` IS NULL", array($upload_stamp))->fetch_all();
 foreach ($grab_all as $grabber)
 {
-	$main = APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename'];
-	$thumb = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename'];
-	
-	if (file_exists($main))
+	if ($grabber['location'] == NULL)
 	{
-		unlink($main);
-	}
-	if (file_exists($thumb))
-	{
-		unlink($thumb);
-	}
+		$main = APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename'];
+		$thumb = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename'];
 
-	if ($grabber['filetype'] == 'gif')
-	{
-		$static_filename = str_replace('.gif', '', $grabber['filename']);
-
-		$static_fullname = APP_ROOT . '/uploads/articles/article_media/' . $static_filename .'_static.jpg';
-
-		if (file_exists($static_fullname))
+		if (file_exists($main))
 		{
-			unlink($static_fullname);
+			unlink($main);
+		}
+		if (file_exists($thumb))
+		{
+			unlink($thumb);
+		}
+	
+		if ($grabber['filetype'] == 'gif')
+		{
+			$static_filename = str_replace('.gif', '', $grabber['filename']);
+	
+			$static_fullname = APP_ROOT . '/uploads/articles/article_media/' . $static_filename .'_static.jpg';
+	
+			if (file_exists($static_fullname))
+			{
+				unlink($static_fullname);
+			}
 		}
 	}
+	else
+	{
+		$result = $client->deleteObject([
+			'Bucket' => 'goluploads',
+			'Key'    => 'uploads/articles/article_media/' . $grabber['filename']
+		]);
+		
+		if ($grabber['filetype'] == 'gif')
+		{
+			$static_filename = str_replace('.gif', '_static.jpg', $grabber['filename']);
+			
+			$result = $client->deleteObject([
+				'Bucket' => 'goluploads',
+				'Key'    => 'uploads/articles/article_media/' . $static_filename
+			]);
+		}
+
+		$result = $client->deleteObject([
+			'Bucket' => 'goluploads',
+			'Key'    => 'uploads/articles/article_media/thumbs/' . $grabber['filename']
+		]);
+	}
+	echo PHP_EOL.'File ' . $grabber['filename'] . ' removed.'.PHP_EOL;
 }
 
-$dbl->run("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0", array($stamp));
+$dbl->run("DELETE FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0 OR `article_id` IS NULL", array($upload_stamp));
 
 /*
 REMOVE TEMP ITEMDB UPLOADS

@@ -20,7 +20,7 @@ class mailer
     public function sendMail($to, $subject, $body, $plainText = NULL, $reply_to = NULL)
 	{
 		// add in logo
-		$body = '<img src="' . $this->core->config('static_image_url') . 'logos/' . $this->core->config('template') . 'icon.png" alt="' . $this->core->config('site_title') . '"><br />' . $body;
+		$body = '<img src="' . $this->core->config('static_image_url') . 'logos/' . 'icon.svg" width="35" height="35" alt="' . $this->core->config('site_title') . '"><br />' . $body;
 
 		// add in footer
 		$body = $body . '<div>

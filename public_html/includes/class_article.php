@@ -204,7 +204,7 @@ class article
 		if ($article_id != NULL)
 		{
 			// add in uploaded images from database
-			$article_images = $this->dbl->run("SELECT `filename`,`id`,`filetype`,`youtube_cache` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
+			$article_images = $this->dbl->run("SELECT `filename`, `location`, `id`,`filetype`,`youtube_cache` FROM `article_images` WHERE `article_id` = ? ORDER BY `id` ASC", array($article_id))->fetch_all();
 		}
 		else
 		{
@@ -230,6 +230,13 @@ class article
 				}
 				$youtube_thumb = '';
 
+				$core_url = $this->core->config('website_url');
+
+				if ($value['location'] != NULL)
+				{
+					$core_url = $this->core->config('external_media_upload_url');
+				}
+
 				if ($value['youtube_cache'] == 1)
 				{
 					$youtube_thumb = 'YouTube Thumbnail Image: <br />';
@@ -239,7 +246,7 @@ class article
 				}
 				else
 				{
-					$main_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $value['filename'];
+					$main_url = $core_url . 'uploads/articles/article_media/' . $value['filename'];
 					$main_path = APP_ROOT . '/uploads/articles/article_media/' . $value['filename'];
 				}
 				$gif_static_button = '';
@@ -255,7 +262,7 @@ class article
 					}
 					else
 					{
-						$thumb_url = $this->core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $value['filename'];
+						$thumb_url = $core_url . 'uploads/articles/article_media/thumbs/' . $value['filename'];
 						$thumb_path = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $value['filename'];
 						$thumbnail_button = '<button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button>'; // we don't make an extra thumbnail for the youtube cache images
 					}
@@ -263,17 +270,8 @@ class article
 					if ($value['filetype'] == 'gif')
 					{
 						$static_filename = str_replace('.gif', '_static.jpg', $value['filename']);
-						$static_url = $this->core->config('website_url') . 'uploads/articles/article_media/' . $static_filename;
+						$static_url = $core_url . 'uploads/articles/article_media/' . $static_filename;
 						$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
-					}
-
-					// for old uploads where no thumbnail was made, make one
-					if (!file_exists($thumb_path) && file_exists($main_path))
-					{
-						include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
-
-						$img = new SimpleImage();
-						$img->fromFile($main_path)->resize(350, null)->toFile($thumb_path);
 					}
 
 					$preview_file = '<img src="' . $thumb_url . '" class="imgList"><br />';

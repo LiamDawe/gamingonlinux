@@ -65,6 +65,7 @@ if (!isset($_GET['module']) || isset($_GET['module']) && $_GET['module'] != 'art
 $templating->load('mainpage');
 
 $templating->block('top');
+$templating->set('static_image_url', $core->config('static_image_url'));
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
 $templating->set('url', $core->config('website_url'));
 

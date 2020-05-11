@@ -412,18 +412,7 @@ class user
 						$secure = 1;
 					}
 
-					// TESTING FOR COOKIE NOT UPDATING
-					if (headers_sent())
-					{
-						error_log("Headers were already sent - setcookie won't work." . PHP_EOL . print_r(getallheaders(), true) . PHP_EOL . core::current_page_url());
-					}
-
 					setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
-
-					if ($this->user_details['user_id'] == 1)
-					{
-						error_log('liam login cookie should be - ' . $lookup . '.' . $validator . ' (with hash - '.hash('sha256', $validator).') - cookie actually was being set to: ' . $this->getcookie('gol_session'));
-					}
 
 					$this->register_session();
 

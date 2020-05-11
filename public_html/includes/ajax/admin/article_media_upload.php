@@ -5,6 +5,23 @@ define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
+require APP_ROOT . '/includes/aws/aws-autoloader.php';
+
+$key = $core->config('do_space_key_uploads');
+$secret = $core->config('do_space_key_private_uploads');
+
+use Aws\S3\S3Client;
+
+$client = new Aws\S3\S3Client([
+        'version' => 'latest',
+        'region'  => 'am3',
+        'endpoint' => 'https://ams3.digitaloceanspaces.com',
+        'credentials' => [
+                'key'    => $key,
+                'secret' => $secret,
+            ],
+]);
+
 include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 $img = new SimpleImage();
@@ -54,7 +71,18 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				$image_name = $new_media_name.'.'.$ext;
 				$main_newname = $uploaddir.$image_name;
 
-				$main_url = $core->config('website_url') . 'uploads/articles/article_media/' . $image_name;
+				$mime = mime_content_type($_FILES['media']['tmp_name'][$name]);
+
+				if (isset($_POST['local_upload']))
+				{
+					$main_url = $core->config('website_url') . 'uploads/articles/article_media/' . $image_name;
+					$location = NULL;
+				}
+				else
+				{
+					$main_url = $core->config('external_media_upload_url') . 'uploads/articles/article_media/' . $image_name;
+					$location = $core->config('external_media_upload_url');
+				}
 				$gif_static_button = '';
 				$thumbnail_button = '';
 				$data_type = '';
@@ -62,31 +90,94 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 				// only for images
 				if ($ext != 'mp4' && $ext != 'webm' && $ext != 'ogg' && $ext != 'mp3')
 				{
-					$thumb_url = $core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $image_name;
-
 					// thumbs
 					$img->fromFile($_FILES['media']['tmp_name'][$name]);
 
 					$thumb_newname = $thumbs_dir.$image_name;
 
-					// so we don't make a big thumbnail of a small image
-					if ($img->getWidth() <= 450)
+					/* LOCAL FILESYSTEM UPLOADS */
+					if (isset($_POST['local_upload']))
 					{
-						$img->fromFile($_FILES['media']['tmp_name'][$name])->toFile($thumb_newname);
+						$thumb_url = $core->config('website_url') . 'uploads/articles/article_media/thumbs/' . $image_name;
+
+						// so we don't make a big thumbnail of a small image
+						if ($img->getWidth() <= 450)
+						{
+							$img->fromFile($_FILES['media']['tmp_name'][$name])->toFile($thumb_newname);
+						}
+						else
+						{
+							$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(450, null)->toFile($thumb_newname);
+						}
+
+						// if it's a gif, we need a static version to switch to a gif
+						if ($ext == 'gif')
+						{
+							$static_pic = $uploaddir.$new_media_name.'_static.jpg';
+							$img->fromFile($_FILES['media']['tmp_name'][$name])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($static_pic, 'image/jpeg');
+
+							$static_url = $core->config('website_url') . 'uploads/articles/article_media/'.$new_media_name.'_static.jpg';
+							$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
+						}
 					}
+					/* EXTERNAL FILE UPLOADS 
+					This is for uploading to DO Spaces, AWS etc
+					*/
 					else
 					{
-						$img->fromFile($_FILES['media']['tmp_name'][$name])->resize(450, null)->toFile($thumb_newname);
-					}
+						$thumb_url = $core->config('external_media_upload_url') . 'uploads/articles/article_media/thumbs/' . $image_name;
 
-					// if it's a gif, we need a static version to switch to a gif
-					if ($ext == 'gif')
-					{
-						$static_pic = $uploaddir.$new_media_name.'_static.jpg';
-						$img->fromFile($_FILES['media']['tmp_name'][$name])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($static_pic, 'image/jpeg');
+						// so we don't make a big thumbnail of a small image
+						if ($img->getWidth() <= 450)
+						{
+							$thumb_file = $img->fromFile($_FILES['media']['tmp_name'][$name])->toString();
+						}
+						else
+						{
+							$thumb_file = $img->fromFile($_FILES['media']['tmp_name'][$name])->resize(450, null)->toString();
+						}
 
-						$static_url = $core->config('website_url') . 'uploads/articles/article_media/'.$new_media_name.'_static.jpg';
-						$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
+						// if it's a gif, we need a static version to switch to a gif
+						if ($ext == 'gif')
+						{
+							$static_pic = $new_media_name.'_static.jpg';
+							$static_file = $img->fromFile($_FILES['media']['tmp_name'][$name])->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toString('image/jpeg');
+
+							$static_url = $core->config('external_media_upload_url') . 'uploads/articles/article_media/'.$new_media_name.'_static.jpg';
+							$gif_static_button = '<button data-url-gif="'.$main_url.'" data-url-static="'.$static_url.'" class="add_static_button">Insert Static</button>';
+
+							$upload_details = [
+								'Bucket' => 'goluploads',
+								'Key'    => 'uploads/articles/article_media/' . $static_pic,
+								'Body'   => $static_file,
+								'ACL'    => 'public-read',
+								'ContentType' => $mime
+							];
+							try {
+								$result = $client->putObject($upload_details);
+							} 
+							catch (S3Exception $e) 
+							{
+								echo 'there has been an exception<br>';
+								print_r($e);
+							}
+						}		
+
+						$upload_details = [
+							'Bucket' => 'goluploads',
+							'Key'    => 'uploads/articles/article_media/thumbs/' . $image_name,
+							'Body'   => $thumb_file,
+							'ACL'    => 'public-read',
+							'ContentType' => $mime
+						];
+						try {
+							$result = $client->putObject($upload_details);
+						} 
+						catch (S3Exception $e) 
+						{
+							echo 'there has been an exception<br>';
+							print_r($e);
+						}
 					}
 
 					$thumbnail_button = '<button data-url="'.$thumb_url.'" data-main-url="'.$main_url.'" class="add_thumbnail_button">Insert thumbnail</button>';
@@ -104,8 +195,40 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 					$preview_file = '<div class="ckeditor-html5-audio" style="text-align: center;"><audio controls="controls" src="'.$main_url.'">&nbsp;</audio></div>';
 					$data_type = 'audio';
 				}
+
+				// upload the main file
+
+				if (isset($_POST['local_upload']))
+				{
+					if (move_uploaded_file($_FILES['media']['tmp_name'][$name], $main_newname))
+					{
+						$finished = 1;
+					}
+				}
+				else
+				{
+					$to_upload = fopen($_FILES['media']['tmp_name'][$name],'rb');
+
+					$upload_details = [
+						'Bucket' => 'goluploads',
+						'Key'    => 'uploads/articles/article_media/' . $image_name,
+						'Body'   => $to_upload,
+						'ACL'    => 'public-read',
+						'ContentType' => $mime
+					];
+					try {
+						$result = $client->putObject($upload_details);
+						$finished = 1;
+					} 
+					catch (S3Exception $e) 
+					{
+						echo 'there has been an exception<br>';
+						print_r($e);
+					}
+				}
+				
 					
-				if (move_uploaded_file($_FILES['media']['tmp_name'][$name], $main_newname))
+				if ($finished == 1)
 				{
 					$article_id = 0;
 					if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
@@ -113,7 +236,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
 						$article_id = $_POST['article_id'];
 					}
 
-					$new_image = $dbl->run("INSERT INTO `article_images` SET `filename` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?, `filetype` = ?", [$image_name, $_SESSION['user_id'], core::$date, $article_id, $ext]);
+					$new_image = $dbl->run("INSERT INTO `article_images` SET `filename` = ?, `location` = ?, `uploader_id` = ?, `date_uploaded` = ?, `article_id` = ?, `filetype` = ?", [$image_name, $location, $_SESSION['user_id'], core::$date, $article_id, $ext]);
 					$media_db_id = $new_image->new_id();
 
 					$html_output = '<div class="box">

@@ -5,6 +5,25 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
+require APP_ROOT . '/includes/aws/aws-autoloader.php';
+
+$key = $core->config('do_space_key_uploads');
+$secret = $core->config('do_space_key_private_uploads');
+
+$space_name = "goluploads";
+
+use Aws\S3\S3Client;
+
+$client = new Aws\S3\S3Client([
+        'version' => 'latest',
+        'region'  => 'am3',
+        'endpoint' => 'https://ams3.digitaloceanspaces.com',
+        'credentials' => [
+                'key'    => $key,
+                'secret' => $secret,
+            ],
+]);
+
 // only logged in accounts can do this too, it's only for articles
 if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 {
@@ -21,7 +40,7 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']) && isset($_POST[
 			$qry2 = "DELETE FROM `itemdb_images` WHERE `id` = ?";				
 		break;
 		case 'article':
-			$qry1 = "SELECT `id`, `filename`, `filetype`, `youtube_cache`, `uploader_id` FROM `article_images` WHERE `id` = ?";
+			$qry1 = "SELECT `id`, `filename`, `location`, `filetype`, `youtube_cache`, `uploader_id` FROM `article_images` WHERE `id` = ?";
 			$qry2 = "DELETE FROM `article_images` WHERE `id` = ?";
 		break;
 	}
@@ -56,16 +75,59 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']) && isset($_POST[
 		{
 			if ($grabber['youtube_cache'] == 0)
 			{
-				unlink(APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename']);
+				if ($grabber['location'] == NULL)
+				{
+					$main = APP_ROOT . '/uploads/articles/article_media/' . $grabber['filename'];
 
-				if ($grabber['filetype'] == 'gif')
-				{
-					$static_filename = str_replace('.gif', '_static.jpg', $grabber['filename']);
-					unlink(APP_ROOT . '/uploads/articles/article_media/' . $static_filename);
+					if (file_exists($main))
+					{
+						unlink($main);
+					}
+
+					if ($grabber['filetype'] == 'gif')
+					{
+						$static_filename = str_replace('.gif', '_static.jpg', $grabber['filename']);
+
+						$static = APP_ROOT . '/uploads/articles/article_media/' . $static_filename;
+
+						if (file_exists($static))
+						{
+							unlink($static);
+						}
+						
+					}
+
+					$thumbnail = APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename'];
+
+					if (file_exists($thumbnail))
+					{
+						unlink($thumbnail);
+					}
 				}
-				if (file_exists(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']))
+				/* EXTERNAL FILE UPLOADS 
+				This is for deleting from DO Spaces, AWS etc
+				*/				
+				else
 				{
-					unlink(APP_ROOT . '/uploads/articles/article_media/thumbs/' . $grabber['filename']);
+					$result = $client->deleteObject([
+						'Bucket' => 'goluploads',
+						'Key'    => 'uploads/articles/article_media/' . $grabber['filename']
+					]);
+					
+					if ($grabber['filetype'] == 'gif')
+					{
+						$static_filename = str_replace('.gif', '_static.jpg', $grabber['filename']);
+						
+						$result = $client->deleteObject([
+							'Bucket' => 'goluploads',
+							'Key'    => 'uploads/articles/article_media/' . $static_filename
+						]);
+					}
+
+					$result = $client->deleteObject([
+						'Bucket' => 'goluploads',
+						'Key'    => 'uploads/articles/article_media/thumbs/' . $grabber['filename']
+					]);
 				}
 			}
 			else

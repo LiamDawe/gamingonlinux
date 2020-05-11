@@ -86,7 +86,6 @@ $templating->set('website_url', $core->config('website_url'));
 $templating->set('subscribe_check', $auto_subscribe);
 
 $local_upload = '';
-
 if ($_SESSION['user_id'] == 1)
 {
 	$local_upload = '<label><input type="checkbox" name="local_upload" /> Upload to local server?</label>';

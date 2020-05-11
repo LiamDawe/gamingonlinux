@@ -269,6 +269,13 @@ if (isset($_GET['view']))
 			$templating->set('article_id', $article['article_id']);
 
 			$templating->block('uploads', 'admin_modules/article_form');
+			$local_upload = '';
+			if ($_SESSION['user_id'] == 1)
+			{
+				$local_upload = '<label><input type="checkbox" name="local_upload" /> Upload to local server?</label>';
+			}
+			$templating->set('local_upload', $local_upload);
+
 			$templating->set('previously_uploaded', $previously_uploaded['output']);
 			$templating->set('article_id', $article['article_id']);
 

@@ -23,6 +23,8 @@ class core
 	public static $user_chart_js = NULL;
 
 	public static $config = [];
+
+	public static $url_command;
 	
 	public static $allowed_modules = [];
 	
@@ -197,6 +199,11 @@ class core
 		else if (core::is_number($_GET['page']))
 		{
 		  $page = $_GET['page'];
+		}
+
+		if (self::$current_module['module_file_name'] == 'articles_full' && isset(core::$url_command[3]) && strpos(core::$url_command[3], 'page=') !== false)
+		{
+			$page = (int) str_replace('page=', '', core::$url_command[3]);
 		}
 
 		return $page;
@@ -976,6 +983,33 @@ class core
 			{
 				self::$current_module = self::$allowed_modules['404'];
 			}
+		}
+		else if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '/')
+		{
+			$module = NULL;
+			self::$url_command = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+			
+			// check if it's an article
+			if (isset(self::$url_command[0]) && strlen(self::$url_command[0]) == 4 && is_numeric(self::$url_command[0]))
+			{
+				if (isset(self::$url_command[1]) && strlen(self::$url_command[1]) == 2 && is_numeric(self::$url_command[1]))
+				{
+					if (isset(self::$url_command[2]))
+					{
+						$module = 'articles_full';
+					}
+				}
+			}
+
+			// now see if we can go to it
+			if (array_key_exists($module, self::$allowed_modules))
+			{
+				self::$current_module = self::$allowed_modules[$module];
+			}
+			else
+			{
+				self::$current_module = self::$allowed_modules['404'];
+			}			
 		}
 
 		else

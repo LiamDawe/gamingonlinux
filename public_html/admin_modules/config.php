@@ -28,6 +28,7 @@ else
 
 		$templating->set('cookie_domain', $core->config('cookie_domain'));
 		$templating->set('javascript_static', $core->config('javascript_static'));
+		$templating->set('static_image_url', $core->config('static_image_url'));
 
 		// set the default module
 		$templating->set('default_module', $core->config('default_module'));
@@ -150,6 +151,8 @@ else
 			$core->set_config($_POST['cookie_domain'], 'cookie_domain');
 
 			$core->set_config($_POST['javascript_static'], 'javascript_static');
+
+			$core->set_config($_POST['static_image_url'], 'static_image_url');
 
 			$core->set_config($_POST['default_module'], 'default_module');
 

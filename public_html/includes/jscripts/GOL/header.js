@@ -707,12 +707,25 @@ jQuery(document).ready(function()
 		$content.slideToggle(500)
 	});
 
-	if($("#tagline").length > 0)
+	if ($('#tagline').val().length > 0)
 	{
-		countchars();
-		jQuery("#tagline").mousedown(countchars);
-		jQuery("#tagline").keyup(countchars);
+		jQuery("#tagline-count").html('<em>Tagline Characters: ' + $('#tagline').val().length + '/400</em>');
 	}
+
+	if ($('#title').val().length > 0)
+	{
+		jQuery("#title-count").html('<em>Title Characters: ' + $('#title').val().length + '/90</em>');
+	}
+
+	$('#tagline').keyup(function()
+	{
+		jQuery("#tagline-count").html('<em>Tagline Characters: ' + $('#tagline').val().length + '/400</em>');
+	})
+
+	$('#title').keyup(function()
+	{
+		jQuery("#title-count").html('<em>Title Characters: ' + $('#title').val().length + '/90</em>');
+	})
 
 	if($("#title").length > 0)
 	{

@@ -18,7 +18,7 @@ if(localStorage.getItem("theme")){
 } 
 
 editor = CKEDITOR.replace( 'ckeditor_gol', {
-customConfig: '/includes/jscripts/ckeditor_config.js', skin: ckeditor_skin
+customConfig: '{:jsstatic}/ckeditor_config.js', skin: ckeditor_skin
 });
 editor.addCommand("spoiler", {
 	exec: function(edt) {
@@ -88,10 +88,10 @@ CKEDITOR.on('instanceReady', function(evt)
 		</div>
 	</div>
 </footer>
-<script src="{:url}includes/jscripts/GOL/twitch_checker.js?v=3"></script>
+<script src="{:jsstatic}/GOL/twitch_checker.js?v=3"></script>
 <script>twitch_check(); setInterval ( "twitch_check()", 60000 );</script>
-<script src="{:url}includes/jscripts/jquery.timeago.js"></script>
-<script src="{:url}includes/jscripts/jquery.qtip.min.js"></script>
+<script src="{:jsstatic}/jquery.timeago.js"></script>
+<script src="{:jsstatic}/jquery.qtip.min.js"></script>
 
 <script>
 	jQuery("abbr.timeago").timeago('init');
@@ -168,10 +168,10 @@ $("#free-search").easyAutocomplete(free_search_options);
 $("#all-games-search").easyAutocomplete(all_search_options);
 </script>
 <script src="{:url}includes/ckeditor/ckeditor.js?v=4.14"></script>
-<script src="{:url}includes/jscripts/Chart.min.js?v=2.9.3"></script>
-<script src="{:url}includes/jscripts/chartjs-plugin-trendline.min.js"></script>
-<script src="{:url}includes/jscripts/sorttable.min.js"></script> 
-<script src="{:url}includes/jscripts/clipboard/clipboard.min.js"></script>
+<script src="{:jsstatic}/Chart.min.js?v=2.9.3"></script>
+<script src="{:jsstatic}/chartjs-plugin-trendline.min.js"></script>
+<script src="{:jsstatic}/sorttable.min.js"></script> 
+<script src="{:jsstatic}/clipboard/clipboard.min.js"></script>
 {:ckeditor_js}
 <script>
 var style = getComputedStyle(document.body);

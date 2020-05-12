@@ -117,6 +117,7 @@ if ($core->config('articles_rss') == 1)
 	a.gallery_tagline,
 	a.tagline,
 	a.date,
+	a.slug,
 	a.text,
 	t.`filename` as `gallery_tagline_filename`, 
 	u.username
@@ -148,9 +149,7 @@ if ($core->config('articles_rss') == 1)
 		}
 		$xml->writeElement('dc:creator', $username);
 
-		// smaller function as found in class_article.php get_link (dont need the entire article class for this!)
-		$nice_title = core::nice_title($line['title']);
-		$article_link = $core->config('website_url') . 'articles/'.$nice_title.'.'.$line['article_id'];
+		$article_link = $core->config('website_url') . date('Y', $line['date']) . '/' . date('m', $line['date']) . '/' . $line['slug'];
 
 		$xml->writeElement('link', $article_link);
 		$xml->writeElement('guid', $article_link);

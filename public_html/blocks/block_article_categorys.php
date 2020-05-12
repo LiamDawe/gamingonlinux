@@ -37,7 +37,7 @@ $templating->set('category_links', $articles_categorys);
 /*
 // top articles this week
 */
-$top_article_query = "SELECT `article_id`, `title` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY) AND `views` > ? AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4";
+$top_article_query = "SELECT `article_id`, `title`, `date`, `slug` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY) AND `views` > ? AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4";
 
 // setup a cache
 $querykey = "KEY" . md5($top_article_query . serialize($core->config('hot-article-viewcount')));
@@ -52,7 +52,7 @@ if ($fetch_top === false || $fetch_top === null) // there's no cache
 $hot_articles = '';
 foreach ($fetch_top as $top_articles)
 {
-	$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a></li>';
+	$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></li>';
 }
 
 $templating->set('top_articles', $hot_articles);

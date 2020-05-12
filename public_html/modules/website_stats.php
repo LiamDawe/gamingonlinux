@@ -114,10 +114,10 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 	$timestamp = strtotime("-3 months");
 
 	$hot_articles = '';
-	$query_hot = $dbl->run("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 AND `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp))->fetch_all();
+	$query_hot = $dbl->run("SELECT `article_id`, `title`, `views`,`date`,`slug` FROM `articles` WHERE `active` = 1 AND `date` > ? ORDER BY `views` DESC LIMIT 5", array($timestamp))->fetch_all();
 	foreach ($query_hot as $get_hot)
 	{
-		$hot_articles .= '<li><a href="'.$article_class->get_link($get_hot['article_id'], $get_hot['title']).'">'.$get_hot['title'].'</a> ('.number_format($get_hot['views']).')</li>';
+		$hot_articles .= '<li><a href="'.$article_class->article_link(array('date' => $get_hot['date'], 'slug' => $get_hot['slug'])).'">'.$get_hot['title'].'</a> ('.number_format($get_hot['views']).')</li>';
 	}
 
 	$templating->set('hot_articles', $hot_articles);
@@ -126,10 +126,10 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 	$templating->block('top_articles');
 
 	$article_list = '';
-	$query_top = $dbl->run("SELECT `article_id`, `title`, `views` FROM `articles` WHERE `active` = 1 ORDER BY `views` DESC LIMIT 5")->fetch_all();
+	$query_top = $dbl->run("SELECT `article_id`, `title`, `views`, `date`, `slug` FROM `articles` WHERE `active` = 1 ORDER BY `views` DESC LIMIT 5")->fetch_all();
 	foreach ($query_top as $top_articles)
 	{
-		$article_list .= '<li><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
+		$article_list .= '<li><a href="'.$article_class->article_link(array('date' => $top_article['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
 	}
 	$templating->set('article_list', $article_list);
 
@@ -137,10 +137,10 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 	$templating->block('most_likes');
 
 	$liked_list = '';
-	$query_liked = $dbl->run("SELECT COUNT(l.like_id) as `total_likes`, a.`article_id`, a.`title` FROM `article_likes` l INNER JOIN `articles` a ON a.`article_id` = l.`article_id` GROUP BY l.`article_id` ORDER BY `total_likes` DESC LIMIT 5")->fetch_all();
+	$query_liked = $dbl->run("SELECT COUNT(l.like_id) as `total_likes`, a.`article_id`, a.`title`, a.`date`, a.`slug` FROM `article_likes` l INNER JOIN `articles` a ON a.`article_id` = l.`article_id` GROUP BY l.`article_id` ORDER BY `total_likes` DESC LIMIT 5")->fetch_all();
 	foreach ($query_liked as $top_liked)
 	{
-		$liked_list .= '<li><a href="'.$article_class->get_link($top_liked['article_id'], $top_liked['title']).'">'.$top_liked['title'].'</a> ('.number_format($top_liked['total_likes']).')</li>';
+		$liked_list .= '<li><a href="'.$article_class->article_link(array('date' => $top_liked['date'], 'slug' => $top_liked['slug'])).'">'.$top_liked['title'].'</a> ('.number_format($top_liked['total_likes']).')</li>';
 	}
 	$templating->set('article_list', $liked_list);
 

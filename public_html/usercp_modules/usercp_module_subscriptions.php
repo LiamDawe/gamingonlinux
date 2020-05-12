@@ -35,7 +35,8 @@ SELECT `item_id`, `date`, `title`, `type`, `emails` FROM ( SELECT s.article_id A
 	// get the subs
 	$res_posts = $dbl->run("SELECT 
 	`item_id`, 
-	`date`, 
+	`date`,
+	`slug`,
 	`title`, 
 	`type`, 
 	`emails`, 
@@ -45,6 +46,7 @@ SELECT `item_id`, `date`, `title`, `type`, `emails` FROM ( SELECT s.article_id A
 		SELECT 
 		s.article_id AS item_id, 
 		a.`date`, 
+		a.`slug`,
 		a.`title`, 
 		'Article' AS `type`, 
 		s.emails, 
@@ -58,6 +60,7 @@ SELECT `item_id`, `date`, `title`, `type`, `emails` FROM ( SELECT s.article_id A
 		SELECT 
 		fs.topic_id AS item_id, 
 		t.`creation_date` as `date`, 
+		NULL as `slug`,
 		t.topic_title as `title`, 
 		'Forum Topic' AS `type`, 
 		fs.emails, 
@@ -78,7 +81,7 @@ SELECT `item_id`, `date`, `title`, `type`, `emails` FROM ( SELECT s.article_id A
 		$link = '';
 		if ($post['type'] == 'Article')
 		{
-			$link = $article_class->get_link($post['item_id'], $post['title']);
+			$link = $article_class->article_link(array('date' => $post['date'], 'slug' => $post['slug']));
 		}
 		if ($post['type'] == 'Forum Topic')
 		{

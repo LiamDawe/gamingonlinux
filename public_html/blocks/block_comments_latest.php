@@ -15,7 +15,7 @@ if (isset($_SESSION['per-page']))
 }
 
 $comment_posts = '';
-$fetch_comments = $dbl->run("SELECT c.`comment_id`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, u.username FROM `articles_comments` c FORCE INDEX(PRIMARY) INNER JOIN `articles` a ON c.`article_id` = a.`article_id` INNER JOIN `users` u ON u.user_id = c.author_id WHERE a.`active` = 1 AND c.`approved` = 1 ORDER BY `comment_id` DESC limit 5")->fetch_all();
+$fetch_comments = $dbl->run("SELECT c.`comment_id`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, u.username, a.`date` FROM `articles_comments` c FORCE INDEX(PRIMARY) INNER JOIN `articles` a ON c.`article_id` = a.`article_id` INNER JOIN `users` u ON u.user_id = c.author_id WHERE a.`active` = 1 AND c.`approved` = 1 ORDER BY `comment_id` DESC limit 5")->fetch_all();
 foreach ($fetch_comments as $comments)
 {
 	$date = $core->human_date($comments['time_posted']);
@@ -31,7 +31,7 @@ foreach ($fetch_comments as $comments)
 		$title = $comments['title'];
 	}
 
-	$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+	$article_link = $article_class->article_link(array('date' => $comments['date'], 'slug' => $comments['slug'], 'additional' => 'comment_id=' . $comments['comment_id']));
 
 	$machine_time = date("Y-m-d\TH:i:s", $comments['time_posted']) . 'Z';
 

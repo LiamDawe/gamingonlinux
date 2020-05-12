@@ -18,10 +18,14 @@ if(isset($_GET['post_id']))
 	{
 		if ($_GET['type'] == 'comment')
 		{
-			$permalink_info = $dbl->run("SELECT c.`comment_id`, a.`article_id`, a.`slug` FROM `articles_comments` c LEFT JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", [$post_id])->fetch();
+			$permalink_info = $dbl->run("SELECT c.`comment_id`, a.`article_id`, a.`slug`, a.`date` FROM `articles_comments` c LEFT JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", [$post_id])->fetch();
 			if ($permalink_info)
 			{				
-				$permalink = $article_class->get_link($permalink_info['article_id'], $permalink_info['slug'], 'comment_id=' . $permalink_info['comment_id']);
+				$permalink = $article_class->article_link(array(
+					'date' => $permalink_info['date'], 
+					'slug' => $permalink_info['slug'], 
+					'additional' => 'comment_id=' . $permalink_info['comment_id']));
+
 				$templating->set('permalink', $permalink);
 			}
 			else

@@ -176,6 +176,12 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^steamplay/?$ steamplay.php [N,NC,QSA]
   
   RewriteRule ^steamplay/reports/([0-9]+)/?$ steamplay_reports.php?id=$1 [N,NC,QSA]
+  
+  # if requested url does not exist pass it as path info to index.php
+  RewriteRule ^$ index.php?/ [QSA,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule (.*) index.php?/$1 [QSA,L]
 
   RewriteCond %{HTTP_HOST} !^www\. [NC]
   RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

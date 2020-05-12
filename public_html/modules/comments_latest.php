@@ -31,7 +31,7 @@ else
 	$templating->block('more_comments');
 
 	$comment_posts = '';
-	$all_comments = $dbl->run("SELECT comment_id, c.author_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active, u.username FROM `articles_comments` c FORCE INDEX (PRIMARY) INNER JOIN `articles` a ON c.article_id = a.article_id LEFT JOIN `users` u ON c.author_id = u.user_id WHERE c.`approved` = 1 AND a.active = 1 ORDER BY c.`comment_id` DESC LIMIT ?, 30", array($core->start))->fetch_all();
+	$all_comments = $dbl->run("SELECT comment_id, c.author_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active, u.username, a.date as article_date FROM `articles_comments` c FORCE INDEX (PRIMARY) INNER JOIN `articles` a ON c.article_id = a.article_id LEFT JOIN `users` u ON c.author_id = u.user_id WHERE c.`approved` = 1 AND a.active = 1 ORDER BY c.`comment_id` DESC LIMIT ?, 30", array($core->start))->fetch_all();
 						
 	// make an array of all comment ids to search for likes (instead of one query per comment for likes)
 	$like_array = [];
@@ -62,9 +62,9 @@ else
 			$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
 		}
 							
-		$view_comment_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
-		$view_article_link = $article_class->get_link($comments['article_id'], $comments['slug']);
-		$view_comments_full_link = $article_class->get_link($comments['article_id'], $comments['slug'], '#comments');
+		$view_comment_link = $article_class->article_link(array('date' => $comments['article_date'], 'slug' => $comments['slug'], 'additional' => 'comment_id=' . $comments['comment_id']));
+		$view_article_link = $article_class->article_link(array('date' => $comments['article_date'], 'slug' => $comments['slug']));
+		$view_comments_full_link = $article_class->article_link(array('date' => $comments['article_date'], 'slug' => $comments['slug'], 'additional' => '#comments'));
 
 		$comment_text = $bbcode->parse_bbcode($comments['comment_text']);
 

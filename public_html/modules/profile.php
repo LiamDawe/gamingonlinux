@@ -202,7 +202,7 @@ if (isset($_GET['user_id']))
 						}
 
 						// gather latest articles
-						$article_res = $dbl->run("SELECT `article_id`, `title`, `slug` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']))->fetch_all();
+						$article_res = $dbl->run("SELECT `article_id`, `title`, `slug`, `date` FROM `articles` WHERE `author_id` = ? AND `admin_review` = 0 AND `active` = 1 ORDER BY `date` DESC LIMIT 5", array($profile['user_id']))->fetch_all();
 						if ($article_res)
 						{
 							$templating->block('articles_top');
@@ -210,7 +210,7 @@ if (isset($_GET['user_id']))
 							{
 								$templating->block('articles');
 
-								$templating->set('latest_article_link', '<a href="' . $article_class->get_link($article_link['article_id'], $article_link['slug']).'">'.$article_link['title'].'</a>');
+								$templating->set('latest_article_link', '<a href="' . $article_class->article_link(array('date' => $article_link['date'], 'slug' => $article_link['slug'])).'">'.$article_link['title'].'</a>');
 							}
 							$templating->block('articles_bottom');
 							$templating->set('user_id', $profile['user_id']);
@@ -219,7 +219,7 @@ if (isset($_GET['user_id']))
 
 						$comment_posts = '';
 						$view_more_comments = '';
-						$comments_execute = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c FORCE INDEX(PRIMARY) INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.approved = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC limit 5", array($_GET['user_id']))->fetch_all();
+						$comments_execute = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.`comment_count`, a.`active`, a.`date` FROM `articles_comments` c FORCE INDEX(PRIMARY) INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.approved = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC limit 5", array($_GET['user_id']))->fetch_all();
 
 						if ($comments_execute)
 						{
@@ -237,7 +237,7 @@ if (isset($_GET['user_id']))
 								$text = preg_replace('/\[quote\=(.+?)\](.+?)\[\/quote\]/is', "", $comments['comment_text']);
 								$text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', "", $text);
 								
-								$article_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
+								$article_link = $article_class->article_link(array('date' => $comments['date'], 'slug' => $comments['slug'], 'additional' => 'comment_id=' . $comments['comment_id']));
 
 								$comment_posts .= "<li class=\"list-group-item\">
 							<a href=\"".$article_link."\">{$title}</a>
@@ -367,7 +367,7 @@ if (isset($_GET['user_id']))
 						$templating->set('profile_link', "/profiles/" . $_GET['user_id']);
 
 						$comment_posts = '';
-						$all_comments = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.comment_count, a.active FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE a.active = 1 AND c.author_id = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start))->fetch_all();
+						$all_comments = $dbl->run("SELECT comment_id, c.`comment_text`, c.`article_id`, c.`time_posted`, a.`title`, a.`slug`, a.`comment_count`, a.`active`, a.`date` FROM `articles_comments` c INNER JOIN `articles` a ON c.`article_id` = a.`article_id` WHERE a.`active` = 1 AND c.`author_id` = ? ORDER BY c.`comment_id` DESC LIMIT ?, 10", array($_GET['user_id'], $core->start))->fetch_all();
 							
 						// make an array of all comment ids to search for likes (instead of one query per comment for likes)
 						$like_array = [];
@@ -395,9 +395,9 @@ if (isset($_GET['user_id']))
 								$likes = ' <span class="profile-comments-heart icon like"></span> Likes: ' . $get_likes[$comments['comment_id']][0];
 							}
 							
-							$view_comment_link = $article_class->get_link($comments['article_id'], $comments['slug'], 'comment_id=' . $comments['comment_id']);
-							$view_article_link = $article_class->get_link($comments['article_id'], $comments['slug']);
-							$view_comments_full_link = $article_class->get_link($comments['article_id'], $comments['slug'], '#comments');
+							$view_comment_link = $article_class->article_link(array('date' => $comments['date'], 'slug' => $comments['slug'], 'additional' => 'comment_id=' . $comments['comment_id']));
+							$view_article_link = $article_class->article_link(array('date' => $comments['date'], 'slug' => $comments['slug']));
+							$view_comments_full_link = $article_class->article_link(array('date' => $comments['date'], 'slug' => $comments['slug'], 'additional' => '#comments'));
 
 							$comment_posts .= "<div class=\"box\"><div class=\"body group\">
 							<a href=\"".$view_comment_link."\">{$title}</a><br />

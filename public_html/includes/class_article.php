@@ -568,7 +568,7 @@ class article
 		if (isset($_SESSION['conflict_checked']) && is_array($_SESSION['conflict_checked']))
 		{
 			$in  = str_repeat('?,', count($_SESSION['conflict_checked']) - 1) . '?';
-			$article_res = $this->dbl->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ? AND `article_id` NOT IN ($in)", array_merge([$_SESSION['article_timer']], $_SESSION['conflict_checked']))->fetch_all();
+			$article_res = $this->dbl->run("SELECT `article_id`, `title`, `date`,`slug` FROM `articles` WHERE `date` > ? AND `article_id` NOT IN ($in)", array_merge([$_SESSION['article_timer']], $_SESSION['conflict_checked']))->fetch_all();
 		}
 		else
 		{
@@ -576,14 +576,14 @@ class article
 			{
 				error_log('Article timer not set: ' . $_SERVER['REQUEST_URI']);
 			}
-			$article_res = $this->dbl->run("SELECT `article_id`, `title` FROM `articles` WHERE `date` > ?", array($_SESSION['article_timer']))->fetch_all();
+			$article_res = $this->dbl->run("SELECT `article_id`, `title`, `date`,`slug` FROM `articles` WHERE `date` > ?", array($_SESSION['article_timer']))->fetch_all();
 		}
 		if ($article_res)
 		{
 			$article_list = '<form><ul>';
 			foreach($article_res as $res)
 			{
-				$article_link = $this->get_link($res['article_id'], $res['title']);
+				$article_link = $this->article_link(array('date' => $res['date'], 'slug' => $res['slug']));
 				$article_list .= '<li><a href="'.$article_link.'" target="_blank">'.$res['title'].'</a><input type="hidden" name="article_ids[]" value="'.$res['article_id'].'" /></li>';
 			}
 
@@ -834,20 +834,17 @@ class article
 		$templating->set('history', $history);
 	}
 
-	public function get_link($id, $title = NULL, $additional = NULL)
+	/* generate a link for articles based on what's given */
+	public function article_link($data)
 	{
-		$link = 'articles/';
-		if (isset($title))
-		{
-			$nice_title = core::nice_title($title);
-			$link = $link . $nice_title . '.';
-		}
+		$year = date('Y', $data['date']);
+		$month = date('m', $data['date']);
 
-		$link = $link . $id;
+		$link = $year . '/' . $month . '/' . $data['slug'];
 
-		if ($additional != NULL)
+		if (isset($data['additional']))
 		{
-			$link = $link . '/' . $additional;
+			$link = $link . '/' . $data['additional'];
 		}
 
 		return $this->core->config('website_url') . $link;
@@ -909,12 +906,14 @@ class article
 				$this->core->update_admin_note(array('type' => $options['clear_notification_type'], 'data' => $_POST['article_id']));
 			}
 
-			$this->dbl->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0, `guest_email` = '', `guest_ip` = '' WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date, $_SESSION['user_id'], $_POST['article_id']));
+			$date_now = core::$date;
+
+			$this->dbl->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0, `guest_email` = '', `guest_ip` = '' WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, $date_now, $_SESSION['user_id'], $_POST['article_id']));
 
 			// since they are approving and not neccisarily editing, check if the text matches, if it doesnt they have edited it
 			if ($_SESSION['original_text'] != $checked['text'])
 			{
-				$this->dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+				$this->dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], $date_now, $_SESSION['original_text']));
 			}
 
 			$article_id = $_POST['article_id'];
@@ -930,7 +929,7 @@ class article
 		// otherwise make the new article
 		else
 		{
-			$this->dbl->run("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, core::$date));
+			$this->dbl->run("INSERT INTO `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0 $gallery_tagline_sql", array($_SESSION['user_id'], $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, $date_now));
 
 			$article_id = $this->dbl->new_id();
 
@@ -973,6 +972,9 @@ class article
 
 		$this->reset_sessions();
 
+		$article_link = self::article_link(array('date' => $date_now, 'slug' => $checked['slug']));
+		$comments_link = $article_link . '/#comments';
+
 		// if the person publishing it is not the author then email them
 		if ($options['type'] == 'admin_review')
 		{
@@ -985,9 +987,9 @@ class article
 				$subject = 'Your article "'.$checked['title'].'" was reviewed and published on GamingOnLinux.com!';
 
 				// message
-				$html_message = "<p><strong>{$_SESSION['username']}</strong> has reviewed and published your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"https://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>.</p>";
+				$html_message = "<p><strong>{$_SESSION['username']}</strong> has reviewed and published your article \"<a href=\"$article_link\">{$checked['title']}</a>\" on <a href=\"https://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>.</p>";
 
-				$plain_message = "{$_SESSION['username']} has reviewed and published your article \"{$checked['title']}\", here's the live link: http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/";
+				$plain_message = "{$_SESSION['username']} has reviewed and published your article \"{$checked['title']}\", here's the live link: $article_link";
 
 				// Mail it
 				if ($this->core->config('send_emails') == 1)
@@ -1016,9 +1018,9 @@ class article
 			$subject = 'Your article "'.$checked['title'].'" was approved on GamingOnLinux.com!';
 
 			// message
-			$html_message = "<p>We have accepted your article \"<a href=\"http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}/\">{$checked['title']}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>";
+			$html_message = "<p>We have accepted your article \"<a href=\"$article_link\">{$checked['title']}</a>\" on <a href=\"http://www.gamingonlinux.com/\" target=\"_blank\">GamingOnLinux.com</a>. Thank you for taking the time to send us news we really appreciate the help, you are awesome.</p>";
 
-			$plain_message = "We have accepted your article \"{$checked['title']}\" on GamingOnLinux.com, here's the live link: http://www.gamingonlinux.com/articles/{$checked['slug']}.{$_POST['article_id']}";
+			$plain_message = "We have accepted your article \"{$checked['title']}\" on GamingOnLinux.com, here's the live link: $article_link";
 
 			if ($this->core->config('send_emails') == 1)
 			{
@@ -1028,9 +1030,6 @@ class article
 		}
 
 		include($this->core->config('path') . 'includes/telegram_poster.php');
-
-		$article_link = self::get_link($article_id);
-		$comments_link = self::get_link($article_id, NULL, '#comments');
 
 		telegram($checked['title'] . "\n\r\n\rLink: " . $article_link . "\n\rComments: " . $comments_link, $article_link);
 
@@ -1044,7 +1043,7 @@ class article
 		}
 
 		// note who did it
-		$core->new_admin_note(array('completed' => 1, 'content' => ' published a new article titled: <a href="/articles/'.$checked['slug'].'.'.$article_id.'">'.$checked['title'].'</a>.'));
+		$core->new_admin_note(array('completed' => 1, 'content' => ' published a new article titled: <a href="/articles/'.$article_id.'">'.$checked['title'].'</a>.'));
 
 		header("Location: " . $redirect);
 		die();
@@ -1129,7 +1128,7 @@ class article
 			// set last bit to 0 so we don't parse links in the tagline
 			$this->templating->set('text', $article['tagline']);
 
-			$this->templating->set('article_link', $this->get_link($article['article_id'], $article['slug']));
+			$this->templating->set('article_link', $this->article_link(array('date' => $article['date'], 'slug' => $article['slug'])));
 			$this->templating->set('comment_count', $article['comment_count']);
 		}
 	}
@@ -1497,7 +1496,7 @@ class article
 			$like_button = '';
 			$comment_delete_link = '';
 			$link_to_comment = '';
-			$permalink = $this->get_link($article_info['article']['article_id'], $article_info['article']['slug'], 'comment_id=' . $comments['comment_id']);
+			$permalink = $this->article_link(array('date' => $article_info['article']['date'], 'slug' => $article_info['article']['slug']));
 			if (isset($article_info['type']) && $article_info['type'] != 'admin')
 			{
 				$link_to_comment = '<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" href="'.$permalink.'" data-src="/includes/ajax/call_post_link.php?post_id=' . $comments['comment_id'] . '&type=comment" title="Link to this comment"><span class="icon link">Link</span></a></li>';

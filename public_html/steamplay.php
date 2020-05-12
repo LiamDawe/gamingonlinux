@@ -33,7 +33,7 @@ if ($articles_res)
 	
 	foreach ($articles_res as $articles)
 	{
-		$article_link = $article_class->get_link($articles['article_id'], $articles['slug']);
+		$article_link = $article_class->article_link(array('date' => $articles['date'], 'slug' => $articles['slug']));
 
 		if ($articles['author_id'] == 0)
 		{

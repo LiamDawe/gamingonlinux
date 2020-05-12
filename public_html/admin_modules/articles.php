@@ -320,7 +320,7 @@ if (isset($_GET['view']))
 			{
 				$active = 0;
 				$paginate_link = "admin.php?module=articles&view=manage&category=inactive&";
-				$article_query = "SELECT a.article_id, a.author_id, a.title, a.tagline, a.date, u.username FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.author_id, a.title, a.tagline, a.date, u.username, a.`slug` FROM `articles` a LEFT JOIN `users` u on a.author_id = u.user_id  WHERE a.`active` = 0 AND a.`admin_review` = 0 AND a.`draft` = 0 AND a.submitted_unapproved = 0 ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 0 AND `admin_review` = 0 AND `draft` = 0 AND `submitted_unapproved` = 0";
 				$category_name = 'Inactive Articles';
 			}
@@ -329,7 +329,7 @@ if (isset($_GET['view']))
 			{
 				$active = 1;
 				$paginate_link = "admin.php?module=articles&view=manage&category=all&";
-				$article_query = "SELECT a.article_id, a.author_id, a.title, a.tagline, a.date, u.username FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
+				$article_query = "SELECT a.article_id, a.author_id, a.title, a.tagline, a.date, u.username, a.`slug` FROM `articles` a JOIN `users` u on a.author_id = u.user_id ORDER BY a.`date` DESC LIMIT ?, 9";
 				$count_query = "SELECT COUNT(`article_id`) FROM `articles`";
 				$category_name = 'All Articles';
 			}
@@ -391,7 +391,7 @@ if (isset($_GET['view']))
 
 					$templating->set('username', $username);
 					$templating->set('date', $date);
-					$templating->set('article_link', $article_class->get_link($article['article_id']));
+					$templating->set('article_link', $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug'])));
 					$templating->set('formaction', $formaction);
 					$templating->set('delete_button', '<button type="submit" name="act" value="Delete" formaction="'.$delete_action.'">Delete</button>');
 				}
@@ -468,7 +468,7 @@ if (isset($_GET['view']))
 
 					$templating->set('username', $username);
 					$templating->set('date', $date);
-					$templating->set('article_link', $article_class->get_link($article['article_id']));
+					$templating->set('article_link', $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug'])));
 					$templating->set('formaction', $formaction);
 					$templating->set('delete_button', '<button type="submit" name="act" value="Delete" formaction="'.$delete_action.'">Delete</button>');
 				}

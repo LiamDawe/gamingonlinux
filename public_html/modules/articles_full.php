@@ -15,16 +15,28 @@ if (!isset($_GET['go']))
 	if (!isset($_GET['view']))
 	{
 		// make sure the id is set
-		if (!isset($_GET['aid']) || core::is_number($_GET['aid']) == false)
+		if (!isset($_GET['aid']) && !isset(core::$url_command[2]))
 		{
 			http_response_code(404);
 			$templating->set_previous('meta_data', '', 1);
 			$templating->set_previous('title', 'No id entered', 1);
 			$core->message('That is not a correct article id!');
+			die('test');
 		}
 
 		else
 		{
+			if (isset($_GET['aid']) && is_numeric($_GET['aid']))
+			{
+				$find_article_where_sql = 'a.`article_id` = ?';
+				$find_article_where_data = array((int) $_GET['aid']);
+			}
+			else if (isset(core::$url_command[0]) && isset(core::$url_command[1]) && isset(core::$url_command[2]))
+			{
+				$find_article_where_sql = 'YEAR(FROM_UNIXTIME(a.`date`)) = ? AND MONTH(FROM_UNIXTIME(a.`date`)) = ? AND a.`slug` = ?';
+				$find_article_where_data = array((int) core::$url_command[0], (int) core::$url_command[1], core::$url_command[2]);
+			}
+
 			// get the article
 			$article = $dbl->run("SELECT
 				a.`article_id`,
@@ -57,31 +69,27 @@ if (!isset($_GET['go']))
 				LEFT JOIN
 				`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 				WHERE
-				a.`article_id` = ?", array((int) $_GET['aid']))->fetch();
+				$find_article_where_sql", $find_article_where_data)->fetch();
 
 			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
-			if (isset($_GET['comment_id']) && core::is_number($_GET['comment_id']))
+			if ((isset($_GET['comment_id']) && core::is_number($_GET['comment_id'])) || (isset(core::$url_command[3]) && strpos( core::$url_command[3], 'comment_id=') !== false))
 			{
+				$comment_id = NULL;
+				if (isset($_GET['comment_id']))
+				{
+					$comment_id = (int) $_GET['comment_id'];
+				}
+				else if (isset(core::$url_command[3]))
+				{
+					$comment_id = (int) str_replace('comment_id=', '', core::$url_command[3]);
+				}
+
 				// check comment still exists
-				$check = $dbl->run("SELECT `comment_id` FROM `articles_comments` WHERE `comment_id` = ? AND `article_id` = ?", array((int) $_GET['comment_id'], (int) $_GET['aid']))->fetchOne();
+				$check = $dbl->run("SELECT c.`comment_id`, c.`article_id`, a.`date`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON a.`article_id` = c.`article_id` WHERE c.`comment_id` = ?", array($comment_id))->fetch();
 				if ($check)
 				{
-					// get blocked id's
-					$blocked_sql = '';
-					$blocked_ids = [];
-					if (count($user->blocked_users) > 0)
-					{
-						foreach ($user->blocked_users as $username => $blocked_id)
-						{
-							$blocked_ids[] = $blocked_id[0];
-						}
-
-						$in  = str_repeat('?,', count($blocked_ids) - 1) . '?';
-						$blocked_sql = "AND c.`author_id` NOT IN ($in)";
-					}
-
 					// calculate the page this comment is on
-					$prev_comments = $dbl->run("SELECT COUNT(comment_id) AS total FROM `articles_comments` WHERE `comment_id` <= ? AND `article_id` = ?", array($_GET['comment_id'], $article['article_id']))->fetchOne();
+					$prev_comments = $dbl->run("SELECT COUNT(comment_id) AS total FROM `articles_comments` WHERE `comment_id` <= ? AND `article_id` = ?", array($check['comment_id'], $check['article_id']))->fetchOne();
 
 					$comments_per_page = $core->config('default-comments-per-page');
 					if (isset($_SESSION['per-page']))
@@ -95,7 +103,7 @@ if (!isset($_GET['go']))
 						$comment_page = ceil($prev_comments/$_SESSION['per-page']);
 					}
 
-					$article_link = $article_class->get_link($article['article_id'], $article['slug'], 'page=' . $comment_page . '#r' . $_GET['comment_id']);
+					$article_link = $article_class->article_link(array('date' => $check['date'], 'slug' => $check['slug'], 'additional' => 'page=' . $comment_page . '#r' . $check['comment_id']));
 
 					header("Location: " . $article_link);
 					die();
@@ -103,7 +111,7 @@ if (!isset($_GET['go']))
 				else
 				{
 					$_SESSION['message'] = 'nocomment';
-					$article_link = $article_class->get_link($article['article_id'], $article['slug']);
+					$article_link = $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug']));
 
 					header("Location: " . $article_link);
 					die();
@@ -147,6 +155,7 @@ if (!isset($_GET['go']))
 				
 				$html_title = htmlentities($article['title'], ENT_COMPAT);
 				
+				$article_link_main = $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug']));
 
 				if (!isset($_GET['preview_code']))
 				{
@@ -262,7 +271,7 @@ if (!isset($_GET['go']))
 				<meta property=\"og:type\" content=\"article\">\n
 				<meta property=\"og:title\" content=\"" . $html_title . "\" />\n
 				<meta property=\"og:description\" content=\"$meta_description\" />\n
-				<meta property=\"og:url\" content=\"" . $article_class->get_link($article['article_id'], $nice_title) . "\" />\n
+				<meta property=\"og:url\" content=\"" . $article_link_main . "\" />\n
 				<meta itemprop=\"image\" content=\"$article_meta_image\" />\n
 				<meta itemprop=\"title\" content=\"" . $html_title . "\" />\n
 				<meta itemprop=\"description\" content=\"$meta_description\" />\n
@@ -273,13 +282,9 @@ if (!isset($_GET['go']))
 				// make date human readable
 				$date = $core->human_date($article['date']);
 
-				$article_link = $article_class->get_link($_GET['aid'], $nice_title);
-
 				$templating->block('article', 'articles_full');
-				$templating->set('article_link', $article_link);
-
-				$share_url = $article_class->get_link($_GET['aid'], $nice_title);
-				$templating->set('share_url', urlencode($share_url));
+				$templating->set('article_link', $article_link_main);
+				$templating->set('share_url', urlencode($article_link_main));
 				$templating->set('share_title', urlencode($article['title']));
 				$templating->set('url', $core->config('website_url'));
 
@@ -363,10 +368,10 @@ if (!isset($_GET['go']))
 
 				$templating->set('text', $bbcode->article_bbcode($article_body));
 
-				$article_link = "/articles/$nice_title.{$_GET['aid']}/";
+				$article_link = $article_link_main;
 				if (isset($_GET['preview']))
 				{
-					$article_link = "/index.php?module=articles_full&amp;aid={$_GET['aid']}&amp;preview&amp;";
+					$article_link = "/index.php?module=articles_full&amp;aid={$article['article_id']}&amp;preview&amp;";
 				}
 
 				$article_pagination = $article_class->article_pagination($article_page, $article_page_count, $article_link);
@@ -500,7 +505,7 @@ if (!isset($_GET['go']))
 				// get the comments if we aren't in preview mode
 				if ($article['active'] == 1)
 				{					
-					$article_class->display_comments(['article' => $article, 'pagination_link' => '/articles/' . $nice_title . '.' . $_GET['aid'] . '/', 'type' => 'live_article', 'page' => core::give_page()]);
+					$article_class->display_comments(['article' => $article, 'pagination_link' => $article_link_main . '/', 'type' => 'live_article', 'page' => core::give_page()]);
 
 					// only show comments box if the comments are turned on for this article
 					if ($core->config('comments_open') == 1)
@@ -560,7 +565,7 @@ if (!isset($_GET['go']))
 								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 								{
 									// check they don't already have a reply in the mod queue for this forum topic
-									$check_queue = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `approved` = 0 AND `author_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $_GET['aid']))->fetchOne();
+									$check_queue = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `approved` = 0 AND `author_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article['article_id']))->fetchOne();
 									if ($check_queue == 0)
 									{
 										$mod_queue = $user->user_details['in_mod_queue'];
@@ -570,7 +575,7 @@ if (!isset($_GET['go']))
 										{
 											$core->message('Some comments are held for moderation. Your post may not appear right away.', NULL, 2);
 										}
-										$subscribe_check = $user->check_subscription($_GET['aid'], 'article');
+										$subscribe_check = $user->check_subscription($article['article_id'], 'article');
 
 										$comment = '';
 										if (isset($_SESSION['acomment']))
@@ -583,7 +588,7 @@ if (!isset($_GET['go']))
 
 										$templating->block('comments_box_top', 'articles_full');
 										$templating->set('url', $core->config('website_url'));
-										$templating->set('article_id', $_GET['aid']);
+										$templating->set('article_id', $article['article_id']);
 
 										$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
 
@@ -591,7 +596,7 @@ if (!isset($_GET['go']))
 										$templating->set('url', $core->config('website_url'));
 										$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
 										$templating->set('subscribe_email_check', $subscribe_check['emails']);
-										$templating->set('aid', $_GET['aid']);
+										$templating->set('aid', $article['article_id']);
 
 										$templating->block('preview', 'articles_full');
 									}
@@ -616,9 +621,9 @@ if (!isset($_GET['go']))
 					// below everything else
 
 					/*
-					// top articles this month
+					// top articles this month but not from the most recent 2 days to prevent showing what they've just seen on the home page
 					*/
-					$top_article_query = "SELECT `article_id`, `title` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND `views` > ? AND `show_in_menu` = 0 ORDER BY RAND() DESC LIMIT 3";
+					$top_article_query = "SELECT `article_id`, `title`, `slug`, `date` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND `date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND `views` > ? AND `show_in_menu` = 0 ORDER BY RAND() DESC LIMIT 3";
 
 					$fetch_top3 = $dbl->run($top_article_query, array($core->config('hot-article-viewcount')))->fetch_all();
 					
@@ -628,7 +633,7 @@ if (!isset($_GET['go']))
 						$hot_articles = '';
 						foreach ($fetch_top3 as $top_articles)
 						{
-							$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->get_link($top_articles['article_id'], $top_articles['title']).'">'.$top_articles['title'].'</a></li>';
+							$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></li>';
 						}
 
 						$templating->set('top_articles', $hot_articles);
@@ -670,9 +675,9 @@ else if (isset($_GET['go']))
 			$correction = core::make_safe($correction, ENT_QUOTES);
 
 			// get article name for the redirect
-			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']))->fetch();
+			$title = $dbl->run("SELECT `title`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']))->fetch();
 			
-			$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
+			$article_link = $article_class->article_class(array('date' => $title['date'], 'slug' => $title['slug']));
 
 			if (empty($correction))
 			{
@@ -726,14 +731,14 @@ else if (isset($_GET['go']))
 			else
 			{
 				// get article name for the email and redirect
-				$title = $dbl->run("SELECT `title`, `comment_count`, `comments_open`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']))->fetch();
+				$title = $dbl->run("SELECT `title`, `comment_count`, `comments_open`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']))->fetch();
 				$title_nice = core::nice_title($title['title']);
 
 				if ($title['comments_open'] == 0 && $user->check_group([1,2]) == false)
 				{
 					$_SESSION['message'] = 'locked';
 					$_SESSION['message_extra'] = 'article comments';
-					$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
+					$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 
 					header("Location: " . $article_link);
 
@@ -758,7 +763,7 @@ else if (isset($_GET['go']))
 					if ($check_comment['comment_text'] == $comment)
 					{
 						$_SESSION['message'] = 'double_comment';
-						$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
+						$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 							
 						header("Location: " . $article_link);
 
@@ -770,7 +775,7 @@ else if (isset($_GET['go']))
 					{
 						$_SESSION['message'] = 'empty';
 						$_SESSION['message_extra'] = 'text';
-						$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
+						$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 
 						header("Location: " . $article_link);
 
@@ -922,8 +927,8 @@ else if (isset($_GET['go']))
 
 							// clear any comment or name left from errors
 							unset($_SESSION['acomment']);
-								
-							$article_link = $article_class->get_link($_POST['aid'], $title['slug'], 'page=' . $comment_page . '#r' . $new_comment_id);
+
+							$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug'], 'additional' => 'page=' . $comment_page . '#r' . $new_comment_id));
 
 							header("Location: " . $article_link);
 							die();
@@ -940,8 +945,8 @@ else if (isset($_GET['go']))
 							unset($_SESSION['acomment']);
 								
 							$_SESSION['message'] = 'mod_queue';
-								
-							$article_link = $article_class->get_link($_POST['aid'], $title['slug']);
+
+							$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 					
 							header("Location: " . $article_link);
 							die();
@@ -961,8 +966,8 @@ else if (isset($_GET['go']))
 			die();
 		}
 
-		$comment = $dbl->run("SELECT a.`slug`, c.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
-		$article_link = $article_class->get_link($comment['article_id'], $comment['slug'], '#comments');
+		$comment = $dbl->run("SELECT a.`slug`, a.`date`, c.`article_id` FROM `articles_comments` c INNER JOIN `articles` a ON c.article_id = a.article_id WHERE c.`comment_id` = ?", array((int) $_GET['comment_id']))->fetch();
+		$article_link = $article_class->article_link(array('date' => $comment['date'], 'slug' => $comment['slug'], 'additional' => '#comments'));
 		
 		if (!isset($_POST['yes']) && !isset($_POST['no']))
 		{
@@ -985,24 +990,20 @@ else if (isset($_GET['go']))
 	if ($_GET['go'] == 'subscribe')
 	{
 		$article_class->subscribe($_GET['article_id']);
-
 		// get info for title
-		$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
-		$title = core::nice_title($title['title']);
-
-		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
+		$title = $dbl->run("SELECT `title`,`date`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
+		$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug'], 'additional' => '#comments'));
+		header("Location: $article_link");
 		die();
 	}
 
 	if ($_GET['go'] == 'unsubscribe')
 	{
 		$article_class->unsubscribe($_GET['article_id']);
-
 		// get info for title
-		$title = $dbl->run("SELECT `title` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
-		$title = core::nice_title($title['title']);
-
-		header("Location: /articles/{$title}.{$_GET['article_id']}#comments");
+		$title = $dbl->run("SELECT `title`,`date`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
+		$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug'], 'additional' => '#comments'));
+		header("Location: $article_link");
 		die();
 	}
 
@@ -1054,9 +1055,9 @@ else if (isset($_GET['go']))
 		else if (isset($_POST['no']))
 		{
 			// get info for title
-			$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
+			$title = $dbl->run("SELECT `title`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array($article_id))->fetch();
 			
-			$article_link = $article_class->get_link($article_id, $title['slug'], '#comments');
+			$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug'], 'additional' => '#comments'));
 
 			header("Location: ".$article_link);
 			die();
@@ -1073,9 +1074,9 @@ else if (isset($_GET['go']))
 			}
 
 			// get info for title
-			$title = $dbl->run("SELECT `slug` FROM `articles` WHERE `article_id` = ?", array((int) $article_id))->fetch();
+			$title = $dbl->run("SELECT `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $article_id))->fetch();
 			
-			$article_link = $article_class->get_link($article_id, $title['slug']);
+			$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 
 			$_SESSION['message'] = 'reported';
 			$_SESSION['message_extra'] = 'comment';
@@ -1088,9 +1089,9 @@ else if (isset($_GET['go']))
 	if ($_GET['go'] == 'open_comments')
 	{
 		// get info for title
-		$title = $dbl->run("SELECT `title`,`slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
+		$title = $dbl->run("SELECT `title`,`slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
 			
-		$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
+		$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 
 		if ($user->check_group([1,2]) == true)
 		{
@@ -1114,9 +1115,9 @@ else if (isset($_GET['go']))
 	if ($_GET['go'] == 'close_comments')
 	{
 		// get info for title
-		$title = $dbl->run("SELECT `title`, `slug` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
+		$title = $dbl->run("SELECT `title`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['article_id']))->fetch();
 			
-		$article_link = $article_class->get_link($_GET['article_id'], $title['slug']);
+		$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 
 		if ($user->check_group([1,2]) == true)
 		{

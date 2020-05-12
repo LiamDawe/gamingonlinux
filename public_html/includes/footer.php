@@ -5,6 +5,7 @@ if(!defined('golapp'))
 }
 $templating->load('footer');
 $templating->block('footer');
+$templating->set('jsstatic', JSSTATIC);
 $templating->set('url', url);
 $templating->set('year', date('Y'));
 
@@ -35,6 +36,7 @@ $ckeditor_js = '';
 if ($core->current_page() == 'admin.php' || (isset($_GET['module']) && $_GET['module'] == 'submit_article'))
 {
 	$ckeditor_js = $templating->block_store('ckeditor', 'footer');
+	$ckeditor_js = $templating->store_replace($ckeditor_js, array('jsstatic' => JSSTATIC));
 }
 $templating->set('ckeditor_js', $ckeditor_js);
 

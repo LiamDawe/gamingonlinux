@@ -206,11 +206,6 @@ function resetFormElement(e)
 	e.unwrap();
 }
 
-function countchars()
-{
-	jQuery("#count").text('Tagline Characters: ' + jQuery('#tagline').val().length);
-}
-
 var slug_enabled=false;
 var current_url = $(location).attr('pathname') + $(location).attr('search');
 if (current_url == '/admin.php?module=add_article')
@@ -707,12 +702,12 @@ jQuery(document).ready(function()
 		$content.slideToggle(500)
 	});
 
-	if ($('#tagline').val().length > 0)
+	if ($('#tagline').length && $('#tagline').val().length > 0)
 	{
 		jQuery("#tagline-count").html('<em>Tagline Characters: ' + $('#tagline').val().length + '/400</em>');
 	}
 
-	if ($('#title').val().length > 0)
+	if ($('#title').length && $('#title').val().length > 0)
 	{
 		jQuery("#title-count").html('<em>Title Characters: ' + $('#title').val().length + '/90</em>');
 	}

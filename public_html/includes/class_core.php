@@ -603,7 +603,7 @@ class core
 		$clean = trim($title);
 		$clean = iconv('UTF-8', 'ASCII//TRANSLIT', $title);
 		$clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
-		$clean = strtolower(trim($clean, '-'));
+		$clean = strtolower(rtrim($clean));
 		$clean = preg_replace("/[\/_|+ -]+/", '-', $clean);
 
 		return $clean;
@@ -986,8 +986,10 @@ class core
 		}
 		else if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '/')
 		{
+			$get_url = parse_url($_SERVER['REQUEST_URI']);
+
 			$module = NULL;
-			self::$url_command = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+			self::$url_command = explode('/', trim($get_url['path'], '/'));
 			
 			// check if it's an article
 			if (isset(self::$url_command[0]) && strlen(self::$url_command[0]) == 4 && is_numeric(self::$url_command[0]))

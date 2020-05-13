@@ -33,7 +33,7 @@
 <div class="box">
 	<div class="body group">
 		<form method="post" role="form">
-			<strong>{:article_title}</strong> by {:username} created {:date_created} <br />
+			<strong>{:article_title}</strong> by <a href="/profiles/{:user_id}">{:username}</a> created {:date_created} <br />
 			<button type="submit" formaction="/admin.php?module=articles&view=drafts&aid={:article_id}">View</button>
 			{:delete_button}
 			<input type="hidden" name="article_id" value="{:article_id}" />

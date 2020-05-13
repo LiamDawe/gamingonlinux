@@ -9,7 +9,7 @@ if (!isset($_GET['aid']))
 {
 	$templating->block('drafts_top', 'admin_modules/admin_articles_sections/drafts');
 
-	$get_articles = $dbl->run("SELECT a.`article_id`, a.`date`, a.`title`, a.`tagline`, a.`guest_username`, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE `draft` = 1 AND `user_id` = ?", array($_SESSION['user_id']))->fetch_all();
+	$get_articles = $dbl->run("SELECT a.`article_id`, a.`date`, a.`title`, a.`tagline`, a.`guest_username`, u.`username`, u.`user_id` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE `draft` = 1 AND `user_id` = ?", array($_SESSION['user_id']))->fetch_all();
 	if ($get_articles)
 	{
 		foreach ($get_articles as $article)
@@ -19,6 +19,7 @@ if (!isset($_GET['aid']))
 			$templating->set('article_id', $article['article_id']);
 			$templating->set('article_title', $article['title']);
 			$templating->set('username', $article['username']);
+			$templating->set('user_id', $article['user_id']);
 
 			$templating->set('date_created', $core->human_date($article['date']));
 			$templating->set('delete_button', '<button type="submit" name="act" value="delete_draft" formaction="'.$core->config('website_url').'admin.php?module=articles">Delete</button>');
@@ -31,7 +32,7 @@ if (!isset($_GET['aid']))
 
 	$templating->block('others_drafts', 'admin_modules/admin_articles_sections/drafts');
 
-	$get_theirs = $dbl->run("SELECT a.`article_id`, a.`date`, a.`title`, a.`tagline`, a.`guest_username`, u.`username` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE `draft` = 1 AND `user_id` != ?", array($_SESSION['user_id']))->fetch_all();
+	$get_theirs = $dbl->run("SELECT a.`article_id`, a.`date`, a.`title`, a.`tagline`, a.`guest_username`, u.`username`, u.`user_id` FROM `articles` a LEFT JOIN `users` u on a.`author_id` = u.`user_id` WHERE `draft` = 1 AND `user_id` != ?", array($_SESSION['user_id']))->fetch_all();
 	if ($get_theirs)
 	{
 		foreach ($get_theirs as $article)
@@ -41,6 +42,7 @@ if (!isset($_GET['aid']))
 			$templating->set('article_id', $article['article_id']);
 			$templating->set('article_title', $article['title']);
 			$templating->set('username', $article['username']);
+			$templating->set('user_id', $article['user_id']);
 
 			$templating->set('date_created', $core->human_date($article['date']));
 			$templating->set('delete_button', '');
@@ -164,6 +166,12 @@ else
 	$previously_uploaded = $article_class->display_previous_uploads($article['article_id']);
 
 	$templating->block('uploads', 'admin_modules/article_form');
+	$local_upload = '';
+	if ($_SESSION['user_id'] == 1)
+	{
+		$local_upload = '<label><input type="checkbox" name="local_upload" /> Upload to local server?</label>';
+	}
+	$templating->set('local_upload', $local_upload);
 	$templating->set('previously_uploaded', $previously_uploaded['output']);
 	$templating->set('article_id', $article['article_id']);
 

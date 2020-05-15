@@ -32,8 +32,8 @@ if (!isset($_GET['go']))
 			}
 			else if (isset(core::$url_command[0]) && isset(core::$url_command[1]) && isset(core::$url_command[2]))
 			{
-				$find_article_where_sql = 'YEAR(FROM_UNIXTIME(a.`date`)) = ? AND MONTH(FROM_UNIXTIME(a.`date`)) = ? AND a.`slug` = ?';
-				$find_article_where_data = array((int) core::$url_command[0], (int) core::$url_command[1], core::$url_command[2]);
+				$find_article_where_sql = 'YEAR(FROM_UNIXTIME(a.`date`)) = ? AND MONTH(FROM_UNIXTIME(a.`date`)) = ? AND a.`slug` = ? OR a.`slug` LIKE ?';
+				$find_article_where_data = array((int) core::$url_command[0], (int) core::$url_command[1], core::$url_command[2], '%'.core::$url_command[2].'%');
 			}
 
 			// get the article

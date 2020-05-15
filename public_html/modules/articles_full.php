@@ -15,13 +15,12 @@ if (!isset($_GET['go']))
 	if (!isset($_GET['view']))
 	{
 		// make sure the id is set
-		if (!isset($_GET['aid']) && !isset(core::$url_command[2]))
+		if ((!isset($_GET['aid']) || isset($_GET['aid']) && !is_numeric($_GET['aid'])) && !isset(core::$url_command[2]))
 		{
 			http_response_code(404);
 			$templating->set_previous('meta_data', '', 1);
 			$templating->set_previous('title', 'No id entered', 1);
 			$core->message('That is not a correct article id!');
-			die('test');
 		}
 
 		else
@@ -623,9 +622,10 @@ if (!isset($_GET['go']))
 					/*
 					// top articles this month but not from the most recent 2 days to prevent showing what they've just seen on the home page
 					*/
-					$top_article_query = "SELECT `article_id`, `title`, `slug`, `date` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND `date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND `views` > ? AND `show_in_menu` = 0 ORDER BY RAND() DESC LIMIT 3";
+					$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
+					$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date` FROM `articles` a WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND a.`date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND a.`views` > ? AND a.`show_in_menu` = 0 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) ORDER BY RAND() DESC LIMIT 3";
 
-					$fetch_top3 = $dbl->run($top_article_query, array($core->config('hot-article-viewcount')))->fetch_all();
+					$fetch_top3 = $dbl->run($top_article_query, array_merge([$core->config('hot-article-viewcount')], $user->blocked_tags))->fetch_all();
 					
 					if (is_array($fetch_top3) && count($fetch_top3) === 3)
 					{
@@ -677,7 +677,7 @@ else if (isset($_GET['go']))
 			// get article name for the redirect
 			$title = $dbl->run("SELECT `title`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $_POST['aid']))->fetch();
 			
-			$article_link = $article_class->article_class(array('date' => $title['date'], 'slug' => $title['slug']));
+			$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
 
 			if (empty($correction))
 			{

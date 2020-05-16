@@ -885,6 +885,8 @@ class article
 
 		$gallery_tagline_sql = $this->gallery_tagline($checked);
 
+		$date_now = core::$date;
+
 		// an existing article (submitted/review/draft)
 		if (isset($_POST['article_id']) && !empty($_POST['article_id']))
 		{
@@ -904,9 +906,7 @@ class article
 			if (isset($options['type']) && $options['type'] != 'draft')
 			{
 				$this->core->update_admin_note(array('type' => $options['clear_notification_type'], 'data' => $_POST['article_id']));
-			}
-
-			$date_now = core::$date;
+			}	
 
 			$this->dbl->run("UPDATE `articles` SET `author_id` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = 1, `date` = ?, `admin_review` = 0, `reviewed_by_id` = ?, `submitted_unapproved` = 0, `draft` = 0, `locked` = 0, `comment_count` = 0, `guest_email` = '', `guest_ip` = '' WHERE `article_id` = ?", array($author_id, $checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $editors_pick, $date_now, $_SESSION['user_id'], $_POST['article_id']));
 
@@ -1032,6 +1032,26 @@ class article
 		include($this->core->config('path') . 'includes/telegram_poster.php');
 
 		telegram($checked['title'] . "\n\r\n\rLink: " . $article_link . "\n\rComments: " . $comments_link, $article_link);
+
+		include($this->core->config('path') . 'includes/discord_poster.php');
+
+		$tagline_image_sql = $this->dbl->run("SELECT a.`tagline_image`,a.`gallery_tagline`, t.`filename` as `gallery_tagline_filename` FROM `articles` a LEFT JOIN
+		`articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`article_id` = ?", array($article_id))->fetch();
+		$tagline_image = '';
+		if (!empty($tagline_image_sql['tagline_image']))
+		{
+			$tagline_image = $this->core->config('website_url')."uploads/articles/tagline_images/".$tagline_image_sql['tagline_image'];
+		}
+		if ($tagline_image_sql['gallery_tagline'] > 0 && !empty($tagline_image_sql['gallery_tagline_filename']))
+		{
+			$tagline_image = $this->core->config('website_url')."uploads/tagline_gallery/".$tagline_image_sql['gallery_tagline_filename'];
+		}
+		if (empty($tagline_image_sql['tagline_image']) && $tagline_image_sql['gallery_tagline'] == 0)
+		{
+			$tagline_image = $this->core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png";
+		}
+
+		post_to_discord(array('title' => $checked['title'], 'link' => $article_link, 'tagline' => $checked['tagline'], 'image' => $tagline_image));
 
 		if (!isset($_POST['show_block']))
 		{

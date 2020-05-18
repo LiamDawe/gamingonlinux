@@ -202,37 +202,31 @@ class bbcode
 		},
 		$text);
 
-		// markdown image as a link
-		$text = preg_replace_callback("~\[\[img\](($this->protocols).+?)\[\/img\]\]\((($this->protocols).+?)\)~is",
+		// markdown images as links
+		$text = preg_replace_callback("/\[\!\[([^]]+?)?\]\((($this->protocols)([^ |)]+))\)\]\(($this->protocols)([^ |)]+)\)/is",
 		function($matches)
 		{
-			return "<a href=\"".$matches[3]."\" target=\"_blank\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a href=\"".$matches[5].$matches[6]."\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"".$matches[1]."\" /></a>";
 		},
 		$text);
 
-		$text = preg_replace_callback("~\[url=([^]]+)]\[img]([^[]+)\[/img]\[/url]~i",
+		// markdown images
+		$text = preg_replace_callback("/\!\[([^]]+?)?\]\((($this->protocols)([^ |)]+))\)/is",
 		function($matches)
 		{
-			return "<a href=\"".$matches[1]."\" target=\"_blank\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"image\" /></a>";
-		},
-		$text);
-
-		// for the image proxy, basic images
-		$text = preg_replace_callback("/\[img\](.+?)\[\/img\]/is",
-		function($matches)
-		{
-			return "<a data-fancybox rel=\"group\" href=\"".$matches[1]."\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[1]."\" class=\"img-responsive\" alt=\"image\" /></a>";
+			return "<a data-fancybox rel=\"group\" href=\"".$matches[2]."\" rel=\"nofollow noopener noreferrer\"><img itemprop=\"image\" src=\"".$matches[2]."\" class=\"img-responsive\" alt=\"".$matches[1]."\" /></a>";
 		},
 		$text);
 		
 		return $text;
 	}
 	
+	// markdown link support
 	function parse_links($text)
 	{
-		$text = preg_replace("/(?:&lt;)(($this->protocols)([\S]+))(?:&gt;)/is", "<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text);
-
-		// markdown link support
+		//<link>
+		$text = preg_replace("/(?:&lt;)(($this->protocols)([\S]+))(?:&gt;)/is", "<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text); 
+		// [title](link)
 		$text = preg_replace("/\[([^]]+?)\]\((($this->protocols)([^ ]+))\)/is", "<a href=\"$2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text);
 
 		return $text;

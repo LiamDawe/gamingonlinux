@@ -595,6 +595,9 @@ class article
 		}
 		else
 		{
+			// get current list of featured article ids
+			$featured_ids = $this->dbl->run("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1")->fetch_all(PDO::FETCH_COLUMN);
+
 			// make sure its not empty
 			$empty_check = core::mempty(compact('title', 'tagline', 'text', 'categories'));
 			if ($empty_check !== true)
@@ -636,7 +639,7 @@ class article
 				$_SESSION['message'] = 'shorttitle';
 			}
 
-			else if (isset($_POST['show_block']) && $core->config('total_featured') == $core->config('editor_picks_limit'))
+			else if (isset($_POST['show_block']) && $core->config('total_featured') == $core->config('editor_picks_limit') && !in_array($_POST['article_id'], $featured_ids))
 			{
 				$redirect = 1;
 

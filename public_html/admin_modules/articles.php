@@ -534,8 +534,8 @@ if (isset($_POST['act']))
 
 			$article_class->gallery_tagline($checked);
 
-			// first check if it was disabled
-			$enabled_check = $dbl->run("SELECT `active` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
+			// first check if it was disabled and others we need to check
+			$enabled_check = $dbl->run("SELECT `active`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
 			$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0, `edit_date` = ? WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, core::$sql_date_now, $_POST['article_id']));
 
@@ -559,6 +559,12 @@ if (isset($_POST['act']))
 
 			// update history
 			$dbl->run("INSERT INTO `article_history` SET `article_id` = ?, `user_id` = ?, `date` = ?, `text` = ?", array($_POST['article_id'], $_SESSION['user_id'], core::$date, $_SESSION['original_text']));
+
+			// if it was previously active and the SLUG is different, we need to ensure no broken links
+			if ($enabled_check['active'] == 1 && $enabled_check['slug'] != $checked['slug'])
+			{
+				$dbl->run("INSERT INTO `article_slug_change` SET `id` = UUID(), `article_id` = ?, `old_slug` = ?", array($_POST['article_id'], $enabled_check['slug']));
+			}
 
 			// article has been edited, remove any saved info from errors (so the fields don't get populated if you post again)
 			unset($_SESSION['atitle']);

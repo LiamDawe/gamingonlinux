@@ -6,7 +6,7 @@ include(APP_ROOT . '/includes/header.php');
 
 if (isset($_GET['featured']) && isset($_GET['aid']) && is_numeric($_GET['aid']))
 {
-	$featured_grabber = $dbl->run("SELECT `article_id`, `slug` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']))->fetch();
+	$featured_grabber = $dbl->run("SELECT `article_id`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array($_GET['aid']))->fetch();
 
 	if (!empty($featured_grabber['article_id']))
 	{

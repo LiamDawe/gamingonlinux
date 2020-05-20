@@ -253,11 +253,12 @@ body {
 
  hr {height: 0px; clear: both; border: solid var(--hr-border-color); border-width: 1px 0 0}
 
- p > code {
+ code {
 	white-space: nowrap;
 	margin: 0px;
 	border: 1px solid #DDD;
 	background-color: var(--code-background);
+	color: var(--code-text-color);
 	border-radius: 3px;
 	max-width: 100%;
 	display: inline-block;
@@ -267,11 +268,6 @@ body {
 	padding: 5px;
 	box-sizing: border-box;
 	width: 100%;
-}
-
-.bbcodeblock, code {
-	color: var(--code-text-color);
-	background-color: var(--code-background);
 }
 
 .gol-form textarea, .gol-form input[type="text"], .gol-form input[type="text"]:disabled, .gol-form input[type="password"], .gol-form input[type="email"], .gol-form select {

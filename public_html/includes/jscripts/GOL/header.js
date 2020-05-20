@@ -378,7 +378,7 @@ jQuery(document).ready(function()
                 return null;
             } 
 
-            selected = window.prompt('URL link text');
+            selected = window.prompt('URL link text (or alt text if image)');
             if(selected === null || selected === '') 
 			{
                 selected = 'link';
@@ -420,6 +420,23 @@ jQuery(document).ready(function()
 				ins = '[' + selected + ']' + '(' + entered_url + ')';
 
 				this_textarea.insertAtCaret(ins);
+			}
+			else if ($(this).data('tag') == 'img')
+			{
+				popUpData = urlhelper(selected);
+				entered_url   = popUpData[0];
+				selected = popUpData[1];
+				ins = '![' + selected + ']' + '(' + entered_url + ')';
+
+				this_textarea.insertAtCaret(ins);		
+			}
+			else if ($(this).data('tag') == 'code')
+			{
+				if (selected.length == 0)
+				{
+					selected = ' \n\n';
+				}
+				this_textarea.insertAtCaret('```' + selected + '```');	
 			}
 			else
 			{

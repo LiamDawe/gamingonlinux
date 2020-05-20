@@ -244,17 +244,17 @@ class bbcode
 	function parse_bbcode($body, $article = 1)
 	{
 		//  get rid of empty BBCode, is there a point in having excess markup?
-		$body = preg_replace("`\[(b|i|s|u|mail|spoiler|img|quote|code|color|youtube)\]\[/(b|i|s|u|spoiler|mail|img|quote|code|color|youtube)\]`",'',$body);
+		$body = preg_replace("`\[(b|i|s|u|mail|spoiler|img|quote|color|youtube)\]\[/(b|i|s|u|spoiler|mail|img|quote|color|youtube)\]`",'',$body);
 
 		// Array for tempory storing codeblock contents
 		$codeBlocks = [];
 
 		// make all bbcode brackets inside the code tags be the correct html entities to prevent the bbcode inside from parsing
-		$body = preg_replace_callback("/\[code\](.+?)\[\/code\]/is",
+		$body = preg_replace_callback("/`{3}\n?([a-z]*[\s\S]*?\n?)`{3}/",
 			function($matches) use(&$codeBlocks)
 			{
 				$matches[1] = str_replace(' ', '&nbsp;', $matches[1]); // preserve whitespace no matter what
-				$codeBlocks[] = str_replace(array('[', ']'), array('&#91;', '&#93;'), "<code class='bbcodeblock'>" . $matches[1] . '</code>');
+				$codeBlocks[] = str_replace(array('[', ']'), array('&#91;', '&#93;'), "<code class='bbcodeblock'>" . trim($matches[1]) . '</code>');
 				end($codeBlocks); //Move array pointer to the end
 				$k = key($codeBlocks); //Get the last inserted number
 				reset($codeBlocks); //Reset the array pointer to the start
@@ -315,8 +315,6 @@ class bbcode
 			=> '<a href="mailto:$1">$2</a>',
 		"/\[justify\](.+?)\[\/justify\]/is" 
 			=> '$1',
-		"/\[code\](.+?)\[\/code\]/is" 
-			=> '<code>$1</code>',
 		"/\[sup\](.+?)\[\/sup\]/is" 
 			=> '<sup>$1</sup>',
 		"/\[spoiler](.+?)\[\/spoiler\](\r?\n)?/is" 
@@ -398,7 +396,6 @@ class bbcode
 		"/\[size\=(.+?)\](.+?)\[\/size\]/is",
 		"/\[email\=(.+?)\](.+?)\[\/email\]/is",
 		"/\[justify\](.+?)\[\/justify\]/is",
-		"/\[code\](.+?)\[\/code\]/is",
 		"/\[spoiler\](.+?)\[\/spoiler\]/is"
 		);
 
@@ -425,7 +422,6 @@ class bbcode
 		'$2',
 		'<a href="mailto:$1">$2</a>',
 		'$1',
-		'Code:<br /><code>$1</code>',
 		'SPOILER: View the website if you wish to see it.'
 		);
 

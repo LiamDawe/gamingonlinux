@@ -15,7 +15,7 @@ if ($checked = $article_class->check_article_inputs($return_page))
 
 	$article_class->gallery_tagline($checked);
 
-	$dbl->run("UPDATE `articles` SET `title` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ? WHERE `article_id` = ?", array($checked['title'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
+	$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ? WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $_POST['article_id']));
 
 	$article_class->process_categories($_POST['article_id']);
 	$article_class->process_games($_POST['article_id']);

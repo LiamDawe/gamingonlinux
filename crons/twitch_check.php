@@ -44,8 +44,6 @@ function validate_token ($core, $access_token)
 
 	$validation_details = json_decode($validate, true);
 
-	print_r($validation_details);
-
 	// need to refresh the details
 	if (empty($validation_details))
 	{
@@ -69,17 +67,18 @@ function validate_token ($core, $access_token)
 }
 
 $access_token = validate_token($core, $access_token);
-
+echo $access_token;
 if ($access_token)
 {
 	// grab details of their stream, will be blank of they're not live)
-	$stream = core::file_get_contents_curl("https://api.twitch.tv/helix/streams?user_id=".CHANNEL_ID, "GET", NULL, array("Client-ID: ". $core->config('twitch_dev_key'), 'Authorization: OAuth '.$access_token));
+	$stream = core::file_get_contents_curl("https://api.twitch.tv/helix/streams?user_id=".CHANNEL_ID, "GET", NULL, array("Client-ID: ". $core->config('twitch_dev_key'), 'Authorization: Bearer '.$access_token));
+	var_dump($stream);
 	$stream_details = json_decode($stream, true);
 
 	// are they streaming a specific game?
 	if (isset($stream_details['data'][0]['game_id']))
 	{
-		$game = core::file_get_contents_curl("https://api.twitch.tv/helix/games?id=".$stream_details['data'][0]['game_id'], "GET", NULL, array("Client-ID: ". $core->config('twitch_dev_key'), 'Authorization: OAuth '.$access_token));
+		$game = core::file_get_contents_curl("https://api.twitch.tv/helix/games?id=".$stream_details['data'][0]['game_id'], "GET", NULL, array("Client-ID: ". $core->config('twitch_dev_key'), 'Authorization: Bearer '.$access_token));
 		$game_details = json_decode($game, true);
 		$game_name = $game_details['data'][0]['name'];
 

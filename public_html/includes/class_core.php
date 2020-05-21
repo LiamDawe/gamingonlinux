@@ -243,18 +243,29 @@ class core
 	Quickly grab and save an image
 	Currently used for steam/gog game importing
 	*/
-	function save_image($img,$fullpath){
+	function save_image($img,$fullpath)
+	{
 		$ch = curl_init ($img);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 		$rawdata=curl_exec($ch);
 		curl_close ($ch);
 		if(file_exists($fullpath)){
 			unlink($fullpath);
 		}
-		$fp = fopen($fullpath,'x');
-		fwrite($fp, $rawdata);
+		$fp = fopen($fullpath,'c');
+		if (false === $fp) {
+			error_log('Cannot open file for writing.');
+		}
+
+		if (fwrite($fp, $rawdata) === FALSE) 
+		{
+			error_log('Cannot write to file');
+		}
 		fclose($fp); 
 	}
 	

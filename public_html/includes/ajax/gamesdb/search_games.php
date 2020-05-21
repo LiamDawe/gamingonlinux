@@ -13,7 +13,7 @@ if(isset($_GET['q']) && isset($_GET['return_type']))
 
 	if ((isset($_GET['type']) && $_GET['type'] == 'all') || !isset($_GET['type']))
 	{
-		$sql = "SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? ORDER BY `name` ASC";	
+		$sql = "SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? ORDER BY `is_dlc` ASC, `name` ASC";	
 	}
 	if (isset($_GET['type']) && $_GET['type'] == 'sales')
 	{

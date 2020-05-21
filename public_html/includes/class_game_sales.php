@@ -104,14 +104,17 @@ class game_sales
 
 		if ($check_name)
 		{
+			echo PHP_EOL . 'Now using the main ID.' . PHP_EOL;
 			$game_id = $check_name;
 		}
 		if ($duplicate)
 		{
+			echo PHP_EOL . 'Now using real ID from the dupe.' . PHP_EOL;
 			$game_id = $duplicate;
 		}
 		if ($name_change)
 		{
+			echo PHP_EOL . 'Now using real ID from the name change.' . PHP_EOL;
 			$game_id = $name_change;
 		}
 

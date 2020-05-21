@@ -298,7 +298,7 @@ else if (isset($_GET['aid']))
 	{
 		$templating->set('title', htmlentities($article['title'], ENT_QUOTES));
 		$templating->set('tagline', $article['tagline']);
-		$templating->set('slug', core::nice_title($article['title']));
+		$templating->set('slug', core::nice_title($article['slug']));
 	}
 
 	$tagline_image = $article_class->display_tagline_image($article);

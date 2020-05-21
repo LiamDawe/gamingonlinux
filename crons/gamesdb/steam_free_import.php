@@ -54,20 +54,44 @@ do
 			}
 			echo 'steam id is ' . $steam_id . PHP_EOL;
 
-			$game_id = $game_sales->get_correct_info($title, $steam_id);
+			$game_details = $game_sales->get_correct_info($title, $steam_id);
 			
-			if ($game_id === false)
+			if ($game_details === false)
 			{
 				echo PHP_EOL . 'Not found in DB - adding.' . PHP_EOL;
 				$dbl->run("INSERT INTO `calendar` SET `name` = ?, `steam_id` = ?, `date` = ?, `steam_link` = ?, `free_game` = 1, `approved` = 1, `stripped_name` = ?", array($title, $steam_id, $clean_release_date, $link, $stripped_title));
 					
 				$new_id = $dbl->new_id();
 
-				$new_games[] = $new_id;
+				$new_games[] = array('release_date' => $clean_release_date, 'name' => $title, 'link' => $link);
 
 				$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $new_id . '.jpg';
 				$core->save_image($image, $saved_file);
 				$dbl->run("UPDATE `calendar` SET `small_picture` = ? WHERE `id` = ?", [$new_id . '.jpg', $new_id]);
+			}
+			else
+			{
+				$update = 0;
+				$sql_updates = array();
+				$sql_data = array();
+
+				// if the game list has no picture, grab it and save it
+				if ($game_details['small_picture'] == NULL || $game_details['small_picture'] == '')
+				{
+					$update = 1;
+					$saved_file = $core->config('path') . 'uploads/gamesdb/small/' . $game_details['id'] . '.jpg';
+					$core->save_image($image, $saved_file);
+					$sql_updates[] = '`small_picture` = ?';
+					$sql_data[] = $game_details['id'] . '.jpg';
+
+					echo PHP_EOL . 'Game missing small image - adding.' . PHP_EOL;
+				}
+
+				if ($update == 1)
+				{
+					$sql_data[] = $game_details['id'];
+					$dbl->run("UPDATE `calendar` SET " . implode(', ', $sql_updates) . " WHERE `id` = ?", $sql_data);
+				}
 			}
 		}
 		// free up memory
@@ -81,5 +105,31 @@ do
 $total_found_new = count($new_games);
 
 echo 'Total new found: ' . $total_found_new . "\n";
+
+if ($total_found_new > 0)
+{
+	$email_output = array();
+	foreach ($new_games as $new)
+	{
+		$email_output[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: <a href="'.$new['link'].'">' . $new['link'] . '</a>';
+		$email_output_plain[] = 'Release Date: ' . $new['release_date'] . ' | Name: ' . $new['name'] . ' | Link: ' . $new['link'];
+	}
+
+	$html_message = implode("<br />", $email_output);
+	$html_message .= '<br />Total pages scanned: ' . $page;
+
+	$plain_message = implode("\n", $email_output_plain);
+	$plain_message .= "\nTotal pages scanned: " . $page;
+
+	$to = $core->config('contact_email');
+	$subject = 'GOL Steam New - Found New Free Games';
+
+	// Mail it
+	if ($core->config('send_emails') == 1)
+	{
+		$mail = new mailer($core);
+		$mail->sendMail($to, $subject, $html_message, $plain_message);
+	}
+}
 
 echo "End of Steam Free Games Store import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";

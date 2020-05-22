@@ -536,8 +536,10 @@ class article
 			$temp_tagline = 1;
 		}
 
+		$article_id = 0;
 		if (isset($_POST['article_id']) && is_numeric($_POST['article_id']))
 		{
+			$article_id = $_POST['article_id'];
 			$check_article = $this->dbl->run("SELECT `tagline_image`, `gallery_tagline` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 		}
 
@@ -601,7 +603,7 @@ class article
 			$featured_ids = $this->dbl->run("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1")->fetch_all(PDO::FETCH_COLUMN);
 
 			// ensure unique slugs
-			$slug_check = $this->dbl->run("SELECT 1 FROM `articles` WHERE `slug` = ?", array($slug))->fetchOne();
+			$slug_check = $this->dbl->run("SELECT 1 FROM `articles` WHERE `slug` = ? AND `article_id` != ?", array($slug, $article_id))->fetchOne();
 
 			// make sure its not empty
 			$empty_check = core::mempty(compact('title', 'tagline', 'text', 'categories'));
@@ -1042,6 +1044,10 @@ class article
 		}
 
 		include($this->core->config('path') . 'includes/telegram_poster.php');
+
+		define('CHAT_ID', $core->config('telegram_news_channel'));
+		define('BOT_TOKEN', $core->config('telegram_bot_key'));
+		define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
 		telegram($checked['title'] . "\n\r\n\rLink: " . $article_link . "\n\rComments: " . $comments_link, $article_link);
 

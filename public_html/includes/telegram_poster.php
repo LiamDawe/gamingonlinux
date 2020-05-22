@@ -3,9 +3,6 @@ if(!defined('golapp'))
 {
 	die('Direct access not permitted');
 }
-define('CHAT_ID', $core->config('telegram_news_channel'));
-define('BOT_TOKEN', $core->config('telegram_bot_key'));
-define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
 function exec_curl_request($handle) 
 {

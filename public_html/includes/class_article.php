@@ -127,6 +127,10 @@ class article
 				{
 					$class = 'class="steamplay"';
 				}
+				else if ($tag['category_name'] == 'Stadia')
+				{
+					$class = 'class="stadia"';
+				}
 
 				if ($style == 'list')
 				{
@@ -523,8 +527,6 @@ class article
 	// this function will check over everything necessary for an article to be correctly done, including an article crossover checker
 	public function check_article_inputs($return_page)
 	{
-		global $core;
-
 		// if this is set to 1, we've come across an issue, so redirect
 		$redirect = 0;
 
@@ -598,6 +600,9 @@ class article
 			// get current list of featured article ids
 			$featured_ids = $this->dbl->run("SELECT `article_id` FROM `articles` WHERE `show_in_menu` = 1")->fetch_all(PDO::FETCH_COLUMN);
 
+			// ensure unique slugs
+			$slug_check = $this->dbl->run("SELECT 1 FROM `articles` WHERE `slug` = ?", array($slug))->fetchOne();
+
 			// make sure its not empty
 			$empty_check = core::mempty(compact('title', 'tagline', 'text', 'categories'));
 			if ($empty_check !== true)
@@ -606,6 +611,12 @@ class article
 
 				$_SESSION['message'] = 'empty';
 				$_SESSION['message_extra'] = $empty_check;
+			}
+			else if ($slug_check)
+			{
+				$redirect = 1;
+
+				$_SESSION['message'] = 'slug_dupe';
 			}
 			// prevent ckeditor just giving us a blank article (this is the default for an empty editor)
 			// this way if there's an issue and it gets wiped, we still don't get a blank article published
@@ -624,12 +635,12 @@ class article
 				$_SESSION['message'] = 'shorttagline';
 			}
 
-			else if (strlen($tagline) > $core->config('tagline-max-length'))
+			else if (strlen($tagline) > $this->core->config('tagline-max-length'))
 			{
 				$redirect = 1;
 
 				$_SESSION['message'] = 'taglinetoolong';
-				$_SESSION['message_extra'] = $core->config('tagline-max-length');
+				$_SESSION['message_extra'] = $this->core->config('tagline-max-length');
 			}
 
 			else if (strlen($title) < 10)
@@ -639,12 +650,12 @@ class article
 				$_SESSION['message'] = 'shorttitle';
 			}
 
-			else if (isset($_POST['show_block']) && $core->config('total_featured') == $core->config('editor_picks_limit') && !in_array($_POST['article_id'], $featured_ids))
+			else if (isset($_POST['show_block']) && $this->core->config('total_featured') == $this->core->config('editor_picks_limit') && !in_array($_POST['article_id'], $featured_ids))
 			{
 				$redirect = 1;
 
 				$_SESSION['message'] = 'editor_picks_full';
-				$_SESSION['message_extra'] = $core->config('editor_picks_limit');
+				$_SESSION['message_extra'] = $this->core->config('editor_picks_limit');
 			}
 
 			// if it's an existing article, check tagline image
@@ -828,7 +839,7 @@ class article
 			{
 				$view_link = '- <a href="/admin.php?module=article_history&id='.$grab_history['id'].'">View text</a>';
 			}
-			$date = $core->human_date($grab_history['date']);
+			$date = $this->core->human_date($grab_history['date']);
 			$history .= '<li><a href="/profiles/'. $grab_history['user_id'] .'">' . $grab_history['username'] . '</a> '.$view_link.' - ' . $date . '</li>';
 		}
 
@@ -863,8 +874,6 @@ class article
 
 	public function publish_article($options)
 	{
-		global $core;
-
 		if (isset($_POST['article_id']))
 		{
 			// check it hasn't been accepted already
@@ -966,7 +975,7 @@ class article
 		// move new uploaded tagline image, and save it to the article
 		if (isset($_SESSION['uploads_tagline']) && $_SESSION['uploads_tagline']['image_rand'] == $_SESSION['image_rand'])
 		{
-			$core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name'], $checked['text']);
+			$this->core->move_temp_image($article_id, $_SESSION['uploads_tagline']['image_name'], $checked['text']);
 		}
 
 		$this->dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_articles'");
@@ -997,7 +1006,7 @@ class article
 				// Mail it
 				if ($this->core->config('send_emails') == 1)
 				{
-					$mail = new mailer($core);
+					$mail = new mailer($this->core);
 					$mail->sendMail($author_email, $subject, $html_message, $plain_message);
 				}
 			}
@@ -1027,7 +1036,7 @@ class article
 
 			if ($this->core->config('send_emails') == 1)
 			{
-				$mail = new mailer($core);
+				$mail = new mailer($this->core);
 				$mail->sendMail($email, $subject, $html_message, $plain_message);
 			}
 		}
@@ -1066,7 +1075,7 @@ class article
 		}
 
 		// note who did it
-		$core->new_admin_note(array('completed' => 1, 'content' => ' published a new article titled: <a href="/articles/'.$article_id.'">'.$checked['title'].'</a>.'));
+		$this->core->new_admin_note(array('completed' => 1, 'content' => ' published a new article titled: <a href="/articles/'.$article_id.'">'.$checked['title'].'</a>.'));
 
 		header("Location: " . $redirect);
 		die();

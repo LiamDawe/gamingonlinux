@@ -6,6 +6,11 @@ return [
 		"additions" => 1,
 		"error" => 1
 	],
+	"slug_dupe" =>
+	[
+		"text" => "The article slug was not unique!",
+		"error" => 1
+	],
 	"shorttagline" => 
 	[
 		"text" => "The tagline text was too short!",

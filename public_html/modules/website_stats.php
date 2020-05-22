@@ -129,7 +129,7 @@ $templating->set_previous('meta_description', 'Statistics from the GamingOnLinux
 	$query_top = $dbl->run("SELECT `article_id`, `title`, `views`, `date`, `slug` FROM `articles` WHERE `active` = 1 ORDER BY `views` DESC LIMIT 5")->fetch_all();
 	foreach ($query_top as $top_articles)
 	{
-		$article_list .= '<li><a href="'.$article_class->article_link(array('date' => $top_article['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
+		$article_list .= '<li><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a> ('.number_format($top_articles['views']).')</li>';
 	}
 	$templating->set('article_list', $article_list);
 

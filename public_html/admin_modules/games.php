@@ -36,7 +36,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		if (isset($_POST['q']) && !empty($_POST['q']))
 		{
 			$text_sql = '%'.$search_text.'%';
-			$find_items = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ?", [$text_sql])->fetch_all();		
+			$find_items = $dbl->run("SELECT `id`, `name` FROM `calendar` WHERE `name` LIKE ? ORDER BY `is_dlc` ASC, `name`", [$text_sql])->fetch_all();		
 			if ($find_items)
 			{
 				$templating->block('search_result_top');
@@ -1208,6 +1208,8 @@ if (isset($_POST['act']))
 
 			// remove game developer associations
 			$dbl->run("DELETE FROM `game_developer_reference` WHERE `game_id` = ?", [$_GET['id']]);
+
+			$dbl->run("DELETE FROM `itemdb_dupes` WHERE `real_id` = ?", array($_GET['id']));
 
 			// remove article associations
 			$dbl->run("DELETE FROM `article_item_assoc` WHERE `game_id` = ?", [$_GET['id']]);

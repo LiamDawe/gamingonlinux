@@ -17,7 +17,10 @@ $text = "<p>This is your once a month reminder to make sure your PC information 
 
 <div class=\"all-ok\" id=\"pc_info_done\"></div></p>";
 
-$slug = core::nice_title($title);
+$year = date('Y');
+$month = date('m');
+
+$slug = core::nice_title('update-pc-info-'.$year.$month);
 
 $dbl->run("INSERT INTO `articles` SET `author_id` = 1844, `date` = ?, `title` = ?, `slug` = ?, `tagline` = ?, `text` = ?, `show_in_menu` = 0, `gallery_tagline` = 26, `active` = 0, `admin_review` = 1", array(core::$date, $title, $slug, $tagline, $text));
 

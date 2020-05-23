@@ -221,9 +221,10 @@ class bbcode
 		return $text;
 	}
 	
-	// markdown link support
 	function parse_links($text)
 	{
+		// general link matching
+		$text = preg_replace("/(\s|^)(($this->protocols)[\w\d\.\/#\_\-\?:=&;()\%]+)(?:(?<![.,;!?:\"\'-])(\s|.|$))/iu", '$1<a href="$2" target="_blank" rel="nofollow noopener noreferrer">$2</a>$4', $text);
 		//<link>
 		$text = preg_replace("/(?:&lt;)(($this->protocols)([\S]+))(?:&gt;)/is", "<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text); 
 		// [title](link)

@@ -80,7 +80,7 @@ if (isset($_GET['view']))
 		$templating->block('full_db_search');
 
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, c.`is_crowdfunded`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			// sort out the external links we have for it
@@ -112,7 +112,7 @@ if (isset($_GET['view']))
 				
 				foreach ($articles_res as $articles)
 				{
-					$article_link = $article_class->get_link($articles['article_id'], $articles['slug']);
+					$article_link = $article_class->article_link(array('date' => $articles['date'], 'slug' => $articles['slug']));
 
 					if ($articles['author_id'] == 0)
 					{
@@ -332,6 +332,12 @@ if (isset($_GET['view']))
 				$description = '<strong>About this game</strong>:<br />' . $get_item['description'];
 			}
 			$templating->set('description', $description);
+
+			// crowdfunded?
+			if ($get_item['is_crowdfunded'] == 1)
+			{
+				$templating->block('crowdfunded');
+			}
 
 			// find any associations
 			$get_associations = $dbl->run("SELECT `name` FROM `calendar` WHERE `also_known_as` = ?", array($get_item['id']))->fetch_all();

@@ -160,7 +160,7 @@ if (isset($_POST['act']))
 
 		$dbl->run("UPDATE `editor_picks` SET `end_date` = ? WHERE `article_id` = ?", array($_POST['end_date'], $_POST['article_id']));
 
-		if (isset($_FILES['new_image']))
+		if (isset($_FILES['new_image']) && $_FILES['new_image']['name'] != "")
 		{
 			$upload = $image_upload->featured_image($_POST['article_id'], 0);
 		}

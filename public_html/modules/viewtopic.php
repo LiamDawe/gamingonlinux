@@ -5,7 +5,10 @@ if(!defined('golapp'))
 }
 if (!isset($_GET['topic_id']) || !core::is_number($_GET['topic_id']))
 {
+	$_SESSION['message'] = 'no_id';
 	$core->message('That is not a valid forum topic!');
+	header("Location: /forum/");
+	die();
 }
 if (isset($_GET['bypass_block']))
 {

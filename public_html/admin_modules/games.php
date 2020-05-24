@@ -1209,7 +1209,7 @@ if (isset($_POST['act']))
 			// remove game developer associations
 			$dbl->run("DELETE FROM `game_developer_reference` WHERE `game_id` = ?", [$_GET['id']]);
 
-			$dbl->run("DELETE FROM `itemdb_dupes` WHERE `real_id` = ?", array($_GET['id']));
+			$dbl->run("DELETE FROM `item_dupes` WHERE `real_id` = ?", array($_GET['id']));
 
 			// remove article associations
 			$dbl->run("DELETE FROM `article_item_assoc` WHERE `game_id` = ?", [$_GET['id']]);

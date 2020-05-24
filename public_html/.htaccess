@@ -1,3 +1,4 @@
+
 Options +SymLinksifOwnerMatch
 
   RewriteEngine On
@@ -51,11 +52,11 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^home/?$ /index.php?module=home [N]
 
-  RewriteRule ^free-games/?$ /free_games.php [N]
+  RewriteRule ^free-games/?$ free_games.php [N]
   
   RewriteRule ^calendar/?$ /index.php?module=calendar [N]
   
-  RewriteRule ^sales/?$ /sales.php [N]
+  RewriteRule ^sales/?$ sales.php [N]
   
   RewriteRule ^mailinglist/?$ /index.php?module=mailing_list [N]
 
@@ -75,11 +76,11 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^irc/?$ /index.php?module=irc [N]
 
-  RewriteRule ^sales/page=([0-9]+)/?$ /sales.php?page=$1 [N,NC,QSA]
+  RewriteRule ^sales/page=([0-9]+)/?$ sales.php?page=$1 [N,NC,QSA]
 
-  RewriteRule ^sales/([0-9]+)/?$ /sales.php?sale_id=$1 [N,NC,QSA]
+  RewriteRule ^sales/([0-9]+)/?$ sales.php?sale_id=$1 [N,NC,QSA]
 
-  RewriteRule ^sales/message=(.+?)/?$ /sales.php?message=$1 [N,NC,QSA]
+  RewriteRule ^sales/message=(.+?)/?$ sales.php?message=$1 [N,NC,QSA]
 
   RewriteRule ^register/?$ /index.php?module=register [N]
 
@@ -165,7 +166,7 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^articles/category/(.+?)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA,B]
   
-  RewriteRule ^itemdb/?$ /itemdb.php [N,NC,QSA]
+  RewriteRule ^itemdb/?$ itemdb.php [N,NC,QSA]
   
   RewriteRule ^itemdb/([0-9]+)/?$ /index.php?module=items_database&view=item&id=$1 [N,NC,QSA]
   
@@ -176,15 +177,15 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^steamplay/?$ steamplay.php [N,NC,QSA]
   
   RewriteRule ^steamplay/reports/([0-9]+)/?$ steamplay_reports.php?id=$1 [N,NC,QSA]
+
+  RewriteCond %{HTTP_HOST} !^www\.
+  RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+
+  RewriteCond %{HTTPS} off
+  RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
   
   # if requested url does not exist pass it as path info to index.php
   RewriteRule ^$ index.php?/ [QSA,L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule (.*) index.php?/$1 [QSA,L]
-
-  RewriteCond %{HTTP_HOST} !^www\. [NC]
-  RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-  
-  RewriteCond %{HTTPS} !=on
-  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

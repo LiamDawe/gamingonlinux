@@ -48,11 +48,11 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^home/?$ /index.php?module=home [N]
 
-  RewriteRule ^free-games/?$ /free_games.php [N]
+  RewriteRule ^free-games/?$ free_games.php [N]
   
   RewriteRule ^calendar/?$ /index.php?module=calendar [N]
   
-  RewriteRule ^sales/?$ /sales.php [N]
+  RewriteRule ^sales/?$ sales.php [N]
   
   RewriteRule ^mailinglist/?$ /index.php?module=mailing_list [N]
 
@@ -72,11 +72,11 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^irc/?$ /index.php?module=irc [N]
 
-  RewriteRule ^sales/page=([0-9]+)/?$ /sales.php?page=$1 [N,NC,QSA]
+  RewriteRule ^sales/page=([0-9]+)/?$ sales.php?page=$1 [N,NC,QSA]
 
-  RewriteRule ^sales/([0-9]+)/?$ /sales.php?sale_id=$1 [N,NC,QSA]
+  RewriteRule ^sales/([0-9]+)/?$ sales.php?sale_id=$1 [N,NC,QSA]
 
-  RewriteRule ^sales/message=(.+?)/?$ /sales.php?message=$1 [N,NC,QSA]
+  RewriteRule ^sales/message=(.+?)/?$ sales.php?message=$1 [N,NC,QSA]
 
   RewriteRule ^register/?$ /index.php?module=register [N]
 
@@ -162,7 +162,7 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^articles/category/(.+?)/?$ /index.php?module=articles&view=cat&catid=$1 [N,NC,QSA,B]
   
-  RewriteRule ^itemdb/?$ /itemdb.php [N,NC,QSA]
+  RewriteRule ^itemdb/?$ itemdb.php [N,NC,QSA]
   
   RewriteRule ^itemdb/([0-9]+)/?$ /index.php?module=items_database&view=item&id=$1 [N,NC,QSA]
 

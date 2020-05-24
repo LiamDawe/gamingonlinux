@@ -13,14 +13,14 @@ $beginOfDay = strtotime("midnight yesterday");
 $endOfDay   = strtotime("midnight today") - 1;
 
 // gather a list of articles in the last day
-$article_list = $dbl->run("SELECT `title`, `article_id` FROM `articles` WHERE `date` >= $beginOfDay AND `date` <= $endOfDay AND `active` = 1 AND `draft` = 0")->fetch_all();
+$article_list = $dbl->run("SELECT `title`, `article_id`, `date` FROM `articles` WHERE `date` >= $beginOfDay AND `date` <= $endOfDay AND `active` = 1 AND `draft` = 0")->fetch_all();
 if ($article_list)
 {
 	$email_article_list = '';
 	$email_article_list_plain = '';
 	foreach ($article_list as $article)
 	{
-		$link = $article_class->get_link($article['article_id'], $article['title']);
+		$link = $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug']));
 		$email_article_list .= '<p><a href="'.$link.'">'.$article['title'].'</a></p>';
 		$email_article_list_plain .= $article['title'] .': ' . $link . "\r\n\r\n";
 	}

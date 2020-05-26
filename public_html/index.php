@@ -39,12 +39,12 @@ if (core::$current_module['module_file_name'] == 'home')
 		}
 
 		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> '' AND p.`end_date` > now() $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
-
-		$_SESSION['last_featured_id'] = $featured['article_id'];
 	}
 
 	if ($total_featured >= 1 && $featured)
 	{
+		$_SESSION['last_featured_id'] = $featured['article_id'];
+
 		$templating->block('featured', 'mainpage');
 		$templating->set('title', $featured['title']);
 		$templating->set('image', $featured['featured_image']);

@@ -1045,11 +1045,13 @@ class article
 
 		include($this->core->config('path') . 'includes/telegram_poster.php');
 
-		define('CHAT_ID', $core->config('telegram_news_channel'));
-		define('BOT_TOKEN', $core->config('telegram_bot_key'));
+		define('CHAT_ID', $this->core->config('telegram_news_channel'));
+		define('BOT_TOKEN', $this->core->config('telegram_bot_key'));
 		define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
 		telegram($checked['title'] . "\n\r\n\rLink: " . $article_link . "\n\rComments: " . $comments_link, $article_link);
+
+		define('WEBHOOK_URL', $this->core->config('discord_news_webhook'));
 
 		include($this->core->config('path') . 'includes/discord_poster.php');
 

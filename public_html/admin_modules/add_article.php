@@ -85,13 +85,12 @@ $templating->set('hidden_upload_fields', $previously_uploaded['hidden']);
 $templating->set('website_url', $core->config('website_url'));
 $templating->set('subscribe_check', $auto_subscribe);
 
+$templating->block('uploads', 'admin_modules/article_form');
 $local_upload = '';
 if ($_SESSION['user_id'] == 1)
 {
 	$local_upload = '<label><input type="checkbox" name="local_upload" /> Upload to local server?</label>';
 }
-
-$templating->block('uploads', 'admin_modules/article_form');
 $templating->set('local_upload', $local_upload);
 $templating->set('previously_uploaded', $previously_uploaded['output']);
 $templating->set('article_id', '');

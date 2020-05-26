@@ -501,6 +501,26 @@ if (!isset($_GET['go']))
 					$templating->set('user_id', $article['author_id']);
 				}
 
+				/*
+				// top articles this month but not from the most recent 2 days to prevent showing what they've just seen on the home page
+				*/
+				$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
+				$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date` FROM `articles` a WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND a.`date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND a.`views` > ? AND a.`show_in_menu` = 0 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) ORDER BY RAND() DESC LIMIT 3";
+
+				$fetch_top3 = $dbl->run($top_article_query, array_merge([$core->config('hot-article-viewcount')], $user->blocked_tags))->fetch_all();
+				
+				if (is_array($fetch_top3) && count($fetch_top3) === 3)
+				{
+					$templating->block('top-articles-bottom', 'articles_full');
+					$hot_articles = '';
+					foreach ($fetch_top3 as $top_articles)
+					{
+						$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></li>';
+					}
+
+					$templating->set('top_articles', $hot_articles);
+				}
+
 				// get the comments if we aren't in preview mode
 				if ($article['active'] == 1)
 				{					
@@ -618,26 +638,6 @@ if (!isset($_GET['go']))
 					}
 
 					// below everything else
-
-					/*
-					// top articles this month but not from the most recent 2 days to prevent showing what they've just seen on the home page
-					*/
-					$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
-					$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date` FROM `articles` a WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND a.`date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND a.`views` > ? AND a.`show_in_menu` = 0 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) ORDER BY RAND() DESC LIMIT 3";
-
-					$fetch_top3 = $dbl->run($top_article_query, array_merge([$core->config('hot-article-viewcount')], $user->blocked_tags))->fetch_all();
-					
-					if (is_array($fetch_top3) && count($fetch_top3) === 3)
-					{
-						$templating->block('top-articles-bottom', 'articles_full');
-						$hot_articles = '';
-						foreach ($fetch_top3 as $top_articles)
-						{
-							$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></li>';
-						}
-
-						$templating->set('top_articles', $hot_articles);
-					}
 				}
 			}
 		}

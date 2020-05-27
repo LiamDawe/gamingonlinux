@@ -998,16 +998,17 @@ a.button {
 	margin: 0 auto;
 	margin-bottom: 10px;
 }
+.info_box_top_articles-container
+{
+	margin-right: 10px;
+}
 .info_box_top_articles{
 	width: 100%;
 	box-shadow: 10px 10px var(--info-box-shadow); 
 	border: 1px solid grey;
 	padding: 5px;
-	margin-bottom: 1.5rem;
-	padding-right: 1.5rem;
 	box-sizing: border-box;
-	margin: 0 auto;
-	margin-bottom: 10px;
+	margin-bottom: 15px;
 }
 .article {
 	background: var(--article-main-background);
@@ -1104,6 +1105,9 @@ a.button {
 .article .tags ul li.steamplay {
 	background: #928d44;
 }
+.article .tags ul li.stadia {
+	background: #ff5832;
+}
 .article .tags > a.ea
 {
 	color: #ac6a30;
@@ -1111,6 +1115,10 @@ a.button {
 .article .tags > a.steamplay
 {
 	color: #928d44;
+}
+.article .tags > a.stadia
+{
+	color: #ff5832;
 }
 .article .tags ul li a {
 	color: #ffffff;
@@ -1943,6 +1951,8 @@ th, td { vertical-align: top; }
     color: var(--font-color);
 	white-space: nowrap;
 }
+
+.forum_top_option li.green {background-color: green;}
 
 .forum_top_option li.active {background: #dba12c;}
 

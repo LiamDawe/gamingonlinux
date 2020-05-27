@@ -1,14 +1,21 @@
 [block: main_top]
 				<div class="box">
-					<ul class="breadcrumb">
-						<li><a href="/forum/">Forum</a></li>
-						<li class="active">{:forum_name}</li>
-					</ul>
-				</div>
-				<div class="box">
-					<div class="head">{:forum_name} {:new_topic_link}</div>
+					<div class="head"> <a href="/forum_rss.php?fid={:forum_id}{:rss_pass}"><img src="/templates/default/images/network-icons/white/rss.svg" alt="" class="fright" width="23px"></a> Viewing: {:forum_name} </div>
 				</div>
 [/block: main_top]
+
+[block: options]
+<div class="box">
+	<div class="group">
+			<ul class="forum_top_option">
+				<li><a class="forum_button" href="/forum/latest">Latest</a></li>
+				<li><a class="forum_button" href="/forum/categories">Categories</a></li>
+				{:new_topic_link}
+				<li class="jump-list"><select class="wrap ays-ignore" name="category" onchange="window.open(this.options[this.selectedIndex].value, '_self')"><option value="">Jump to a category</option>{:forum_list}</select></li>
+			</ul>	
+	</div>
+</div>
+[/block: options]
 
 [block: pinned]
 	<div class="box"><div class="subhead"> &#x1F4CC; Pinned Topics</div></div>

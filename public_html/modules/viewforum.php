@@ -44,13 +44,33 @@ else
 
 	$templating->load('viewforum');
 
-	$name = $dbl->run("SELECT `name` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetchOne();
+	$details = $dbl->run("SELECT `name`, `rss_password` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetch();
 
-	$templating->set_previous('title', 'Viewing forum ' . $name, 1);
-	$templating->set_previous('meta_description', 'GamingOnLinux forum - Viewing forum ' . $name, 1);
+	$templating->set_previous('title', 'Viewing forum ' . $details['name'], 1);
+	$templating->set_previous('meta_description', 'GamingOnLinux forum - Viewing forum ' . $details['name'], 1);
 
 	$templating->block('main_top', 'viewforum');
-	$templating->set('forum_name', $name);
+	$templating->set('forum_name', $details['name']);
+	$templating->set('forum_id', (int) $_GET['forum_id']);
+
+	$rss_pass = NULL;
+	if ($details['rss_password'] != NULL)
+	{
+		$rss_pass = '&amp;rss_pass='.$details['rss_password'];
+	}
+	$templating->set('rss_pass', $rss_pass);
+
+	// get the forum ids this user is actually allowed to view
+	$groups_in = str_repeat('?,', count($user->user_groups) - 1) . '?';
+	$forum_ids = $dbl->run("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all();
+	$templating->block('options', 'viewforum');
+	$forum_list = '';
+	foreach ($forum_ids as $forum)
+	{
+		$forum_list .= '<option value="/forum/' . $forum['forum_id'] . '">' . $forum['name'] . '</option>';
+		$forum_id_list[] = $forum['forum_id'];
+	}
+	$templating->set('forum_list', $forum_list);
 
 	$new_topic = '';
 	$new_topic_bottom = '';
@@ -64,7 +84,7 @@ else
 	{
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{
-			$new_topic = "<span class=\"fright\"><a class=\"badge blue\" href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\"> Create Post</a></span>";
+			$new_topic = '<li class="green"><a class="forum_button" href="/index.php?module=newtopic">Create Post</a></li>';
 			$new_topic_bottom = "<div class=\"fright\"><span class=\"badge blue\"><a class=\"\" href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\">Create Post</a></span></div>";
 		}
 	}

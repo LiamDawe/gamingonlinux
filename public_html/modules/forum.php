@@ -40,7 +40,7 @@ else
 	{
 		if ($_SESSION['activated'] == 1)
 		{
-			$new_topic = '<li><a class="forum_button blue" href="/index.php?module=newtopic">Create Post</a></li>';
+			$new_topic = '<li class="green"><a class="forum_button" href="/index.php?module=newtopic">Create Post</a></li>';
 		}
 	}
 	$templating->set('new_topic', $new_topic);
@@ -229,6 +229,7 @@ else
 			forum.last_post_user_id as Forum_last_post_user_id,
 			forum.last_post_time,
 			forum.last_post_topic_id,
+			forum.rss_password,
 			users.username,
 			topic.topic_title,
 			topic.replys,
@@ -282,6 +283,7 @@ else
 				$forum_array[$row['ForumId']]['topic_title'] = $row['topic_title'];
 				$forum_array[$row['ForumId']]['topic_replies'] = $row['replys'];
 				$forum_array[$row['ForumId']]['last_post_id'] = $row['last_post_id'];
+				$forum_array[$row['ForumId']]['rss_password'] = $row['rss_password'];
 			}
 		}
 	
@@ -340,6 +342,14 @@ else
 					$templating->set('last_post_title', $last_title);
 					$templating->set('last_post_username', $last_username);
 					$templating->set('last_post_time', $last_post_time);
+					$templating->set('forum_id', $forum['id']);
+
+					$rss_pass = NULL;
+					if ($forum['rss_password'] != NULL)
+					{
+						$rss_pass = '&amp;rss_pass='.$forum['rss_password'];
+					}
+					$templating->set('rss_pass', $rss_pass);
 				}
 			}
 			$templating->block('category_bottom', 'forum');

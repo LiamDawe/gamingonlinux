@@ -218,6 +218,16 @@ if (!isset($_GET['type']))
 			{
 				// check it's not already in there
 				$check_exists = $dbl->run("SELECT `email` FROM `mailing_list` WHERE `email` = ?", array($email))->fetchOne();
+
+				// check account with that email doesn't exist
+				$chech_acc = $dbl->run("SELECT `email` FROM `users` WHERE `email` = ?", array($email))->fetchOne();
+
+				if ($chech_acc)
+				{
+					$_SESSION['message'] = 'account_used';
+					header('Location: '.$core->config('website_url').'mailinglist');
+					die();					
+				}
 				
 				if (!$check_exists)
 				{

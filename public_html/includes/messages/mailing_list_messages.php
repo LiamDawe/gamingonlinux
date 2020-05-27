@@ -31,6 +31,11 @@ return [
 	[
 		"text" => "That was not an email address, please try again!",
 		"error" => 1
+	],
+	"account_used" =>
+	[
+		"text" => 'An account with that email exists, please <a href="/index.php?module=login">login first</a> or use a different email.',
+		"error" => 1
 	]
 ];
 ?>

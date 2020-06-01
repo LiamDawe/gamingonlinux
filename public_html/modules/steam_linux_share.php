@@ -104,9 +104,9 @@ $linux_share_data = "
 	}
 }";
 
-$linuxonly = "<div class=\"chartjs-container\"><canvas id=\"linuxonly\" width=\"400\" height=\"200\"></canvas></div>";
+$linuxonly = "<div class=\"chartjs-container\"><canvas class=\"chartjs\" id=\"linuxonly\" width=\"400\" height=\"200\"></canvas></div>";
 
-core::$user_chart_js .= "<script>var linuxonly = document.getElementById('linuxonly');
+core::$user_chart_js .= "var linuxonly = document.getElementById('linuxonly');
 var Chartlinuxonly = new Chart(linuxonly, {
 type: 'line',
 data: {
@@ -139,8 +139,7 @@ yAxes: [{
 		},
 		},
 }
-});
-</script>";
+});";
 
 $templating->set('linuxonly', $linuxonly);
 
@@ -230,9 +229,9 @@ foreach ($lang_data as $key => $data)
 	$counter++;
 }
 
-$languages = "<div class=\"chartjs-container\"><canvas id=\"languages\" width=\"400\" height=\"200\"></canvas></div>";
+$languages = "<div class=\"chartjs-container\"><canvas class=\"chartjs\" id=\"languages\" width=\"400\" height=\"200\"></canvas></div>";
 
-core::$user_chart_js .= "<script>var languages = document.getElementById('languages');
+core::$user_chart_js .= "var languages = document.getElementById('languages');
 var Chartlanguages = new Chart(languages, {
 type: 'line',
 data: {
@@ -265,8 +264,7 @@ yAxes: [{
 		},
 		},
 }
-});
-</script>";
+});";
 
 $templating->set('languages', $languages);
 
@@ -295,9 +293,9 @@ foreach ($lang_data as $key => $data)
 	$counter_linux++;
 }
 
-$languages_linux = "<div class=\"chartjs-container\"><canvas id=\"languages_linux\" width=\"400\" height=\"200\"></canvas></div>";
+$languages_linux = "<div class=\"chartjs-container\"><canvas class=\"chartjs\" id=\"languages_linux\" width=\"400\" height=\"200\"></canvas></div>";
 
-core::$user_chart_js .= "<script>var languages_linux = document.getElementById('languages_linux');
+core::$user_chart_js .= "var languages_linux = document.getElementById('languages_linux');
 var Chartlanguages_linux = new Chart(languages_linux, {
 type: 'line',
 data: {
@@ -330,8 +328,7 @@ yAxes: [{
 		},
 		},
 }
-});
-</script>";
+});";
 
 $templating->set('languages_linux', $languages_linux);
 
@@ -355,9 +352,9 @@ $threesome_data = "
 	borderWidth: 1
 }";
 
-$threesome = "<div class=\"chartjs-container\"><canvas id=\"threesome\" width=\"400\" height=\"200\"></canvas></div>";
+$threesome = "<div class=\"chartjs-container\"><canvas class=\"chartjs\" id=\"threesome\" width=\"400\" height=\"200\"></canvas></div>";
 
-core::$user_chart_js .= "<script>var threesome = document.getElementById('threesome');
+core::$user_chart_js .= "var threesome = document.getElementById('threesome');
 var Chartthreesome = new Chart(threesome, {
 type: 'line',
 data: {
@@ -390,8 +387,7 @@ yAxes: [{
 		},
 		},
 }
-});
-</script>";
+});";
 
 $templating->set('threesome', $threesome);
 

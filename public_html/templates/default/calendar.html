@@ -30,13 +30,7 @@
 					Official site: <br />
 					<input type="text" name="link" />
 					Release Date: </a><br />
-					<input name="date" id="datepicker" type="text" />
-					<script>
-					var picker = new Pikaday({
-				        field: document.getElementById('datepicker'),
-				        format: "DD-MM-YYYY",
-						showTime: false
-				    });</script>
+					<input class="datetimepicker date-only" name="date" id="datepicker1" type="text" />
 					Best guess <em>If there isn't an exact date!</em> <input type="checkbox" name="guess" /><br />
 					Genres:<br />
 					<select tabindex="-1" multiple="" name="genre_ids[]" id="genres" class="populate select2-offscreen"></select>

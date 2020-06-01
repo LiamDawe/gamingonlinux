@@ -794,8 +794,7 @@ class charts
 				$colors_array[] = '"'.$colour.'"';
 			}
 			
-			core::$user_chart_js .= "<script>
-			var ".$graph_name." = document.getElementById('".$graph_name."');
+			core::$user_chart_js .= "var ".$graph_name." = document.getElementById('".$graph_name."');
 			var Chart".$graph_name." = new Chart(".$graph_name.", {
 			type: 'horizontalBar',
 			data:{
@@ -823,10 +822,9 @@ class charts
 					}
 				},
 			}
-			});
-			</script>";
+			});";
 
-			$get_graph['graph'] = '<canvas id="'.$graph_name.'" width="400" height="200"></canvas><noscript>';
+			$get_graph['graph'] = '<canvas class="chartjs" id="'.$graph_name.'" width="400" height="200"></canvas><noscript>';
 		}
 
 		/* now for the SVG non-JS fallback & download option */
@@ -1416,7 +1414,7 @@ class charts
 				$graph_name = str_replace(' ', '', $name); // Replaces all spaces with hyphens.
 				$graph_name = preg_replace('/[^A-Za-z0-9\-]/', '', $graph_name); // Removes special chars.
 
-				$get_graph['graph'] = '<div id="'.$graph_name.'-legends" class="trend-legend"></div><canvas id="'.$graph_name.'" width="400" height="200"></canvas>';
+				$get_graph['graph'] = '<div id="'.$graph_name.'-legends" class="trend-legend"></div><canvas class="chartjs" id="'.$graph_name.'" width="400" height="200"></canvas>';
 
 				$total_array = count($labels);
 
@@ -1455,7 +1453,7 @@ class charts
 					}
 				}
 
-				core::$user_chart_js .= "<script>
+				core::$user_chart_js .= "
 				var ".$graph_name." = document.getElementById('".$graph_name."');
 				var Chart".$graph_name." = new Chart.Line(".$graph_name.", {
 				type: 'line',
@@ -1502,8 +1500,7 @@ class charts
 				}
 				});
 
-				document.getElementById('".$graph_name."-legends').innerHTML = Chart".$graph_name.".generateLegend();
-				</script>";
+				document.getElementById('".$graph_name."-legends').innerHTML = Chart".$graph_name.".generateLegend();";
 
 				return $get_graph;
 			}

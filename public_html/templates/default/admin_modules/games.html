@@ -138,13 +138,8 @@
 				<label><input type="checkbox" name="free_game" {:free_game_check}/> Free (as in money)? <em>Tick if this is free/free to play</em></label><br />
 					License <select name="license"><option value=""></option>{:license_options}</select><br />
 					Release Date: <br />
-					<input name="date" id="datepicker" type="text" value="{:date} "/>
-					<script>
-					var picker = new Pikaday({
-						field: document.getElementById('datepicker'),
-						format: "DD-MM-YYYY",
-						showTime: false
-					});</script><br />
+					<input class="datetimepicker date-only" name="date" id="datepicker" type="text" value="{:date} "/>
+					<br />
 					Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="best_guess" {:best_guess_check}/><br />
 					<br />
 					Developers and Publishers names:<br />

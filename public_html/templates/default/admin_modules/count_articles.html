@@ -4,33 +4,11 @@
 		You can use this form to easily count articles between specific dates.<br />
 		<form class="gol-form" method="post" action="/admin.php?module=count_articles">
 		Start Date: <br />
-										<input name="start_date" id="datetimepicker1" type="text" value="" autocomplete="off" />
-										<script>
-										var timepicker = new Pikaday(
-											{
-												field: document.getElementById('datetimepicker1'),
-												firstDay: 1,
-												minDate: new Date(2000, 0, 1),
-												maxDate: new Date(2020, 12, 31),
-												yearRange: [2000,2020],
-												showTime: true,
-												autoClose: false,
-												use24hour: false
-											});</script>
+										<input class="datetimepicker" name="start_date" id="datetimepicker1" type="text" value="" autocomplete="off" />
+										
 											End Date: <br />
-											<input name="end_date" id="datetimepickere2" type="text" value="" autocomplete="off" />
-											<script>
-											var timepicker = new Pikaday(
-												{
-													field: document.getElementById('datetimepickere2'),
-													firstDay: 1,
-													minDate: new Date(2000, 0, 1),
-													maxDate: new Date(2020, 12, 31),
-													yearRange: [2000,2020],
-													showTime: true,
-													autoClose: false,
-													use24hour: false
-												});</script>
+											<input class="datetimepicker" name="end_date" id="datetimepickere2" type="text" value="" autocomplete="off" />
+											
 		<button type="submit" name="act" value="count">Count articles</button>		
 		</form>
 	</div>

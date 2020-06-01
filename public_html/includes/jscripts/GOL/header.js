@@ -1,3 +1,18 @@
+// load file in and cache
+jQuery.cachedScript = function( url, options ) {
+ 
+	// Allow user to set any option except for dataType, cache, and url
+	options = $.extend( options || {}, {
+	  dataType: "script",
+	  cache: true,
+	  url: url
+	});
+   
+	// Use $.ajax() since it is more flexible than $.getScript
+	// Return the jqXHR object so we can chain callbacks
+	return jQuery.ajax( options );
+  };
+
 // to insert text in a textarea at the cursor position
 jQuery.fn.extend({
 	insertAtCaret: function(myValue){
@@ -27,6 +42,19 @@ jQuery.fn.extend({
 	}
 });
 
+function getCookie(name) {
+	var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+	return v ? v[2] : null;
+}
+
+function setCookie(name, value, days) {
+	var d = new Date();
+	d.setTime(d.getTime() + 24*60*60*1000*days);
+	document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString() + ';secure;samesite=Strict;';
+}
+
+function deleteCookie(name) { setCookie(name, '', -1); }
+
 // for the quote function, so we don't end up with garbled html and get the proper output instead
 function decodeEntities(encodedString) {
     var textArea = document.createElement('textarea');
@@ -36,7 +64,7 @@ function decodeEntities(encodedString) {
 /* chart.js custom legend filtering */
 function toggleLabels(index,chart)
 {
-	var ci = chart //Chart
+	var ci = chart; //Chart
 	var meta = ci.getDatasetMeta(index);
 	
 	// See controller.isDatasetVisible comment
@@ -47,7 +75,7 @@ function toggleLabels(index,chart)
 }
 function toggle_all_Labels(chart)
 {
-	var ci = chart //Chart
+	var ci = chart; //Chart
 
 	ci.data.datasets.forEach(function(ds) 
 	{
@@ -147,13 +175,6 @@ var getUrlParameter = function getUrlParameter(sParam) {
             return sParameterName[1] === undefined ? true : sParameterName[1];
         }
     }
-}
-
-function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
 jQuery.fn.highlight = function () {
@@ -352,8 +373,6 @@ jQuery(document).ready(function()
 	{
 		toggleSwitch2.addEventListener('change', switchTheme, false);
 	}
-
-	$('.cocoen').cocoen(); // image comparison slider
 
 	$('.octus-editor .styles').show();
 
@@ -1673,10 +1692,87 @@ jQuery(document).ready(function()
 			$(this).text(event.strftime('%D days %H:%M:%S'));
 		});
 	});
+
+	/* chart js */
+	if ($('.chartjs').length)
+	{
+		$.when(
+			$.cachedScript( "/includes/jscripts/Chart.min.js?v=2.9.3" ),
+			$.cachedScript( "/includes/jscripts/chartjs-plugin-trendline.min.js"),
+			$.Deferred(function( deferred ){
+				$( deferred.resolve );
+			})
+		).done(function(){
+			load_charts();
+		});	
+	}
+
+	/* cocoen image comparison */
+	if ($('.cocoen').length)
+	{
+		$.when(
+			$.cachedScript( "/includes/jscripts/cocoen/js/cocoen.min.js"),
+			$.cachedScript( "/includes/jscripts/cocoen/js/cocoen-jquery.min.js"),
+			$.Deferred(function( deferred ){
+				$( deferred.resolve );
+			})
+		).done(function(){
+			$('.cocoen').cocoen(); // image comparison slider
+		});	
+	}
+
+	/* datetime fields */
+	if ($('.datetimepicker').length)
+	{
+		$.cachedScript( "/includes/jscripts/timepicker/datepicker.js" ).done(function( script, textStatus ) 
+		{		  	
+			$('.datetimepicker').each(function () 
+			{
+				var current_date = new Date();
+				var current_field = document.getElementById($(this).attr('id'));
+
+				var default_date = '';
+				if($(this).val().length > 0)
+				{
+					default_date = new Date($(this).val());
+				}
+
+				var show_time = true;
+				var format = "YYYY-MM-DD hh:mm:ss";
+				if ($(this).hasClass('date-only'))
+				{
+					show_time = false;
+					format = "YYYY-MM-DD";
+				}
+
+				var min_date = new Date(1990, 0, 1);
+				var min_year = 1990;
+				if($(this).data('date-min') == 'now')
+				{
+					min_date = Date();
+					var min_year = current_date.getFullYear();
+				}
+
+				var max_date = current_date.getFullYear() + 10;
+
+				new Pikaday(
+				{
+					defaultDate: default_date,
+					setDefaultDate: true,
+					field: current_field,
+					firstDay: 1,
+					minDate: min_date,
+					yearRange: [min_year,max_date],
+					format: format,
+					showTime: show_time,
+					autoClose: false,
+					use24hour: false
+				});
+			});
+		});
+	}
 	
-	
-	/* ARTICLE PREVIEW */
-	
+	/* ARTICLE PREVIEW */	
 	$('.admin_preview_article').click(function(e)
 	{
 		e.preventDefault();
@@ -2437,7 +2533,7 @@ jQuery(document).ready(function()
 		e.preventDefault();
 		var video_id = $(this).attr("data-video-id");
 		$(this).closest('.hidden_video').replaceWith('<div class="youtube-embed-wrapper" style="position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden"><iframe allowfullscreen="" frameborder="0" height="360" src="https://www.youtube-nocookie.com/embed/'+video_id+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%" width="640"></iframe></div>');
-		Cookies.set('gol_youtube_consent', 'yup', { expires: 60 });
+		setCookie('gol_youtube_consent', 'yup', 60);
 	});
 
 	/* cookie preferences page */
@@ -2445,14 +2541,14 @@ jQuery(document).ready(function()
 	{
 		if (this.checked) 
 		{
-			Cookies.set('gol_youtube_consent', 'yup', { expires: 60 });
+			setCookie('gol_youtube_consent', 'yup', 60 );
 			$(".youtube_status_text").text('On');
 		}
 		else
 		{
 			$("#youtube-cookie-slider").prop('checked', false);
 			$(".youtube_status_text").text('Off');
-			Cookies.set('gol_youtube_consent', 'nope', { expires: 60 });			
+			setCookie('gol_youtube_consent', 'nope', 60 );			
 		}
 	});
 

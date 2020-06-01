@@ -14,20 +14,7 @@
 						Total Linux Games: <input type="number" name="total" value="" /><br />
 						Link: <input type="text" name="link" value="" /><br />
 						End Date (<strong>UTC Only</strong>): 
-						<input name="end_date" id="datetimepicker_bundle" type="text" value="" />
-						<script>
-						var timepicker = new Pikaday(
-							{
-								field: document.getElementById('datetimepicker_bundle'),
-								firstDay: 1,
-								minDate: new Date(2017, 0, 1),
-								maxDate: new Date(2020, 12, 31),
-								yearRange: [2017,2020],
-								showTime: true,
-								autoClose: false,
-								use24hour: false
-							});
-						</script>
+						<input class="datetimepicker" name="end_date" id="datetimepicker_bundle" type="text" value="" />
 						Store <br />
 						<select name="store">{:stores}</select><br />
 						<em>Are we missing a store? <a href="/email-us/">Email Us</a> to let us know!</em><br />

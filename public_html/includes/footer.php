@@ -67,11 +67,13 @@ $templating->set('debug', $debug);
 $svg_js = '';
 if (!empty(core::$user_chart_js) || isset(core::$user_chart_js))
 {
-	$svg_js = core::$user_chart_js;
+	$svg_js = '<script>function load_charts(){var style = getComputedStyle(document.body);
+		var textcolor = style.getPropertyValue("--svg-text-color");
+		Chart.defaults.global.defaultFontColor = textcolor;
+		' . core::$user_chart_js . '};
+		</script>';
 }
 $templating->set('user_chart_js', $svg_js);
-
-
 echo $templating->output();
 
 // close the mysql connection

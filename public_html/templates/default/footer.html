@@ -34,10 +34,6 @@ icon: '/templates/default/images/spoiler.png'
 });
 CKEDITOR.on('instanceReady', function(evt)
 {
-	// Note nested arrays
-	// http://docs.ckeditor.com/#!/api/CKEDITOR.filter-method-addTransformations
-	// This rule will add the target="_blank" attribute to all links that
-	// do not have it.
 	evt.editor.filter.addTransformations([
 	[{
 		element: 'a',
@@ -47,17 +43,7 @@ CKEDITOR.on('instanceReady', function(evt)
 		right: function( el, tools ) {
 			el.attributes.target = '_blank';
 		}
-	}]/* WAITING ON CKEDITOR BUGS FOR THIS
-	,
-	[{
-		element: 'a',
-		left: function( el ) {
-			return el.attributes['class'].indexOf('article-link') !== -1;
-		},
-		right: function( el, tools ) {
-			el.attributes['class'] += ' article-link';
-		}
-	}]*/
+	}]
 	]);
 });
 </script>
@@ -93,17 +79,24 @@ CKEDITOR.on('instanceReady', function(evt)
 <script src="{:jsstatic}/jquery.are-you-sure.js"></script>
 <script>twitch_check(); setInterval ( "twitch_check()", 60000 );</script>
 <script src="{:jsstatic}/jquery.timeago.js"></script>
-<script src="{:jsstatic}/jquery.qtip.min.js"></script>
+<!-- Qtip2 -->
+<link rel="stylesheet" href="{:jsstatic}/qtip2/jquery.qtip.min.css" type="text/css" media="screen" />
+<script src="{:jsstatic}/qtip2/jquery.qtip.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/datatables/datatables.min.css">
 <script src="{:jsstatic}/datatables/datatables.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/select2/css/select2.min.css">
 <script src="{:jsstatic}/select2/js/select2.min.js?v=4"></script>
 <script src="{:jsstatic}/jquery.countdown.min.js"></script>
 <!-- moment -->
+<script src="{:jsstatic}/moment/moment.min.js"></script>
 <script src="{:jsstatic}/moment/moment-timezone-with-data.min.js"></script>
 <!-- fancybox for images -->
 <link rel="stylesheet" href="{:jsstatic}/fancybox/jquery.fancybox.css?v=3" type="text/css" media="screen" />
 <script src="{:jsstatic}/fancybox/jquery.fancybox.min.js?v=3"></script>
+<link rel="stylesheet" href="{:jsstatic}/autocomplete/easy-autocomplete.min.css"> 
+<script src="{:jsstatic}/autocomplete/jquery.easy-autocomplete.min.js"></script> 
+<!-- datetime picker -->
+<link rel="stylesheet" type="text/css" href="{:jsstatic}/timepicker/datepicker.css" />
 <script>
 	jQuery("abbr.timeago").timeago('init');
 	jQuery("time.timeago").timeago();
@@ -178,15 +171,9 @@ $("#sale-search").easyAutocomplete(sale_search_options);
 $("#free-search").easyAutocomplete(free_search_options);
 $("#all-games-search").easyAutocomplete(all_search_options);
 </script>
-<script src="{:jsstatic}/Chart.min.js?v=2.9.3"></script>
-<script src="{:jsstatic}/chartjs-plugin-trendline.min.js"></script>
 <script src="{:jsstatic}/sorttable.min.js"></script> 
 <script src="{:jsstatic}/clipboard/clipboard.min.js"></script>
 {:ckeditor_js}
-<script>
-var style = getComputedStyle(document.body);
-var textcolor = style.getPropertyValue('--svg-text-color');
-Chart.defaults.global.defaultFontColor = textcolor;</script>
 {:user_chart_js}
 </body>
 </html>{:debug}

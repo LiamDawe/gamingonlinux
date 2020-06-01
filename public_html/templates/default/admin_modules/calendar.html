@@ -9,13 +9,7 @@
 				Official website:<br />
 				<input type="text" name="link" value="{:link}" /><br />
 				Release Date:
-				<input name="date" id="datepicker_{:id}" type="text" value="{:date}"/>
-				<script>
-				var picker = new Pikaday({
-					field: document.getElementById('datepicker_{:id}'),
-					format: "DD-MM-YYYY",
-					showTime: false
-				});</script>
+				<input class="datetimepicker date-only" name="date" id="datepicker_{:id}" type="text" value="{:date}"/>
 				Best guess <em>If we don't have an exact date!</em> <input type="checkbox" name="guess" {:guess_check}/><br />
 				Genres<br />
 				<select tabindex="-1" multiple="" name="genre_ids[]" id="genres" class="populate select2-offscreen">{:genre_list}</select><br />

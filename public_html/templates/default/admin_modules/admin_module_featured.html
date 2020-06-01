@@ -10,19 +10,7 @@
 	Must be {:max_width} width, {:max_height} height. Max of 300kb!<br />
 	<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
 	End Date (UTC): <br />
-	<input name="end_date" id="datetimepicker" type="text" value="" autocomplete="off" />
-	<script>
-	var timepicker = new Pikaday(
-		{
-			field: document.getElementById('datetimepicker'),
-			firstDay: 1,
-			minDate: new Date(),
-			maxDate: new Date({:next_year}),
-			yearRange: [{:start_year},{:next_year}],
-			showTime: true,
-			autoClose: false,
-			use24hour: false
-		});</script>
+	<input class="datetimepicker" name="end_date" data-date-min="now" id="datetimepicker" type="text" value="" autocomplete="off" />
 	<input type="hidden" name="article_id" value="{:article_id}" />
 	<button type="submit" name="act" value="add" class="btn btn-primary">Upload &amp; Activate</button>
 	</form>
@@ -43,19 +31,7 @@
 	Carousel Image (Must be {:max_width} width, {:max_height} height). Max of 55kb!<br />
 	<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
 	End Date (UTC): <br />
-	<input name="end_date" id="datetimepicker{:article_id}" type="text" value="{:end_date}" autocomplete="off" />
-	<script>
-		var timepicker = new Pikaday(
-			{
-				field: document.getElementById('datetimepicker{:article_id}'),
-				firstDay: 1,
-				minDate: new Date(),
-				maxDate: new Date({:next_year}),
-				yearRange: [{:start_year},{:next_year}],
-				showTime: true,
-				autoClose: false,
-				use24hour: false
-			});</script>
+	<input class="datetimepicker" name="end_date" data-date-min="now" id="datetimepicker{:article_id}" type="text" value="{:end_date}" autocomplete="off" />
 	Total hits: {:hits}<br />
 	<button type="submit" name="act" value="edit" class="btn btn-primary">Edit</button> <button type="submit" name="act" value="delete" class="btn btn-primary">Delete</button>
 	<input type="hidden" name="article_id" value="{:article_id}" />

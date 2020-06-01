@@ -15,9 +15,9 @@
 <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
 {:meta_data}
 <!--JS Files-->
+<link rel="preload" as="script" href="{:jsstatic}/jquery-3.4.1.min.js">
 <script src="{:jsstatic}/jquery-3.4.1.min.js"></script>
 <script src="{:jsstatic}/cookies.js"></script>
-<script src="{:jsstatic}/jquery.are-you-sure.js"></script>
 <script src="{:jsstatic}/autocomplete/jquery.easy-autocomplete.min.js"></script> 
 <link rel="stylesheet" href="{:jsstatic}/autocomplete/easy-autocomplete.min.css"> 
 <script src="{:jsstatic}/cocoen/js/cocoen.min.js"></script> 
@@ -38,8 +38,8 @@
 <meta name="msapplication-config" content="{:this_template}/images/favicons/browserconfig.xml">
 <!-- Custom CSS Styles -->
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/cocoen/css/cocoen.min.css">
-<link rel="stylesheet" type="text/css" href="{:this_template}/css/shipping/style.css?v=1.5.32" />
-<link rel="stylesheet" type="text/css" href="{:jsstatic}/datatables/datatables.min.css">
+<link rel="preload" href="{:this_template}/css/shipping/style.css?v=1.5.33" as="style" />
+<link rel="stylesheet" href="{:this_template}/css/shipping/style.css?v=1.5.33">
 <!-- Qtip2 -->
 <link rel="stylesheet" href="{:jsstatic}/qtip2/jquery.qtip.min.css?v=2.1.6" type="text/css" media="screen" />
 <script src="{:jsstatic}/qtip2/imagesloaded.pkg.min.js"></script>

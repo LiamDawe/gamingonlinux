@@ -69,9 +69,6 @@ class article
 	*/
 	public function find_article_tags($options)
 	{
-		// this is required to properly count up the rank for the tags
-		$this->dbl->run("SET @rank=null, @val=null;");
-
 		// setting a limit on the amount of tags per article
 		if (isset($options['limit']))
 		{

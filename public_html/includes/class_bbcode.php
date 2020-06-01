@@ -127,11 +127,11 @@ class bbcode
 		if (preg_match("/\*time-only/is", $matches[0]))
 		{
 			$rest = substr($matches[1], 0, -10);
-			return '<div id="'.$rest.'"></div><script type="text/javascript">var ' . $rest . ' = moment.tz("'.$matches[2].'", "UTC"); $("#'.$rest.'").countdown('.$rest.'.toDate(),function(event) {$(this).text(event.strftime(\'%H:%M:%S\'));});</script>';
+			return '<div class="countdown" id="'.$rest.'">'.$matches[2].'</div>';
 		}
 		else
 		{
-			return '<div id="'.$matches[1].'"></div><script type="text/javascript">var ' . $matches[1] . ' = moment.tz("'.$matches[2].'", "UTC"); $("#'.$matches[1].'").countdown('.$matches[1].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+			return '<div class="countdown" id="'.$matches[1].'">'.$matches[2].'</div>';
 		}
 	}
 

@@ -24,7 +24,7 @@ Options +SymLinksifOwnerMatch
     ExpiresByType image/vnd.microsoft.icon "access plus 1 year"
     ExpiresByType image/x-icon "access plus 1 year"
     ExpiresByType application/x-javascript "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 month"
     ExpiresByType application/x-icon "access plus 1 year"
 </IfModule>
 # END EXPIRES

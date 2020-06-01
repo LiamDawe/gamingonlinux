@@ -25,15 +25,6 @@ else
 
 $templating->set('submit_article_link', $submit_link);
 
-// Get the categorys, for the jump list, also used in "block_article_categorys.php"
-$articles_categorys = '';
-$fetch_cats = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();
-foreach ($fetch_cats as $categorys)
-{
-	$articles_categorys .= '<option value="'.$article_class->tag_link($categorys['category_name']).'">'.$categorys['category_name'].'</option>';
-}
-$templating->set('category_links', $articles_categorys);
-
 /*
 // top articles this week
 */

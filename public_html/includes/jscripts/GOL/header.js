@@ -1660,6 +1660,20 @@ jQuery(document).ready(function()
 			});			
 		}
 	});
+
+	/* countdown timers */
+	$('.countdown').each(function () 
+	{
+		var time_listed = $(this).text();
+
+		var livestream_time = moment.tz(time_listed, "UTC");
+
+		$(this).countdown(livestream_time.toDate(),function(event) 
+		{
+			$(this).text(event.strftime('%D days %H:%M:%S'));
+		});
+	});
+	
 	
 	/* ARTICLE PREVIEW */
 	

@@ -76,7 +76,7 @@ if (!isset($_POST['act']))
 			$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $user_timezone));
 			$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $user_timezone));
 
-			$countdown = '<span id="timer'.$streams['row_id'].'"></span><script type="text/javascript">var timer' . $streams['row_id'] . ' = moment.tz("'.$streams['date'].'", "UTC"); $("#timer'.$streams['row_id'].'").countdown(timer'.$streams['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+			$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
 			$templating->set('countdown', $countdown);
 
 			$streamer_list = [];

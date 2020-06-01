@@ -19,7 +19,9 @@ if ($get_official)
 	}
 	else
 	{
-		$countdown = '<noscript>'.$get_official['date'].' UTC</noscript><span id="livestream'.$get_official['row_id'].'"></span><script type="text/javascript">var livestream' . $get_official['row_id'] . ' = moment.tz("'.$get_official['date'].'", "UTC"); $("#livestream'.$get_official['row_id'].'").countdown(livestream'.$get_official['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+		$countdown = '<noscript>'.$get_official['date'].' UTC</noscript><span id="livestream'.$get_official['row_id'].'">'.$get_official['date'].'</span>
+		
+		<script type="text/javascript">var livestream' . $get_official['row_id'] . ' = moment.tz("'.$get_official['date'].'", "UTC"); $("#livestream'.$get_official['row_id'].'").countdown(livestream'.$get_official['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
 	}
 
 	$official = $templating->block_store('official_streams');
@@ -62,7 +64,7 @@ if ($get_info)
 		}
 		else
 		{
-			$countdown = '<noscript>'.$info['date'].' UTC</noscript><span id="livestream'.$info['row_id'].'"></span><script type="text/javascript">var livestream' . $info['row_id'] . ' = moment.tz("'.$info['date'].'", "UTC"); $("#livestream'.$info['row_id'].'").countdown(livestream'.$info['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+			$countdown = '<noscript>'.$info['date'].' UTC</noscript><span class="countdown" id="livestream'.$info['row_id'].'">'.$info['date'].'</span>';
 		}
 
 		$community_output .= '<li><a href="'.$info['stream_url'].'" target="_blank">'.$info['title'].'</a><br />

@@ -93,7 +93,16 @@ CKEDITOR.on('instanceReady', function(evt)
 <script>twitch_check(); setInterval ( "twitch_check()", 60000 );</script>
 <script src="{:jsstatic}/jquery.timeago.js"></script>
 <script src="{:jsstatic}/jquery.qtip.min.js"></script>
-<script src="{:jsstatic}/datatables/datatables.min.js"></script> 
+<script src="{:jsstatic}/datatables/datatables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{:jsstatic}/select2/css/select2.min.css">
+<script src="{:jsstatic}/select2/js/select2.min.js?v=4"></script>
+<script src="{:jsstatic}/jquery.countdown.min.js"></script>
+<!-- moment -->
+<script src="{:jsstatic}/moment/moment.min.js"></script>
+<script src="{:jsstatic}/moment/moment-timezone-with-data.min.js"></script>
+<!-- fancybox for images -->
+<link rel="stylesheet" href="{:jsstatic}/fancybox/jquery.fancybox.css?v=3" type="text/css" media="screen" />
+<script async src="{:jsstatic}/fancybox/jquery.fancybox.min.js?v=3"></script>
 <script>
 	jQuery("abbr.timeago").timeago('init');
 	jQuery("time.timeago").timeago();

@@ -1018,10 +1018,12 @@ a.button {
 {
 	position: relative;
 	max-height: 300px;
+	width: 100%;
+	height: auto;
 }
 .article .featured-image img {
-	width: 100%;
 	display: block;
+	width: 1300px;
 	max-height: 300px;
 }
 .article .youtube-embed-wrapper

@@ -37,8 +37,9 @@
 							Title: <em>Please try not to have question marks in the title unless you have to! To adhere to <a href="https://en.wikipedia.org/wiki/Betteridge%27s_Law_of_Headlines">Betteridges law of headlines</a></em><br />
 							<input spellcheck="true" type="text" name="title" id="title" autocomplete="off" placeholder="Enter a title..." value="{:title}" maxlength="90" {:edit_state}/><br />
 							<div id="title-count"></div>
-							Friendly url (what shows in the url bar).
-							<input type="text" name="slug" id="slug" value="{:slug}" readonly="readonly" {:edit_state}/> <a id="slug_edit" href="#">Edit Slug</a> | <a id="slug_update" href="#">Update Slug</a>
+							Friendly url (keep it short!).
+							<input spellcheck="true" type="text" name="slug" id="slug" value="{:slug}" readonly="readonly" maxlength="90" {:edit_state}/> <a id="slug_edit" href="#">Manual Edit</a> | <a id="slug_update" href="#">Update From Title</a>
+							<em>Do not edit after publishing, unless it's an emergency - will cause broken links.</em>
 						</div>
 					</div>
 			<div class="box">

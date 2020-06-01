@@ -349,6 +349,7 @@ function grab_youtube_image(el)
 
 		xhttp.open("GET", "/includes/youtube_image_proxy.php?id="+videoID+'&aid='+article_id, true);
 		xhttp.setRequestHeader ("Cache-Control", "no-store, no-cache, must-revalidate");
+		xhttp.setRequestHeader ("X-Requested-With", "XMLHttpRequest");
 		xhttp.send();
 	}
 }

@@ -34,7 +34,6 @@ class article
 		{
 			unset($_SESSION['conflict_checked']);
 		}
-
 		unset($_SESSION['atitle']);
 		unset($_SESSION['aslug']);
 		unset($_SESSION['atagline']);
@@ -1091,7 +1090,7 @@ class article
 		foreach ($article_list as $article)
 		{
 			// make date human readable
-			$date = $this->core->human_date($article['date'], 'j F Y');
+			$date = $this->core->time_ago($article['date']);
 
 			$machine_time = date('c',$article['date']) . 'Z';
 
@@ -1396,7 +1395,7 @@ class article
 
 		foreach ($comments_get as $comments)
 		{
-			$comment_date = $this->core->human_date($comments['time_posted']);
+			$comment_date = $this->core->time_ago($comments['time_posted']);
 
 			if (in_array($comments['author_id'], $blocked_ids))
 			{

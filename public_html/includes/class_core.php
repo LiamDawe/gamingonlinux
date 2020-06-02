@@ -1,4 +1,20 @@
 <?php
+define( 'TIMEBEFORE_NOW',         'less than a minute ago' );
+define( 'TIMEBEFORE_MINUTE_ABOUT','about a minute ago' );
+define( 'TIMEBEFORE_MINUTE',      '{num} minute ago' );
+define( 'TIMEBEFORE_MINUTES',     '{num} minutes ago' );
+define( 'TIMEBEFORE_HOUR',        '{num} hour ago' );
+define( 'TIMEBEFORE_HOURS',       'about {num} hours ago' );
+define( 'TIMEBEFORE_YESTERDAY',   'a day ago' );
+define( 'TIMEBEFORE_DAYS',    '{num} days ago' );
+define( 'TIMEBEFORE_WEEK',    '{num} week ago' );
+define( 'TIMEBEFORE_WEEKS',   '{num} weeks ago' );
+define( 'TIMEBEFORE_MONTH',   '{num} month ago' );
+define( 'TIMEBEFORE_MONTHS',  '{num} months ago' );
+define( 'TIMEBEFORE_YEAR',  'about a year ago' );
+define( 'TIMEBEFORE_FORMAT',      '%e %b' );
+define( 'TIMEBEFORE_FORMAT_YEAR', '%e %b, %Y' );
+
 class core
 {	
 	protected $dbl;	
@@ -186,6 +202,58 @@ class core
 	
 		return false;
 	}
+	// use this on top of javascript, to ensure dates don't flicker on first load
+	// tried to match jquery timeago
+    function time_ago( $time ) 
+    {
+        $out    = ''; // what we will print out
+        $now    = time(); // current time
+        $diff   = $now - $time; // difference between the current and the provided dates
+
+		if( $diff < 45 ) // it happened now
+		{ 
+            return TIMEBEFORE_NOW;
+		}
+		else if ($diff >= 45 && $diff < 90)
+		{
+			return TIMEBEFORE_MINUTE_ABOUT;
+		}
+		else if( $diff < 3600 ) // it happened X minutes ago
+		{
+            return str_replace( '{num}', ( $out = round( $diff / 60 ) ), $out == 1 ? TIMEBEFORE_MINUTE : TIMEBEFORE_MINUTES );
+		}
+		else if( $diff < 3600 * 24 ) // it happened X hours ago
+		{
+            return str_replace( '{num}', ( $out = round( $diff / 3600 ) ), $out == 1 ? TIMEBEFORE_HOUR : TIMEBEFORE_HOURS );
+		}
+		else if( $diff < 3600 * 24 * 2 ) // it happened yesterday
+		{
+            return TIMEBEFORE_YESTERDAY;
+		}
+		else if( $diff < 3600 * 24 * 7 )
+		{
+			return str_replace( '{num}', round( $diff / ( 3600 * 24 ) ), TIMEBEFORE_DAYS );
+		}
+
+		else if( $diff < 3600 * 24 * 7 * 4 )
+		{
+			return str_replace( '{num}', ( $out = round( $diff / ( 3600 * 24 * 7 ) ) ), $out == 1 ? TIMEBEFORE_WEEK : TIMEBEFORE_WEEKS );
+		}
+		else if( $diff < 3600 * 24 * 7 * 4 * 12 )
+		{
+			return str_replace( '{num}', ( $out = round( $diff / ( 3600 * 24 * 7 * 4 ) ) ), $out == 1 ? TIMEBEFORE_MONTH : TIMEBEFORE_MONTHS );
+		}
+
+		else if( $diff = 3600 * 24 * 7 * 4 * 12 )
+		{
+			return TIMEBEFORE_YEAR;
+		}
+		
+		else // falling back on a usual date format as it happened later than yesterday
+		{
+			return strftime( date( 'Y', $time ) == date( 'Y' ) ? TIMEBEFORE_FORMAT : TIMEBEFORE_FORMAT_YEAR, $time );
+		}
+    }
 
 	// simple helper function to make sure we always have a page number set
 	public static function give_page()

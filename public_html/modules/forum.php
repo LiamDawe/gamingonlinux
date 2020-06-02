@@ -151,7 +151,7 @@ else
 		{
 			$templating->block('topics', 'forum');
 
-			$last_date = $core->human_date($topics['last_post_date']);
+			$last_date = $core->time_ago($topics['last_post_date']);
 			$templating->set('tzdate', date('c',$topics['last_post_date']) );
 			
 			$avatar = $user->sort_avatar($topics);
@@ -337,7 +337,7 @@ else
 						$last_title = '<a href="'.$last_post_link.'">'.$forum['topic_title'].'</a>';
 	
 						$last_username = "<a href=\"/profiles/{$forum['last_post_user_id']}\">{$forum['last_post_username']}</a>";
-						$last_post_time = $core->human_date($forum['last_post_time']);
+						$last_post_time = $core->time_ago($forum['last_post_time']);
 					}
 					$templating->set('last_post_title', $last_title);
 					$templating->set('last_post_username', $last_username);
@@ -365,7 +365,7 @@ else
 		{
 			foreach ($grab_topics as $topics)
 			{
-				$date = $core->human_date($topics['last_post_date']);
+				$date = $core->time_ago($topics['last_post_date']);
 	
 				$last_post = '';
 				if ($topics['last_post_id'] != NULL)

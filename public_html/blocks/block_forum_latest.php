@@ -39,7 +39,7 @@ if ($forum_ids)
 	$fetch_topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`last_post_date`, t.`replys`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON u.user_id = t.last_post_user_id WHERE t.`approved` = 1 AND t.`forum_id` IN ($forum_id_in) ORDER BY t.`last_post_date` DESC limit 5", $forum_ids)->fetch_all();
 	foreach ($fetch_topics as $topics)
 	{
-		$date = $core->human_date($topics['last_post_date']);
+		$date = $core->time_ago($topics['last_post_date']);
 
 		$post_count = $topics['replys'];
 		// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
@@ -71,7 +71,7 @@ if ($forum_ids)
 			$title = $topics['topic_title'];
 		}
 
-		$machine_time = date("Y-m-d\TH:i:s", $topics['last_post_date']) . 'Z';
+		$machine_time = date("Y-m-d\TH:i:s", $topics['last_post_date']);
 
 		if ($postPage > 1)
 		{
@@ -83,7 +83,7 @@ if ($forum_ids)
 		}
 
 		$forum_posts .= '<li class="list-group-item"><a href="'. $forum_class->get_link($topics['topic_id'], $link_page) . '">' . $title . '</a><br />
-		<small><time class="timeago" datetime="'.$machine_time.'">' . $date .'</time> - ' . $topics['username'] . '</small></li>';
+		<small><time datetime="'.$machine_time.'">' . $date .'</time> - ' . $topics['username'] . '</small></li>';
 	}
 }
 else

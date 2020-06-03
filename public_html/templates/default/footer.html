@@ -75,10 +75,10 @@ CKEDITOR.on('instanceReady', function(evt)
 		</div>
 	</div>
 </footer>
+<script src="{:jsstatic}/GOL/header.min.js?v=2.6.1"></script>
 <script src="{:jsstatic}/GOL/twitch_checker.js?v=3"></script>
 <script src="{:jsstatic}/jquery.are-you-sure.js"></script>
 <script>twitch_check(); setInterval ( "twitch_check()", 60000 );</script>
-<script src="{:jsstatic}/jquery.timeago.js"></script>
 <!-- Qtip2 -->
 <link rel="stylesheet" href="{:jsstatic}/qtip2/jquery.qtip.min.css" type="text/css" media="screen" />
 <script src="{:jsstatic}/qtip2/jquery.qtip.min.js"></script>
@@ -98,8 +98,6 @@ CKEDITOR.on('instanceReady', function(evt)
 <!-- datetime picker -->
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/timepicker/datepicker.css" />
 <script>
-	jQuery("abbr.timeago").timeago('init');
-	jQuery("time.timeago").timeago();
 	jQuery('.tooltip-top').qtip({
 	    position: {
 	        my: 'bottom center',

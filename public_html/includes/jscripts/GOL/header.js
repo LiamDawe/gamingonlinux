@@ -1,6 +1,6 @@
-// load file in and cache
-jQuery.cachedScript = function( url, options ) {
- 
+// load file in and use cache
+jQuery.cachedScript = function( url, options ) 
+{
 	// Allow user to set any option except for dataType, cache, and url
 	options = $.extend( options || {}, {
 	  dataType: "script",
@@ -11,7 +11,19 @@ jQuery.cachedScript = function( url, options ) {
 	// Use $.ajax() since it is more flexible than $.getScript
 	// Return the jqXHR object so we can chain callbacks
 	return jQuery.ajax( options );
-  };
+};
+
+// deal with cookies
+function getCookie(name) {
+	var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+	return v ? v[2] : null;
+}
+function setCookie(name, value, days) {
+	var d = new Date();
+	d.setTime(d.getTime() + 24*60*60*1000*days);
+	document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString() + ';secure;samesite=Strict;';
+}
+function deleteCookie(name) { setCookie(name, '', -1); }
 
 // to insert text in a textarea at the cursor position
 jQuery.fn.extend({
@@ -41,19 +53,6 @@ jQuery.fn.extend({
 	  });
 	}
 });
-
-function getCookie(name) {
-	var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-	return v ? v[2] : null;
-}
-
-function setCookie(name, value, days) {
-	var d = new Date();
-	d.setTime(d.getTime() + 24*60*60*1000*days);
-	document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString() + ';secure;samesite=Strict;';
-}
-
-function deleteCookie(name) { setCookie(name, '', -1); }
 
 // for the quote function, so we don't end up with garbled html and get the proper output instead
 function decodeEntities(encodedString) {
@@ -108,25 +107,20 @@ function recaptchacallback()
 	});
 }
 
-    /*
-	 * getYouTubeID()
-	 *
-	 * Get YouTube ID
-	 */
-	function getYouTubeID(input)
-	{
-	   var video_id;
+function getYouTubeID(input)
+{
+	var video_id;
 
-		video_id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
-		 if(video_id === null) 
+	video_id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
+		if(video_id === null) 
+	{
+		return null;
+	}
+	else
 		{
-		   return null;
+		return video_id[1];
 		}
-		else
-		 {
-		   return video_id[1];
-		 }
-   }
+}
 
 // scroll to an element if it's not in view, all other ways I could find completely sucked
 jQuery.fn.scrollMinimal = function(smooth)
@@ -160,22 +154,6 @@ jQuery.fn.scrollMinimal = function(smooth)
 		}
 	}
 };
-
-// can probably get rid of this in favour of the newer method $_GET
-var getUrlParameter = function getUrlParameter(sParam) {
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
-
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
-}
 
 jQuery.fn.highlight = function () {
     $(this).each(function () {
@@ -484,22 +462,6 @@ jQuery(document).ready(function()
 			scrollTop: ($('.crowdfunded-page-top').offset().top)
 		},300);
 	} );
-
-  // this will grab any url parameter like ?module=test and give you "test" if you search for "module"
-  var getUrlParameter = function getUrlParameter(sParam) {
-      var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-          sURLVariables = sPageURL.split('&'),
-          sParameterName,
-          i;
-
-      for (i = 0; i < sURLVariables.length; i++) {
-          sParameterName = sURLVariables[i].split('=');
-
-          if (sParameterName[0] === sParam) {
-              return sParameterName[1] === undefined ? true : sParameterName[1];
-          }
-      }
-  };
 
 	$(".remove_announce").on('click', function(event)
 	{
@@ -1581,7 +1543,7 @@ jQuery(document).ready(function()
 		{
 			e.preventDefault();
 			var page = element.attr("data-page");
-			var article_id = getUrlParameter('aid');
+			var article_id = $_GET('aid');
 			$('.comments').load('/includes/ajax/article_comment_pagination.php', {'type':'reload', 'article_id':article_id, 'page':page}, function() 
 			{
 				$('.comments').scrollMinimal();
@@ -1695,16 +1657,14 @@ jQuery(document).ready(function()
 
 	/* chart js */
 	if ($('.chartjs').length)
-	{
-		$.when(
-			$.cachedScript( "/includes/jscripts/Chart.min.js?v=2.9.3" ),
-			$.cachedScript( "/includes/jscripts/chartjs-plugin-trendline.min.js"),
-			$.Deferred(function( deferred ){
-				$( deferred.resolve );
-			})
-		).done(function(){
-			load_charts();
-		});	
+	{		
+		$.cachedScript( "/includes/jscripts/Chart.min.js?v=2.9.3" ).done(function() 
+		{
+			$.cachedScript( "/includes/jscripts/chartjs-plugin-trendline.min.js").done(function()
+			{
+				load_charts();
+			});
+		});
 	}
 
 	/* cocoen image comparison */
@@ -1738,7 +1698,7 @@ jQuery(document).ready(function()
 				}
 
 				var show_time = true;
-				var format = "YYYY-MM-DD hh:mm:ss";
+				var format = "YYYY-MM-DD HH:mm:ss";
 				if ($(this).hasClass('date-only'))
 				{
 					show_time = false;
@@ -1766,7 +1726,7 @@ jQuery(document).ready(function()
 					format: format,
 					showTime: show_time,
 					autoClose: false,
-					use24hour: false
+					use24hour: true
 				});
 			});
 		});

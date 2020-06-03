@@ -7,11 +7,6 @@ define( 'TIMEBEFORE_HOUR',        '{num} hour ago' );
 define( 'TIMEBEFORE_HOURS',       'about {num} hours ago' );
 define( 'TIMEBEFORE_YESTERDAY',   'a day ago' );
 define( 'TIMEBEFORE_DAYS',    '{num} days ago' );
-define( 'TIMEBEFORE_WEEK',    '{num} week ago' );
-define( 'TIMEBEFORE_WEEKS',   '{num} weeks ago' );
-define( 'TIMEBEFORE_MONTH',   '{num} month ago' );
-define( 'TIMEBEFORE_MONTHS',  '{num} months ago' );
-define( 'TIMEBEFORE_YEAR',  'about a year ago' );
 define( 'TIMEBEFORE_FORMAT',      '%e %b' );
 define( 'TIMEBEFORE_FORMAT_YEAR', '%e %b, %Y' );
 
@@ -230,25 +225,10 @@ class core
 		{
             return TIMEBEFORE_YESTERDAY;
 		}
-		else if( $diff < 3600 * 24 * 7 )
+		elseif( $diff < 3600 * 24 * 7 )
 		{
 			return str_replace( '{num}', round( $diff / ( 3600 * 24 ) ), TIMEBEFORE_DAYS );
 		}
-
-		else if( $diff < 3600 * 24 * 7 * 4 )
-		{
-			return str_replace( '{num}', ( $out = round( $diff / ( 3600 * 24 * 7 ) ) ), $out == 1 ? TIMEBEFORE_WEEK : TIMEBEFORE_WEEKS );
-		}
-		else if( $diff < 3600 * 24 * 7 * 4 * 12 )
-		{
-			return str_replace( '{num}', ( $out = round( $diff / ( 3600 * 24 * 7 * 4 ) ) ), $out == 1 ? TIMEBEFORE_MONTH : TIMEBEFORE_MONTHS );
-		}
-
-		else if( $diff = 3600 * 24 * 7 * 4 * 12 )
-		{
-			return TIMEBEFORE_YEAR;
-		}
-		
 		else // falling back on a usual date format as it happened later than yesterday
 		{
 			return strftime( date( 'Y', $time ) == date( 'Y' ) ? TIMEBEFORE_FORMAT : TIMEBEFORE_FORMAT_YEAR, $time );

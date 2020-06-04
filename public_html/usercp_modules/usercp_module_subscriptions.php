@@ -27,11 +27,6 @@ if (!isset($_GET['go']))
 	// sort out the pagination link
 	$pagination = $core->pagination_link(10, $total_subs, "usercp.php?module=subscriptions&", $page);
 
-	/*
-	IN PROGRESS QUERY TO PULL FORUM AND ARTICLE TOGETHER
-SELECT `item_id`, `date`, `title`, `type`, `emails` FROM ( SELECT s.article_id AS item_id, s.emails, a.`date`, a.`title`, 'Article' AS `type` FROM `articles_subscriptions` s INNER JOIN `articles` a ON a.article_id = s.article_id WHERE s.`user_id` = 1 UNION ALL SELECT fs.topic_id AS item_id, t.`creation_date` as `date`, fs.emails, t.topic_title as `title`, 'Forum Topic' AS `type` FROM `forum_topics_subscriptions` fs INNER JOIN `forum_topics` t ON fs.`topic_id` = t.`topic_id` WHERE fs.`user_id` = 1 ) X ORDER BY `date` DESC LIMIT ?, 10
-	*/
-
 	// get the subs
 	$res_posts = $dbl->run("SELECT 
 	`item_id`, 

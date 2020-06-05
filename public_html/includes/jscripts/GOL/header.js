@@ -1684,7 +1684,7 @@ jQuery(document).ready(function()
 	/* datetime fields */
 	if ($('.datetimepicker').length)
 	{
-		$.cachedScript( "/includes/jscripts/timepicker/datepicker.js" ).done(function( script, textStatus ) 
+		$.cachedScript( "/includes/jscripts/timepicker/datepicker.js?v1.1" ).done(function( script, textStatus ) 
 		{		  	
 			$('.datetimepicker').each(function () 
 			{

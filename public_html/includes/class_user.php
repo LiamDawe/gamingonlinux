@@ -1005,7 +1005,13 @@ class user
 
 		$this->db->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_users'");
 
-		$this->core->new_admin_note(array('completed' => 1,
-		'content' => 'deleted the user account for ' . $deleted_info['username']));
+		if ($_SESSION['user_id'] == $user_id)
+		{
+			$this->core->new_admin_note(array('completed' => 1, 'content' => $deleted_info['username'] . ' deleted their account.'));
+		}
+		else
+		{
+			$this->core->new_admin_note(array('completed' => 1, 'content' => ' deleted the account for ' . $deleted_info['username'] . '.'));
+		}
 	}
 }

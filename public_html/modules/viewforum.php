@@ -230,7 +230,7 @@ else
 		$templating->set('title', $poll_title . $post['topic_title']);
 		$templating->set('author_id', $post['author_id']);
 		
-		$date = $core->human_date($post['creation_date']);
+		$date = $core->time_ago($post['creation_date']);
 		$tzdate = date('c',$post['creation_date']);
 		$post_date = '<abbr title="'.$tzdate.'" class="timeago">'.$date.'</abbr>';
 		$templating->set('post_date', $post_date);
@@ -245,7 +245,8 @@ else
 		
 		$templating->set('pagination_post', $pagination_post);
 
-		$last_date = $core->human_date($post['last_post_date']);
+		$last_date = $core->time_ago($post['last_post_date']);
+		$templating->set('last_date', $last_date);
 		$templating->set('tzdate', date('c',$post['last_post_date']) );
 		$templating->set('last_username', $post['username_last']);
 	}

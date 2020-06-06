@@ -431,7 +431,7 @@ else
 						$templating->set('user_info_extra', $pc_info);
 						$templating->set('topic_title', $topic['topic_title']);
 
-						$topic_date = $core->human_date($topic['creation_date']);
+						$topic_date = $core->time_ago($topic['creation_date']);
 						$templating->set('topic_date', $topic_date);
 						$templating->set('tzdate', date('c',$topic['creation_date']) ); // timeago
 						$templating->set('edit_link', $edit_link);
@@ -666,7 +666,7 @@ else
 								$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
 								$templating->set('permalink', $permalink);
 
-								$reply_date = $core->human_date($post['creation_date']);
+								$reply_date = $core->time_ago($post['creation_date']);
 								$templating->set('tzdate', date('c',$post['creation_date']) ); // timeago
 								$templating->set('reply_date', $reply_date);
 

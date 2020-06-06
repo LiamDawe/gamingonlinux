@@ -1997,7 +1997,7 @@ jQuery(document).ready(function()
 	selectOnClose: true,
 	width: '100%',
 	ajax: {
-    url: "/includes/ajax/games_ajax.php?return_type=option&type=games_only",
+    url: "/includes/ajax/gamesdb/search_games.php?return_type=option&type=games_only",
     dataType: 'json',
     delay: 250,
     data: function (params) {

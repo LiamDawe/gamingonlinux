@@ -10,7 +10,16 @@ if (!isset($_GET['go']))
 {
 	$templating->block('main_top');
 
-	$current = $dbl->run("SELECT c.name, w.wish_id FROM `user_wishlist` w INNER JOIN `calendar` c ON c.id = w.game_id WHERE w.user_id = ?", [$_SESSION['user_id']])->fetch_all();
+	$delete_all = '';
+
+	$current = $dbl->run("SELECT c.name, w.wish_id FROM `user_wishlist` w INNER JOIN `calendar` c ON c.id = w.game_id WHERE w.user_id = ? ORDER BY c.`name` ASC", [$_SESSION['user_id']])->fetch_all();
+	if ($current)
+	{
+		$delete_all = '<button type="submit" class="fright" name="act" value="delete_all">Delete All</button>';
+	}
+
+	$templating->set('delete_all', $delete_all);
+		
 	if ($current)
 	{
 		foreach ($current as $wish)
@@ -69,6 +78,16 @@ if (isset($_POST['act']))
 
 		// check it doesn't exist
 		$dbl->run("DELETE FROM `user_wishlist` WHERE `wish_id` = ? AND `user_id` = ?", [$_POST['wish_id'], $_SESSION['user_id']])->fetch();
+
+		$_SESSION['message'] = 'deleted';
+		$_SESSION['message_extra'] = 'wishlist entry';
+		header("Location: /usercp.php?module=wishlist");
+	}
+
+	if ($_POST['act'] == 'delete_all')
+	{
+		// check it doesn't exist
+		$dbl->run("DELETE FROM `user_wishlist` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
 
 		$_SESSION['message'] = 'deleted';
 		$_SESSION['message_extra'] = 'wishlist entry';

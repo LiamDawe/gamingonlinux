@@ -1399,7 +1399,8 @@ a:target + div.comment .comment-meta a:link, a:target + div.comment .comment-met
 	background: #B20000;
 }
 .badge.orange {
-    background: #f0ad4e;
+	background: #f0ad4e;
+	color: #0D0D0D;
 }
 .badge.blue {
     background: #006EA1;
@@ -1415,6 +1416,10 @@ a:target + div.comment .comment-meta a:link, a:target + div.comment .comment-met
 }
 .badge.purple {
     background: #4b367c;
+}
+.badge.darkturquoise {
+	background: #00CED1;
+	color: #0D0D0D;
 }
 
 /* Social Networks */

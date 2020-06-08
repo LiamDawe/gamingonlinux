@@ -1138,28 +1138,22 @@ else
 						// update the topic
 						$dbl->run("UPDATE `forum_topics` SET `forum_id` = ? WHERE `topic_id` = ?", array($_POST['new_forum'], $_GET['topic_id']));
 
-						// finally check if this is the latest topic we are moving to update the latest topic info for the previous forum
-						$last_post = $dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
-
-						// if it is then we need to get the *now* newest topic and update the forums info
-						if ($last_post['last_post_topic_id'] == $_GET['topic_id'])
+						// Check over the ORIGINAL forum, if this topic was the newest, find the second newest for the last post info
+						$last_post = $dbl->run("SELECT `last_post_topic_id` FROM `forums` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetchOne();
+						if ($last_post == $_GET['topic_id'])
 						{
-							$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `forum_id` = ?", array($_POST['old_forum_id']))->fetch();
-
-							$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['old_forum_id']));
+							$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `forum_id` = ? ORDER BY `last_post_date` DESC LIMIT 1", array($_POST['old_forum_id']))->fetch();
+							$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $_POST['old_forum_id']));
 						}
 
-						// now we need to check if the topic being moved is newer than the new forums last post and update if needed
+						// For the NEW forum, is this moved topic the NEWEST? If so update last post info
 						$last_post_new = $dbl->run("SELECT `last_post_time` FROM `forums` WHERE `forum_id` = ?", array($_POST['new_forum']))->fetch();
-
 						$last_post_topic = $dbl->run("SELECT `last_post_date` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
-
-						//
 						if ($last_post_topic['last_post_date'] > $last_post_new['last_post_time'])
 						{
-							$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
+							$new_info = $dbl->run("SELECT `topic_id`, `last_post_date`, `last_post_user_id` FROM `forum_topics` WHERE `topic_id` = ?", array($_GET['topic_id']))->fetch();
 
-							$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_id'], $new_info['topic_id'], $_POST['new_forum']));
+							$dbl->run("UPDATE `forums` SET `last_post_time` = ?, `last_post_user_id` = ?, `last_post_topic_id` = ? WHERE `forum_id` = ?", array($new_info['last_post_date'], $new_info['last_post_user_id'], $new_info['topic_id'], $_POST['new_forum']));
 						}
 
 						// get the name of the topic

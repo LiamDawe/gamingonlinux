@@ -115,27 +115,21 @@
 .octus-editor > .styles > ul > li > select option {
 	border: none;
 }
-.octus-editor > .styles > ul > li.dropdown ul.smiley li {
-	background-repeat: no-repeat;
-	background-position: 7px 5px;
-	padding-left: 30px;
-}
 .octus-editor > .styles > ul > li.dropdown {
-	width: 100%;
+	width: auto;
 }
+ul li.dropdown.emoji {padding-right:20px; text-align: center;}
+.octus-editor > .styles > ul > li.dropdown.emoji ul.smiley li {border-bottom: none;}
 .octus-editor > .styles > ul > li.dropdown ul {
 	display: none;
+	column-count: 3;
 	background: var(--bbcode-editor-dropdown-ul-bg-color);
-	border-left: 1px solid var(--bbcode-editor-dropdown-ul-border-color);
-	border-right: 1px solid var(--bbcode-editor-dropdown-ul-border-color);
-	border-bottom: 1px solid var(--bbcode-editor-dropdown-ul-border-color);
+	border: 1px solid var(--bbcode-editor-dropdown-ul-border-color);
 	position: absolute;
 	margin: 0px;
 	padding: 0px;
-	top: 34px;
 	left: -1px;
-	width: 100%;
-	line-height: 20px;
+	width: 200px;
 }
 .octus-editor > .styles > ul > li.dropdown:hover ul {
 	display: inherit;

@@ -11,6 +11,7 @@ class bbcode
 
 	private $allowed_link_protocols = array('http:\/\/', 'https:\/\/', 'ftp:\/\/', 'ftps:\/\/', 'mailto:', 'irc:\/\/', 'ircs:\/\/');
 	private $protocols = '';
+	public $emoji = array();
 
 	function __construct($dbl, $core, $user)
 	{
@@ -19,6 +20,7 @@ class bbcode
 		$this->user = $user;
 
 		$this->protocols = implode('|',$this->allowed_link_protocols);
+		$this->prepare_emoji();
 	}
 	
 	function do_charts($body)
@@ -224,11 +226,11 @@ class bbcode
 	function parse_links($text)
 	{
 		// general link matching
-		$text = preg_replace("/(\s|^)(($this->protocols)[\w\d\.\/#\_\-\?:=&;()\%]+)(?:(?<![.,;!?:\"\'-])(\s|.|$))/iu", '$1<a href="$2" target="_blank" rel="nofollow noopener noreferrer">$2</a>$4', $text);
+		$text = preg_replace("/(\s|^)(($this->protocols)[\w\d\.\/#\_\-\?:=&;@()\%]+)(?:(?<![.,;!?:\"\'-])(\s|.|$))/iu", '$1<a href="$2" target="_blank" rel="nofollow noopener noreferrer">$2</a>$4', $text);
 		//<link>
 		$text = preg_replace("/(?:&lt;)(($this->protocols)([\S]+))(?:&gt;)/is", "<a href=\"$1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text); 
 		// [title](link)
-		$text = preg_replace("/\[([^]]+?)\]\((($this->protocols)([^ ]+))\)/is", "<a href=\"$2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>", $text);
+		$text = preg_replace("/\[([^]]+?)\]\((($this->protocols)[\w\d\.\/#\_\-\?:=&;@()\%]+)(?:(?<![.,;!?:\"\'-])\)(\s|.|$))/is", "<a href=\"$2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">$1</a>$4", $text);
 
 		return $text;
 	}
@@ -438,36 +440,24 @@ class bbcode
 		return $body;
 	}
 
+	function prepare_emoji()
+	{
+		if (!isset($this->emoji['raw'])) // ensure we only do this once
+		{
+			$this->emoji['raw'] = $this->dbl->run("SELECT `text_replace`, `filename` FROM `emoji`")->fetch_all(PDO::FETCH_KEY_PAIR);
+		}
+
+		$emoji_location = $this->core->config('website_url') . 'templates/' . $this->core->config('template');
+
+		foreach ($this->emoji['raw'] as $key => $value)
+		{
+			$this->emoji['replaced'][$key] = '<img src="'. $emoji_location . '/images/emoticons/' . $value . '" alt="" />';
+		}
+	}
+
 	function emoticons($text)
 	{
-		$smilie_location = $this->core->config('website_url') . 'templates/' . $this->core->config('template');
-		
-		$smilies = array(
-		":><:" => '<img src="'.$smilie_location.'/images/emoticons/angry.png" alt="" />',
-		":&gt;&lt;:" => '<img src="'.$smilie_location.'/images/emoticons/angry.png" alt="" />', // for comments as they are made html-safe
-		":'(" => '<img src="'.$smilie_location.'/images/emoticons/cry.png" alt="" />', // for comments as they are made html-safe
-		":&#039;(" => '<img src="'.$smilie_location.'/images/emoticons/cry.png" alt="" />',
-		":dizzy:" => '<img src="'.$smilie_location.'/images/emoticons/dizzy.png" alt="" />',
-		":D" => '<img src="'.$smilie_location.'/images/emoticons/grin.png" alt="" />',
-		"^_^" => '<img src="'.$smilie_location.'/images/emoticons/happy.png" alt="" />',
-		"<3" => '<img src="'.$smilie_location.'/images/emoticons/heart.png" alt="" />',
-		"&lt;3" => '<img src="'.$smilie_location.'/images/emoticons/heart.png" alt="" />', // for comments as they are made html-safe
-		":huh:" => '<img src="'.$smilie_location.'/images/emoticons/huh.png" alt="" />',
-		":|" => '<img src="'.$smilie_location.'/images/emoticons/pouty.png" alt="" />',
-		":(" => '<img src="'.$smilie_location.'/images/emoticons/sad.png" alt=""/>',
-		":O" => '<img src="'.$smilie_location.'/images/emoticons/shocked.png" alt="" />',
-		":sick:" => '<img src="'.$smilie_location.'/images/emoticons/sick.png" alt="" />',
-		":)" => '<img src="'.$smilie_location.'/images/emoticons/smile.png" alt="" />',
-		":P" => '<img src="'.$smilie_location.'/images/emoticons/tongue.png" alt="" />',
-		":S:" => '<img src="'.$smilie_location.'/images/emoticons/unsure.png" alt="" />',
-		":woot:" => '<img src="'.$smilie_location.'/images/emoticons/w00t.png" alt="" />',
-		":whistle:" => '<img src="'.$smilie_location.'/images/emoticons/whistle.png" alt="" />',
-		":wink:" => '<img src="'.$smilie_location.'/images/emoticons/wink.png" alt="" />',
-		":wub:" => '<img src="'.$smilie_location.'/images/emoticons/wub.png" alt="" />'
-		);
-
-		$text = str_replace( array_keys( $smilies ), array_values( $smilies ), $text );
-
+		$text = str_replace( array_keys( $this->emoji['replaced'] ), array_values( $this->emoji['replaced'] ), $text );
 		return $text;
 	}
 

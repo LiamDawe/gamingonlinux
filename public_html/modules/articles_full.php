@@ -609,7 +609,8 @@ if (!isset($_GET['go']))
 										$templating->set('url', $core->config('website_url'));
 										$templating->set('article_id', $article['article_id']);
 
-										$core->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
+										$comment_editor = new editor($core, $templating, $bbcode);
+										$comment_editor->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
 
 										$templating->block('comment_buttons', 'articles_full');
 										$templating->set('url', $core->config('website_url'));

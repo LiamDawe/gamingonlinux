@@ -978,7 +978,8 @@ else
 
 									if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 									{
-										$core->editor(['name' => 'text', 'editor_id' => 'comment']);
+										$comment_editor = new editor($core, $templating, $bbcode);
+										$comment_editor->editor(['name' => 'text', 'editor_id' => 'comment']);
 
 										$templating->block('reply_buttons', 'viewtopic');
 										$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);

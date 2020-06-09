@@ -51,7 +51,8 @@ if (!isset($_POST['act']))
 			$templating->block('edit_top');
 			$templating->set('title', htmlentities($topic['topic_title'], ENT_QUOTES));
 
-			$core->editor(['name' => 'text', 'content' => $topic['reply_text'], 'editor_id' => 'post_text']);
+			$comment_editor = new editor($core, $templating, $bbcode);
+			$comment_editor->editor(['name' => 'text', 'content' => $topic['reply_text'], 'editor_id' => 'post_text']);
 
 			$templating->block('edit_bottom', 'editpost');
 			$templating->set('page', $_GET['page']);
@@ -90,7 +91,8 @@ if (!isset($_POST['act']))
 				$reported = 1;
 			}
 
-			$core->editor(['name' => 'text', 'content' => $post['reply_text'], 'editor_id' => 'post_text']);
+			$comment_editor = new editor($core, $templating, $bbcode);
+			$comment_editor->editor(['name' => 'text', 'content' => $post['reply_text'], 'editor_id' => 'post_text']);
 
 			$templating->block('edit_bottom', 'editpost');
 			$templating->set('page', $_GET['page']);

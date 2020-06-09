@@ -96,7 +96,8 @@ if ($core->config('forum_posting_open') == 1)
 					$comment = '[quote=' . $get_comment['username'] . ']' . $get_comment['reply_text'] . '[/quote]';
 				}
 
-				$core->editor(['name' => 'text', 'editor_id' => 'comment', 'content' => $comment]);
+				$comment_editor = new editor($core, $templating, $bbcode);
+				$comment_editor->editor(['name' => 'text', 'editor_id' => 'comment', 'content' => $comment]);
 
 				$templating->block('reply_buttons', 'viewtopic');
 				$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);

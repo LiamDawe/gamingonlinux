@@ -57,7 +57,8 @@ if (isset($_GET['view']) && $_GET['view'] == 'Edit' && !isset($_POST['act']))
 
 	$templating->block('edit_top', 'edit_comment');
 
-	$core->editor(['name' => 'text', 'content' => $comment_text, 'editor_id' => 'comment']);
+	$comment_editor = new editor($core, $templating, $bbcode);
+	$comment_editor->editor(['name' => 'text', 'content' => $comment_text, 'editor_id' => 'comment']);
 
 	$templating->block('edit_comment_buttons', 'edit_comment');
 	$templating->set('comment_id', $comment['comment_id']);

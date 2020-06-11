@@ -279,14 +279,15 @@ else
 	}
 
 	$subscribe_email_check = '';
-	if ((isset($check_current_sub) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
+	if ((isset($check_current_sub['emails']) && $check_current_sub['emails'] == 1) || !isset($check_current_sub) && $_SESSION['auto_subscribe_email'] == 1)
 	{
 		$subscribe_email_check = 'selected';
 	}
 
 	$templating->block('form_top');
 
-	$core->editor(['name' => 'text', 'content' => '', 'editor_id' => 'comment']);
+	$comment_editor = new editor($core, $templating, $bbcode);
+	$comment_editor->editor(['name' => 'text', 'content' => '', 'editor_id' => 'comment']);
 
 	$templating->block('form_bottom', 'admin_modules/admin_module_comments');
 	$templating->set('subscribe_check', $subscribe_check);

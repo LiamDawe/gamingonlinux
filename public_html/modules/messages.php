@@ -402,7 +402,8 @@ else
 				$templating->block('reply', 'private_messages');
 				$templating->set('pagination', $pagination);
 
-				$core->editor(['name' => 'text', 'editor_id' => 'comment']);
+				$comment_editor = new editor($core, $templating, $bbcode);
+				$comment_editor->editor(['name' => 'text', 'editor_id' => 'comment']);
 
 				$templating->block('reply_bottom', 'private_messages');
 				$templating->set('conversation_id', $start['conversation_id']);
@@ -499,7 +500,8 @@ else
 		$templating->set('to', $user_to);
 		$templating->set('title', $title);
 
-		$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment']);
+		$comment_editor = new editor($core, $templating, $bbcode);
+		$comment_editor->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment']);
 
 		$templating->block('compose_bottom', 'private_messages');
 		$templating->block('preview', 'private_messages');

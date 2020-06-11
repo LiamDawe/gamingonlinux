@@ -86,6 +86,7 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute( 'version', '2.0' );
 	$xml->writeAttribute( 'xmlns:atom', 'http://www.w3.org/2005/Atom' );
 	$xml->writeAttribute( 'xmlns:dc', 'http://purl.org/dc/elements/1.1/' );
+	$xml->writeAttribute('xmlns:media', 'http://search.yahoo.com/mrss/');
 
 	$xml->startElement('channel');
 	$xml->writeElement('title', $rss_title);
@@ -197,7 +198,26 @@ if ($core->config('articles_rss') == 1)
 				}
 				
 			}
-			
+
+			$tagline_image = '';
+
+			if (!empty($line['tagline_image']))
+			{
+				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/".$line['tagline_image'];
+			}
+			if ($line['gallery_tagline'] > 0 && !empty($line['gallery_tagline_filename']))
+			{
+				$tagline_image = $core->config('website_url')."uploads/tagline_gallery/".$line['gallery_tagline_filename'];
+			}
+			if (empty($line['tagline_image']) && $line['gallery_tagline'] == 0)
+			{
+				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png";
+			}
+
+			$xml->startElement( 'media:thumbnail');
+			$xml->writeAttribute( 'url', $tagline_image);
+			$xml->endElement();
+
 			$xml->startElement('description');
 			$xml->writeCData('<p>' . $text . '</p>');
 			$xml->endElement();

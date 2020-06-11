@@ -178,7 +178,7 @@ else
 			$replies = '';
 			$last_link = $link;
 			$last_link = $forum_class->get_link($topics['topic_id'], 'post_id=' . $topics['last_post_id']);
-			$replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" alt="">  ' . $topics['replys'] . ' replies';
+			$replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" alt="">  ' . number_format($topics['replys']) . ' replies';
 			$templating->set('replies', $replies);
 			$templating->set('avatar', $avatar);
 			if (isset($topics['username']))

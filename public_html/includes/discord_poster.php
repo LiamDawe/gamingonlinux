@@ -4,7 +4,6 @@ if(!defined('golapp'))
 	die('Direct access not permitted');
 }
 
-define('WEBHOOK_URL', $core->config('discord_news_webhook'));
 define('TIMESTAMP', date("c", strtotime("now")));
 
 function post_to_discord($data)

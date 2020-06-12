@@ -71,33 +71,34 @@ if ($core->config('forum_rss') == 1)
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();
 
-
-
-	foreach ($fetch_topics as $line)
+	if ($fetch_topics)
 	{
-		$xml->startElement('item');
-		
-		$xml->startElement('title');
-		$xml->writeCData($line['topic_title']);
+		foreach ($fetch_topics as $line)
+		{
+			$xml->startElement('item');
+			
+			$xml->startElement('title');
+			$xml->writeCData($line['topic_title']);
+			$xml->endElement();
+			
+			// make date human readable
+			$date = date("D, d M Y H:i:s O", $line['last_post_date']);
+			$xml->writeElement('pubDate', $date);
+			
+			$link = $core->config('website_url') . "forum/topic/{$line['topic_id']}/";
+			$xml->writeElement('link', $link);
+			$xml->writeElement('guid', $link);
+			
+			// close this item
+			$xml->endElement();
+		}
+
+		// close the channel and then the rss tags and then output the RSS feed
 		$xml->endElement();
-		
-		// make date human readable
-		$date = date("D, d M Y H:i:s O", $line['last_post_date']);
-		$xml->writeElement('pubDate', $date);
-		
-		$link = $core->config('website_url') . "forum/topic/{$line['topic_id']}/";
-		$xml->writeElement('link', $link);
-		$xml->writeElement('guid', $link);
-		
-		// close this item
 		$xml->endElement();
+
+		echo $xml->outputMemory();
 	}
-
-	// close the channel and then the rss tags and then output the RSS feed
-	$xml->endElement();
-	$xml->endElement();
-
-	echo $xml->outputMemory();
 }
 
 else

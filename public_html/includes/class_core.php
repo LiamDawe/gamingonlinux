@@ -964,7 +964,7 @@ class core
 			}
 		}
 
-		// modules loading, first are we asked to load a module, if not use the default
+		// modules loading with basic normal PHP ?module= URL, first are we asked to load a module, if not use the default
 		if (isset($_GET['module']))
 		{
 			if (array_key_exists($_GET['module'], self::$allowed_modules))
@@ -976,34 +976,51 @@ class core
 				self::$current_module = self::$allowed_modules['404'];
 			}
 		}
+		// "friendly" URL support
 		else if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '/')
 		{
 			$get_url = parse_url($_SERVER['REQUEST_URI']);
 
-			$module = NULL;
-			self::$url_command = explode('/', trim($get_url['path'], '/'));
-			
-			// check if it's an article
-			if (isset(self::$url_command[0]) && strlen(self::$url_command[0]) == 4 && is_numeric(self::$url_command[0]))
+			// deal with extra silly slashes included somehow, send to the correct URL
+			if (preg_match('~(\/{2,})~', $_SERVER['REQUEST_URI']))
 			{
-				if (isset(self::$url_command[1]) && strlen(self::$url_command[1]) == 2 && is_numeric(self::$url_command[1]))
+				$_SERVER['REQUEST_URI'] = preg_replace('~/+~', '/', $_SERVER['REQUEST_URI']);
+				header("HTTP/1.1 301 Moved Permanently");
+				header("Location: " . substr($this->config('website_url'), 0, -1) . $_SERVER['REQUEST_URI']); // substr to remove the extra slash we end up with
+				die();
+			}
+			
+			if (isset($get_url['path']))
+			{
+				$module = NULL;
+				self::$url_command = explode('/', trim($get_url['path'], '/'));
+				
+				// check if it's an article
+				if (isset(self::$url_command[0]) && strlen(self::$url_command[0]) == 4 && is_numeric(self::$url_command[0]))
 				{
-					if (isset(self::$url_command[2]))
+					if (isset(self::$url_command[1]) && strlen(self::$url_command[1]) == 2 && is_numeric(self::$url_command[1]))
 					{
-						$module = 'articles_full';
+						if (isset(self::$url_command[2]))
+						{
+							$module = 'articles_full';
+						}
 					}
 				}
-			}
 
-			// now see if we can go to it
-			if (array_key_exists($module, self::$allowed_modules))
-			{
-				self::$current_module = self::$allowed_modules[$module];
+				// now see if we can go to it
+				if (array_key_exists($module, self::$allowed_modules))
+				{
+					self::$current_module = self::$allowed_modules[$module];
+				}
+				else
+				{
+					self::$current_module = self::$allowed_modules['404'];
+				}
 			}
 			else
 			{
-				self::$current_module = self::$allowed_modules['404'];
-			}			
+				self::$current_module = self::$allowed_modules[$this->config('default_module')];
+			}	
 		}
 
 		else

@@ -315,7 +315,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$crowdfund_notes = '';
 				if ($game['crowdfund_notes'] != NULL)
 				{
-					$crowdfund_notes = htmlspecialchars($game['crowdfund_notes'], ENT_QUOTES);
+					$crowdfund_notes = $game['crowdfund_notes'];
 				}
 				$templating->set('crowdfund_notes', $crowdfund_notes);
 

@@ -80,7 +80,7 @@ if (isset($_GET['view']))
 		$templating->block('full_db_search');
 
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, c.`is_crowdfunded`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`bundle`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, c.`is_crowdfunded`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			// sort out the external links we have for it
@@ -146,7 +146,7 @@ if (isset($_GET['view']))
 			{
 				header('Content-Type: application/json; charset=utf-8');
 
-				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'license' => $license_name, 'game_engine' => $game_engine_name);
+				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'is_bundle' => $get_item['bundle'], 'license' => $license_name, 'game_engine' => $game_engine_name, 'was_crowdfunded' => $get_item['is_crowdfunded']);
 
 				$data['links'] = $links_array;
 
@@ -183,6 +183,10 @@ if (isset($_GET['view']))
 			if ($get_item['is_dlc'] == 1)
 			{
 				$top_badges[] = '<span class="badge yellow">DLC</span>';
+			}
+			if ($get_item['bundle'] == 1)
+			{
+				$top_badges[] = '<span class="badge green">Bundle</span>';
 			}
 			$templating->set('top_badges', implode(' ', $top_badges));
 
@@ -336,7 +340,7 @@ if (isset($_GET['view']))
 			// crowdfunded?
 			if ($get_item['is_crowdfunded'] == 1)
 			{
-				$templating->block('crowdfunded');
+				$templating->block('crowdfunded', 'items_database');
 			}
 
 			// find any associations

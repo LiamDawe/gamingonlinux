@@ -18,10 +18,16 @@ function getCookie(name) {
 	var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
 	return v ? v[2] : null;
 }
-function setCookie(name, value, days) {
+function setCookie(name, value, days, headers) {
+
+	var additional = '';
+	if (headers)
+	{
+		additional = headers;
+	}
 	var d = new Date();
 	d.setTime(d.getTime() + 24*60*60*1000*days);
-	document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString() + ';secure;samesite=Strict;';
+	document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString() + ';secure;' + additional;
 }
 function deleteCookie(name) { setCookie(name, '', -1); }
 
@@ -2501,14 +2507,14 @@ jQuery(document).ready(function()
 	{
 		if (this.checked) 
 		{
-			setCookie('gol_youtube_consent', 'yup', 60 );
+			setCookie('gol_youtube_consent', 'yup', 60);
 			$(".youtube_status_text").text('On');
 		}
 		else
 		{
 			$("#youtube-cookie-slider").prop('checked', false);
 			$(".youtube_status_text").text('Off');
-			setCookie('gol_youtube_consent', 'nope', 60 );			
+			setCookie('gol_youtube_consent', 'nope', 60);			
 		}
 	});
 

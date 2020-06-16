@@ -142,7 +142,9 @@ else
 				$templating->set('category_options', $cat_options);
 
 				$templating->set('title', $title);
-				$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment_text']);
+
+				$comment_editor = new editor($core, $templating, $bbcode);
+				$comment_editor->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment_text']);
 
 				$templating->block('bottom', 'newtopic');
 				$templating->set('options', $options);

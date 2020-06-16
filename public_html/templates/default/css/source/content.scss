@@ -48,7 +48,7 @@ hr.content_split {
 	border-top: 2px dotted #8c8b8b;
 }
 
-.article table {border: 1px solid #2e2e2e;}
+.article table {border: var(--table-border);}
 
 .ckeditor-html5-video video {
 	max-width: 100%;
@@ -56,4 +56,6 @@ hr.content_split {
 }
 
 table.center {    margin-left:auto; 
-    margin-right:auto;}
+	margin-right:auto;}
+	
+.scroll-table{overflow-x:auto;}

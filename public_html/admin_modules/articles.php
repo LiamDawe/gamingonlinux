@@ -286,10 +286,42 @@ if (isset($_GET['view']))
 	// manage articles
 	if ($_GET['view'] == 'manage')
 	{
-		$templating->set_previous('title', 'Articles' . $templating->get('title', 1)  , 1);
 		if (!isset($_GET['category_id']) && !isset($_GET['category']))
 		{
 			$templating->block('manage_cat_top');
+			$templating->set_previous('title', 'Articles' . $templating->get('title', 1)  , 1);
+			// count any submitted admin articles for review
+			$review_count = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `admin_review` = 1")->fetchOne();
+			if ($review_count > 0)
+			{
+				$templating->set('review_count', "<span class=\"badge badge-important\">$review_count</span>");
+			}
+			else if ($review_count == 0)
+			{
+				$templating->set('review_count', "(0)");
+			}
+
+			// count any submitted articles for review
+			$submitted_count = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `submitted_unapproved` = 1 AND `active` = 0")->fetchOne();
+			if ($submitted_count > 0)
+			{
+				$templating->set('submitted_count', "<span class=\"badge badge-important\">$submitted_count</span>");
+			}
+			else if ($submitted_count == 0)
+			{
+				$templating->set('submitted_count', "(0)");
+			}
+
+			// correction counter
+			$correction_counter = $dbl->run("SELECT COUNT(`row_id`) FROM `article_corrections`")->fetchOne();
+			if ($correction_counter > 0)
+			{
+				$templating->set('correction_count', "<span class=\"badge badge-important\">$correction_counter</span>");
+			}
+			else if ($correction_counter == 0)
+			{
+				$templating->set('correction_count', "(0)");
+			}
 
 			// list categorys and all option
 			$cat_res = $dbl->run("SELECT `category_id`, `category_name` FROM `articles_categorys` ORDER BY `category_name` ASC")->fetch_all();

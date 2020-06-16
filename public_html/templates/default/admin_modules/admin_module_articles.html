@@ -67,6 +67,18 @@
 [/block: edit_bottom]
 
 [block: manage_cat_top]
+<div class="box">
+	<div class="head">Article lists</div>
+	<div class="body list">
+		<ul>
+			<li class="list-group-item"><a href="admin.php?module=corrections">Correction Suggestions {:correction_count}</a></li>
+			<li class="list-group-item"><a href="admin.php?module=reviewqueue">Editor Posts Awaiting Review {:review_count}</a></li>
+			<li class="list-group-item"><a href="admin.php?module=articles&amp;view=Submitted">Managed Submitted Articles {:submitted_count}</a></li>
+			<li class="list-group-item"><a href="admin.php?module=articles&amp;view=drafts">Manage Drafts</a></li>
+		</ul>
+	</div>
+</div>
+
 <div class="box"><div class="head">Here you can select a category to manage or view all.</div></div>
 			<div class="box">
 				<div class="body group">

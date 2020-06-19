@@ -144,6 +144,24 @@ if (isset($view))
 			die();
 		}
 
+		if (count($_GET['catid']) === 1 && is_numeric($_GET['catid'][0]))
+		{
+			$find_name = $dbl->run("SELECT `category_name` FROM `articles_categorys` WHERE `category_id` = ?", array($_GET['catid'][0]))->fetchOne();
+
+			if ($find_name)
+			{
+				header("Location: " . $article_class->tag_link($find_name));
+				die();
+			}
+			else
+			{
+				$_SESSION['message'] = 'none_found';
+				$_SESSION['message_extra'] = 'categories';
+				header("Location: /index.php?module=search");
+				die();
+			}
+		}
+
 		$categorys_ids = $_GET['catid'];
 		
 		$safe_ids = array();
@@ -170,9 +188,8 @@ if (isset($view))
 
 		$article_class->display_category_picker($categorys_ids);
 		
-		// this is really ugly, but I can't think of a better way to do it
-		$count_array = count($safe_ids);
 		// sort placeholders for sql
+		$count_array = count($safe_ids);
 		$cat_sql  = 'r.`category_id` IN (' . str_repeat('?,', count($safe_ids) - 1) . '?)';
 		
 		// count how many there is in total

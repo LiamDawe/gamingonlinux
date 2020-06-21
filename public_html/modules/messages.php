@@ -165,7 +165,8 @@ else
 				$templating->block('edit', 'private_messages');
 				$templating->set('formaction', $core->config('website_url') . 'index.php?module=messages&message_id='.$_GET['message_id'].'&conversation_id='.$_GET['conversation_id'].'&page=' . $page);
 
-				$core->editor(['name' => 'text', 'content' => $info['message'], 'editor_id' => 'comment']);
+				$comment_editor = new editor($core, $templating, $bbcode);
+				$comment_editor->editor(['name' => 'text', 'content' => $info['message'], 'editor_id' => 'comment']);
 
 				$templating->block('edit_bottom', 'private_messages');
 				$templating->block('preview', 'private_messages');

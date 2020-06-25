@@ -776,7 +776,6 @@ class charts
 				$data_array[] = $data['percent'];
 				$totals_array[] = $data['total'];
 				
-
 				$colour = $this->rand_color();
 				if ($data['name'] == 'Intel')
 				{
@@ -789,6 +788,14 @@ class charts
 				if ($data['name'] == 'Nvidia' || $data['name'] == 'Open Source')
 				{
 					$colour = "#33a02c";
+				}
+				if ($data['name'] == 'x11')
+				{
+					$colour = "#3339ff";
+				}
+				if ($data['name'] == 'Wayland')
+				{
+					$colour = "#ff3339";
 				}
 
 				$colors_array[] = '"'.$colour.'"';
@@ -1434,6 +1441,14 @@ class charts
 					if ($key == 'Nvidia' || $key == 'Open Source')
 					{
 						$colour = "#33a02c";
+					}
+					if ($key == 'x11')
+					{
+						$colour = "#3339ff";
+					}
+					if ($key == 'Wayland')
+					{
+						$colour = "#ff3339";
 					}
 
 					$data_sets .= "{

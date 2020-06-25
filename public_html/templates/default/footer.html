@@ -38,7 +38,7 @@ CKEDITOR.on('instanceReady', function(evt)
 	[{
 		element: 'a',
 		left: function( el ) {
-			return el.target !== '_blank';
+			return !el.attributes.target;
 		},
 		right: function( el, tools ) {
 			el.attributes.target = '_blank';

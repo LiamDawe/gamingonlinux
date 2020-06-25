@@ -13,7 +13,7 @@ $text = "<p>This is your once a month reminder to make sure your PC information 
 
 <p>You can see the statistics any time <a href=\"https://www.gamingonlinux.com/users/statistics\" target=\"_blank\">on this page</a>.</p>
 
-<p>PC Info is automatically purged if it hasn&#39;t been updated, or if you don&#39;t click the link to remain in for 2 years. This way we prevent too much stale data and don&#39;t hold onto your data for longer than required. If this is still correct and it has been a long time since you updated, you can simply <strong><a href=\"#\" id=\"pc_info_update\">click here to continue</a> to be included</strong>. If this isn't correct, <a href=\"/usercp.php?module=pcinfo\">click here to go to your User Control Panel to update it!</a>
+<p>PC Info is automatically purged if it hasn&#39;t been updated, or if you don&#39;t click the link to remain in for 2 years. This way we prevent too much stale data and don&#39;t hold onto your data for longer than required. If this is still correct and it has been a long time since you updated, you can simply <strong><a href=\"#\" id=\"pc_info_update\" target=\"_self\">click here to continue</a> to be included</strong>. If this isn't correct, <a href=\"/usercp.php?module=pcinfo\">click here to go to your User Control Panel to update it!</a>
 
 <div class=\"all-ok\" id=\"pc_info_done\"></div></p>";
 

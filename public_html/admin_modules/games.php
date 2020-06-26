@@ -115,7 +115,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		$templating->set('engine_options', $engine_options);
 
-		$core->article_editor(['content' => '']);
+		$editor = new editor($core, $templating, $bbcode);
+		$editor->article_editor(['content' => '']);
 
 		$previous_uploads = $games_database->display_previous_uploads(NULL);
 
@@ -381,7 +382,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$genre_list = $core->display_game_genres($game['id']);
 				$templating->set('genre_list', $genre_list);
 
-				$core->article_editor(['content' => $text]);
+				$editor = new editor($core, $templating, $bbcode);
+				$editor->article_editor(['content' => $text]);
 
 				$previous_uploads = $games_database->display_previous_uploads($game['id']);
 
@@ -612,7 +614,8 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$genre_list = $core->display_game_genres($game['id']);
 				$templating->set('genre_list', $genre_list);
 
-				$core->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'game_text']);
+				$editor = new editor($core, $templating, $bbcode);
+				$editor->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'game_text']);
 
 				$templating->block('submitted_bottom', 'admin_modules/games');
 				$templating->set('id', $game['id']);

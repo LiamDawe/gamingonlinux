@@ -11,8 +11,6 @@ $answers = array();
 $distributions = $dbl->run("SELECT `name` FROM `distributions` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
 $answers['desktop_environment'] = $dbl->run("SELECT `name` FROM `desktop_environments` ORDER BY `name` = 'Not Listed' DESC, `name` ASC")->fetch_all(PDO::FETCH_COLUMN);
 $dual_boot_systems = array("Yes Windows", "Yes Mac", "Yes ChromeOS", "Yes Other", "No");
-$steamplay_options = array("I will not use it", "Waiting on a specific game working", "In the last month", "In the last six months", "More than six months ago");
-$wine_options = array("In the last month", "In the last three months", "In the last six months", "Over six months ago", "I never use it");
 $cpu_vendors = array('Intel', 'AMD');
 $gpu_vendors = array('Intel', 'AMD', 'Nvidia');
 $gpu_driver_options = array('Open Source', 'Proprietary');
@@ -48,7 +46,7 @@ if (!isset($_POST['act']))
 {
 	$usercpcp = $dbl->run("SELECT `pc_info_public`, `distro` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();#
 
-	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`dual_boot`, p.`steamplay`, p.`wine`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`vrheadset`, p.`session_type`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
+	$additional_sql = "SELECT p.`date_updated`, p.`desktop_environment`, p.`dual_boot`, p.`cpu_vendor`, p.`cpu_model`, p.`gpu_vendor`, g.`id` AS `gpu_id`, g.`name` AS `gpu_model`, p.`gpu_driver`, p.`ram_count`, p.`monitor_count`, p.`gaming_machine_type`, p.`resolution`, p.`gamepad`, p.`vrheadset`, p.`session_type`, p.`include_in_survey` FROM `user_profile_info` p LEFT JOIN `gpu_models` g ON g.id = p.gpu_model WHERE p.`user_id` = ?";
 	$additional = $dbl->run($additional_sql, array($_SESSION['user_id']))->fetch();
 	
 	// if for some reason they don't have a profile info row, give them one
@@ -124,32 +122,6 @@ if (!isset($_POST['act']))
 		$dual_boot_options .= '<option value="'.$system.'" '.$selected.'>'.$system.'</option>';
 	}
 	$templating->set('dual_boot_options', $dual_boot_options);
-
-	// Steam Play
-	$steamplay_options_output = '';
-	foreach ($steamplay_options as $option)
-	{
-		$selected = '';
-		if ($additional['steamplay'] == $option)
-		{
-			$selected = 'selected';
-		}
-		$steamplay_options_output .= '<option value="'.$option.'" '.$selected.'>'.$option.'</option>';
-	}
-	$templating->set('steamplay_options', $steamplay_options_output);
-
-	// WINE USE
-	$wine_options_output = '';
-	foreach ($wine_options as $option)
-	{
-		$selected = '';
-		if ($additional['wine'] == $option)
-		{
-			$selected = 'selected';
-		}
-		$wine_options_output .= '<option value="'.$option.'" '.$selected.'>'.$option.'</option>';
-	}
-	$templating->set('wine_options', $wine_options_output);
 
 	// CPU vendor
 	$cpu_options = '';
@@ -302,7 +274,7 @@ else if (isset($_POST['act']))
 		else if (isset($_POST['yes']))
 		{
 			$empty_sql = [];
-			$fields = ['date_updated', 'desktop_environment', 'dual_boot', 'wine', 'ram_count', 'cpu_vendor', 'cpu_model', 'gpu_vendor', 'gpu_model', 'gpu_driver', 'monitor_count', 'resolution', 'gaming_machine_type', 'gamepad', 'session_type','vrheadset', 'steamplay'];
+			$fields = ['date_updated', 'desktop_environment', 'dual_boot', 'ram_count', 'cpu_vendor', 'cpu_model', 'gpu_vendor', 'gpu_model', 'gpu_driver', 'monitor_count', 'resolution', 'gaming_machine_type', 'gamepad', 'session_type','vrheadset'];
 			foreach ($fields as $field)
 			{
 				$empty_sql[] = ' `'.$field.'` = NULL ';
@@ -372,14 +344,6 @@ else if (isset($_POST['act']))
 		if (!in_array($_POST['pc_info']['dual_boot'], $dual_boot_systems))
 		{
 			$_POST['pc_info']['dual_boot'] = '';
-		}
-		if (!in_array($_POST['pc_info']['steamplay'], $steamplay_options))
-		{
-			$_POST['pc_info']['steamplay'] = '';
-		}
-		if (!in_array($_POST['pc_info']['wine'], $wine_options))
-		{
-			$_POST['pc_info']['wine'] = '';
 		}
 		if (!in_array($_POST['pc_info']['cpu_vendor'], $cpu_vendors))
 		{

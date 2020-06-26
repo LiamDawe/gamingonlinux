@@ -33,8 +33,6 @@ $charts_list = array(
 	array("name" => "Linux Distributions (Split)", "bundle_outside_top10" => 1),
 	array("name" => "Desktop Environment", "bundle_outside_top10" => 1),
 	array("name" => "Dual Booting", "bundle_outside_top10" => 0),
-	array("name" => "Steam Play Use", "bundle_outside_top10" => 0),
-	array("name" => "Wine Use", "bundle_outside_top10" => 0),
 	array("name" => "RAM", "bundle_outside_top10" => 1),
 	array("name" => "CPU Vendor", "bundle_outside_top10" => 0),
 	array("name" => "GPU Vendor", "bundle_outside_top10" => 0),

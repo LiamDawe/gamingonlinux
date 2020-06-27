@@ -1530,7 +1530,7 @@ class article
 			$like_button = '';
 			$comment_delete_link = '';
 			$link_to_comment = '';
-			$permalink = $this->article_link(array('date' => $article_info['article']['date'], 'slug' => $article_info['article']['slug']));
+			$permalink = $this->article_link(array('date' => $article_info['article']['date'], 'slug' => $article_info['article']['slug'], 'additional' => 'comment_id=' . $comments['comment_id']));
 			if (isset($article_info['type']) && $article_info['type'] != 'admin')
 			{
 				$link_to_comment = '<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" href="'.$permalink.'" data-src="/includes/ajax/call_post_link.php?post_id=' . $comments['comment_id'] . '&type=comment" title="Link to this comment"><span class="icon link">Link</span></a></li>';

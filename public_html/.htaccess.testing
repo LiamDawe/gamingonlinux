@@ -8,6 +8,12 @@ Options +SymLinksifOwnerMatch
   ErrorDocument 403 default
   ErrorDocument 404 /index.php?module=404
   ErrorDocument 500 /down.html
+  
+  #fonts
+  AddType application/font-sfnt            otf ttf
+  AddType application/font-woff            woff
+  AddType application/font-woff2           woff2
+  AddType application/vnd.ms-fontobject    eot
 
   # BEGIN EXPIRES
 <IfModule mod_expires.c>
@@ -16,6 +22,7 @@ Options +SymLinksifOwnerMatch
     ExpiresByType text/plain "access plus 1 month"
     ExpiresByType image/gif "access plus 1 year"
     ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
     ExpiresByType image/vnd.microsoft.icon "access plus 1 year"
@@ -23,6 +30,10 @@ Options +SymLinksifOwnerMatch
     ExpiresByType application/x-javascript "access plus 1 year"
     ExpiresByType application/javascript "access plus 1 year"
     ExpiresByType application/x-icon "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year" 
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    ExpiresByType application/font-sfnt "access plus 1 year"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
 </IfModule>
 # END EXPIRES
 
@@ -37,10 +48,6 @@ Options +SymLinksifOwnerMatch
 	Header set X-Content-Type-Options nosniff
 
 </IfModule>
-
-  RewriteCond %{SCRIPT_FILENAME} !-d
-
-  RewriteCond %{SCRIPT_FILENAME} !-f
   
   RewriteRule ^image_prox/([%\w\.-_]*)$ /includes/image_proxy.php?url=$1 [N,NC]
 
@@ -136,7 +143,7 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^forum/topic/([0-9]+)/post_id\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&post_id=$2 [N,NC,QSA]
   
-    RewriteRule ^forum/topic/([0-9]+)/post_id\=([0-9]+)/clear_note\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&post_id=$2&clear_note=$3 [N,NC,QSA]
+  RewriteRule ^forum/topic/([0-9]+)/post_id\=([0-9]+)/clear_note\=([0-9]+)?$ /index.php?module=viewtopic&topic_id=$1&post_id=$2&clear_note=$3 [N,NC,QSA]
 
   RewriteRule ^private-messages/page\=([0-9]+)?$ /index.php?module=messages&page=$1 [N,NC,QSA]
 

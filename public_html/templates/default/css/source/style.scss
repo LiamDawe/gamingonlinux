@@ -1,10 +1,9 @@
-@import 'reset';
-
 // root/default variables
 :root {
 	--hightlight-select-background: #222222;
 	--hightlight-select-color: #ffffff;
 	--font-color: #404040;
+	--strong-font-color: #404040;
     --link-color:#1C75B9;
 	--bg-color: #ffffff;
 	--header-text-color: #444444;
@@ -116,7 +115,8 @@
 [data-theme="dark"] {
 	--hightlight-select-background: rgb(94, 0, 0);
 	--hightlight-select-color: #adadad;
-    --font-color: #cccccc;
+	--font-color: #cccccc;
+	--strong-font-color: #e0e0e0;
     --link-color:#428BCA;
 	--bg-color: #151515;
 	--header-text-color: #428BCA;
@@ -225,10 +225,13 @@
 	--svg-bar-total: white;;
 }
 
+@import 'font';
+@import 'reset';
+
 body {
 	background: var(--bg-color);
 	color: var(--font-color);
-	font-family: 'Ubuntu', sans-serif;
+	font-family: 'Open Sans', 'Ubuntu', sans-serif;
 	margin: 47px auto 0 auto;
 	padding: 0px;
 	word-wrap: break-word;

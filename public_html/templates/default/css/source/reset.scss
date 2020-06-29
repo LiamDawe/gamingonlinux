@@ -55,7 +55,7 @@
 	}
 
 	em {font-style: italic;}
-	strong {font-weight: bold;}
+	strong {font-weight: bold; color: var(--strong-font-color);}
 	small {font-size: 80%;}
 
 	blockquote, blockquote p {color: #777; font-style: italic;}

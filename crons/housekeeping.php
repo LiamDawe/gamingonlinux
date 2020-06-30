@@ -182,7 +182,7 @@ $dbl->run("DELETE FROM `itemdb_images` WHERE `date_uploaded` < ? AND `approved` 
 /*
 REMOVE EXPIRED EDITOR PICKS
 */
-$featured = $dbl->run("SELECT p.`article_id`, p.`featured_image`, p.hits, a.date, a.title FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE p.`end_date` < now()")->fetch_all();
+$featured = $dbl->run("SELECT p.`article_id`, p.`featured_image`, p.`featured_image_backup`, p.hits, a.date, a.title FROM `editor_picks` p INNER JOIN `articles` a ON p.article_id = a.article_id WHERE p.`end_date` < now()")->fetch_all();
 
 $games = '';
 
@@ -196,11 +196,15 @@ foreach($featured as $row)
 
 	if (!empty($row['featured_image']))
 	{
-		$image = $core->config('path') . 'uploads/carousel/' . $row['featured_image'];
-
-		if (file_exists($image))
+		$featured_image = $core->config('path') . 'uploads/carousel/' . $row['featured_image'];
+		if (file_exists($featured_image))
 		{
-			unlink($image);
+			unlink($featured_image);
+		}
+		$featured_image_backup = $core->config('path') . 'uploads/carousel/' . $row['featured_image_backup'];
+		if (file_exists($featured_image_backup))
+		{
+			unlink($featured_image_backup);
 		}
 	}
 	$total_to_remove++;

@@ -146,7 +146,8 @@ $templating->set('article_list', $liked_list);
 // user numbers
 $templating->block('user_numbers');
 
-$user_count = $dbl->run("SELECT `total`, `date` FROM `stats_registered_users` ORDER BY `date` ASC")->fetch_all();
+$user_count = $dbl->run("SELECT `total`, `date` FROM `stats_registered_users` ORDER BY `date` DESC LIMIT 90")->fetch_all();
+$user_count = array_reverse($user_count);
 $user_dates = array();
 $user_counts = array();
 foreach ($user_count as $data)

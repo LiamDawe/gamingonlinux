@@ -21,38 +21,56 @@ if (core::$current_module['module_file_name'] == 'home')
 {
 	$total_featured = $core->config('total_featured');
 
-	if ($total_featured == 1)
+	if ($total_featured > 0)
 	{
-		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> '' AND `end_date` > now()")->fetch();
-	}
-	if ($total_featured > 1)
-	{
-		if (!isset($_SESSION['last_featured_id']))
+		if ($total_featured == 1)
 		{
-			$_SESSION['last_featured_id'] = 0;
+			$featured = $dbl->run("SELECT a.article_id, a.`title`, a.`active`, p.`featured_image`, p.`featured_image_backup` FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> '' AND `end_date` > now()")->fetch();
+		}
+		if ($total_featured > 1)
+		{
+			if (!isset($_SESSION['last_featured_id']))
+			{
+				$_SESSION['last_featured_id'] = 0;
+			}
+
+			$last_featured_sql = '';
+			if ($core->config('total_featured') > 1)
+			{
+				$last_featured_sql = 'AND a.article_id != ?';
+			}
+
+			$featured = $dbl->run("SELECT a.article_id, a.`title`, a.`active`, p.`featured_image`, p.`featured_image_backup` FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> '' AND p.`end_date` > now() $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
 		}
 
-		$last_featured_sql = '';
-		if ($core->config('total_featured') > 1)
+		if ($total_featured >= 1 && $featured)
 		{
-			$last_featured_sql = 'AND a.article_id != ?';
+			$_SESSION['last_featured_id'] = $featured['article_id'];
+
+			$templating->block('featured', 'mainpage');
+			$templating->set('title', $featured['title']);
+
+			$images = '';
+			if (strpos($featured['featured_image'], 'webp'))
+			{
+				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image'].'" type="image/webp">';
+				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'" type="image/jpeg">';
+				$images .= '<img src="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'">';
+			}
+			if (strpos($featured['featured_image'], 'jpg'))
+			{
+				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image'].'" type="image/jpeg">';
+				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'" type="image/webp">';
+				$images .= '<img src="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'">';
+			}
+
+			$templating->set('images', $images);
+
+			$article_link = url . 'index.php?featured&amp;aid=' . $featured['article_id'];
+
+			$templating->set('article_link', $article_link);
+			$templating->set('url', url);
 		}
-
-		$featured = $dbl->run("SELECT a.article_id, a.`title`, a.active, p.featured_image FROM `editor_picks` p INNER JOIN `articles` a ON a.article_id = p.article_id WHERE a.active = 1 AND p.featured_image <> '' AND p.`end_date` > now() $last_featured_sql ORDER BY RAND() LIMIT 1", array($_SESSION['last_featured_id']))->fetch();
-	}
-
-	if ($total_featured >= 1 && $featured)
-	{
-		$_SESSION['last_featured_id'] = $featured['article_id'];
-
-		$templating->block('featured', 'mainpage');
-		$templating->set('title', $featured['title']);
-		$templating->set('image', $featured['featured_image']);
-
-		$article_link = url . 'index.php?featured&amp;aid=' . $featured['article_id'];
-
-		$templating->set('article_link', $article_link);
-		$templating->set('url', url);
 	}
 }
 

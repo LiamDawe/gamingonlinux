@@ -567,7 +567,7 @@ if (isset($_POST['act']))
 			$article_class->gallery_tagline($checked);
 
 			// first check if it was disabled and others we need to check
-			$enabled_check = $dbl->run("SELECT `active`, `slug` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
+			$enabled_check = $dbl->run("SELECT `active`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
 
 			$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0, `edit_date` = ? WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, core::$sql_date_now, $_POST['article_id']));
 
@@ -613,9 +613,11 @@ if (isset($_POST['act']))
 			unset($_SESSION['gallery_tagline_id']);
 			unset($_SESSION['gallery_tagline_rand']);
 			
+			$article_link = $article_class->article_link(array('date' => $enabled_check['date'], 'slug' => $checked['slug']));
+
 			if (!isset($_POST['show_block']))
 			{
-				header("Location: /articles/{$checked['slug']}.{$_POST['article_id']}/");
+				header("Location: ".$article_link);
 				die();
 			}
 			else
@@ -628,7 +630,7 @@ if (isset($_POST['act']))
 				}
 				else
 				{
-					header("Location: /articles/{$checked['slug']}.{$_POST['article_id']}/");
+					header("Location: ".$article_link);
 					die();
 				}
 			}

@@ -22,13 +22,14 @@ if (isset($_POST['go']))
 	foreach ($csv as $line)
 	{
 		// make it a proper decimal number to compare against
-		$pledge = (float) $line[3];
-		$status = trim($line[5]);
+		$pledge = str_replace('$', '', $line[6]);
+		$status = trim($line[19]);
+		$email = trim($line[1]);
 
 		// if they pledge at least 5 dollars a month
-		if ($pledge >= 4 && $status == 'Processed')
+		if ($pledge >= 4 && $status == 'Paid')
 		{
-			$user_info = $dbl->run("SELECT `username`, `user_id` FROM `users` WHERE `email` = ? OR `supporter_email` = ?", array($line[2], $line[2]))->fetch();
+			$user_info = $dbl->run("SELECT `username`, `user_id` FROM `users` WHERE `email` = ? OR `supporter_email` = ?", array($email, $email))->fetch();
 			// it didn't find an account, email them
 			if (!$user_info)
 			{
@@ -49,10 +50,10 @@ if (isset($_POST['go']))
 					if (!isset($_POST['test_run']))
 					{
 						$mail = new mailer($core);
-						$mail->sendMail($line[2], 'Thank you for supporting GamingOnLinux, more info may be needed', $html_message, $plain_message, ['name' => 'Liam Dawe', 'email' => 'contact@gamingonlinux.com']);
+						$mail->sendMail($email, 'Thank you for supporting GamingOnLinux, more info may be needed', $html_message, $plain_message, ['name' => 'Liam Dawe', 'email' => 'contact@gamingonlinux.com']);
 					}
 
-					echo "Email sent to " . $line[2] . '<br />';
+					echo "Email sent to " . $email . '<br />';
 				}
 			}
 			// it found an account, give them their badge
@@ -123,10 +124,12 @@ if (isset($_POST['go']))
 		unset($pledge); // don't let them accidentally add up
 		unset($status);
 		unset($their_groups);
+		unset($email);
 	}
 
-	if (!isset($_POST['test_run']))
+	if (!isset($_POST['test_run']) && !empty($user_id_list))
 	{
+		print_r($user_id_list);
 		// okay, now we need to remove anyone not in that list
 		$in = str_repeat('?,', count($user_id_list) - 1) . '?';
 

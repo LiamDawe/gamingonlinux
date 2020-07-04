@@ -1241,6 +1241,7 @@ a.button {
 	border: var(--comment-box-border);
 	background: var(--comment-background-color);
 }
+.comment:last-child{margin-bottom:0px;}
 .comment.mod_queue
 {
 	margin-bottom: 0px;

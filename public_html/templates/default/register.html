@@ -1,10 +1,12 @@
 [block: main]
-<div class="box">
+<div class="box"><div class="head">User Registration</div>
 	<div class="body group">
-		You can use this form to register to become a full user of the website. If you do not see a captcha to prove you are not a bot disable adblock plus. You never see the captcha again once registered.<br />
-    <br />
-    <strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong><br />
-		<br />
+		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong>
+	</div>
+</div>
+<div class="box">
+	<div class="head">Your Details</div>
+	<div class="body group">
 		<form class="gol-form" method="post" action="/index.php?module=register">
 			Timezone:<br />
 			{:timezone_list}
@@ -19,7 +21,11 @@
 			Email: <br />
 			<input type="text" class="ays-ignore" name="uemail" /><br />
 			<em>Your email address will never be shared with anyone. It's so you can verify your account and so we can see you're not a bot. It also enables you to get notified of replies to comments and forum posts, if you choose to do so.</em><br />
-			<strong>These are required.</strong><br />
+	</div>
+</div>
+<div class="box">
+	<div class="head">These are required.</div>
+	<div class="body group">
 			<label><input id="policy_agree" type="checkbox" name="policy_agree" /> I have read and agreed to the <a href="/privacy.html" target="_blank">privacy policy</a>.</label><br />
 			<label><input id="spam_list" type="checkbox" name="spam_list" /> I agree to have my IP address checked against the <a href="https://www.stopforumspam.com/" target="_blank">Stop Forum Spam</a> list.</label><br />
 			{:captcha}

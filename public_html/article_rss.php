@@ -180,6 +180,21 @@ if ($core->config('articles_rss') == 1)
 				$bbcode_tagline_gallery = 1;
 			}
 
+			$tagline_image = '';
+
+			if (!empty($line['tagline_image']))
+			{
+				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/".$line['tagline_image'];
+			}
+			if ($line['gallery_tagline'] > 0 && !empty($line['gallery_tagline_filename']))
+			{
+				$tagline_image = $core->config('website_url')."uploads/tagline_gallery/".$line['gallery_tagline_filename'];
+			}
+			if (empty($line['tagline_image']) && $line['gallery_tagline'] == 0)
+			{
+				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png";
+			}
+
 			// for viewing the tagline, not the whole article
 			if (isset($_GET['tagline']) && $_GET['tagline'] == 1)
 			{
@@ -194,24 +209,14 @@ if ($core->config('articles_rss') == 1)
 				}
 				else
 				{
+					// make sure RSS for special feed always has an image inside - mainly for Google News capturing
+					if (strpos($line['text'], '<img') === false)
+					{
+						$line['text'] = '<img src="'.$tagline_image.'" alt />' . $line['text'];
+					}
 					$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
 				}
 				
-			}
-
-			$tagline_image = '';
-
-			if (!empty($line['tagline_image']))
-			{
-				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/".$line['tagline_image'];
-			}
-			if ($line['gallery_tagline'] > 0 && !empty($line['gallery_tagline_filename']))
-			{
-				$tagline_image = $core->config('website_url')."uploads/tagline_gallery/".$line['gallery_tagline_filename'];
-			}
-			if (empty($line['tagline_image']) && $line['gallery_tagline'] == 0)
-			{
-				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png";
 			}
 
 			$xml->startElement( 'media:thumbnail');

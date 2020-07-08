@@ -82,7 +82,34 @@ class message_map
 			
 			self::$error = $error;
 		}
-		else
+		else if ($plain_message == 'return_parsed')
+		{
+			$templating->load('messages');
+			
+			$message_block_html = $templating->block_store('message', 'messages');
+
+			if ($error == 0)
+			{
+				$message_block_html = $templating->store_replace($message_block_html, array('type' => ''));
+			}
+
+			else if ($error == 1)
+			{
+				$message_block_html = $templating->store_replace($message_block_html, array('type' => 'error'));
+			}
+
+			else if ($error == 2)
+			{
+				$message_block_html = $templating->store_replace($message_block_html, array('type' => 'warning'));
+			}
+
+			$message_block_html = $templating->store_replace($message_block_html, array('message' => $stored_message));
+			
+			self::$error = $error;
+
+			return $message_block_html;
+		}
+		else if ($plain_message == 'return_plain')
 		{
 			return $stored_message;
 		}

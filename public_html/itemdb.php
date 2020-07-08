@@ -9,6 +9,23 @@ $game_sales = new game_sales($dbl, $templating, $user, $core);
 $templating->set_previous('title', 'Linux Games Database', 1);
 $templating->set_previous('meta_description', 'Linux Games Database', 1);
 
+if (isset($_GET['steamid']) && is_numeric($_GET['steamid']))
+{
+	$true_id = $dbl->run("SELECT `id` FROM `calendar` WHERE `steam_id` = ?", array($_GET['steamid']))->fetchOne();
+	if ($true_id)
+	{
+		header("Location: /itemdb/".$true_id);
+		die();
+	}
+	else
+	{
+		$_SESSION['message'] = 'none_found';
+		$_SESSION['message_extra'] = 'GamingOnLinux database entries with that Steam ID';
+		header("Location: /itemdb/");
+		die();
+	}
+}
+
 // TWITCH ONLINE INDICATOR
 if (!isset($_COOKIE['gol_announce_gol_twitch'])) // if they haven't dissmissed it
 {
@@ -48,6 +65,13 @@ if (isset($_SESSION['activated']) && $_SESSION['activated'] == 0)
 	}
 }
 
+$templating->load('itemdb');
+
+$templating->block('itemdb_navigation', 'itemdb');
+// count the total
+$total_games = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `supports_linux` = 1 AND `approved` = 1 AND `is_application` = 0 AND `bundle` = 0 AND `also_known_as` IS NULL")->fetchOne();
+$templating->set('total', number_format($total_games));
+
 if (isset($_SESSION['message']))
 {
 	$extra = NULL;
@@ -55,16 +79,11 @@ if (isset($_SESSION['message']))
 	{
 		$extra = $_SESSION['message_extra'];
 	}
-	$message_map->display_message('sales_page', $_SESSION['message'], $extra);
+	$message_output = $message_map->display_message('itemdb', $_SESSION['message'], $extra, 'return_parsed');
+	$templating->block('message', 'itemdb');
+	$templating->set('message', $message_output);
 }
 
-$templating->load('itemdb');
-
-$templating->block('itemdb_navigation', 'itemdb');
-
-// count the total
-$total_games = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `supports_linux` = 1 AND `approved` = 1 AND `is_application` = 0 AND `bundle` = 0 AND `also_known_as` IS NULL")->fetchOne();
-$templating->set('total', number_format($total_games));
 
 // LANDING PAGE TODO - NEED TO UPDATE ALL SEARCHES TO $_GET['view'] == 'mainlist'
 if (!isset($_GET['view']))
@@ -100,7 +119,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 	$templating->set('alpha_filters', implode(' ', $filters));
 
 	// genre checkboxes
-	$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id FROM `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by cat.category_name, cat.category_id")->fetch_all();
+	$genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id FROM `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id WHERE c.`is_application` = 0 AND c.`approved` = 1 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by cat.category_name, cat.category_id")->fetch_all();
 	$genres_output = '';
 	$counter = 0;
 	foreach ($genres_res as $genre)
@@ -129,7 +148,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 	}
 	$templating->set('genres_output', $genres_output);
 
-	$licenses_res = $dbl->run("select count(*) as `total`, i.license_name, i.license_id FROM `item_licenses` i INNER JOIN `calendar` c ON c.license = i.license_name where c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by i.license_name, i.license_id ")->fetch_all();
+	$licenses_res = $dbl->run("select count(*) as `total`, i.license_name, i.license_id FROM `item_licenses` i INNER JOIN `calendar` c ON c.license = i.license_name where c.`is_application` = 0 AND c.`approved` = 1 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by i.license_name, i.license_id ")->fetch_all();
 	$licenses_output = '';
 	$license_counter = 0;
 	foreach ($licenses_res as $license)
@@ -158,7 +177,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 	}
 	$templating->set('licenses_output', $licenses_output);
 
-	$engines_res = $dbl->run("select count(*) as `total`, e.engine_name, e.engine_id FROM `game_engines` e INNER JOIN `calendar` c ON c.game_engine_id = e.engine_id WHERE c.`is_application` = 0 AND c.`approved` = 1 AND c.`is_emulator` = 0 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by e.`engine_name`, e.`engine_id`")->fetch_all();
+	$engines_res = $dbl->run("select count(*) as `total`, e.engine_name, e.engine_id FROM `game_engines` e INNER JOIN `calendar` c ON c.game_engine_id = e.engine_id WHERE c.`is_application` = 0 AND c.`approved` = 1 AND c.`bundle` = 0 AND c.`supports_linux` = 1 group by e.`engine_name`, e.`engine_id`")->fetch_all();
 	$engines_output = '';
 	$engines_counter = 0;
 	foreach ($engines_res as $engine)

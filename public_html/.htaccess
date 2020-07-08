@@ -176,6 +176,8 @@ Options +SymLinksifOwnerMatch
   
   RewriteRule ^itemdb/([0-9]+)/?$ /index.php?module=items_database&view=item&id=$1 [N,NC,QSA]
   
+  RewriteRule ^itemdb/steamid/([0-9]+)/?$ itemdb.php?steamid=$1 [N,NC,QSA]
+  
   RewriteRule ^itemdb/developer/([0-9]+)/?$ /index.php?module=items_database&view=developer&id=$1 [N,NC,QSA]
   
   RewriteRule ^steam-tracker/?$ index.php?module=steam_linux_share [N,NC,QSA]

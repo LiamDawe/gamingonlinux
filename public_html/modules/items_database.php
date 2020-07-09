@@ -79,8 +79,10 @@ if (isset($_GET['view']))
 		
 		$templating->block('full_db_search');
 
+		$json_extra = array();
+
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`bundle`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, c.`is_crowdfunded`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT c.`id`, c.`steam_id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`bundle`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, c.`is_crowdfunded`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			// sort out the external links we have for it
@@ -92,7 +94,16 @@ if (isset($_GET['view']))
 				if (!empty($get_item[$key]))
 				{
 					$links_array[$key] = '<a href="'.$get_item[$key].'">'.$text.'</a>';
+					$json_extra['links'][$key] = $get_item[$key];
 				}
+			}
+			if ($get_item['steam_id'] != NULL && $get_item['steam_id'] != 0)
+			{
+				$links_array[] = '<a href="https://steamdb.info/app/'.$get_item['steam_id'].'/">SteamDB</a>';
+				$links_array[] = '<a href="https://pcgamingwiki.com/api/appid.php?appid='.$get_item['steam_id'].'">PCGamingWiki</a>';
+
+				$json_extra['links']['steamdb'] = 'https://steamdb.info/app/'.$get_item['steam_id'].'/';
+				$json_extra['links']['PCGamingWiki'] = 'https://pcgamingwiki.com/api/appid.php?appid='.$get_item['steam_id'];
 			}
 
 			// sort out license
@@ -148,7 +159,7 @@ if (isset($_GET['view']))
 
 				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'is_bundle' => $get_item['bundle'], 'license' => $license_name, 'game_engine' => $game_engine_name, 'was_crowdfunded' => $get_item['is_crowdfunded']);
 
-				$data['links'] = $links_array;
+				$data = array_merge($data, $json_extra);
 
 				if (isset($article_json) && !empty($article_json))
 				{
@@ -402,6 +413,7 @@ if (isset($_GET['view']))
 			{
 				$templating->block('articles', 'items_database');
 				$templating->set('articles', $article_list);
+				$templating->set('item_id', $get_item['id']);
 			}
 
 			$templating->block('help_info', 'items_database');

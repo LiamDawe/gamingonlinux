@@ -48,6 +48,32 @@ if ($core->config('articles_rss') == 1)
 		$url_addition = '?tags%5B%5D='.$tags[0];
 	}
 
+	// getting articles for specific items - games, software etc
+	if (isset($_GET['items']))
+	{
+		$tags = $_GET['items'];
+
+		if (!is_array($tags))
+		{
+			die("Tags list needs to be an array of tags!");
+		}
+		if (!core::is_number($tags))
+		{
+			die("Tags have to be an ID number.");
+		}
+
+		if (count($tags) == 1)
+		{
+			$name = $dbl->run("SELECT `name` FROM `calendar` WHERE `id` = ?", $tags)->fetchOne();
+			$rss_title = 'GamingOnLinux Article RSS For: ' . $name;
+		}
+		$sql_join .= " INNER JOIN `article_item_assoc` c ON a.article_id = c.article_id ";
+		$in  = str_repeat('?,', count($tags) - 1) . '?';
+		$sql_addition .= ' AND c.`game_id` IN ( ' . $in . ' ) ';
+
+		$url_addition = '?items%5B%5D='.$tags[0];
+	}
+
 	$last_time = $dbl->run("SELECT a.`date`
 	FROM `articles` a $sql_join
 	WHERE a.`active` = 1 $sql_addition

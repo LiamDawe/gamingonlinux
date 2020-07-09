@@ -133,7 +133,7 @@
 
 [block: item_view_top]
 <div class="box">
-	<div class="head">{:top_badges} {:name} {:edit-link}</div>
+	<div class="head">{:top_badges} {:name} {:edit-link} </div>
 [/block: item_view_top]
 
 [block: base_game]
@@ -178,7 +178,11 @@
 [/block: help_info]
 
 [block: articles]
-  <div class="head">GOL Articles</div>
+  <div class="head">GOL Articles <div class="rss-home gol-share-button rss fright">
+	<a href="/article_rss.php?items[]={:item_id}" target="_blank">
+		<img src="/templates/default/images/network-icons/white/rss.svg" alt="" />
+	</a>
+</div></div>
   <div class="body list"><ul>{:articles}</ul></div>
 [/block: articles]
 

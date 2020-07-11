@@ -19,6 +19,7 @@ $templating->block('top');
 
 $templating->load('forum_search');
 $templating->block('small');
+$templating->set('search_text', '');
 
 // paging for pagination
 $page = core::give_page();

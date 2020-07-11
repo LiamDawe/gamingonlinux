@@ -39,8 +39,7 @@ else
 	// paging for pagination
 	$page = core::give_page();
 
-	$templating->load('forum_search');
-	$templating->block('small');
+
 
 	$templating->load('viewforum');
 
@@ -59,6 +58,10 @@ else
 		$rss_pass = '&amp;rss_pass='.$details['rss_password'];
 	}
 	$templating->set('rss_pass', $rss_pass);
+
+	$templating->load('forum_search');
+	$templating->block('small');
+	$templating->set('search_text','');
 
 	// get the forum ids this user is actually allowed to view
 	$groups_in = str_repeat('?,', count($user->user_groups) - 1) . '?';
@@ -143,7 +146,7 @@ else
 		// if we're on the first sticky topic, show the notice (only once)
 		if ($pinned == 1 && $post['is_sticky'] == 1)
 		{
-			$templating->block('pinned');
+			$templating->block('pinned', 'viewforum');
 		}
 
 		if ($post['is_sticky'] == 0 && $pinned != 0)
@@ -151,7 +154,7 @@ else
 			$normal_test++;
 			if ($normal_test == 1)
 			{
-				$templating->block('normal_posts');
+				$templating->block('normal_posts', 'viewforum');
 			}
 		}
 

@@ -2,58 +2,63 @@
 <div class="box">
 	<div class="body group">
 		<form method="get" action="/index.php">
-			<span class="col-8"><input type="hidden" name="go" value="1" /><input type="hidden" name="forums" value="all" /> <input placeholder="Search the forum..." style="display: inline; width: 100%;" type="text" name="q" /></span> <span class="col-4"><button style="display: inline; float: right;" type="submit" name="module" value="search_forum">Search</button> <button type="submit" name="module" value="search_forum" style="display: inline; float: right;" formaction="/index.php?module=search_forum" formmethod="post">Advanced Search</button></span>
+			<span class="col-8">
+				<input type="hidden" name="go" value="1" />
+				<input type="hidden" name="forums" value="all" /> <input placeholder="Search the forum..." style="width: 100%;" type="text" name="q" value="{:search_text}" />
+			</span> 
+			<span class="col-4">
+				<button style="float: right;" type="submit" name="module" value="search_forum">Search</button> 
+				<button type="submit" name="module" value="search_forum" style="float: right;" formaction="/index.php?module=search_forum" formmethod="post">Advanced Search</button>
+			</span>
 		</form>
 	</div>
 </div>
 [/block: small]
 
-[block: top]
+[block: full_breadcrumb]
 <div class="box">
 	<ul class="breadcrumb">
 		<li><a href="/forum/">Forum</a></li>
-		<li class="active">Advanced Forum Search</li>
+		<li class="active"><a href="/index.php?module=search_forum">Search</a></li>
 	</ul>
 </div>
-				<div class="filter-box box">
-					<div class="filter-title head">Forum search <a class="filter-link fright"><span class="caret-down"></span> Hide</a></div>
-					<div class="filter-content">
-						<div class="subhead">Search by title (required) plus extra filtering options</div>
-					<div class="body group">
-						<form class="gol-form" method="get" action="{:url}index.php">
-							<input type="hidden" name="module" value="search_forum" />
-							<input type="hidden" name="go" value="1" />
-							<input type="text" name="q" placeholder="Enter topic title search terms..." value="{:search_text}" /> <br />
-							<strong>Search Options</strong><br />
-							<em>Pick a forum to search in:</em>
-							<select name="forums"><option value="all">Search all forums</option>{:forum_list_search}</select>
-							<em>Topic created by a specific user? Leave blank to search all:</em>
-							<select tabindex="-1" name="user_id" class="call_usernames main_user_search_forum" style="width:300px" class="populate select2-offscreen">{:user_search}</select><br />
-							<small><a href="#" class="clear-username">Clear username</a></small><br />
-							<button class="btn btn-primary">Search</button>
-						</form>
-					</div>
-					<div class="subhead">Want to search for all posts from a specific user without a title?</div>
-						<div class="body group">
-						<form class="gol-form" method="get" action="{:url}index.php">
-							<em>Username:</em>
-							<select tabindex="-1" name="user_id" class="call_usernames single_user_forum_search" style="width:300px" class="populate select2-offscreen">{:single_user_search}</select><br />
-							<strong>Search Options</strong><br />
-							<em>Pick a forum to search in:</em>
-							<select name="forums"><option value="all">Search all forums</option>{:forum_list_search}</select>							
-							<button class="btn btn-primary">Search</button>
-							<input type="hidden" name="module" value="search_forum" />
-							<input type="hidden" name="single_user_forum_search" value="1" />
-						</form>
-					</div>
-				</div>
-			</div>
+[/block: full_breadcrumb]
+
+[block: top]
+<div class="box">
+	<div class="head">Forum search</div>
+	<div class="body group">
+		<form class="gol-form" method="get" action="{:url}index.php">
+			<input type="hidden" name="module" value="search_forum" />
+			<input type="hidden" name="go" value="1" />
+		<div class="flex-row">
+			<div class="flex-column-left"><strong>Title</strong></div>
+			<div class="flex-column-right"><input style="display: inline" type="text" name="q" placeholder="Enter topic title search terms..." value="" /><em>Leave blank if searching for all posts by a specific user.</em></div>
+		</div>
+		<div class="flex-row">
+			<div class="flex-column-left"><strong>Forum</strong></div>
+			<div class="flex-column-right"><select name="forums"><option value="all">Search all forums</option>{:forum_list_search}</select></div>
+		</div>
+		<div class="flex-row">
+			<div class="flex-column-left"><strong>Search by user?</strong></em></div>
+			<div class="flex-column-right"><select tabindex="-1" name="user_id" class="call_usernames main_user_search_forum" style="width:300px" class="populate select2-offscreen">{:user_search}</select><small><a href="#" class="clear-username">Clear username</a></small></div>
+		</div>
+		<div class="flex-row">
+			<div class="flex-column-left"><button class="btn btn-primary">Search</button></div>
+		</div>
+		</form>
+	</div>
+</div>
 [/block: top]
 
+[block: results_head]
+<div class="box"><div class="head">Search results</div></div>
+[/block: results_head]
+
 [block: row]
-			<div class="box">
-				<div class="body group"><a href="/forum/topic/{:topic_id}">{:title}</a> by {:username} {:date} in <a href="/forum/{:forum_id}">{:forum_name}</a></div>
-			</div>
+<div class="box">
+	<div class="body group"><a href="/forum/topic/{:topic_id}">{:title}</a> by {:username} {:date} in <a href="/forum/{:forum_id}">{:forum_name}</a></div>
+</div>
 [/block: row]
 
 [block: bottom]

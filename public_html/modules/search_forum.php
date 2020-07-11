@@ -16,57 +16,21 @@ if (!$forum_ids || empty($forum_ids))
 	die();
 }
 
-$templating->load('forum_search');
-$templating->block('top');
-$templating->set('url', $core->config('website_url'));
-
 $forum_list = '';
 foreach ($forum_ids as $forum)
 {
 	$forum_list .= '<option value="'. $forum['forum_id'] . '">' . $forum['name'] . '</option>';
 	$forum_id_list[] = $forum['forum_id'];
 }
-$templating->set('forum_list_search', $forum_list);
 
-$search_sql = '';
-$forum_id = '';
-if (isset($_GET['forums']) && $_GET['forums'] != 'all' && in_array($_GET['forums'], $forum_id_list))
+$templating->load('forum_search');
+
+if (!isset($_GET['go']))
 {
-	if ( (!isset($_GET['forums']) || empty($_GET['forums'])) || (isset($_GET['forums']) && !core::is_number($_GET['forums'])) )
-	{
-		$_SESSION['message'] = 'no_id';
-		$_SESSION['message_extra'] = 'forum';
-		header("Location: /index.php?module=search_forum&q=".$_GET['q']);
-		die();
-	}
-	$forum_id = (int) $_GET['forums'];
-	$search_sql = ' AND t.`forum_id` IN ('.$forum_id.')';
-}
-else
-{
-	$forum_id = 'all';
-	$search_sql = ' AND t.`forum_id` IN ('.implode(',',$forum_id_list).')';
-}
-
-$user_search = '';
-$fsearch_user_id = '';
-$user_sql_data = array();
-if (isset($_GET['user_id']) && !empty($_GET['user_id']))
-{
-	if (!core::is_number($_GET['user_id']))
-	{
-		$_SESSION['message'] = 'no_id';
-		$_SESSION['message_extra'] = 'forum';
-		header("Location: /index.php?module=search_forum&q=".$_GET['q']);
-		die();
-	}
-	$fsearch_user_id = (int) $_GET['user_id'];
-	$user_sql_data[] = (int) $_GET['user_id'];
-	$search_sql = ' AND t.`author_id` = ?';
-
-	$get_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($fsearch_user_id))->fetchOne();
-
-	$user_search = '<option value="'.$fsearch_user_id.'" selected>'.$get_username.'</option>';
+	$templating->block('full_breadcrumb');
+	$templating->block('top');
+	$templating->set('url', $core->config('website_url'));
+	$templating->set('forum_list_search', $forum_list);
 }
 
 $search_text = '';
@@ -75,7 +39,6 @@ if (isset($_GET['q']))
 	$search_text = str_replace("+", ' ', $_GET['q']);
 	$search_text = htmlspecialchars($search_text);
 }
-$templating->set('search_text', $search_text);
 
 $search_array = array(explode(" ", $search_text));
 $search_through = '';
@@ -90,76 +53,70 @@ $page = core::give_page();
 $per_page = 50;
 $page_url = '/index.php?module=search_forum';
 
-if (isset($_GET['go']) && !empty($search_text) && !isset($_GET['single_user_forum_search']))
+if (isset($_GET['go']))
 {
-	$templating->set('user_search',$user_search);
+	$search_sql = array();
+	$search_data = array();
 
-	$page_url .= '&amp;q=' . $search_text . '&amp;go=1&amp;forums=' . $forum_id . '&amp;';
-
-	// count total
-	$total = $dbl->run("SELECT count(*) FROM `forum_topics` t WHERE t.approved = 1 AND t.`topic_title` LIKE ? $search_sql", array_merge([$search_through],$user_sql_data))->fetchOne();
-
-	$last_page = ceil($total/$per_page);
-		
-	if ($page > $last_page)
+	if (isset($_GET['forums']) && $_GET['forums'] != 'all' && in_array($_GET['forums'], $forum_id_list))
 	{
-		$page = $last_page;
-	}
-
-	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
-
-	// do the search query
-	$found_search = $dbl->run("SELECT 
-	t.topic_id, 
-	t.`topic_title`, 
-	t.author_id, 
-	t.`creation_date`, 
-	u.username,
-	f.name,
-	f.forum_id
-	FROM `forum_topics` t
-	INNER JOIN `forums` f on f.forum_id = t.forum_id
-	LEFT JOIN `users` u ON t.author_id = u.user_id
-	WHERE t.`topic_title` LIKE ? $search_sql AND t.approved = 1
-	ORDER BY t.creation_date DESC
-	LIMIT $core->start, $per_page", array_merge([$search_through],$user_sql_data))->fetch_all();
-
-	if ($found_search)
-	{
-		// loop through results
-		foreach ($found_search as $found)
+		if ( (!isset($_GET['forums']) || empty($_GET['forums'])) || (isset($_GET['forums']) && !core::is_number($_GET['forums'])) )
 		{
-			$date = $core->human_date($found['creation_date']);
-
-			$templating->block('row');
-
-			$templating->set('date', $date);
-			$templating->set('title', $found['topic_title']);
-			$templating->set('topic_id', $found['topic_id']);
-			$templating->set('username', "<a href=\"/profiles/{$found['author_id']}\">" . $found['username'] . '</a>');
-			$templating->set('forum_name', $found['name']);
-			$templating->set('forum_id', $found['forum_id']);
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'forum';
+			header("Location: /index.php?module=search_forum&q=".$_GET['q']);
+			die();
 		}
+		$forum_id = (int) $_GET['forums'];
+		$search_sql[] = 't.`forum_id` IN (?)';
+		$search_data[] = $forum_id;
 	}
 	else
 	{
-		$core->message('Nothing was found with those search terms.');
+		$forum_id = 'all';
+		$search_sql[] = 't.`forum_id` IN ('.implode(',',$forum_id_list).')';
 	}
-}
-else if (isset($_GET['go']) && empty($search_text))
-{
-	$core->message('You have to enter some title text to search for. Otherwise, search by a user in the second section.', 1);
-}
 
-if (isset($_GET['single_user_forum_search']) && isset($_GET['user_id']))
-{
-	$templating->set('single_user_search',$user_search);
+	$page_url .= '&amp;go=1&amp;forums=' . $forum_id;
 
-	$page_url .= '&amp;forums=' . $forum_id . '&amp;user_id=' . $fsearch_user_id . '&amp;single_user_forum_search=1' .'&amp;';
+	if (empty($search_text) && !isset($_GET['user_id']))
+	{
+		$_SESSION['message'] = 'empty';
+		$_SESSION['message_extra'] = 'search options';
+		header("Location: /index.php?module=search_forum");
+		die();
+	}
 
-	// count total
-	$total = $dbl->run("SELECT count(*) FROM `forum_topics` t WHERE t.approved = 1 $search_sql", $user_sql_data)->fetchOne();
+	if(isset($_GET['user_id']) && !empty($_GET['user_id']))
+	{
+		if (!core::is_number($_GET['user_id']))
+		{
+			$_SESSION['message'] = 'no_id';
+			$_SESSION['message_extra'] = 'forum';
+			header("Location: /index.php?module=search_forum&q=".$_GET['q']);
+			die();
+		}
+		$fsearch_user_id = (int) $_GET['user_id'];
+		$search_sql[] = 't.`author_id` = ?';
+		$search_data[] = $fsearch_user_id;
+		$page_url .= '&amp;user_id='.$fsearch_user_id;
 	
+		$get_username = $dbl->run("SELECT `username` FROM `users` WHERE `user_id` = ?", array($fsearch_user_id))->fetchOne();
+	
+		$user_search = '<option value="'.$fsearch_user_id.'" selected>'.$get_username.'</option>';
+		$templating->set('user_search',$user_search);
+	}
+	if (isset($search_text) && !empty($search_text))
+	{
+		$search_sql[] = 't.`topic_title` LIKE ?';
+		$search_data[] = $search_through;
+		$page_url .= '&amp;q='.$search_text;
+	}
+
+	// count total
+	$total_sql = "SELECT count(*) FROM `forum_topics` t WHERE t.approved = 1 AND " . implode(' AND ', $search_sql);
+	$total = $dbl->run($total_sql, $search_data)->fetchOne();
+
 	$last_page = ceil($total/$per_page);
 		
 	if ($page > $last_page)
@@ -167,7 +124,7 @@ if (isset($_GET['single_user_forum_search']) && isset($_GET['user_id']))
 		$page = $last_page;
 	}
 
-	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
+	$pagination = $core->pagination_link($per_page, $total, $page_url . '&amp;', $page);
 
 	// do the search query
 	$found_search = $dbl->run("SELECT 
@@ -181,12 +138,16 @@ if (isset($_GET['single_user_forum_search']) && isset($_GET['user_id']))
 	FROM `forum_topics` t
 	INNER JOIN `forums` f on f.forum_id = t.forum_id
 	LEFT JOIN `users` u ON t.author_id = u.user_id
-	WHERE t.approved = 1 $search_sql  
+	WHERE t.approved = 1 AND ".implode(' AND ', $search_sql)."
 	ORDER BY t.creation_date DESC
-	LIMIT $core->start, $per_page", $user_sql_data)->fetch_all();
+	LIMIT $core->start, $per_page", $search_data)->fetch_all();
 
 	if ($found_search)
 	{
+		$templating->block('full_breadcrumb');
+		$templating->block('small');
+		$templating->set('search_text', $search_text);
+		$templating->block('results_head');
 		// loop through results
 		foreach ($found_search as $found)
 		{
@@ -204,12 +165,11 @@ if (isset($_GET['single_user_forum_search']) && isset($_GET['user_id']))
 	}
 	else
 	{
-		$core->message('Nothing was found with those search terms.');
+		$_SESSION['message'] = 'none_found';
+		$_SESSION['message_extra'] = 'forum posts';
+		header("Location: /index.php?module=search_forum");
+		die();
 	}
-}
-else if (isset($_GET['single_user_forum_search']) && !isset($_GET['user_id']))
-{
-	$core->message('You did not enter a username to look for posts.', 1);	
 }
 
 if (isset($found_search) && !empty($found_search))

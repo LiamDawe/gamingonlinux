@@ -540,7 +540,7 @@ class article
 		$title = strip_tags($_POST['title']);
 		$title = mb_convert_encoding($title, 'UTF-8');
 		$tagline = trim($_POST['tagline']);
-		$text = trim($_POST['text']);
+		$text = html_entity_decode(trim($_POST['text']), ENT_QUOTES);
 		$categories = [];
 		if (!empty($_POST['categories']))
 		{
@@ -1838,7 +1838,7 @@ class article
 	{
 		if ($this->user->check_group([1,2,5]))
 		{
-			$featured = $this->dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id))->fetch();
+			$featured = $this->dbl->run("SELECT `featured_image`, `featured_image_backup` FROM `editor_picks` WHERE `article_id` = ?", array($article_id))->fetch();
 			if ($featured)
 			{
 				$this->dbl->run("DELETE FROM `editor_picks` WHERE `article_id` = ?", array($article_id));
@@ -1847,14 +1847,18 @@ class article
 				{
 					unlink($featured_image);
 				}
-
+				$featured_image_backup = $this->core->config('path') . 'uploads/carousel/' . $featured['featured_image_backup'];
+				if (file_exists($featured_image_backup))
+				{
+					unlink($featured_image_backup);
+				}
 				$this->dbl->run("UPDATE `config` SET `data_value` = (data_value - 1) WHERE `data_key` = 'total_featured'");
 
 				$this->dbl->run("UPDATE `articles` SET `show_in_menu` = 0 WHERE `article_id` = ?", array($article_id));
 
 				// update cache
 				$new_featured_total = $this->core->config('total_featured') - 1;
-				core::$redis->set('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
+				$this->core->set_dbcache('CONFIG_total_featured', $new_featured_total); // no expiry as config hardly ever changes
 
 				$_SESSION['message'] = 'featured_unpicked';
 			}

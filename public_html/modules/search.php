@@ -51,10 +51,12 @@ if (!isset($_GET['q']) && !isset($_GET['author_id']) && !isset($_GET['appid']))
 
 $search_array = array(explode(" ", $search_text));
 $search_through = '';
+$search_sql_text = '';
 foreach ($search_array[0] as $item)
 {
 	$item = str_replace("%","\%", $item);
 	$search_through .= '%'.$item.'%';
+	$search_sql_text .= '+'.$item;
 }
 
 $per_page = 15;
@@ -70,14 +72,16 @@ if (isset($search_text) && !empty($search_text))
 	
 	$page_url = '/index.php?module=search&amp;q='.$search_text.'&amp;';
 
-	$search_type = 'MATCH (title, text)';
+	$search_type = '`title` LIKE ? OR MATCH(`text`) AGAINST(? IN BOOLEAN MODE)';
+	$search_data = array($search_through,'"'.$search_sql_text.'"');
 	if (isset($_GET['title_only']) && $_GET['title_only'] == 'on')
 	{
-		$search_type = 'MATCH (title)';
+		$search_type = '`title` LIKE ?';
 		$page_url .= 'title_only=on&amp;';
+		$search_data = array($search_through);
 	}
 
-	$total = $dbl->run("SELECT count(*) FROM articles WHERE $search_type AGAINST (? IN NATURAL LANGUAGE MODE) AND `active` = 1 ",array($search_through))->fetchOne();
+	$total = $dbl->run("SELECT count(*) FROM articles WHERE $search_type AND `active` = 1 ",$search_data)->fetchOne();
 
 	$last_page = ceil($total/$per_page);
 		
@@ -94,9 +98,9 @@ if (isset($search_text) && !empty($search_text))
 	LEFT JOIN `users` u ON a.`author_id` = u.`user_id`
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 	WHERE a.`active` = 1
-	AND $search_type AGAINST (? IN NATURAL LANGUAGE MODE)
+	AND $search_type 
 	ORDER BY a.`date` DESC
-	LIMIT $core->start , $per_page", array($search_through))->fetch_all();
+	LIMIT $core->start , $per_page", $search_data)->fetch_all();
 
 	if ($found_search)
 	{

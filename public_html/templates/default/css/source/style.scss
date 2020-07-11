@@ -1590,24 +1590,62 @@ ul.social-networks li > a {
 	flex-direction: row;
 	flex-wrap: wrap;
 	width: 100%;
-	align-items: flex-start;
+	align-items: stretch;
+	box-sizing: border-box;
 }
   
 .flex-column-left
 {
-	display: flex;
-	flex-direction: column;
 	padding: 5px;
 	align-self: flex-start;
 	width: 22%;
+	box-sizing: border-box;
 } 
 .flex-column-right
 {
-	display: flex;
-	flex-direction: column;
 	padding: 5px;
 	align-self: flex-start;
 	width: 50%;	
+	box-sizing: border-box;
+}
+
+.flex-col-normal
+{
+	height: 35px;
+	padding: 5px;
+	align-self: flex-start;
+	flex: 0.9;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+
+.flex-col-double
+{
+	height: 35px;
+	padding: 5px;
+	align-self: flex-start;
+	flex: 2;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+
+.flex-col-small
+{
+	height: 35px;
+	padding: 5px;
+	align-self: flex-start;
+	flex: 0.3;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	box-sizing: border-box;
 }
 
 /* Icons */
@@ -1939,6 +1977,10 @@ div.modal-container.modal-standalone
 	audio{width: 100%;}
 	.flex-column-left{width:100%;}
 	.flex-column-right{width:100%;}
+	.flex-row {flex-direction: column;}
+	.flex-col {width: 100%;}
+	.flex-row .flex-col{flex-direction: row;}
+	.flex-col-normal{align-items: flex-start;}
 }
 /* MOBILE LANDSCAPE */
 @media only screen and (max-width: 480px) {

@@ -61,9 +61,16 @@ if (isset($search_text) && !empty($search_text))
 {
 	$page = core::give_page();
 	
-	$page_url = '/index.php?module=search&q='.$search_text.'&';
+	$page_url = '/index.php?module=search&amp;q='.$search_text.'&amp;';
 
-	$total = $dbl->run("SELECT count(*) FROM `articles` WHERE `active` = 1 AND `title` LIKE ?",array($search_through))->fetchOne();
+	$search_type = 'MATCH (title, text)';
+	if (isset($_GET['title_only']) && $_GET['title_only'] == 'on')
+	{
+		$search_type = 'MATCH (title)';
+		$page_url .= 'title_only=on&amp;';
+	}
+
+	$total = $dbl->run("SELECT count(*) FROM articles WHERE $search_type AGAINST (? IN NATURAL LANGUAGE MODE) AND `active` = 1 ",array($search_through))->fetchOne();
 
 	$last_page = ceil($total/$per_page);
 		
@@ -80,7 +87,7 @@ if (isset($search_text) && !empty($search_text))
 	LEFT JOIN `users` u ON a.`author_id` = u.`user_id`
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`
 	WHERE a.`active` = 1
-	AND a.`title` LIKE ?
+	AND $search_type AGAINST (? IN NATURAL LANGUAGE MODE)
 	ORDER BY a.`date` DESC
 	LIMIT $core->start , $per_page", array($search_through))->fetch_all();
 
@@ -326,4 +333,5 @@ if (isset($_GET['appid']) && is_numeric($_GET['appid']))
 	$templating->set('total', $total);
 	$templating->set('pagination', $pagination);
 }
+$templating->block('help_links','search');
 ?>

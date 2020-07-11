@@ -1,10 +1,15 @@
 [block: top]
 <div class="box">
-	<div class="head">Here you can search by article title</div>
+	<div class="head">Article Search</div>
 	<div class="body group">
 		<form class="gol-form" method="get" class="form-inline" action="{:url}index.php">
 		<input type="hidden" name="module" value="search" />
-		<input type="text" class="ays-ignore" name="q" value="{:search_text}" /> <button>Search</button><br />
+		<div class="flex-row">
+			<div class="flex-col-double flex-col"><input type="text" class="ays-ignore" name="q" value="{:search_text}" /></div>
+			<div class="flex-col-normal flex-col">
+				<div class="flex-row flex-col">
+				<div class="flex-col-normal"><label><input type="checkbox" name="title_only"> Search title only?</label></div> <div class="flex-col-small"><button>Search</button></div></div></div>
+		</div>	
 		</form>
 	</div>
 </div>
@@ -34,3 +39,10 @@
 	<div class="body group">This may not be all of them, it depends on articles being correctly tagged.</div>
 </div>
 [/block: game_top]
+
+[block: help_links]
+<hr />
+<div class="box">
+	<div class="body group">Not finding what you're looking for? Ask for help in <a href="/forum/"><img height="15" src="/templates/default/images/steamplay_forum_icon.svg" alt="" /> The Forum</a> or our <a href="https://discord.gg/0rxBtcSOonvGzXr4"><img height="15" src="/templates/default/images/steamplay_discord.svg" alt="" /> Discord Server</a>.</div>
+</div>
+[/block: help_links]

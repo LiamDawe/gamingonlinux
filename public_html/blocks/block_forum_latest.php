@@ -19,9 +19,6 @@ $forum_sql = "SELECT p.`forum_id` FROM `forum_permissions` p INNER JOIN `forums`
 
 // setup a cache
 $querykey = "KEY" . md5($forum_sql . serialize($user->user_groups));
-
-
-
 $forum_ids = unserialize($core->get_dbcache($querykey)); // check cache
 
 if (!$forum_ids) // there's no cache
@@ -36,29 +33,10 @@ if ($forum_ids)
 	$forum_id_in  = str_repeat('?,', count($forum_ids) - 1) . '?';
 
 	$forum_posts = '';
-	$fetch_topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`last_post_date`, t.`replys`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON u.user_id = t.last_post_user_id WHERE t.`approved` = 1 AND t.`forum_id` IN ($forum_id_in) ORDER BY t.`last_post_date` DESC limit 5", $forum_ids)->fetch_all();
+	$fetch_topics = $dbl->run("SELECT p.`post_id`, t.`topic_id`, t.`topic_title`, t.`last_post_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON u.user_id = t.last_post_user_id WHERE t.`approved` = 1 AND t.`forum_id` IN ($forum_id_in) ORDER BY p.`post_id` DESC limit 5", $forum_ids)->fetch_all();
 	foreach ($fetch_topics as $topics)
 	{
 		$date = $core->time_ago($topics['last_post_date']);
-
-		$post_count = $topics['replys'];
-		// if we have already 9 or under replys its simple, as this reply makes 9, we show 9 per page, so it's still the first page
-		if ($post_count <= $comments_per_page)
-		{
-			// it will be the first page
-			$postPage = 1;
-			$postNumber = 1;
-		}
-
-		// now if the reply count is bigger than or equal to 10 then we have more than one page, a little more tricky
-		if ($post_count >= $comments_per_page)
-		{
-			// page we are going to
-			$postPage = ceil($post_count / $comments_per_page);
-
-			// the post we are going to
-			$postNumber = (($post_count - 1) % $comments_per_page) + 1;
-		}
 
 		$title_length = strlen($topics['topic_title']);
 		if ($title_length >= 55)
@@ -73,16 +51,7 @@ if ($forum_ids)
 
 		$machine_time = date("Y-m-d\TH:i:s", $topics['last_post_date']);
 
-		if ($postPage > 1)
-		{
-			$link_page = 'page=' . $postPage;
-		}
-		else if ($postPage <= 1)
-		{
-			$link_page = '';
-		}
-
-		$forum_posts .= '<li class="list-group-item"><a href="'. $forum_class->get_link($topics['topic_id'], $link_page) . '">' . $title . '</a><br />
+		$forum_posts .= '<li class="list-group-item"><a href="'. $forum_class->get_link($topics['topic_id'], 'post_id=' . $topics['post_id']) . '">' . $title . '</a><br />
 		<small><time datetime="'.$machine_time.'">' . $date .'</time> - ' . $topics['username'] . '</small></li>';
 	}
 }

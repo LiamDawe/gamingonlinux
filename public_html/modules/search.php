@@ -21,6 +21,13 @@ if (isset($_GET['q']))
 }
 $templating->set('search_text', htmlspecialchars($search_text));
 
+$ticked = '';
+if (isset($_GET['title_only']) && $_GET['title_only'] == 'on')
+{
+	$ticked = 'checked';
+}
+$templating->set('ticked', $ticked);
+
 if (!isset($_GET['q']) && !isset($_GET['author_id']) && !isset($_GET['appid']))
 {
 	$templating->load('articles');

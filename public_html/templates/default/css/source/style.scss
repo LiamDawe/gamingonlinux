@@ -1584,6 +1584,32 @@ ul.social-networks li > a {
 .poll_button{float: none ;}
 .poll_content{padding: 4px;}
 
+.flex-row 
+{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 100%;
+	align-items: flex-start;
+}
+  
+.flex-column-left
+{
+	display: flex;
+	flex-direction: column;
+	padding: 5px;
+	align-self: flex-start;
+	width: 22%;
+} 
+.flex-column-right
+{
+	display: flex;
+	flex-direction: column;
+	padding: 5px;
+	align-self: flex-start;
+	width: 50%;	
+}
+
 /* Icons */
 .social_icons_search
 {
@@ -1911,6 +1937,8 @@ div.modal-container.modal-standalone
 	.last_post{display: none;visibility: hidden;}
 
 	audio{width: 100%;}
+	.flex-column-left{width:100%;}
+	.flex-column-right{width:100%;}
 }
 /* MOBILE LANDSCAPE */
 @media only screen and (max-width: 480px) {

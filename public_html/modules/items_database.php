@@ -7,6 +7,8 @@ include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 $img = new SimpleImage();
 
+$games_database = new game_sales($dbl, $templating, $user, $core);
+
 $templating->set_previous('title', 'Linux Games & Software List', 1);
 $templating->set_previous('meta_description', 'Linux Games & Software List', 1);
 
@@ -81,17 +83,23 @@ if (isset($_GET['view']))
 
 		$json_extra = array();
 
+		$links_sql = array();
+		foreach ($games_database->main_links as $field => $name)
+		{
+			$links_sql[] = 'c.`'.$field.'`';
+		}
+
 		// make sure it exists
-		$get_item = $dbl->run("SELECT c.`id`, c.`steam_id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`gog_link`, c.`steam_link`, c.`link`, c.`itch_link`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`bundle`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, c.`is_crowdfunded`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
+		$get_item = $dbl->run("SELECT ".implode(', ', $links_sql).", c.`id`, c.`steam_id`, c.`name`, c.`trailer`, c.`trailer_thumb`, c.`date`, c.`description`, c.`best_guess`, c.`is_dlc`, c.`free_game`, c.`bundle`, c.`license`, c.`supports_linux`, c.`is_hidden_steam`, c.`is_crowdfunded`, b.`name` as base_game_name, b.`id` as base_game_id, ge.engine_id, ge.engine_name FROM `calendar` c LEFT JOIN `calendar` b ON c.`base_game_id` = b.`id` LEFT JOIN `game_engines` ge ON ge.engine_id = c.game_engine_id WHERE c.`id` = ? AND c.`approved` = 1", array($_GET['id']))->fetch();
 		if ($get_item)
 		{
 			// sort out the external links we have for it
 			$external_links = '';
 			$links_array = [];
-			$link_types = ['link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'itch_link' => 'itch.io'];
+			$link_types = $games_database->main_links;
 			foreach ($link_types as $key => $text)
 			{
-				if (!empty($get_item[$key]))
+				if (!empty($get_item[$key]) && $key != 'crowdfund_link')
 				{
 					$links_array[$key] = '<a href="'.$get_item[$key].'">'.$text.'</a>';
 					$json_extra['links'][$key] = $get_item[$key];

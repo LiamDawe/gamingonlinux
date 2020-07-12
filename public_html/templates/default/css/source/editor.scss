@@ -1,9 +1,6 @@
-.octus-editor, .octus-editor select {
-	font-family: "Open Sans", "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
 .octus-editor .styles {
 	display: none;
-	background: var(--bbcode-editor-background);
+	background: var(--bbcode-editor-buttons-background);
 	border: 1px solid var(--bbcode-editor-border);
 	color: #a5a5a5;
 	padding: 14px 14px 7px 14px;

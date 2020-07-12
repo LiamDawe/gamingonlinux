@@ -2,8 +2,8 @@
 :root {
 	--hightlight-select-background: #222222;
 	--hightlight-select-color: #ffffff;
-	--font-color: #404040;
-	--strong-font-color: #404040;
+	--font-color: #333333;
+	--strong-font-color: #333333;
     --link-color:#1C75B9;
 	--bg-color: #ffffff;
 	--header-text-color: #444444;
@@ -27,20 +27,20 @@
 	--read-only-field-color: #ccc;
 	--disabled-field-color: #000;
 	--disabled-text-color: red;
-	--input-field-background: #fcfcfc;
+	--input-field-background: #ffffff;
 	--input-field-border: #ddd;
-	--input-field-text-color: #444444;
+	--input-field-text-color: #333333;
 	--select2-picked-background: #eeeeee;
-	--select2-picked-text-color: #444444;
+	--select2-picked-text-color: #333333;
 	--select2-picked-hover-bg: #d8d8d8;
 	--input-field-addon-bg: #d8d8d8;
 	--input-field-addon-text-shadow: 0 1px 0 #fff;
 	//buttons
 	--button-background: #f9f9f9;
 	--button-border: #dddddd;
-	--button-text-color: #404040;
+	--button-text-color: #333333;
 	--button-hover-bg-color: #f1f1f1;
-	--link-button-text-color: #444444;
+	--link-button-text-color: #333333;
 	// content
 	--box-head-background: #222222;
 	--box-body-background: #efefef;
@@ -96,8 +96,9 @@
 	--icon-plus-url: url('/templates/default/images/comments/plus.svg');
 	--icon-minus-url: url('/templates/default/images/comments/minus.svg');
 	// bbcode editor
-	--bbcode-editor-font-color: #444444;
-	--bbcode-editor-background: #f1f1f1;
+	--bbcode-editor-font-color: #333333;
+	--bbcode-editor-buttons-background: #f1f1f1;
+	--bbcode-editor-background: #ffffff;
 	--bbcode-editor-border: #cecfd1;
 	--bbcode-editor-styles-li-background: #ffffff;
 	--bbcode-editor-styles-li-border: #ddd;
@@ -210,6 +211,7 @@
 	--icon-minus-url: url('/templates/default/images/comments/white/minus.svg');
 	// bbcode editor
 	--bbcode-editor-font-color: #ffffff;
+	--bbcode-editor-buttons-background: #222222;
 	--bbcode-editor-background: #222222;
 	--bbcode-editor-border: #333333;
 	--bbcode-editor-styles-li-background: #333333;

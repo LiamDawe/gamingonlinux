@@ -8,12 +8,17 @@ class game_sales
 	protected $user;
 	protected $core;
 
+	public $main_links;
+
 	function __construct($dbl, $templating, $user, $core)
 	{
 		$this->dbl = $dbl;
 		$this->templating = $templating;
 		$this->user = $user;
 		$this->core = $core;
+
+		// key/db field => nice name
+		$this->main_links = array('link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'stadia_link' => 'Stadia', 'itch_link' => 'itch.io', 'crowdfund_link' => 'Crowdfunded');
 	}
 
 	// this will remove needless junk for the proper display title of a game

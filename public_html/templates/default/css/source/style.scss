@@ -4,7 +4,7 @@
 	--hightlight-select-color: #ffffff;
 	--font-color: #333333;
 	--strong-font-color: #333333;
-    --link-color:#1C75B9;
+    --link-color:#0f63a3;
 	--bg-color: #ffffff;
 	--header-text-color: #444444;
 	--ul-pagination-link-border: solid 1px #c0c0c0;
@@ -49,6 +49,8 @@
 	--body-group-list-border-color: #cccccc;
 	--collapse-container-border: 1px solid #d3d3d3;
 	--breadcrumb-background: #f5f5f5;
+	--quote-background-color: #e5e5e5;
+	--quote-border-color: #303030;
 	// articles
 	--article-main-background: #efefef;
 	--hr-border-color: #dddddd;
@@ -163,6 +165,8 @@
 	--body-group-list-border-color: #111111;
 	--collapse-container-border: 1px solid #888888;
 	--breadcrumb-background: #2E2E2E;
+	--quote-background-color: #333333;
+	--quote-border-color: #111111;
 	// articles
 	--article-main-background: #222222;
 	--hr-border-color: #333333;
@@ -1090,7 +1094,7 @@ a.button {
 	padding: 0 14px;
 }
 .article .content a {
-	color: #428BCA;
+	color: var(--link-color);
 }
 .article .tags ul {
 	list-style: none;

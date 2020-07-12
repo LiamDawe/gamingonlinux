@@ -58,8 +58,8 @@
 	strong {font-weight: bold; color: var(--strong-font-color);}
 	small {font-size: 80%;}
 
-	blockquote, blockquote p {color: var(--font-color); font-size: 95%;}
-	blockquote {border-left: 7px solid #303030; margin: 0 0 2px 21px;  padding: 0px 14px 0px 14px;}
+	blockquote, blockquote p {color: var(--font-color); font-size: 95%; background: var(--quote-background-color);}
+	blockquote {border-left: 4px solid var(--quote-border-color); padding: 0px 14px 0px 14px;}
 	blockquote cite {display: block; color: var(--font-color);}
 	blockquote cite:before {content: "\2014 \0020";}
 	blockquote cite:after {content: "\0020 \2014";}

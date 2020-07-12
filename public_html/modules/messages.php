@@ -113,7 +113,7 @@ else
 
 			$templating->set('title', $message['title']);
 			$templating->set('reply_count', $message['replies']);
-			$templating->set('last_reply_date', $core->human_date($message['last_reply_date']));
+			$templating->set('last_reply_date', $core->time_ago($message['last_reply_date']));
 			if (isset($message['username']))
 			{
 				$author_username = "<a href=\"/profiles/{$message['user_id']}/\">{$message['username']}</a>";
@@ -123,7 +123,7 @@ else
 				$author_username = 'Guest';
 			}
 			$templating->set('author', $author_username);
-			$templating->set('creation_date', $core->human_date($message['creation_date']));
+			$templating->set('creation_date', $core->time_ago($message['creation_date']));
 			$templating->set('last_reply_username', "<a href=\"/profiles/{$message['last_user_id']}/\">{$message['last_username']}</a>");
 		}
 
@@ -232,7 +232,7 @@ else
 			$templating->set('title', $start['title']);
 			$templating->set('post_id', $start['message_id']);
 			$templating->set('pm_id', $start['conversation_id']);
-			$templating->set('message_date', $core->human_date($start['creation_date']));
+			$templating->set('message_date', $core->time_ago($start['creation_date']));
 			$templating->set('tzdate', date('c',$start['creation_date']) ); //piratelv timeago
 			$templating->set('plain_username',$start['username']);
 			$templating->set('text_plain', htmlspecialchars($start['message'], ENT_QUOTES));
@@ -318,7 +318,7 @@ else
 			foreach ($get_replies as $replies)
 			{
 				$templating->block('view_row_reply', 'private_messages');
-				$templating->set('message_date', $core->human_date($replies['creation_date']));
+				$templating->set('message_date', $core->time_ago($replies['creation_date']));
 				$templating->set('tzdate', date('c',$replies['creation_date']) ); //piratelv timeago
 				$templating->set('post_id', $replies['message_id']);
 				$templating->set('plain_username',$replies['username']);
@@ -587,9 +587,9 @@ else
 
 				$templating->set('title', $search['title']);
 				$templating->set('reply_count', $search['replies']);
-				$templating->set('last_reply_date', $core->human_date($search['last_reply_date']));
+				$templating->set('last_reply_date', $core->time_ago($search['last_reply_date']));
 				$templating->set('author', "<a href=\"/profiles/{$search['user_id']}/\">{$search['username']}</a>");
-				$templating->set('creation_date', $core->human_date($search['creation_date']));
+				$templating->set('creation_date', $core->time_ago($search['creation_date']));
 				$templating->set('last_reply_username', "<a href=\"/profiles/{$search['last_user_id']}/\">{$search['last_username']}</a>");
 			}
 		}

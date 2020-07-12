@@ -1,4 +1,5 @@
 [block: main]
+<form class="gol-form" method="post" action="/index.php?module=register">
 <div class="box"><div class="head">User Registration</div>
 	<div class="body group">
 		<strong>By signing up you are agreeing to certain rules, <a href="/index.php?module=rules" target="_blank">click here for them</a>. You can also see our <a href="/ethics.html">Ethics Policy</a>.</strong>
@@ -7,7 +8,7 @@
 <div class="box">
 	<div class="head">Your Details</div>
 	<div class="body group">
-		<form class="gol-form" method="post" action="/index.php?module=register">
+		
 			Timezone:<br />
 			{:timezone_list}
 			Username, please use plain text: <br />
@@ -31,9 +32,9 @@
 			{:captcha}
 			<div id="hidden_captcha" class="hidden_captcha"></div><br />
 			<button type="submit" name="register" value="Register" class="btn btn-primary reg-button">Register</button>
-		</form>
 	</div>
 </div>
+</form>
 [/block: main]
 
 [block: twitter_new]

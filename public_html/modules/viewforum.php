@@ -39,8 +39,6 @@ else
 	// paging for pagination
 	$page = core::give_page();
 
-
-
 	$templating->load('viewforum');
 
 	$details = $dbl->run("SELECT `name`, `rss_password` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetch();
@@ -87,7 +85,7 @@ else
 	{
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{
-			$new_topic = '<li class="green"><a class="forum_button" href="/index.php?module=newtopic">Create Post</a></li>';
+			$new_topic = '<li class="green"><a class="forum_button" href="/index.php?module=newtopic&amp;forum_id='.(int) $_GET['forum_id'].'">Create Post</a></li>';
 			$new_topic_bottom = "<div class=\"fright\"><span class=\"badge blue\"><a class=\"\" href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\">Create Post</a></span></div>";
 		}
 	}

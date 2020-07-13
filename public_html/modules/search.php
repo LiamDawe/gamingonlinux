@@ -72,7 +72,7 @@ if (isset($search_text) && !empty($search_text))
 	
 	$page_url = '/index.php?module=search&amp;q='.$search_text.'&amp;';
 
-	$search_type = '`title` LIKE ? OR MATCH(`text`) AGAINST(? IN BOOLEAN MODE)';
+	$search_type = '(`title` LIKE ? OR MATCH(`text`) AGAINST(? IN BOOLEAN MODE))';
 	$search_data = array($search_through,'"'.$search_sql_text.'"');
 	if (isset($_GET['title_only']) && $_GET['title_only'] == 'on')
 	{

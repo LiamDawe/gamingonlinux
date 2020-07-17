@@ -38,12 +38,27 @@ if (isset($_GET['clear_note']) && isset($_SESSION['user_id']))
 
 $forum_class = new forum($dbl, $core, $user);
 
+$templating->load('header_inserts');
+$header_non_admin = $templating->block_store('non_admin', 'header_inserts');
+$header_admin = $templating->block_store('admin_only', 'header_inserts');
+$header_everywhere = $templating->block_store('everywhere', 'header_inserts');
+
 // get the header template html
 $templating->load('header');
 $templating->block('header', 'header');
 $templating->set('url', $core->config('website_url'));
 $templating->set('jsstatic', JSSTATIC);
 $templating->set('this_template', $core->config('website_url') . 'templates/' . $core->config('template'));
+
+//html insertion from header_inserts file
+if ((isset(core::$current_page) && core::$current_page != 'admin.php') || !isset(core::$current_page))
+{
+	$templating->set('header_html_inserts', $header_everywhere . $header_non_admin);
+}
+if ((isset(core::$current_page) && core::$current_page == 'admin.php'))
+{
+	$templating->set('header_html_inserts', $header_everywhere . $header_admin);
+}
 
 // forced theming
 $force_theme = '';

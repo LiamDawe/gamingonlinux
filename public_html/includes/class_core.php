@@ -45,6 +45,8 @@ class core
 
 	public static $redis = NULL;
 
+	public static $current_page = NULL;
+
 	function __construct($dbl)
 	{	
 		header('X-Frame-Options: SAMEORIGIN');
@@ -53,6 +55,7 @@ class core
 		core::$date = strtotime(gmdate("d-n-Y H:i:s"));
 		core::$sql_date_now = date('Y-m-d H:i:s');
 		core::$ip = $this->get_client_ip();
+		core::$current_page = $this->current_page();
 		$this->dbl = $dbl;
 
 		$this->check_dbcache();
@@ -367,7 +370,6 @@ class core
 	}
 
 	// find the current page we are on
-	// only used in old mysql class, can remove once thats removed
 	function current_page()
 	{
 		return substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);

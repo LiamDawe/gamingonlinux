@@ -1661,18 +1661,6 @@ jQuery(document).ready(function()
 		});
 	});
 
-	/* chart js */
-	if ($('.chartjs').length)
-	{		
-		$.cachedScript( "/includes/jscripts/Chart.min.js?v=2.9.3" ).done(function() 
-		{
-			$.cachedScript( "/includes/jscripts/chartjs-plugin-trendline.min.js").done(function()
-			{
-				load_charts();
-			});
-		});
-	}
-
 	/* cocoen image comparison */
 	if ($('.cocoen').length)
 	{

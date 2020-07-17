@@ -67,11 +67,12 @@ $templating->set('debug', $debug);
 $svg_js = '';
 if (!empty(core::$user_chart_js) || isset(core::$user_chart_js))
 {
-	$svg_js = '<script>function load_charts(){var style = getComputedStyle(document.body);
+	$svg_js = '<script src="'.JSSTATIC.'/Chart.min.js?v=2.9.3"></script>
+	<script src="'.JSSTATIC.'/chartjs-plugin-trendline.min.js"></script>
+	<script>var style = getComputedStyle(document.body);
 		var textcolor = style.getPropertyValue("--svg-text-color");
 		Chart.defaults.global.defaultFontColor = textcolor;
-		' . core::$user_chart_js . '};
-		</script>';
+		' . core::$user_chart_js . '</script>';
 }
 $templating->set('user_chart_js', $svg_js);
 echo $templating->output();

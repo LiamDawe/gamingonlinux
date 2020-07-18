@@ -246,6 +246,13 @@ else
 		
 		$templating->set('pagination_post', $pagination_post);
 
+		$last_link = $topic_link;
+		if ($post['replys'] > 0)
+		{
+			$last_link = $forum_class->get_link($post['topic_id'], 'post_id=' . $post['last_post_id']);
+		}
+		$templating->set('last_link', $last_link);
+
 		$last_date = $core->time_ago($post['last_post_date']);
 		$templating->set('last_date', $last_date);
 		$templating->set('tzdate', date('c',$post['last_post_date']) );

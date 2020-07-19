@@ -13,6 +13,36 @@ jQuery.cachedScript = function( url, options )
 	return jQuery.ajax( options );
 };
 
+// selected text
+function getSelected() 
+{
+	var return_text = '';
+	if (window.getSelection) 
+	{
+        return_text = window.getSelection();
+    }
+	else if (document.getSelection) 
+	{
+        return_text = document.getSelection();
+	}
+	return return_text;
+}
+/* 
+Clear selected text - because Chrome behaviour is fucking annoying
+When clicking inside selected text, Firefox removes it but Chrome keeps it for another click
+*/
+function clearTheSelection() {
+    if (window.getSelection) {
+      if (window.getSelection().empty) {  // Chrome
+        window.getSelection().empty();
+      } else if (window.getSelection().removeAllRanges) {  // Firefox
+        window.getSelection().removeAllRanges();
+      }
+    } else if (document.selection) {  // IE?
+      document.selection.empty();
+    }
+}
+
 // deal with cookies
 function getCookie(name) {
 	var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
@@ -507,9 +537,24 @@ jQuery(document).ready(function()
 
 	$(document).click(function(e) 
 	{
+		// hide nav
 		if (!$(e.target).is('#search-button-nav .toggle-content .search-field') && !$(e.target).is('#search-button-nav .toggle-content')) 
 		{
 			$(".toggle-content").removeClass('toggle-active');
+		}
+		
+		// engage highlighted quote selection
+		if ($('#insert-selective-quote').is(e.target) && $("#selective-quote").is(":visible")) 
+		{
+			var username = $('#selective-quote').attr('data-username');
+			var selection = getSelected();
+			var selectedText = selection.toString();
+			insert_quote_text(username, selectedText);
+		}
+
+		if ($("#selective-quote").is(":visible") && !$('#insert-selective-quote').is(e.target) && getSelected().toString().length === 0)
+		{
+			$('#selective-quote').hide();
 		}
 	});
 
@@ -1757,7 +1802,47 @@ jQuery(document).ready(function()
 	});
 	
 	/* BBCODE EDITOR BITS */
+
+	// quoting from text selection
+	var quote_box = $('#selective-quote');
+	function insert_quote_text(username, text)
+	{
+		text_to_insert = '[quote='+username+']' + $.trim(text) + '[/quote]';
+
+		var current_text = $('#comment').val();
 	
+		$('#comment').val(current_text + text_to_insert); 
+		quote_box.hide();
+		$('#comment').scrollMinimal();
+	}
+	$(document).on('mouseup', ".comment-body div", function(e) 
+	{
+		if ($('#comment').length) // only do this if comment box exists (logged in)
+		{
+			var selection = getSelected();
+			var selectedText = selection.toString();
+
+			if (typeof selection !== undefined && selectedText.length > 0 && selection.anchorNode.nodeName == '#text')
+			{
+				var container = $(this);
+				var r=selection.getRangeAt(0).getBoundingClientRect();
+				var relative=document.body.parentNode.getBoundingClientRect();
+
+				var username = container.parent().parent().children('.comment-meta').find('.username').text();
+				quote_box.attr( "data-username", username );
+				quote_box.css('position','absolute');
+				quote_box.css('top',r.bottom -relative.top - 45);
+				quote_box.css('left',r.left);
+				quote_box.css('height', 'auto');
+				quote_box.show();
+			}
+		}
+	});
+	$(document).on('mousedown', ".comment-body div", function(e) 
+	{
+		clearTheSelection();
+	});
+
 	// quoting a comment
 	$(document).on('click', ".quote_function", function(e) 
 	{

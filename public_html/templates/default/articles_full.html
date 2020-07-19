@@ -106,6 +106,11 @@
 					<a class="anchor" id="comments"></a>
 					<div class="head">{:comments_top_text} {:subscribe_link} {:close_comments} <div class="head-list-position head-list">{:pagination_head}</div><br class="clearer" /></div>
 					<div id="comments-background" class="body group">
+						<div id="selective-quote" data-username="" style="display:none; border: 1px solid grey;">
+							<div>
+								<div class="body group" style="height: 100%; text-align: center;"><button id="insert-selective-quote">Quote This</button></div>
+							</div>
+						</div>
 [/block: comments_top]
 
 [block: article_comments]
@@ -113,7 +118,7 @@
 						<div class="comment group r{:comment_id}">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									{:username} {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr>
+									<span class="username">{:username}</span> {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr>
 								</div>
 								<div class="comment-actions">
 									<ul>
@@ -160,7 +165,7 @@
 <div class="hidden_comment comment group r{:comment_id}">
 	<div class="comment-meta group">
 		<div class="comment-post">
-			{:username} {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr>
+			<span class="username">{:username}</span> {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr>
 		</div>
 		<div class="comment-actions">
 			<ul>

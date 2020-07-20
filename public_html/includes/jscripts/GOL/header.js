@@ -1840,7 +1840,15 @@ jQuery(document).ready(function()
 	});
 	$(document).on('mousedown', ".comment-body div", function(e) 
 	{
-		clearTheSelection();
+		// Check for left button only so we don't prevent right click, this is mainly because Chrome is annoying
+		if (e.button == 0) 
+		{
+			clearTheSelection();
+		}
+		if (e.which == 1)
+		{
+			clearTheSelection();
+		}
 	});
 
 	// quoting a comment

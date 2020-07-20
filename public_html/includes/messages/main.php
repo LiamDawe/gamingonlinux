@@ -90,7 +90,8 @@ return [
 	"none_found" => 
 	[
 		"text" => "No %s were found!",
-		"additions" => 1
+		"additions" => 1,
+		"error" => 1
 	],
 	"notloggedin" => 
 	[

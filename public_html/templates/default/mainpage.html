@@ -141,7 +141,10 @@
         <div class="col-12">
             <div class="article group">
                 <div class="featured-image group">
-                    <a href="{:article_link}"><img alt="featured image" src="{:url}uploads/carousel/{:image}" /></a>
+                    <a href="{:article_link}">
+						<picture>
+							{:images}
+						</picture>						
 					<div class="featured-title"><div class="featured-title-text"><a href="{:article_link}">{:title}</a></div></div>
                 </div>
             </div>

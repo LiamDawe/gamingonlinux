@@ -469,7 +469,7 @@ if (!isset($_GET['go']))
 					}
 					else
 					{
-						$like_button = '<a class="likearticle tooltip-top" data-type="article" data-id="'.$article['article_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a>';
+						$like_button = '<a class="plusarticle tooltip-top" data-type="article" data-id="'.$article['article_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a>';
 					}
 				}
 				$templating->set('like_button', $like_button);

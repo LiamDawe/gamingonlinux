@@ -873,7 +873,7 @@ jQuery(document).ready(function()
 	// container for like button - only shown if user has JS turned on
     $(".lb-container").show();
 
-	$(document).on('click', '.likebutton', function()
+	$(document).on('click', '.plusone', function()
 	{
 		//Get our comment
 		var comment = $(this).parents('.comment')[0];
@@ -900,24 +900,28 @@ jQuery(document).ready(function()
 		}, 
 		function (returndata)
 		{
-			if(returndata['result'] == "liked")
+			var button = $(comment).find(".plusone span");
+
+			if (returndata['type'] == 'comment')
 			{
-				var likeobj = $("#"+sid+" div.likes");
+				var type_id = 'comment_id';
+			}
+			else if (returndata['type'] == 'forum_topic')
+			{
+				var type_id = 'topic_id';
+			}
+			else if (returndata['type'] == 'forum_reply')
+			{
+				var type_id = 'reply_id';	
+			}
+
+			var likeobj = $("#"+sid+" div.likes");
+
+			if (returndata['result'] == "liked")
+			{
 				var total_likes_obj = likeobj.find('.total_likes');
 				var who_likes_obj = likeobj.find('.who-likes');
 
-				if (returndata['type'] == 'comment')
-				{
-					var type_id = 'comment_id';
-				}
-				else if (returndata['type'] == 'forum_topic')
-				{
-					var type_id = 'topic_id';
-				}
-				else if (returndata['type'] == 'forum_reply')
-				{
-					var type_id = 'reply_id';	
-				}
 				var wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?'+type_id+'='+sid+'">Who?</a>';
 				total_likes_obj.text(returndata['total']);
 				who_likes_obj.html(wholikes);
@@ -926,20 +930,18 @@ jQuery(document).ready(function()
 				{
 					likeobj.show();
 				}
-
-				var button = $(comment).find(".likebutton span");
+	
 				button.text("Unlike").removeClass("like").addClass("unlike");
 			}
-			else if(returndata['result'] == "unliked")
+			else if (returndata['result'] == "unliked")
 			{
-				var likeobj = $("#"+sid+" div.likes");
 				var total_likes_obj = likeobj.find('.total_likes');
 				var who_likes_obj = likeobj.find('.who-likes');
 				
 				var wholikes = "";
 				if (returndata['total'] > 0)
 				{
-					wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='+sid+'">Who?</a>';
+					wholikes = ', <a class="who_likes" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?'+type_id+'='+sid+'">Who?</a>';
 					total_likes_obj.text(returndata['total']);
 					who_likes_obj.html(wholikes);
 				}
@@ -947,7 +949,7 @@ jQuery(document).ready(function()
 				{
 					likeobj.hide();
 				}
-				var button = $(comment).find(".likebutton span");
+
 				button.text("Like").removeClass("unlike").addClass("like");
 			}
 			else if (returndata['result'] == "nope") 
@@ -973,7 +975,7 @@ jQuery(document).ready(function()
 		});
 	});
 
-	$(document).on('click', '.likearticle', function()
+	$(document).on('click', '.plusarticle', function()
 	{
 		// get this like link
 		var this_link = $(this).parents('.article_likes')[0];
@@ -1002,7 +1004,7 @@ jQuery(document).ready(function()
 				}
 				$("#who-likes-article").html(wholikes);
 				likeobj.html(numlikes + " Likes");
-				var button = $(this_link).find(".likearticle span");
+				var button = $(this_link).find(".plusarticle span");
 				button.text("Unlike").removeClass("like").addClass("unlike");
 			}
 			if(returndata['result'] == "unliked")
@@ -1016,7 +1018,7 @@ jQuery(document).ready(function()
 				}
 				$("#who-likes-article").html(wholikes);
 				likeobj.html(numlikes + " Likes" );
-				var button = $(this_link).find(".likearticle span");
+				var button = $(this_link).find(".plusarticle span");
 				button.text("Like").removeClass("unlike").addClass("like");
 			}
 			else if (returndata['result'] == "nope")
@@ -1965,8 +1967,8 @@ jQuery(document).ready(function()
 	// NOT FINISHED
 	// Need to find the best approach to making the entire line italic, including the "from" bit
 	var showChar = 600;
-	var moretext = "<em>Click to view long quote </em>";
-	var lesstext = "<em>Click to hide long quote </em>";
+	var moretext = "&plus; Click to view long quote ";
+	var lesstext = "&minus; Click to hide long quote ";
 	var quote_count = $(".comment_quote").length;
 	$('.comment_quote').each(function(i) 
 	{
@@ -1975,10 +1977,10 @@ jQuery(document).ready(function()
 
 		if(actual_text.length > showChar) 
 		{
-			var cite = $(this).find('cite').first().text();
+			var cite = $(this).find('cite span.username').first().text();
 			var cite_link = '';
 
-			if (cite != 'Quote')
+			if (cite.length > 0)
 			{
 				cite_link = 'from ' + cite;
 			}
@@ -2000,13 +2002,12 @@ jQuery(document).ready(function()
 			}
 		}
 	});
-
 	$(".morelink").click(function()
 	{
-		var cite = $(this).prev().find('cite').first().text();
+		var cite = $(this).prev().find('cite span.username').first().text();
 		var cite_link = '';
 
-		if (cite != 'Quote')
+		if (cite.length > 0)
 		{
 			cite_link = 'from ' + cite;
 		}
@@ -2024,6 +2025,7 @@ jQuery(document).ready(function()
 		$(this).prev().toggle();
 		return false;
 	});	
+
 	var $gamesMulti = $("#articleGames").select2({
 		selectOnClose: true,
 		width: '100%',

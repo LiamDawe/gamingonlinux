@@ -121,30 +121,33 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			{
 				// see if there's any left already for it
 				$current_likes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date` FROM `user_notifications` WHERE `owner_id` = ? AND `type` = '$notification_type' AND `$notification_sql_field` = ?", array($_POST['author_id'], $_POST['comment_id']))->fetch();
-				if ($current_likes['total'] >= 2)
+				if ($current_likes)
 				{
-					// find the last available like now (second to last row)
-					$last_like = $dbl->run("SELECT `user_id`, `date` FROM `likes` WHERE `data_id` = ? ORDER BY `date` DESC LIMIT 1 OFFSET 1", array($_POST['comment_id']))->fetch();
-
-					$seen = '';
-					// if the last time they saw this like notification was before the date of the new last like, they haven't seen it
-					if ($last_like['date'] > $current_likes['seen_date'])
+					if ($current_likes['total'] >= 2)
 					{
-						$seen = 0;
+						// find the last available like now (second to last row)
+						$last_like = $dbl->run("SELECT `user_id`, `date` FROM `likes` WHERE `data_id` = ? ORDER BY `date` DESC LIMIT 1 OFFSET 1", array($_POST['comment_id']))->fetch();
+
+						$seen = '';
+						// if the last time they saw this like notification was before the date of the new last like, they haven't seen it
+						if ($last_like['date'] > $current_likes['seen_date'])
+						{
+							$seen = 0;
+						}
+						else
+						{
+							$seen = 1;
+						}
+
+						$new_date = date('Y-m-d H:i:s', $last_like['date']); //likes table uses plain int for date format
+
+						$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = ?, `total` = (total - 1) WHERE `id` = ?", array($new_date, $last_like['user_id'], $seen, $current_likes['id']));
 					}
-					else
+					// it's the only one, so just delete the notification to completely remove it
+					else if ($current_likes['total'] == 1)
 					{
-						$seen = 1;
+						$dbl->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($current_likes['id']));
 					}
-
-					$new_date = date('Y-m-d H:i:s', $last_like['date']); //likes table uses plain int for date format
-
-					$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `notifier_id` = ?, `seen` = ?, `total` = (total - 1) WHERE `id` = ?", array($new_date, $last_like['user_id'], $seen, $current_likes['id']));
-				}
-				// it's the only one, so just delete the notification to completely remove it
-				else if ($current_likes['total'] == 1)
-				{
-					$dbl->run("DELETE FROM `user_notifications` WHERE `id` = ?", array($current_likes['id']));
 				}
 			}
 			$dbl->run("DELETE FROM `$table` WHERE $type_delete `$like_sql_field` = ? AND user_id = ?", array($item_id, $_SESSION['user_id']));
@@ -152,7 +155,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			$dbl->run("UPDATE `$main_table` SET `total_likes` = (total_likes - 1) WHERE `$main_table_id_field` = ?", array($item_id));
 			$total_likes = $dbl->run("SELECT `total_likes` FROM `$main_table` WHERE `$main_table_id_field` = ?", array($item_id))->fetchOne();
 
-			echo json_encode(array("result" => 'unliked', 'total' => $total_likes));
+			echo json_encode(array("result" => 'unliked', 'total' => $total_likes, 'type' => $_POST['type']));
 			return true;
 		}
 		echo 2; //Bad Checknum

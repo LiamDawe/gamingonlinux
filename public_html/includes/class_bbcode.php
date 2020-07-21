@@ -164,7 +164,7 @@ class bbcode
 
 		// Quoting an actual person, book or whatever
 		$pattern = '~\[quote=([^]]+)](?:\s)*([^[]*(?:\[(?!/?quote\b)[^[]*)*)\[/quote]~i';
-		$replace = '<blockquote class="comment_quote"><cite>Quoting: $1</cite>$2</blockquote>';
+		$replace = '<blockquote class="comment_quote"><cite>Quoting: <span class="username">$1</span></cite>$2</blockquote>';
 		while(preg_match($pattern, $body))
 		{
 			$body = preg_replace($pattern, $replace, $body);

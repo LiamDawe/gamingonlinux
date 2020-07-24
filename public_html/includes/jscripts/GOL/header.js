@@ -519,21 +519,22 @@ jQuery(document).ready(function()
 		$(this).closest(".announce").hide();
 	});
   
-  // navbar toggle menu
-	$(document).on('click', ".toggle-nav > a", function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-  	var $toggle = $(this).closest('.toggle-nav').children('.toggle-content');
-    if ($toggle.hasClass('toggle-active'))
-    {
-      $($toggle).removeClass('toggle-active');
-    }
-    else
-    {
-      $(".toggle-content").removeClass('toggle-active');
-      $($toggle).addClass('toggle-active');
-    }
-  });
+	// navbar toggle menu
+	$(document).on('click', ".toggle-nav > a", function(event) 
+	{
+		event.preventDefault();
+		event.stopPropagation();
+		var $toggle = $(this).closest('.toggle-nav').children('.toggle-content');
+		if ($toggle.hasClass('toggle-active'))
+		{
+			$($toggle).removeClass('toggle-active');
+		}
+		else
+		{
+			$(".toggle-content").removeClass('toggle-active');
+			$($toggle).addClass('toggle-active');
+		}
+	});
 
 	$(document).click(function(e) 
 	{
@@ -1817,26 +1818,48 @@ jQuery(document).ready(function()
 		quote_box.hide();
 		$('#comment').scrollMinimal();
 	}
-	$(document).on('mouseup', ".comment-body div", function(e) 
+	$(document).on('mouseup', ".comment-body div.actual-comment-text", function(e) 
 	{
 		if ($('#comment').length) // only do this if comment box exists (logged in)
 		{
 			var selection = getSelected();
 			var selectedText = selection.toString();
+			var allow_quoting = 1;
 
-			if (typeof selection !== undefined && selectedText.length > 0 && selection.anchorNode.nodeName == '#text')
+			// prevent selective quoting on elements we don't want included
+			if (typeof selection !== undefined && selection.rangeCount > 0)
 			{
-				var container = $(this);
-				var r=selection.getRangeAt(0).getBoundingClientRect();
-				var relative=document.body.parentNode.getBoundingClientRect();
+				switch(selection.getRangeAt(0).startContainer.parentElement.tagName)
+				{
+					case 'CITE':
+						console.log('test');
+						allow_quoting = 0;
+						break;
+					case 'BLOCKQUOTE':
+						allow_quoting = 0;
+						break;
+					case 'SPAN':
+						allow_quoting = 0;
+						break;										
+				}
+			}
 
-				var username = container.parent().parent().children('.comment-meta').find('.username').text();
-				quote_box.attr( "data-username", username );
-				quote_box.css('position','absolute');
-				quote_box.css('top',r.bottom -relative.top - 45);
-				quote_box.css('left',r.left);
-				quote_box.css('height', 'auto');
-				quote_box.show();
+			if (allow_quoting === 1)
+			{
+				if (typeof selection !== undefined && selectedText.length > 0 && selection.anchorNode.nodeName == '#text')
+				{
+					var container = $(this);
+					var r=selection.getRangeAt(0).getBoundingClientRect();
+					var relative=document.body.parentNode.getBoundingClientRect();
+
+					var username = container.parent().parent().children('.comment-meta').find('.username').text();
+					quote_box.attr( "data-username", username );
+					quote_box.css('position','absolute');
+					quote_box.css('top',r.bottom -relative.top - 45);
+					quote_box.css('left',r.left);
+					quote_box.css('height', 'auto');
+					quote_box.show();
+				}
 			}
 		}
 	});

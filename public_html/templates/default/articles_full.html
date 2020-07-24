@@ -140,10 +140,10 @@
 								</ul>
 							</div>
 							<div id="{:comment_id}" class="comment-body">
-								<div id="text_{:comment_id}">
+								<div class="actual-comment-text" id="text_{:comment_id}">
 									{:text}
 								</div>
-								<div class="likes {:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
+								<div class="likes{:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
 							</div>
 						</div>
 [/block: article_comments]
@@ -187,10 +187,10 @@
 		</ul>
 	</div>
 	<div id="{:comment_id}" class="comment-body">
-		<div id="text_{:comment_id}">
+		<div class="actual-comment-text" id="text_{:comment_id}">
 			{:text}
 		</div>
-		<div class="likes {:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
+		<div class="likes{:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
 	</div>
 </div>
 [/block: blocked_comment]

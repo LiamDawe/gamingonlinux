@@ -372,7 +372,11 @@ class core
 	// find the current page we are on
 	function current_page()
 	{
-		return substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
+		if (isset($_SERVER["SCRIPT_NAME"]) && !empty($_SERVER["SCRIPT_NAME"]))
+		{
+			return substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
+		}
+		return false;
 	}
 
 	public static function current_page_url()

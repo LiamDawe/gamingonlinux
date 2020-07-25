@@ -8,13 +8,16 @@ $templating->load('admin_modules/admin_module_announcements');
 
 $group_types = ['' => '', 'in_groups' => 'Only those groups', 'not_in_groups' => 'Not in those groups'];
 
+$editor = new editor($core, $templating, $bbcode);
+
 if (isset($_GET['view']))
 {
 	if ($_GET['view'] == 'manage')
 	{
 		$templating->block('add', 'admin_modules/admin_module_announcements');
 		$templating->block('row', 'admin_modules/admin_module_announcements');
-		$core->editor(['name' => 'text', 'editor_id' => 'announcement']);
+		
+		$editor->editor(['name' => 'text', 'editor_id' => 'announcement']);
 		$templating->block('bottom_add', 'admin_modules/admin_module_announcements');
 		$types_list = '';
 		foreach ($group_types as $value => $text)
@@ -32,7 +35,8 @@ if (isset($_GET['view']))
 			foreach ($get_announcements as $announce)
 			{
 				$templating->block('row', 'admin_modules/admin_module_announcements');
-				$core->editor(['name' => 'text', 'content' => $announce['text'], 'editor_id' => 'announcement-' . $announce['id']]);
+
+				$editor->editor(['name' => 'text', 'content' => $announce['text'], 'editor_id' => 'announcement-' . $announce['id']]);
 				
 				$templating->block('bottom_edit', 'admin_modules/admin_module_announcements');
 				$templating->set('id', $announce['id']);

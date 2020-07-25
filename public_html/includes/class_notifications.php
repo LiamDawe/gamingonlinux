@@ -194,7 +194,7 @@ class notifications
 			}
 			else
 			{
-				$username = 'Guest ' . $options['content'];
+				$username = 'Guest';
 			}
 
 			$notification_rows[] = '<li data-id="'.$tracking['id'].'">' . $completed_indicator . ' ' . $username . ' ' . $tracking['content'] . ' When: ' . $this->core->human_date($tracking['created_date']) . '</li>';

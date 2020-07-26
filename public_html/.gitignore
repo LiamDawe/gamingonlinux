@@ -13,5 +13,6 @@ uploads/tagline_gallery
 cache/default
 cache/youtube_thumbs/
 includes/config.php
+/vendor
 /w
 error_log

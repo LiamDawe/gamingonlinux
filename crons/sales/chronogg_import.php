@@ -1,7 +1,7 @@
 <?php
-define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
+define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
 
-require APP_ROOT . '/includes/bootstrap.php';
+require APP_ROOT . '/includes/cron_bootstrap.php';
 
 $game_sales = new game_sales($dbl, $templating, $user, $core);
 

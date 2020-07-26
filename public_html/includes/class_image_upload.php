@@ -130,10 +130,13 @@ class image_upload
 			return false;
 		}
 
-		$allowed =  array('gif', 'png' ,'jpg');
-		$filename = $_FILES['new_image']['name'];
-		$ext = pathinfo($filename, PATHINFO_EXTENSION);
-		if(!in_array($ext,$allowed) )
+		$upload_path = $this->core->config('path') . "uploads/carousel/";
+
+		$image_info = getimagesize($_FILES['new_image']['tmp_name']);
+		$mime_type = $image_info['mime'];
+
+		$allowed =  array('image/jpeg' , 'image/png', 'image/webp');
+		if(!in_array($mime_type,$allowed))
 		{
 			$_SESSION['message'] = 'filetype';
     		return false;
@@ -158,35 +161,27 @@ class image_upload
 			{
 				// check the dimensions
 				$image_info = getimagesize($_FILES['new_image']['tmp_name']);
-				$image_type = $image_info[2];
 
 				list($width, $height, $type, $attr) = $image_info;
 
-				if ($this->core->config('carousel_image_width') > $width || $this->core->config('carousel_image_height') > $height)
+				if ($this->core->config('carousel_image_width') != $width || $this->core->config('carousel_image_height') != $height)
 				{					
 					$img = new SimpleImage();
 
-					$img->fromFile($_FILES['new_image']['tmp_name'])->resize($this->core->config('carousel_image_width'), $this->core->config('carousel_image_height'))->toFile($_FILES['new_image']['tmp_name']);
+					$img->fromFile($_FILES['new_image']['tmp_name'])->resize($this->core->config('carousel_image_width'), $this->core->config('carousel_image_height'))->toFile($_FILES['new_image']['tmp_name'], $mime_type, 99);
+					clearstatcache();
 				}
 
 				// check if its too big
-				if ($_FILES['new_image']['size'] > 305900)
+				if (filesize($_FILES['new_image']['tmp_name']) > 180000)
 				{
 					$image_info = getimagesize($_FILES['new_image']['tmp_name']);
 					$image_type = $image_info[2];
 					if( $image_type == IMAGETYPE_JPEG )
 					{
 						$oldImage = imagecreatefromjpeg($_FILES['new_image']['tmp_name']);
-						imagejpeg($oldImage, $_FILES['new_image']['tmp_name'], 90);
+						imagejpeg($oldImage, $_FILES['new_image']['tmp_name'], 95);
 					}
-
-					// cannot compress gifs so it's just too big
-					else if( $image_type == IMAGETYPE_GIF )
-					{
-						$_SESSION['message'] = 'toobig';
-						return false;
-					}
-
 					else if( $image_type == IMAGETYPE_PNG )
 					{
 						$oldImage = imagecreatefrompng($_FILES['new_image']['tmp_name']);
@@ -196,18 +191,18 @@ class image_upload
 					clearstatcache();
 
 					// check again
-					if (filesize($_FILES['new_image']['tmp_name']) > 305900)
+					if (filesize($_FILES['new_image']['tmp_name']) > 180000)
 					{
 						// try reducing it some more
 						if( $image_type == IMAGETYPE_JPEG )
 						{
 							$oldImage = imagecreatefromjpeg($_FILES['new_image']['tmp_name']);
-							imagejpeg($oldImage, $_FILES['new_image']['tmp_name'], 80);
+							imagejpeg($oldImage, $_FILES['new_image']['tmp_name'], 90);
 
 							clearstatcache();
 
 							// still too big
-							if (filesize($_FILES['new_image']['tmp_name']) > 305900)
+							if (filesize($_FILES['new_image']['tmp_name']) > 180000)
 							{
 								$_SESSION['message'] = 'toobig';
 								return false;
@@ -224,20 +219,12 @@ class image_upload
 				}
 			}
 
-			$image_info = getimagesize($_FILES['new_image']['tmp_name']);
-			$image_type = $image_info[2];
 			$file_ext = '';
-			if( $image_type == IMAGETYPE_JPEG )
+			if ($mime_type == 'image/jpeg')
 			{
 				$file_ext = 'jpg';
 			}
-
-			else if( $image_type == IMAGETYPE_GIF )
-			{
-				$file_ext = 'gif';
-			}
-
-			else if( $image_type == IMAGETYPE_PNG )
+			else if ($mime_type == 'image/png')
 			{
 				$file_ext = 'png';
 			}
@@ -249,25 +236,74 @@ class image_upload
 			$source = $_FILES['new_image']['tmp_name'];
 
 			// where to upload to
-			$target = $this->core->config('path') . "uploads/carousel/" . $imagename;
+			$target = $upload_path . $imagename;
 
 			if (move_uploaded_file($source, $target))
 			{
+				$main_file = NULL;
+				$backup_file = NULL;
+				// make opposite files so we always have a backup for older/crap browsers
+				if ($file_ext != 'webp')
+				{
+					$img = new SimpleImage();
+
+					$new_webp = str_replace($file_ext, '', $imagename) . 'webp';
+
+					$img->fromFile($target)->toFile($upload_path.$new_webp, 'image/webp', '90');
+
+					if (filesize($target) < filesize($upload_path.$new_webp))
+					{
+						$main_file = $imagename;
+						$backup_file = $new_webp;
+					}
+					else
+					{
+						$main_file = $new_webp;
+						$backup_file = $imagename;
+					}
+				}
+
+				if ($file_ext == 'webp')
+				{
+					$img = new SimpleImage();
+
+					$new_jpg = str_replace('webp', '', $target) . 'jpg';
+
+					$img->fromFile($target)->toFile($upload_path.$new_jpg, 'image/jpeg', '90');	
+					
+					if (filesize($target) < filesize($upload_path.$new_jpg))
+					{
+						$main_file = $imagename;
+						$backup_file = $new_jpg;
+					}
+					else
+					{
+						$main_file = $new_jpg;
+						$backup_file = $imagename;
+					}
+				}
+
 				// we are editing an existing featured image
 				if ($new == 0)
 				{
 					// see if there is a current top image
-					$image = $this->dbl->run("SELECT `featured_image` FROM `editor_picks` WHERE `article_id` = ?", array($article_id))->fetch();
+					$image = $this->dbl->run("SELECT `featured_image`, `featured_image_backup` FROM `editor_picks` WHERE `article_id` = ?", array($article_id))->fetch();
 
 					// remove old image
 					if (!empty($image['featured_image']))
 					{
-						$current_image = $this->core->config('path') . 'uploads/carousel/' . $image['featured_image'];
-						if (file_exists($current_image))
+						$featured_image = $this->core->config('path') . 'uploads/carousel/' . $image['featured_image'];
+						if (file_exists($featured_image))
 						{
-							unlink($current_image);
+							unlink($featured_image);
 						}
-						$this->dbl->run("UPDATE `editor_picks` SET `featured_image` = ? WHERE `article_id` = ?", array($imagename, $article_id));
+						$featured_image_backup = $this->core->config('path') . 'uploads/carousel/' . $image['featured_image_backup'];
+						if (file_exists($featured_image_backup))
+						{
+							unlink($featured_image_backup);
+						}
+
+						$this->dbl->run("UPDATE `editor_picks` SET `featured_image` = ?, `featured_image_backup` = ? WHERE `article_id` = ?", array($main_file, $backup_file, $article_id));
 					}
 				}
 
@@ -278,7 +314,7 @@ class image_upload
 
 					$this->dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
 
-					$this->dbl->run("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?, `end_date` = ?", array($article_id, $imagename, $_POST['end_date']));
+					$this->dbl->run("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?, `featured_image_backup` = ?, `end_date` = ?", array($article_id, $main_file, $backup_file, $_POST['end_date']));
 				}
 
 				return true;

@@ -530,7 +530,7 @@ else
 						$likes_hidden = '';
 						if ($topic['total_likes'] == 0)
 						{
-							$likes_hidden = 'likes_hidden';
+							$likes_hidden = ' likes_hidden';
 						}
 						$templating->set('hidden_likes_class', $likes_hidden);
 
@@ -745,7 +745,7 @@ else
 								$likes_hidden = '';
 								if ($post['total_likes'] == 0)
 								{
-									$likes_hidden = 'likes_hidden';
+									$likes_hidden = ' likes_hidden ';
 								}
 								$templating->set('hidden_likes_class', $likes_hidden);
 

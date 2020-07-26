@@ -1519,7 +1519,7 @@ class article
 			$likes_hidden = '';
 			if ($comments['total_likes'] == 0)
 			{
-				$likes_hidden = 'likes_hidden';
+				$likes_hidden = ' likes_hidden ';
 			}
 			$this->templating->set('hidden_likes_class', $likes_hidden);
 

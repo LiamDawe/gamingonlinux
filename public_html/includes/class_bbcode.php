@@ -544,8 +544,10 @@ class bbcode
 				{
 					if ($pc_info['empty'] > 0)
 					{
-						$fields_output .= '<br /><p>You currently have <u><strong>' . $pc_info['empty'] . '</strong></u> fields not filled out.</p>';
+						$fields_output .= '<div class="info_box">Info: you currently have <u><strong>' . $pc_info['empty'] . '</strong></u> fields <strong>not</strong> filled out.</div>';
 					}
+
+					$fields_output .= '<p>Here\'s what we have for you at the moment:</p>';
 
 					$fields_output .= '<ul style="list-style-type: none; margin: 0; padding: 0;">';
 					foreach ($pc_info as $k => $info)
@@ -582,7 +584,7 @@ class bbcode
 					$date_updated = '<strong>' . date('d M, Y', strtotime($pc_info['date_updated'])) . '</strong>';
 				}
 
-				$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . '. <br /><br />'.$included_note.'<br /><br />Here\'s what we have for you at the moment:' . $fields_output . '<br />', $body);
+				$body = str_replace("[pcinfo]", 'You last updated yours: ' . $date_updated . '. <br /><br />'.$included_note.'<br />' . $fields_output . '<br />', $body);
 			}
 			else
 			{

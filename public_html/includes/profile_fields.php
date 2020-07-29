@@ -1,6 +1,4 @@
 <?php
-// $profile_fields['twitter']['link'] = 1; can be removed from most things, only add to stuff like website and mastodon that has no set url
-// then we check for $profile_fields['link'] = 1; to ensure it has either http or https
 if(!defined('golapp')) 
 {
 	die('Direct access not permitted: profile fields.');

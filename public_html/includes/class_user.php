@@ -797,13 +797,12 @@ class user
 					continue;
 				}
 
-				if ($field['db_field'] == 'website')
+				$url = '';
+				if ($field['plain_link'] == 1 && (strpos($data[$field['db_field']], 'https://') === false && strpos($data[$field['db_field']], 'http://') === false))
 				{
-					$data[$field['db_field']] = str_replace('https://', '', $data[$field['db_field']]);
-					$data[$field['db_field']] = str_replace('http://', '', $data[$field['db_field']]);
+					$url .= 'http://';
 				}
 
-				$url = '';
 				if ($field['base_link_required'] == 1 && strpos($data[$field['db_field']], $field['base_link']) === false ) //base_link_required and not already in the database
 				{
 					$url = $field['base_link'];

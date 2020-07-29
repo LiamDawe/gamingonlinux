@@ -367,7 +367,7 @@ else if (isset($_POST['act']))
 		$_SESSION['articles-per-page'] = $aper_page;
 		
 		$db_grab_fields = '';
-		foreach ($profile_fields as $field)
+		foreach ($profile_fields as $key => $field)
 		{
 			// tell them to do it properly
 			if ($field['db_field'] == 'youtube' && (!empty($_POST['youtube']) && strpos($_POST['youtube'], "youtube.com") === false))
@@ -385,24 +385,26 @@ else if (isset($_POST['act']))
 				die();
 			}
 
+			if ($field['plain_link'] == 1 && !empty($_POST[$key]) && (strpos($_POST[$key], 'https://') === false && strpos($_POST[$key], 'http://') === false))
+			{
+				$_SESSION['message'] = 'broken_link';
+				$_SESSION['message_extra'] = $key;
+				header("Location: " . $core->config('website_url') . "usercp.php?module=home");
+				die();
+			}
+
 			// make sure the fields can't be just the basic url for broken junk links
-			if ($field['db_field'] == 'steam' && ($_POST['steam'] == 'http://steamcommunity.com/id/' || $_POST['steam'] == 'https://steamcommunity.com/id/'))
+			if ($field['db_field'] == 'steam' && ($_POST['steam'] != 'http://steamcommunity.com/id/' || $_POST['steam'] != 'https://steamcommunity.com/id/'))
 			{
 				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
 			}
-			else if ($field['db_field'] == 'twitch' && ($_POST['twitch'] == 'https://www.twitch.tv/' || $_POST['twitch'] == 'http://www.twitch.tv/'))
+			else if ($field['db_field'] == 'twitch' && ($_POST['twitch'] != 'https://www.twitch.tv/' || $_POST['twitch'] != 'http://www.twitch.tv/'))
 			{
 				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
 			}
 			else
 			{
 				$sanatized = trim(strip_tags($_POST[$field['db_field']]));
-
-				if ($field['db_field'] == 'website')
-				{
-					$sanatized = str_replace('https://', '', $sanatized);
-					$sanatized = str_replace('http://', '', $sanatized);
-				}
 
 				if (!empty($sanatized))
 				{

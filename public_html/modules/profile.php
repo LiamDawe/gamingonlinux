@@ -122,13 +122,13 @@ if (isset($_GET['user_id']))
 							{
 								$profile[$field['db_field']] = htmlspecialchars($profile[$field['db_field']]);
 
-								if ($field['db_field'] == 'website')
+								$url = '';
+
+								if ($field['plain_link'] == 1 && (strpos($profile[$field['db_field']], 'https://') === false && strpos($profile[$field['db_field']], 'http://') === false))
 								{
-									$profile[$field['db_field']] = str_replace('https://', '', $profile[$field['db_field']]);
-									$profile[$field['db_field']] = str_replace('http://', '', $profile[$field['db_field']]);
+									$url .= 'http://';
 								}
 								
-								$url = '';
 								if ($field['base_link_required'] == 1 && strpos($profile[$field['db_field']], $field['base_link']) === false ) //base_link_required and not already in the database
 								{
 									$url = $field['base_link'];

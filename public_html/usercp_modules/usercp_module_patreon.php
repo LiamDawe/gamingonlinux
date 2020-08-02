@@ -93,96 +93,103 @@ if ( isset($_GET['code']) && $_GET['code'] != '' )
 	$patron_response = $api_client->fetch_user();
 
 	$templating->block('response');
-	$last_charge_month = date('m', strtotime($patron_response['included'][0]['attributes']['last_charge_date']));
-	$joined_date = date('m-Y', strtotime($patron_response['included'][0]['attributes']['pledge_relationship_start']));
-	if ($patron_response['data']['attributes']['last_charge_status'] = 'Paid' && $last_charge_month == date('m'))
+	if (isset($patron_response['included']))
 	{
-		$their_groups = $user->post_group_list([$_SESSION['user_id']]);
-			
-		// now check how much they've paid and sort the correct user groups
-		$pledge = $patron_response['included'][0]['attributes']['currently_entitled_amount_cents'];
-
-		$return_text = NULL;
-
-		if ($pledge < 400)
+		$last_charge_month = date('m', strtotime($patron_response['included'][0]['attributes']['last_charge_date']));
+		$joined_date = date('m-Y', strtotime($patron_response['included'][0]['attributes']['pledge_relationship_start']));
+		if ($patron_response['data']['attributes']['last_charge_status'] = 'Paid' && $last_charge_month == date('m'))
 		{
-			$return_text .= "Sorry but to be given Supporter status you need to have paid the correct amount (at least $4 on Patreon).";
-		}
+			$their_groups = $user->post_group_list([$_SESSION['user_id']]);
+				
+			// now check how much they've paid and sort the correct user groups
+			$pledge = $patron_response['included'][0]['attributes']['currently_entitled_amount_cents'];
 
-		if ($pledge >= 400)
-		{
-			// check if we need to update their profile information
-			$check_profile = $dbl->run("SELECT `supporter_email`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+			$return_text = NULL;
 
-			$sql_text = array();
-			$sql_data = array(); 
-			if ($check_profile['supporter_email'] == NULL || $check_profile['supporter_email'] == '')
+			if ($pledge < 400)
 			{
-				// email is verified, let's act on it
-				if ($patron_response['data']['attributes']['is_email_verified'] == 1)
+				$return_text .= "Sorry but to be given Supporter status you need to have paid the correct amount (at least $4 on Patreon).";
+			}
+
+			if ($pledge >= 400)
+			{
+				// check if we need to update their profile information
+				$check_profile = $dbl->run("SELECT `supporter_email`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+
+				$sql_text = array();
+				$sql_data = array(); 
+				if ($check_profile['supporter_email'] == NULL || $check_profile['supporter_email'] == '')
 				{
-					$sql_text[] = "`supporter_email` = ?";
-					$sql_data[] = $patron_response['data']['attributes']['email'];
+					// email is verified, let's act on it
+					if ($patron_response['data']['attributes']['is_email_verified'] == 1)
+					{
+						$sql_text[] = "`supporter_email` = ?";
+						$sql_data[] = $patron_response['data']['attributes']['email'];
+					}
+					else
+					{
+						$return_text .= 'Note: It seems your Patreon email is not verified. We suggest you <a href="https://www.patreon.com/">head on over to Patreon</a> to take a look.<br />';
+					}
 				}
-				else
+
+				if ($check_profile['supporter_type'] == NULL || $check_profile['supporter_type'] != 'patreon')
 				{
-					$return_text .= 'Note: It seems your Patreon email is not verified. We suggest you <a href="https://www.patreon.com/">head on over to Patreon</a> to take a look.<br />';
+					$sql_text[] = "`supporter_type` = 'patreon'";
 				}
-			}
 
-			if ($check_profile['supporter_type'] == NULL || $check_profile['supporter_type'] != 'patreon')
-			{
-				$sql_text[] = "`supporter_type` = 'patreon'";
-			}
-
-			if (!empty($sql_text) || !empty($sql_data))
-			{
-				// set their status
-				$dbl->run("UPDATE `users` SET ".implode(",", $sql_text)." WHERE `user_id` = ?", array_merge($sql_data, [$_SESSION['user_id']]));
-			}
-
-			// they're not currently set as a supporter, give them the status
-			if (!in_array(6, $their_groups[$_SESSION['user_id']]))
-			{
-				$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 6", [$_SESSION['user_id']]);
-
-				$return_text .= "Given Supporter status!";
-			}
-			if ($pledge <= 600)
-			{
-				// they don't pledge enough for supporter plus, if they're currently in it then remove them
-				if (in_array(9, $their_groups[$_SESSION['user_id']]))
+				if (!empty($sql_text) || !empty($sql_data))
 				{
-					$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ? AND `group_id` = 9", [$_SESSION['user_id']]);
+					// set their status
+					$dbl->run("UPDATE `users` SET ".implode(",", $sql_text)." WHERE `user_id` = ?", array_merge($sql_data, [$_SESSION['user_id']]));
+				}
+
+				// they're not currently set as a supporter, give them the status
+				if (!in_array(6, $their_groups[$_SESSION['user_id']]))
+				{
+					$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 6", [$_SESSION['user_id']]);
+
+					$return_text .= "Given Supporter status!";
+				}
+				if ($pledge <= 600)
+				{
+					// they don't pledge enough for supporter plus, if they're currently in it then remove them
+					if (in_array(9, $their_groups[$_SESSION['user_id']]))
+					{
+						$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ? AND `group_id` = 9", [$_SESSION['user_id']]);
+					}
 				}
 			}
-		}
-		// they pledge enough to be given the Supporter Plus group
-		if ($pledge >= 700)
-		{
-			if (!in_array(9, $their_groups[$_SESSION['user_id']]))
+			// they pledge enough to be given the Supporter Plus group
+			if ($pledge >= 700)
 			{
-				$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 9", [$_SESSION['user_id']]);
+				if (!in_array(9, $their_groups[$_SESSION['user_id']]))
+				{
+					$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 9", [$_SESSION['user_id']]);
 
-				$return_text .= " Also given Supporter Plus status!";
+					$return_text .= " Also given Supporter Plus status!";
+				}
 			}
-		}
 
-		if ($return_text == NULL || $return_text == '')
+			if ($return_text == NULL || $return_text == '')
+			{
+				// generic message when we didnt need to do anything but it still all worked
+				$return_text .= "You're all up to date!";
+			}
+
+			$templating->set('text', $return_text);
+		}
+		else if ($patron_response['data']['attributes']['last_charge_status'] != 'Paid')
 		{
-			// generic message when we didnt need to do anything but it still all worked
-			$return_text .= "You're all up to date!";
+			$new_patron = '';
+			if ($joined_date == date('m-Y'))
+			{
+				$new_patron = '<p>Our records show you started pledging on <u>' . $joined_date . '</u> - Payments are taken <strong>once a month</strong>, at the start of each month so your pledge is due next month.</p>';
+			}
+			$templating->set('text', 'Sorry but it seems your last payment has not been paid. We suggest you <a href="https://www.patreon.com/">head on over to Patreon</a> to take a look. We don\'t handle the payments directly, so you need to fix it there. Thank you!' . $new_patron);
 		}
-
-		$templating->set('text', $return_text);
 	}
-	else if ($patron_response['data']['attributes']['last_charge_status'] != 'Paid')
+	else
 	{
-		$new_patron = '';
-		if ($joined_date == date('m-Y'))
-		{
-			$new_patron = '<p>Our records show you started pledging on <u>' . $joined_date . '</u> - Payments are taken <strong>once a month</strong>, at the start of each month so your pledge is due next month.</p>';
-		}
-		$templating->set('text', 'Sorry but it seems your last payment has not been paid. We suggest you <a href="https://www.patreon.com/">head on over to Patreon</a> to take a look. We don\'t handle the payments directly, so you need to fix it there. Thank you!' . $new_patron);
+		$templating->set('text', 'Sorry but we were unable to get your data from Patreon. This might be a temporary issue and you can try later. Also, please check your most recent payment went though. We suggest you <a href="https://www.patreon.com/">head on over to Patreon</a> to take a look. We don\'t handle the payments directly, so you need to fix it there. Thank you! If you have paid and it\'s still not working, let us know in <a href="https://www.gamingonlinux.com/forum/14">our Forum</a>.' . $new_patron);
 	}
 }

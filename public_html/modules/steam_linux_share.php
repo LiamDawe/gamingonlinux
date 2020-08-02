@@ -9,7 +9,86 @@ $templating->set_previous('meta_description', 'Steam Linux Market Share', 1);
 $templating->load('steam_linux_share');
 $templating->block('top');
 
-$data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` > '2016-04-01' ORDER BY `date` ASC")->fetch_all();
+$data_years = $dbl->run("SELECT DISTINCT YEAR(`date`) FROM `steam_linux_share` ORDER BY `date` ASC")->fetch_all(PDO::FETCH_COLUMN);
+
+$months = array('01','02','03','04','05','06','07','08','09','10','11','12');
+
+//defaults
+$from = '2018-01-01';
+$to_year = date('Y');
+$to_month = date('m');
+$sql_from = $from;
+$sql_to = $to_year . '-' . $to_month . '-01';
+
+$start_options = '';
+$end_options = '';
+$dates_to_insert = array();
+foreach ($data_years as $year)
+{
+	foreach($months as $month)
+	{
+		$dates_to_insert[] = $year . '-' . $month . '-01';
+	}
+}
+foreach ($dates_to_insert as $insert)
+{
+	if (isset($_POST['filter-date']))
+	{
+		$selected = '';
+		if ($insert == $_POST['start'])
+		{
+			$selected = ' selected';
+		}
+		$start_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';
+
+		$selected = '';
+		if ($insert == $_POST['end'])
+		{
+			$selected = ' selected';
+		}
+		$end_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';		
+	}
+	else
+	{
+		$selected = '';
+		if ($from == $insert)
+		{
+			$selected = ' selected';
+		}
+		$start_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';
+
+		$selected = '';
+		if ($to_year . '-' . $to_month . '-01' == $insert)
+		{
+			$selected = ' selected';
+		}
+		$end_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';
+	}
+}
+
+$templating->set('start_options', $start_options);
+$templating->set('end_options', $end_options);
+
+function isValidDate($date) {
+    return date('Y-m-d', strtotime($date)) === $date;
+}
+
+if (isset($_POST['filter-date']))
+{
+	if (isValidDate($_POST['start']) && isValidDate($_POST['end']))
+	{
+		$sql_from = $_POST['start'];
+		$sql_to = $_POST['end'];
+	}
+	else
+	{
+		$_SESSION['message'] = 'invalid-date';
+		header("Location: /steam-tracker/");
+		die();
+	}
+}
+
+$data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` BETWEEN ? AND ? ORDER BY `date` ASC", array($sql_from, $sql_to))->fetch_all();
 
 $colours = array(
 	'#3999cc',

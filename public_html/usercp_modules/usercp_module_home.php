@@ -394,11 +394,7 @@ else if (isset($_POST['act']))
 			}
 
 			// make sure the fields can't be just the basic url for broken junk links
-			if ($field['db_field'] == 'steam' && ($_POST['steam'] != 'http://steamcommunity.com/id/' || $_POST['steam'] != 'https://steamcommunity.com/id/'))
-			{
-				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
-			}
-			else if ($field['db_field'] == 'twitch' && ($_POST['twitch'] != 'https://www.twitch.tv/' || $_POST['twitch'] != 'http://www.twitch.tv/'))
+			if ($field['db_field'] == 'twitch' && ($_POST['twitch'] != 'https://www.twitch.tv/' || $_POST['twitch'] != 'http://www.twitch.tv/'))
 			{
 				$dbl->run("UPDATE `users` SET `{$field['db_field']}` = '' WHERE `user_id` = ?", array($_SESSION['user_id']));
 			}

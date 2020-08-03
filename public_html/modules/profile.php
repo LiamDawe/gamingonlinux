@@ -116,13 +116,14 @@ if (isset($_GET['user_id']))
 
 						$profile_fields_output = '';
 
-						foreach ($profile_fields as $field)
+						foreach ($profile_fields as $name => $field)
 						{
 							if (!empty($profile[$field['db_field']]) && $field['name'] != 'Distro')
 							{
 								$profile[$field['db_field']] = htmlspecialchars($profile[$field['db_field']]);
 
 								$url = '';
+								$rel = '';
 
 								if ($field['plain_link'] == 1 && (strpos($profile[$field['db_field']], 'https://') === false && strpos($profile[$field['db_field']], 'http://') === false))
 								{
@@ -145,8 +146,13 @@ if (isset($_GET['user_id']))
 								{
 									$span = $field['span'];
 								}
+
+								if ($name == 'website' || $name == 'mastodon' || $name == 'twitter')
+								{
+									$rel = ' rel="me" ';
+								}						
 							
-								$profile_fields_output .= "$image$span {$field['name']} <a href=\"$url{$profile[$field['db_field']]}\" target=\"_blank\">$url{$profile[$field['db_field']]}</a><br />";
+								$profile_fields_output .= "$image$span {$field['name']} <a $rel href=\"$url{$profile[$field['db_field']]}\" target=\"_blank\">$url{$profile[$field['db_field']]}</a><br />";
 							}
 						}
 

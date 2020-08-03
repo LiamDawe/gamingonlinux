@@ -907,6 +907,11 @@ else
 						}
 					}
 
+					if ($user->check_group([6,9]) === false)
+					{
+						$templating->block('patreon_comments', 'articles_full');
+					}
+
 					if ($core->config('forum_posting_open') == 1)
 					{
 						if ($_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))

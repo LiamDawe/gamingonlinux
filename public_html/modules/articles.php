@@ -264,6 +264,21 @@ if (isset($view))
 		$article_class->display_article_list($articles_get, $get_categories);
 				
 		$templating->block('bottom');
+		$start_no = $core->start;
+		if ($core->start == 0)
+		{
+			$start_no = 1;
+		}
+		$templating->set('search_no_start', $start_no);
+	
+		$end_no = $core->start + $articles_per_page;
+		if ($end_no > $total_items)
+		{
+			$end_no = $total_items;
+		}
+		$templating->set('end_no', $end_no);
+		$templating->set('total', $total_items);
+
 		$templating->set('pagination', $pagination);
 	}
 	else

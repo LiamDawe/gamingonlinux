@@ -22,6 +22,7 @@ if ($core->config('articles_rss') == 1)
 	}
 
 	$url_addition = '';
+	$all_sql = '';
 	// viewing specific tags only
 	if (isset($_GET['tags']))
 	{
@@ -44,6 +45,13 @@ if ($core->config('articles_rss') == 1)
 		$sql_join .= " INNER JOIN `article_category_reference` c ON a.article_id = c.article_id ";
 		$in  = str_repeat('?,', count($tags) - 1) . '?';
 		$sql_addition .= ' AND c.`category_id` IN ( ' . $in . ' ) ';
+
+		// if this is set, articles need to have ALL the tags
+		$count_array = count($tags);
+		if (isset($_GET['all']))
+		{
+			$all_sql = 'GROUP BY a.`article_id` having count(c.`category_id`) = ' . $count_array;
+		}
 
 		$url_addition = '?tags%5B%5D='.$tags[0];
 	}
@@ -115,6 +123,12 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute('xmlns:media', 'http://search.yahoo.com/mrss/');
 
 	$xml->startElement('channel');
+
+	if ($tags[0] == 5 && isset($_GET['steamcurator'])) // Steam only for Curator RSS
+	{
+		$xml->writeAttribute( 'xmlns:steam', 'https://store.steampowered.com/' );
+	}
+	
 	$xml->writeElement('title', $rss_title);
 	$xml->writeElement('link', $core->config('website_url'));
 	$xml->writeElement('description', 'The latest articles from GamingOnLinux');
@@ -154,6 +168,7 @@ if ($core->config('articles_rss') == 1)
 	LEFT JOIN 
 		`users` u ON a.author_id = u.user_id $sql_join
 	WHERE a.`active` = 1 $sql_addition
+	$all_sql 
 	ORDER BY a.`date` DESC
 	LIMIT 50", $tags)->fetch_all();
 
@@ -221,28 +236,46 @@ if ($core->config('articles_rss') == 1)
 				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png";
 			}
 
-			// for viewing the tagline, not the whole article
-			if (isset($_GET['tagline']) && $_GET['tagline'] == 1)
+			if ($tags[0] == 5 && isset($_GET['steamcurator'])) // Steam only for Curator RSS
 			{
-				$text = $line['tagline'];
+				$current_linked_games = $dbl->run("SELECT g.`steam_id` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ? AND g.is_dlc = 0", array($line['article_id']))->fetch_all();
+				if ($current_linked_games)
+				{
+					$xml->startElement('steam:appids');
+					foreach ($current_linked_games as $game)
+					{
+						$xml->writeElement('steam:appid', $game['steam_id']);
+					}
+					$xml->endElement();
+				}
+	
+				$text = '<p>' . $line['tagline'] . '</p><p><img src="'.$tagline_image.'" alt /></p>';
 			}
 			else
 			{
-				if (!isset($_GET['special']))
+				// for viewing the tagline, not the whole article
+				if (isset($_GET['tagline']) && $_GET['tagline'] == 1)
 				{
-					$random_id = core::random_id(15);
-					$text = $bbcode->rss_stripping($line['text'] . "<div id=\"{$random_id}\">Article from <a href=\"https://www.gamingonlinux.com/\">GamingOnLinux.com</a> - do not reproduce this article without permission. This RSS feed is intended for readers, not scrapers.</div>", $tagline_bbcode, $bbcode_tagline_gallery);
+					$text = $line['tagline'];
 				}
 				else
 				{
-					// make sure RSS for special feed always has an image inside - mainly for Google News capturing
-					if (strpos($line['text'], '<img') === false)
+					if (!isset($_GET['special']))
 					{
-						$line['text'] = '<img src="'.$tagline_image.'" alt />' . $line['text'];
+						$random_id = core::random_id(15);
+						$text = $bbcode->rss_stripping($line['text'] . "<div id=\"{$random_id}\">Article from <a href=\"https://www.gamingonlinux.com/\">GamingOnLinux.com</a> - do not reproduce this article without permission. This RSS feed is intended for readers, not scrapers.</div>", $tagline_bbcode, $bbcode_tagline_gallery);
 					}
-					$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
+					else
+					{
+						// make sure RSS for special feed always has an image inside - mainly for Google News capturing
+						if (strpos($line['text'], '<img') === false)
+						{
+							$line['text'] = '<img src="'.$tagline_image.'" alt />' . $line['text'];
+						}
+						$text = $bbcode->rss_stripping($line['text'], $tagline_bbcode, $bbcode_tagline_gallery);
+					}
+					
 				}
-				
 			}
 
 			$xml->startElement( 'media:thumbnail');

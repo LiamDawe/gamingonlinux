@@ -365,7 +365,8 @@ else if (isset($_GET['aid']))
 
 	$templating->block('form_top');
 
-	$core->editor(['name' => 'text', 'content' => '', 'editor_id' => 'comment']);
+	$editor = new editor($core, $templating, $bbcode);
+	$editor->editor(['name' => 'text', 'content' => '', 'editor_id' => 'comment']);
 
 	$templating->block('form_bottom', 'admin_modules/admin_module_comments');
 	$templating->set('subscribe_check', $subscribe_check);

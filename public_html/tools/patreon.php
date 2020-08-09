@@ -129,7 +129,6 @@ if (isset($_POST['go']))
 
 	if (!isset($_POST['test_run']) && !empty($user_id_list))
 	{
-		print_r($user_id_list);
 		// okay, now we need to remove anyone not in that list
 		$in = str_repeat('?,', count($user_id_list) - 1) . '?';
 
@@ -140,7 +139,7 @@ if (isset($_POST['go']))
 
 		if ($removed > 0)
 		{
-			echo PHP_EOL . $removed . ' total usrs removed as supporters.';
+			echo PHP_EOL . $removed . ' total users removed as supporters.';
 		}
 
 		$dbl->run("UPDATE `users` SET `supporter_type` = NULL WHERE `supporter_type` = 'patreon' AND `user_id` NOT IN ($in)", $user_id_list);

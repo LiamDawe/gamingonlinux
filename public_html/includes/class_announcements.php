@@ -110,7 +110,7 @@ class announcements
 		{
 			$checker = $this->dbl->run("SELECT `date_updated` FROM `user_profile_info` WHERE `user_id` = ?", array($user_id))->fetch();
 
-			if ($checker['date_updated'] != NULL)
+			if ($checker && $checker['date_updated'] != NULL)
 			{
 				$minus_4months = strtotime('-4 months');
 

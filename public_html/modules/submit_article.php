@@ -151,7 +151,8 @@ if (isset($_GET['view']))
             $subscribe_box = '<label>Subscribe to article to receive comment replies via email <input type="checkbox" name="subscribe" checked /></label><br />';
         }
 
-        $core->article_editor(['content' => $text]);
+		$editor = new editor($core, $templating, $bbcode);
+        $editor->article_editor(['content' => $text]);
 
         // sort out previously uploaded images
         $previously_uploaded = '';

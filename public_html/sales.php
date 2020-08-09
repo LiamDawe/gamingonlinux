@@ -91,7 +91,7 @@ if ($res_bundle)
 		$templating->set('linux_total', $total);
 
 		// end timer
-		$countdown = '<noscript>'.$bundle['end_date'].' UTC</noscript><span id="bundle'.$bundle['id'].'"></span><script type="text/javascript">var bundle' . $bundle['id'] . ' = moment.tz("'.$bundle['end_date'].'", "UTC"); $("#bundle'.$bundle['id'].'").countdown(bundle'.$bundle['id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+		$countdown = '<noscript>'.$bundle['end_date'].' UTC</noscript><span class="countdown" id="bundle'.$bundle['id'].'">'.$bundle['end_date'].'</span>';
 		$templating->set('time_left', $countdown);
 	}
 

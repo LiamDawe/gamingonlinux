@@ -53,11 +53,10 @@ else
 				
 				$html_message = '<p>Your article submission on GamingOnLinux was denied and the editor left a message for you below:</p>
 				<p>'.$_POST['message'].'</p>
-				<p>Here is a copy below are your article:<br />
+				<p>Here is a copy below of your article so you don\'t lose it:<br />
 				Title: '.$check['title'].'<br />
 				' . $check['text']. '</p>';
 
-				// message
 				$plain_message = 'Your article submission on GamingOnLinux was denied and the editor said this' . "\n\n" . $_POST['message'] . "\n\n" . 'Here\'s a copy of your article below' . "\n\n" . $check['text'];
 				
 				if ($core->config('send_emails') == 1)

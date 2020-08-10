@@ -13,10 +13,30 @@ if (!isset($_GET['1']) || !isset($_GET['2']))
 }
 else
 {
+	$images = $dbl->run("SELECT `filename`,`location` FROM `article_images` WHERE `filename` IN ( ?,? ) ORDER BY FIELD(`filename`, ?,?)", array($_GET['1'], $_GET['2'],$_GET['1'], $_GET['2']))->fetch_all();
 	$templating->load('image_compare');
 	$templating->block('main');
-	$templating->set('before', $_GET['1']);
-	$templating->set('after', $_GET['2']);
+
+	if ($images[0]['location'] == NULL)
+	{
+		$before_location = $core->config('website_url') . 'uploads/articles/article_media/';
+	}
+	else
+	{
+		$before_location = $images[0]['location'] . 'uploads/articles/article_media/';
+	}
+
+	if ($images[1]['location'] == NULL)
+	{
+		$after_location = $core->config('website_url') . 'uploads/articles/article_media/';
+	}
+	else
+	{
+		$after_location = $images[1]['location'] . 'uploads/articles/article_media/';
+	}
+
+	$templating->set('before', $before_location . $images[0]['filename']);
+	$templating->set('after', $after_location . $images[1]['filename']);
 }
 
 include(APP_ROOT . '/includes/footer.php');

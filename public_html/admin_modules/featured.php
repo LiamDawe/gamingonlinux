@@ -23,6 +23,7 @@ if (isset($_GET['view']))
 				$templating->block('add', 'admin_modules/admin_module_featured');
 				$templating->set('max_width', $core->config('carousel_image_width'));
 				$templating->set('max_height', $core->config('carousel_image_height'));
+				$templating->set('featured_max_filesize', core::readable_bytes($core->config('max_featured_image_filesize')));
 				$templating->set('start_year', $start_year);
 				$templating->set('next_year', $next_year);
 
@@ -65,6 +66,7 @@ if (isset($_GET['view']))
 				$templating->set('next_year', $next_year);
 
 				$templating->set('current_image', $image);
+				$templating->set('featured_max_filesize', core::readable_bytes($core->config('max_featured_image_filesize')));
 				$templating->set('max_width', $core->config('carousel_image_width'));
 				$templating->set('max_height', $core->config('carousel_image_height'));
 				$templating->set('hits', $items['hits']);

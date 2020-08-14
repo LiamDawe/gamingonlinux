@@ -173,7 +173,7 @@ class image_upload
 				}
 
 				// check if its too big
-				if (filesize($_FILES['new_image']['tmp_name']) > 180000)
+				if (filesize($_FILES['new_image']['tmp_name']) > $this->core->config('max_featured_image_filesize'))
 				{
 					$image_info = getimagesize($_FILES['new_image']['tmp_name']);
 					$image_type = $image_info[2];
@@ -191,7 +191,7 @@ class image_upload
 					clearstatcache();
 
 					// check again
-					if (filesize($_FILES['new_image']['tmp_name']) > 180000)
+					if (filesize($_FILES['new_image']['tmp_name']) > $this->core->config('max_featured_image_filesize'))
 					{
 						// try reducing it some more
 						if( $image_type == IMAGETYPE_JPEG )
@@ -202,7 +202,7 @@ class image_upload
 							clearstatcache();
 
 							// still too big
-							if (filesize($_FILES['new_image']['tmp_name']) > 180000)
+							if (filesize($_FILES['new_image']['tmp_name']) > $this->core->config('max_featured_image_filesize'))
 							{
 								$_SESSION['message'] = 'toobig';
 								return false;

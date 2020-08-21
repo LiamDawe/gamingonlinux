@@ -15,6 +15,7 @@ $parray = $forum_class->forum_permissions($_GET['forum_id']);
 // permissions for viewforum page
 if($parray['can_view'] == 0)
 {
+	$templating->set_previous('title', 'No access', 1);
 	$core->message('You do not have permission to view this forum!', 1);
 }
 

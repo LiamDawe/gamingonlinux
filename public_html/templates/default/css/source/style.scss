@@ -51,6 +51,7 @@
 	--breadcrumb-background: #f5f5f5;
 	--quote-background-color: #e5e5e5;
 	--quote-border-color: #303030;
+	--header-title-line-color: rgba(0, 0, 0, 0.10);
 	// articles
 	--article-main-background: #efefef;
 	--hr-border-color: #dddddd;
@@ -167,6 +168,7 @@
 	--breadcrumb-background: #2E2E2E;
 	--quote-background-color: #333333;
 	--quote-border-color: #111111;
+	--header-title-line-color: rgba(218, 218, 218, 0.10);
 	// articles
 	--article-main-background: #222222;
 	--hr-border-color: #333333;
@@ -1592,6 +1594,23 @@ ul.social-networks li > a {
 .poll_button{float: none ;}
 .poll_content{padding: 4px;}
 
+.header-text-plain
+{
+	display: flex;
+	align-items: center;
+	font-weight: 700;
+	margin-bottom: 5px;
+}
+.header-text-plain::after 
+{
+    content: "";
+    background: var(--header-title-line-color);
+    height: 1px;
+    flex: 1;
+	margin-left: 1rem;
+}
+
+
 .flex-row 
 {
 	display: flex;
@@ -1600,6 +1619,12 @@ ul.social-networks li > a {
 	width: 100%;
 	align-items: stretch;
 	box-sizing: border-box;
+	align-items: center;
+}
+
+.flex-stretch
+{
+	flex-grow: 2;
 }
   
 .flex-column-left
@@ -1928,6 +1953,10 @@ div.modal-container.modal-standalone
 	{
 		flex-direction: column;
 	}
+	.free-featured-list
+	{
+		flex-direction: column;
+	}
 	.article > .image a
 	{
 		width: 100%;
@@ -2234,6 +2263,53 @@ div.dataTables_wrapper > div.dataTables_info, div.dataTables_wrapper > div.dataT
 .table-stripes-tbody tbody tr:nth-child(even) {background: var(--table-stripes-treven-bg)}
 .table-stripes-tbody tbody tr:nth-child(odd) {background: var(--table-stripes-trodd-bg)}
 .td-free-games-tags {padding-top: 0px;}
+
+.free-featured
+{
+	border-left: 1px solid var(--header-title-line-color);
+	border-right: 1px solid var(--header-title-line-color);
+	border-bottom: 1px solid var(--header-title-line-color);
+}
+
+.free-featured-list
+{
+	display: flex; 
+	justify-content: center; 
+	text-align: center; 
+	padding: 0;
+}
+
+.featured-container {
+	position: relative;
+  }
+
+  .featured-image {
+	display: block;
+  }
+
+.featured-overlay {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	opacity: 0;
+	transition: .5s ease;
+	background-color: rgba(117, 193, 2550, 0.95);
+  }
+  
+  .featured-container:hover .featured-overlay {
+	opacity: 1;
+  }
+  
+  .overlay-text {
+	color: rgb(0, 0, 0);
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+  }
 
 /* calendar */
 .calendar-table {border-collapse: collapse;}

@@ -3,22 +3,32 @@
 	<div class="col-12">
 		<div class="box">
 			<div class="body group">
-				Welcome to the GamingOnLinux free games list! This page is currently in BETA. We are currently tracking <strong>{:total}</strong> free games! Please be aware some links may be an affiliate link (yes even for free games, it helps). Looking for Linux games on sale, or games currently 100% off? Check out the <a href="/sales.php">Sales Page</a>! This page is for games that are permanently free.
-			</div>
-		</div>
-		<div class="box">
-			<div class="body group">
-				<form class="gol-form" id="free-search-form" action="/free_games.php"><input id="free-search" class="ays-ignore" name="q" type="search" placeholder="Search for a free game by title..." /><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" /></form>
+				<div class="flex-row">
+					<div class="flex-stretch">We are currently tracking <strong>{:total}</strong> free Linux games! Please be aware some links may be an affiliate link.</div>
+					<div>
+					<form class="gol-form" id="free-search-form" action="/free-games/">
+						<input id="free-search" class="ays-ignore" name="q" type="search" placeholder="Search for a free game by title..." />
+						<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+					</form>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
+
 	<div class="col-9">
+		<div class="box">
+			<div class="header-text-plain">Random featured</div>
+			<div class="free-featured">{:featured_items}</div>
+		</div>
 [/block: top]
 
 [block: list_top]
 		<div class="free-list">
 		<div class="box"><div class="head">Games List - Total with current filters: {:filter_total}</div>
+
 		<div class="body group"><small>If it has a trailer, click the little icon to see it. Are we missing a free game? You can <a href="/index.php?module=items_database&amp;view=submit_item">submit it yourself</a>, or <a href="/index.php?module=email_us">send us a tip!</a></small></div></div>
+
 			<table class="sales-table table-stripes-tbody">
 			<thead>
 				<tr><th colspan="2">Name</th><th>Links</th><th>License</th></tr>
@@ -55,7 +65,7 @@
 <div class="col-3">
 	<form id="game_filters" name="free" method="get">
 	<div class="box">
-		<div class="head">Filters <a href="/free_games.php">&#10005; Clear all filters</a></div>
+		<div class="head">Filters <a href="/free-games/">&#10005; Clear all filters</a></div>
 		<div class="body list">
 			<div class="filter-box">
 				<div class="subhead filter-title"><a class="filter-link"><span class="caret-down"></span> Genres</a></div>

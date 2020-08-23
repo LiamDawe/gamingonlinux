@@ -60,10 +60,29 @@ if (isset($_SESSION['message']))
 
 $templating->load('free_games');
 
-$total_free = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `free_game` = 1 AND `approved` = 1 AND `is_application` = 0 AND `also_known_as` IS NULL")->fetchOne();
+$total_free = $dbl->run("SELECT COUNT(*) FROM `calendar` WHERE `free_game` = 1 AND `approved` = 1 AND `is_application` = 0 AND `is_emulator` = 0 AND `is_dlc` = 0")->fetchOne();
 
 $templating->block('top', 'free_games');
 $templating->set('total', $total_free);
+
+$featured = $dbl->run("SELECT i.`item_id`, i.`filename`, i.`location`, c.`name` FROM `itemdb_images` i JOIN `calendar` c ON c.id = i.item_id WHERE i.`featured` = 1 AND c.`free_game` = 1 ORDER BY RAND() LIMIT 2")->fetch_all();
+
+$featured_output = '<ul class="free-featured-list">';
+foreach ($featured as $item)
+{
+	$location = $core->config('website_url');
+	if ($item['location'] != NULL)
+	{
+		$location = $item['location'];
+	}
+	$featured_output .= '<li style="display: flex; margin: 5px; justify-content: center;"><div class="featured-container"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img src="'.$location.'uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" class="featured-image" />  <div class="featured-overlay">
+    <div class="overlay-text">'.$item['name'].'<br />Click for more</div>
+  </div></a></div></li>';
+}
+
+$featured_output .= '</ul>';
+
+$templating->set('featured_items', $featured_output);
 
 $game_sales->display_free();
 

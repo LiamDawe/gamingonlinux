@@ -7,6 +7,19 @@ require APP_ROOT . '/includes/aws/aws-autoloader.php';
 
 use Aws\S3\S3Client;
 
+$key = $core->config('do_space_key_uploads');
+$secret = $core->config('do_space_key_private_uploads');
+
+$client = new Aws\S3\S3Client([
+        'version' => 'latest',
+        'region'  => 'am3',
+        'endpoint' => 'https://ams3.digitaloceanspaces.com',
+        'credentials' => [
+                'key'    => $key,
+                'secret' => $secret,
+            ],
+]);
+
 /*
 REMOVE LIVESTREAMS THAT HAVE FINISHED
 */
@@ -63,19 +76,6 @@ $upload_timeout = 86400; // 1 day
 $upload_stamp = time() - $upload_timeout;
 
 // grab all old article_images and remove them if not used
-$key = $core->config('do_space_key_uploads');
-$secret = $core->config('do_space_key_private_uploads');
-
-$client = new Aws\S3\S3Client([
-        'version' => 'latest',
-        'region'  => 'am3',
-        'endpoint' => 'https://ams3.digitaloceanspaces.com',
-        'credentials' => [
-                'key'    => $key,
-                'secret' => $secret,
-            ],
-]);
-
 $grab_all = $dbl->run("SELECT `filename`, `filetype`, `location` FROM `article_images` WHERE `date_uploaded` < ? AND `article_id` = 0 OR `article_id` IS NULL", array($upload_stamp))->fetch_all();
 foreach ($grab_all as $grabber)
 {
@@ -137,44 +137,66 @@ REMOVE TEMP ITEMDB UPLOADS
 */
 
 // normal uploads
-$itemdb_timeout = 86400; // 1 day
+$itemdb_timeout = 1; // 1 day
 
 $stamp = time() - $itemdb_timeout;
 
 $sql_date = date('Y/m/d H:i:s', $stamp);
 
-$grab_all = $dbl->run("SELECT `filename` FROM `itemdb_images` WHERE `date_uploaded` < ? AND `item_id` = 0 OR `item_id` IS NULL", array($sql_date))->fetch_all();
+$grab_all = $dbl->run("SELECT `filename`, `location` FROM `itemdb_images` WHERE `date_uploaded` < ? AND `item_id` = 0 OR `item_id` IS NULL", array($sql_date))->fetch_all();
 foreach ($grab_all as $grabber)
 {
-	$main = APP_ROOT . '/uploads/gamesdb/big/tmp/' . $grabber['filename'];
-	$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/tmp/' . $grabber['filename'];
-	if (file_exists($main))
+	if ($grabber['location'] == NULL)
 	{
-		unlink($main);
+		$main = APP_ROOT . '/uploads/gamesdb/big/tmp/' . $grabber['filename'];
+		$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/tmp/' . $grabber['filename'];
+		if (file_exists($main))
+		{
+			unlink($main);
+		}
+		if (file_exists($thumb))
+		{
+			unlink($thumb);
+		}
 	}
-	if (file_exists($thumb))
+	else
 	{
-		unlink($thumb);
+		$result = $client->deleteObject([
+			'Bucket' => 'goluploads',
+			'Key'    => 'uploads/gamesdb/big/tmp/' . $grabber['filename']
+		]);			
 	}
+	echo PHP_EOL.'File ' . $grabber['filename'] . ' removed for ItemDB.'.PHP_EOL;
 }
 
 $dbl->run("DELETE FROM `itemdb_images` WHERE `date_uploaded` < ? AND `item_id` = 0 OR `item_id` IS NULL", array($sql_date));
 
-// featured uploads
-$grab_all = $dbl->run("SELECT `filename`,`item_id` FROM `itemdb_images` WHERE `date_uploaded` < ? AND `approved` = 0", array($sql_date))->fetch_all();
+// featured uploads (if someone goes to change and doesn't hit Edit - remove the temp files)
+$grab_all = $dbl->run("SELECT `filename`, `item_id`, `location` FROM `itemdb_images` WHERE `date_uploaded` < ? AND `approved` = 0", array($sql_date))->fetch_all();
 foreach ($grab_all as $grabber)
 {
-	$main = APP_ROOT . '/uploads/gamesdb/big/' . $grabber['item_id'] . '/' . $grabber['filename'];
-	$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/' . $grabber['item_id'] . '/' . $grabber['filename'];
+	if ($grabber['location'] == NULL)
+	{
+		$main = APP_ROOT . '/uploads/gamesdb/big/' . $grabber['item_id'] . '/' . $grabber['filename'];
+		$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/' . $grabber['item_id'] . '/' . $grabber['filename'];
 
-	if (file_exists($main))
-	{
-		unlink($main);
+		if (file_exists($main))
+		{
+			unlink($main);
+		}
+		if (file_exists($thumb))
+		{
+			unlink($thumb);
+		}
 	}
-	if (file_exists($thumb))
+	else
 	{
-		unlink($thumb);
+		$result = $client->deleteObject([
+			'Bucket' => 'goluploads',
+			'Key'    => 'uploads/gamesdb/big/' . $grabber['item_id'] . '/' . $grabber['filename']
+		]);		
 	}
+	echo PHP_EOL.'File ' . $grabber['filename'] . ' removed for ItemDB.'.PHP_EOL;
 }
 
 $dbl->run("DELETE FROM `itemdb_images` WHERE `date_uploaded` < ? AND `approved` = 0", array($sql_date));

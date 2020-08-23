@@ -91,8 +91,13 @@ $templating->block('filters', 'free_games');
 // genre checkboxes
 $genres_res = $dbl->run("select count(*) as `total`, cat.category_name, cat.category_id from `calendar` c INNER JOIN `game_genres_reference` ref ON ref.game_id = c.id INNER JOIN `articles_categorys` cat ON cat.category_id = ref.genre_id where c.`free_game` = 1 group by cat.category_name, cat.category_id")->fetch_all();
 $genres_output = '';
+$genres_show = '';
+$hidden_genres = '<li class="hidden-details"><a id="hide1" href="#hide1" class="hide">+ More</a>
+<a id="show1" href="#show1" class="show">- Less</a><div class="details"><ul>';
+$genres_counter = 0;
 foreach ($genres_res as $genre)
 {
+	$genres_counter++;
 	$checked = '';
 	if (isset($filters_sort['genres']) && in_array($genre['category_id'], $filters_sort['genres']))
 	{
@@ -103,9 +108,17 @@ foreach ($genres_res as $genre)
 	{
 		$total = ' <small>('.$genre['total'].')</small>';
 	}
-	$genres_output .= '<li><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
+	if ($genres_counter > 4)
+	{
+		$hidden_genres .= '<li><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
+	}
+	else
+	{
+		$genres_show .= '<li><label><input type="checkbox" name="genres[]" value="'.$genre['category_id'].'" '.$checked.'> '.$genre['category_name'].$total.'</label></li>';
+	}
 }
-$templating->set('genres_output', $genres_output);
+$hidden_genres .= '</ul></div></li>';
+$templating->set('genres_output', $genres_show . $hidden_genres);
 
 $licenses = ['BSD', 'GPL', 'MIT', 'Closed Source'];
 $licenses_output = '';

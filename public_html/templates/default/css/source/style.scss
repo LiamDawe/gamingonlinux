@@ -2252,6 +2252,26 @@ table tr td {
 
 div.dataTables_wrapper > div.dataTables_info, div.dataTables_wrapper > div.dataTables_length, div.dataTables_wrapper > div.dataTables_filter {color: var(--font-color)}
 
+/* pure CSS to show/hide content */
+.details,
+.show,
+.hide:target {
+  display: none;
+}
+.hide:target + .show,
+.hide:target ~ .details {
+  display: block;
+}
+
+.box .body ul li.hidden-details
+{
+	padding-left: 0px;
+}
+.box .body ul li.hidden-details a
+{
+	padding-left: 10px;
+}
+
 /* sales page */
 .bundle-row:hover {background-color: var(--sales-tr-hover);}
 .sales-options {border-bottom: 1px solid rgb(177, 177, 177);}

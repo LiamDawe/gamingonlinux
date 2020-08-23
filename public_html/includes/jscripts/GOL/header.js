@@ -2295,6 +2295,22 @@ jQuery(document).ready(function()
 		$header.first().find('span').toggleClass("caret-down caret-right");
 	});
 
+	/* Make filter expanding prettier for people with JS turned on - hides anchor from URL */
+	$(document).on('click', ".hidden-details .show, .hidden-details .hide", function(e)
+	{
+		e.preventDefault();
+		$(this).closest('.hidden-details').find('.details').toggle();
+		$(this).hide();
+		if ($(this).attr('class') == 'hide')
+		{
+			$(this).closest('.hidden-details').find('.show').show();
+		}
+		if ($(this).attr('class') == 'show')
+		{
+			$(this).closest('.hidden-details').find('.hide').show();
+		}
+	});
+
 	// uploading a small pic
 	$('#small_pic').off('click').on('change', function()
 	{

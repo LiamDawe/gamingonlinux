@@ -88,14 +88,19 @@ if (isset($_SESSION['message']))
 // LANDING PAGE TODO - NEED TO UPDATE ALL SEARCHES TO $_GET['view'] == 'mainlist'
 if (!isset($_GET['view']))
 {
-	$featured = $dbl->run("SELECT i.`item_id`, i.`filename`, c.`name` FROM `itemdb_images` i JOIN `calendar` c ON c.id = i.item_id WHERE i.`featured` = 1 ORDER BY RAND() LIMIT 6")->fetch_all();
+	$featured = $dbl->run("SELECT i.`item_id`, i.`filename`, i.`location`, c.`name` FROM `itemdb_images` i JOIN `calendar` c ON c.id = i.item_id WHERE i.`featured` = 1 ORDER BY RAND() LIMIT 6")->fetch_all();
 
 	$templating->block('featured', 'itemdb');
 
 	$featured_output = '<ul style="text-align: center; padding: 0;">';
 	foreach ($featured as $item)
 	{
-		$featured_output .= '<li style="display:inline;"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img src="'.$core->config('website_url').'uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" /></a></li>';
+		$location = $core->config('website_url');
+		if ($item['location'] != NULL)
+		{
+			$location = $item['location'];
+		}
+		$featured_output .= '<li style="display:inline;"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img src="'.$location.'uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" /></a></li>';
 	}
 
 	$featured_output .= '</ul>';

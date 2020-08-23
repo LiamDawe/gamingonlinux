@@ -36,7 +36,7 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']) && isset($_POST[
 	{
 		case 'itemdb':
 		case 'itemdb_featured':
-			$qry1 = "SELECT `filename`, `item_id` FROM `itemdb_images` WHERE `id` = ?";
+			$qry1 = "SELECT `filename`, `location`, `item_id` FROM `itemdb_images` WHERE `id` = ?";
 			$qry2 = "DELETE FROM `itemdb_images` WHERE `id` = ?";				
 		break;
 		case 'article':
@@ -53,22 +53,33 @@ if (isset($_POST['image_id']) && is_numeric($_POST['image_id']) && isset($_POST[
 		{
 			if ($grabber['item_id'] > 0)
 			{
-				$main = APP_ROOT . '/uploads/gamesdb/big/' . $grabber['item_id'] . '/' . $grabber['filename'];
-				$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/' . $grabber['item_id'] . '/' . $grabber['filename'];
+				$item_id = $grabber['item_id'];
 			}
 			else
 			{
-				$main = APP_ROOT . '/uploads/gamesdb/big/tmp/' . $grabber['filename'];
-				$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/tmp/' . $grabber['filename'];				
+				$item_id = 'tmp';
 			}
 
-			if (file_exists($main))
+			$main = APP_ROOT . '/uploads/gamesdb/big/'. $item_id .'/' . $grabber['filename'];
+			$thumb = APP_ROOT . '/uploads/gamesdb/big/thumbs/'. $item_id .'/' . $grabber['filename'];	
+
+			if ($grabber['location'] == NULL)
 			{
-				unlink($main);
+				if (file_exists($main))
+				{
+					unlink($main);
+				}
+				if (file_exists($thumb))
+				{
+					unlink($thumb);
+				}
 			}
-			if (file_exists($thumb))
+			else
 			{
-				unlink($thumb);
+				$result = $client->deleteObject([
+					'Bucket' => 'goluploads',
+					'Key'    => 'uploads/gamesdb/big/' . $item_id . '/' . $grabber['filename']
+				]);				
 			}
 		}
 		else

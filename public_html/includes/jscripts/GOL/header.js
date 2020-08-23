@@ -2342,7 +2342,7 @@ jQuery(document).ready(function()
 				$("#featured-load-status").hide();
 				$("#featured-load-button").show();
 				$('#featured-preview').html(data.data[0].output);
-				$('#itemdbform').append('<input class="uploads-'+data.data[0].media_id+'" type="hidden" name="uploads[]" value="'+data.data[0].media_id+'" />');
+				$('#itemdbform').append('<input class="uploads-'+data.data[0].media_id+'" type="hidden" name="uploads[]" value="'+data.data[0].media_id+'" /><input class="uploads-'+data.data[0].media_id+'" type="hidden" name="featured" value="'+data.data[0].media_id+'" />');
 			}
 		});
 	});

@@ -1,5 +1,7 @@
 <?php
+require_once APP_ROOT . '/includes/aws/aws-autoloader.php';
 use claviska\SimpleImage;
+use Aws\S3\S3Client;
 
 class game_sales
 {
@@ -1033,7 +1035,7 @@ class game_sales
 				}
 				unset($_SESSION['itemdb']['uploads']);
 				$in  = str_repeat('?,', count($image_ids) - 1) . '?';
-				$item_images = $this->dbl->run("SELECT `filename`,`id`,`filetype` FROM `itemdb_images` WHERE `id` IN ($in) ORDER BY `id` ASC", $image_ids)->fetch_all();
+				$item_images = $this->dbl->run("SELECT `filename`,`id`,`filetype`,`featured` FROM `itemdb_images` WHERE `id` IN ($in) ORDER BY `id` ASC", $image_ids)->fetch_all();
 			}
 		}
 		if ($item_images)
@@ -1050,20 +1052,23 @@ class game_sales
 					$item_dir = $item_id . '/';
 				}
 
-				$thumbs_dir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/gamesdb/big/thumbs/" . $item_dir;
+				if ($value['featured'] == 0)
+				{
+					$thumbs_dir = $_SERVER['DOCUMENT_ROOT'] . "/uploads/gamesdb/big/thumbs/" . $item_dir;
 
-				$main_url = $this->core->config('website_url') . 'uploads/gamesdb/big/' . $item_dir . $value['filename'];
-				$thumb_url = $this->core->config('website_url') . 'uploads/gamesdb/big/thumbs/' . $item_dir . $value['filename'];
+					$main_url = $this->core->config('website_url') . 'uploads/gamesdb/big/' . $item_dir . $value['filename'];
+					$thumb_url = $this->core->config('website_url') . 'uploads/gamesdb/big/thumbs/' . $item_dir . $value['filename'];
 
-				$preview_file = '<a data-fancybox="images" href="'.$main_url.'" target="_blank"><img src="' . $thumb_url . '" class="imgList"></a><br />';
+					$preview_file = '<a data-fancybox="images" href="'.$main_url.'" target="_blank"><img src="' . $thumb_url . '" class="imgList"></a><br />';
 
-				$previously_uploaded['output'] .= '<div class="box">
-				<div class="body group">
-				<div id="'.$value['id'].'">'.$preview_file.'
-				<button id="' . $value['id'] . '" class="trash" data-type="itemdb">Delete Media</button>
-				</div>
-				</div>
-				</div>';
+					$previously_uploaded['output'] .= '<div class="box">
+					<div class="body group">
+					<div id="'.$value['id'].'">'.$preview_file.'
+					<button id="' . $value['id'] . '" class="trash" data-type="itemdb">Delete Media</button>
+					</div>
+					</div>
+					</div>';
+				}
 			}
 		}
 		return $previously_uploaded;
@@ -1071,57 +1076,122 @@ class game_sales
 
 	function move_tmp_media($uploads, $item_id)
 	{
+		$key = $this->core->config('do_space_key_uploads');
+		$secret = $this->core->config('do_space_key_private_uploads');
+
+		$client = new Aws\S3\S3Client([
+				'version' => 'latest',
+				'region'  => 'am3',
+				'endpoint' => 'https://ams3.digitaloceanspaces.com',
+				'credentials' => [
+						'key'    => $key,
+						'secret' => $secret,
+					],
+		]);
+
 		foreach($uploads as $key)
 		{
 			$this->dbl->run("UPDATE `itemdb_images` SET `item_id` = ?, `approved` = 1 WHERE `id` = ?", array($item_id, $key));
 
-			$file = $this->dbl->run("SELECT `filename`, `featured` FROM `itemdb_images` WHERE `id` = ?", array($key))->fetch();
+			$file = $this->dbl->run("SELECT `filename`, `location`, `featured`, `filetype` FROM `itemdb_images` WHERE `id` = ?", array($key))->fetch();
 
 			// feature item, check if there's an older one and remove it
 			if ($file['featured'] == 1)
 			{
-				$check_featured = $this->dbl->run("SELECT `id`, `filename` FROM `itemdb_images` WHERE `id` != ? AND `featured` = 1 AND `item_id` = ?", array($key, $item_id))->fetch_all();
+				$check_featured = $this->dbl->run("SELECT `id`, `filename`, `location` FROM `itemdb_images` WHERE `id` != ? AND `featured` = 1 AND `item_id` = ?", array($key, $item_id))->fetch_all();
 				if ($check_featured)
 				{
 					foreach ($check_featured as $old_featured)
 					{
-						unlink(APP_ROOT . "/uploads/gamesdb/big/" . $item_id . '/' . $old_featured['filename']);
+						if ($old_featured['location'] == NULL)
+						{
+							unlink(APP_ROOT . "/uploads/gamesdb/big/tmp/" . $old_featured['filename']);
+						}
+						else
+						{
+							$result = $client->deleteObject([
+								'Bucket' => 'goluploads',
+								'Key'    => 'uploads/gamesdb/big/tmp/' . $old_featured['filename']
+							]);	
+						}
 					}
 					$this->dbl->run("DELETE FROM `itemdb_images` WHERE `featured` = 1 AND `item_id` = ? AND `id` != ?", array($item_id, $key));
 				}
+				if ($file['location'] != NULL)
+				{
+					try
+					{
+						$mime_types = array('jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png');
+
+						$mime = $mime_types[$file['filetype']];
+
+						$result = $client->copyObject([
+							'Bucket' => 'goluploads',
+							'CopySource' =>  'goluploads/uploads/gamesdb/big/tmp/' . $file['filename'],
+							'Key' => 'uploads/gamesdb/big/' . $item_id . '/' . $file['filename'],
+							'MetadataDirective' => 'REPLACE',
+							'ACL'    => 'public-read',
+							'ContentType' => $mime
+						]);	
+
+						$result = $client->deleteObject([
+							'Bucket' => 'goluploads',
+							'Key'    => 'uploads/gamesdb/big/tmp/' . $file['filename']
+						]);							
+					}
+					catch (Exception $e)
+					{
+						error_log($e->getMessage());
+					}
+				}
 			}
-
-			$uploaddir = APP_ROOT . "/uploads/gamesdb/big/" . $item_id;
-			$thumbs_dir = APP_ROOT . "/uploads/gamesdb/big/thumbs/" . $item_id;
-
-			if (!is_dir($uploaddir))
+			else
 			{
-				mkdir($uploaddir, 0777);
+				$uploaddir = APP_ROOT . "/uploads/gamesdb/big/" . $item_id;
+				$thumbs_dir = APP_ROOT . "/uploads/gamesdb/big/thumbs/" . $item_id;
+
+				if (!is_dir($uploaddir))
+				{
+					mkdir($uploaddir, 0777);
+				}
+			
+				if (!is_dir($thumbs_dir))
+				{
+					mkdir($thumbs_dir, 0777);
+				}
+
+				$tmp_full_file_big = APP_ROOT . "/uploads/gamesdb/big/tmp/" . $file['filename'];
+				$full_file_big = $uploaddir . '/' . $file['filename'];
+
+				$tmp_full_file_thumbnail = APP_ROOT . "/uploads/gamesdb/big/thumbs/tmp/" . $file['filename'];
+				$full_file_thumbnail = $thumbs_dir . '/' . $file['filename'];
+
+				rename($tmp_full_file_big, $full_file_big);
+				rename($tmp_full_file_thumbnail, $full_file_thumbnail);
 			}
-		
-			if (!is_dir($thumbs_dir))
-			{
-				mkdir($thumbs_dir, 0777);
-			}
-
-			$tmp_full_file_big = APP_ROOT . "/uploads/gamesdb/big/tmp/" . $file['filename'];
-			$full_file_big = $uploaddir . '/' . $file['filename'];
-
-			$tmp_full_file_thumbnail = APP_ROOT . "/uploads/gamesdb/big/thumbs/tmp/" . $file['filename'];
-			$full_file_thumbnail = $thumbs_dir . '/' . $file['filename'];
-
-			rename($tmp_full_file_big, $full_file_big);
-			rename($tmp_full_file_thumbnail, $full_file_thumbnail);
 		}
 	}
 
 	// when updating an item, this will remove older featured images left when a new one is put up as we only keep one
 	function update_featured($item_id)
 	{
-		$check_featured = $this->dbl->run("SELECT `id`, `filename` FROM `itemdb_images` WHERE `featured` = 1 AND `item_id` = ? ORDER BY `id` ASC", array($item_id))->fetch_all();
+		$check_featured = $this->dbl->run("SELECT `id`, `filename`, `location` FROM `itemdb_images` WHERE `featured` = 1 AND `item_id` = ? ORDER BY `id` ASC", array($item_id))->fetch_all();
 		$count_featured = count($check_featured);
 		if ($check_featured && $count_featured > 1)
 		{
+			$key = $this->core->config('do_space_key_uploads');
+			$secret = $this->core->config('do_space_key_private_uploads');
+
+			$client = new Aws\S3\S3Client([
+					'version' => 'latest',
+					'region'  => 'am3',
+					'endpoint' => 'https://ams3.digitaloceanspaces.com',
+					'credentials' => [
+							'key'    => $key,
+							'secret' => $secret,
+						],
+			]);
+
 			$current = 0;
 			$picture_ids = [];
 			foreach ($check_featured as $old_featured)
@@ -1130,7 +1200,17 @@ class game_sales
 
 				if ($current != $count_featured)
 				{
-					unlink(APP_ROOT . "/uploads/gamesdb/big/" . $item_id . '/' . $old_featured['filename']);
+					if ($old_featured['location'] == NULL)
+					{
+						unlink(APP_ROOT . "/uploads/gamesdb/big/" . $item_id . '/' . $old_featured['filename']);
+					}
+					else
+					{
+						$result = $client->deleteObject([
+							'Bucket' => 'goluploads',
+							'Key'    => 'uploads/gamesdb/big/' . $item_id . '/' .  $old_featured['filename']
+						]);
+					}
 					$picture_ids[] = $old_featured['id'];
 				}
 			}
@@ -1164,5 +1244,437 @@ class game_sales
 		$img->fromFile($_SERVER['DOCUMENT_ROOT'].$filename)->resize(450, null)->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($_SERVER['DOCUMENT_ROOT'].$save_as, 'image/jpeg');
 
 		$this->dbl->run("UPDATE `calendar` SET `trailer_thumb` = ? WHERE `id` = ?", array($this->core->config('website_url') . $save_as, $item_id));
+	}
+
+	public function display_comments($data)
+	{
+		// get blocked id's
+		$blocked_ids = [];
+		$blocked_usernames = [];
+		if (count($this->user->blocked_users) > 0)
+		{
+			foreach ($this->user->blocked_users as $username => $blocked_id)
+			{
+				$blocked_ids[] = $blocked_id[0];
+				$blocked_usernames[] = $username;
+			}
+		}
+
+		$total_comments = $data['item']['total_comments'];
+
+		$per_page = 15;
+		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
+		{
+			$per_page = $_SESSION['per-page'];
+		}
+
+		//lastpage is = total comments / items per page, rounded up.
+		if ($total_comments <= 10)
+		{
+			$lastpage = 1;
+		}
+		else
+		{
+			$lastpage = ceil($total_comments/$per_page);
+		}
+
+		// paging for pagination
+		if (!isset($data['page']) || $data['page'] == 0)
+		{
+			$page = 1;
+		}
+
+		else if (is_numeric($data['page']))
+		{
+			$page = $data['page'];
+		}
+
+		if ($page > $lastpage)
+		{
+			$page = $lastpage;
+		}
+
+		// sort out the pagination link
+		$pagination = $this->core->pagination_link($per_page, $total_comments, $data['pagination_link'], $page, '#comments');
+		$pagination_head = $this->core->head_pagination($per_page, $total_comments, $data['pagination_link'], $page, '#comments');
+
+		$this->templating->block('comments_top', 'items_database');
+		$this->templating->set('pagination_head', $pagination_head);
+		$this->templating->set('pagination', $pagination);
+
+		$subscribe_link = '';
+		$close_comments_link = '';
+
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+		{
+			// they're logged in, so let's see if they're subscribed to the article
+			$check_sub = $this->dbl->run("SELECT `send_email` FROM `itemdb_subscriptions` WHERE `user_id` = ? AND `item_id` = ?", array((int) $_SESSION['user_id'], (int) $data['item']['id']))->fetch();
+			if ($check_sub)
+			{
+				// update their subscriptions if they are reading the last page
+				if ($_SESSION['email_options'] == 2 && $check_sub['send_email'] == 0)
+				{
+					// they have read all new comments (or we think they have since they are on the last page)
+					if ($page == $lastpage)
+					{
+						// send them an email on a new comment again
+						$this->dbl->run("UPDATE `itemdb_subscriptions` SET `send_email` = 1 WHERE `user_id` = ? AND `item_id` = ?", array((int) $_SESSION['user_id'], (int) $data['item']['id']));
+					}
+				}
+				// they're subscribed, so set the quick link to unsubscribe
+				$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"unsubscribe\" data-article-id=\"{$data['item']['id']}\" href=\"/index.php?module=articles_full&amp;go=unsubscribe&amp;article_id={$data['item']['id']}\" class=\"white-link\"><span class=\"link_button\">Unsubscribe</span></a>";
+			}
+			// they're not subscribed, so set the quick link to subscribe
+			else
+			{
+				$subscribe_link = "<a id=\"subscribe-link\" data-sub=\"subscribe\" data-article-id=\"{$data['item']['id']}\" href=\"/index.php?module=articles_full&amp;go=subscribe&amp;article_id={$data['item']['id']}\" class=\"white-link\"><span class=\"link_button\">Subscribe</span></a>";
+			}
+		}
+		$this->templating->set('subscribe_link', $subscribe_link);
+
+		//
+		/* DISPLAY THE COMMENTS */
+		//
+
+		// first grab a list of their bookmarks
+		if ($total_comments > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		{
+			$bookmarks_array = $this->dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'itemdb_comment' AND `parent_id` = ? AND `user_id` = ?", array((int) $data['item']['id'], (int) $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
+		}
+
+		$profile_fields = include dirname ( dirname ( __FILE__ ) ) . '/includes/profile_fields.php';
+
+		$db_grab_fields = '';
+		foreach ($profile_fields as $field)
+		{
+			$db_grab_fields .= "u.`{$field['db_field']}`,";
+		}
+
+		$params = array_merge([(int) $data['item']['id']], [$this->core->start], [$per_page]);
+
+		$comments_get = $this->dbl->run("SELECT ic.author_id, ic.comment_text, ic.comment_id, u.pc_info_public, u.distro, ic.time_posted, ic.last_edited, ic.last_edited_time, ic.`total_likes`, u.username, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `itemdb_comments` ic LEFT JOIN `users` u ON ic.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = ic.last_edited WHERE ic.`item_id` = ? AND ic.approved = 1 ORDER BY ic.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
+
+		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
+		$like_array = [];
+		$sql_replacers = [];
+		$user_ids = [];
+
+		foreach ($comments_get as $id_loop)
+		{
+			// no point checking for if they've liked a comment, that has no likes
+			if ($id_loop['total_likes'] > 0)
+			{
+				$like_array[] = (int) $id_loop['comment_id'];
+				$sql_replacers[] = '?';
+			}
+			$user_ids[] = (int) $id_loop['author_id'];
+		}
+
+		/* total comments indicator */
+		$total_hidden = 0;
+		if (!empty($user_ids) && !empty($blocked_ids))
+		{
+			foreach ($user_ids as $user_id)
+			{
+				if (in_array($user_id, $blocked_ids))
+				{
+					$total_hidden++;
+				}
+			}
+		}
+
+		$comments_top_text = '';
+		if ($total_comments > 0)
+		{
+			$comments_top_text = number_format($total_comments) . ' comment';
+			if ($total_comments > 1)
+			{
+				$comments_top_text .= 's';
+			}
+
+			if ($total_hidden > 0)
+			{
+				$comments_top_text .= ' ('.$total_hidden.' hidden)';
+			}
+		}
+		else
+		{
+			$comments_top_text = 'No comments yet!';
+		}
+		$this->templating->set('comments_top_text', $comments_top_text);
+
+		if (!empty($like_array))
+		{
+			$to_replace = implode(',', $sql_replacers);
+
+			// get this users likes
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+			{
+				$replace = [$_SESSION['user_id']];
+				foreach ($like_array as $comment_id)
+				{
+					$replace[] = $comment_id;
+				}
+
+				$get_user_likes = $this->dbl->run("SELECT `data_id` FROM `likes` WHERE `user_id` = ? AND `data_id` IN ( $to_replace ) AND `type` = 'comment'", $replace)->fetch_all(PDO::FETCH_COLUMN);
+			}
+		}
+
+		// get a list of each users user groups, so we can display their badges
+		if (!empty($user_ids))
+		{
+			$comment_user_groups = $this->user->post_group_list($user_ids);
+		}
+
+		// check over their permissions now
+		$permission_check = $this->user->can(array('mod_delete_comments', 'mod_edit_comments'));
+
+		$can_delete = 0;
+		if ($permission_check['mod_delete_comments'] == 1)
+		{
+			$can_delete = 1;
+		}
+		$can_edit = 0;
+		if ($permission_check['mod_edit_comments'] == 1)
+		{
+			$can_edit = 1;
+		}
+
+		foreach ($comments_get as $comments)
+		{
+			$comment_date = $this->core->time_ago($comments['time_posted']);
+
+			if (in_array($comments['author_id'], $blocked_ids))
+			{
+				$this->templating->block('blocked_comment', 'articles_full');
+			}
+			else
+			{
+				$this->templating->block('article_comments', 'articles_full');
+			}
+			// remove blocked users quotes
+			if (count($blocked_usernames) > 0)
+			{
+				foreach($blocked_usernames as $username)
+				{
+
+					$capture_quotes = preg_split('~(\[/?quote[^]]*\])~', $comments['comment_text'], NULL, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+
+					// need to count the amount of [quote=?
+					// each time we hit [/quote] take one away from counter
+					// snip the comment between the start and the final index number?
+					foreach ($capture_quotes as $index => $quote)
+					{
+						if(!isset($start) && $quote == "[quote={$username}]")
+						{
+							$start = $index;
+							$opens = 1;
+						}
+						else if(isset($start))
+						{
+							if(strpos($quote,'[quote=') !== false || strpos($quote,'[quote]') !== false)
+							{
+								++$opens;
+							}
+							else if(strpos($quote,'[/quote]')!==false)
+							{
+								--$opens;
+								if($opens == 0)
+								{
+									$capture_quotes = array_diff_key($capture_quotes,array_flip(range($start,$index)));
+									$comments['comment_text'] = trim(implode($capture_quotes));
+									unset($start);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if ($comments['author_id'] == 0 || empty($comments['username']))
+			{
+				if (empty($comments['username']))
+				{
+					$username = 'Guest';
+				}
+				if (!empty($comments['guest_username']))
+				{
+					if ($this->user->check_group([1,2]) == true)
+					{
+						$username = "<a href=\"/admin.php?module=articles&view=comments&ip_id={$comments['comment_id']}\">{$comments['guest_username']}</a>";
+					}
+					else
+					{
+						$username = $comments['guest_username'];
+					}
+				}
+				$quote_username = $comments['guest_username'];
+			}
+			else
+			{
+				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
+				$quote_username = $comments['username'];
+			}
+
+			// sort out the avatar
+			$comment_avatar = $this->user->sort_avatar($comments);
+
+			$into_username = '';
+			if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
+			{
+				$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . $this->core->config('website_url') . 'templates/'.$this->core->config('template').'/images/distros/' . $comments['distro'] . '.svg" />';
+			}
+
+			$pc_info = '';
+			if (isset($comments['pc_info_public']) && $comments['pc_info_public'] == 1)
+			{
+				if ($comments['pc_info_filled'] == 1)
+				{
+					$pc_info = '<a class="computer_deets" data-fancybox data-type="ajax" href="javascript:;" data-src="'.$this->core->config('website_url').'includes/ajax/call_profile.php?user_id='.$comments['author_id'].'">View PC info</a>';
+				}
+			}
+
+
+			$this->templating->set('user_id', $comments['author_id']);
+			$this->templating->set('username', $into_username . $username);
+			$this->templating->set('comment_avatar', $comment_avatar);
+			$this->templating->set('user_info_extra', $pc_info);
+
+			$cake_bit = '';
+			if ($username != 'Guest')
+			{
+				$cake_bit = $this->user->cake_day($comments['register_date'], $comments['username']);
+			}
+			$this->templating->set('cake_icon', $cake_bit);
+
+			$last_edited = '';
+			if ($comments['last_edited'] != 0)
+			{
+				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' on ' . $this->core->human_date($comments['last_edited_time']) . '[/i]';
+			}
+
+			$this->templating->set('article_id', $article_info['article']['article_id']);
+			$this->templating->set('comment_id', $comments['comment_id']);
+
+			$this->templating->set('total_likes', $comments['total_likes']);
+
+			$who_likes_link = '';
+			if ($comments['total_likes'] > 0)
+			{
+				$who_likes_link = ', <a class="who_likes" href="/index.php?module=who_likes&amp;comment_id='.$comments['comment_id'].'" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?comment_id='.$comments['comment_id'].'">Who?</a>';
+			}
+			$this->templating->set('who_likes_link', $who_likes_link);
+
+			$likes_hidden = '';
+			if ($comments['total_likes'] == 0)
+			{
+				$likes_hidden = ' likes_hidden ';
+			}
+			$this->templating->set('hidden_likes_class', $likes_hidden);
+
+			$logged_in_options = '';
+			$bookmark_comment = '';
+			$report_link = '';
+			$comment_edit_link = '';
+			$like_button = '';
+			$comment_delete_link = '';
+			$link_to_comment = '';
+			$permalink = $this->article_link(array('date' => $article_info['article']['date'], 'slug' => $article_info['article']['slug'], 'additional' => 'comment_id=' . $comments['comment_id']));
+			if (isset($article_info['type']) && $article_info['type'] != 'admin')
+			{
+				$link_to_comment = '<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" href="'.$permalink.'" data-src="/includes/ajax/call_post_link.php?post_id=' . $comments['comment_id'] . '&type=comment" title="Link to this comment"><span class="icon link">Link</span></a></li>';
+			}
+			$this->templating->set('link_to_comment', $link_to_comment);
+			$block_icon = '';
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+			{
+				$logged_in_options = $this->templating->block_store('logged_in_options', 'articles_full');
+
+				if (isset($article_info['type']) && $article_info['type'] != 'admin')
+				{
+					// sort bookmark icon out
+					if (in_array($comments['comment_id'], $bookmarks_array))
+					{
+						$bookmark_comment = '<li><a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="comment" data-id="'.$comments['comment_id'].'" data-parent-id="'.$article_info['article']['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a></li>';
+					}
+					else
+					{
+						$bookmark_comment = '<li><a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="comment" data-id="'.$comments['comment_id'].'" data-parent-id="'.$article_info['article']['article_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a></li>';
+					}
+
+					// block icon
+					$block_icon = '';
+					if ($_SESSION['user_id'] != $comments['author_id'])
+					{
+						$block_icon = '<li><a class="tooltip-top" href="/index.php?module=block_user&block='.$comments['author_id'].'" title="Block User"><span class="icon block"></span></a></li>';
+					}
+
+					$like_text = "Like";
+					$like_class = "like";
+					if ($_SESSION['user_id'] != 0)
+					{
+						if (isset($get_user_likes) && in_array($comments['comment_id'], $get_user_likes))
+						{
+							$like_text = "Unlike";
+							$like_class = "unlike";
+						}
+						else
+						{
+							$like_text = "Like";
+							$like_class = "like";
+						}
+					}
+
+					// don't let them like their own post
+					if ($comments['author_id'] != $_SESSION['user_id'])
+					{
+						$like_button = '<li class="lb-container" style="display:none !important"><a class="plusone tooltip-top" data-type="comment" data-id="'.$comments['comment_id'].'" data-article-id="'.$article_info['article']['article_id'].'" data-author-id="'.$comments['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
+					}
+
+					$report_link = "<li><a class=\"tooltip-top\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$article_info['article']['article_id']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
+
+					if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
+					{
+						$comment_edit_link = "<li><a class=\"tooltip-top edit_comment_link\" data-comment-id=\"{$comments['comment_id']}\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['comment_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
+					}
+
+					if ($can_delete == 1 || $_SESSION['user_id'] == $comments['author_id'])
+					{
+						$comment_delete_link = "<li><a class=\"tooltip-top delete_comment\" title=\"Delete\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=deletecomment&amp;comment_id={$comments['comment_id']}\" data-comment-id=\"{$comments['comment_id']}\"><span class=\"icon delete\"></span></a></li>";
+					}
+				}
+
+				$logged_in_options = $this->templating->store_replace($logged_in_options, array('post_id' => $comments['comment_id'], 'like_button' => $like_button, 'article_id' => $article_info['article']['article_id']));
+			}
+			$this->templating->set('logged_in_options', $logged_in_options);
+			$this->templating->set('bookmark', $bookmark_comment);
+			$this->templating->set('edit', $comment_edit_link);
+			$this->templating->set('delete', $comment_delete_link);
+			$this->templating->set('report_link', $report_link);
+			$this->templating->set('block', $block_icon);
+
+			// if we have some user groups for that user
+			$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
+			$badges = user::user_badges($comments, 1);
+			$this->templating->set('badges', implode(' ', $badges));
+
+			$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
+
+			$this->templating->set('profile_fields', $profile_fields_output);
+
+			// do this last, to help stop templating tags getting parsed in user text
+			$this->templating->set('text', $this->bbcode->parse_bbcode($comments['comment_text'] . $last_edited, 0));
+
+			$this->templating->set('date', $comment_date);
+			$this->templating->set('tzdate', date('c',$comments['time_posted']) );
+		}
+
+		$this->templating->block('bottom', 'articles_full');
+		$this->templating->set('pagination', $pagination);
+
+		if (isset($article_info['type']) && $article_info['type'] != 'admin' && $this->user->check_group([6,9]) === false)
+		{
+			$this->templating->block('patreon_comments', 'articles_full');
+		}
 	}
 }

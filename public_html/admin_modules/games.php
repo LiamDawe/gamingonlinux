@@ -78,7 +78,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		$templating->block('item', 'admin_modules/games');
 
 		// all these need to be empty, as it's a new game
-		$set_empty = array_merge(array('id', 'name', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name', 'crowdfund_notes', 'featured_pic', 'item_id', 'youtube-thumb'), array_keys($games_database->main_links));
+		$set_empty = array_merge(array('id', 'name', 'date', 'best_guess_check', 'is_dlc_check', 'base_game', 'free_game_check', 'trailer', 'trailer_link','small_pic', 'supports_linux_check', 'is_hidden_steam_check', 'is_crowdfunded_check', 'failed_linux_check', 'linux_stretch_goal_check', 'in_development_check', 'developer_name', 'crowdfund_notes', 'item_id', 'youtube-thumb'), array_keys($games_database->main_links));
 		foreach ($set_empty as $field_name)
 		{
 			if (!isset($_SESSION['item_error'][$field_name]))
@@ -90,6 +90,23 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 				$templating->set($field_name, $_SESSION['item_error'][$field_name]);
 			}
 		}
+
+		$featured_pic = '';
+		$featured_removal_button = '';
+		$featured_location = $core->config('website_url');
+		if (isset($_SESSION['item_error']['featured']))
+		{
+			$get_featured = $dbl->run("SELECT `filename`, `location`, `id` FROM `itemdb_images` WHERE `id` = ? AND `featured` = 1", array($_SESSION['item_error']['featured']))->fetch();
+
+			if ($get_featured['location'] != NULL)
+			{
+				$featured_location = $get_featured['location'];
+			}
+			$featured_pic = '<div id="'.$get_featured['id'].'"><img src="'.$featured_location.'uploads/gamesdb/big/tmp/' .$get_featured['filename'].'" alt="" /></div>';
+			$featured_removal_button = '<br /><button id="' . $get_featured['id'] . '" class="trash" data-type="itemdb_featured">Remove Featured</button>';
+		}
+		$templating->set('featured_pic', $featured_pic);
+		$templating->set('delete_featured_button', $featured_removal_button);
 
 		$types = ['is_game' => "Game", 'is_application' => "Misc Software or Application", 'is_emulator' => "Emulator"];
 		$type_options = '';
@@ -215,7 +232,7 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 		}
 		else
 		{
-			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id, i.filename as featured_pic, i.id as featured_id FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id LEFT JOIN `itemdb_images` i ON i.featured = 1 AND i.item_id = c.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
+			$game = $dbl->run("SELECT c.*, b.name as base_game_name, b.id as base_game_id, i.filename as featured_pic, i.id as featured_id, i.location as featured_location FROM `calendar` c LEFT JOIN `calendar` b ON c.base_game_id = b.id LEFT JOIN `itemdb_images` i ON i.featured = 1 AND i.item_id = c.id WHERE c.`id` = ?", array($_GET['id']))->fetch();
 
 			if (!$game)
 			{
@@ -272,10 +289,26 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 
 				$featured_pic = '';
 				$featured_removal_button = '';
-				if ($game['featured_pic'] != NULL && $game['featured_pic'] != '')
+				$featured_location = $core->config('website_url');
+				if (isset($_SESSION['item_error']['featured']))
 				{
-					$featured_pic = '<div id="'.$game['featured_id'].'"><img src="/uploads/gamesdb/big/'.$game['id'] . '/' .$game['featured_pic'].'" alt="" /></div>';
-					$featured_removal_button = '<br /><button id="' . $game['featured_id'] . '" class="trash" data-type="itemdb_featured">Delete Media</button>';
+					$get_featured = $dbl->run("SELECT `filename`, `location`, `id` FROM `itemdb_images` WHERE `id` = ? AND `featured` = 1", array($_SESSION['item_error']['featured']))->fetch();
+		
+					if ($get_featured['location'] != NULL)
+					{
+						$featured_location = $get_featured['location'];
+					}
+					$featured_pic = '<div id="'.$get_featured['id'].'"><img src="'.$featured_location.'uploads/gamesdb/big/'. $game['id'] .'/' .$get_featured['filename'].'" alt="" /></div>';
+					$featured_removal_button = '<br /><button id="' . $get_featured['id'] . '" class="trash" data-type="itemdb_featured">Remove Featured</button>';
+				}
+				else if ($game['featured_pic'] != NULL && $game['featured_pic'] != '')
+				{
+					if ($game['featured_location'] != NULL)
+					{
+						$featured_location = $game['featured_location'];
+					}
+					$featured_pic = '<div id="'.$game['featured_id'].'"><img src="'.$featured_location.'uploads/gamesdb/big/'.$game['id'] . '/' .$game['featured_pic'].'" alt="" /></div>';
+					$featured_removal_button = '<br /><button id="' . $game['featured_id'] . '" class="trash" data-type="itemdb_featured">Remove Featured</button>';
 				}
 				$templating->set('featured_pic', $featured_pic);
 				$templating->set('delete_featured_button', $featured_removal_button);
@@ -761,6 +794,10 @@ if (isset($_POST['act']))
 			if (isset($_POST['uploads']))
 			{
 				$_SESSION['itemdb']['uploads'] = $_POST['uploads'];
+			}
+			if (isset($_POST['featured']))
+			{
+				$_SESSION['item_error']['featured'] = $_POST['featured'];
 			}
 
 			header("Location: $error_page");

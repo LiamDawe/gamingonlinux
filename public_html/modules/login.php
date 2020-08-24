@@ -16,53 +16,7 @@ if (!isset($_POST['action']))
 	{
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 		{
-			$templating->block('main', 'login');
-			$templating->set('url', $core->config('website_url'));
-
-			$username = '';
-			if (isset($_SESSION['login_error_username']))
-			{
-				$username = $_SESSION['login_error_username'];
-			}
-
-			$templating->set('username', $username);
-
-			$current_page = '';
-			$templating->set('current_page', $current_page);
-			
-			$twitter_button = '';
-			if ($core->config('twitter_login') == 1)
-			{	
-				$twitter_button = '<a href="'.$core->config('website_url').'index.php?module=login&twitter" class="btn-auth btn-twitter"><span class="btn-icon"><img alt="" src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/twitter.png" /> </span>Sign in with <b>Twitter</b></a>';
-			}
-			$templating->set('twitter_button', $twitter_button);
-			
-			$steam_button = '';
-			if ($core->config('steam_login') == 1)
-			{
-				$steam_button = '<a href="'.$core->config('website_url').'index.php?module=login&steam" class="btn-auth btn-steam"><span class="btn-icon"><img alt="" src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/white/steam.png" /> </span>Sign in with <b>Steam</b></a>';
-			}
-			$templating->set('steam_button', $steam_button);
-			
-			$google_button = '';
-			if ($core->config('google_login') == 1)
-			{
-				$client_id = $core->config('google_login_public'); 
-				$client_secret = $core->config('google_login_secret');
-				$redirect_uri = $core->config('website_url') . 'includes/google/login.php';
-				require_once ($core->config('path') . 'includes/google/libraries/Google/autoload.php');
-				$client = new Google_Client();
-				$client->setClientId($client_id);
-				$client->setClientSecret($client_secret);
-				$client->setRedirectUri($redirect_uri);
-				$client->addScope("email");
-				$client->addScope("profile");
-				$service = new Google_Service_Oauth2($client);
-				$authUrl = $client->createAuthUrl();
-				
-				$google_button = '<a href="'.$authUrl.'" class="btn-auth btn-google"><span class="btn-icon"><img alt="" src="'.$core->config('website_url'). 'templates/' . $core->config('template') .'/images/network-icons/google.svg" /> </span>Sign in with <b>Google</b></a>';
-			}
-			$templating->set('google_button', $google_button);
+			$user_session->login_form();
 		}
 
 		else

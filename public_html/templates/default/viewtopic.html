@@ -169,21 +169,33 @@
 [/block: rules]
 
 [block: reply_top]
-<form method="post" formaction="{:url}index.php?module=newreply&amp;topic_id={:topic_id}&amp;forum_id={:forum_id}">
+<form method="post" class="gol-form" formaction="{:url}index.php?module=newreply&amp;topic_id={:topic_id}&amp;forum_id={:forum_id}">
 [/block: reply_top]
 
 [block: reply_buttons]
 <div class="box">
 	<div class="body group">
 		<strong>Subscribe to topic?</strong><br />
-		<em>You can <a href="/usercp.php?module=subscriptions">see all watched topics here</a>.</em><br />
-		<label class="checkbox">
-			<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to topic
-		</label>
-		<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select><br />
+		<em>You can <a href="/usercp.php?module=subscriptions">see all watched topics here</a>.</em>
+		<div class="flex-row">
+			<div class="flex-column-left">
+			<label class="checkbox">
+				<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to topic
+			</label>
+			</div>
+			<div class="flex-column-right">
+			<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select></div>
+		</div>
 		<input type="hidden" name="act" value="Add" />
 		{:moderator_options}
-		<button id="send" type="submit" class="button" onclick="setTimeout(disableFunction, 1);" formaction="{:url}index.php?module=newreply&amp;topic_id={:topic_id}&amp;forum_id={:forum_id}">Post Reply</button> <button id="preview_text_button" type="button">Preview</button>
+		<div class="flex-row">
+			<div class="flex-column-left">
+				<button id="send" type="submit" class="button" onclick="setTimeout(disableFunction, 1);" formaction="{:url}index.php?module=newreply&amp;topic_id={:topic_id}&amp;forum_id={:forum_id}">Post Reply</button> 
+			</div>
+			<div class="flex-column-right">
+				<button id="preview_text_button" type="button">Preview</button>
+			</div>
+		</div>
 	</div>
 </div>
 </form>

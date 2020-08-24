@@ -955,7 +955,9 @@ else
 										$templating->set('topic_id', $_GET['topic_id']);
 										$templating->set('forum_id', $topic['forum_id']);
 
-										$reply_options = 'Moderator options after posting: <select name="moderator_options"><option value=""></option>';
+										$reply_options = '<div class="flex-row">
+										<div class="flex-column-left">Moderator options:</div> 
+										<div class="flex-column-right"><select name="moderator_options"><option value=""></option>';
 										$options_count = 0;
 
 										if ($parray['can_sticky'] == 1)
@@ -1013,7 +1015,8 @@ else
 
 										if ($options_count > 0)
 										{
-											$reply_options .= '</select><br />';
+											$reply_options .= '</select></div>
+											</div>';
 										}
 
 										// if they have no moderator abilitys then remove the select box altogether

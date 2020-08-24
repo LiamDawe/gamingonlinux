@@ -2234,6 +2234,12 @@ div.gol_twitch .twitch_announce a.remove_announce {text-decoration: none;}
 
 /* GAMES DB */
 .filter-link {color: #000; font-weight: bold; cursor: pointer;}
+a.itemdb-quick-list{display: block;}
+div.itemdb-short-list a:nth-child(even) {background: var(--table-stripes-treven-bg)}
+div.itemdb-short-list a:nth-child(odd) {background: var(--table-stripes-trodd-bg)}
+.itemdb-quick-list{padding: 5px;}
+.itemdb-quick-name{margin-left: 10px;}
+div a.itemdb-quick-list:hover{background: #10131b;}
 
 /* Tables */
 table {

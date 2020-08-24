@@ -16,9 +16,14 @@
 
 [block: guest_add]
 	<div class="body group">
-		<form method="post">
-			Email: <input type="email" name="email" /><br />
-			<button type="submit" name="act" value="guest_sub">Subscribe</button>
+		<form method="post" class="gol-form">
+			<div class="flex-row">
+				<div class="flex-column-left"><strong>Email:</strong></div> 
+				<div class="flex-column-right"><input type="email" name="email" placeholder="Enter your email..." /></div>
+			</div>
+			<div class="flex-row">
+				<div class="flex-column-left"><button type="submit" name="act" value="guest_sub">Subscribe</button></div>
+			</div>
 		</form>
 	</div>
 </div>

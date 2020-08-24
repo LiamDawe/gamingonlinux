@@ -28,37 +28,6 @@
 				</div>
 [/block: main]
 
-[block: small]
-        <div class="box">
-					<div class="body group">
-						<p>You need to <a href="{:url}register/">Register</a> and <a href="{:url}index.php?module=login">Login</a> to comment, submit articles and more.</p>
-						<form class="gol-form" method="post" action="{:url}index.php?module=login">
-							<input type="hidden" name="current_page" value="{:current_page}" />
-							<input class="ays-ignore" name="username" type="text" value="" placeholder="Username or Email" />
-							<input class="ays-ignore" name="password" type="password" placeholder="Password" autocomplete="off" />
-							<label>
-								<input class="ays-ignore" name="stay" type="checkbox" /> Stay logged in. <em>Note: Checking this box requires a cookie. It is not required.</em>
-							</label>
-							<hr />
-							<button type="submit" name="action" value="Login">Login</button>
-							<span class="group fright" style="margin-top: 7px;">Or login with...</span>
-							<hr />
-							<div class="group">
-								{:steam_button}
-								<!--{:twitter_button}-->
-								{:google_button}
-								<br /><em>Social logins require cookies to stay logged in.</em>
-							</div>
-							<hr />
-							<div class="group">
-								<a href="/register/" class="button fleft">Register</a>
-								<a href="/index.php?module=login&amp;forgot" class="button fright">Forgot Login?</a>
-							</div>
-						</form>
-					</div>
-				</div>
-[/block: small]
-
 [block: forgot]
 <div class="box">
   <div class="head">Here you can request your password</div>

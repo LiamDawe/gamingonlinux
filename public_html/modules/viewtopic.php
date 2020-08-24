@@ -917,7 +917,8 @@ else
 						if ($_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 						{
 							$templating->load('login');
-							$templating->block('small');
+							$templating->block('main');
+							$templating->set('username', '');
 							$templating->set('current_page', core::current_page_url());
 
 							$templating->set('url', $core->config('website_url'));

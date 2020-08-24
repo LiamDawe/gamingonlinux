@@ -18,7 +18,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == 0)
 	$core->message('You do not have permissions to view this page! You need to be logged in to submit an article.');
 
 	$templating->load('login');
-	$templating->block('small');
+	$templating->block('main');
+	$templating->set('username', '');
 	$templating->set('current_page', core::current_page_url());
 	$templating->set('url', $core->config('website_url'));
 	

@@ -180,6 +180,8 @@ if (isset($_GET['view']))
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
 			$templating->set_previous('title', $get_item['name'], 1);
 
+			$dbl->run("UPDATE `calendar` SET `visits_today` = (visits_today + 1) WHERE `id` = ?", array($get_item['id']));
+
 			if ($get_item['supports_linux'] == 0 && !empty($get_item['steam_link']))
 			{
 				$core->message("Note: This item does not currently support Linux. You can try <a href=\"https://www.gamingonlinux.com/steamplay/\">Steam Play Proton</a> or Wine.", 2);
@@ -435,6 +437,83 @@ if (isset($_GET['view']))
 			{
 				$templating->block('user_bottom', 'items_database');
 			}
+
+			// itemdb comments
+			/*$total_comments = $dbl->run("SELECT COUNT(*) FROM `itemdb_comments` WHERE `item_id` = ?", array($get_item['id']))->fetchOne();
+
+			$get_item['total_comments'] = $total_comments;
+
+			$games_database->display_comments(['item' => $get_item, 'pagination_link' => '/itemdb/' . $get_item['id'] . '/', 'page' => core::give_page()]);
+
+			if ($core->config('comments_open') == 1)
+			{
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
+				{
+					$user_session->login_form(core::current_page_url());
+				}
+
+				else
+				{
+					if (!isset($_SESSION['activated']))
+					{
+						$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array((int) $_SESSION['user_id']))->fetch();
+						$_SESSION['activated'] = $get_active['activated'];
+					}
+
+					if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
+					{
+						// check they don't already have a reply in the mod queue for this forum topic
+						$check_queue = $dbl->run("SELECT COUNT(`comment_id`) FROM `itemdb_comments` WHERE `approved` = 0 AND `author_id` = ? AND `item_id` = ?", array($_SESSION['user_id'], $get_item['id']))->fetchOne();
+						if ($check_queue == 0)
+						{
+							$mod_queue = $user->user_details['in_mod_queue'];
+							$forced_mod_queue = $user->can('forced_mod_queue');
+				
+							if ($forced_mod_queue == true || $mod_queue == 1)
+							{
+								$core->message('Some comments are held for moderation. Your post may not appear right away.', NULL, 2);
+							}
+							$subscribe_check = $user->check_subscription($get_item['id'], 'itemdb_comment');
+
+							$comment = '';
+							if (isset($_SESSION['acomment']))
+							{
+								$comment = $_SESSION['acomment'];
+							}
+
+							$templating->block('rules', 'items_database');
+							$templating->set('url', $core->config('website_url'));
+
+							$templating->block('comments_box_top', 'items_database');
+							$templating->set('url', $core->config('website_url'));
+
+							$comment_editor = new editor($core, $templating, $bbcode);
+							$comment_editor->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
+
+							$templating->block('comment_buttons', 'items_database');
+							$templating->set('url', $core->config('website_url'));
+							$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
+							$templating->set('subscribe_email_check', $subscribe_check['emails']);
+							$templating->set('iid', $get_item['id']);
+
+							$templating->block('preview', 'items_database');
+						}
+						else
+						{
+							$core->message('You currently have a comment in the moderation queue for this item, you must wait for that to be approved/denied before you can post another reply here.', NULL, 2);
+						}
+					}
+
+					else
+					{
+						$core->message('To comment you need to activate your account! You were sent an email with instructions on how to activate. <a href="/index.php?module=activate_user&redo=1">Click here to re-send a new activation key</a>');
+					}
+				}
+			}
+			else if ($core->config('comments_open') == 0)
+			{
+				$core->message('Commenting is currently down for maintenance.');
+			}*/
 		}
 		else
 		{
@@ -767,5 +846,238 @@ if (isset($_POST['act']))
 		$_SESSION['message'] = 'dev_submitted';
 		$_SESSION['message_extra'] = $name;
 		header("Location: /index.php?module=items_database&view=submit_dev");			
+	}
+
+	if ($_POST['act'] == 'comment')
+	{
+		// make sure item id is a number
+		if (!isset($_POST['iid']) || !is_numeric($_POST['iid']))
+		{
+			header("Location: " . $core->config('website_url'));
+			die();
+		}
+		// check it even exists
+		$item_id = $dbl->run("SELECT `id` FROM `calendar` WHERE `id` = ?", array($_POST['iid']))->fetchOne();
+		if (!$item_id)
+		{
+			header("Location: " . $core->config('website_url'));
+			die();
+		}
+
+		else if (!isset($_SESSION['user_id']) || ( isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 ) )
+		{
+			$core->message('You do not have permission to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
+		}
+
+		else if (!$user->can('comment_on_articles'))
+		{
+			$core->message('You do not have permission to comment on articles, you may need to be <a href="index.php?module=register">Registered</a> and <a href="index.php?module=login">Logged in</a> to be able to comment! Or else your user group doesn\'t have permissions to comment!');
+		}
+
+		else
+		{
+			if ($core->config('comments_open') == 0)
+			{
+				$core->message('Commenting is currently down for maintenance.');
+			}
+			else
+			{
+				// sort out what page the new comment is on, if current is 9, the next comment is on page 2, otherwise round up for the correct page
+				$comment_page = 1;
+				if ($title['comment_count'] >= $_SESSION['per-page'])
+				{
+					$new_total = $title['comment_count']+1;
+					$comment_page = ceil($new_total/$_SESSION['per-page']);
+				}
+
+				// remove extra pointless whitespace
+				$comment = trim($_POST['text']);
+
+				// check for double comment
+				$check_comment = $dbl->run("SELECT `comment_text` FROM `itemdb_comments` WHERE `item_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array((int) $_POST['iid']))->fetch();
+
+				if ($check_comment['comment_text'] == $comment)
+				{
+					$_SESSION['message'] = 'double_comment';
+					header("Location: /itemdb/" . $item_id);
+
+					die();
+				}
+
+				// check if it's an empty comment
+				if (empty($comment))
+				{
+					$_SESSION['message'] = 'empty';
+					$_SESSION['message_extra'] = 'text';
+
+					header("Location: /itemdb/" . $item_id);
+
+					die();
+				}
+
+				else
+				{
+					$mod_queue = $user->user_details['in_mod_queue'];
+					$forced_mod_queue = $user->can('forced_mod_queue');
+						
+					$approved = 1;
+					if ($mod_queue == 1 || $forced_mod_queue == true)
+					{
+						$approved = 0;
+					}
+			
+					$comment = core::make_safe($comment);
+
+					// add the comment
+					$dbl->run("INSERT INTO `itemdb_comments` SET `item_id` = ?, `author_id` = ?, `time_posted` = ?, `comment_text` = ?, `approved` = ?", array($item_id, (int) $_SESSION['user_id'], core::$date, $comment, $approved));
+						
+					$new_comment_id = $dbl->new_id();
+						
+					// if they aren't keeping a subscription
+					if (!isset($_POST['subscribe']))
+					{
+						$dbl->run("DELETE FROM `itemdb_subscriptions` WHERE `user_id` = ? AND `item_id` = ?", array((int) $_SESSION['user_id'], $item_id));
+					}
+
+					if ($approved == 1)
+					{
+						$dbl->run("UPDATE `calendar` SET `comment_count` = (comment_count + 1) WHERE `id` = ?", array($item_id));
+
+						// check if they are subscribing
+						if (isset($_POST['subscribe']) && $_SESSION['user_id'] != 0)
+						{
+							$emails = 0;
+							if ($_POST['subscribe-type'] == 'sub-emails')
+							{
+								$emails = 1;
+							}
+							$article_class->subscribe($article_id, $emails);
+						}
+							
+						$new_notification_id = $notifications->quote_notification($comment, $_SESSION['username'], $_SESSION['user_id'], array('type' => 'itemdb_comment', 'thread_id' => $item_id, 'post_id' => $new_comment_id));
+
+						/* gather a list of subscriptions for this article (not including yourself!)
+						- Make an array of anyone who needs an email now
+						- Additionally, send a notification to anyone subscribed
+						*/
+						$users_to_email = $dbl->run("SELECT s.`user_id`, s.`emails`, s.`send_email`, s.`secret_key`, u.`email`, u.`username`, u.`email_options`, u.`display_comment_alerts` FROM `articles_subscriptions` s INNER JOIN `users` u ON s.user_id = u.user_id WHERE s.`article_id` = ? AND s.user_id != ? AND NOT EXISTS (SELECT `user_id` FROM `user_block_list` WHERE `blocked_id` = ? AND `user_id` = s.user_id)", array($article_id, (int) $_SESSION['user_id'], (int) $_SESSION['user_id']))->fetch_all();
+						$users_array = array();
+						foreach ($users_to_email as $email_user)
+						{
+							// gather list
+							if ($email_user['emails'] == 1 && $email_user['send_email'] == 1)
+							{
+								// use existing key, or generate any missing keys
+								if (empty($email_user['secret_key']))
+								{
+									$secret_key = core::random_id(15);
+									$dbl->run("UPDATE `articles_subscriptions` SET `secret_key` = ? WHERE `user_id` = ? AND `article_id` = ?", array($secret_key, $email_user['user_id'], $article_id));
+								}
+								else
+								{
+									$secret_key = $email_user['secret_key'];
+								}
+									
+								$users_array[$email_user['user_id']]['user_id'] = $email_user['user_id'];
+								$users_array[$email_user['user_id']]['email'] = $email_user['email'];
+								$users_array[$email_user['user_id']]['username'] = $email_user['username'];
+								$users_array[$email_user['user_id']]['email_options'] = $email_user['email_options'];
+								$users_array[$email_user['user_id']]['secret_key'] = $secret_key;
+							}
+
+							// notify them, if they haven't been quoted and already given one and they have comment notifications turned on
+							if ($email_user['display_comment_alerts'] == 1)
+							{
+								if (isset($new_notification_id['quoted_usernames']) && !in_array($email_user['username'], $new_notification_id['quoted_usernames']) || !isset($new_notification_id['quoted_usernames']))
+								{
+									$get_note_info = $dbl->run("SELECT `id`, `article_id`, `seen` FROM `user_notifications` WHERE `article_id` = ? AND `owner_id` = ? AND `type` != 'liked' AND `type` != 'quoted'", array($article_id, $email_user['user_id']))->fetch();
+
+									if (!$get_note_info)
+									{
+										$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `notifier_id` = ?, `article_id` = ?, `comment_id` = ?, `total` = 1, `type` = 'article_comment'", array($email_user['user_id'], (int) $_SESSION['user_id'], $article_id, $new_comment_id));
+										$new_notification_id[$email_user['user_id']] = $dbl->new_id();
+									}
+									else if ($get_note_info)
+									{
+										if ($get_note_info['seen'] == 1)
+										{
+											// they already have one, refresh it as if it's literally brand new (don't waste the row id)
+											$dbl->run("UPDATE `user_notifications` SET `notifier_id` = ?, `seen` = 0, `last_date` = ?, `total` = 1, `seen_date` = NULL, `comment_id` = ? WHERE `id` = ?", array($_SESSION['user_id'], core::$sql_date_now, $new_comment_id, $get_note_info['id']));
+										}
+										else if ($get_note_info['seen'] == 0)
+										{
+											// they haven't seen the last one yet, so only update the time and date
+											$dbl->run("UPDATE `user_notifications` SET `last_date` = ?, `total` = (total + 1) WHERE `id` = ?", array(core::$sql_date_now, $get_note_info['id']));
+										}
+
+										$new_notification_id[$email_user['user_id']] = $get_note_info['id'];
+									}
+								}
+							}
+						}
+
+						// send the emails
+						foreach ($users_array as $email_user)
+						{
+							// subject
+							$subject = "New reply to article {$title['title']} on GamingOnLinux.com";
+
+							$comment_email = $bbcode->email_bbcode($comment);
+
+							// message
+							$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
+							<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+							<div>
+							<hr>
+							{$comment_email}
+							<hr>
+							<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
+
+							$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
+
+							// Mail it
+							if ($core->config('send_emails') == 1)
+							{
+								$mail = new mailer($core);
+								$mail->sendMail($email_user['email'], $subject, $html_message, $plain_message);
+							}
+
+							// remove anyones send_emails subscription setting if they have it set to email once
+							if ($email_user['email_options'] == 2)
+							{
+								$dbl->run("UPDATE `articles_subscriptions` SET `send_email` = 0 WHERE `article_id` = ? AND `user_id` = ?", array($article_id, $email_user['user_id']));
+							}
+						}
+
+						// try to stop double postings, clear text
+						unset($_POST['text']);
+
+						// clear any comment or name left from errors
+						unset($_SESSION['acomment']);
+
+						$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug'], 'additional' => 'page=' . $comment_page . '#r' . $new_comment_id));
+
+						header("Location: " . $article_link);
+						die();
+					}
+					else if ($approved == 0)
+					{
+						// note who did it
+						$core->new_admin_note(array('completed' => 0, 'content' => ' has a comment that <a href="/admin.php?module=mod_queue&view=manage">needs approval.</a>', 'type' => 'mod_queue_comment', 'data' => $new_comment_id));
+
+						// try to stop double postings, clear text
+						unset($_POST['text']);
+
+						// clear any comment or name left from errors
+						unset($_SESSION['acomment']);
+							
+						$_SESSION['message'] = 'mod_queue';
+				
+						header("Location: /itemdb/" . $item_id);
+						die();
+					}
+				}
+			}
+		}
 	}
 }

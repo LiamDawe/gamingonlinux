@@ -73,10 +73,7 @@ if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] == $_REQUES
 
 			$user->new_login($lookup,$validator);
 
-			if ($userdata['social_stay_cookie'] == 1)
-			{
-				setcookie('gol_session', $validator . '.' . $validator, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1, 1);
-			}
+			setcookie('gol_session', $validator . '.' . $validator, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1, 1);
 
 			header("Location: " . $core->config('website_url'));
 			die();

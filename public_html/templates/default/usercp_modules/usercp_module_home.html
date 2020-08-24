@@ -39,10 +39,7 @@
 <div class="box">
 	<div class="subhead">Social logins</div>
 	<div class="body group">
-		<form method="post" style="display: inline-block">
-			Options: <label style="display: inline-block"><input type="checkbox" name="social_stay" style="display: inline-block" {:social_stay_check}/> Use cookies to stay logged in with the social logins?</label>
-			<button type="submit" name="act" value="update_social_stay" formaction="{:url}usercp.php?module=home" style="display: inline-block">Update</button>
-		</form>
+		<p>Note: social logins use cookies to stay logged in.</p>
 	{:twitter_button}
 	{:steam_button}
 	{:google_button}

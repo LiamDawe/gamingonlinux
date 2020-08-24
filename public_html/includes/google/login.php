@@ -81,10 +81,7 @@ if (isset($_GET['code']))
 
 		$user->new_login($lookup,$validator);
 
-		if ($userdata['social_stay_cookie'] == 1)
-		{
-			setcookie('gol_session', $lookup . '.' . $validator, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1);
-		}
+		setcookie('gol_session', $lookup . '.' . $validator, $user->expires_date->getTimestamp(), '/', $user->cookie_domain, 1);
 
 		header("Location: /");
 		die();

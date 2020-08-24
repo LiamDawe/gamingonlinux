@@ -47,7 +47,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `steam_id`, `steam_username`, `google_email`, `timezone`, `email_articles`, `mailing_list_key`, `social_stay_cookie`, `supporter_end_date`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `steam_id`, `steam_username`, `google_email`, `timezone`, `email_articles`, `mailing_list_key`, `supporter_end_date`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 	
 	// make sure they have a mailing_list_key
 	// if they unsubscribe it's wiped, but if they stay subscribed/make a new sub = use new or existing key
@@ -225,14 +225,7 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('aper-page', $apage_options);
 
-	/* social logins */
-	$stay_cookie = '';
-	if ($usercpcp['social_stay_cookie'])
-	{
-		$stay_cookie = 'checked';
-	}
-	$templating->set('social_stay_check', $stay_cookie);
-	
+	/* social logins */	
 	$twitter_button = '';
 	if ($core->config('twitter_login') == 1)
 	{
@@ -444,19 +437,6 @@ else if (isset($_POST['act']))
 	if ($_POST['act'] == 'google_remove')
 	{
 		$dbl->run("UPDATE `users` SET `google_email` = ? WHERE `user_id` = ?", array('', $_SESSION['user_id']));
-
-		header("Location: " . $core->config('website_url') . "usercp.php");
-	}
-
-	if ($_POST['act'] == 'update_social_stay')
-	{
-		$stay_cookie = 0;
-		if (isset($_POST['social_stay']))
-		{
-			$stay_cookie = 1;
-		}
-
-		$dbl->run("UPDATE `users` SET `social_stay_cookie` = ? WHERE `user_id` = ?", array($stay_cookie, $_SESSION['user_id']));
 
 		header("Location: " . $core->config('website_url') . "usercp.php");
 	}

@@ -75,10 +75,7 @@ class steam_user
 
 					$this->user->new_login($lookup,$validator);
 
-					if ($userdata['social_stay_cookie'] == 1)
-					{
-						setcookie('gol_session', $lookup . '.' . $validator, $this->user->expires_date->getTimestamp(), '/', $this->user->cookie_domain, 1,1);
-					}
+					setcookie('gol_session', $lookup . '.' . $validator, $this->user->expires_date->getTimestamp(), '/', $this->user->cookie_domain, 1,1);
 					
 					header("Location: {$_GET['real_return']}");
 				}

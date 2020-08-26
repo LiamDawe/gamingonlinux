@@ -27,26 +27,13 @@
 		<div class="free-list">
 		<div class="box"><div class="head">Games List - Total with current filters: {:filter_total}</div>
 
-		<div class="body group"><small>If it has a trailer, click the little icon to see it. Are we missing a free game? You can <a href="/index.php?module=items_database&amp;view=submit_item">submit it yourself</a>, or <a href="/index.php?module=email_us">send us a tip!</a></small></div></div>
+		<div class="body group"><small>Are we missing a free Linux game? You can <a href="/index.php?module=items_database&amp;view=submit_item">submit it yourself</a>, or <a href="/index.php?module=email_us">send us a tip!</a></small></div></div>
 
-			<table class="sales-table table-stripes-tbody">
-			<thead>
-				<tr><th colspan="2">Name</th><th>Links</th><th>License</th></tr>
-			</thead>
+		<div class="itemdb-short-list">
 [/block: list_top]
 
 [block: row]
-			<tbody>
-			<tr>
-				<td width="15%;">{:small_pic}</td>
-				<td width="40%;">{:edit}<a href="/index.php?module=items_database&amp;view=item&amp;id={:id}">{:name}</a></td>
-				<td width="40%;">{:links}</td>
-				<td width="5%;">{:license}</td>
-			</tr>
-			<tr>
-				<td class="td-free-games-tags" colspan="4"><small>Tags: {:genre_list} {:suggest_link}</small></td>
-			</tr>
-			</tbody>
+			<a class="itemdb-quick-list" href="/itemdb/{:item_id}"><div class="flex-row">{:small_pic}<div class="itemdb-quick-name">{:name}{:license}</div></div></a>
 [/block: row]
 
 [block: genres]
@@ -54,13 +41,13 @@
 [/block: genres]
 
 [block: bottom]
-			</table>
+			</div>
 			{:pagination}
 		</div>
 [/block: bottom]
 
 [block: filters]
-	<div class="box"><div class="body group"><small>Are we missing a free game? You can <a href="/index.php?module=items_database&amp;view=submit_item">submit it yourself</a>, or <a href="/index.php?module=email_us">send us a tip!</a></small></div></div>
+	<div class="box"><div class="body group"><small>Are we missing a free game? You can <a href="/index.php?module=items_database&amp;view=submit_item">submit it yourself</a>, or <a href="/index.php?module=email_us">send us a tip!</a> Looking for open source game engine reimplementations, like those that still need the commercial game data? Try the <a href="/db/">full GOL database</a>.</small></div></div>
 </div>
 <div class="col-3">
 	<form id="game_filters" name="free" method="get">

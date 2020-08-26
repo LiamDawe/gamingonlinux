@@ -1283,11 +1283,26 @@ class article
 			$this->templating->set('close_comments', '');
 		}
 
+		// check over their permissions now
+		$permission_check = $this->user->can(array('mod_delete_comments', 'mod_edit_comments'));
+
+		$can_delete = 0;
+		if ($permission_check['mod_delete_comments'] == 1)
+		{
+			$can_delete = 1;
+		}
+		$can_edit = 0;
+		if ($permission_check['mod_edit_comments'] == 1)
+		{
+			$can_edit = 1;
+		}
+
 		//
 		/* DISPLAY THE COMMENTS */
 		//
 
 		// first grab a list of their bookmarks
+		$bookmarks_array = NULL;
 		if ($total_comments > 0 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			$bookmarks_array = $this->dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `type` = 'comment' AND `parent_id` = ? AND `user_id` = ?", array((int) $article_info['article']['article_id'], (int) $_SESSION['user_id']))->fetch_all(PDO::FETCH_COLUMN);
@@ -1303,7 +1318,8 @@ class article
 
 		$params = array_merge([(int) $article_info['article']['article_id']], [$this->core->start], [$per_page]);
 
-		$comments_get = $this->dbl->run("SELECT a.author_id, a.guest_username, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`total_likes`, u.username, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.approved = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
+		/* NORMAL COMMENTS */
+		$comments_get = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.`comment_text`, a.`comment_id`, u.`pc_info_public`, u.`distro`, a.`time_posted`, a.`last_edited`, a.`last_edited_time`, a.`total_likes`, u.`username`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, ul.`username` as `username_edited` FROM `articles_comments` a LEFT JOIN `users` u ON a.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = a.`last_edited` WHERE a.`article_id` = ? AND a.`approved` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
 
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
@@ -1354,6 +1370,7 @@ class article
 		}
 		$this->templating->set('comments_top_text', $comments_top_text);
 
+		$get_user_likes = NULL;
 		if (!empty($like_array))
 		{
 			$to_replace = implode(',', $sql_replacers);
@@ -1377,9 +1394,40 @@ class article
 			$comment_user_groups = $this->user->post_group_list($user_ids);
 		}
 
-		// check over their permissions now
-		$permission_check = $this->user->can(array('mod_delete_comments', 'mod_edit_comments'));
+		/* PROMOTED COMMENTS */
+		if ($page == 1)
+		{
+			$promoted_comments = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`total_likes`, u.username, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.`approved` = 1 AND a.`promoted` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
 
+			if ($promoted_comments)
+			{
+				$this->templating->block('promoted_top', 'articles_full');
+
+				$this->render_comments($promoted_comments, $article_info, $bookmarks_array, $permission_check, $comment_user_groups, $profile_fields, $get_user_likes, 'promoted_comments');
+			}
+		}
+
+		if($promoted_comments)
+		{
+			$this->templating->block('normal_comments_top', 'articles_full');
+		}
+
+		if ($comments_get)
+		{
+			$this->render_comments($comments_get, $article_info, $bookmarks_array, $permission_check, $comment_user_groups, $profile_fields, $get_user_likes, 'normal_comments');
+		}
+
+		$this->templating->block('bottom', 'articles_full');
+		$this->templating->set('pagination', $pagination);
+
+		if (isset($article_info['type']) && $article_info['type'] != 'admin' && $this->user->check_group([6,9]) === false)
+		{
+			$this->templating->block('patreon_comments', 'articles_full');
+		}
+	}
+
+	function render_comments($comments_get, $article_info, $bookmarks_array, $permission_check, $comment_user_groups, $profile_fields, $get_user_likes, $type)
+	{
 		$can_delete = 0;
 		if ($permission_check['mod_delete_comments'] == 1)
 		{
@@ -1395,18 +1443,24 @@ class article
 		{
 			$comment_date = $this->core->time_ago($comments['time_posted']);
 
-			if (in_array($comments['author_id'], $blocked_ids))
+			if (in_array($comments['author_id'], $this->user->blocked_user_ids))
 			{
 				$this->templating->block('blocked_comment', 'articles_full');
 			}
 			else
 			{
+				$promoted_style = '';
+				if ($comments['promoted'] == 1)
+				{
+					$promoted_style = 'promoted-comment';
+				}
 				$this->templating->block('article_comments', 'articles_full');
+				$this->templating->set('promoted_style', $promoted_style);
 			}
 			// remove blocked users quotes
-			if (count($blocked_usernames) > 0)
+			if (count($this->user->blocked_usernames) > 0)
 			{
-				foreach($blocked_usernames as $username)
+				foreach($this->user->blocked_usernames as $username)
 				{
 
 					$capture_quotes = preg_split('~(\[/?quote[^]]*\])~', $comments['comment_text'], NULL, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
@@ -1504,6 +1558,20 @@ class article
 				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' on ' . $this->core->human_date($comments['last_edited_time']) . '[/i]';
 			}
 
+			$promote_option = '';
+			if ($this->user->check_group([1,2,5]))
+			{
+				if ($comments['promoted'] == 1)
+				{
+					$promote_option = ' <a href="/index.php?module=articles_full&aid='.$article_info['article']['article_id'].'&go=demote&demote='.$comments['comment_id'].'"><span class="link_button">Demote</span></a> ';
+				}
+				else
+				{
+					$promote_option = ' <a href="/index.php?module=articles_full&aid='.$article_info['article']['article_id'].'&go=promote&promote='.$comments['comment_id'].'"><span class="link_button">Promote</span></a> ';				
+				}
+			}
+			$this->templating->set('promote_option', $promote_option);
+
 			$this->templating->set('article_id', $article_info['article']['article_id']);
 			$this->templating->set('comment_id', $comments['comment_id']);
 
@@ -1517,7 +1585,7 @@ class article
 			$this->templating->set('who_likes_link', $who_likes_link);
 
 			$likes_hidden = '';
-			if ($comments['total_likes'] == 0)
+			if ($comments['total_likes'] == 0 || $type == 'promoted_comments')
 			{
 				$likes_hidden = ' likes_hidden ';
 			}
@@ -1560,29 +1628,32 @@ class article
 						$block_icon = '<li><a class="tooltip-top" href="/index.php?module=block_user&block='.$comments['author_id'].'" title="Block User"><span class="icon block"></span></a></li>';
 					}
 
-					$like_text = "Like";
-					$like_class = "like";
-					if ($_SESSION['user_id'] != 0)
+					if ($type == 'normal_comments')
 					{
-						if (isset($get_user_likes) && in_array($comments['comment_id'], $get_user_likes))
+						$like_text = "Like";
+						$like_class = "like";
+						if ($_SESSION['user_id'] != 0)
 						{
-							$like_text = "Unlike";
-							$like_class = "unlike";
+							if (isset($get_user_likes) && in_array($comments['comment_id'], $get_user_likes))
+							{
+								$like_text = "Unlike";
+								$like_class = "unlike";
+							}
+							else
+							{
+								$like_text = "Like";
+								$like_class = "like";
+							}
 						}
-						else
+
+						// don't let them like their own post
+						if ($comments['author_id'] != $_SESSION['user_id'])
 						{
-							$like_text = "Like";
-							$like_class = "like";
+							$like_button = '<li class="lb-container" style="display:none !important"><a class="plusone tooltip-top" data-type="comment" data-id="'.$comments['comment_id'].'" data-article-id="'.$article_info['article']['article_id'].'" data-author-id="'.$comments['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
 						}
+					
+						$report_link = "<li><a class=\"tooltip-top\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$article_info['article']['article_id']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
 					}
-
-					// don't let them like their own post
-					if ($comments['author_id'] != $_SESSION['user_id'])
-					{
-						$like_button = '<li class="lb-container" style="display:none !important"><a class="plusone tooltip-top" data-type="comment" data-id="'.$comments['comment_id'].'" data-article-id="'.$article_info['article']['article_id'].'" data-author-id="'.$comments['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
-					}
-
-					$report_link = "<li><a class=\"tooltip-top\" href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&amp;go=report_comment&amp;article_id={$article_info['article']['article_id']}&amp;comment_id={$comments['comment_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
 
 					if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
 					{
@@ -1618,14 +1689,6 @@ class article
 
 			$this->templating->set('date', $comment_date);
 			$this->templating->set('tzdate', date('c',$comments['time_posted']) );
-		}
-
-		$this->templating->block('bottom', 'articles_full');
-		$this->templating->set('pagination', $pagination);
-
-		if (isset($article_info['type']) && $article_info['type'] != 'admin' && $this->user->check_group([6,9]) === false)
-		{
-			$this->templating->block('patreon_comments', 'articles_full');
 		}
 	}
 

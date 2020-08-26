@@ -74,6 +74,7 @@
 	--coment-actions-bg-color: #ffffff;
 	--distro-icon-background: inherit;
 	--avatar-default-img: url('/uploads/avatars/no_avatar.png');
+	--promoted-comment-border: 2px solid rgba(255, 217, 0, 0.349);
 	// forum
 	--forum-row-bg: #efefef;
 	// icons
@@ -191,6 +192,7 @@
 	--coment-actions-bg-color: #222222;
 	--distro-icon-background: #b7b7b7;
 	--avatar-default-img: url('/uploads/avatars/no_avatar_dark.png');
+	--promoted-comment-border: 2px solid rgba(255, 217, 0, 0.24);
 	// forum
 	--forum-row-bg: #333333;
 	// icons
@@ -1245,6 +1247,11 @@ a.button {
 .collapse_container .collapse_header {background: var(--collapse-header-background);}
 
 .comments .img-responsive {max-height: 500px;}
+
+.comment.promoted-comment
+{
+	border: var(--promoted-comment-border);
+}
 
 .comment {
 	margin-bottom: 7px;

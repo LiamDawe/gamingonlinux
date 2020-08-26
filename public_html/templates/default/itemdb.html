@@ -32,19 +32,33 @@
 [/block: message]
 
 [block: featured]
-	<div class="col-12">
-		<div class="head">Random Featured</div>
-		<div style="text-align: center; padding: 5px;">These randomised featured items are games we believe work well, <u>support Linux</u> and are worth trying!</div>
+	<div class="col-6">
+		<div class="header-text-plain">Random Featured Picks</div>
 		{:featured}
 	</div>
 [/block: featured]
 
-[block: new_top]
-<div class="col-12">
-	<div class="head">Newest</div>
-	<div class="body group">Test</div>
+[block: popular]
+<div class="col-6">
+<div class="box">
+	<div class="header-text-plain">Popular today</div>
+	<div class="itemdb-short-list">
+		{:popular_today}
+	</div>
 </div>
-[/block: new_top]
+</div>
+[/block: popular]
+
+[block: new]
+<div class="col-6">
+<div class="box">
+	<div class="header-text-plain">New to GOL</div>
+	<div class="itemdb-short-list">
+		{:new_list}
+	</div>
+</div>
+</div>
+[/block: new]
 
 [block: top]
 	<div class="col-9">

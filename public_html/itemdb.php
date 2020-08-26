@@ -88,7 +88,7 @@ if (isset($_SESSION['message']))
 // LANDING PAGE TODO - NEED TO UPDATE ALL SEARCHES TO $_GET['view'] == 'mainlist'
 if (!isset($_GET['view']))
 {
-	$featured = $dbl->run("SELECT i.`item_id`, i.`filename`, i.`location`, c.`name` FROM `itemdb_images` i JOIN `calendar` c ON c.id = i.item_id WHERE i.`featured` = 1 ORDER BY RAND() LIMIT 6")->fetch_all();
+	$featured = $dbl->run("SELECT i.`item_id`, i.`filename`, i.`location`, c.`name` FROM `itemdb_images` i JOIN `calendar` c ON c.id = i.item_id WHERE i.`featured` = 1 ORDER BY RAND() LIMIT 3")->fetch_all();
 
 	$templating->block('featured', 'itemdb');
 
@@ -106,6 +106,49 @@ if (!isset($_GET['view']))
 	$featured_output .= '</ul>';
 
 	$templating->set('featured', $featured_output);
+
+	$popular = $dbl->run("SELECT `name`,`id`,`small_picture` FROM `calendar` ORDER BY `visits_today` DESC LIMIT 5")->fetch_all();
+	if ($popular)
+	{
+		$popular_list = '';
+		$templating->block('popular', 'itemdb');
+		foreach ($popular as $item)
+		{
+			if ($item['small_picture'])
+			{
+				$small_pic = $core->config('website_url') . 'uploads/gamesdb/small/' . $item['small_picture'];
+			}
+			else
+			{
+				$small_pic = $core->config('website_url') . 'templates/default/images/gamesdb/default_smallpic.jpg';
+			}
+			$img = '<img src="'.$small_pic.'" alt="" />';
+			$popular_list .= '<a class="itemdb-quick-list" href="/itemdb/'.$item['id'].'"><div class="flex-row">' . $img . '<div class="itemdb-quick-name">' . $item['name'] . '</div></div></a>';
+		}
+		$templating->set('popular_today', $popular_list);
+	}
+
+	$new = $dbl->run("SELECT `name`,`id`,`small_picture` FROM `calendar` WHERE `bundle` = 0 ORDER BY `id` DESC LIMIT 5")->fetch_all();
+	if ($new)
+	{
+		$new_list = '';
+		$templating->block('new', 'itemdb');
+		foreach ($new as $item)
+		{
+			if ($item['small_picture'])
+			{
+				$small_pic = $core->config('website_url') . 'uploads/gamesdb/small/' . $item['small_picture'];
+			}
+			else
+			{
+				$small_pic = $core->config('website_url') . 'templates/default/images/gamesdb/default_smallpic.jpg';
+			}
+			$img = '<img src="'.$small_pic.'" alt="" />';
+			$new_list .= '<a class="itemdb-quick-list" href="/itemdb/'.$item['id'].'"><div class="flex-row">' . $img . '<div class="itemdb-quick-name">' . $item['name'] . '</div></div></a>';
+		}
+		$templating->set('new_list', $new_list);
+	}
+
 }
 
 if (isset($_GET['view']) && $_GET['view'] == 'mainlist')

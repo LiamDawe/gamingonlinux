@@ -746,6 +746,11 @@ class user
 				$sql_table = 'forum_topics_subscriptions';
 				$sql_id_field = 'topic_id';
 			}
+			if ($type == 'itemdb_comment')
+			{
+				$sql_table = 'itemdb_subscriptions';
+				$sql_id_field = 'item_id';
+			}
 
 			// see if they are subscribed right now, if they are and they untick the subscribe box, remove their subscription as they are unsubscribing
 			$subscribe_check = [];

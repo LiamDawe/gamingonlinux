@@ -26,5 +26,13 @@ return [
 	[
 		"text" => "Someone is currently editing that comment, please check back in 5 minutes.",
 		"error" => 1
+	],
+	"comment_demoted" =>
+	[
+		"text" => 'You have demoted that comment!'
+	],
+	"comment_promoted" =>
+	[
+		"text" => 'That comment has been promoted to the top!'
 	]
 ];

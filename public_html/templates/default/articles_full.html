@@ -113,12 +113,24 @@
 						</div>
 [/block: comments_top]
 
+[block: promoted_top]
+<div class="box">
+	<div class="header-text-plain">&#9734; Promoted Comments</div>
+</div>
+[/block: promoted_top]
+
+[block: normal_comments_top]
+<div class="box">
+	<div class="header-text-plain">Full Comments</div>
+</div>
+[/block: normal_comments_top]
+
 [block: article_comments]
 						<a class="anchor" id="r{:comment_id}"></a>
-						<div class="comment group r{:comment_id}">
+						<div class="comment group r{:comment_id} {:promoted_style}">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									<span class="username">{:username}</span> {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr>
+									<span class="username">{:username}</span> {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr> {:promote_option}
 								</div>
 								<div class="comment-actions">
 									<ul>

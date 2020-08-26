@@ -610,6 +610,102 @@ if (!isset($_GET['go']))
 
 else if (isset($_GET['go']))
 {
+	if ($_GET['go'] == 'demote')
+	{
+		if ($user->check_group([1,2,5]))
+		{
+			if (!isset($_GET['aid']) || !isset($_GET['demote']))
+			{
+				header("Location: " . $core->config('website_url'));
+				die();				
+			}
+
+			$test = $dbl->run("SELECT c.`promoted`, u.`user_id`, u.`username` FROM `articles_comments` c INNER JOIN `users` u ON c.author_id = u.user_id WHERE c.`comment_id` = ?", array($_GET['demote']))->fetch();
+			if ($test)
+			{
+				// get article name for the redirect
+				$title = $dbl->run("SELECT `title`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['aid']))->fetch();
+
+				$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
+
+				if (!isset($_POST['yes']) && !isset($_POST['no']))
+				{
+					$templating->set_previous('title', 'Demoting a comment', 1);
+
+					$core->confirmation(array('title' => 'Are you sure you want to demote that comment?', 'text' => 'This will remove it from showing up at the top of the comments section.', 'action_url' => "/index.php?module=articles_full&amp;go=demote&amp;aid=".$_GET['aid']."&amp;demote={$_GET['demote']}", 'act' => 'demote'));
+				}
+				else if (isset($_POST['no']))
+				{
+					header("Location: ".$article_link);
+					die();
+				}
+				else
+				{
+					$dbl->run('UPDATE `articles_comments` SET `promoted` = 0 WHERE `comment_id` = ?', array($_GET['demote']));
+
+					$core->new_admin_note(array('completed' => 1, 'type' => 'comment_demoted', 'data' => $_GET['demote'], 'content' => ' demoted a <a href="'.$article_link.'/comment_id='.$_GET['demote'].'">comment</a> from ' . $test['username'] . ' in the article titled <a href="'.$article_link.'">'.$title['title'].'</a>.'));
+					
+					$_SESSION['message'] = 'comment_demoted';
+					header("Location: " . $article_link);
+					die();
+				}
+			}
+		}
+		else
+		{
+			header("Location: " . $core->config('website_url'));
+			die();			
+		}
+	}
+
+	if ($_GET['go'] == 'promote')
+	{
+		if ($user->check_group([1,2,5]))
+		{
+			if (!isset($_GET['aid']) || !isset($_GET['promote']))
+			{
+				header("Location: " . $core->config('website_url'));
+				die();				
+			}
+
+			$test = $dbl->run("SELECT c.`promoted`, u.`user_id`, u.`username` FROM `articles_comments` c INNER JOIN `users` u ON c.author_id = u.user_id WHERE c.`comment_id` = ?", array($_GET['promote']))->fetch();
+			if ($test)
+			{
+				// get article name for the redirect
+				$title = $dbl->run("SELECT `title`, `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $_GET['aid']))->fetch();
+
+				$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
+
+				if (!isset($_POST['yes']) && !isset($_POST['no']))
+				{
+					$templating->set_previous('title', 'Promoting a comment', 1);
+
+					$core->confirmation(array('title' => 'Are you sure you want to promote that comment?', 'text' => 'This will make it show up at the top of the comments section. Please only do this for genuinely good, helpful and insightful comments. Try to keep the amount limited too.', 'action_url' => "/index.php?module=articles_full&amp;go=promote&amp;aid=".$_GET['aid']."&amp;promote={$_GET['promote']}", 'act' => 'promote'));
+				}
+				else if (isset($_POST['no']))
+				{
+					header("Location: ".$article_link);
+					die();
+				}
+				else
+				{
+					$dbl->run('UPDATE `articles_comments` SET `promoted` = 1 WHERE `comment_id` = ?', array($_GET['promote']));
+
+					$core->new_admin_note(array('completed' => 1, 'type' => 'comment_promoted', 'data' => $_GET['promote'], 'content' => ' promoted a <a href="'.$article_link.'/comment_id='.$_GET['promote'].'">comment</a> from ' . $test['username'] . ' in the article titled <a href="'.$article_link.'">'.$title['title'].'</a>.'));
+					
+					$_SESSION['message'] = 'comment_promoted';
+					header("Location: " . $article_link);
+					die();
+				}
+			}
+		}
+		else
+		{
+			header("Location: " . $core->config('website_url'));
+			die();			
+		}
+	}
+
 	if ($_GET['go'] == 'correction')
 	{
 		// make sure news id is a number

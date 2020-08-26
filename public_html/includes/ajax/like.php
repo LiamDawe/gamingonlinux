@@ -120,7 +120,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 			if ($_POST['type'] == 'comment' || $_POST['type'] == 'forum_topic')
 			{
 				// see if there's any left already for it
-				$current_likes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date` FROM `user_notifications` WHERE `owner_id` = ? AND `type` = '$notification_type' AND `$notification_sql_field` = ?", array($_POST['author_id'], $_POST['comment_id']))->fetch();
+				$current_likes = $dbl->run("SELECT `owner_id`, `id`, `total`, `seen`, `seen_date` FROM `user_notifications` WHERE `owner_id` = ? AND `type` = ? AND `$notification_sql_field` = ?", array($_POST['author_id'], $notification_type, $_POST['comment_id']))->fetch();
 				if ($current_likes)
 				{
 					if ($current_likes['total'] >= 2)
@@ -130,7 +130,7 @@ if($_POST && isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 
 						$seen = '';
 						// if the last time they saw this like notification was before the date of the new last like, they haven't seen it
-						if ($last_like['date'] > $current_likes['seen_date'])
+						if ($current_likes['seen_date'] == NULL || ($last_like['date'] > $current_likes['seen_date']))
 						{
 							$seen = 0;
 						}

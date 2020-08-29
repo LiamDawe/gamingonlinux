@@ -154,18 +154,18 @@ if (isset($_GET['view']))
 				}
 			}
 
-			$game_engine_name = 'Not Listed';
+			$game_engine_output = '';
 			if (isset($get_item['engine_id']) && is_numeric($get_item['engine_id']))
 			{
-				$game_engine_name = $get_item['engine_name'];
-			}
-			$game_engine_output = '<li><strong>Made With</strong></li><li>'.$game_engine_name.'</li>';
+				$json_extra = ['game_engine' => $get_item['engine_name']];
+				$game_engine_output = '<li><strong>Made With</strong></li><li>'.$get_item['engine_name'].'</li>';
+			}			
 
 			if (isset($_GET['json']))
 			{
 				header('Content-Type: application/json; charset=utf-8');
 
-				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'is_bundle' => $get_item['bundle'], 'license' => $license_name, 'game_engine' => $game_engine_name, 'was_crowdfunded' => $get_item['is_crowdfunded']);
+				$data = array('title' => $get_item['name'], 'GOL_page' => url . 'itemdb/'.$get_item['id'], 'supports_linux' => $get_item['supports_linux'], 'free_game' => $get_item['free_game'], 'is_dlc' => $get_item['is_dlc'], 'is_bundle' => $get_item['bundle'], 'license' => $license_name, 'was_crowdfunded' => $get_item['is_crowdfunded']);
 
 				$data = array_merge($data, $json_extra);
 
@@ -180,7 +180,11 @@ if (isset($_GET['view']))
 			$templating->set_previous('meta_description', 'GamingOnLinux Games & Software database: '.$get_item['name'], 1);
 			$templating->set_previous('title', $get_item['name'], 1);
 
-			$dbl->run("UPDATE `calendar` SET `visits_today` = (visits_today + 1) WHERE `id` = ?", array($get_item['id']));
+			// update hits to this page, not counting staff as we may be editing and so on repeatedly
+			if (!$user->check_group([1,2,5]))
+			{
+				$dbl->run("UPDATE `calendar` SET `visits_today` = (visits_today + 1) WHERE `id` = ?", array($get_item['id']));
+			}
 
 			if ($get_item['supports_linux'] == 0 && !empty($get_item['steam_link']))
 			{

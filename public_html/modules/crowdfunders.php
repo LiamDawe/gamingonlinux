@@ -89,7 +89,7 @@ foreach ($crowdfunders as $item)
 	}
 	else if ($item['failed_linux'] == 0)
 	{
-		$status_text = 'Linux build released.';
+		$status_text = 'Released.';
 	}
 	if ($item['in_development'] == 1)
 	{

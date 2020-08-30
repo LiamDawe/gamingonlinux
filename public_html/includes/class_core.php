@@ -1000,16 +1000,24 @@ class core
 			{
 				$module = NULL;
 				self::$url_command = explode('/', trim($get_url['path'], '/'));
-				
-				// check if it's an article
-				if (isset(self::$url_command[0]) && strlen(self::$url_command[0]) == 4 && is_numeric(self::$url_command[0]))
+
+				if (isset(self::$url_command[0]))
 				{
-					if (isset(self::$url_command[1]) && strlen(self::$url_command[1]) == 2 && is_numeric(self::$url_command[1]))
+					// an article
+					if (strlen(self::$url_command[0]) == 4 && is_numeric(self::$url_command[0]))
 					{
-						if (isset(self::$url_command[2]))
+						if (isset(self::$url_command[1]) && strlen(self::$url_command[1]) == 2 && is_numeric(self::$url_command[1]))
 						{
-							$module = 'articles_full';
+							if (isset(self::$url_command[2]))
+							{
+								$module = 'articles_full';
+							}
 						}
+					}
+					// forum
+					if (self::$url_command[0] == 'forum')
+					{
+						$module = 'forum';
 					}
 				}
 

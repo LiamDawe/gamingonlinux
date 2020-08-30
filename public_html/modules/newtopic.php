@@ -53,9 +53,22 @@ else
 			{
 				$templating->load('newtopic');
 
+				// check for post template
+				$post_template = $dbl->run("SELECT t.`description`, t.`text` FROM `post_templates_ref` r INNER JOIN `post_templates` t ON t.id = r.template_id WHERE r.forum_id = ?", array($_GET['forum_id']))->fetch();
+
 				$title = '';
 				$text = '';
-	
+				$post_template_description = '';
+
+				if ($post_template)
+				{
+					$text = $post_template['text'];
+					if (!empty($post_template['description']))
+					{
+						$post_template_description = $post_template['description'];
+					}
+				}
+
 				if (isset($_GET['error']))
 				{
 					$title = $_SESSION['atitle'];
@@ -142,6 +155,8 @@ else
 				$templating->set('category_options', $cat_options);
 
 				$templating->set('title', $title);
+
+				$templating->set('post_template_description', $post_template_description);
 
 				$comment_editor = new editor($core, $templating, $bbcode);
 				$comment_editor->editor(['name' => 'text', 'content' => $text, 'editor_id' => 'comment_text']);

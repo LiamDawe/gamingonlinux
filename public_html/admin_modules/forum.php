@@ -514,10 +514,13 @@ else if (isset($_POST['act']))
 		$category = $_POST['category'];
 
 		// find the last order
+		$order_now = 1;
 		$order = $dbl->run("SELECT `order` FROM `forums` WHERE `is_category` = 0 AND `parent_id` = ? ORDER BY `order` DESC LIMIT 1", array($category))->fetch();
-
-		// find this forums order, which will be 1 after the last one
-		$order_now = $order['order'] + 1;
+		if ($order)
+		{
+			// find this forums order, which will be 1 after the last one
+			$order_now = $order['order'] + 1;
+		}
 
 		// make the actual forum
 		$dbl->run("INSERT INTO `forums` SET `name` = ?, `is_category` = '0', `description` = ?, `parent_id` = ?, `order` = ?", array($name, $description, $category, $order_now));

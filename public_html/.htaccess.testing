@@ -87,8 +87,6 @@ Options +SymLinksifOwnerMatch
 
   RewriteRule ^register/?$ /index.php?module=register [N]
 
-  RewriteRule ^forum/?$ /index.php?module=forum [N]
-
   RewriteRule ^forum/latest?$ /index.php?module=forum&type=latest [N,NC,QSA]
   
   RewriteRule ^forum/categories?$ /index.php?module=forum&type=categories [N,NC,QSA]  

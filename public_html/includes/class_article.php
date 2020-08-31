@@ -1407,7 +1407,7 @@ class article
 		{
 			$promoted_comments = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`total_likes`, u.username, u.`profile_address`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.`approved` = 1 AND a.`promoted` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
 
-			if (isset($promoted_comments))
+			if (isset($promoted_comments) && !empty($promoted_comments))
 			{
 				$this->templating->block('promoted_top', 'articles_full');
 
@@ -1415,7 +1415,7 @@ class article
 			}
 		}
 
-		if($promoted_comments)
+		if(isset($promoted_comments) && !empty($promoted_comments))
 		{
 			$this->templating->block('normal_comments_top', 'articles_full');
 		}

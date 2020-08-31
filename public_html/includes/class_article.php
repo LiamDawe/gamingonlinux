@@ -1135,7 +1135,15 @@ class article
 
 			else
 			{
-				$username = "<a href=\"/profiles/{$article['author_id']}\">" . $article['username'] . '</a>';
+                if (isset($article['profile_address']) && !empty($article['profile_address']))
+                {
+                    $profile_address = '/profiles/' . $article['profile_address'];
+                }
+                else
+                {
+                    $profile_address = '/profiles/' . $article['author_id'];
+                }
+				$username = "<a href=\"".$profile_address."\">" . $article['username'] . '</a>';
 			}
 
 			$this->templating->set('username', $username);
@@ -1319,7 +1327,7 @@ class article
 		$params = array_merge([(int) $article_info['article']['article_id']], [$this->core->start], [$per_page]);
 
 		/* NORMAL COMMENTS */
-		$comments_get = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.`comment_text`, a.`comment_id`, u.`pc_info_public`, u.`distro`, a.`time_posted`, a.`last_edited`, a.`last_edited_time`, a.`total_likes`, u.`username`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, ul.`username` as `username_edited` FROM `articles_comments` a LEFT JOIN `users` u ON a.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = a.`last_edited` WHERE a.`article_id` = ? AND a.`approved` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
+		$comments_get = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.`comment_text`, a.`comment_id`, u.`pc_info_public`, u.`distro`, a.`time_posted`, a.`last_edited`, a.`last_edited_time`, a.`total_likes`, u.`username`, u.`profile_address`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, ul.`username` as `username_edited` FROM `articles_comments` a LEFT JOIN `users` u ON a.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = a.`last_edited` WHERE a.`article_id` = ? AND a.`approved` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
 
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
@@ -1397,9 +1405,9 @@ class article
 		/* PROMOTED COMMENTS */
 		if ($page == 1)
 		{
-			$promoted_comments = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`total_likes`, u.username, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.`approved` = 1 AND a.`promoted` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
+			$promoted_comments = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`total_likes`, u.username, u.`profile_address`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.`approved` = 1 AND a.`promoted` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
 
-			if ($promoted_comments)
+			if (isset($promoted_comments))
 			{
 				$this->templating->block('promoted_top', 'articles_full');
 
@@ -1517,7 +1525,15 @@ class article
 			}
 			else
 			{
-				$username = "<a href=\"/profiles/{$comments['author_id']}\">{$comments['username']}</a>";
+                if (isset($comments['profile_address']) && !empty($comments['profile_address']))
+                {
+                    $profile_address = '/profiles/' . $comments['profile_address'];
+                }
+                else
+                {
+                    $profile_address = '/profiles/' . $comments['author_id'];
+                }
+				$username = "<a href=\"".$profile_address."\">{$comments['username']}</a>";
 				$quote_username = $comments['username'];
 			}
 

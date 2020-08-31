@@ -236,6 +236,7 @@ else
 			forum.last_post_time,
 			forum.last_post_topic_id,
 			forum.rss_password,
+			forum.pretty_url,
 			users.username,
 			topic.topic_title,
 			topic.replys,
@@ -290,6 +291,7 @@ else
 				$forum_array[$row['ForumId']]['topic_replies'] = $row['replys'];
 				$forum_array[$row['ForumId']]['last_post_id'] = $row['last_post_id'];
 				$forum_array[$row['ForumId']]['rss_password'] = $row['rss_password'];
+				$forum_array[$row['ForumId']]['pretty_url'] = $row['pretty_url'];
 			}
 		}
 	
@@ -320,7 +322,15 @@ else
 						}
 					}
 					$templating->set('forum_icon', $forum_icon);
-					$templating->set('forum_link', '/forum/' . $forum['id'] . '/');
+					if (isset($forum['pretty_url']) && !empty($forum['pretty_url']))
+					{
+						$forum_url = '/forum/' . $forum['pretty_url'];
+					}
+					else
+					{
+						$forum_url = '/forum/' . $forum['id'];
+					}
+					$templating->set('forum_link', $forum_url);
 					$templating->set('forum_name', $forum['name']);
 					$templating->set('forum_description', $forum['description']);
 					$templating->set('forum_posts', number_format($forum['posts']));

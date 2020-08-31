@@ -3,14 +3,29 @@ if(!defined('golapp'))
 {
 	die('Direct access not permitted');
 }
-if (!core::is_number($_GET['forum_id']))
+
+$forum_id = NULL;
+if (isset($_GET['forum_id']) && is_numeric($_GET['forum_id']))
+{
+	$forum_id = $_GET['forum_id'];
+}
+else if (isset(core::$url_command[0]) && isset(core::$url_command[1]))
+{
+	$find_forum = $dbl->run("SELECT `forum_id` FROM `forums` WHERE `pretty_url` = ?", array(core::$url_command[1]))->fetch();
+	if ($find_forum)
+	{
+		$forum_id = $find_forum['forum_id'];
+	}
+}
+
+if (!core::is_number($forum_id))
 {
 	$core->message('The forum ID has to be a number!', 1);
 	include('includes/footer.php');
 	die();
 }
 
-$parray = $forum_class->forum_permissions($_GET['forum_id']);
+$parray = $forum_class->forum_permissions($forum_id);
 
 // permissions for viewforum page
 if($parray['can_view'] == 0)
@@ -26,14 +41,14 @@ else
 	// update the time the last read this forum for forum icons on normal category forum view
 	if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 	{
-		$check = $dbl->run("SELECT `last_read` FROM `user_forum_read` WHERE `user_id` = ? AND `forum_id` = ?", array($_SESSION['user_id'], $_GET['forum_id']))->fetchOne();
+		$check = $dbl->run("SELECT `last_read` FROM `user_forum_read` WHERE `user_id` = ? AND `forum_id` = ?", array($_SESSION['user_id'], $forum_id))->fetchOne();
 		if ($check)
 		{
-			$dbl->run("UPDATE `user_forum_read` SET `last_read` = ? WHERE `user_id` = ? AND `forum_id` = ?", array(core::$date, $_SESSION['user_id'], $_GET['forum_id']));
+			$dbl->run("UPDATE `user_forum_read` SET `last_read` = ? WHERE `user_id` = ? AND `forum_id` = ?", array(core::$date, $_SESSION['user_id'], $forum_id));
 		}
 		else
 		{
-			$dbl->run("INSERT INTO `user_forum_read` SET `last_read` = ?, `user_id` = ?, `forum_id` = ?", array(core::$date, $_SESSION['user_id'], $_GET['forum_id']));
+			$dbl->run("INSERT INTO `user_forum_read` SET `last_read` = ?, `user_id` = ?, `forum_id` = ?", array(core::$date, $_SESSION['user_id'], $forum_id));
 		}
 	}
 
@@ -42,14 +57,14 @@ else
 
 	$templating->load('viewforum');
 
-	$details = $dbl->run("SELECT `name`, `rss_password` FROM `forums` WHERE forum_id = ?", array($_GET['forum_id']))->fetch();
+	$details = $dbl->run("SELECT `name`, `rss_password` FROM `forums` WHERE forum_id = ?", array($forum_id))->fetch();
 
 	$templating->set_previous('title', 'Viewing forum ' . $details['name'], 1);
 	$templating->set_previous('meta_description', 'GamingOnLinux forum - Viewing forum ' . $details['name'], 1);
 
 	$templating->block('main_top', 'viewforum');
 	$templating->set('forum_name', $details['name']);
-	$templating->set('forum_id', (int) $_GET['forum_id']);
+	$templating->set('forum_id', (int) $forum_id);
 
 	$rss_pass = NULL;
 	if ($details['rss_password'] != NULL)
@@ -86,8 +101,8 @@ else
 	{
 		if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
 		{
-			$new_topic = '<li class="green"><a class="forum_button" href="/index.php?module=newtopic&amp;forum_id='.(int) $_GET['forum_id'].'">Create Post</a></li>';
-			$new_topic_bottom = "<div class=\"fright\"><span class=\"badge blue\"><a class=\"\" href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$_GET['forum_id']}\">Create Post</a></span></div>";
+			$new_topic = '<li class="green"><a class="forum_button" href="/index.php?module=newtopic&amp;forum_id='.(int) $forum_id.'">Create Post</a></li>';
+			$new_topic_bottom = "<div class=\"fright\"><span class=\"badge blue\"><a class=\"\" href=\"" . $core->config('website_url') . "index.php?module=newtopic&amp;forum_id={$forum_id}\">Create Post</a></span></div>";
 		}
 	}
 	$templating->set('new_topic_link', $new_topic);
@@ -107,7 +122,7 @@ else
 	}
 
 	// count how many there is in total
-	$total_topics = $dbl->run('SELECT COUNT(t.`topic_id`) FROM `forum_topics` t WHERE t.`forum_id` = ? ' . $blocked_sql, array_merge([$_GET['forum_id']],$blocked_ids))->fetchOne();
+	$total_topics = $dbl->run('SELECT COUNT(t.`topic_id`) FROM `forum_topics` t WHERE t.`forum_id` = ? ' . $blocked_sql, array_merge([$forum_id],$blocked_ids))->fetchOne();
 	
 	$per_page = $core->config('default-comments-per-page');
 	if (isset($_SESSION['per-page']) && core::is_number($_SESSION['per-page']))
@@ -116,7 +131,7 @@ else
 	}
 
 	// sort out the pagination link
-	$pagination = $core->pagination_link($per_page, $total_topics, "/forum/{$_GET['forum_id']}/", $page);
+	$pagination = $core->pagination_link($per_page, $total_topics, "/forum/{$forum_id}/", $page);
 
 	// get the posts for this forum
 	$all_posts = $dbl->run('SELECT
@@ -131,7 +146,7 @@ else
 		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
 		LEFT JOIN `users` u2 ON t.`last_post_user_id` = u2.`user_id`
 		WHERE t.`forum_id`= ? AND t.`approved` = 1 ' . $blocked_sql . '
-		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, ' . $per_page, array_merge([$_GET['forum_id']], $blocked_ids, [$core->start]))->fetch_all();
+		ORDER BY t.`is_sticky` DESC, t.`last_post_date` DESC LIMIT ?, ' . $per_page, array_merge([$forum_id], $blocked_ids, [$core->start]))->fetch_all();
 
 	$pinned = 0;
 	$normal_test = 0;

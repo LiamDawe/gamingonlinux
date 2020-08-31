@@ -1017,7 +1017,14 @@ class core
 					// forum
 					if (self::$url_command[0] == 'forum')
 					{
-						$module = 'forum';
+						if (!isset(self::$url_command[1]) || isset(self::$url_command[1]) && empty(self::$url_command[1]))
+						{
+							$module = 'forum';
+						}
+						else if (isset(self::$url_command[1]) && self::$url_command[1] != 'topic')
+						{
+							$module = 'viewforum';
+						}
 					}
 				}
 

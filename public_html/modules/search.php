@@ -93,7 +93,7 @@ if (isset($search_text) && !empty($search_text))
 	$pagination = $core->pagination_link($per_page, $total, $page_url, $page);
 
 	// do the search query
-	$found_search = $dbl->run("SELECT a.`article_id`, a.`tagline`, a.`comment_count`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, a.`show_in_menu`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename
+	$found_search = $dbl->run("SELECT a.`article_id`, a.`tagline`, a.`comment_count`, a.`title`, a.`slug`, a.`author_id`, a.`date` , a.`guest_username`, u.`username`, u.`profile_address`, a.`show_in_menu`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename
 	FROM `articles` a
 	LEFT JOIN `users` u ON a.`author_id` = u.`user_id`
 	LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline`

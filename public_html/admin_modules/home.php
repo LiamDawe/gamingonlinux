@@ -100,15 +100,24 @@ if (!isset($_GET['view']))
 	{
 		$templating->block('comments_top', 'admin_modules/admin_home');
 
-		$grab_comments = $dbl->run("SELECT a.`text`, a.`date_posted`, u.`user_id`, u.`username` FROM `admin_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY a.`id` DESC LIMIT 10")->fetch_all();
+		$grab_comments = $dbl->run("SELECT a.`text`, a.`date_posted`, u.`user_id`, u.`username`, u.`profile_address` FROM `admin_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY a.`id` DESC LIMIT 10")->fetch_all();
 		foreach ($grab_comments as $comments)
 		{
 			$templating->block('comment', 'admin_modules/admin_home');
 
 			$comment_text = $bbcode->parse_bbcode($comments['text'], 0);
-			$date = $core->human_date($comments['date_posted']);
+            $date = $core->human_date($comments['date_posted']);
+            
+            if (isset($comments['profile_address']) && !empty($comments['profile_address']))
+            {
+                $profile_address = '/profiles/' . $comments['profile_address'];
+            }
+            else
+            {
+                $profile_address = '/profiles/' . $comments['user_id'];
+            }
 
-			$templating->set('admin_comments', "<li><a href=\"/profiles/{$comments['user_id']}\">{$comments['username']}</a> - {$date}<br /> {$comment_text}</li>");
+			$templating->set('admin_comments', "<li><a href=\"".$profile_address."\">{$comments['username']}</a> - {$date}<br /> {$comment_text}</li>");
 		}
 
 		$templating->block('comments_bottom', 'admin_modules/admin_home');
@@ -117,15 +126,24 @@ if (!isset($_GET['view']))
 	// all editor private chat
 	$templating->block('comments_alltop', 'admin_modules/admin_home');
 
-	$editor_chat = $dbl->run("SELECT a.*, u.`user_id`, u.`username` FROM `editor_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY `id` DESC LIMIT 10")->fetch_all();
+	$editor_chat = $dbl->run("SELECT a.*, u.`user_id`, u.`username`, u.`profile_address` FROM `editor_discussion` a INNER JOIN `users` u ON a.`user_id` = u.`user_id` ORDER BY `id` DESC LIMIT 10")->fetch_all();
 	foreach ($editor_chat as $commentsall)
 	{
 		$templating->block('commentall', 'admin_modules/admin_home');
 
 		$commentall_text = $bbcode->parse_bbcode($commentsall['text'], 0);
-		$dateall = $core->human_date($commentsall['date_posted']);
+        $dateall = $core->human_date($commentsall['date_posted']);
+        
+        if (isset($commentsall['profile_address']) && !empty($commentsall['profile_address']))
+        {
+            $profile_address = '/profiles/' . $commentsall['profile_address'];
+        }
+        else
+        {
+            $profile_address = '/profiles/' . $commentsall['user_id'];
+        }
 
-		$templating->set('editor_comments', "<li><a href=\"/profiles/{$commentsall['user_id']}\">{$commentsall['username']}</a> - {$dateall}<br /> {$commentall_text}</li>");
+		$templating->set('editor_comments', "<li><a href=\"".$profile_address."\">{$commentsall['username']}</a> - {$dateall}<br /> {$commentall_text}</li>");
 	}
 
 	$templating->block('comments_bottomall', 'admin_modules/admin_home');

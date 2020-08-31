@@ -27,7 +27,7 @@ $page = core::give_page();
 $groups_in = str_repeat('?,', count($user->user_groups) - 1) . '?';
 
 // get the forum ids this user is actually allowed to view
-$forum_ids = $dbl->run("SELECT p.`forum_id`, f.`name` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all();
+$forum_ids = $dbl->run("SELECT p.`forum_id`, f.`name`, f.`pretty_url` FROM `forum_permissions` p INNER JOIN `forums` f ON f.forum_id = p.forum_id WHERE `is_category` = 0 AND `can_view` = 1 AND `group_id` IN ($groups_in) GROUP BY forum_id ORDER BY f.name ASC", $user->user_groups)->fetch_all();
 
 if (!$forum_ids)
 {
@@ -62,7 +62,16 @@ else
 	$forum_list = '';
 	foreach ($forum_ids as $forum)
 	{
-		$forum_list .= '<option value="/forum/' . $forum['forum_id'] . '">' . $forum['name'] . '</option>';
+		if (isset($forum['pretty_url']) && !empty($forum['pretty_url']))
+		{
+			$forum_link = '/forum/' . $forum['pretty_url'];
+		}
+		else
+		{
+			$forum_link = '/forum/' . $forum['forum_id'];
+		}
+
+		$forum_list .= '<option value="'.$forum_link.'">' . $forum['name'] . '</option>';
 		$forum_id_list[] = $forum['forum_id'];
 	}
 	$templating->set('forum_list', $forum_list);

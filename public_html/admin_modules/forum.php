@@ -488,8 +488,12 @@ else if (isset($_POST['act']))
 				$name = strip_tags($name);
 				
 				// find the last order
+				$order_now = 1;
 				$order = $dbl->run("SELECT `order` FROM `forums` WHERE `is_category` = 1 ORDER BY `order` DESC LIMIT 1")->fetch();
-				$order_now = $order['order'] + 1;
+				if ($order)
+				{
+					$order_now = $order['order'] + 1;
+				}
 
 				// make the category
 				$dbl->run("INSERT INTO `forums` SET `name` = ?, `is_category` = 1, `order` = ?", array($name, $order_now));

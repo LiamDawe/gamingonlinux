@@ -125,6 +125,7 @@ else
 			t.`last_post_id`,
 			t.last_post_user_id,
 			f.name as forum_name,
+			f.`pretty_url`,
 			u.`username`,
 			u.`avatar`, 
 			u.`avatar_uploaded`, 
@@ -159,7 +160,15 @@ else
 
 			$profile_link = "/profiles/{$topics['author_id']}";
 			$profile_last_link = "/profiles/{$topics['last_post_user_id']}";
-			$forum_link = '/forum/' . $topics['forum_id'];
+
+			if (isset($topics['pretty_url']) && !empty($topics['pretty_url']))
+			{
+				$forum_link = '/forum/' . $topics['pretty_url'];
+			}
+			else
+			{
+				$forum_link = '/forum/' . $topics['forum_id'];
+			}
 
 			$link = $forum_class->get_link($topics['topic_id']);
 			

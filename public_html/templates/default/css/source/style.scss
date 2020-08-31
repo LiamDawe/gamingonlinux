@@ -19,6 +19,7 @@
 	--sales-tr-hover: #D2D2D2;
 	--box-subhead-background: #d2d2d2;
 	--box-subhead-link-color: #1C75B9;
+	--username-nav-color: #eee;
 	/* fancybox */
 	--fancybox-close-small-bg: #efefef;
 	--fancybox-model-title-bg: #383838;
@@ -137,6 +138,7 @@
 	--sales-tr-hover: rgb(32, 42, 53);
 	--box-subhead-background: #4e4e4e;
 	--box-subhead-link-color: rgb(71, 166, 238);
+	--username-nav-color: #eee;
 	/* fancybox */
 	--fancybox-close-small-bg: #383838;
 	--fancybox-model-title-bg: #383838;
@@ -473,6 +475,7 @@ margin-bottom: -3px;
      color: #fff;
  }
 /* toggle menus */
+.username-nav{color: var(--username-nav-color);}
 .right-menu{float: right; right: 0px;}
 .toggle-content
 {
@@ -488,7 +491,7 @@ margin-bottom: -3px;
 	z-index: 999999;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-     box-sizing: border-box;
+	 box-sizing: border-box;
 }
 .toggle-active {display: block;}
 .toggle-content ul
@@ -1647,6 +1650,7 @@ ul.social-networks li > a {
 	align-self: flex-start;
 	width: 50%;	
 	box-sizing: border-box;
+	flex: 1;
 }
 
 .flex-col-normal
@@ -2116,7 +2120,7 @@ svg text {fill: var(--svg-text-color);}
 	border-top: 1px solid rgb(90, 215, 253);
 }
 .preview_pm{display: none;}
-.register-warning {
+.input-warning {
 	color:#d2232a;
 	background-color:#ffdd97;
 	width:100%;

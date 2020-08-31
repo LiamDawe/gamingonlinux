@@ -1025,6 +1025,15 @@ class core
 						{
 							$module = 'viewforum';
 						}
+                    }
+                    
+					// user profiles
+					if (self::$url_command[0] == 'profiles')
+					{
+						if (isset(self::$url_command[1]) && !empty(self::$url_command[1]))
+						{
+							$module = 'profile';
+						}
 					}
 				}
 

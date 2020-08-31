@@ -172,7 +172,15 @@ else if ($_SESSION['user_id'] > 0)
 	// for the user menu toggle
 	$user_menu = $templating->block_store('user_menu', 'mainpage');
 
-	$profile_link = "/profiles/{$_SESSION['user_id']}";
+    if (isset($user->user_details['profile_address']) && !empty($user->user_details['profile_address']))
+    {
+        $profile_link = '/profiles/' . $user->user_details['profile_address'];
+    }
+    else
+    {
+        $profile_link = "/profiles/{$_SESSION['user_id']}";
+    }
+
 	$messages_html_link = '/private-messages/';
 	
 	$user_avatar = $user->sort_avatar($user->user_details);

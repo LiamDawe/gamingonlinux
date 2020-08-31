@@ -10,7 +10,7 @@ class user
 	`articles-per-page`, `username`, `user_group`, `secondary_user_group`,
 	`banned`, `theme`, `activated`, `in_mod_queue`, `email`, `login_emails`,
 	`forum_type`, `avatar`, `avatar_uploaded`, `avatar_gallery`, `author_picture`, `article_bio`, 
-	`display_comment_alerts`, `display_quote_alerts`, `display_like_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`";
+	`display_comment_alerts`, `display_quote_alerts`, `display_like_alerts`, `admin_comment_alerts`, `email_options`, `auto_subscribe`, `auto_subscribe_email`, `distro`, `timezone`, `social_stay_cookie`, `profile_address`";
 
 	public $user_groups = [0 => 4]; // default for guests
 	public $blocked_users = []; // associative array of blocked usernames/ids

@@ -1691,10 +1691,17 @@ class article
 			$this->templating->set('report_link', $report_link);
 			$this->templating->set('block', $block_icon);
 
-			// if we have some user groups for that user
-			$comments['user_groups'] = $comment_user_groups[$comments['author_id']];
-			$badges = user::user_badges($comments, 1);
-			$this->templating->set('badges', implode(' ', $badges));
+            // if we have some user groups for that user
+            if (isset($comment_user_groups[$comments['author_id']]))
+            {
+                $comments['user_groups'] = $comment_user_groups[$comments['author_id']];
+                $badges = user::user_badges($comments, 1);
+                $this->templating->set('badges', implode(' ', $badges));
+            }
+            else
+            {
+                $this->templating->set('badges', '');
+            }
 
 			$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
 

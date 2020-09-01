@@ -25,7 +25,14 @@ if (isset($_POST['Update']))
 		$_SESSION['message_extra'] = 'password';
 		header("Location: /usercp.php?module=username");
 		die();
-	}
+    }
+    
+    if (strlen($_POST['new_username']) < 4)
+    {
+        $_SESSION['message'] = 'username-short';
+		header("Location: /usercp.php?module=username");
+		die();
+    }
 
 	// find current password
 	$grab_current_password = $dbl->run("SELECT `password`, `steam_id`, `oauth_uid` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();

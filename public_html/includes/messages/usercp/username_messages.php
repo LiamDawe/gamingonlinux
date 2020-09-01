@@ -9,5 +9,10 @@ return [
 	[
 		"text" => "Sorry, you can only use alphanumeric characters, '-' and '_'.",
 		"error" => 1
-	]
+    ],
+    "username-short" =>
+    [
+        "text" => "Sorry, that username is too short.",
+        "error" => 1
+    ]
 ];

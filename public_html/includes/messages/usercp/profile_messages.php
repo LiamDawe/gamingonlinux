@@ -14,6 +14,11 @@ return [
     [
         "text" => 'Sorry, your profile url had terms in it we do not allow. Words like admin and moderator are banned.',
         "error" => 1
+    ],
+    "url-too-short" =>
+    [
+        "text" => 'Sorry, the profile URL was too short. Please make it at least 4 characters long.',
+        "error" => 1
     ]
 ];
 ?>

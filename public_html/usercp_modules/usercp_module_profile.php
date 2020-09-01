@@ -42,7 +42,14 @@ if (isset($_POST['act']))
 			$_SESSION['message'] = 'url-characters';
 			header("Location: /usercp.php?module=profile");
 			die();
-		}
+        }
+        
+        if (strlen($_POST['profile_address']) < 4)
+        {
+            $_SESSION['message'] = 'url-too-short';
+            header("Location: /usercp.php?module=profile");
+            die();
+        }
 
         if ($_POST['profile_address'] != $current_details['profile_address'])
         {

@@ -457,8 +457,11 @@ class bbcode
 
 	function emoticons($text)
 	{
-		$text = str_replace( array_keys( $this->emoji['replaced'] ), array_values( $this->emoji['replaced'] ), $text );
-		return $text;
+        if ($this->emoji['raw'])
+        {
+		    $text = str_replace( array_keys( $this->emoji['replaced'] ), array_values( $this->emoji['replaced'] ), $text );
+        }
+        return $text;
 	}
 
 	function youtube_callback($matches)

@@ -241,10 +241,15 @@ else
 		$locked = '';
 		if ($post['is_locked'] == 1)
 		{
-			$locked = ' <img width="15" height="15" src="'.$this_template.'/images/forum/lock.svg" onerror="'.$this_template.'/images/forum/lock.png" alt=""> ';
+			$locked = ' <img width="15" height="15" src="'.$this_template.'/images/forum/lock.svg" onerror="'.$this_template.'/images/forum/lock.png" style="margin-right: 5px;" alt="locked" title="Locked"> ';
 		}
 		$templating->set('is_locked', $locked);
-
+        $answered = '';
+        if ($post['answered'] == 1)
+        {
+            $answered = '<span class="checkmark" title="Solved"></span>';
+        }
+        $templating->set('answered', $answered);
 		$topic_link = $forum_class->get_link($post['topic_id']);
 		$templating->set('link', $topic_link);
 		$templating->set('topic_id', $post['topic_id']);

@@ -132,7 +132,8 @@ else
 			t.`is_locked`,
 			t.`has_poll`,
 			t.`last_post_id`,
-			t.last_post_user_id,
+            t.`last_post_user_id`,
+            t.`answered`,
 			f.name as forum_name,
 			f.`pretty_url`,
 			u.`username`,
@@ -184,14 +185,20 @@ else
 			$locked = '';
 			if ($topics['is_locked'] == 1)
 			{
-				$locked = ' <img width="15" height="15" src="'.$this_template.'/images/forum/lock.svg" alt=""> ';
+				$locked = ' <img width="15" height="15" src="'.$this_template.'/images/forum/lock.svg" style="margin-right: 5px;" alt="locked" title="Locked"> ';
 			}
 			$templating->set('is_locked', $locked);
 			$poll_title = '';
 			if ($topics['has_poll'] == 1)
 			{
 				$poll_title = '<strong>POLL:</strong> ';
-			}
+            }
+            $answered = '';
+            if ($topics['answered'] == 1)
+            {
+                $answered = '<span class="checkmark" title="Solved"></span>';
+            }
+            $templating->set('answered', $answered);
 			$templating->set('title', $poll_title . $topics['topic_title']);
 			$templating->set('link', $link);
 			$replies = '';

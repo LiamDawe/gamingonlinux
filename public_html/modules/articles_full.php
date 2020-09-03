@@ -378,11 +378,6 @@ if (!isset($_GET['go']))
 				$templating->set('paging', $article_pagination);
 
 				$categories_display = array();
-				if ($article['show_in_menu'] == 1)
-				{
-					$categories_display[] = '<a href="#">Editors Pick</a>';
-				}
-
 				$get_categories = $article_class->find_article_tags(array('article_ids' => $article['article_id']));
 	
 				if ($get_categories)

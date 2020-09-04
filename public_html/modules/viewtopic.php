@@ -92,6 +92,109 @@ else
 			header('Location: ' . $return);
 			die();
 		}
+    }
+    
+	if (isset($_GET['view']) && $_GET['view'] == 'remove_answer')
+	{
+		if (!isset($_GET['pid']) || !isset($_GET['topic_id']))
+		{
+            $_SESSION['message'] = 'empty';
+            $_SESSION['message_extra'] = 'post ID or topic ID';
+			header('Location: /forum/');
+			die();
+		}
+
+		if (!core::is_number($_GET['pid']) || !core::is_number($_GET['topic_id']))
+		{
+			header('Location: /forum/');
+			die();
+        }
+        
+        $return = "/forum/topic/" . $_GET['topic_id'];
+
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Remove post as topic answer', 1);
+			$core->confirmation(array('title' => 'Are you sure you want to remove that forum post as the answer to the topic?', 'text' => '', 'action_url' => '/index.php?module=viewtopic&view=remove_answer&pid='.$_GET['pid'].'&topic_id='.$_GET['topic_id'], 'act' => ''));
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+            // check it exists
+            $check = $dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['pid']))->fetch();
+            if (isset($check) && $check['author_id'] == $_SESSION['user_id'])
+            {
+                // remove it as answer
+                $dbl->run("UPDATE `forum_replies` SET `post_answer` = 0 WHERE `post_id` = ?", array($_GET['pid']));
+                $dbl->run("UPDATE `forum_topics` SET `answered` = 0 WHERE `topic_id` = ?", array($_GET['topic_id']));
+
+                header('Location: ' . $return);
+                die();
+            }
+            else
+            {
+                header("Location: " . $return);
+                die();                
+            }
+		}
+    }
+    
+	if (isset($_GET['view']) && $_GET['view'] == 'answer')
+	{
+		if (!isset($_GET['pid']) || !isset($_GET['topic_id']))
+		{
+            $_SESSION['message'] = 'empty';
+            $_SESSION['message_extra'] = 'post ID or topic ID';
+			header('Location: /forum/');
+			die();
+		}
+
+		if (!core::is_number($_GET['pid']) || !core::is_number($_GET['topic_id']))
+		{
+			header('Location: /forum/');
+			die();
+        }
+        
+        $return = "/forum/topic/" . $_GET['topic_id'];
+
+		if (!isset($_POST['yes']) && !isset($_POST['no']))
+		{
+			$templating->set_previous('title', 'Approve post as topic answer', 1);
+			$core->confirmation(array('title' => 'Are you sure you want to approve that forum post as the answer to the topic?', 'text' => 'This will REMOVE the answered markings from another post if it is already set!', 'action_url' => '/index.php?module=viewtopic&view=answer&pid='.$_GET['pid'].'&topic_id='.$_GET['topic_id'], 'act' => ''));
+		}
+
+		else if (isset($_POST['no']))
+		{
+			header("Location: " . $return);
+			die();
+		}
+
+		else if (isset($_POST['yes']))
+		{
+            // check it exists
+            $check = $dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['pid']))->fetch();
+            if (isset($check) && $check['author_id'] == $_SESSION['user_id'])
+            {
+                // remove it as answer
+                $dbl->run("UPDATE `forum_replies` SET `post_answer` = 1 WHERE `post_id` = ?", array($_GET['pid']));
+                $dbl->run("UPDATE `forum_replies` SET `post_answer` = 0 WHERE `post_id` != ?", array($_GET['pid']));
+                $dbl->run("UPDATE `forum_topics` SET `answered` = ? WHERE `topic_id` = ?", array($_GET['pid'], $_GET['topic_id']));
+
+                header('Location: ' . $return);
+                die();
+            }
+            else
+            {
+                header("Location: " . $return);
+                die();                
+            }
+		}
 	}
 
 	else if (!isset($_POST['act']) && !isset($_GET['go']) && !isset($_GET['view']))
@@ -135,6 +238,7 @@ else
 			t.`last_edited`,
 			t.`last_edited_time`,
 			t.`replys`,
+            t.`answered`,
 			p.`reply_text`,
 			u.`user_id`,
 			u.`distro`,
@@ -300,7 +404,17 @@ else
 
 					}
 
-					$templating->set('notice', $notice_html);
+                    $templating->set('notice', $notice_html);
+                    
+                    $answered = '';
+                    $answered_title_css = '';
+                    if ($topic['answered'] != 0)
+                    {
+                        $answered_title_css = 'answered_title_css';
+                        $answered = '<span class="checkmark" title="Solved"></span>';
+                    }
+                    $templating->set('answered_title_css', $answered_title_css);
+                    $templating->set('answered', $answered);
 
 					$templating->set('topic_title', $topic['topic_title']);
 
@@ -429,7 +543,17 @@ else
 							}
 						}
 						$templating->set('user_info_extra', $pc_info);
-						$templating->set('topic_title', $topic['topic_title']);
+                        $templating->set('topic_title', $topic['topic_title']);
+                        
+                        $answered = '';
+                        $answered_link = '';
+                        if ($topic['answered'] != 0)
+                        {
+                            $answered = '<span class="checkmark" title="Solved"></span>';
+                            $answered_link = '<div class="fright"><small>This topic has an answer marked - <a href="/forum/topic/'.$topic['topic_id'].'/post_id='.$topic['answered'].'">jump to answer</a>.</small></div>';
+                        }
+                        $templating->set('answered', $answered);
+                        $templating->set('answered_link', $answered_link);
 
 						$topic_date = $core->time_ago($topic['creation_date']);
 						$templating->set('topic_date', $topic_date);
@@ -595,6 +719,7 @@ else
 						p.`total_likes`, 
 						p.`last_edited`,
 						p.`last_edited_time`,
+                        p.`post_answer`,
 						u.user_id, 
 						u.pc_info_public, 
 						u.register_date, 
@@ -661,7 +786,17 @@ else
 								else
 								{
 									$templating->block('reply', 'viewtopic');
-								}
+                                }
+                                
+                                $answer_css = '';
+                                $answer_note = '';
+                                if ($post['post_answer'] == 1)
+                                {
+                                    $answer_css = 'promoted-comment';
+                                    $answer_note = '<strong>&#9734; Topic Answer</strong>';
+                                }
+                                $templating->set('answer_css', $answer_css);
+                                $templating->set('answer_note', $answer_note);
 
 								$permalink = $forum_class->get_link($topic['topic_id'], 'post_id=' . $post['post_id']);
 								$templating->set('permalink', $permalink);
@@ -729,7 +864,6 @@ else
 
 								$templating->set('profile_fields', $profile_fields_output);
 
-
 								$templating->set('post_id', $post['post_id']);
 								$templating->set('topic_id', $_GET['topic_id']);
 
@@ -781,7 +915,22 @@ else
 									if ($post['author_id'] != $_SESSION['user_id'])
 									{
 										$user_options .= '<li class="lb-container" style="display:none !important"><a class="plusone tooltip-top" data-type="forum_reply" data-id="'.$post['post_id'].'" data-topic-id="'.$_GET['topic_id'].'" data-author-id="'.$post['author_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a></li>';
-									}
+                                    }
+
+                                    // bottom options
+                                    $bottom_reply_options = '';
+                                    if ($topic['author_id'] == $_SESSION['user_id'] || $user->check_group([1,2]) == true)
+                                    {
+                                        if ($post['post_answer'] == 0)
+                                        {
+                                            $bottom_reply_options = '<div class="fright"><small><a href="/index.php?module=viewtopic&view=answer&pid='.$post['post_id'].'&topic_id='.$topic['topic_id'].'">&check; Mark as answer</a></small></div>';
+                                        }
+                                        else if ($post['post_answer'] == 1)
+                                        {
+                                            $bottom_reply_options = '<div class="fright"><small><a href="/index.php?module=viewtopic&view=remove_answer&pid='.$post['post_id'].'&topic_id='.$topic['topic_id'].'">&#x2715; Remove as answer</a></small></div>';
+                                        }
+                                    }
+                                    $templating->set('bottom_reply_options', $bottom_reply_options);
 								}
 								$templating->set('user_options', $user_options);
 								$templating->set('bookmark', $bookmark_reply);

@@ -3,11 +3,11 @@
 	<ul class="breadcrumb">
 		<li><a href="{:forum_index}">Forum</a></li>
 		<li><a href="/forum/{:forum_id}/">{:forum_name}</a></li>
-		<li class="active">{:notice} {:topic_title}</li>
+		<li class="active {:answered_title_css}">{:answered} {:notice} {:topic_title}</li>
 	</ul>
 </div>
 <div id="comments-background" class="box comments group">
-<div class="head">{:topic_title} <span class="link_button">{:subscribe_link}</span> <div class="head-list-position head-list">{:pagination_head}</div></div>
+<div class="head forum-topic-head">{:answered} <div class="topic-flex-title">{:topic_title}</div> <span class="link_button">{:subscribe_link}</span> <div class="head-list-position head-list">{:pagination_head}</div></div>
 <div id="selective-quote" data-username="" style="display:none; border: 1px solid grey;">
 	<div>
 		<div class="body group" style="height: 100%; text-align: center;"><button id="insert-selective-quote">Quote This</button></div>
@@ -67,7 +67,8 @@
 							<div id="{:post_id}" class="comment-body">
 								<div class="actual-comment-text" id="{:post_id}">
 									<p>{:post_text}</p>
-								</div>
+                                </div>
+                                {:answered_link}
 								<div class="likes{:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
 							</div>
 					</div>
@@ -75,10 +76,10 @@
 
 [block: reply]
 					<a class="anchor" id="r{:post_id}"></a>
-						<div class="comment group r{:post_id}">
+						<div class="comment group r{:post_id} {:answer_css}">
 							<div class="comment-meta group">
 								<div class="comment-post">
-									<span class="username">{:username}</span> {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:reply_date}</abbr>
+									<span class="username">{:username}</span> {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:reply_date}</abbr> {:answer_note}
 								</div>
 								<div class="comment-actions">
 									<ul>
@@ -103,7 +104,8 @@
 							<div id="{:post_id}" class="comment-body">
 								<div class="actual-comment-text" id="{:post_id}">
 									<p>{:post_text}</p>
-								</div>
+                                </div>
+                                {:bottom_reply_options}
 								<div class="likes{:hidden_likes_class}"><span class="total_likes">{:total_likes}</span> Likes<span class="who-likes">{:who_likes_link}</span></div>
 							</div>
 					</div>

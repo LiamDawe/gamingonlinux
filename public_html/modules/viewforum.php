@@ -245,7 +245,7 @@ else
 		}
 		$templating->set('is_locked', $locked);
         $answered = '';
-        if ($post['answered'] == 1)
+        if ($post['answered'] != 0)
         {
             $answered = '<span class="checkmark" title="Solved"></span>';
         }
@@ -270,7 +270,7 @@ else
 		$replies = '';
 		if ($post['replys'] > 0)
 		{
-			$replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" onerror="'.$this_template.'/images/comments/replies.png" alt=""> ' . $post['replys'];
+			$replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" onerror="'.$this_template.'/images/comments/replies.png" alt=""> ' . $post['replys'] . ' replies';
 		}
 		$templating->set('replies', $replies);
 		

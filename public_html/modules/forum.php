@@ -136,11 +136,13 @@ else
             t.`answered`,
 			f.name as forum_name,
 			f.`pretty_url`,
-			u.`username`,
+            u.`username`,
+            u.`profile_address`,
 			u.`avatar`, 
 			u.`avatar_uploaded`, 
 			u.`avatar_gallery`,
-			u2.`username` as username_last
+            u2.`username` as username_last,
+            u2.`profile_address` as `profile_address_last`
 		FROM
 			`forum_topics` t
 		INNER JOIN
@@ -166,10 +168,27 @@ else
 			$last_date = $core->time_ago($topics['last_post_date']);
 			$templating->set('tzdate', date('c',$topics['last_post_date']) );
 			
-			$avatar = $user->sort_avatar($topics);
+            $avatar = $user->sort_avatar($topics);
+            
+            // topic creator profile address
+            if (isset($topics['profile_address']) && !empty($topics['profile_address']))
+            {
+                $profile_address = '/profiles/' . $topics['profile_address'];
+            }
+            else
+            {
+                $profile_address = '/profiles/' . $topics['author_id'];
+            }
 
-			$profile_link = "/profiles/{$topics['author_id']}";
-			$profile_last_link = "/profiles/{$topics['last_post_user_id']}";
+            // last poster profile address
+            if (isset($topics['profile_address_last']) && !empty($topics['profile_address_last']))
+            {
+                $profile_last_link = '/profiles/' . $topics['profile_address_last'];
+            }
+            else
+            {
+                $profile_last_link = '/profiles/' . $topics['last_post_user_id'];
+            }
 
 			if (isset($topics['pretty_url']) && !empty($topics['pretty_url']))
 			{
@@ -194,7 +213,7 @@ else
 				$poll_title = '<strong>POLL:</strong> ';
             }
             $answered = '';
-            if ($topics['answered'] == 1)
+            if ($topics['answered'] != 0)
             {
                 $answered = '<span class="checkmark" title="Solved"></span>';
             }
@@ -206,10 +225,10 @@ else
 			$last_link = $link;
 			if ($topics['replys'] > 0)
 			{
-				$last_link = $forum_class->get_link($topics['topic_id'], 'post_id=' . $topics['last_post_id']);
+                $last_link = $forum_class->get_link($topics['topic_id'], 'post_id=' . $topics['last_post_id']);
+                $replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" alt="">  ' . number_format($topics['replys']) . ' replies';
 			}
 
-			$replies = '<img width="15" height="12" src="'.$this_template.'/images/comments/replies.svg" alt="">  ' . number_format($topics['replys']) . ' replies';
 			$templating->set('replies', $replies);
 			$templating->set('avatar', $avatar);
 			if (isset($topics['username']))
@@ -227,7 +246,7 @@ else
 			$templating->set('last_date', $last_date);
 			$templating->set('forum_name', $topics['forum_name']);
 			$templating->set('forum_link', $forum_link);
-			$templating->set('profile_link', $profile_link);
+			$templating->set('profile_link', $profile_address);
 			$templating->set('this_template', $this_template);
 		}
 

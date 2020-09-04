@@ -1587,7 +1587,14 @@ ul.social-networks li > a {
 	margin-right: 5px;
 }
 .forum_avatar_holder:empty {background-image: var(--avatar-default-img); background-size: contain;}
-
+.forum-topic-head {display: flex; align-items: center; align-content: space-between; flex-wrap: wrap;}
+.topic-flex-title{flex-grow:1;}
+.forum-topic-head div {margin-left: 5px; margin-right: 5px;}
+ul li.answered_title_css
+{
+    display: inline-flex;
+    align-items: center;
+}
 .forum_post_info 
 {
 	overflow:hidden;
@@ -2016,7 +2023,9 @@ div.modal-container.modal-standalone
 		margin-bottom: 14px;
 	}
 
-	.head-list-position {float: left; margin-top: 5px;}
+    .head-list-position {float: left; margin-top: 5px;}
+    
+    .forum-topic-head div {margin-left: 0; margin-right: 0;}
 
 	.article.individual.no-image .info {
 		padding: 14px;
@@ -2308,6 +2317,16 @@ div.dataTables_wrapper > div.dataTables_info, div.dataTables_wrapper > div.dataT
 .table-stripes-tbody tbody tr:nth-child(even) {background: var(--table-stripes-treven-bg)}
 .table-stripes-tbody tbody tr:nth-child(odd) {background: var(--table-stripes-trodd-bg)}
 .td-free-games-tags {padding-top: 0px;}
+
+/* tables */
+.scrolling-table
+{
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 10px;
+    word-break: normal;
+    overflow-x: scroll;
+}
 
 .free-featured
 {

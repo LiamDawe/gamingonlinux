@@ -128,7 +128,7 @@ else
 		{
             // check it exists
             $check = $dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['pid']))->fetch();
-            if (isset($check) && $check['author_id'] == $_SESSION['user_id'])
+            if (isset($check) && ($check['author_id'] == $_SESSION['user_id'] || $user->check_group([1,2]) == true))
             {
                 // remove it as answer
                 $dbl->run("UPDATE `forum_replies` SET `post_answer` = 0 WHERE `post_id` = ?", array($_GET['pid']));
@@ -179,9 +179,9 @@ else
 		{
             // check it exists
             $check = $dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['pid']))->fetch();
-            if (isset($check) && $check['author_id'] == $_SESSION['user_id'])
+            if (isset($check) && ($check['author_id'] == $_SESSION['user_id'] || $user->check_group([1,2]) == true))
             {
-                // remove it as answer
+                // add it as answer
                 $dbl->run("UPDATE `forum_replies` SET `post_answer` = 1 WHERE `post_id` = ?", array($_GET['pid']));
                 $dbl->run("UPDATE `forum_replies` SET `post_answer` = 0 WHERE `post_id` != ?", array($_GET['pid']));
                 $dbl->run("UPDATE `forum_topics` SET `answered` = ? WHERE `topic_id` = ?", array($_GET['pid'], $_GET['topic_id']));
@@ -929,9 +929,9 @@ else
                                         {
                                             $bottom_reply_options = '<div class="fright"><small><a href="/index.php?module=viewtopic&view=remove_answer&pid='.$post['post_id'].'&topic_id='.$topic['topic_id'].'">&#x2715; Remove as answer</a></small></div>';
                                         }
-                                    }
-                                    $templating->set('bottom_reply_options', $bottom_reply_options);
-								}
+                                    } 
+                                }
+                                $templating->set('bottom_reply_options', $bottom_reply_options);
 								$templating->set('user_options', $user_options);
 								$templating->set('bookmark', $bookmark_reply);
 

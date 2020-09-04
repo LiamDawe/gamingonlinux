@@ -1588,7 +1588,7 @@ ul.social-networks li > a {
 }
 .forum_avatar_holder:empty {background-image: var(--avatar-default-img); background-size: contain;}
 .forum-topic-head {display: flex; align-items: center; align-content: space-between; flex-wrap: wrap;}
-.topic-flex-title{flex-grow:1;}
+.topic-flex-title{display: flex; flex-grow:1;}
 .forum-topic-head div {margin-left: 5px; margin-right: 5px;}
 ul li.answered_title_css
 {
@@ -2819,6 +2819,7 @@ div.dataTables_wrapper .dataTables_info {padding-top: 0.25em}
     -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
     transform: rotate(45deg);
     margin-right: 5px;
+    flex-shrink: 0;
 }
 
 .checkmark:before{

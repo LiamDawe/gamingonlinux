@@ -150,7 +150,8 @@ else
 		u.`avatar_uploaded`,
 		u.`avatar_gallery`,
 		u2.`username` as `username_last`,
-		u2.`user_id` as `user_id_last`
+		u2.`user_id` as `user_id_last`,
+        u2.`profile_address` as `profile_address_last`
 		FROM `forum_topics` t
 		LEFT JOIN `users` u ON t.`author_id` = u.`user_id`
 		LEFT JOIN `users` u2 ON t.`last_post_user_id` = u2.`user_id`
@@ -285,7 +286,19 @@ else
 
 		$last_date = $core->time_ago($post['last_post_date']);
 		$templating->set('last_date', $last_date);
-		$templating->set('tzdate', date('c',$post['last_post_date']) );
+        $templating->set('tzdate', date('c',$post['last_post_date']) );
+        
+        // last poster profile address
+        if (isset($post['profile_address_last']) && !empty($post['profile_address_last']))
+        {
+            $profile_last_link = '/profiles/' . $post['profile_address_last'];
+        }
+        else
+        {
+            $profile_last_link = '/profiles/' . $post['last_post_user_id'];
+        }
+
+        $templating->set('profile_last_link', $profile_last_link);
 		$templating->set('last_username', $post['username_last']);
 	}
 

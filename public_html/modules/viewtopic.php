@@ -884,7 +884,8 @@ else
 								$templating->set('hidden_likes_class', $likes_hidden);
 
 								$user_options = '';
-								$bookmark_reply = '';
+                                $bookmark_reply = '';
+                                $bottom_reply_options = '';
 								if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 								{
 									$user_options = "<li><a class=\"tooltip-top\" title=\"Report\" href=\"" . $core->config('website_url') . "index.php?module=report_post&view=reportreply&post_id={$post['post_id']}&topic_id={$_GET['topic_id']}\"><span class=\"icon flag\">Flag</span></a></li><li><a class=\"tooltip-top quote_function\" title=\"Quote\" data-id=\"".$post['post_id']."\" data-type=\"forum_reply\" href=\"/index.php?module=newreply&qid=".$post['post_id']."&topic_id=".$topic['topic_id']."&forum_id=".$topic['forum_id']."&type=reply\"><span class=\"icon quote\">Quote</span></a></li>";
@@ -918,7 +919,6 @@ else
                                     }
 
                                     // bottom options
-                                    $bottom_reply_options = '';
                                     if ($topic['author_id'] == $_SESSION['user_id'] || $user->check_group([1,2]) == true)
                                     {
                                         if ($post['post_answer'] == 0)

@@ -1,52 +1,6 @@
 [block: ckeditor]
 <script src="/includes/ckeditor/ckeditor.js?v=4.14"></script>
-<script>	
-CKEDITOR.on('instanceCreated', function(e) 
-{
-	e.editor.on('change', function(event) 
-	{
-		var textarea = event.editor.element.$;
-		$(textarea).val(event.editor.getData().trim());
-		$(textarea.form).trigger('checkform.areYouSure');
-	});
-})
-var ckeditor_skin = 'moono-lisa';
-if(localStorage.getItem("theme")){
-		if(localStorage.getItem("theme") == "dark")
-		{
-			ckeditor_skin = 'moono-dark';
-        }
-} 
-
-editor = CKEDITOR.replace( 'ckeditor_gol', {
-customConfig: '{:jsstatic}/ckeditor_config.js', skin: ckeditor_skin
-});
-editor.addCommand("spoiler", {
-	exec: function(edt) {
-		edt.insertHtml('<div class="collapse_container"><div class="collapse_header"><span>Spoiler, click me</span></div><div class="collapse_content"><div class="body group">hidden text here</div></div></div>');
-	}
-});
-editor.ui.addButton('spoilerbutton', {
-label: "Spoiler",
-command: 'spoiler',
-toolbar: 'insert',
-icon: '/templates/default/images/spoiler.png'
-});
-CKEDITOR.on('instanceReady', function(evt)
-{
-	evt.editor.filter.addTransformations([
-	[{
-		element: 'a',
-		left: function( el ) {
-			return !el.attributes.target;
-		},
-		right: function( el, tools ) {
-			el.attributes.target = '_blank';
-		}
-	}]
-	]);
-});
-</script>
+<script src="{:jsstatic}/GOL/ckeditor-custom.js"></script>
 [/block: ckeditor]
 
 [block: footer]
@@ -76,15 +30,13 @@ CKEDITOR.on('instanceReady', function(evt)
 		</div>
 	</div>
 </footer>
-<script src="{:jsstatic}/GOL/header.min.js?v=2.6.16"></script>
+<script src="{:jsstatic}/GOL/header.min.js?v=2.6.22"></script>
 <script src="{:jsstatic}/GOL/twitch_checker.js?v=3"></script>
 <script src="{:jsstatic}/jquery.are-you-sure.js"></script>
 <script>twitch_check(); setInterval ( "twitch_check()", 60000 );</script>
 <!-- Qtip2 -->
 <link rel="stylesheet" href="{:jsstatic}/qtip2/jquery.qtip.min.css" type="text/css" media="screen" />
 <script src="{:jsstatic}/qtip2/jquery.qtip.min.js"></script>
-<link rel="stylesheet" type="text/css" href="{:jsstatic}/datatables/datatables.min.css">
-<script src="{:jsstatic}/datatables/datatables.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/select2/css/select2.min.css">
 <script src="{:jsstatic}/select2/js/select2.min.js?v=4"></script>
 <script src="{:jsstatic}/jquery.countdown.min.js"></script>

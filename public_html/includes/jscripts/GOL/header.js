@@ -484,20 +484,48 @@ jQuery(document).ready(function()
 	{
 		var item = $(this).data('highlight-class');
 		$('.'+item).highlight();
-	});
-
-	// table sorting
-	$('#crowdfunded').dataTable( 
+    });
+    
+    if ($('.dataTable').length)
 	{
-		"iDisplayLength": 25,
-		colReorder: true
-	});
+        $('.js-loading').show();
+        
+		$.cachedScript( "/includes/jscripts/datatables/datatables.min.js" ).done(function( script, textStatus ) 
+		{	
+            var link = document.createElement('link');
 
-	$('#crowdfunded').on( 'page.dt', function () {
-		$('html, body').animate({
-			scrollTop: ($('.crowdfunded-page-top').offset().top)
-		},300);
-	} );
+            // set properties of link tag
+            link.href = '/includes/jscripts/datatables/datatables.min.css';
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            document.body.appendChild(link);
+
+            link.onload = function() 
+            {
+                // table sorting
+                $('#crowdfunded').dataTable( 
+                {
+                    "iDisplayLength": 25,
+                    colReorder: true
+                });
+    
+                $('#crowdfunded').on( 'page.dt', function () {
+                    $('html, body').animate({
+                        scrollTop: ($('.crowdfunded-page-top').offset().top)
+                    },300);
+                });
+
+                setTimeout(function() { 
+                    $('.js-loading').replaceWith($('.dataTable-container').fadeIn(700));
+                }, 900);
+                
+            };
+            link.onerror = function() 
+            {
+                console.log('Couldn\'t load datatables fully.');
+            };
+        })
+    }
 
 	$(".remove_announce").on('click', function(event)
 	{
@@ -1910,61 +1938,6 @@ jQuery(document).ready(function()
 			}
 		});
     });
-	
-	/* CKEditor */
-	// insert tagline image html into editor
-	$(document).on('click', ".insert_tagline_image", function(e) 
-	{
-		e.preventDefault();
-		var tagline_image = $('.tagline-image').attr('href');
-		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><img src="'+tagline_image+'" /></p>');
-	});	
-	
-	// insert normal image uploads into article textarea
-	// main image
-	$(document).on('click', ".uploads .add_button", function(e) 
-	{
-		var text = $(this).data('url');
-		var type = $(this).data('type');
-		if (type == 'video')
-		{
-			CKEDITOR.instances.ckeditor_gol.insertHtml('<div class="ckeditor-html5-video" style="text-align: center;"><video controls="controls" src="'+text+'">&nbsp;</video></div>');
-		}
-		else if (type == 'audio')
-		{
-			CKEDITOR.instances.ckeditor_gol.insertHtml('<div class="ckeditor-html5-audio" style="text-align: center;"><audio controls="controls" src="'+text+'">&nbsp;</audio></div>');
-		}
-		else
-		{
-			CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+text+'" data-fancybox="images"><img src="'+text+'" /></a></p>');
-		}
-	});
-	
-	// thumbnail insertion
-	$(document).on('click', ".uploads .add_thumbnail_button", function(e) 
-	{
-		var thumbnail = $(this).data('url');
-		var big_image = $(this).data('main-url');
-		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+big_image+'" data-fancybox="images"><img src="'+thumbnail+'" /></a></p>');
-	});
-
-	// static image for a gif
-	$(document).on('click', ".uploads .add_static_button", function(e) 
-	{
-		var actual_gif = $(this).data('url-gif');
-		var static_image = $(this).data('url-static');
-		CKEDITOR.instances.ckeditor_gol.insertHtml('<p style="text-align:center"><a href="'+actual_gif+'" class="img_anim" target="_blank"><img src="'+static_image+'" /></a></p>');
-	});
-
-	// approving submitted article as yourself (if you re-wrote large portions)
-	$(document).on('click', "#self-submit", function(e) 
-	{
-		var username = $("#submitter-username").text();   
-		var targetEditor = CKEDITOR.instances.ckeditor_gol;
-		var range = targetEditor.createRange();
-		range.moveToElementEditEnd(range.root);
-		targetEditor.insertHtml('<p>&nbsp;</p><p style="text-align:right"><em>With thanks to the original submission from ' + username + '!</em></p>', 'html', range);
-	});
 	
 	// prevent accidental logouts
 	$(document).on('click', ".logout_link", function(e) 

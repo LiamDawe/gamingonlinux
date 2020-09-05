@@ -34,9 +34,6 @@
 <script src="{:jsstatic}/GOL/twitch_checker.js?v=3"></script>
 <script src="{:jsstatic}/jquery.are-you-sure.js"></script>
 <script>twitch_check(); setInterval ( "twitch_check()", 60000 );</script>
-<!-- Qtip2 -->
-<link rel="stylesheet" href="{:jsstatic}/qtip2/jquery.qtip.min.css" type="text/css" media="screen" />
-<script src="{:jsstatic}/qtip2/jquery.qtip.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/select2/css/select2.min.css">
 <script src="{:jsstatic}/select2/js/select2.min.js?v=4"></script>
 <script src="{:jsstatic}/jquery.countdown.min.js"></script>
@@ -51,16 +48,6 @@
 <!-- datetime picker -->
 <link rel="stylesheet" type="text/css" href="{:jsstatic}/timepicker/datepicker.css" />
 <script>
-	jQuery('.tooltip-top').qtip({
-	    position: {
-	        my: 'bottom center',
-	        at: 'top center'
-	    },
-	    style: {
-	        classes: 'qtip-bootstrap qtip-shadow'
-	    }
-	});
-
 	var sale_search_options = {
 		url: function(phrase) { 
 				return "/includes/ajax/gamesdb/search_games.php?return_type=text&q=" + phrase + "&type=sales&format=json";    

@@ -2743,7 +2743,6 @@ input:checked + .theme-slider:before
 
 .gamesdbbutton 
 {
-	padding: 5px 10px;
 	border-radius: 2px;
 	font-weight: bold;
 	outline: none;
@@ -2756,13 +2755,12 @@ input:checked + .theme-slider:before
 	text-align: center;
 }
 
-.gamesdbbutton a {display: block;}
+.gamesdbbutton a {display: block; padding: 5px 10px; box-sizing: border-box;}
 .gamesdbbutton a:link, .gamesdbbutton a:visited, .gamesdbbutton a:active {color: white;}
 
 .gamesdbbutton:hover 
 {
 	border: 1px #2f5bb7 solid;
-	box-shadow: 0 1px 1px #eaeaea, inset 0 1px 0 #5a94f1;
 	background: #3f83f1;
 	color: white;
 }

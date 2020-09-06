@@ -17,8 +17,11 @@ else
 	{
 		if ($_GET['view'] == 'add')
 		{
-			$templating->block('add', 'admin_modules/admin_module_blocks');
-			$core->editor(['name' => 'text', 'editor_id' => 'block']);
+            $templating->block('add', 'admin_modules/admin_module_blocks');
+
+            $editor = new editor($core, $templating, $bbcode);
+            $editor->article_editor(['content' => '']);
+
 			$templating->block('add_bottom', 'admin_modules/admin_module_blocks');
 
 			if (!isset($_GET['usercp']))
@@ -103,9 +106,10 @@ else
 
 					$templating->set('block_name', $blocks['block_name']);
 					$templating->set('block_title', $blocks['block_title']);
-					$templating->set('link', $blocks['block_title_link']);
-					
-					$core->editor(['name' => 'text', 'content' => $blocks['block_custom_content'], 'editor_id' => 'block']);
+                    $templating->set('link', $blocks['block_title_link']);
+                    
+                    $editor = new editor($core, $templating, $bbcode);
+                    $editor->article_editor(['content' => $blocks['block_custom_content']]);
 
 					$templating->block('custom_row_bottom', 'admin_modules/admin_module_blocks');
 
@@ -206,8 +210,11 @@ else
 				// note who did it
 				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
 
-				$core->message('You have succesfully made the new block! <a href="admin.php">Return to admin panel</a> or <a href="admin.php?module=blocks&amp;view=add">Create another block</a>?');
-			}
+                $_SESSION['message'] = 'saved';
+                $_SESSION['message_extra'] = 'block';
+                header("Location: /admin.php?module=blocks&view=manage&{$_POST['type']}");
+                die();
+            }
 		}
 
 		if ($_POST['act'] == 'addmain')
@@ -247,7 +254,10 @@ else
 				// note who did it
 				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
 
-				$core->message("You have succesfully added the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage&{$_POST['type']}\">Manage blocks</a>?");
+                $_SESSION['message'] = 'saved';
+                $_SESSION['message_extra'] = 'block';
+                header("Location: /admin.php?module=blocks&view=manage&{$_POST['type']}");
+                die();
 			}
 		}
 
@@ -294,7 +304,10 @@ else
 					// note who did it
 					$core->new_admin_note(array('completed' => 1, 'content' => ' updated the sidebar block named: '.$name.'.'));
 
-					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
+                    $_SESSION['message'] = 'saved';
+                    $_SESSION['message_extra'] = 'block';
+                    header("Location: /admin.php?module=blocks&view=manage&{$_POST['type']}");
+                    die();
 				}
 			}
 
@@ -352,8 +365,11 @@ else
 					// note who did it
 					$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
 
-					$core->message("You have updated the block! <a href=\"admin.php\">Return to admin panel</a> or <a href=\"admin.php?module=blocks&amp;view=manage{$usercp_link}\">Manage another block</a>?");
-				}
+                    $_SESSION['message'] = 'saved';
+                    $_SESSION['message_extra'] = 'block';
+                    header("Location: /admin.php?module=blocks&view=manage&{$_POST['type']}");
+                    die();				
+                }
 			}
 		}
 

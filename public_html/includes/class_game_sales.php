@@ -262,7 +262,7 @@ class game_sales
 			$total_rows = $this->dbl->run("SELECT COUNT(Distinct id) FROM `calendar` c WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND `is_dlc` = 0 ORDER BY c.`name` ASC", [$where])->fetchOne();
 			$pagination = $this->core->pagination_link(50, $total_rows, '/free_games.php?', $page, $link_extra);	
 
-			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`license`, c.`small_picture`, FROM `calendar` c $genre_join WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND `is_dlc` = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
+			$games_res = $this->dbl->run("SELECT c.`id`, c.`name`, c.`license`, c.`small_picture` FROM `calendar` c $genre_join WHERE $sql_where c.`free_game` = 1 AND c.`also_known_as` IS NULL AND c.`is_application` = 0 AND c.`approved` = 1 AND `is_emulator` = 0 AND `is_dlc` = 0 $options_sql GROUP BY c.`id` ORDER BY c.`name` ASC LIMIT {$this->core->start}, 50", $merged_arrays)->fetch_all();
 		}
 		else
 		{

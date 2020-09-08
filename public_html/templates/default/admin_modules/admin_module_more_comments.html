@@ -1,18 +1,16 @@
 [block: main]
 				<div class="box">
 					<div class="head">Viewing more Editor Comments</div>
-				</div>
+                </div>
+                <div class="box">
+					<div class="head">Message all editors here</div>
+                </div>
+                <div class="box">
+					<div class="body group">
+                        <form method="post" action="admin.php?module=more_comments" class="gol-form">
 [/block: main]
 
 [block: comments_alltop]
-				<div class="box">
-					<div class="head">Message all editors here</div>
-				</div>
-
-				<div class="box">
-					<div class="body group">
-						<form method="post" action="admin.php?module=more_comments">
-							<textarea name="text" class="form-control" rows="5"></textarea><br />
 							<button class="btn btn-primary" type="submit" name="act" value="commentall">Add Comment</button>
 						</form>
 					</div>

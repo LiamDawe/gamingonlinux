@@ -31,7 +31,12 @@ if (isset($_GET['view']) && $_GET['view'] == 'editors')
 	// sort out the pagination link
 	$pagination = $core->pagination_link($comments_per_page, $total_comments, "admin.php?module=more_comments&view=editors&", $page);
 
-	// all editor private chat
+    // all editor private chat
+    $templating->block('main', 'admin_modules/admin_module_more_comments');
+
+    $comment_editor = new editor($core, $templating, $bbcode);
+    $comment_editor->editor(['name' => 'text', 'content' => '', 'editor_id' => 'comment']);
+
 	$templating->block('comments_alltop', 'admin_modules/admin_module_more_comments');
 	$templating->set('pagination', $pagination);
 

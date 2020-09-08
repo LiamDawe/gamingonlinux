@@ -253,6 +253,7 @@ else
 			u.`game_developer`,
 			$db_grab_fields
 			f.`name` as `forum_name`,
+            f.`pretty_url`,
 			ul.username as username_edited
 			FROM `forum_topics` t
 			JOIN `forum_replies` p ON p.topic_id = t.topic_id AND p.is_topic = 1
@@ -374,8 +375,18 @@ else
 
 
 					// get the template, sort out the breadcrumb
-					$templating->block('top', 'viewtopic');
-					$templating->set('forum_id', $topic['forum_id']);
+                    $templating->block('top', 'viewtopic');
+                    
+                    if (isset($topic['pretty_url']) && !empty($topic['pretty_url']))
+                    {
+                        $forum_link = 'forum/' . $topic['pretty_url'];
+                    }
+                    else
+                    {
+                        $forum_link = 'forum/' . $topic['forum_id'];
+                    }
+                    $templating->set('forum_link', $core->config('website_url') . $forum_link);
+					
 					$templating->set('forum_name', $topic['forum_name']);
 					$templating->set('subscribe_link', $subscribe_link);
 					$templating->set('pagination_head', $pagination_head);

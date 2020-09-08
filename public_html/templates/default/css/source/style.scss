@@ -2842,5 +2842,24 @@ div.dataTables_wrapper .dataTables_info {padding-top: 0.25em}
     top:12px;
 }
 
+.box.fixed-alert {
+    position: fixed;
+    top: 49px; 
+    z-index: 9999; 
+    width: 100%;
+    left: 0px;
+    border-radius: 0px;
+}
+
+.alert-toggle {
+    display: none;
+}
+
+#alert-toggle-close {cursor: pointer; color: #000;}
+
+#toggle:checked ~ #message-box {
+    display: none;
+}
+
 @import 'content';
 @import 'editor';

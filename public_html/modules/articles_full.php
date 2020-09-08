@@ -1131,10 +1131,11 @@ else if (isset($_GET['go']))
 			// get info for title
 			$title = $dbl->run("SELECT `slug`, `date` FROM `articles` WHERE `article_id` = ?", array((int) $article_id))->fetch();
 			
-			$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));
+			$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug'], 'additional' => 'comment_id='.$comment_id));
 
 			$_SESSION['message'] = 'reported';
-			$_SESSION['message_extra'] = 'comment';
+            $_SESSION['message_extra'] = 'comment';
+            $_SESSION['message_stick'] = 1;
 
 			header("Location: ".$article_link);
 			die();

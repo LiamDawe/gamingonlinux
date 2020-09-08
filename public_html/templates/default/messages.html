@@ -1,8 +1,15 @@
 [block: message]
-				<div class="box {:type} message">
-					<div class="head ">{:message}</div>
-				</div>
+<div id="message-box" class="box {:type} message">
+	<div class="head ">{:message}</div>
+</div>
 [/block: message]
+
+[block: message_fixed]
+<input type="checkbox" id="toggle" class="alert-toggle">
+<div id="message-box" class="box {:type} message fixed-alert">
+	<div class="head ">{:message} - <label id="alert-toggle-close" for="toggle">&#x2715; Close</label></div>
+</div>
+[/block: message_fixed]
 
 [block: yes_no]
 				<div class="box">

@@ -108,7 +108,8 @@ return [
 	[
 		"text" => "That %s was reported to the editors to review!",
 		"additions" => 1,
-		"error" => 0
+        "error" => 0,
+        "sticky" => 1
 	],
 	"mod_queue" => 
 	[

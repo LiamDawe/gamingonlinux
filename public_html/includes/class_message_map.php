@@ -43,7 +43,13 @@ class message_map
 			if (isset($this->messages[$key]['error']) && is_numeric($this->messages[$key]['error']))
 			{
 				$error = $this->messages[$key]['error'];
-			}
+            }
+            
+            $sticky = 0;
+            if (isset($this->messages[$key]['sticky']) && $this->messages[$key]['sticky'] == 1)
+			{
+				$sticky = 1;
+            }           
 	
 			$stored_message = vsprintf($this->messages[$key]['text'], $extras_output);
 		}
@@ -53,15 +59,31 @@ class message_map
 			$stored_message = 'We tried to give a message with the key "'.$key.'" but we couldn\'t find that message.';
 		}
 
-		unset($_SESSION['message']);
-		unset($_SESSION['message_extra']);
-		unset($_SESSION['error']);
+        // keep it around once, useful for a redirect to set $_SESSION['message_stick'] = 1 to have it stick between that one redirect
+        if (!isset($_SESSION['message_stick']) || $_SESSION['message_stick'] == 0)
+        {
+		    unset($_SESSION['message']);
+		    unset($_SESSION['message_extra']);
+            unset($_SESSION['error']);
+            unset($_SESSION['message_stick']);
+        }
+        else
+        {
+            $_SESSION['message_stick'] = 0;
+        }
 
 		if (!$plain_message)
 		{
 			$templating->load('messages');
-			
-			$templating->block('message');
+            
+            if ($sticky == 0)
+            {
+                $templating->block('message');
+            }
+            else if ($sticky == 1)
+            {
+                $templating->block('message_fixed');
+            }
 
 			if ($error == 0)
 			{

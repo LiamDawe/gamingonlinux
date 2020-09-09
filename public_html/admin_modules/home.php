@@ -27,11 +27,6 @@ if (!isset($_GET['view']))
 		{
 			$core->message('Added the comment!');
 		}
-
-		if ($_GET['message'] == 'emptycomment')
-		{
-			$core->message('You can\'t submit an empty admin area comment silly!', 1);
-		}
 	}
 
 	$templating->set('articles_css', "adminHome");
@@ -227,39 +222,19 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'commentall')
 	{
-		$text = trim($_POST['text']);
-		$text = core::make_safe($text);
-
-		if (empty($text))
+        $text = trim($_POST['text']);
+        $text = core::make_safe($text);
+        
+        if (empty($text))
 		{
-			header('Location: /admin.php?message=emptycomment');
-			exit;
-		}
+            $_SESSION['message'] = 'empty';
+            $_SESSION['message_extra'] = 'editor comment';
+			header('Location: /admin.php');
+			die();
+        }
 
-		$date = core::$date;
-		$dbl->run("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, $date));
-
-		$grab_editors = $dbl->run("SELECT m.`user_id`, u.`email`, u.`username` FROM `user_group_membership` m INNER JOIN `users` u ON m.`user_id` = u.`user_id` WHERE m.`group_id` IN (1,2,5) AND u.`user_id` != ?", [$_SESSION['user_id']])->fetch_all();
-
-		foreach ($grab_editors as $emailer)
-		{
-			$subject = "A new editor area comment on GamingOnLinux.com";
-
-			// message
-			$html_message = "<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"https://www.gamingonlinux.com/admin.php\">editor panel</a>:</p>
-			<hr>
-			<p>{$text}</p>";
-
-			$plain_message = "Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux editor panel: https://www.gamingonlinux.com/admin.php";
-			
-			// Mail it
-			if ($core->config('send_emails') == 1)
-			{
-				$mail = new mailer($core);
-				$mail->sendMail($emailer['email'], $subject, $html_message, $plain_message);
-			}
-		}
-
-		header('Location: /admin.php?message=added');
+        $admin->add_editor_chat($text);
+        header('Location: /admin.php');
+        die();
 	}
 }

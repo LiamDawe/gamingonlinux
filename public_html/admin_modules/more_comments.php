@@ -65,43 +65,18 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'commentall')
 	{
-		$text = trim($_POST['text']);
-
-		if (empty($text))
+        $text = trim($_POST['text']);
+		$text = core::make_safe($text);
+        if (empty($text))
 		{
-			$_SESSION['message'] = 'empty';
-			$_SESSION['message_extra'] = 'comment';
-			header('Location: /admin.php?module=more_comments&view=editors');
+            $_SESSION['message'] = 'empty';
+            $_SESSION['message_extra'] = 'editor comment';
+			header('Location: /admin.php');
 			die();
-		}
-
-		$dbl->run("INSERT INTO `editor_discussion` SET `user_id` = ?, `text` = ?, `date_posted` = ?", array($_SESSION['user_id'], $text, core::$date));
-
-		$res = $dbl->run("SELECT `username`, `email` FROM `users` WHERE `user_group` IN (1,2,5) AND `user_id` != ?", array($_SESSION['user_id']))->fetch_all();
-
-		foreach ($res as $emailer)
-		{
-			$subject = "A new editor area comment on GamingOnLinux.com";
-
-			$comment_email = $bbcode->email_bbcode($text);
-
-			// message
-			$html_message = "<p>Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux <a href=\"" . $core->config('website_url') . "admin.php\">editor panel</a>:</p>
-			<hr>
-			<p>{$text}</p>";
-
-			$plain_message = PHP_EOL."Hello {$emailer['username']}, there's a new message from {$_SESSION['username']} on the GamingOnLinux editor panel: " . $core->config('website_url') . "admin.php\r\n\r\n{$_POST['text']}\r\n\r\n";
-
-			// Mail it
-			if ($core->config('send_emails') == 1)
-			{
-				$mail = new mailer($core);
-				$mail->sendMail($emailer['email'], $subject, $html_message, $plain_message);
-			}
-		}
-
-		$_SESSION['message'] = 'saved';
-		$_SESSION['message_extra'] = 'comment';
-		header('Location: /admin.php?module=more_comments&view=editors');
+        }
+        
+        $admin->add_editor_chat($text);        
+        header('Location: /admin.php?module=more_comments&view=editors');
+        die();
 	}
 }

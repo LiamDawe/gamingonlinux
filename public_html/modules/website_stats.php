@@ -47,6 +47,7 @@ $article_list = $dbl->run("SELECT
 	COUNT(DISTINCT a.article_id) AS `counter`,
 	u.`username`,
 	u.`user_id`,
+    u.`profile_address`,
 	MAX(a.date) AS `last_date`
 FROM
 	`articles` a
@@ -78,8 +79,6 @@ $now_date = date("j M Y");
 $templating->set('last_month', $last_month);
 $templating->set('now_date', $now_date);
 
-$profile_url = '/profiles/';
-
 $counter = 0;
 
 foreach ($article_list as $fetch_authors)
@@ -99,7 +98,16 @@ foreach ($article_list as $fetch_authors)
 	}
 	else
 	{
-		$username = '<a href="'. $profile_url . $fetch_authors['user_id'] . '">' . $fetch_authors['username'] . '</a>';
+        if (isset($fetch_authors['profile_address']) && !empty($fetch_authors['profile_address']))
+        {
+            $profile_url = '/profiles/' . $fetch_authors['profile_address'];
+        }
+        else
+        {
+            $profile_url = '/profiles/' . $fetch_authors['user_id'];
+        }
+        
+		$username = '<a href="'. $profile_url . '">' . $fetch_authors['username'] . '</a>';
 	}
 
 	$author_list .= '<li>' . $username . ' (' . $article_count . ') <em>Last article: ' . $core->human_date($fetch_authors['last_date']) . '</em></li>';

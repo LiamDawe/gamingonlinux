@@ -1644,6 +1644,9 @@ ul li.answered_title_css
 	align-items: center;
 }
 
+.flex-nowrap{flex-wrap: nowrap;}
+.flex-noshrink{flex-shrink: 0;}
+
 .flex-stretch
 {
 	flex-grow: 2;
@@ -2860,6 +2863,11 @@ div.dataTables_wrapper .dataTables_info {padding-top: 0.25em}
 #toggle:checked ~ #message-box {
     display: none;
 }
+
+.steamplay-icon{height: 50px; width: 50px; float: left; padding: 5px; box-sizing: border-box; border-radius: 5px; margin-right: 5px;}
+.steamplay-icon.working {background-color: rgba(0, 234, 61, 0.5);}
+.steamplay-icon.hasissues {background-color: rgba(30, 139, 195, 0.5);}
+.steamplay-icon.broken {background-color: rgba(207, 0, 15, 0.5);}
 
 @import 'content';
 @import 'editor';

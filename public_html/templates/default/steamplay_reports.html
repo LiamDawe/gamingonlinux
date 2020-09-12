@@ -1,0 +1,110 @@
+[block: top]
+<div id="content" class="container group">
+	<div class="col-12">
+		<div class="box">
+			<ul class="breadcrumb">
+				<li class="active">Quick Links</li>
+				<li><a href="/">GOL News Home</a></li>
+				<li><a href="/steamplay/">Steam Play Home</a></li>
+			</ul>
+		</div>
+		<div class="box">
+			<h3 style="display: inline;">{:name}</h3> 
+        </div>
+        <div class="box">
+            <div class="head">Total reports overall: {:total} <div class="fright">{:new_report}</div></div>
+            <div class="subhead" style="text-align: center">Our rating system is simple: if it's reported as working that means it's click and play with Proton. No workarounds, no external helpers. <a href="#comments_top">&dArr; Jump to comments &dArr;</a></div>
+        </div>
+[/block: top]
+
+[block: ratings_grouped]
+<div class="box">
+	<div class="body group">
+        <div class="flex-row">
+            <div class="flex-column-left flex-stretch flex-row flex-nowrap" style="margin-right: 10px;">
+                {:singleplayer_badge}
+                <h5>Singleplayer</h5>
+            </div>
+            <div><strong><u>{:percent_good}%</u></strong> of the last 30 reports say it's "click and play" with Steam Play Proton. {:issues_info}</div>
+        </div>
+        <hr />
+        <div class="flex-row">
+            <div class="flex-column-left flex-stretch flex-row flex-nowrap" style="margin-right: 10px;">
+                {:multiplayer_badge}
+                <h5>Multiplayer</h5>
+            </div>
+            <div><strong><u>{:percent_good_multi}%</u></strong> of the last 30 reports say it's "click and play" with Steam Play Proton. {:issues_info_multi}</div>
+        </div>
+    </div>
+</div>
+<div class="box">
+    <div class="header-text-plain">Report Charts</div>
+    <div class="body group">
+            
+                <h5>Singleplayer</h5>
+                {:rating_single_time}
+				<div class="subhead" style="text-align: center">Where the reports are marked as working, what Proton versions are suitable?</div>
+				{:proton_versions}
+	</div>
+</div>
+[/block: ratings_grouped]
+
+[block: help_links]
+        <div class="box">
+            <div class="header-text-plain">Helpful links</div>
+            <div class="body group"><a href="/forum/11" target="_blank"><img height="15" src="/templates/default/images/steamplay_forum_icon.svg" alt="" /> Steam Play forum</a> <a href="https://discord.gg/T8wqadk" target="_blank"><img height="15" src="/templates/default/images/steamplay_discord.svg" alt="" /> our Discord</a> {:helpful_links}</div>
+        </div>
+[/block: help_links]
+
+[block: comments_top]
+		<div id="comments_top" class="box">
+			<div class="head">Report Comments</div>
+		</div>
+[/block: comments_top]
+
+[block: comment]
+<a class="anchor" id="r{:comment_id}"></a>
+<div class="comment group r{:comment_id} {:promoted_style}">
+    <div class="comment-meta group">
+        <div class="comment-post">
+            <span class="username">{:username}</span> {:cake_icon} <abbr title="{:tzdate}" class="timeago">{:date}</abbr>
+        </div>
+        <div class="comment-actions">
+            <ul>
+                {:report_link}
+                {:edit} {:delete}
+                {:link_to_comment}
+            </ul>
+        </div>
+    </div>
+    <div class="comment-author hide-xsmall">
+        <div class="avatar">{:comment_avatar}</div>
+        {:user_info_extra}
+        <ul class="comment-badges">
+            {:badges}
+        </ul>
+        <ul class="comment-social">
+            {:profile_fields}
+        </ul>
+    </div>
+    <div id="{:comment_id}" class="comment-body">
+        <div class="actual-comment-text" id="text_{:comment_id}">
+            {:text}
+            {:report_info}
+        </div>
+    </div>
+</div>
+[/block: comment]
+
+[block: articles]
+<div class="col-12">
+	<div class="box">
+		<div class="head">Latest GOL articles for {:name}</div>
+	</div>
+</div>
+[block: articles]
+
+[block: bottom]
+    <div class="box"><div class="fright">{:new_report}</div></div>
+</div>
+[/block: bottom]

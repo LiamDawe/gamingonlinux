@@ -8,16 +8,18 @@ class game_sales
 	protected $templating;
 	protected $dbl;
 	protected $user;
-	protected $core;
+    protected $core;
+    protected $bbcode;
 
 	public $main_links;
 
-	function __construct($dbl, $templating, $user, $core)
+	function __construct($dbl, $templating, $user, $core, $bbcode)
 	{
 		$this->dbl = $dbl;
 		$this->templating = $templating;
 		$this->user = $user;
-		$this->core = $core;
+        $this->core = $core;
+        $this->bbcode = $bbcode;
 
 		// key/db field => nice name
 		$this->main_links = array('link' => 'Official Site', 'gog_link' => 'GOG', 'steam_link' => 'Steam', 'stadia_link' => 'Stadia', 'itch_link' => 'itch.io', 'crowdfund_link' => 'Crowdfunded');
@@ -1632,6 +1634,293 @@ class game_sales
 		if (isset($article_info['type']) && $article_info['type'] != 'admin' && $this->user->check_group([6,9]) === false)
 		{
 			$this->templating->block('patreon_comments', 'articles_full');
+		}
+    }
+    
+    function render_proton_comments($steam_id, $total_comments)
+	{
+        $per_page = 15;
+		if (isset($_SESSION['per-page']) && is_numeric($_SESSION['per-page']) && $_SESSION['per-page'] > 0)
+		{
+			$per_page = $_SESSION['per-page'];
+		}
+
+		//lastpage is = total comments / items per page, rounded up.
+		if ($total_comments <= 10)
+		{
+			$lastpage = 1;
+		}
+		else
+		{
+			$lastpage = ceil($total_comments/$per_page);
+		}
+        
+		// paging for pagination
+		if (!isset($article_info['page']) || $article_info['page'] == 0)
+		{
+			$page = 1;
+		}
+
+		else if (is_numeric($article_info['page']))
+		{
+			$page = $article_info['page'];
+		}
+
+		if ($page > $lastpage)
+		{
+			$page = $lastpage;
+        }
+        
+        $profile_fields = include dirname ( dirname ( __FILE__ ) ) . '/includes/profile_fields.php';
+
+		$db_grab_fields = '';
+		foreach ($profile_fields as $field)
+		{
+			$db_grab_fields .= "u.`{$field['db_field']}`,";
+		}
+
+        $params = array_merge([(int) $steam_id], [$this->core->start], [$per_page]);
+        
+        $comments_get = $this->dbl->run("SELECT r.`author_id`, r.`comment`, r.`report_id`, r.`single_works`, r.`multi_works`, u.`pc_info_public`, u.`distro`, r.`report_date`, r.`last_edited_by`, r.`last_edited_time`, v.version, u.`username`, u.`profile_address`, u.`avatar`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, ul.`username` as `username_edited` FROM `proton_reports` r INNER JOIN `proton_versions` v ON r.proton_id = v.id LEFT JOIN `users` u ON r.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = r.`last_edited_by` WHERE r.`steam_appid` = ? ORDER BY r.`report_date` DESC LIMIT ?,?", $params)->fetch_all();
+
+		// check over their permissions now
+		$permission_check = $this->user->can(array('mod_delete_comments', 'mod_edit_comments'));
+
+        // get blocked id's
+		$blocked_ids = [];
+		$blocked_usernames = [];
+		if (count($this->user->blocked_users) > 0)
+		{
+			foreach ($this->user->blocked_users as $username => $blocked_id)
+			{
+				$blocked_ids[] = $blocked_id[0];
+				$blocked_usernames[] = $username;
+			}
+        }
+
+		$can_delete = 0;
+		if ($permission_check['mod_delete_comments'] == 1)
+		{
+			$can_delete = 1;
+		}
+		$can_edit = 0;
+		if ($permission_check['mod_edit_comments'] == 1)
+		{
+			$can_edit = 1;
+		}
+
+		foreach ($comments_get as $comments)
+		{
+			$comment_date = $this->core->time_ago(strtotime($comments['report_date']));
+
+			if (in_array($comments['author_id'], $this->user->blocked_user_ids))
+			{
+				$this->templating->block('blocked_comment', 'steamplay_reports');
+			}
+			else
+			{
+				$this->templating->block('comment', 'steamplay_reports');
+			}
+			// remove blocked users quotes
+			if (count($this->user->blocked_usernames) > 0)
+			{
+				foreach($this->user->blocked_usernames as $username)
+				{
+
+					$capture_quotes = preg_split('~(\[/?quote[^]]*\])~', $comments['comment'], NULL, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+
+					// need to count the amount of [quote=?
+					// each time we hit [/quote] take one away from counter
+					// snip the comment between the start and the final index number?
+					foreach ($capture_quotes as $index => $quote)
+					{
+						if(!isset($start) && $quote == "[quote={$username}]")
+						{
+							$start = $index;
+							$opens = 1;
+						}
+						else if(isset($start))
+						{
+							if(strpos($quote,'[quote=') !== false || strpos($quote,'[quote]') !== false)
+							{
+								++$opens;
+							}
+							else if(strpos($quote,'[/quote]')!==false)
+							{
+								--$opens;
+								if($opens == 0)
+								{
+									$capture_quotes = array_diff_key($capture_quotes,array_flip(range($start,$index)));
+									$comments['comment'] = trim(implode($capture_quotes));
+									unset($start);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if ($comments['author_id'] == 0 || empty($comments['username']))
+			{
+				if (empty($comments['username']))
+				{
+					$username = 'Guest';
+				}
+				if (!empty($comments['guest_username']))
+				{
+					if ($this->user->check_group([1,2]) == true)
+					{
+						$username = "<a href=\"/admin.php?module=articles&view=comments&ip_id={$comments['comment_id']}\">{$comments['guest_username']}</a>";
+					}
+					else
+					{
+						$username = $comments['guest_username'];
+					}
+				}
+				$quote_username = $comments['guest_username'];
+			}
+			else
+			{
+                if (isset($comments['profile_address']) && !empty($comments['profile_address']))
+                {
+                    $profile_address = '/profiles/' . $comments['profile_address'];
+                }
+                else
+                {
+                    $profile_address = '/profiles/' . $comments['author_id'];
+                }
+				$username = "<a href=\"".$profile_address."\">{$comments['username']}</a>";
+				$quote_username = $comments['username'];
+			}
+
+			// sort out the avatar
+			$comment_avatar = $this->user->sort_avatar($comments);
+
+			$into_username = '';
+			if (!empty($comments['distro']) && $comments['distro'] != 'Not Listed')
+			{
+				$into_username .= '<img title="' . $comments['distro'] . '" class="distro tooltip-top"  alt="" src="' . $this->core->config('website_url') . 'templates/'.$this->core->config('template').'/images/distros/' . $comments['distro'] . '.svg" />';
+			}
+
+			$pc_info = '';
+			if (isset($comments['pc_info_public']) && $comments['pc_info_public'] == 1)
+			{
+				if ($comments['pc_info_filled'] == 1)
+				{
+					$pc_info = '<a class="computer_deets" data-fancybox data-type="ajax" href="javascript:;" data-src="'.$this->core->config('website_url').'includes/ajax/call_profile.php?user_id='.$comments['author_id'].'">View PC info</a>';
+				}
+			}
+
+			$this->templating->set('user_id', $comments['author_id']);
+			$this->templating->set('username', $into_username . $username);
+			$this->templating->set('comment_avatar', $comment_avatar);
+			$this->templating->set('user_info_extra', $pc_info);
+
+			$cake_bit = '';
+			if ($username != 'Guest')
+			{
+				$cake_bit = $this->user->cake_day($comments['register_date'], $comments['username']);
+			}
+			$this->templating->set('cake_icon', $cake_bit);
+
+			$last_edited = '';
+			if ($comments['last_edited_by'] != 0)
+			{
+				$last_edited = "\r\n\r\n\r\n[i]Last edited by " . $comments['username_edited'] . ' on ' . $this->core->human_date($comments['last_edited_time']) . '[/i]';
+			}
+
+			$this->templating->set('comment_id', $comments['report_id']);
+
+			$logged_in_options = '';
+			$bookmark_comment = '';
+			$report_link = '';
+			$comment_edit_link = '';
+			$comment_delete_link = '';
+			$link_to_comment = '';
+            $permalink = '/steamplay/reports/' . $steam_id . '/report_id=' . $comments['report_id'];
+            			
+			$link_to_comment = '<li><a class="post_link tooltip-top" data-fancybox data-type="ajax" href="'.$permalink.'" data-src="/includes/ajax/call_post_link.php?post_id=' . $comments['report_id'] . '&type=protonreport" title="Link to this comment"><span class="icon link">Link</span></a></li>';
+			
+			$this->templating->set('link_to_comment', $link_to_comment);
+			$block_icon = '';
+			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
+			{
+                // block icon
+                $block_icon = '';
+                if ($_SESSION['user_id'] != $comments['author_id'])
+                {
+                    $block_icon = '<li><a class="tooltip-top" href="/index.php?module=block_user&block='.$comments['author_id'].'" title="Block User"><span class="icon block"></span></a></li>';
+                }
+                
+                $report_link = "<li><a class=\"tooltip-top\" href=\"" . $this->core->config('website_url') . "steamplay_reports.php&amp;go=report_comment&amp;steam_id={$steam_id}&amp;comment_id={$comments['report_id']}\" title=\"Report\"><span class=\"icon flag\">Flag</span></a></li>";
+
+                if ($_SESSION['user_id'] == $comments['author_id'] || $can_edit == 1)
+                {
+                    $comment_edit_link = "<li><a class=\"tooltip-top edit_comment_link\" data-comment-id=\"{$comments['report_id']}\" title=\"Edit\" href=\"" . $this->core->config('website_url') . "index.php?module=edit_comment&amp;view=Edit&amp;comment_id={$comments['report_id']}\"><span class=\"icon edit\">Edit</span></a></li>";
+                }
+
+                if ($can_delete == 1 || $_SESSION['user_id'] == $comments['author_id'])
+                {
+                    $comment_delete_link = "<li><a class=\"tooltip-top delete_comment\" title=\"Delete\" href=\"" . $this->core->config('website_url') . "steamplay_reports.php?&amp;go=deletereport&amp;report_id={$comments['report_id']}\" data-comment-id=\"{$comments['report_id']}\"><span class=\"icon delete\"></span></a></li>";
+                }
+			}
+			$this->templating->set('edit', $comment_edit_link);
+			$this->templating->set('delete', $comment_delete_link);
+			$this->templating->set('report_link', $report_link);
+			$this->templating->set('block', $block_icon);
+
+            // if we have some user groups for that user
+            if (isset($comment_user_groups[$comments['author_id']]))
+            {
+                $comments['user_groups'] = $comment_user_groups[$comments['author_id']];
+                $badges = user::user_badges($comments, 1);
+                $this->templating->set('badges', implode(' ', $badges));
+            }
+            else
+            {
+                $this->templating->set('badges', '');
+            }
+
+			$profile_fields_output = user::user_profile_icons($profile_fields, $comments);
+
+            $this->templating->set('profile_fields', $profile_fields_output);
+            
+            $report_info = '<br /><br /><blockquote><p><strong>Report info</strong></p><ul>';
+            $report_info .= '<li>Proton version: ' . $comments['version'] . '</li>';
+            if (isset($comments['single_works']))
+            {
+                $report_info .= '<li>Singleplayer</li>';
+                if ($comments['single_works'] == 1)
+                {
+                    $report_info .= '<ul><li>Works without issues</li></ul>';
+                }
+                if ($comments['single_works'] == 0)
+                {
+                    $report_info .= '<ul><li>Has issues</li></ul>';
+                }
+            }
+            if (isset($comments['multi_works']))
+            {
+                $report_info .= '<li>Multiplayer</li>';
+                if ($comments['multi_works'] == 1)
+                {
+                    $report_info .= '<ul><li>Works without issues</li></ul>';
+                }
+                if ($comments['multi_works'] == 0)
+                {
+                    $report_info .= '<ul><li>Has issues</li></ul>';
+                }               
+            }
+        
+            $report_info .= '</ul></blockquote>';
+
+            $this->templating->set('report_info', $report_info);
+
+			// do this last, to help stop templating tags getting parsed in user text
+			$this->templating->set('text', $this->bbcode->parse_bbcode($comments['comment'] . $last_edited, 0));
+
+			$this->templating->set('date', $comment_date);
+			$this->templating->set('tzdate', date('c', strtotime($comments['report_date'])) );
 		}
 	}
 }

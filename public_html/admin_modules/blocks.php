@@ -141,6 +141,7 @@ else
 					{
 						$nonpremium = 'checked';
 					}
+					$templating->set('nonpremium_check', $nonpremium);
 
 					$homepage = '';
 					if ($blocks['homepage_only'] == 1)
@@ -210,6 +211,9 @@ else
 				// note who did it
 				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
 
+                $blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
+                $core->set_dbcache('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
+
                 $_SESSION['message'] = 'saved';
                 $_SESSION['message_extra'] = 'block';
                 header("Location: /admin.php?module=blocks&view=manage&{$_POST['type']}");
@@ -252,7 +256,10 @@ else
 				core::$redis->set('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 
 				// note who did it
-				$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
+                $core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
+                
+                $blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
+                $core->set_dbcache('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 
                 $_SESSION['message'] = 'saved';
                 $_SESSION['message_extra'] = 'block';
@@ -302,7 +309,10 @@ else
 					$dbl->run("UPDATE `{$usercp}blocks` SET `block_name` = ?, `block_title` = ?, `block_title_link` = ?, `block_link` = ?, `activated` = ? WHERE `block_id` = ?", array($name, $title, $_POST['link'], $_POST['filename'], $activated, $id));
 
 					// note who did it
-					$core->new_admin_note(array('completed' => 1, 'content' => ' updated the sidebar block named: '.$name.'.'));
+                    $core->new_admin_note(array('completed' => 1, 'content' => ' updated the sidebar block named: '.$name.'.'));
+                    
+                    $blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
+                    $core->set_dbcache('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 
                     $_SESSION['message'] = 'saved';
                     $_SESSION['message_extra'] = 'block';
@@ -364,6 +374,9 @@ else
 
 					// note who did it
 					$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website sidebar block named: '.$_POST['name'].'.'));
+
+                    $blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
+                    $core->set_dbcache('index_blocks', serialize($blocks)); // no expiry as shown blocks hardly ever changes
 
                     $_SESSION['message'] = 'saved';
                     $_SESSION['message_extra'] = 'block';

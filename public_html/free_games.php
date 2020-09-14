@@ -4,8 +4,6 @@ define('golapp', TRUE);
 
 include(APP_ROOT . '/includes/header.php');
 
-$game_sales = new game_sales($dbl, $templating, $user, $core);
-
 $templating->set_previous('title', 'Free Linux games', 1);
 $templating->set_previous('meta_description', 'Free Linux games', 1);
 
@@ -84,7 +82,7 @@ $featured_output .= '</ul>';
 
 $templating->set('featured_items', $featured_output);
 
-$game_sales->display_free();
+$gamedb->display_free();
 
 $templating->block('filters', 'free_games');
 

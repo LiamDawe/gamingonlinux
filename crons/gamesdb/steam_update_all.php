@@ -5,9 +5,7 @@ define("THIS_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/crons');
 // http://simplehtmldom.sourceforge.net/
 include(THIS_ROOT . '/simple_html_dom.php');
 
-require APP_ROOT . '/includes/cron_bootstrap.php';
-
-$game_sales = new game_sales($dbl, $templating = NULL, $user = NULL, $core);
+require APP_ROOT . '/includes/bootstrap.php';
 
 echo "Steam Games Updater Store importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -39,9 +37,9 @@ do
 			{
 				$link = $element->href;
 
-				$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
+				$title = $gamedb->clean_title($element->find('span.title', 0)->plaintext);	
 				$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database	
-				$stripped_title = $game_sales->stripped_title($title);
+				$stripped_title = $gamedb->stripped_title($title);
 				echo $title . "\n";
 
 				$image = $element->find('div.search_capsule img', 0)->src;
@@ -61,7 +59,7 @@ do
 				}
 
 				$release_date_raw = $element->find('div.search_released', 0)->plaintext;
-				$clean_release_date = $game_sales->steam_release_date($release_date_raw);
+				$clean_release_date = $gamedb->steam_release_date($release_date_raw);
 
 				// ADD IT TO THE GAMES DATABASE
 				$game_list = $dbl->run("SELECT `id`, `steam_id`, `small_picture`, `bundle`, `date`, `stripped_name`, `steam_link` FROM `calendar` WHERE BINARY `name` = ?", array($title))->fetch();

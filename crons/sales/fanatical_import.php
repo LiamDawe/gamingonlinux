@@ -6,8 +6,6 @@ define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
 
 require APP_ROOT . '/includes/bootstrap.php';
 
-$game_sales = new game_sales($dbl, $templating, $user, $core);
-
 echo "Fanatical importer started on " .date('d-m-Y H:m:s'). "\n";
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));
@@ -61,7 +59,7 @@ do
 				$current_price_eu =  $games['current_price']['EUR'];
 				$original_price_eu = $games['regular_price']['EUR'];
 
-				$games['title'] = $game_sales->clean_title($games['title']);
+				$games['title'] = $gamedb->clean_title($games['title']);
 
 				echo $games['title'] . "\n";
 				echo "* Original Price: $". $original_price_us ."\n";

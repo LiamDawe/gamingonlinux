@@ -1,9 +1,7 @@
 <?php
 define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
 
-require APP_ROOT . '/includes/cron_bootstrap.php';
-
-$game_sales = new game_sales($dbl, $templating, $user, $core);
+require APP_ROOT . '/includes/bootstrap.php';
 
 echo "Chrono.gg Store importer started on " . date('d-m-Y H:m:s'). "\n";
 
@@ -44,7 +42,7 @@ if (!empty($game))
 
 	if ($use_sale == 1)
 	{
-		$sane_name = $game_sales->clean_title($game->name);
+		$sane_name = $gamedb->clean_title($game->name);
 
 		echo $sane_name."\n";
 
@@ -89,7 +87,7 @@ if (!empty($game))
 							
 				$sale_id = $dbl->new_id();
 
-				$game_sales->notify_wishlists($game_id);
+				$gamedb->notify_wishlists($game_id);
 							
 				echo "\tAdded ".$sane_name." to the sales DB with id: " . $sale_id . ".\n";
 			}

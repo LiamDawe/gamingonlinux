@@ -5,8 +5,6 @@ define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
 
 require APP_ROOT . '/includes/cron_bootstrap.php';
 
-$game_sales = new game_sales($dbl, $templating, $user, $core);
-
 echo "GOG importer started on " .date('d-m-Y H:m:s'). "\n";
 
 include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
@@ -80,7 +78,7 @@ do {
 					$games['title'] = 'The ' . $games['title'];
 				}
 
-				$games['title'] = $game_sales->clean_title($games['title']);
+				$games['title'] = $gamedb->clean_title($games['title']);
 
 				/*echo $games['title'] . "\n";
 				echo "* Original Price: $". $original_price ."\n";
@@ -146,7 +144,7 @@ do {
 
 					$sale_id = $dbl->new_id();
 
-					$game_sales->notify_wishlists($game_id);
+					$gamedb->notify_wishlists($game_id);
 
 					//echo "\tAdded ".$games['title']." to the sales DB with id: " . $sale_id . ".\n";
 				}

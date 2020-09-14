@@ -128,7 +128,7 @@ foreach ($returned_array as $payment)
 
 		if ($supporter_status == 1)
 		{
-			//echo 'SUPPORTER!';
+			echo 'SUPPORTER!';
 			//echo '<br />Total months worth: ' . $total_months;
 
 			// basic end date, for those who haven't pledged before

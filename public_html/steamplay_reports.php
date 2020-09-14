@@ -46,7 +46,7 @@ $templating->set('total', $total_ratings);
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 {
-    $report_button = '<span class="link_button">&plus; Add yours</span>';
+    $report_button = '<span class="link_button"><a href="/steamplay_submit.php?steam_id='.$steam_id.'">&plus; Submit report</a></span>';
 }
 else
 {
@@ -140,7 +140,7 @@ if ($total_ratings > 0)
         }
         else if ($percent_probablyok <= 50)
         {
-            $singleplayer_badge = '<span title="Under 40% report it works" class="steamplay-icon broken flex-noshrink"><img height="40" src="/templates/default/images/infoicon.svg" alt="" /></span>';
+            $singleplayer_badge = '<span title="Under 40% report it works" class="steamplay-icon broken flex-noshrink"><img height="40" src="/templates/default/images/brokenicon.svg" alt="" /></span>';
         }
         $templating->set('singleplayer_badge', $singleplayer_badge);
 
@@ -168,7 +168,7 @@ if ($total_ratings > 0)
         }
         else if ($percent_multi_probablyok <= 50)
         {
-            $multiplayer_badge = '<span title="Under 40% report it works" class="steamplay-icon broken flex-noshrink"><img height="40" src="/templates/default/images/infoicon.svg" alt="" /></span>';
+            $multiplayer_badge = '<span title="Under 40% report it works" class="steamplay-icon broken flex-noshrink"><img height="40" src="/templates/default/images/brokenicon.svg" alt="" /></span>';
         }
         $templating->set('multiplayer_badge', $multiplayer_badge);
 
@@ -186,7 +186,7 @@ if ($total_ratings > 0)
             $percent_good_multi = round(($total_multi_working / $total_ratings_multi) * 100);
             $percent_bad_multi = 100 - $percent_good_multi;
 
-            core::$user_chart_js .= "<script>var multioptions = {
+            /*core::$user_chart_js .= "<script>var multioptions = {
                 tooltips: {
                     enabled: true,
                     callbacks: {
@@ -221,7 +221,7 @@ if ($total_ratings > 0)
                 options: multioptions,
             });</script>";
 
-            $rating_multi = '<h6>Multiplayer</h6><canvas id="multiplayer"></canvas>';
+            $rating_multi = '<h6>Multiplayer</h6><canvas id="multiplayer"></canvas>';*/
         }
 
         /* reports over time */
@@ -305,7 +305,7 @@ if ($total_ratings > 0)
             }
         }
 
-        core::$user_chart_js .= "<script>var rating_single_time_options = {
+        core::$user_chart_js .= "var rating_single_time_options = {
             responsive: true,
             maintainAspectRatio: false,
             tooltips: {
@@ -355,7 +355,7 @@ if ($total_ratings > 0)
                 }]
             },
             options: rating_single_time_options,
-        });</script>";
+        });";
 
         $rating_single_time = '<div style="height: 400px;"><canvas id="rating_single_time"></canvas></div>';
 
@@ -396,7 +396,7 @@ if ($total_ratings > 0)
             }
         }
 
-        core::$user_chart_js .= "<script>var proton_versions_options = {
+        core::$user_chart_js .= "var proton_versions_options = {
             tooltips: {
                 enabled: true,
                 callbacks: {
@@ -430,18 +430,28 @@ if ($total_ratings > 0)
                 }]
             },
             options: proton_versions_options,
-        });</script>";
+        });";
 
         $versions = '<canvas id="versions"></canvas>';
-        $templating->set('rating_multi', $rating_multi);
+        //$templating->set('rating_multi', $rating_multi);
         $templating->set('proton_versions', $versions);
         $templating->set('rating_single_time', $rating_single_time);
 
     }
 
+    if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
+    {
+        $user_session->login_form(core::current_page_url());
+    }
+
+    if ($user->check_group([6,9]) === false)
+    {
+        $templating->block('patreon_comments', 'articles_full');
+    }
+
     /* comments */
     $templating->block('comments_top', 'steamplay_reports');
-    $gamedb = new game_sales($dbl, $templating, $user, $core, $bbcode);
+    $templating->set('new_report', $report_button);
     $gamedb->render_proton_comments($steam_id, $total_ratings);
 }
 else if ($total_ratings == 0)

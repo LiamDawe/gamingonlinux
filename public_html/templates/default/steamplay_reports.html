@@ -7,13 +7,13 @@
 				<li><a href="/">GOL News Home</a></li>
 				<li><a href="/steamplay/">Steam Play Home</a></li>
 			</ul>
-		</div>
+        </div>
 		<div class="box">
 			<h3 style="display: inline;">{:name}</h3> 
         </div>
         <div class="box">
-            <div class="head">Total reports overall: {:total} <div class="fright">{:new_report}</div></div>
-            <div class="subhead" style="text-align: center">Our rating system is simple: if it's reported as working that means it's click and play with Proton. No workarounds, no external helpers. <a href="#comments_top">&dArr; Jump to comments &dArr;</a></div>
+            <div class="head">Total reports: {:total} <div class="fright">{:new_report}</div></div>
+            <div class="subhead">Our rating system is simple: if it's reported as working that means it's click and play with Valve-provided official Proton (any version). No extra workarounds, no external helpers. <a href="#comments_top">&dArr; Jump to comments &dArr;</a></div>
         </div>
 [/block: top]
 
@@ -40,11 +40,11 @@
 <div class="box">
     <div class="header-text-plain">Report Charts</div>
     <div class="body group">
-            
-                <h5>Singleplayer</h5>
-                {:rating_single_time}
-				<div class="subhead" style="text-align: center">Where the reports are marked as working, what Proton versions are suitable?</div>
-				{:proton_versions}
+		<h5>Singleplayer</h5>
+		{:rating_single_time}
+		{:rating_multi_time}
+		<div class="subhead" style="text-align: center">Where the reports are marked as working, what Proton versions are suitable?</div>
+		{:proton_versions}
 	</div>
 </div>
 [/block: ratings_grouped]
@@ -58,7 +58,7 @@
 
 [block: comments_top]
 		<div id="comments_top" class="box">
-			<div class="head">Report Comments</div>
+			<div class="head">Report Comments <div class="fright">{:new_report}</div></div>
 		</div>
 [/block: comments_top]
 
@@ -89,8 +89,8 @@
     </div>
     <div id="{:comment_id}" class="comment-body">
         <div class="actual-comment-text" id="text_{:comment_id}">
-            {:text}
-            {:report_info}
+			{:report_info}
+			{:text}
         </div>
     </div>
 </div>

@@ -2078,7 +2078,6 @@ div.modal-container.modal-standalone
 
 }
 
-/* liam additions */
 th, td { vertical-align: top; }
 .link_button {
     background: #474747;
@@ -2088,6 +2087,7 @@ th, td { vertical-align: top; }
 	white-space: nowrap;
 	box-sizing: border-box;
 }
+.link_button a:link, .link_button a:visited {color: #ffffff;}
 
 .forum_top_option{ list-style: none; padding: 0;}
 
@@ -2864,10 +2864,36 @@ div.dataTables_wrapper .dataTables_info {padding-top: 0.25em}
     display: none;
 }
 
-.steamplay-icon{height: 50px; width: 50px; float: left; padding: 5px; box-sizing: border-box; border-radius: 5px; margin-right: 5px;}
+.steamplay-icon{display: flex; height: 50px; width: 50px; float: left; padding: 5px; box-sizing: border-box; border-radius: 5px; margin-right: 5px; text-align: center;}
+.steamplay-icon.small{height: 25px; width: 25px;}
 .steamplay-icon.working {background-color: rgba(0, 234, 61, 0.5);}
 .steamplay-icon.hasissues {background-color: rgba(30, 139, 195, 0.5);}
 .steamplay-icon.broken {background-color: rgba(207, 0, 15, 0.5);}
+
+.support_us_button {text-align: center;}
+
+.support_us_button a {
+	display: block;
+	text-align: center;
+	color: #fff !important;
+	text-transform: uppercase;
+	text-decoration: none;
+	background: #ed3330;
+	padding: 20px;
+	border-radius: 5px;
+	display: inline-block;
+	border: none;
+	transition: all 0.4s ease 0s;
+}
+
+.support_us_button a:hover {
+	background: #434343;
+	letter-spacing: 1px;
+	-webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+	-moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+	box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
+	transition: all 0.4s ease 0s;
+	}
 
 @import 'content';
 @import 'editor';

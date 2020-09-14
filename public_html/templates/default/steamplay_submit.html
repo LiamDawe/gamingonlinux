@@ -1,0 +1,52 @@
+[block: top]
+<div id="content" class="container group">
+	<div class="col-12">
+		<div class="box">
+			<ul class="breadcrumb">
+				<li class="active">Quick Links</li>
+				<li><a href="/">GOL News Home</a></li>
+                <li><a href="/steamplay/">Steam Play Home</a></li>
+                <li><a href="/steamplay/reports/{:steam_id}">Go back to {:name}</a></li>
+			</ul>
+        </div>
+		<div class="box">
+			<h3 style="display: inline;">Adding a report for <a href="/steamplay/reports/{:steam_id}">{:name}</a></h3> 
+        </div>
+        <form class="gol-form" method="post">
+        <div class="box">
+            <div class="head">Main report info</div>
+            <div class="body group">
+                <em>If the game does not have singleplayer or multiplayer pick "N/A". <strong>All questions required.</strong></em><br />
+                <div class="flex-row">
+                    <div class="flex-column-left"><strong>Singleplayer works?</strong></div>
+                    <div class="flex-column-right"><select name="singleplayer"><option value=""></option><option value="N/A">N/A</option><option value="Yes">Yes</option><option value="Has Issues">Works With Issues</option><option value="Broken">Broken</option></select></div>
+                </div>
+                <div class="flex-row">
+                    <div class="flex-column-left"><strong>Multiplayer works?</strong></div>
+                    <div class="flex-column-right"><select name="multiplayer"><option value=""></option><option value="N/A">N/A</option><option value="Yes">Yes</option><option value="Has Issues">Works With Issues</option><option value="Broken">Broken</option></select></div>
+                </div>
+                <div class="flex-row">
+                    <div class="flex-column-left"><strong>Proton version used</strong></div>
+                    <div class="flex-column-right"><select name="proton_version"><option value=""></option>{:proton_versions}</select>How to find the version used? See <a href="/templates/default/images/steamplay-version.png" target="_blank">this image</a>. You need to click the I info button.</div>
+                </div>
+                <div class="flex-row">
+                    <div class="flex-column-left"><strong>Time played</strong></div>
+                    <div class="flex-column-right"><em>If you've played less than an hour. Please consider trying it for longer to be accurate and check for issues.</em><select name="time_played"><option value=""></option>{:time_options}</select></div>
+                </div>			
+			</div>
+            <div class="head">Comments (not required)</div>
+            <div class="subhead">Feel free to add anything you used here. You can explain why a specific Proton version needed forcing, or anything else. Tips and tricks or whatever. Anything is okay here, as long as the above questions are properly honest and accurate to the experience.</div>
+            <div class="body group">
+[/block: top]
+
+[block: bottom]
+            </div>
+            <div class="body group">
+                <button formaction="steamplay_submit.php?steam_id={:steam_id}" name="act" value="submit">Submit</button>
+            </div>    
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+[/block: bottom]

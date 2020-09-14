@@ -14,8 +14,9 @@ $user = new user($dbl, $core);
 
 $message_map = new message_map();
 
-// setup the templating, if not logged in default theme, if logged in use selected theme
 $templating = new template($core, $core->config('template'));
+
+$user_session = new session($dbl, $core, $templating);
 
 $filecache = new file_cache($core);
 
@@ -23,6 +24,10 @@ $announcements_class = new announcements($core, $dbl, $user);
 
 $bbcode = new bbcode($dbl, $core, $user);
 
+$gamedb = new game_sales($dbl, $templating, $user, $core, $bbcode);
+
 $notifications = new notifications($dbl, $core, $bbcode);
 
 $article_class = new article($dbl, $core, $user, $templating, $bbcode);
+
+require_once APP_ROOT . '/includes/aws/aws-autoloader.php';

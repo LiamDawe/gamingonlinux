@@ -1,11 +1,9 @@
 <?php
 error_reporting(E_ALL);
 
-define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
+define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
 
 require APP_ROOT . '/includes/bootstrap.php';
-
-$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 echo "GamersGate importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -49,8 +47,8 @@ foreach ($xml->item as $game)
 	$new_title = str_replace("(Mac & Linux)", '', $new_title);
 	$new_title = str_replace("(Mac)", '', $new_title);
 	
-	$stripped_title = $game_sales->stripped_title($new_title);
-	$new_title = $game_sales->clean_title($new_title);
+	$stripped_title = $gamedb->stripped_title($new_title);
+	$new_title = $gamedb->clean_title($new_title);
 
 	// they are cet (UTC+1), so add one hour, but they also use CEST in summer, not UTC *sigh*
 	/*$date = new DateTime(null, new DateTimeZone('Europe/Stockholm'));
@@ -118,7 +116,7 @@ foreach ($xml->item as $game)
 			
 			$sale_id = $dbl->new_id();
 
-			$game_sales->notify_wishlists($game_id);
+			$gamedb->notify_wishlists($game_id);
 			
 			echo "\tAdded ".$new_title." to the sales DB with id: " . $sale_id . ".\n";
 		}

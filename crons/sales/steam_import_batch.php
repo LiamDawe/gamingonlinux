@@ -1,12 +1,11 @@
 <?php
-// http://simplehtmldom.sourceforge.net/
-include('simple_html_dom.php');
+define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
+define("THIS_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/crons');
 
-define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
+// http://simplehtmldom.sourceforge.net/
+include(THIS_ROOT . '/simple_html_dom.php');
 
 require APP_ROOT . '/includes/bootstrap.php';
-
-$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 echo "Steam Store importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -55,9 +54,9 @@ do
 			{
 				$link = $element->href;
 
-				$title = $game_sales->clean_title($element->find('span.title', 0)->plaintext);	
+				$title = $gamedb->clean_title($element->find('span.title', 0)->plaintext);	
 				$title = html_entity_decode($title); // as we are scraping an actual html page, make it proper for the database
-				$stripped_title = $game_sales->stripped_title($title);
+				$stripped_title = $gamedb->stripped_title($title);
 				echo $title . "\n";
 
 				$image = $element->find('div.search_capsule img', 0)->src;
@@ -214,7 +213,7 @@ do
 					
 						$sale_id = $dbl->new_id();
 
-						$game_sales->notify_wishlists($game_id);
+						$gamedb->notify_wishlists($game_id);
 					}
 					// update it with the current info
 					else

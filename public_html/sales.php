@@ -3,8 +3,6 @@ define("APP_ROOT", dirname(__FILE__));
 define('golapp', TRUE);
 include(APP_ROOT . '/includes/header.php');
 
-$game_sales = new game_sales($dbl, $templating, $user, $core);
-
 $templating->set_previous('title', 'Linux game sales - BETA', 1);
 $templating->set_previous('meta_description', 'Linux games and bundles on sale', 1);
 
@@ -100,7 +98,7 @@ if ($res_bundle)
 
 $templating->block('top_closing', 'sales');
 
-$game_sales->display_normal();
+$gamedb->display_normal();
 
 $templating->block('filters', 'sales');
 

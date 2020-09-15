@@ -4,8 +4,6 @@ define('golapp', TRUE);
 
 include(APP_ROOT . '/includes/header.php');
 
-$game_sales = new game_sales($dbl, $templating, $user, $core);
-
 $templating->set_previous('title', 'Linux Games Database', 1);
 $templating->set_previous('meta_description', 'Linux Games Database', 1);
 
@@ -155,7 +153,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'mainlist')
 {
 	$templating->block('top', 'itemdb');
 	
-	$game_sales->display_all_games();
+	$gamedb->display_all_games();
 
 	$templating->block('filters', 'itemdb');
 

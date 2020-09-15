@@ -144,7 +144,6 @@ $templating->block('left_end', 'mainpage');
 $templating->block('right', 'mainpage');
 
 /* get the blocks */
-
 if (($blocks = unserialize($core->get_dbcache('index_blocks'))) === false) // there's no cache
 {
 	$blocks = $dbl->run('SELECT `block_link`, `block_id`, `block_title_link`, `block_title`, `block_custom_content`, `style`, `nonpremium_only`, `homepage_only` FROM `blocks` WHERE `activated` = 1 ORDER BY `order`')->fetch_all();
@@ -167,7 +166,7 @@ foreach ($blocks as $block)
 		// this is to make sure the google ad only shows up for non ad-free people
 		if ($block['nonpremium_only'] == 1)
 		{
-			if ($user->check_group(6) == true)
+			if ($user->check_group([6,9]) === true)
 			{
 				$show = 0;
 			}

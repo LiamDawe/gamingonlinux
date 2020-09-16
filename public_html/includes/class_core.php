@@ -122,7 +122,7 @@ class core
 		}
 		else
 		{
-			return core::$redis->delete($key);
+			return core::$redis->del($key);
 		}		
 	}
 

@@ -1,8 +1,14 @@
 <?php
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/cron_bootstrap.php";
+include (APP_ROOT . '/includes/config.php');
+include (APP_ROOT . '/includes/class_db_mysql.php');
+include (APP_ROOT . '/includes/class_core.php');
+include (APP_ROOT . '/includes/class_user.php');
 
+$dbl = new db_mysql();
+$core = new core($dbl);
+define('url', $core->config('website_url'));
 $user = new user($dbl, $core);
 
 // TODO

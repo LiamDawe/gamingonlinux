@@ -4,7 +4,14 @@ define('golapp', TRUE);
 
 define("APP_ROOT", dirname(__FILE__));
 
-require APP_ROOT . "/includes/bootstrap.php";
+include (dirname(__FILE__) . '/includes/config.php');
+include (dirname(__FILE__) . '/includes/class_db_mysql.php');
+include (dirname(__FILE__) . '/includes/class_core.php');
+
+$dbl = new db_mysql();
+
+$core = new core($dbl);
+define('url', $core->config('website_url'));
 
 if ($core->config('forum_rss') == 1)
 {
@@ -34,7 +41,13 @@ if ($core->config('forum_rss') == 1)
 	$self_add = NULL;
 	if (!isset($_GET['fid']))
 	{
-		$fetch_topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`last_post_date` FROM `forum_topics` t INNER JOIN `forum_permissions` p ON t.forum_id = p.forum_id WHERE t.`approved` = 1 AND p.`group_id` = 4 AND p.`can_view` = 1 ORDER BY t.`last_post_date` DESC LIMIT 30")->fetch_all();
+		$fetch_topics = unserialize($core->get_dbcache('forum_plain_rss'));
+		if ($fetch_topics === false)
+		{
+			$fetch_topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`last_post_date` FROM `forum_topics` t INNER JOIN `forum_permissions` p ON t.forum_id = p.forum_id WHERE t.`approved` = 1 AND p.`group_id` = 4 AND p.`can_view` = 1 ORDER BY t.`last_post_date` DESC LIMIT 30")->fetch_all();
+
+			$core->set_dbcache('forum_plain_rss', serialize($fetch_topics), 300);
+		}
 	}
 	if (isset($_GET['fid']) && is_numeric($_GET['fid']))
 	{

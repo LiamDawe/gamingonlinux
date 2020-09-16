@@ -444,7 +444,14 @@ class bbcode
 	{
 		if (!isset($this->emoji['raw'])) // ensure we only do this once
 		{
-			$this->emoji['raw'] = $this->dbl->run("SELECT `text_replace`, `filename` FROM `emoji`")->fetch_all(PDO::FETCH_KEY_PAIR);
+			$this->emoji['raw'] = $this->core->get_dbcache('emoji_raw');
+
+			if ($this->emoji['raw'] === false) // there's no cache
+			{
+				$this->emoji['raw'] = $this->emoji['raw'] = $this->dbl->run("SELECT `text_replace`, `filename` FROM `emoji`")->fetch_all(PDO::FETCH_KEY_PAIR);
+
+				$this->core->set_dbcache('emoji_raw', $get_emoji); // no expiry as config hardly ever changes
+			}
 		}
 
 		$emoji_location = $this->core->config('website_url') . 'templates/' . $this->core->config('template');

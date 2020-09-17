@@ -249,7 +249,7 @@ if ($core->config('articles_rss') == 1)
 					$xml->endElement();
 				}
 	
-				$text = '<p>' . $line['tagline'] . '</p><p><img src="'.$tagline_image.'" alt /></p>';
+				$text = '<p>' . $line['tagline'] . '</p><p><img src="'.$tagline_image.'" alt /></p><p>Read the full article here: ' . $article_link . '</p>';
 			}
 			else
 			{

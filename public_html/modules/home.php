@@ -36,7 +36,11 @@ if (!isset($_GET['view']))
 	$page = core::give_page();
 
 	// count how many there is in total
-	$total = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 1")->fetchOne();
+	if (($total = $core->get_dbcache('total_articles_active')) === false) // there's no cache
+	{
+		$total = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 1")->fetchOne();
+		$core->set_dbcache('total_articles_active', $total);
+	}
 
 	if ($total)
 	{

@@ -571,6 +571,10 @@ if (isset($_POST['act']))
 
 			$dbl->run("UPDATE `articles` SET `title` = ?, `slug` = ?, `tagline` = ?, `text`= ?, `show_in_menu` = ?, `active` = ?, `locked` = 0, `locked_by` = 0, `locked_date` = 0, `edit_date` = ? WHERE `article_id` = ?", array($checked['title'], $checked['slug'], $checked['tagline'], $checked['text'], $block, $show, core::$sql_date_now, $_POST['article_id']));
 
+			// update total article live cache to account for live/hidden articles being newly hidden or shown
+			$total = $dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 1")->fetchOne();
+			$core->set_dbcache('total_articles_active', $total);
+
 			$article_class->process_categories($_POST['article_id']);
 			$article_class->process_games($_POST['article_id']);
 

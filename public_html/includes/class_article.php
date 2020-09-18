@@ -472,6 +472,10 @@ class article
 		}
 
 		$this->dbl->run("DELETE FROM `article_images` WHERE `article_id` = ?", array($article['article_id']));
+
+		// update cache for total articles live just in case
+		$total = $this->dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 1")->fetchOne();
+		$this->core->set_dbcache('total_articles_active', $total);
 	}
 
 	function display_tagline_image($article = NULL)
@@ -1078,6 +1082,10 @@ class article
 
 		// note who did it
 		$this->core->new_admin_note(array('completed' => 1, 'content' => ' published a new article titled: <a href="/articles/'.$article_id.'">'.$checked['title'].'</a>.'));
+
+		// update total active article cache
+		$total = $this->dbl->run("SELECT COUNT(`article_id`) FROM `articles` WHERE `active` = 1")->fetchOne();
+		$this->core->set_dbcache('total_articles_active', $total);
 
 		header("Location: " . $redirect);
 		die();

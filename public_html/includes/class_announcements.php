@@ -11,13 +11,12 @@ class announcements
 	function get_announcements()
 	{
 		$announcement_return = [];
-
 		
 		$get_announcements = unserialize($this->core->get_dbcache('index_announcements'));
-		if ($get_announcements === false || $get_announcements === null) // there's no cache
+		if ($get_announcements === false) // there's no cache
 		{
 			$get_announcements = $this->dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
-			$this->core->set_dbcache('index_announcements', serialize($get_announcements), 600);
+			$this->core->set_dbcache('index_announcements', serialize($get_announcements));  // no need for a cache, don't update often
 		}
 
 		if (isset($_SESSION) && isset($_SESSION['user_id']))

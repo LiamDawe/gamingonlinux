@@ -129,7 +129,8 @@ if (isset($_POST['act']))
 
 		$dbl->run("INSERT INTO `announcements` SET `text` = ?, `author_id` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ?", array($text, $_SESSION['user_id'], $user_groups, $_POST['type'], $modules, $dismiss));
 
-		$core->delete_dbcache('index_announcements');
+		$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+		$core->set_dbcache('index_announcements', serialize($get_announcements)); // no need for a cache, don't update often
 
 		// note who did it
 		$core->new_admin_note(array('completed' => 1, 'content' => ' added a new website announcement bar.'));
@@ -177,7 +178,8 @@ if (isset($_POST['act']))
 
 		$dbl->run("UPDATE `announcements` SET `text` = ?, `user_groups` = ?, `type` = ?, `modules` = ?, `can_dismiss` = ? WHERE `id` = ?", array($text, $user_groups, $_POST['type'], $modules, $dismiss, $_POST['id']));
 
-		$core->delete_dbcache('index_announcements');
+		$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+		$core->set_dbcache('index_announcements', serialize($get_announcements)); // no need for a cache, don't update often
 
 		// note who did it
 		$core->new_admin_note(array('completed' => 1, 'content' => ' edited a website announcement bar.'));
@@ -202,7 +204,8 @@ if (isset($_POST['act']))
 		{
 			$dbl->run("DELETE FROM `announcements` WHERE `id` = ?", array($_GET['id']));
 
-			$core->delete_dbcache('index_announcements');
+			$get_announcements = $dbl->run("SELECT `id`, `text`, `user_groups`, `type`, `modules`, `can_dismiss` FROM `announcements` ORDER BY `id` DESC")->fetch_all();
+			$core->set_dbcache('index_announcements', serialize($get_announcements)); // no need for a cache, don't update often
 
 			// note who did it
 			$core->new_admin_note(array('completed' => 1, 'content' => ' deleted a website announcement bar.'));

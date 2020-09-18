@@ -952,7 +952,13 @@ class core
 	public function load_modules($options)
 	{
 		$module_links = '';
-		$fetch_modules = $this->dbl->run('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC')->fetch_all();
+
+		if (($fetch_modules = unserialize($this->get_dbcache('active_main_modules'))) === false) // there's no cache
+		{
+			$fetch_modules = $this->dbl->run('SELECT `module_id`, `module_file_name`, `nice_title`, `nice_link`, `sections_link` FROM `'.$options['db_table'].'` WHERE `activated` = 1 ORDER BY `nice_title` ASC')->fetch_all();
+			$this->set_dbcache('active_main_modules', serialize($fetch_modules)); // no expiry as shown blocks hardly ever changes
+		}
+		
 		foreach ($fetch_modules as $modules)
 		{
 			// modules allowed for loading

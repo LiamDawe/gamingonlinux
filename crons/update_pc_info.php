@@ -1,7 +1,7 @@
 <?php
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/cron_bootstrap.php";
+require APP_ROOT . "/includes/bootstrap.php";
 
 $title = "Reminder: Update your PC info for the next round of statistics updates";
 

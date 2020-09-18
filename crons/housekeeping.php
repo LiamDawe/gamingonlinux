@@ -1,9 +1,7 @@
 <?php
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/cron_bootstrap.php";
-
-require APP_ROOT . '/includes/aws/aws-autoloader.php';
+require APP_ROOT . "/includes/bootstrap.php";
 
 use Aws\S3\S3Client;
 

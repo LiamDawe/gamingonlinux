@@ -8,7 +8,7 @@ GOL Channel User ID: 50905707
 */
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/cron_bootstrap.php";
+require APP_ROOT . "/includes/bootstrap.php";
 
 define ('ACCESS_TOKEN_FILE', dirname(__FILE__) . '/twitch_access_token');
 

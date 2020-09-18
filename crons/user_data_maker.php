@@ -12,7 +12,7 @@ ini_set("memory_limit", "-1");
 
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/cron_bootstrap.php";
+require APP_ROOT . "/includes/bootstrap.php";
 
 // make sure user exists first
 $get_users = $dbl->run("SELECT dr.`user_id`,u.`username`,u.`avatar_uploaded`,u.`avatar` FROM `user_data_request` dr INNER JOIN `users` u ON u.user_id = dr.user_id ORDER BY `date_requested` ASC")->fetch_all();

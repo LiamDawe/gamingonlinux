@@ -7,7 +7,7 @@ define("THIS_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/crons');
 // http://simplehtmldom.sourceforge.net/
 include(THIS_ROOT . '/simple_html_dom.php');
 
-require APP_ROOT . '/includes/cron_bootstrap.php';
+require APP_ROOT . '/includes/bootstrap.php';
 
 $game_sales = new game_sales($dbl, $templating = NULL, $user = NULL, $core);
 

@@ -3,7 +3,7 @@ error_reporting(-1);
 
 define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
 
-require APP_ROOT . '/includes/cron_bootstrap.php';
+require APP_ROOT . '/includes/bootstrap.php';
 
 echo "GOG importer started on " .date('d-m-Y H:m:s'). "\n";
 

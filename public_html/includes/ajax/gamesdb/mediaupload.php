@@ -22,7 +22,6 @@ $client = new Aws\S3\S3Client([
             ],
 ]);
 
-include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 $img = new SimpleImage();
 

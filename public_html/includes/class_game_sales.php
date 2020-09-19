@@ -1,5 +1,4 @@
 <?php
-require_once APP_ROOT . '/includes/aws/aws-autoloader.php';
 use claviska\SimpleImage;
 use Aws\S3\S3Client;
 
@@ -1182,7 +1181,6 @@ class game_sales
 
 	function sort_yt_thumb($filename, $item_id)
 	{
-		include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 		$img = new SimpleImage();
 
 		if (strpos($filename, 'youtube_cache_default') !== false) // we don't want to touch the standard fallback image
@@ -1198,7 +1196,10 @@ class game_sales
 
 		$save_as = '/uploads/gamesdb/big/thumbs/'.$item_id.'/trailer_thumb.jpg';
 
-		$filename = '/'.str_replace($this->core->config('website_url'),'',$filename);
+		if (null !== $this->core->config('website_url') && !empty($this->core->config('website_url')) && $this->core->config('website_url') != '/') // for local dev
+		{
+			$filename = '/'.str_replace($this->core->config('website_url'),'',$filename);
+		}
 
 		$img->fromFile($_SERVER['DOCUMENT_ROOT'].$filename)->resize(450, null)->overlay($_SERVER['DOCUMENT_ROOT'].'/templates/default/images/playbutton.png')->toFile($_SERVER['DOCUMENT_ROOT'].$save_as, 'image/jpeg');
 
@@ -1681,7 +1682,7 @@ class game_sales
 
         $params = array_merge([(int) $steam_id], [$this->core->start], [$per_page]);
         
-        $comments_get = $this->dbl->run("SELECT r.`author_id`, r.`comment`, r.`report_id`, r.`single_works`, r.`multi_works`, u.`pc_info_public`, u.`distro`, r.`report_date`, r.`last_edited_by`, r.`last_edited_time`, v.version, u.`username`, u.`profile_address`, u.`avatar`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, ul.`username` as `username_edited` FROM `proton_reports` r INNER JOIN `proton_versions` v ON r.proton_id = v.id LEFT JOIN `users` u ON r.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = r.`last_edited_by` WHERE r.`steam_appid` = ? ORDER BY r.`report_date` DESC LIMIT ?,?", $params)->fetch_all();
+        $comments_get = $this->dbl->run("SELECT r.`author_id`, r.`comment`, r.`report_id`, r.`single_works`, r.`multi_works`, r.`time_played`, u.`pc_info_public`, u.`distro`, r.`report_date`, r.`last_edited_by`, r.`last_edited_time`, v.version, u.`username`, u.`profile_address`, u.`avatar`, $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, ul.`username` as `username_edited` FROM `proton_reports` r INNER JOIN `proton_versions` v ON r.proton_id = v.id LEFT JOIN `users` u ON r.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = r.`last_edited_by` WHERE r.`steam_appid` = ? ORDER BY r.`report_date` DESC LIMIT ?,?", $params)->fetch_all();
 
 		// check over their permissions now
 		$permission_check = $this->user->can(array('mod_delete_comments', 'mod_edit_comments'));
@@ -1885,18 +1886,24 @@ class game_sales
 
             $this->templating->set('profile_fields', $profile_fields_output);
             
-            $report_info = '<br /><br /><blockquote><p><strong>Report info</strong></p><ul>';
-            $report_info .= '<li>Proton version: ' . $comments['version'] . '</li>';
+            $report_info = '<p><strong>Report answers</strong></p><blockquote><ul>';
+			$report_info .= '<li>Proton version: ' . $comments['version'] . '</li>';
+			$report_info .= '<li>Time played: ' . $comments['time_played'] . '</li>';
+			
             if (isset($comments['single_works']))
             {
                 $report_info .= '<li>Singleplayer</li>';
                 if ($comments['single_works'] == 1)
                 {
-                    $report_info .= '<ul><li>Works without issues</li></ul>';
+                    $report_info .= '<ul><li><span class="steamplay-icon small working flex-noshrink"><img src="/templates/default/images/thumbsup.svg" alt="" /></span> Works without issues</li></ul>';
                 }
+                if ($comments['single_works'] == 2)
+                {
+                    $report_info .= '<ul><li><span class="steamplay-icon small hasissues flex-noshrink"><img src="/templates/default/images/infoicon.svg" alt="" /></span> Has issues</li></ul>';
+				}
                 if ($comments['single_works'] == 0)
                 {
-                    $report_info .= '<ul><li>Has issues</li></ul>';
+                    $report_info .= '<ul><li><span class="steamplay-icon small broken flex-noshrink"><img src="/templates/default/images/brokenicon.svg" alt="" /></span> Broken</li></ul>';
                 }
             }
             if (isset($comments['multi_works']))
@@ -1904,12 +1911,16 @@ class game_sales
                 $report_info .= '<li>Multiplayer</li>';
                 if ($comments['multi_works'] == 1)
                 {
-                    $report_info .= '<ul><li>Works without issues</li></ul>';
+                    $report_info .= '<ul><li><span class="steamplay-icon small working flex-noshrink"><img src="/templates/default/images/thumbsup.svg" alt="" /></span> Works without issues</li></ul>';
                 }
+                if ($comments['multi_works'] == 2)
+                {
+                    $report_info .= '<ul><li><span class="steamplay-icon small hasissues flex-noshrink"><img src="/templates/default/images/infoicon.svg" alt="" /></span> Has issues</li></ul>';
+				}             
                 if ($comments['multi_works'] == 0)
                 {
-                    $report_info .= '<ul><li>Has issues</li></ul>';
-                }               
+                    $report_info .= '<ul><li><span class="steamplay-icon small broken flex-noshrink"><img src="/templates/default/images/brokenicon.svg" alt="" /></span> Broken</li></ul>';
+                }      
             }
         
             $report_info .= '</ul></blockquote>';

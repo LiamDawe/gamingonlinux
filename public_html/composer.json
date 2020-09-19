@@ -1,6 +1,7 @@
 {
     "require": {
         "phpmailer/phpmailer": "~6.1",
-        "aws/aws-sdk-php": "^3.154"
+        "aws/aws-sdk-php": "^3.154",
+        "claviska/simpleimage": "^3.3"
     }
 }

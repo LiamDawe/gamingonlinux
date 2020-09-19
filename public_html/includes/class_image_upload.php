@@ -1,6 +1,4 @@
 <?php
-// include the image class to resize it as its too big
-include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 
 class image_upload

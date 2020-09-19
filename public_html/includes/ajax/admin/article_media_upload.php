@@ -5,8 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname ( dirname(__FILE__) ) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-require APP_ROOT . '/includes/aws/aws-autoloader.php';
-
 $key = $core->config('do_space_key_uploads');
 $secret = $core->config('do_space_key_private_uploads');
 
@@ -22,7 +20,6 @@ $client = new Aws\S3\S3Client([
             ],
 ]);
 
-include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 $img = new SimpleImage();
 

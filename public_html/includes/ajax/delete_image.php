@@ -5,8 +5,6 @@ define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";
 
-require APP_ROOT . '/includes/aws/aws-autoloader.php';
-
 $key = $core->config('do_space_key_uploads');
 $secret = $core->config('do_space_key_private_uploads');
 

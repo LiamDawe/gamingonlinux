@@ -46,74 +46,162 @@ if (!isset($_POST['act']))
 		}
 	}
 
+	$today_streams = array();
+	$later_streams = array();
 	$grab_streams = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url`, `author_id` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC")->fetch_all();
 	if ($grab_streams)
 	{
 		foreach ($grab_streams as $streams)
 		{
-			$templating->block('item', 'livestreams');
-
-			$badge = '';
-			if ($streams['community_stream'] == 1)
+			if (date('Ymd') == date('Ymd', strtotime($streams['date'])))
 			{
-				$badge = '<span class="badge blue">Community Stream</span>';
-			}
-			else if ($streams['community_stream'] == 0)
-			{
-				$badge = '<span class="badge editor">Official GOL Stream</span>';
-			}
-			$templating->set('badge', $badge);
-
-			$stream_url = 'https://www.twitch.tv/gamingonlinux';
-			if ($streams['community_stream'] == 1)
-			{
-				$stream_url = $streams['stream_url'];
-			}
-			$templating->set('stream_url', $stream_url);
-
-			$templating->set('title', $streams['title']);
-			
-			$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $user_timezone));
-			$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $user_timezone));
-
-			$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
-			$templating->set('countdown', $countdown);
-
-			$streamer_list = [];
-			$grab_streamers = $dbl->run("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
-			foreach ($grab_streamers as $streamer)
-			{
-				$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
-			}
-
-			if (!empty($streamer_list))
-			{
-				$streamer_list = implode(', ', $streamer_list);
-				if (!empty($streams['streamer_community_name']))
-				{
-					$streamer_list .= ', ' . $streams['streamer_community_name'];
-				}
+				$today_streams[] = $streams;
 			}
 			else
 			{
-				$streamer_list = $streams['streamer_community_name'];
+				$later_streams[] = $streams;
 			}
-			
-			$templating->set('profile_links', $streamer_list);
+		}
 
-			$options = '';
-			if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+		if (!empty($today_streams))
+		{
+			$templating->block('header_today', 'livestreams');
+			foreach ($today_streams as $streams)
 			{
-				if ($_SESSION['user_id'] == $streams['author_id'] || $user->check_group([1,2]) == true)
+				$templating->block('item', 'livestreams');
+
+				$badge = '';
+				if ($streams['community_stream'] == 1)
 				{
-					$options = '<input type="hidden" name="livestream_id" value="'.$streams['row_id'].'" /><button formaction="/index.php?module=livestreams" value="Delete" name="act">Delete</button>';
+					$badge = '<span class="badge blue">Community Stream</span>';
 				}
+				else if ($streams['community_stream'] == 0)
+				{
+					$badge = '<span class="badge editor">Official GOL Stream</span>';
+				}
+				$templating->set('badge', $badge);
+	
+				$stream_url = 'https://www.twitch.tv/gamingonlinux';
+				if ($streams['community_stream'] == 1)
+				{
+					$stream_url = $streams['stream_url'];
+				}
+				$templating->set('stream_url', $stream_url);
+	
+				$templating->set('title', $streams['title']);
+				
+				$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $user_timezone));
+				$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $user_timezone));
+	
+				$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
+				$templating->set('countdown', $countdown);
+	
+				$streamer_list = [];
+				$grab_streamers = $dbl->run("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
+				foreach ($grab_streamers as $streamer)
+				{
+					$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
+				}
+	
+				if (!empty($streamer_list))
+				{
+					$streamer_list = implode(', ', $streamer_list);
+					if (!empty($streams['streamer_community_name']))
+					{
+						$streamer_list .= ', ' . $streams['streamer_community_name'];
+					}
+				}
+				else
+				{
+					$streamer_list = $streams['streamer_community_name'];
+				}
+				
+				$templating->set('profile_links', $streamer_list);
+	
+				$options = '';
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				{
+					if ($_SESSION['user_id'] == $streams['author_id'] || $user->check_group([1,2]) == true)
+					{
+						$options = '<input type="hidden" name="livestream_id" value="'.$streams['row_id'].'" /><button formaction="/index.php?module=livestreams" value="Delete" name="act">Delete</button>';
+					}
+				}
+				if (!empty($options))
+				{
+					$options = '<form method="post">' . $options . '</form>';
+				}
+				$templating->set('options', $options);				
 			}
-			if (!empty($options))
+		}
+		if (!empty($later_streams))
+		{
+			$templating->block('header_later', 'livestreams');
+			foreach ($later_streams as $streams)
 			{
-				$options = '<form method="post">' . $options . '</form>';
-			}
-			$templating->set('options', $options);
+				$templating->block('item', 'livestreams');
+
+				$badge = '';
+				if ($streams['community_stream'] == 1)
+				{
+					$badge = '<span class="badge blue">Community Stream</span>';
+				}
+				else if ($streams['community_stream'] == 0)
+				{
+					$badge = '<span class="badge editor">Official GOL Stream</span>';
+				}
+				$templating->set('badge', $badge);
+	
+				$stream_url = 'https://www.twitch.tv/gamingonlinux';
+				if ($streams['community_stream'] == 1)
+				{
+					$stream_url = $streams['stream_url'];
+				}
+				$templating->set('stream_url', $stream_url);
+	
+				$templating->set('title', $streams['title']);
+				
+				$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $user_timezone));
+				$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $user_timezone));
+	
+				$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
+				$templating->set('countdown', $countdown);
+	
+				$streamer_list = [];
+				$grab_streamers = $dbl->run("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
+				foreach ($grab_streamers as $streamer)
+				{
+					$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
+				}
+	
+				if (!empty($streamer_list))
+				{
+					$streamer_list = implode(', ', $streamer_list);
+					if (!empty($streams['streamer_community_name']))
+					{
+						$streamer_list .= ', ' . $streams['streamer_community_name'];
+					}
+				}
+				else
+				{
+					$streamer_list = $streams['streamer_community_name'];
+				}
+				
+				$templating->set('profile_links', $streamer_list);
+	
+				$options = '';
+				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+				{
+					if ($_SESSION['user_id'] == $streams['author_id'] || $user->check_group([1,2]) == true)
+					{
+						$options = '<input type="hidden" name="livestream_id" value="'.$streams['row_id'].'" /><button formaction="/index.php?module=livestreams" value="Delete" name="act">Delete</button>';
+					}
+				}
+				if (!empty($options))
+				{
+					$options = '<form method="post">' . $options . '</form>';
+				}
+				$templating->set('options', $options);				
+			}			
 		}
 	}
 	else

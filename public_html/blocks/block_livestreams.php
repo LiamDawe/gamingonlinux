@@ -39,7 +39,7 @@ $count_total = $dbl->run("SELECT COUNT(*) FROM `livestreams` WHERE NOW() < `end_
 $more_text = '';
 if ($count_total <= 3)
 {
-	$more_text = 'Add your own livestream here.';
+	$more_text = 'Add your own or view all';
 }
 else if ($count_total > 3)
 {

@@ -1740,15 +1740,12 @@ jQuery(document).ready(function()
 	/* cocoen image comparison */
 	if ($('.cocoen').length)
 	{
-		$.when(
-			$.cachedScript( "/includes/jscripts/cocoen/js/cocoen.min.js"),
-			$.cachedScript( "/includes/jscripts/cocoen/js/cocoen-jquery.min.js"),
-			$.Deferred(function( deferred ){
-				$( deferred.resolve );
-			})
-		).done(function(){
-			$('.cocoen').cocoen(); // image comparison slider
-		});	
+		var cocoen_js = Promise.resolve($.cachedScript("/includes/jscripts/cocoen/js/cocoen.min.js"));
+		var cocoean_jquery = Promise.resolve($.cachedScript("/includes/jscripts/cocoen/js/cocoen-jquery.min.js"));
+
+		Promise.all([cocoen_js, cocoean_jquery]).then(() => { 
+			$('.cocoen').cocoen();
+		  });
 	}
 
 	/* datetime fields */

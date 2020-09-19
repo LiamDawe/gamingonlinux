@@ -282,7 +282,7 @@ if (!isset($_POST['act']))
 			$client_id = $core->config('google_login_public'); 
 			$client_secret = $core->config('google_login_secret');
 			$redirect_uri = $core->config('website_url') . 'includes/google/login.php';
-			require_once ($core->config('path') . 'includes/google/libraries/Google/autoload.php');
+			
 			$client = new Google_Client();
 			$client->setClientId($client_id);
 			$client->setClientSecret($client_secret);

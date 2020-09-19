@@ -7,8 +7,6 @@ require APP_ROOT . "/includes/bootstrap.php";
 
 include (APP_ROOT . "/includes/google/functions.php");
 
-require_once (APP_ROOT . '/includes/google/libraries/Google/autoload.php');
-
 //Insert your cient ID and secret 
 //You can get it from : https://console.developers.google.com/
 $client_id = $core->config('google_login_public'); 

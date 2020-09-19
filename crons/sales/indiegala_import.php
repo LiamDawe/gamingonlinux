@@ -1,11 +1,9 @@
 <?php
 error_reporting(E_ALL);
 
-define("APP_ROOT", dirname( dirname( dirname( dirname(__FILE__) ) ) ));
+define("APP_ROOT", dirname( dirname( dirname(__FILE__) ) ) . '/public_html');
 
 require APP_ROOT . '/includes/bootstrap.php';
-
-$game_sales = new game_sales($dbl, $templating, $user, $core);
 
 echo "IndieGala importer started on " .date('d-m-Y H:m:s'). "\n";
 
@@ -57,8 +55,8 @@ for ($i = 1; $i <= $xml->channel->totalPages; $i++)
 		if ($on_linux == 1)
 		{
 			$new_title = html_entity_decode($game->title, ENT_QUOTES);
-			$stripped_title = $game_sales->stripped_title($new_title);
-			$new_title = $game_sales->clean_title($new_title);
+			$stripped_title = $gamedb->stripped_title($new_title);
+			$new_title = $gamedb->clean_title($new_title);
 
 			// for seeing what we have available
 			/*echo '<pre>';
@@ -121,7 +119,7 @@ for ($i = 1; $i <= $xml->channel->totalPages; $i++)
 					
 				$sale_id = $dbl->new_id();
 
-				$game_sales->notify_wishlists($game_id);
+				$gamedb->notify_wishlists($game_id);
 					
 				echo "\tAdded ".$new_title." to the sales DB with id: " . $sale_id . ".\n";
 			}
@@ -134,7 +132,6 @@ for ($i = 1; $i <= $xml->channel->totalPages; $i++)
 				}
 			}
 		}
-		echo "\n"; //Just a bit of white space here.
 	}
 }
 
@@ -146,6 +143,8 @@ if (isset($total_on_sale) && $total_on_sale > 0)
 	$in  = str_repeat('?,', count($on_sale) - 1) . '?';
 	$dbl->run("DELETE FROM `sales` WHERE `game_id` NOT IN ($in) AND `store_id` = 3", $on_sale);
 }
+
+echo 'Added ' . $total_on_sale . ' sales'.PHP_EOL;
 
 echo "End of IndieGala import @ " . date('d-m-Y H:m:s') . ".\nHave a nice day.\n";
 

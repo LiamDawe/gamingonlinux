@@ -3,11 +3,9 @@ if(!defined('golapp'))
 {
 	die('Direct access not permitted');
 }
-include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
+
 use claviska\SimpleImage;
 $img = new SimpleImage();
-
-$games_database = new game_sales($dbl, $templating, $user, $core);
 
 $templating->set_previous('title', 'Linux Games & Software List', 1);
 $templating->set_previous('meta_description', 'Linux Games & Software List', 1);
@@ -84,7 +82,7 @@ if (isset($_GET['view']))
 		$json_extra = array();
 
 		$links_sql = array();
-		foreach ($games_database->main_links as $field => $name)
+		foreach ($gamedb->main_links as $field => $name)
 		{
 			$links_sql[] = 'c.`'.$field.'`';
 		}
@@ -96,7 +94,7 @@ if (isset($_GET['view']))
 			// sort out the external links we have for it
 			$external_links = '';
 			$links_array = [];
-			$link_types = $games_database->main_links;
+			$link_types = $gamedb->main_links;
 			foreach ($link_types as $key => $text)
 			{
 				if (!empty($get_item[$key]) && $key != 'crowdfund_link')
@@ -447,7 +445,7 @@ if (isset($_GET['view']))
 
 			$get_item['total_comments'] = $total_comments;
 
-			$games_database->display_comments(['item' => $get_item, 'pagination_link' => '/itemdb/' . $get_item['id'] . '/', 'page' => core::give_page()]);
+			$gamedb->display_comments(['item' => $get_item, 'pagination_link' => '/itemdb/' . $get_item['id'] . '/', 'page' => core::give_page()]);
 
 			if ($core->config('comments_open') == 1)
 			{

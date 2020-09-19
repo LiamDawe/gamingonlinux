@@ -14,6 +14,8 @@ if (!$user->can('access_admin'))
 
 $templating->set_previous('title', ' - Admin and Editor Control Panel', 1);
 
+$admin = new admin($dbl, $core);
+
 $sql_editor = '';
 if ($user->check_group(1) == false)
 {

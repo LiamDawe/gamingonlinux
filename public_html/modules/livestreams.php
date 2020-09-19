@@ -48,6 +48,7 @@ if (!isset($_POST['act']))
 
 	$today_streams = array();
 	$later_streams = array();
+	$stream_ids = array();
 	$grab_streams = $dbl->run("SELECT `row_id`, `title`, `date`, `end_date`, `community_stream`, `streamer_community_name`, `stream_url`, `author_id` FROM `livestreams` WHERE NOW() < `end_date` AND `accepted` = 1 ORDER BY `date` ASC")->fetch_all();
 	if ($grab_streams)
 	{
@@ -60,6 +61,25 @@ if (!isset($_POST['act']))
 			else
 			{
 				$later_streams[] = $streams;
+			}
+
+			$stream_ids[] = $streams['row_id'];
+		}
+
+		if (!empty($stream_ids))
+		{
+			$in  = str_repeat('?,', count($stream_ids) - 1) . '?';
+
+			$streamer_list = array();
+			$grab_streamers = $dbl->run("SELECT s.`user_id`, s.`livestream_id`, u.`username`, u.`profile_address` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` IN ( $in )", $stream_ids)->fetch_all();
+			foreach ($grab_streamers as $streamer)
+			{
+				$profile_link = '/profiles/' . $streamer['user_id'];
+				if (!empty($streamer['profile_address']))
+				{
+					$profile_link = '/profiles/' . $streamer['profile_address'];
+				}
+				$streamer_list[$streamer['livestream_id']][] = '<a href="' . $profile_link . '">'.$streamer['username'].'</a>';
 			}
 		}
 
@@ -96,27 +116,21 @@ if (!isset($_POST['act']))
 				$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
 				$templating->set('countdown', $countdown);
 	
-				$streamer_list = [];
-				$grab_streamers = $dbl->run("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
-				foreach ($grab_streamers as $streamer)
+				$streamer_output = '';
+				if (!empty($streamer_list[$streams['row_id']]))
 				{
-					$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
-				}
-	
-				if (!empty($streamer_list))
-				{
-					$streamer_list = implode(', ', $streamer_list);
+					$streamer_output = implode(', ', $streamer_list[$streams['row_id']]);
 					if (!empty($streams['streamer_community_name']))
 					{
-						$streamer_list .= ', ' . $streams['streamer_community_name'];
+						$streamer_output .= ', ' . $streams['streamer_community_name'];
 					}
 				}
 				else
 				{
-					$streamer_list = $streams['streamer_community_name'];
+					$streamer_output = $streams['streamer_community_name'];
 				}
 				
-				$templating->set('profile_links', $streamer_list);
+				$templating->set('profile_links', $streamer_output);
 	
 				$options = '';
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
@@ -166,27 +180,21 @@ if (!isset($_POST['act']))
 				$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
 				$templating->set('countdown', $countdown);
 	
-				$streamer_list = [];
-				$grab_streamers = $dbl->run("SELECT s.`user_id`, u.`username` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
-				foreach ($grab_streamers as $streamer)
+				$streamer_output = '';
+				if (!empty($streamer_list[$streams['row_id']]))
 				{
-					$streamer_list[] = '<a href="/profiles/' . $streamer['user_id'] . '">'.$streamer['username'].'</a>';
-				}
-	
-				if (!empty($streamer_list))
-				{
-					$streamer_list = implode(', ', $streamer_list);
+					$streamer_output = implode(', ', $streamer_list[$streams['row_id']]);
 					if (!empty($streams['streamer_community_name']))
 					{
-						$streamer_list .= ', ' . $streams['streamer_community_name'];
+						$streamer_output .= ', ' . $streams['streamer_community_name'];
 					}
 				}
 				else
 				{
-					$streamer_list = $streams['streamer_community_name'];
+					$streamer_output = $streams['streamer_community_name'];
 				}
 				
-				$templating->set('profile_links', $streamer_list);
+				$templating->set('profile_links', $streamer_output);
 	
 				$options = '';
 				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)

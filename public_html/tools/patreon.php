@@ -8,23 +8,28 @@ require APP_ROOT . "/includes/bootstrap.php";
 <form method="post" action="patreon.php">
 	<label>Send emails?<input type="checkbox" name="emails" <?php if (isset($_POST['emails'])){echo'checked';}?>/></label><br />
 	<label>Test run?<input type="checkbox" name="test_run" <?php if (isset($_POST['test_run'])){echo'checked';}?>/></label><br />
+	<label>Don't remove users<input type="checkbox" name="dont_remove" <?php if (isset($_POST['dont_remove'])){echo'checked';}?>/></label><br />
+	<em>Tick this if doing it for newer pledges during a month only, otherwise it will remove everyone else!</em><br />
+	<br />
 	<button type="submit" name="go" value="1">Process</button>
 </form>
 
 <?php
 if (isset($_POST['go']))
 {
-	$csv = array_map('str_getcsv', file('patreon.csv'));
+    echo 'Working...' . PHP_EOL;
+    $csv = array_map('str_getcsv', file('patreon.csv'));
 
 	$email_list = [];
 
-	array_splice($csv, 0, 2);
+    array_splice($csv, 0, 1);
+
 	foreach ($csv as $line)
 	{
 		// make it a proper decimal number to compare against
 		$pledge = str_replace('$', '', $line[6]);
-		$status = trim($line[19]);
-		$email = trim($line[1]);
+		$status = trim($line[18]);
+        $email = trim($line[1]);
 
 		// if they pledge at least 5 dollars a month
 		if ($pledge >= 4 && $status == 'Paid')
@@ -127,7 +132,7 @@ if (isset($_POST['go']))
 		unset($email);
 	}
 
-	if (!isset($_POST['test_run']) && !empty($user_id_list))
+	if (!isset($_POST['test_run']) && !empty($user_id_list) && !isset($_POST['dont_remove']))
 	{
 		// okay, now we need to remove anyone not in that list
 		$in = str_repeat('?,', count($user_id_list) - 1) . '?';

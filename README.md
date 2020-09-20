@@ -23,6 +23,7 @@ It is also required to have the following php extentions available:
 - Iconv
 - Json
 - Mysql
+- Composer
 
 ## PHP Settings
 
@@ -34,9 +35,9 @@ You should really have these set, to make cookies more secure:
 
 ## Installing / Setting up a dev enviroment
 
-Setup apache, PHP and MySQL to serve up PHP pages as with any other. 
+1) Setup LAMP (Apache, PHP and MySQL). 
 
-Create `includes/config.php` with this (fill your details):
+2) Create `includes/config.php` with this (fill your details):
 
 ```
 <?php
@@ -52,6 +53,8 @@ define("DB",
 Import the development SQL database from the stripped SQL file `tools/SQL.sql`  
 
 Eventually I will do an actual installer...
+
+3) Run "composer install" inside the main directory to pull in the PHP library dependencies
 
 ## Apache rewrite
 
@@ -115,8 +118,6 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 - Gallery avatars (https://openclipart.org/ Public Domain)
 
 - /includes/jscripts/Chart.min.js (http://www.chartjs.org/ MIT)
-
-- /includes/image_class/ (https://github.com/claviska/SimpleImage MIT)
 
 - /includes/datatables/ (https://datatables.net/ MIT)
 

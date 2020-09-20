@@ -33,10 +33,15 @@ if ($forum_ids)
 	$forum_id_in  = str_repeat('?,', count($forum_ids) - 1) . '?';
 
 	$forum_posts = '';
-	$fetch_topics = $dbl->run("SELECT p.`post_id`, t.`topic_id`, t.`topic_title`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON u.user_id = p.author_id WHERE t.`approved` = 1 AND t.`forum_id` IN ($forum_id_in) ORDER BY p.`post_id` DESC limit 5", $forum_ids)->fetch_all();
+	#$fetch_topics = $dbl->run("SELECT p.`post_id`, t.`topic_id`, t.`topic_title`, p.`creation_date`, u.`username` FROM `forum_replies` p INNER JOIN `forum_topics` t ON p.topic_id = t.topic_id INNER JOIN `users` u ON u.user_id = p.author_id WHERE t.`approved` = 1 AND t.`forum_id` IN ($forum_id_in) ORDER BY p.`post_id` DESC limit 5", $forum_ids)->fetch_all();
+
+
+	$fetch_topics = $dbl->run("SELECT t.`topic_id`, t.`topic_title`, t.`last_post_date`, t.`last_post_id`, u.`username` FROM `forum_topics` t INNER JOIN `users` u ON u.user_id = t.last_post_user_id WHERE t.`approved` = 1 AND t.`forum_id` IN ($forum_id_in) ORDER BY t.`last_post_date` DESC limit 5", $forum_ids)->fetch_all();
+
+
 	foreach ($fetch_topics as $topics)
 	{
-		$date = $core->time_ago($topics['creation_date']);
+		$date = $core->time_ago($topics['last_post_date']);
 
 		$title_length = strlen($topics['topic_title']);
 		if ($title_length >= 55)
@@ -49,9 +54,9 @@ if ($forum_ids)
 			$title = $topics['topic_title'];
 		}
 
-		$machine_time = date("Y-m-d\TH:i:s", $topics['creation_date']);
+		$machine_time = date("Y-m-d\TH:i:s", $topics['last_post_date']);
 
-		$forum_posts .= '<li class="list-group-item"><a href="'. $forum_class->get_link($topics['topic_id'], 'post_id=' . $topics['post_id']) . '">' . $title . '</a><br />
+		$forum_posts .= '<li class="list-group-item"><a href="'. $forum_class->get_link($topics['topic_id'], 'post_id=' . $topics['last_post_id']) . '">' . $title . '</a><br />
 		<small><time datetime="'.$machine_time.'">' . $date .'</time> - ' . $topics['username'] . '</small></li>';
 	}
 }

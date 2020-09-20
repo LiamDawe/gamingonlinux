@@ -79,22 +79,25 @@ if (!isset($_GET['view']))
 
 		$articles_get = $dbl->run($query, array_merge($user->blocked_tags, [$core->start], [$per_page]))->fetch_all();
 
-		$article_id_array = array();
-
-		foreach ($articles_get as $article)
+		if ($articles_get)
 		{
-			$article_id_array[] = $article['article_id'];
+			$article_id_array = array();
+
+			foreach ($articles_get as $article)
+			{
+				$article_id_array[] = $article['article_id'];
+			}
+			$article_id_sql = implode(', ', $article_id_array);
+
+			$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
+			
+			$templating->load('articles');
+
+			$article_class->display_article_list($articles_get, $get_categories);
+
+			$templating->block('bottom', 'home');
+			$templating->set('pagination', $pagination);
 		}
-		$article_id_sql = implode(', ', $article_id_array);
-
-		$get_categories = $article_class->find_article_tags(array('article_ids' => $article_id_sql, 'limit' => 5));
-		
-		$templating->load('articles');
-
-		$article_class->display_article_list($articles_get, $get_categories);
-
-		$templating->block('bottom', 'home');
-		$templating->set('pagination', $pagination);
 	}
 }
 

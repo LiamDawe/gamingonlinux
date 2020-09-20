@@ -366,6 +366,7 @@ margin-bottom: -3px;
  ul.header-navbar li a
  {
 	font-weight: bold; 
+	transition: all 0.4s ease 0s;
  }
  .nav-title a {
     font-weight: bold;
@@ -388,7 +389,8 @@ margin-bottom: -3px;
  .header-navbar>li>a:hover {
      color: #FFF;
 	 text-decoration: none;
-	 transition: all .50s ease 0s;
+	 letter-spacing: 1px;
+	 transition: all 0.4s ease 0s;
  }
  .header-navbar>.gol-icon>a {
      line-height: 0;

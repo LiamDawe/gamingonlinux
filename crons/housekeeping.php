@@ -297,5 +297,16 @@ foreach ($find_requests as $request)
 	}
 }
 
+// check for old pc info and notify users if they haven't been reminded for 1 month (to not spam them)
+$pc_info_checker = $dbl->run("SELECT `user_id` FROM `user_profile_info` WHERE `date_updated` <= NOW() - INTERVAL 3 MONTH AND `last_update_reminder` IS NULL OR `last_update_reminder` <= NOW() - INTERVAL 1 MONTH")->fetch_all(PDO::FETCH_COLUMN);
+if ($pc_info_checker)
+{
+	foreach ($pc_info_checker as $key => $user_id)
+	{
+		$dbl->run("INSERT INTO `user_notifications` SET `owner_id` = ?, `type` = 'update_pc_info'", array($user_id));
+		$dbl->run("UPDATE `user_profile_info` SET `last_update_reminder` = ?", array(core::$sql_date_now));
+	}
+}
+
 // update last ran datetime
 $dbl->run("UPDATE `crons` SET `last_ran` = ? WHERE `name` = 'housekeeping'", [core::$sql_date_now]);

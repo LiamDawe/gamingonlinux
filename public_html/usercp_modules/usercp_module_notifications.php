@@ -16,7 +16,8 @@ $notification_types = [
 'liked' =>				['text' => 'liked your comment on'],
 'liked_forum_topic' =>  ['text' => 'liked your forum topic titled'],
 'liked_forum_reply' =>  ['text' => 'liked your forum post in the topic titled'],
-'wishlist_sale' => 		['text' => 'has been detected as going on sale!']
+'wishlist_sale' => 		['text' => 'has been detected as going on sale!'],
+'update_pc_info' => 	['text' => 'hasn\'t been updated in a few months - be sure to keep it up to date!']
 ];
 
 if (!isset($_GET['go']))
@@ -85,7 +86,7 @@ if (!isset($_GET['go']))
 				$icon = 'envelope-open';
 			}
 
-			if ($note_list['type'] != 'wishlist_sale')
+			if ($note_list['type'] != 'wishlist_sale' && $note_list['type'] != 'update_pc_info')
 			{
 				if (!empty($note_list['username']))
 				{
@@ -157,9 +158,9 @@ if (!isset($_GET['go']))
 					'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
 			}
 
-			else
+			else if ($note_list['type'] == 'wishlist_sale')
 			{
-				$note_row = $templating->block_store('wishlist_sale_row', 'usercp_modules/notifications');
+				$note_row = $templating->block_store('system_row', 'usercp_modules/notifications');
 				$link = '/sales.php?game_id='.$note_list['sale_game_id'].'&amp;clear_note=' . $note_list['id'];
 				$title = $note_list['name'];
 
@@ -170,6 +171,20 @@ if (!isset($_GET['go']))
 					'action_text' => $notification_types[$note_list['type']]['text'],
 					'title' => $title,
 					'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));
+			}
+			else if ($note_list['type'] == 'update_pc_info')
+			{
+				$note_row = $templating->block_store('system_row', 'usercp_modules/notifications');
+				$link = '/usercp.php?module=pcinfo&amp;clear_note=' . $note_list['id'];;
+				$title = 'Your PC information';
+
+				$note_row = $templating->store_replace($note_row, array(
+					'id' => $note_list['id'],
+					'icon' => $icon,
+					'link' => $link,
+					'action_text' => $notification_types[$note_list['type']]['text'],
+					'title' => $title,
+					'this_template' => $core->config('website_url') . 'templates/' . $core->config('template')));				
 			}
 
 			if ($note_list['seen'] == 0)

@@ -107,7 +107,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
 		$height = imagesy($base_image);
 		$font = 4;
 		imagestring($base_image, $font, 1, $height-70, "ERROR: That users PC info is not public!", $text_colour);
-		imagestring($base_image, $font, 260, $height-20, 'GamingOnLinux', $text_colour);
+		imagestring($base_image, $font, 260, $height-20, 'GamingOnLinux.com', $text_colour);
 		header('Content-Type: image/png');
 		imagepng($base_image);
 	}
@@ -121,7 +121,7 @@ else
 	$height = imagesy($base_image);
 	$font = 4;
 	imagestring($base_image, $font, 1, $height-70, "ERROR: No User ID set", $text_colour);
-	imagestring($base_image, $font, 260, $height-20, 'GamingOnLinux', $text_colour);
+	imagestring($base_image, $font, 260, $height-20, 'GamingOnLinux.com', $text_colour);
 	header('Content-Type: image/png');
 	imagepng($base_image);
 }

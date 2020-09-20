@@ -52,6 +52,8 @@ for ($i = 1; $i <= $article_total; $i++)
   }
 
   $dbl->run("UPDATE `articles` SET `comment_count` = ? WHERE `article_id` = ?", array($comments_total, $article_id));
+
+  echo 'Article ' . $i . ' done.'.PHP_EOL;
 }
 echo 'Done';
 ?>

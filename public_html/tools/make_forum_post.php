@@ -1,4 +1,6 @@
 <?php
+ini_set("memory_limit", "-1");
+
 define("APP_ROOT", dirname( dirname(__FILE__) ) );
 
 require APP_ROOT . "/includes/bootstrap.php";

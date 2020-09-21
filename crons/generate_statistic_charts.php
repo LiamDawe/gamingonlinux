@@ -1,7 +1,7 @@
 <?php
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/cron_bootstrap.php";
+require APP_ROOT . "/includes/bootstrap.php";
 
 // get the last grouping_id, this is how we group together each new generation for easy edits and deletions
 $get_grouping_id = $dbl->run("SELECT `grouping_id` FROM `user_stats_charts` ORDER BY `id` DESC LIMIT 1")->fetch();
@@ -20,7 +20,7 @@ $data = array();
 
 $users = $dbl->run("SELECT u.`distro`, count(*) as 'total', d.`arch-based`, d.`ubuntu-based` FROM `users` u INNER JOIN `user_profile_info` p ON u.user_id = p.user_id INNER JOIN `distributions` d ON u.distro = d.name WHERE u.`distro` != '' AND u.`distro` != 'Not Listed' AND u.`distro` IS NOT NULL AND p.`include_in_survey` = 1 GROUP BY u.`distro`, d.`arch-based`, d.`ubuntu-based` ORDER BY `total` DESC")->fetch_all();
 
-$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Percentage of users', 'Linux Distributions (Combined)'));
+$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id, `bundle_outside_top10` = 1", array('Percentage of users', 'Linux Distributions (Combined)'));
 $new_chart_id = $dbl->new_id();
 
 $arch_total = 0;
@@ -67,8 +67,8 @@ unset($dat);
 
 // this is for all the others that can be generated automatically
 $charts = array (
-array ("name" => "Linux Distributions (Split)", "db_field" => "u.distro", "table" => 'users u INNER JOIN user_profile_info p ON u.user_id = p.user_id'),
-array ("name" => "Desktop Environment", "db_field" => "p.desktop_environment"),
+array ("name" => "Linux Distributions (Split)", "db_field" => "u.distro", "table" => 'users u INNER JOIN user_profile_info p ON u.user_id = p.user_id', 'bundle_outside_top10' => 1),
+array ("name" => "Desktop Environment", "db_field" => "p.desktop_environment", 'bundle_outside_top10' => 1),
 array ("name" => "Dual Booting", "db_field" => "p.dual_boot"),
 array ("name" => "CPU Vendor", "db_field" => "p.cpu_vendor"),
 array ("name" => "GPU Vendor", "db_field" => "p.gpu_vendor"),
@@ -76,12 +76,12 @@ array ("name" => "GPU Model", "db_field" => "g.name", "table" => "user_profile_i
 array ("name" => "GPU Driver", "db_field" => "p.gpu_driver"),
 array ("name" => "GPU Driver (Nvidia)", "db_field" => "p.gpu_driver", "gpu_vendor" => "Nvidia"),
 array ("name" => "GPU Driver (AMD)", "db_field" => "p.gpu_driver", "gpu_vendor" => "AMD"),
-array ("name" => "RAM", "db_field" => "p.ram_count"),
+array ("name" => "RAM", "db_field" => "p.ram_count", 'bundle_outside_top10' => 1),
 array ("name" => "Number of monitors", "db_field" => "p.monitor_count"),
-array ("name" => "Resolution", "db_field" => "p.resolution"),
+array ("name" => "Resolution", "db_field" => "p.resolution", 'bundle_outside_top10' => 1),
 array ("name" => "Main Gaming Machine", "db_field" => "p.gaming_machine_type"),
-array ("name" => "Main Gamepad", "db_field" => "p.gamepad"),
-array ("name" => "PC VR Headset", "db_field" => "p.vrheadset"),
+array ("name" => "Main Gamepad", "db_field" => "p.gamepad", 'bundle_outside_top10' => 1),
+array ("name" => "PC VR Headset", "db_field" => "p.vrheadset", 'bundle_outside_top10' => 1),
 array ("name" => "Session Type", "db_field" => "p.session_type")
 );
 
@@ -106,7 +106,13 @@ foreach ($charts as $chart)
 	$labels = array();
 	$data = array();
 
-	$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id", array('Percentage of users', $chart['name']));
+	$bundle_outside_top10 = 0;
+	if (isset($chart['bundle_outside_top10']) && $chart['bundle_outside_top10'] = 1)
+	{
+		$bundle_outside_top10 = 1;
+	}
+
+	$dbl->run("INSERT INTO `user_stats_charts` SET `h_label` = ?, `name` = ?, `grouping_id` = $grouping_id, `bundle_outside_top10` = ?", array('Percentage of users', $chart['name'], $bundle_outside_top10));
 	$new_chart_id = $dbl->new_id();
 	
 	foreach ($users as $user)

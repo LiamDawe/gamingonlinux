@@ -83,7 +83,7 @@ if (!isset($_GET['view']) || isset($_GET['view']) && $_GET['view'] == 'monthly')
 		$grouping_id = $dbl->run("SELECT `grouping_id` FROM user_stats_grouping ORDER BY `grouping_id` DESC LIMIT 1")->fetchOne();
 	}
 
-	$get_charts_info = $dbl->run("SELECT `name`, `id`, `grouping_id`, `total_answers` FROM `user_stats_charts` WHERE `grouping_id` = ? ORDER BY `id` ASC", array($grouping_id))->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+	$get_charts_info = $dbl->run("SELECT `name`, `id`, `grouping_id`, `total_answers`, `bundle_outside_top10` FROM `user_stats_charts` WHERE `grouping_id` = ? ORDER BY `id` ASC", array($grouping_id))->fetch_all(PDO::FETCH_GROUP|PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
 
 	foreach($get_charts_info as $name => $chart)
 	{

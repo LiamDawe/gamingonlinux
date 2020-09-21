@@ -100,11 +100,6 @@ else
 
 	$new_topic = '';
 	$new_topic_bottom = '';
-	if (!isset($_SESSION['activated']))
-	{
-		$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
-		$_SESSION['activated'] = $get_active['activated'];
-	}
 
 	if ($parray['can_topic'] == 1)
 	{

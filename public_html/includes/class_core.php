@@ -86,6 +86,7 @@ class core
 			catch (Exception $e) 
 			{
 				error_log($e->getMessage());
+				core::$redis = NULL;
 			}
 		}
 	}
@@ -323,23 +324,29 @@ class core
 	// grab a config key
 	public function config($key)
 	{
-		$get_config = $this->get_dbcache('CONFIG_'.$key);
-
-		if ($get_config === false) // there's no cache
+		if (!isset(core::$config[$key]))
 		{
+			$get_config = $this->get_dbcache('CONFIG_'.$key);
+
+			if ($get_config === false) // there's no cache
+			{
 				$get_config = $this->dbl->run("SELECT `data_value` FROM config WHERE `data_key` = ?", array($key))->fetchOne();
 
 				$this->set_dbcache('CONFIG_'.$key, $get_config); // no expiry as config hardly ever changes
+			}
+			core::$config[$key] = $get_config;
 		}
 
 		// return the requested key with the value in place
-		return $get_config;
+		return core::$config[$key];
 	}
 
 	// update a single config var
 	function set_config($value, $key)
 	{
 		$this->dbl->run("UPDATE `config` SET `data_value` = ? WHERE `data_key` = ?", [$value, $key]);
+
+		core::$config[$key] = $value;
 
 		$this->set_dbcache('CONFIG_'.$key, $value); // no expiry as config hardly ever changes
 	}

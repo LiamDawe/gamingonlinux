@@ -70,53 +70,6 @@ if (!isset($_GET['go']))
 				WHERE
 				$find_article_where_sql", $find_article_where_data)->fetch();
 
-			// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
-			if ((isset($_GET['comment_id']) && core::is_number($_GET['comment_id'])) || (isset(core::$url_command[3]) && strpos( core::$url_command[3], 'comment_id=') !== false))
-			{
-				$comment_id = NULL;
-				if (isset($_GET['comment_id']))
-				{
-					$comment_id = (int) $_GET['comment_id'];
-				}
-				else if (isset(core::$url_command[3]))
-				{
-					$comment_id = (int) str_replace('comment_id=', '', core::$url_command[3]);
-				}
-
-				// check comment still exists
-				$check = $dbl->run("SELECT c.`comment_id`, c.`article_id`, a.`date`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON a.`article_id` = c.`article_id` WHERE c.`comment_id` = ?", array($comment_id))->fetch();
-				if ($check)
-				{
-					// calculate the page this comment is on
-					$prev_comments = $dbl->run("SELECT COUNT(comment_id) AS total FROM `articles_comments` WHERE `comment_id` <= ? AND `article_id` = ?", array($check['comment_id'], $check['article_id']))->fetchOne();
-
-					$comments_per_page = $core->config('default-comments-per-page');
-					if (isset($_SESSION['per-page']))
-					{
-						$comments_per_page = $_SESSION['per-page'];
-					}
-
-					$comment_page = 1;
-					if ($article['comment_count'] > $comments_per_page)
-					{
-						$comment_page = ceil($prev_comments/$_SESSION['per-page']);
-					}
-
-					$article_link = $article_class->article_link(array('date' => $check['date'], 'slug' => $check['slug'], 'additional' => 'page=' . $comment_page . '#r' . $check['comment_id']));
-
-					header("Location: " . $article_link);
-					die();
-				}
-				else
-				{
-					$_SESSION['message'] = 'nocomment';
-					$article_link = $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug']));
-
-					header("Location: " . $article_link);
-					die();
-				}
-			}
-
 			if (!$article)
 			{
 				http_response_code(404);
@@ -129,474 +82,523 @@ if (!isset($_GET['go']))
 				$templating->set('url', $core->config('website_url'));
 				$templating->set('search_text', '');
 			}
-
-			else if ($article['active'] == 0 && !isset($_GET['preview_code']))
+			else // article exists
 			{
-				$templating->set_previous('meta_description', 'Article error on GamingOnLinux', 1);
-				$templating->set_previous('title', 'Article Inactive', 1);
-				$templating->set_previous('meta_data', '', 1);
-				$core->message('This article is currently inactive!');
-			}
-
-			else if ($article['active'] == 0 && isset($_GET['preview_code']) && $article['preview_code'] != $_GET['preview_code'])
-			{
-				$templating->set_previous('meta_description', 'Article error on GamingOnLinux', 1);
-				$templating->set_previous('title', 'Article Inactive', 1);
-				$templating->set_previous('meta_data', '', 1);
-				$core->message('This article is currently inactive!');
-			}
-
-			else if ($article['active'] == 0 && $article['preview_code'] == $_GET['preview_code'] || $article['active'] == 1)
-			{
-				$meta_description = str_replace('"', '', $article['tagline']);
-
-				$templating->set_previous('meta_description', $meta_description, 1);
-				
-				$html_title = htmlentities($article['title'], ENT_COMPAT);
-				
-				$article_link_main = $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug']));
-
-				if (!isset($_GET['preview_code']))
+				// FIND THE CORRECT PAGE IF THEY HAVE A LINKED COMMENT
+				if ((isset($_GET['comment_id']) && core::is_number($_GET['comment_id'])) || (isset(core::$url_command[3]) && strpos( core::$url_command[3], 'comment_id=') !== false))
 				{
-					$templating->set_previous('title', $html_title, 1);
-
-					// update the view counter if it is not a preview
-					$dbl->run("UPDATE `articles` SET `views` = (views + 1) WHERE `article_id` = ?", array($article['article_id']));
-				}
-				else
-				{
-					$templating->set_previous('title', 'PREVIEW: ' . $article['title'], 1);
-
-					$core->message('Article currently inactive, you are seeing a private preview. Please do not share this unless you have been given permission.');
-				}
-
-				// set the article image meta
-				$article_meta_image = '';
-				if (!empty($article['tagline_image']))
-				{
-					$article_meta_image = $core->config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}";
-				}
-				if (!empty($article['gallery_tagline_filename']))
-				{
-					$article_meta_image = $core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}";
-				}
-
-				$nice_title = core::nice_title($article['title']);
-
-				// twitter info card
-				$twitter_card = '<meta name="twitter:card" content="summary_large_image">'.PHP_EOL;
-				$twitter_card .= '<meta name="twitter:site" content="@'.$core->config('twitter_username').'">'.PHP_EOL;
-				if (!empty($article['twitter_on_profile']))
-				{
-					$twitter_card .= '<meta name="twitter:creator" content="@'.$article['twitter_on_profile'].'">'.PHP_EOL;
-				}
-
-				$twitter_card .= '<meta name="twitter:title" content="'.$html_title.'">'.PHP_EOL;
-				$twitter_card .= '<meta name="twitter:description" content="'.$meta_description.'">'.PHP_EOL;
-				$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">'.PHP_EOL;
-				$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">'.PHP_EOL;
-				
-				$published_date_meta = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
-				if ($article['edit_date'] != NULL)
-				{
-					$edit_date_meta = date("Y-m-d\TH:i:s", strtotime($article['edit_date'])) . 'Z';
-				}
-				else
-				{
-					$edit_date_meta = $published_date_meta;
-				}
-
-				if ($article['author_id'] == 0)
-				{
-					if (empty($article['guest_username']))
+					$comment_id = NULL;
+					if (isset($_GET['comment_id']))
 					{
-						$username = 'Guest';
+						$comment_id = (int) $_GET['comment_id'];
+					}
+					else if (isset(core::$url_command[3]))
+					{
+						$comment_id = (int) str_replace('comment_id=', '', core::$url_command[3]);#
+					}
+
+					// check comment still exists
+					$check = $dbl->run("SELECT c.`comment_id`, c.`article_id`, a.`date`, a.`slug` FROM `articles_comments` c INNER JOIN `articles` a ON a.`article_id` = c.`article_id` WHERE c.`comment_id` = ?", array($comment_id))->fetch();
+					if ($check)
+					{						
+						// calculate the page this comment is on
+						$prev_comments = $dbl->run("SELECT COUNT(comment_id) AS total FROM `articles_comments` WHERE `comment_id` <= ? AND `article_id` = ?", array($check['comment_id'], $check['article_id']))->fetchOne();
+
+						$comments_per_page = $core->config('default-comments-per-page');
+						if (isset($_SESSION['per-page']))
+						{
+							$comments_per_page = $_SESSION['per-page'];
+						}
+
+						$comment_page = 1;
+						if ($article['comment_count'] > $comments_per_page)
+						{
+							$comment_page = ceil($prev_comments/$_SESSION['per-page']);
+						}
+
+						$article_link = $article_class->article_link(array('date' => $check['date'], 'slug' => $check['slug'], 'additional' => 'page=' . $comment_page . '#r' . $check['comment_id']));
+
+						header("Location: " . $article_link);
+						die();
+					}
+					else
+					{
+						$_SESSION['message'] = 'nocomment';
+						$article_link = $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug']));
+
+						header("Location: " . $article_link);
+						die();
+					}
+				}
+
+				if ($article['active'] == 0 && !isset($_GET['preview_code']))
+				{
+					$templating->set_previous('meta_description', 'Article error on GamingOnLinux', 1);
+					$templating->set_previous('title', 'Article Inactive', 1);
+					$templating->set_previous('meta_data', '', 1);
+					$core->message('This article is currently inactive!');
+				}
+
+				else if ($article['active'] == 0 && isset($_GET['preview_code']) && $article['preview_code'] != $_GET['preview_code'])
+				{
+					$templating->set_previous('meta_description', 'Article error on GamingOnLinux', 1);
+					$templating->set_previous('title', 'Article Inactive', 1);
+					$templating->set_previous('meta_data', '', 1);
+					$core->message('This article is currently inactive!');
+				}
+
+				else if ($article['active'] == 0 && $article['preview_code'] == $_GET['preview_code'] || $article['active'] == 1)
+				{
+					$meta_description = str_replace('"', '', $article['tagline']);
+
+					$templating->set_previous('meta_description', $meta_description, 1);
+					
+					$html_title = htmlentities($article['title'], ENT_COMPAT);
+					
+					$article_link_main = $article_class->article_link(array('date' => $article['date'], 'slug' => $article['slug']));
+
+					if (!isset($_GET['preview_code']))
+					{
+						$templating->set_previous('title', $html_title, 1);
+
+						// update the view counter if it is not a preview
+						$dbl->run("UPDATE `articles` SET `views` = (views + 1) WHERE `article_id` = ?", array($article['article_id']));
+					}
+					else
+					{
+						$templating->set_previous('title', 'PREVIEW: ' . $article['title'], 1);
+
+						$core->message('Article currently inactive, you are seeing a private preview. Please do not share this unless you have been given permission.');
+					}
+
+					// set the article image meta
+					$article_meta_image = '';
+					if (!empty($article['tagline_image']))
+					{
+						$article_meta_image = $core->config('website_url') . "uploads/articles/tagline_images/{$article['tagline_image']}";
+					}
+					if (!empty($article['gallery_tagline_filename']))
+					{
+						$article_meta_image = $core->config('website_url') . "uploads/tagline_gallery/{$article['gallery_tagline_filename']}";
+					}
+
+					$nice_title = core::nice_title($article['title']);
+
+					// twitter info card
+					$twitter_card = '<meta name="twitter:card" content="summary_large_image">'.PHP_EOL;
+					$twitter_card .= '<meta name="twitter:site" content="@'.$core->config('twitter_username').'">'.PHP_EOL;
+					if (!empty($article['twitter_on_profile']))
+					{
+						$twitter_card .= '<meta name="twitter:creator" content="@'.$article['twitter_on_profile'].'">'.PHP_EOL;
+					}
+
+					$twitter_card .= '<meta name="twitter:title" content="'.$html_title.'">'.PHP_EOL;
+					$twitter_card .= '<meta name="twitter:description" content="'.$meta_description.'">'.PHP_EOL;
+					$twitter_card .= '<meta name="twitter:image" content="'.$article_meta_image.'">'.PHP_EOL;
+					$twitter_card .= '<meta name="twitter:image:src" content="'.$article_meta_image.'">'.PHP_EOL;
+					
+					$published_date_meta = date("Y-m-d\TH:i:s", $article['date']) . 'Z';
+					if ($article['edit_date'] != NULL)
+					{
+						$edit_date_meta = date("Y-m-d\TH:i:s", strtotime($article['edit_date'])) . 'Z';
+					}
+					else
+					{
+						$edit_date_meta = $published_date_meta;
+					}
+
+					if ($article['author_id'] == 0)
+					{
+						if (empty($article['guest_username']))
+						{
+							$username = 'Guest';
+						}
+
+						else
+						{
+							$username = $article['guest_username'];
+						}
+						$username_top = $username;
 					}
 
 					else
 					{
-						$username = $article['guest_username'];
+						$username = $article['username'];
+						$username_top = "<a rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
+						$username_bio = "<a class=\"p-name u-url\" rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
 					}
-					$username_top = $username;
-				}
 
-				else
-				{
-					$username = $article['username'];
-					$username_top = "<a rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
-					$username_bio = "<a class=\"p-name u-url\" rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
-				}
+					// structured data for search engines
+					$json_title = json_encode($article['title'], JSON_HEX_QUOT);
+					$json_description = json_encode($article['tagline'], JSON_HEX_QUOT);
 
-				// structured data for search engines
-				$json_title = json_encode($article['title'], JSON_HEX_QUOT);
-				$json_description = json_encode($article['tagline'], JSON_HEX_QUOT);
-
-				$structured_info = "<script type=\"application/ld+json\">
-				{
-					\"@context\": \"https://schema.org\",
-					\"@type\": \"NewsArticle\",
-					\"mainEntityOfPage\": {
-						\"@type\": \"WebPage\",
-						\"@id\": \"https://www.gamingonlinux.com/articles/{$article['article_id']}\"
-					},
-					\"headline\": $json_title,
-					\"image\": {
-						\"@type\": \"ImageObject\",
-						\"url\": \"$article_meta_image\"
-					},
-					\"author\": {
-					  \"@type\": \"Person\",
-					  \"name\": \"$username\"
-					},
-					\"datePublished\": \"$published_date_meta\",
-					\"dateModified\": \"$edit_date_meta\",
-					\"description\": $json_description,
-					\"publisher\": {
-						\"@type\": \"Organization\",
-						\"name\": \"GamingOnLinux\",
-						\"url\": \"https://www.gamingonlinux.com/\",
-						\"logo\": {
+					$structured_info = "<script type=\"application/ld+json\">
+					{
+						\"@context\": \"https://schema.org\",
+						\"@type\": \"NewsArticle\",
+						\"mainEntityOfPage\": {
+							\"@type\": \"WebPage\",
+							\"@id\": \"https://www.gamingonlinux.com/articles/{$article['article_id']}\"
+						},
+						\"headline\": $json_title,
+						\"image\": {
 							\"@type\": \"ImageObject\",
-							\"url\": \"https://www.gamingonlinux.com/templates/default/images/icon.png\",
-							\"width\": 47,
-							\"height\": 55
+							\"url\": \"$article_meta_image\"
+						},
+						\"author\": {
+						\"@type\": \"Person\",
+						\"name\": \"$username\"
+						},
+						\"datePublished\": \"$published_date_meta\",
+						\"dateModified\": \"$edit_date_meta\",
+						\"description\": $json_description,
+						\"publisher\": {
+							\"@type\": \"Organization\",
+							\"name\": \"GamingOnLinux\",
+							\"url\": \"https://www.gamingonlinux.com/\",
+							\"logo\": {
+								\"@type\": \"ImageObject\",
+								\"url\": \"https://www.gamingonlinux.com/templates/default/images/icon.png\",
+								\"width\": 47,
+								\"height\": 55
+							}
+						}
+					}</script>";
+
+					// meta tags for g+, facebook and twitter images
+					$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n
+					<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n
+					<meta property=\"og:type\" content=\"article\">\n
+					<meta property=\"og:title\" content=\"" . $html_title . "\" />\n
+					<meta property=\"og:description\" content=\"$meta_description\" />\n
+					<meta property=\"og:url\" content=\"" . $article_link_main . "\" />\n
+					<meta itemprop=\"image\" content=\"$article_meta_image\" />\n
+					<meta itemprop=\"title\" content=\"" . $html_title . "\" />\n
+					<meta itemprop=\"description\" content=\"$meta_description\" />\n
+					<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n
+					$twitter_card\n
+					$structured_info", 1);
+
+					// make date human readable
+					$date = $core->human_date($article['date']);
+
+					$templating->block('article', 'articles_full');
+					$templating->set('article_link', $article_link_main);
+					$templating->set('share_url', urlencode($article_link_main));
+					$templating->set('share_title', urlencode($article['title']));
+					$templating->set('url', $core->config('website_url'));
+
+					$templating->set('rules', $core->config('rules'));
+
+					if (($user->check_group([1,2,5]) == true) && !isset($_GET['preview']))
+					{
+						$templating->set('edit_link', " <a href=\"" . $core->config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;aid={$article['article_id']}\">Edit</a>");
+						$templating->set('admin_button', '');
+					}
+
+					else if (($user->check_group([1,2,5]) == true) && isset($_GET['preview']))
+					{
+						$page_action = 'admin.php?module=adminreview';
+						if (isset($_GET['submitted']) && $_GET['submitted'] == 1)
+						{
+							$page_action ='admin.php?module=articles&view=Submitted';
+						}
+						if (isset($_GET['draft']) && $_GET['draft'] == 1)
+						{
+							$page_action ='admin.php?module=articles&view=drafts';
+						}
+						$templating->set('edit_link', '');
+						$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . $core->config('website_url') . "{$page_action}\">Back</button> <button type=\"submit\" formaction=\"" . $core->config('url') . "{$page_action}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
+					}
+
+					if ($user->check_group([1,2,5]) == false)
+					{
+						$templating->set('edit_link', '');
+						$templating->set('admin_button', '');
+					}
+
+					$templating->set('title', $article['title']);
+					$templating->set('user_id', $article['author_id']);
+					$templating->set('username', $username_top);
+
+					$templating->set('date', $date);
+					$templating->set('machine_time', $published_date_meta);
+					$templating->set('article_views', number_format($article['views']));
+					$templating->set('article_meta', "<script>var postdate=new Date('".date('c', $article['date'])."')</script>");
+
+					$tagline_bbcode = '';
+					$bbcode_tagline_gallery = NULL;
+					if (!empty($article['tagline_image']))
+					{
+						$tagline_bbcode  = $article['tagline_image'];
+					}
+					if (!empty($article['gallery_tagline']))
+					{
+						$tagline_bbcode = $article['gallery_tagline_filename'];
+						$bbcode_tagline_gallery = 1;
+					}
+
+					$article_page = 1;
+					if (isset($_GET['article_page']) && is_numeric($_GET['article_page']))
+					{
+						$article_page = $_GET['article_page'];
+					}
+
+					// sort out the pages and pagination and only return the page requested
+					if ($user->user_details['single_article_page'] == 0)
+					{
+						$pages_array = explode('<*PAGE*>', $article['text']);
+						$article_page_count = count($pages_array);
+						$pages_array = array_combine(range(1, count($pages_array)), $pages_array);
+						if ($article_page <= $article_page_count)
+						{
+							$article_body = $pages_array[$article_page];
+						}
+						else
+						{
+							$article_body = $pages_array[1];
+							$article_page = 1;
 						}
 					}
-				}</script>";
-
-				// meta tags for g+, facebook and twitter images
-				$templating->set_previous('meta_data', "<meta property=\"og:image\" content=\"$article_meta_image\"/>\n
-				<meta property=\"og:image_url\" content=\"$article_meta_image\"/>\n
-				<meta property=\"og:type\" content=\"article\">\n
-				<meta property=\"og:title\" content=\"" . $html_title . "\" />\n
-				<meta property=\"og:description\" content=\"$meta_description\" />\n
-				<meta property=\"og:url\" content=\"" . $article_link_main . "\" />\n
-				<meta itemprop=\"image\" content=\"$article_meta_image\" />\n
-				<meta itemprop=\"title\" content=\"" . $html_title . "\" />\n
-				<meta itemprop=\"description\" content=\"$meta_description\" />\n
-				<meta property=\"datePublished\" content=\"{$published_date_meta}\">\n
-				$twitter_card\n
-				$structured_info", 1);
-
-				// make date human readable
-				$date = $core->human_date($article['date']);
-
-				$templating->block('article', 'articles_full');
-				$templating->set('article_link', $article_link_main);
-				$templating->set('share_url', urlencode($article_link_main));
-				$templating->set('share_title', urlencode($article['title']));
-				$templating->set('url', $core->config('website_url'));
-
-				$templating->set('rules', $core->config('rules'));
-
-				if (($user->check_group([1,2,5]) == true) && !isset($_GET['preview']))
-				{
-					$templating->set('edit_link', " <a href=\"" . $core->config('website_url') . "admin.php?module=articles&amp;view=Edit&amp;aid={$article['article_id']}\">Edit</a>");
-					$templating->set('admin_button', '');
-				}
-
-				else if (($user->check_group([1,2,5]) == true) && isset($_GET['preview']))
-				{
-					$page_action = 'admin.php?module=adminreview';
-					if (isset($_GET['submitted']) && $_GET['submitted'] == 1)
-					{
-						$page_action ='admin.php?module=articles&view=Submitted';
-					}
-					if (isset($_GET['draft']) && $_GET['draft'] == 1)
-					{
-						$page_action ='admin.php?module=articles&view=drafts';
-					}
-					$templating->set('edit_link', '');
-					$templating->set('admin_button', "<form method=\"post\"><button type=\"submit\" class=\"btn btn-info\" formaction=\"" . $core->config('website_url') . "{$page_action}\">Back</button> <button type=\"submit\" formaction=\"" . $core->config('url') . "{$page_action}&aid={$_GET['aid']}\" class=\"btn btn-info\">Edit</button></form>");
-				}
-
-				if ($user->check_group([1,2,5]) == false)
-				{
-					$templating->set('edit_link', '');
-					$templating->set('admin_button', '');
-				}
-
-				$templating->set('title', $article['title']);
-				$templating->set('user_id', $article['author_id']);
-				$templating->set('username', $username_top);
-
-				$templating->set('date', $date);
-				$templating->set('machine_time', $published_date_meta);
-				$templating->set('article_views', number_format($article['views']));
-				$templating->set('article_meta', "<script>var postdate=new Date('".date('c', $article['date'])."')</script>");
-
-				$tagline_bbcode = '';
-				$bbcode_tagline_gallery = NULL;
-				if (!empty($article['tagline_image']))
-				{
-					$tagline_bbcode  = $article['tagline_image'];
-				}
-				if (!empty($article['gallery_tagline']))
-				{
-					$tagline_bbcode = $article['gallery_tagline_filename'];
-					$bbcode_tagline_gallery = 1;
-				}
-
-				$article_page = 1;
-				if (isset($_GET['article_page']) && is_numeric($_GET['article_page']))
-				{
-					$article_page = $_GET['article_page'];
-				}
-
-				// sort out the pages and pagination and only return the page requested
-				if ($user->user_details['single_article_page'] == 0)
-				{
-					$pages_array = explode('<*PAGE*>', $article['text']);
-					$article_page_count = count($pages_array);
-					$pages_array = array_combine(range(1, count($pages_array)), $pages_array);
-					if ($article_page <= $article_page_count)
-					{
-						$article_body = $pages_array[$article_page];
-					}
 					else
 					{
-						$article_body = $pages_array[1];
-						$article_page = 1;
+						$article_body = str_replace('<*PAGE*>', '', $article['text']);
+						$article_page_count = 1;
 					}
-				}
-				else
-				{
-					$article_body = str_replace('<*PAGE*>', '', $article['text']);
-					$article_page_count = 1;
-				}
 
-				$templating->set('text', $bbcode->article_bbcode($article_body));
+					$templating->set('text', $bbcode->article_bbcode($article_body));
 
-				$article_link = $article_link_main;
-				if (isset($_GET['preview']))
-				{
-					$article_link = "/index.php?module=articles_full&amp;aid={$article['article_id']}&amp;preview&amp;";
-				}
+					$article_link = $article_link_main;
+					if (isset($_GET['preview']))
+					{
+						$article_link = "/index.php?module=articles_full&amp;aid={$article['article_id']}&amp;preview&amp;";
+					}
 
-				$article_pagination = $article_class->article_pagination($article_page, $article_page_count, $article_link);
+					$article_pagination = $article_class->article_pagination($article_page, $article_page_count, $article_link);
 
-				$templating->set('paging', $article_pagination);
+					$templating->set('paging', $article_pagination);
 
-				$categories_display = array();
-				$get_categories = $article_class->find_article_tags(array('article_ids' => $article['article_id']));
-	
-				if ($get_categories)
-				{
-					$categories_display = array_merge($categories_display, $article_class->display_article_tags($get_categories[$article['article_id']], 'array_plain'));
-				}
+					$categories_display = array();
+					$get_categories = $article_class->find_article_tags(array('article_ids' => $article['article_id']));
+		
+					if ($get_categories)
+					{
+						$categories_display = array_merge($categories_display, $article_class->display_article_tags($get_categories[$article['article_id']], 'array_plain'));
+					}
 
-				$current_linked_games = $dbl->run("SELECT a.`game_id`, g.`name` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ?", array($article['article_id']))->fetch_all();
-				$games_display = '';
-				if ($current_linked_games)
-				{
-					$games_display = ' | Apps: ';
-				}
+					$current_linked_games = $dbl->run("SELECT a.`game_id`, g.`name` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ?", array($article['article_id']))->fetch_all();
+					$games_display = '';
+					if ($current_linked_games)
+					{
+						$games_display = ' | Apps: ';
+					}
 
-				if (!empty($categories_display))
-				{
-					$suggest_link = '';
+					if (!empty($categories_display))
+					{
+						$suggest_link = '';
+						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
+						{
+							$suggest_link = ' (<a href="/index.php?module=article_tag_suggest&amp;article_id='.$article['article_id'].'">Suggest more</a>) ';
+						}
+						$templating->block('tags', 'articles_full');
+						$templating->set('categories_list', 'Tags'.$suggest_link.': ' . implode(', ', $categories_display) . $games_display . implode(', ', $article_class->display_game_tags($current_linked_games, 'array_plain')));
+					}
+
+					// article meta for bookmarking, likes etc
+					$templating->block('article_meta', 'articles_full');
+
+					$bookmark_link = '';
 					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 					{
-						$suggest_link = ' (<a href="/index.php?module=article_tag_suggest&amp;article_id='.$article['article_id'].'">Suggest more</a>) ';
-					}
-					$templating->block('tags', 'articles_full');
-					$templating->set('categories_list', 'Tags'.$suggest_link.': ' . implode(', ', $categories_display) . $games_display . implode(', ', $article_class->display_game_tags($current_linked_games, 'array_plain')));
-				}
-
-				// article meta for bookmarking, likes etc
-				$templating->block('article_meta', 'articles_full');
-
-				$bookmark_link = '';
-				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
-				{
-					$bookmark_check = $dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `data_id` = ? AND `user_id` = ? AND `type` = 'article'", array($article['article_id'], (int) $_SESSION['user_id']))->fetchOne();
-					if ($bookmark_check)
-					{
-						$bookmark_link = '<a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a>';
-					}
-					else
-					{
-						$bookmark_link = '<a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a>';
-					}
-				}
-				$templating->set('bookmark_link', $bookmark_link);
-
-				$templating->set('total_likes', $article['total_likes']);
-
-				$who_likes_alink = '';
-				if ($article['total_likes'] > 0)
-				{
-					$who_likes_alink = ', <a class="who_likes" href="/index.php?module=who_likes&amp;article_id='.$article['article_id'].'" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?article_id='.$article['article_id'].'">Who?</a>';
-				}
-				$templating->set('who_likes_alink', $who_likes_alink);
-
-				$like_button = '';
-				if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
-				{
-					$like_text = "Like";
-					$like_class = "like";
-					$they_liked = 0;
-					// Checks current login user liked this status or not
-					if ($article['total_likes'] > 0) // no point checking if they've liked it, if there's no likes
-					{
-						$numlikes = $dbl->run("SELECT 1 FROM `article_likes` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article['article_id']))->fetchOne();
-
-						if ($numlikes)
+						$bookmark_check = $dbl->run("SELECT `data_id` FROM `user_bookmarks` WHERE `data_id` = ? AND `user_id` = ? AND `type` = 'article'", array($article['article_id'], (int) $_SESSION['user_id']))->fetchOne();
+						if ($bookmark_check)
 						{
-							$they_liked = 1;
+							$bookmark_link = '<a href="#" class="bookmark-content tooltip-top bookmark-saved" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="remove" title="Remove Bookmark"><span class="icon bookmark"></span></a>';
+						}
+						else
+						{
+							$bookmark_link = '<a href="#" class="bookmark-content tooltip-top" data-page="normal" data-type="article" data-id="'.$article['article_id'].'" data-method="add" title="Bookmark"><span class="icon bookmark"></span></a>';
 						}
 					}
-					if ($they_liked == 1)
+					$templating->set('bookmark_link', $bookmark_link);
+
+					$templating->set('total_likes', $article['total_likes']);
+
+					$who_likes_alink = '';
+					if ($article['total_likes'] > 0)
 					{
-						$like_text = "Unlike";
-						$like_class = "unlike";
+						$who_likes_alink = ', <a class="who_likes" href="/index.php?module=who_likes&amp;article_id='.$article['article_id'].'" data-fancybox data-type="ajax" href="javascript:;" data-src="/includes/ajax/who_likes.php?article_id='.$article['article_id'].'">Who?</a>';
 					}
-					else
+					$templating->set('who_likes_alink', $who_likes_alink);
+
+					$like_button = '';
+					if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != 0)
 					{
 						$like_text = "Like";
 						$like_class = "like";
-					}
-
-					// don't let them like their own post
-					if ($article['author_id'] == $_SESSION['user_id'])
-					{
-						$like_button = '';
-					}
-					else
-					{
-						$like_button = '<a class="plusarticle tooltip-top" data-type="article" data-id="'.$article['article_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a>';
-					}
-				}
-				$templating->set('like_button', $like_button);
-
-				$templating->block('article_bottom', 'articles_full');
-
-				// only show corrections box if logged in and it's not old
-				if ($_SESSION['user_id'] > 0 && $article['date'] >= strtotime('-1 year'))
-				{
-					$templating->block('corrections', 'articles_full');
-					$templating->set('article_id', $article['article_id']);
-				}
-
-				if (isset($article['article_bio']) && !empty($article['article_bio']) && $article['author_id'] != 1844) // dont show for the gamingonlinux bot
-				{
-					if (isset($article['author_picture']) && !empty($article['author_picture']) && $article['author_picture'] != NULL)
-					{
-						$templating->block('about_author');
-						$author_pic = '<img class="u-photo" src="'.url.'uploads/avatars/author_pictures/'.$article['author_picture'] . '" alt="author picture" />';
-						$templating->set('author_picture', $author_pic);
-					}
-					else
-					{
-						$templating->block('about_author_nopic');
-					}
-					
-					$templating->set('author_bio', $bbcode->parse_bbcode($article['article_bio']));
-					$templating->set('username', $username_bio);
-					$templating->set('user_id', $article['author_id']);
-				}
-
-				/*
-				// top articles this month but not from the most recent 2 days to prevent showing what they've just seen on the home page
-				*/
-				$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
-				$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date` FROM `articles` a WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND a.`date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND a.`views` > ? AND a.`show_in_menu` = 0 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) ORDER BY RAND() DESC LIMIT 3";
-
-				$fetch_top3 = $dbl->run($top_article_query, array_merge([$core->config('hot-article-viewcount')], $user->blocked_tags))->fetch_all();
-				
-				if (is_array($fetch_top3) && count($fetch_top3) === 3)
-				{
-					$templating->block('top-articles-bottom', 'articles_full');
-					$hot_articles = '';
-					foreach ($fetch_top3 as $top_articles)
-					{
-						$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></li>';
-					}
-
-					$templating->set('top_articles', $hot_articles);
-				}
-
-				// get the comments if we aren't in preview mode
-				if ($article['active'] == 1)
-				{					
-					$article_class->display_comments(['article' => $article, 'pagination_link' => $article_link_main . '/', 'type' => 'live_article', 'page' => core::give_page()]);
-
-					// only show comments box if the comments are turned on for this article
-					if ($core->config('comments_open') == 1)
-					{
-						if (($article['comments_open'] == 1) || ($article['comments_open'] == 0 && $user->check_group([1,2]) == true))
+						$they_liked = 0;
+						// Checks current login user liked this status or not
+						if ($article['total_likes'] > 0) // no point checking if they've liked it, if there's no likes
 						{
-							if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
+							$numlikes = $dbl->run("SELECT 1 FROM `article_likes` WHERE `user_id` = ? AND `article_id` = ?", array((int) $_SESSION['user_id'], $article['article_id']))->fetchOne();
+
+							if ($numlikes)
 							{
-								$user_session->login_form(core::current_page_url());
+								$they_liked = 1;
 							}
+						}
+						if ($they_liked == 1)
+						{
+							$like_text = "Unlike";
+							$like_class = "unlike";
+						}
+						else
+						{
+							$like_text = "Like";
+							$like_class = "like";
+						}
 
-							else
+						// don't let them like their own post
+						if ($article['author_id'] == $_SESSION['user_id'])
+						{
+							$like_button = '';
+						}
+						else
+						{
+							$like_button = '<a class="plusarticle tooltip-top" data-type="article" data-id="'.$article['article_id'].'" title="Like"><span class="icon '.$like_class.'">'.$like_text.'</span></a>';
+						}
+					}
+					$templating->set('like_button', $like_button);
+
+					$templating->block('article_bottom', 'articles_full');
+
+					// only show corrections box if logged in and it's not old
+					if ($_SESSION['user_id'] > 0 && $article['date'] >= strtotime('-1 year'))
+					{
+						$templating->block('corrections', 'articles_full');
+						$templating->set('article_id', $article['article_id']);
+					}
+
+					if (isset($article['article_bio']) && !empty($article['article_bio']) && $article['author_id'] != 1844) // dont show for the gamingonlinux bot
+					{
+						if (isset($article['author_picture']) && !empty($article['author_picture']) && $article['author_picture'] != NULL)
+						{
+							$templating->block('about_author');
+							$author_pic = '<img class="u-photo" src="'.url.'uploads/avatars/author_pictures/'.$article['author_picture'] . '" alt="author picture" />';
+							$templating->set('author_picture', $author_pic);
+						}
+						else
+						{
+							$templating->block('about_author_nopic');
+						}
+						
+						$templating->set('author_bio', $bbcode->parse_bbcode($article['article_bio']));
+						$templating->set('username', $username_bio);
+						$templating->set('user_id', $article['author_id']);
+					}
+
+					/*
+					// top articles this month but not from the most recent 2 days to prevent showing what they've just seen on the home page
+					*/
+					$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
+					$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date` FROM `articles` a WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND a.`date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND a.`views` > ? AND a.`show_in_menu` = 0 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) ORDER BY RAND() DESC LIMIT 3";
+
+					$fetch_top3 = $dbl->run($top_article_query, array_merge([$core->config('hot-article-viewcount')], $user->blocked_tags))->fetch_all();
+					
+					if (is_array($fetch_top3) && count($fetch_top3) === 3)
+					{
+						$templating->block('top-articles-bottom', 'articles_full');
+						$hot_articles = '';
+						foreach ($fetch_top3 as $top_articles)
+						{
+							$hot_articles .= '<li class="list-group-item"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></li>';
+						}
+
+						$templating->set('top_articles', $hot_articles);
+					}
+
+					// get the comments if we aren't in preview mode
+					if ($article['active'] == 1)
+					{					
+						$article_class->display_comments(['article' => $article, 'pagination_link' => $article_link_main . '/', 'type' => 'live_article', 'page' => core::give_page()]);
+
+						// only show comments box if the comments are turned on for this article
+						if ($core->config('comments_open') == 1)
+						{
+							if (($article['comments_open'] == 1) || ($article['comments_open'] == 0 && $user->check_group([1,2]) == true))
 							{
-								if (!isset($_SESSION['activated']))
+								if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 0 || !isset($_SESSION['user_id']))
 								{
-									$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array((int) $_SESSION['user_id']))->fetch();
-									$_SESSION['activated'] = $get_active['activated'];
-								}
-
-								if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
-								{
-									// check they don't already have a reply in the mod queue for this forum topic
-									$check_queue = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `approved` = 0 AND `author_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article['article_id']))->fetchOne();
-									if ($check_queue == 0)
-									{
-										$mod_queue = $user->user_details['in_mod_queue'];
-										$forced_mod_queue = $user->can('forced_mod_queue');
-							
-										if ($forced_mod_queue == true || $mod_queue == 1)
-										{
-											$core->message('Some comments are held for moderation. Your post may not appear right away.', NULL, 2);
-										}
-										$subscribe_check = $user->check_subscription($article['article_id'], 'article');
-
-										$comment = '';
-										if (isset($_SESSION['acomment']))
-										{
-											$comment = $_SESSION['acomment'];
-										}
-
-										$templating->block('rules', 'articles_full');
-										$templating->set('url', $core->config('website_url'));
-
-										$templating->block('comments_box_top', 'articles_full');
-										$templating->set('url', $core->config('website_url'));
-										$templating->set('article_id', $article['article_id']);
-
-										$comment_editor = new editor($core, $templating, $bbcode);
-										$comment_editor->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
-
-										$templating->block('comment_buttons', 'articles_full');
-										$templating->set('url', $core->config('website_url'));
-										$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
-										$templating->set('subscribe_email_check', $subscribe_check['emails']);
-										$templating->set('aid', $article['article_id']);
-
-										$templating->block('preview', 'articles_full');
-									}
-									else
-									{
-										$core->message('You currently have a comment in the moderation queue for this article, you must wait for that to be approved/denied before you can post another reply here.', NULL, 2);
-									}
+									$user_session->login_form(core::current_page_url());
 								}
 
 								else
 								{
-									$core->message('To comment you need to activate your account! You were sent an email with instructions on how to activate. <a href="/index.php?module=activate_user&redo=1">Click here to re-send a new activation key</a>');
+									if (!isset($_SESSION['activated']))
+									{
+										$get_active = $dbl->run("SELECT `activated` FROM `users` WHERE `user_id` = ?", array((int) $_SESSION['user_id']))->fetch();
+										$_SESSION['activated'] = $get_active['activated'];
+									}
+
+									if (isset($_SESSION['activated']) && $_SESSION['activated'] == 1)
+									{
+										// check they don't already have a reply in the mod queue for this forum topic
+										$check_queue = $dbl->run("SELECT COUNT(`comment_id`) FROM `articles_comments` WHERE `approved` = 0 AND `author_id` = ? AND `article_id` = ?", array($_SESSION['user_id'], $article['article_id']))->fetchOne();
+										if ($check_queue == 0)
+										{
+											$mod_queue = $user->user_details['in_mod_queue'];
+											$forced_mod_queue = $user->can('forced_mod_queue');
+								
+											if ($forced_mod_queue == true || $mod_queue == 1)
+											{
+												$core->message('Some comments are held for moderation. Your post may not appear right away.', NULL, 2);
+											}
+											$subscribe_check = $user->check_subscription($article['article_id'], 'article');
+
+											$comment = '';
+											if (isset($_SESSION['acomment']))
+											{
+												$comment = $_SESSION['acomment'];
+											}
+
+											$templating->block('rules', 'articles_full');
+											$templating->set('url', $core->config('website_url'));
+
+											$templating->block('comments_box_top', 'articles_full');
+											$templating->set('url', $core->config('website_url'));
+											$templating->set('article_id', $article['article_id']);
+
+											$comment_editor = new editor($core, $templating, $bbcode);
+											$comment_editor->editor(['name' => 'text', 'content' => $comment, 'editor_id' => 'comment']);
+
+											$templating->block('comment_buttons', 'articles_full');
+											$templating->set('url', $core->config('website_url'));
+											$templating->set('subscribe_check', $subscribe_check['auto_subscribe']);
+											$templating->set('subscribe_email_check', $subscribe_check['emails']);
+											$templating->set('aid', $article['article_id']);
+
+											$templating->block('preview', 'articles_full');
+										}
+										else
+										{
+											$core->message('You currently have a comment in the moderation queue for this article, you must wait for that to be approved/denied before you can post another reply here.', NULL, 2);
+										}
+									}
+
+									else
+									{
+										$core->message('To comment you need to activate your account! You were sent an email with instructions on how to activate. <a href="/index.php?module=activate_user&redo=1">Click here to re-send a new activation key</a>');
+									}
 								}
 							}
 						}
-					}
-					else if ($core->config('comments_open') == 0)
-					{
-						$core->message('Commenting is currently down for maintenance.');
-					}
+						else if ($core->config('comments_open') == 0)
+						{
+							$core->message('Commenting is currently down for maintenance.');
+						}
 
-					// below everything else
+						// below everything else
+					}
 				}
 			}
 		}

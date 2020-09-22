@@ -386,37 +386,44 @@ class user
 					// login then
 					$this->user_details = $this->db->run("SELECT ".$this::$user_sql_fields." FROM `users` WHERE `user_id` = ?", array($session_check['user_id']))->fetch();
 
-					$this->check_banned();
-
-					// update IP address and last login
-					$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
-
-					// update their stay logged in cookie with new details
-					$lookup = base64_encode(random_bytes(9));
-					$validator = base64_encode(random_bytes(18));
-
-					if (isset($_SERVER['HTTP_USER_AGENT']))
+					if ($this->user_details)
 					{
-						$user_agent = $_SERVER['HTTP_USER_AGENT'];
+						$this->check_banned();
+
+						// update IP address and last login
+						$this->db->run("UPDATE `users` SET `ip` = ?, `last_login` = ? WHERE `user_id` = ?", array(core::$ip, core::$date, $this->user_details['user_id']));
+
+						// update their stay logged in cookie with new details
+						$lookup = base64_encode(random_bytes(9));
+						$validator = base64_encode(random_bytes(18));
+
+						if (isset($_SERVER['HTTP_USER_AGENT']))
+						{
+							$user_agent = $_SERVER['HTTP_USER_AGENT'];
+						}
+						else
+						{
+							$user_agent = 'empty';
+						}
+
+						$this->db->run("INSERT INTO `saved_sessions` SET `uuid` = UUID(), `user_id` = ?, `lookup` = ?, `validator` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $lookup, hash('sha256', $validator), $user_agent, $session_check['device-id'], date("Y-m-d"), $this->expires_date->format('Y-m-d H:i:s')));
+
+						$secure = 0; // allows cookies for localhost dev env
+						if (!empty($this->core->config('cookie_domain')))
+						{
+							$secure = 1;
+						}
+
+						setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
+
+						$this->register_session();
+
+						return true;
 					}
 					else
 					{
-						$user_agent = 'empty';
+						return false;
 					}
-
-					$this->db->run("INSERT INTO `saved_sessions` SET `uuid` = UUID(), `user_id` = ?, `lookup` = ?, `validator` = ?, `browser_agent` = ?, `device-id` = ?, `date` = ?, `expires` = ?", array($this->user_details['user_id'], $lookup, hash('sha256', $validator), $user_agent, $session_check['device-id'], date("Y-m-d"), $this->expires_date->format('Y-m-d H:i:s')));
-
-					$secure = 0; // allows cookies for localhost dev env
-					if (!empty($this->core->config('cookie_domain')))
-					{
-						$secure = 1;
-					}
-
-					setcookie('gol_session', $lookup . '.' . $validator, $this->expires_date->getTimestamp(), '/', $this->cookie_domain, $secure, 1);
-
-					$this->register_session();
-
-					return true;
 				}
 				else
 				{

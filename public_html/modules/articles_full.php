@@ -817,7 +817,7 @@ else if (isset($_GET['go']))
 					// check for double comment
 					$check_comment = $dbl->run("SELECT `comment_text` FROM `articles_comments` WHERE `article_id` = ? ORDER BY `comment_id` DESC LIMIT 1", array((int) $_POST['aid']))->fetch();
 
-					if ($check_comment['comment_text'] == $comment)
+					if ($check_comment && $check_comment['comment_text'] == $comment)
 					{
 						$_SESSION['message'] = 'double_comment';
 						$article_link = $article_class->article_link(array('date' => $title['date'], 'slug' => $title['slug']));

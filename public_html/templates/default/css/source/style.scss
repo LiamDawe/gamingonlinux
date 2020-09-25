@@ -1625,6 +1625,10 @@ ul li.answered_title_css
 	font-weight: 700;
 	margin-bottom: 5px;
 }
+.header-text-plain.bigger
+{
+	font-size: 1.1em;
+}
 .header-text-plain::after 
 {
     content: "";
@@ -1648,6 +1652,9 @@ ul li.answered_title_css
 
 .flex-nowrap{flex-wrap: nowrap;}
 .flex-noshrink{flex-shrink: 0;}
+.flex-pull-center{justify-content: center;}
+.flex-pull-top{align-items: flex-start;}
+.flex-force-row{flex-direction: row !important;}
 
 .flex-stretch
 {
@@ -2898,7 +2905,17 @@ div.dataTables_wrapper .dataTables_info {padding-top: 0.25em}
 	-moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
 	box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
 	transition: all 0.4s ease 0s;
-	}
+}
+
+.footer-article-flex-col
+{
+	justify-content: center;
+}
+.footer-article-flex-col-item
+{
+	padding:0 20px;
+	max-width: 250px;
+}
 
 @import 'content';
 @import 'editor';

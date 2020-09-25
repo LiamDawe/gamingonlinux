@@ -79,7 +79,7 @@ if (!isset($_POST['act']))
 	$templating->set('public_check', $public_info);
 
 	$include_in_survey = '';
-	if ($additional['include_in_survey'] == 1)
+	if (isset($additional['include_in_survey']) && $additional['include_in_survey'] == 1)
 	{
 		$include_in_survey = 'checked';
 	}
@@ -90,7 +90,7 @@ if (!isset($_POST['act']))
 	foreach ($distributions as $distros)
 	{
 		$selected = '';
-		if ($usercpcp['distro'] == $distros)
+		if (isset($usercpcp['distro']) && $usercpcp['distro'] == $distros)
 		{
 			$selected = 'selected';
 		}
@@ -103,7 +103,7 @@ if (!isset($_POST['act']))
 	foreach ($answers['desktop_environment'] as $desktops)
 	{
 		$selected = '';
-		if ($additional['desktop_environment'] == $desktops)
+		if (isset($additional['desktop_environment']) && $additional['desktop_environment'] == $desktops)
 		{
 			$selected = 'selected';
 		}
@@ -115,7 +115,7 @@ if (!isset($_POST['act']))
 	foreach ($dual_boot_systems as $system)
 	{
 		$selected = '';
-		if ($additional['dual_boot'] == $system)
+		if (isset($additional['dual_boot']) && $additional['dual_boot'] == $system)
 		{
 			$selected = 'selected';
 		}
@@ -128,7 +128,7 @@ if (!isset($_POST['act']))
 	foreach ($cpu_vendors as $vendor)
 	{
 		$selected = '';
-		if ($additional['cpu_vendor'] == $vendor)
+		if (isset($additional['cpu_vendor']) && $additional['cpu_vendor'] == $vendor)
 		{
 			$selected = 'selected';
 		}
@@ -136,13 +136,18 @@ if (!isset($_POST['act']))
 	}
 	$templating->set('cpu_options', $cpu_options);
 
-	$templating->set('cpu_model', htmlspecialchars($additional['cpu_model']));
+	$cpu_model_output = '';
+	if (isset($additional['cpu_model']))
+	{
+		$cpu_model_output = htmlspecialchars($additional['cpu_model']);
+	}
+	$templating->set('cpu_model', $cpu_model_output);
 
 	$gpu_options = '';
 	foreach ($gpu_vendors as $vendor)
 	{
 		$selected = '';
-		if ($additional['gpu_vendor'] == $vendor)
+		if (isset($additional['gpu_vendor']) && $additional['gpu_vendor'] == $vendor)
 		{
 			$selected = 'selected';
 		}
@@ -152,7 +157,7 @@ if (!isset($_POST['act']))
 
 	// GPU MODEL 
 	$gpu_model = '';
-	if (is_numeric($additional['gpu_id']))
+	if (isset($additional['gpu_id']) && is_numeric($additional['gpu_id']))
 	{
 		$gpu_model = "<option value=\"{$additional['gpu_id']}\" selected>{$additional['gpu_model']}</option>";
 	}
@@ -163,7 +168,7 @@ if (!isset($_POST['act']))
 	foreach ($gpu_driver_options as $type)
 	{
 		$selected = '';
-		if ($additional['gpu_driver'] == $type)
+		if (isset($additional['gpu_driver']) && $additional['gpu_driver'] == $type)
 		{
 			$selected = 'selected';
 		}
@@ -176,7 +181,7 @@ if (!isset($_POST['act']))
 	foreach ($ram_numbers as $i)
 	{
 		$ram_selected = '';
-		if ($i == $additional['ram_count'])
+		if (isset($additional['ram_count']) && $i == $additional['ram_count'])
 		{
 			$ram_selected = 'selected';
 		}
@@ -189,7 +194,7 @@ if (!isset($_POST['act']))
 	foreach ($monitor_numbers as $i)
 	{
 		$monitor_selected = '';
-		if ($i == $additional['monitor_count'])
+		if (isset($additional['monitor_count']) && $i == $additional['monitor_count'])
 		{
 			$monitor_selected = 'selected';
 		}
@@ -202,7 +207,7 @@ if (!isset($_POST['act']))
 	foreach ($resolution_options as $res)
 	{
 		$resolution_selected = '';
-		if ($res == $additional['resolution'])
+		if (isset($additional['resolution']) && $res == $additional['resolution'])
 		{
 			$resolution_selected = 'selected';
 		}
@@ -215,7 +220,7 @@ if (!isset($_POST['act']))
 	foreach ($gaming_machine_types as $type)
 	{
 		$selected = '';
-		if ($type == $additional['gaming_machine_type'])
+		if (isset($additional['gaming_machine_type']) && $type == $additional['gaming_machine_type'])
 		{
 			$selected = 'selected';
 		}
@@ -227,7 +232,7 @@ if (!isset($_POST['act']))
 	foreach ($gamepads as $gamepad)
 	{
 		$selected = '';
-		if ($additional['gamepad'] == $gamepad)
+		if (isset($additional['gamepad']) && $additional['gamepad'] == $gamepad)
 		{
 			$selected = 'selected';
 		}
@@ -239,7 +244,7 @@ if (!isset($_POST['act']))
 	foreach ($vrheadset as $vr_option)
 	{
 		$selected = '';
-		if ($additional['vrheadset'] == $vr_option)
+		if (isset($additional['vrheadset']) && $additional['vrheadset'] == $vr_option)
 		{
 			$selected = 'selected';
 		}
@@ -251,7 +256,7 @@ if (!isset($_POST['act']))
 	foreach ($answers['session_type'] as $session)
 	{
 		$selected = '';
-		if ($additional['session_type'] == $session)
+		if (isset($additional['session_type']) && $additional['session_type'] == $session)
 		{
 			$selected = 'selected';
 		}

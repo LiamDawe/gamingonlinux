@@ -34,6 +34,26 @@
                     <div class="flex-column-right"><em>If you've played less than an hour. Please consider trying it for longer to be accurate and check for issues.</em><select name="time_played"><option value=""></option>{:time_options}</select></div>
                 </div>			
 			</div>
+			<div class="head">PC Info</div>
+			<div class="body group">
+				<em><strong>All questions required</strong>. Want this to be automated? Add <a href="/usercp.php?module=pcinfo" target="_blank">your PC Info here</a>.</em>
+				<div class="flex-row">
+					<div class="flex-column-left"><strong>Linux Distribution</strong></div>
+					<div class="flex-column-right"><select name="distro">{:distro_list}</select></div>	
+				</div>		
+				<div class="flex-row">
+					<div class="flex-column-left"><strong>Processor (CPU)</strong></div>
+					<div class="flex-column-right"><input type="text" name="cpu" value="{:cpu}" /></div>	
+				</div>
+				<div class="flex-row">
+					<div class="flex-column-left"><strong>Graphics Card (GPU)</strong></div>
+					<div class="flex-column-right"><input type="text" name="gpu" value="{:gpu}" /></div>	
+				</div>
+				<div class="flex-row">
+					<div class="flex-column-left"><strong>Graphics Card (GPU) - Driver Version</strong></div>
+					<div class="flex-column-right"><input type="text" name="gpu_driver" value="{:gpu_driver}" /></div>	
+				</div>	
+			</div>
             <div class="head">Comments (not required)</div>
             <div class="subhead">Feel free to add anything you used here. You can explain why a specific Proton version needed forcing, or anything else. Tips and tricks or whatever. Anything is okay here, as long as the above questions are properly honest and accurate to the experience.</div>
             <div class="body group">

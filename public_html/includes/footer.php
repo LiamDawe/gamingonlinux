@@ -31,15 +31,15 @@ if (!isset(core::$current_module) || isset(core::$current_module) && (core::$cur
 	}
 }
 
-// latest open source and linux distro news
+// recent open source and linux distro news
 if (!isset(core::$current_module) || isset(core::$current_module) && (core::$current_module['module_file_name'] == 'home'))
 {
 	$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
-	$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) AND r.category_id IN (11,192,170) ORDER BY a.`date` DESC LIMIT 6";
+	$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) AND r.category_id IN (11,192,170) ORDER BY RAND() DESC LIMIT 6";
 
 	$fetch_top_os = $dbl->run($top_article_query, array_merge($user->blocked_tags))->fetch_all();
 
-	if (is_array($fetch_top_os))
+	if (is_array($fetch_top_os) && count($fetch_top_os) >= 3)
 	{
 		$templating->block('recent_open_source', 'footer');
 		$random_list = '';

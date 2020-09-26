@@ -627,6 +627,7 @@ margin-bottom: -3px;
 #footer #social ul {
 	list-style: none;
 	padding: 0;
+	clear: both;
 }
 #footer #social ul li {
 	background: #333333;
@@ -648,6 +649,7 @@ margin-bottom: -3px;
 #footer #about a {
 	color: #ffffff;
 }
+#footer .box.footer-header{clear:both;}
 
  /* Page CSS */
 .head {

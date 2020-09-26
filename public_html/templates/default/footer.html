@@ -30,7 +30,8 @@
 <footer id="footer" class="group smooth grid">
 	<div id="footer-wrapper" class="row">
 		<div class="container">
-			<div id="social" class="col-8">
+			<div id="social" class="col-6">
+				<div class="box footer-header">Join us</div>
 				<ul>
 					<li><a title="Twitter" class="tooltip-top" href="https://www.twitter.com/gamingonlinux" target="_blank"><img alt="gamingonlinux twitter" src="/templates/default/images/network-icons/white/twitter.svg" width="30" height="30" /></a></li>
 					<li><a title="Telegram" class="tooltip-top" href="https://t.me/linux_gaming" target="_blank"><img alt="gamingonlinux telegram" src="/templates/default/images/network-icons/white/telegram.svg" width="30" height="30" /></a></li>
@@ -41,14 +42,23 @@
 					<li><a title="Youtube" class="tooltip-top" href="https://www.youtube.com/user/GamingOnLinuxcom" target="_blank"><img alt="gamingonlinux youtube" src="/templates/default/images/network-icons/white/youtube.svg" width="30" height="30" /></a></li>
 					<li><a title="Facebook" class="tooltip-top" href="https://www.facebook.com/gamingonlinux" target="_blank"><img alt="gamingonlinux facebook" src="/templates/default/images/network-icons/white/facebook.svg" width="30" height="30" /></a></li>
 					<li><a {:masto_rel} title="Mastodon" class="tooltip-top" href="https://mastodon.social/@gamingonlinux" target="_blank"><img alt="gamingonlinux mastodon" src="/templates/default/images/network-icons/white/mastodon.svg" width="30" height="30" /></a></li>
+				</ul>
+				<div class="box footer-header">RSS Feeds</div>
+				<ul>
 					{:article_rss}
 					{:forum_rss}
 				</ul>
 			</div>
-			<div id="about" class="col-4">
-				<a href="{:url}">GamingOnLinux &copy; {:year}</a> - <a href="{:url}privacy.html">Privacy</a>, <a href="{:url}ethics.html">Ethics</a><br />
+			<div id="about" class="col-6">
+				<div class="col-10">
+				<a href="{:url}">GamingOnLinux &copy; {:year}</a><br />
+				<br />
                 Unless otherwise noted, our articles are licensed as: <br />
-                <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+				<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a><br />
+				<br />
+				<a href="/about-us/">About Us</a>, <a href="/email-us/">Contact Us</a>, <a href="{:url}privacy.html">Privacy</a>, <a href="{:url}ethics.html">Ethics</a></div>
+				<div class="col-2">
+					<img src="/templates/default/images/logos/icon.svg" width="100" alt="logo" /></div>
 			</div>
 		</div>
 	</div>

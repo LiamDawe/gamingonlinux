@@ -7,7 +7,6 @@ require APP_ROOT . '/includes/bootstrap.php';
 
 echo "GOG importer started on " .date('d-m-Y H:m:s'). "\n";
 
-include_once(APP_ROOT . '/includes/image_class/SimpleImage.php');
 use claviska\SimpleImage;
 
 $date = strtotime(gmdate("d-n-Y H:i:s"));

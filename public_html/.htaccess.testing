@@ -180,6 +180,8 @@ Options +SymLinksifOwnerMatch
   RewriteRule ^steamplay/?$ steamplay.php [N,NC,QSA]
   
   RewriteRule ^steamplay/reports/([0-9]+)/?$ steamplay_reports.php?id=$1 [N,NC,QSA]
+
+  Redirect 301 /podcast_rss_ogg.php /podcast_rss.php?format=ogg
   
   # if requested url does not exist pass it as path info to index.php
   RewriteRule ^$ index.php?/ [QSA,L]

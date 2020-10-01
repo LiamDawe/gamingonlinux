@@ -184,6 +184,8 @@ Options +SymLinksifOwnerMatch
   
   RewriteRule ^steamplay/reports/([0-9]+)/?$ steamplay_reports.php?id=$1 [N,NC,QSA]
 
+  Redirect 301 /podcast_rss_ogg.php /podcast_rss.php?format=ogg
+
   RewriteCond %{HTTP_HOST} !^www\.
   RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
 

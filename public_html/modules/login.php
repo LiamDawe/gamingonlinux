@@ -78,8 +78,6 @@ if (!isset($_POST['action']))
 	
 	else if (isset($_GET['twitter']))
 	{		
-		require 'includes/twitter/twitteroauth/autoload.php';
-		
 		define('CONSUMER_KEY', $core->config('tw_consumer_key'));
 		define('CONSUMER_SECRET', $core->config('tw_consumer_skey'));
 		define('OAUTH_CALLBACK', getenv('OAUTH_CALLBACK'));

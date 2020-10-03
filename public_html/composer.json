@@ -3,6 +3,7 @@
         "phpmailer/phpmailer": "~6.1",
         "aws/aws-sdk-php": "^3.154",
         "claviska/simpleimage": "^3.3",
-        "google/apiclient": "^2.7"
+        "google/apiclient": "^2.7",
+        "abraham/twitteroauth": "^1.2"
     }
 }

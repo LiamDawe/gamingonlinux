@@ -3,7 +3,6 @@ session_start();
 
 define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
-require APP_ROOT . '/includes/twitter/twitteroauth/autoload.php';
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 require APP_ROOT . "/includes/bootstrap.php";

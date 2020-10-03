@@ -25,6 +25,15 @@ It is also required to have the following php extentions available:
 - Mysql
 - Composer
 
+## Composer Help
+
+If you're putting it live on a server where you can't use "allow_url_fopen" then you can do this workaround as an example:
+
+$ which composer
+/usr/local/bin/composer
+
+$ php -d allow_url_fopen=on /usr/local/bin/composer install
+
 ## PHP Settings
 
 You should really have these set, to make cookies more secure:

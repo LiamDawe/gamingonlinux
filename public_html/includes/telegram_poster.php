@@ -92,13 +92,9 @@ function telegram($message, $article_link)
 		// process incoming message
 		$chat_id = "@" . CHAT_ID;
 
-		$keyboard = array(
-			"inline_keyboard" => array(array(array("text" => "Read on GOL", "url" => $article_link)))
-		);
-
 		if (isset($message))
 		{
-			apiRequest("sendMessage", array('chat_id' => $chat_id, "parse_mode" => "HTML", "text" => $message, 'reply_markup' => $keyboard));
+			apiRequest("sendMessage", array('chat_id' => $chat_id, "parse_mode" => "HTML", "text" => $message));
 		}
 	}
 }

@@ -282,6 +282,7 @@ else
 			forum.rss_password,
 			forum.pretty_url,
 			users.username,
+			users.`profile_address`,
 			topic.topic_title,
 			topic.replys,
 			topic.last_post_id
@@ -329,6 +330,7 @@ else
 				$forum_array[$row['ForumId']]['posts'] = $row['ForumPosts'];
 				$forum_array[$row['ForumId']]['last_post_user_id'] = $row['Forum_last_post_user_id'];
 				$forum_array[$row['ForumId']]['last_post_username'] = $row['username'];
+				$forum_array[$row['ForumId']]['last_post_profile_address'] = $row['profile_address'];
 				$forum_array[$row['ForumId']]['last_post_time'] = $row['last_post_time'];
 				$forum_array[$row['ForumId']]['last_post_topic_id'] = $row['last_post_topic_id'];
 				$forum_array[$row['ForumId']]['topic_title'] = $row['topic_title'];
@@ -395,8 +397,17 @@ else
 							
 						}
 						$last_title = '<a href="'.$last_post_link.'">'.$forum['topic_title'].'</a>';
+
+						if (isset($forum['last_post_profile_address']) && !empty($forum['last_post_profile_address']))
+						{
+							$profile_address = '/profiles/' . $forum['last_post_profile_address'];
+						}
+						else
+						{
+							$profile_address = '/profiles/' . $forum['last_post_user_id'];
+						}
 	
-						$last_username = "<a href=\"/profiles/{$forum['last_post_user_id']}\">{$forum['last_post_username']}</a>";
+						$last_username = '<a href="'.$profile_address.'">'.$forum['last_post_username'].'</a>';
 						$last_post_time = $core->time_ago($forum['last_post_time']);
 					}
 					$templating->set('last_post_title', $last_title);

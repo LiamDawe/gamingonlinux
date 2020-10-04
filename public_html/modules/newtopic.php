@@ -54,13 +54,16 @@ else
 				$templating->load('newtopic');
 
 				// check for post template
-				$post_template = $dbl->run("SELECT t.`description`, t.`text` FROM `post_templates_ref` r INNER JOIN `post_templates` t ON t.id = r.template_id WHERE r.forum_id = ?", array($_GET['forum_id']))->fetch();
+				if (isset($_GET['forum_id']))
+				{
+					$post_template = $dbl->run("SELECT t.`description`, t.`text` FROM `post_templates_ref` r INNER JOIN `post_templates` t ON t.id = r.template_id WHERE r.forum_id = ?", array($_GET['forum_id']))->fetch();
+				}
 
 				$title = '';
 				$text = '';
 				$post_template_description = '';
 
-				if ($post_template)
+				if (isset($post_template) && !empty($post_template))
 				{
 					$text = $post_template['text'];
 					if (!empty($post_template['description']))

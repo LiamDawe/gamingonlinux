@@ -1,11 +1,14 @@
 [block: top]
 	<div class="box">
-		<div class="body group">Actions: {:user_actions}</div>
-	</div>
-	<div class="box">
 		<div class="head">Personal profile for {:username} {:cake_icon} {:badges}</div>
 	</div>
 [/block: top]
+
+[block: top_actions]
+<div class="box">
+	<div class="body group">Actions: {:user_actions}</div>
+</div>
+[/block: top_actions]
 
 [block: main]
 			<!-- profile page -->
@@ -25,7 +28,6 @@
 					<div class="head">Findable On</div>
 					<div class="body group profile">
 						{:profile_fields}
-						{:message_link}
 						{:email}
 					</div>
 				</div>
@@ -42,7 +44,7 @@
 
 [block: additional]
 <div class="box">
-	<div class="head">Computer info for <a href="{:profile_link}">{:username}</a></div>
+	<div class="head">PC info {:edit_pcinfo}</div>
 	<div class="body group profile">
 		<ul style="list-style: none; padding: 0;">
 			{:fields}
@@ -64,7 +66,7 @@
 
 [block: articles_top]
 <div class="box">
-	<div class="head">Latest 5 Articles:</div>
+	<div class="head">Latest 5 Articles</div>
 	<div class="body list">
 		<ul>
 [/block: articles_top]

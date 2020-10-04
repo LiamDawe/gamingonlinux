@@ -49,9 +49,21 @@ else
         }
         else
         {
+			$templating->block('top', 'profile');
+
+			$templating->set('username', $profile['username']);
+
+			$cake_bit = $user->cake_day($profile['register_date'], $profile['username']);
+			$templating->set('cake_icon', $cake_bit);
+			
+			$their_groups = $user->post_group_list([$profile['user_id']]);
+			$profile['user_groups'] = $their_groups[$profile['user_id']];
+			$badges = user::user_badges($profile);
+			$templating->set('badges', implode(' ', $badges));
+
             if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
             {
-                $templating->block('top', 'profile');
+                $templating->block('top_actions', 'profile');
 
                 $user_action_links = [];
 
@@ -77,22 +89,20 @@ else
                     if (in_array($profile['user_id'], $blocked_ids))
                     {
                         $block = '<a href="/index.php?module=block_user&unblock='.$profile['user_id'].'">UnBlock User</a>';
-                    }
+					}
 
-                    $user_action_links[] = $block;
-                }
+					$user_action_links[] = $block;
+					
+					$message_link = '';
+					if ($_SESSION['user_id'] != 0 && ($profile['get_pms'] == 1 || $profile['get_pms'] == 0 && $user->check_group([1,2,5])))
+					{
+						$message_link = "<a href=\"/private-messages/compose/user={$profile['user_id']}\">Send Private Message</a><br />";
+					}
+
+                    $user_action_links[] = $message_link;
+				}
 
                 $templating->set('user_actions', implode(' | ', $user_action_links));
-
-                $templating->set('username', $profile['username']);
-
-                $cake_bit = $user->cake_day($profile['register_date'], $profile['username']);
-                $templating->set('cake_icon', $cake_bit);
-                
-                $their_groups = $user->post_group_list([$profile['user_id']]);
-                $profile['user_groups'] = $their_groups[$profile['user_id']];
-                $badges = user::user_badges($profile);
-                $templating->set('badges', implode(' ', $badges));
             }
 
             // check blocked list
@@ -174,13 +184,6 @@ else
 
                     $templating->set('last_login', $core->human_date($profile['last_login']));
 
-                    $message_link = '';
-                    if ($_SESSION['user_id'] != 0 && ($profile['get_pms'] == 1 || $profile['get_pms'] == 0 && $user->check_group([1,2,5])))
-                    {
-                        $message_link = "<a href=\"/private-messages/compose/user={$profile['user_id']}\">Send Private Message</a><br />";
-                    }
-                    $templating->set('message_link', $message_link);
-
                     $email = '';
                     if ($user->check_group([1,2]) == true)
                     {
@@ -197,7 +200,15 @@ else
                     // additional profile info
                     if ($profile['pc_info_public'] == 1)
                     {
-                        $templating->block('additional', 'profile');
+						$templating->block('additional', 'profile');
+						
+						$edit_pcinfo = '';
+						if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profile['user_id'])
+						{
+							$edit_pcinfo = '<span style="float: right"><a href="/usercp.php?module=pcinfo">Edit</a></span>';
+						}
+						$templating->set('edit_pcinfo', $edit_pcinfo);
+
                         $templating->set('username', $profile['username']);
 
                         if (isset($profile['profile_address']) && !empty($profile['profile_address']))

@@ -141,6 +141,7 @@ else
 	$all_posts = $dbl->run('SELECT
 		t.*,
 		u.`username`,
+		u.`profile_address`,
 		u.`avatar`,
 		u.`avatar_uploaded`,
 		u.`avatar_gallery`,
@@ -182,7 +183,15 @@ else
 		$rows_per_page = $_SESSION['per-page'];
 		$lastpage = ceil($post['replys']/$rows_per_page);
 
-		$profile_link = "/profiles/{$post['author_id']}";
+		// poster profile address
+		if (isset($post['profile_address']) && !empty($post['profile_address']))
+		{
+			$profile_link = '/profiles/' . $post['profile_address'];
+		}
+		else
+		{
+			$profile_link = '/profiles/' . $post['author_id'];
+		}
 
 		// sort out the per-topic pagination shown beside the post title
 		if ($post['replys'] > $rows_per_page)

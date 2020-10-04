@@ -1,17 +1,29 @@
 [block: main]
 	<div class="box">
 		<div class="head">Personal Profile Details</div>
-	</div>
-<div class="box">
     <div class="body group">
         <form method="post">
            <div class="flex-row">
                <div class="flex-column-left"><strong>Profile URL</strong></div>
                <div class="flex-column-right">We only allow letters, numbers, "-" and "_" characters in profile URLs.<div class="input-field"><span class="addon">gamingonlinux.com/profiles/</span><input class="keyup-char" minlength="4" type="text" value="{:profile_address}" maxlength="60" name="profile_address"></div></div>
-            </div>
-           <div class="flex-row">
-               <button type="submit" name="act" value="update" formaction="/usercp.php?module=profile">Update Details</button>
-           </div>
+			</div>
+			<div class="subhead"><label for="about_me">A little about you:</label></div>
+			<div class="flex-row">
+				<div class="body group">
+					To display on your profile.
+					<textarea name="about_me" cols="100" rows="10">{:about_me}</textarea>
+				</div>
+			</div>
+			<div class="subhead">Article Bio</div>
+			<div class="flex-row">
+				<div class="body group">
+					If you plan to write and submit articles, a short blurb about you.
+					<textarea name="article_bio" cols="100" rows="5">{:article_bio}</textarea>
+				</div>
+			</div>
+			<div class="flex-row">
+				<button type="submit" name="act" value="update" formaction="/usercp.php?module=profile">Update Details</button>
+			</div>
         </form>
     </div>
 </div>

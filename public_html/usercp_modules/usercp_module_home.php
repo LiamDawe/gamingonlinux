@@ -47,7 +47,7 @@ if (!isset($_POST['act']))
 		$db_grab_fields .= "{$field['db_field']},";
 	}
 
-	$usercpcp = $dbl->run("SELECT $db_grab_fields `article_bio`, `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `steam_id`, `steam_username`, `google_email`, `timezone`, `email_articles`, `mailing_list_key`, `supporter_end_date`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
+	$usercpcp = $dbl->run("SELECT $db_grab_fields `submission_emails`, `single_article_page`, `per-page`, `articles-per-page`, `twitter_username`, `theme`, `steam_id`, `steam_username`, `google_email`, `timezone`, `email_articles`, `mailing_list_key`, `supporter_end_date`, `supporter_type` FROM `users` WHERE `user_id` = ?", array($_SESSION['user_id']))->fetch();
 	
 	// make sure they have a mailing_list_key
 	// if they unsubscribe it's wiped, but if they stay subscribed/make a new sub = use new or existing key
@@ -196,8 +196,6 @@ if (!isset($_POST['act']))
 		$single_article_no = 'selected';
 	}
 	$templating->set('single_article_no', $single_article_no);
-
-	$templating->set('bio', $usercpcp['article_bio']);
 
 	$page_options = '';
 	$per_page_selected = '';
@@ -352,9 +350,14 @@ else if (isset($_POST['act']))
 			$mailing_list_key = $_POST['mailing_list_key'];
 		}
 
-		$bio = core::make_safe($_POST['bio'], ENT_QUOTES);
-
-		$dbl->run("UPDATE `users` SET `email_articles` = ?, `submission_emails` = ?, `single_article_page` = ?, `articles-per-page` = ?, `per-page` = ?, `article_bio` = ?, `timezone` = ?, `theme` = ? WHERE `user_id` = ?", array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $bio, $_POST['timezone'], $_POST['theme'], $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET 
+		`email_articles` = ?, 
+		`submission_emails` = ?, 
+		`single_article_page` = ?, 
+		`articles-per-page` = ?, 
+		`per-page` = ?, 
+		`timezone` = ?, 
+		`theme` = ? WHERE `user_id` = ?", array($daily_articles, $submission_emails, $single_article_page, $aper_page, $per_page, $_POST['timezone'], $_POST['theme'], $_SESSION['user_id']));
 
 		$_SESSION['per-page'] = $per_page;
 		$_SESSION['articles-per-page'] = $aper_page;

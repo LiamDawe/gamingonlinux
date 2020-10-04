@@ -42,7 +42,7 @@ else
             $db_grab_fields .= "{$field['db_field']},";
         }
 
-        $profile = $dbl->run("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `article_bio`, `last_login`, `banned`, `ip`, `game_developer`, `private_profile`, `get_pms`, `profile_address` FROM `users` WHERE `user_id` = ?", array($profile_id))->fetch();
+        $profile = $dbl->run("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `about_me`, `last_login`, `banned`, `ip`, `game_developer`, `private_profile`, `get_pms`, `profile_address` FROM `users` WHERE `user_id` = ?", array($profile_id))->fetch();
         if (!$profile)
         {
             $core->message('That person does not exist here!');
@@ -191,10 +191,10 @@ else
                     }
                     $templating->set('email', $email);
 
-                    if (!empty($profile['article_bio']))
+                    if (!empty($profile['about_me']))
                     {
                         $templating->block('bio', 'profile');
-                        $templating->set('bio_text', $bbcode->parse_bbcode($profile['article_bio']));
+                        $templating->set('about_me', $bbcode->parse_bbcode($profile['about_me']));
                     }
 
                     // additional profile info

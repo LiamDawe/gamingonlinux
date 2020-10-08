@@ -104,7 +104,7 @@
 [block: comments_top]
 				<div class="box comments">
 					<a class="anchor" id="comments"></a>
-					<div class="head">{:comments_top_text} {:subscribe_link} {:close_comments} <div class="head-list-position head-list">{:pagination_head}</div><br class="clearer" /></div>
+					<div class="head">{:comments_top_text} {:subscribe_link} {:close_comments} <div class="article-pagination head-list-position head-list" data-article-id="{:article_id}">{:pagination_head}</div><br class="clearer" /></div>
 					<div id="comments-background" class="body group">
 						<div id="selective-quote" data-username="" style="display:none; border: 1px solid grey;">
 							<div>
@@ -214,7 +214,9 @@
 
 [block: bottom]
 					</div>
-					{:pagination}
+					<div class="article-pagination" data-article-id="{:article_id}">
+						{:pagination}
+					</div>
 				</div>
 </article>
 [/block: bottom]
@@ -255,6 +257,7 @@
 		</label>
 		<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select><br />
 		<input type="hidden" name="aid" value="{:aid}" />
+		<input type="hidden" name="type" value="add" />
 		<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" class="button" formaction="{:url}index.php?module=articles_full&amp;go=comment">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button> <button formaction="/index.php?module=articles_full&go=correction" type="submit" title="Help us fix links, spelling and more instead of commenting.">Send Correction Report</button>
 	</div>
 </div>

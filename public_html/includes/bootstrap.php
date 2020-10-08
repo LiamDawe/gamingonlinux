@@ -28,4 +28,4 @@ $gamedb = new game_sales($dbl, $templating, $user, $core, $bbcode);
 
 $notifications = new notifications($dbl, $core, $bbcode);
 
-$article_class = new article($dbl, $core, $user, $templating, $bbcode);
+$article_class = new article($dbl, $core, $user, $templating, $bbcode, $notifications);

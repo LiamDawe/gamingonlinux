@@ -202,7 +202,7 @@ jQuery.fn.highlight = function () {
             "left": el.offset().left,
             "top": el.offset().top,
             "background-color": "#f4f4b7",
-            "opacity": ".6",
+            "opacity": ".2",
             "z-index": "9999999"
         }).appendTo('body').fadeOut(1000).queue(function () { $(this).remove(); });
     });
@@ -514,10 +514,8 @@ jQuery(document).ready(function()
                         scrollTop: ($('.crowdfunded-page-top').offset().top)
                     },300);
                 });
-
-                setTimeout(function() { 
-                    $('.js-loading').replaceWith($('.dataTable-container').fadeIn(700));
-                }, 900);
+           
+                $('.js-loading').replaceWith($('.dataTable-container').fadeIn(200));
                 
             };
             link.onerror = function() 
@@ -1378,6 +1376,89 @@ jQuery(document).ready(function()
 		$(this).addClass('show_blocked').removeClass('hide_blocked');
 		$(this).children('span').addClass('plus').removeClass('minus');
 	});	
+
+	/* normal article pagination */
+	function paginate_comments(page, article_id)
+	{
+		var url = "/includes/ajax/post_comment.php";
+		
+		$('.comments').load(url, {'type':'reload', 'article_id': article_id, 'page': page}, function()
+		{
+			$('.box.comments').get(0).scrollIntoView();
+			$('.box.comments').highlight();
+		});
+	}
+
+	$(document).on('click', "ul.pagination li a, .head-list-position a", function(e)
+	{
+		var $this = $(this);
+		ajax_page_comments(e, $this);
+	});
+	
+	$(document).on('change', ".head-list-position select, .pagination", function(e)
+	{
+		var $this = $(this).find(':selected');
+		if (!ajax_page_comments(e, $this)) // if not admin pages
+		{
+			var page = $this.attr('data-page');
+			var article_id = $(this).closest('.article-pagination').data('article-id');
+			paginate_comments(page, article_id);
+		}
+	});
+
+	$(document).on('click', ".article-pagination .pagination a, .article-pagination a", function(e)
+	{
+		e.preventDefault();
+
+		var page = $(this).attr('data-page');
+		var article_id = $(this).closest('.article-pagination').data('article-id');
+
+		paginate_comments(page, article_id)
+	});
+
+	/* ajax comment posting normal */
+	$(document).on('click', "#send", function(e)
+	{
+		e.preventDefault();
+		
+		var url = "/includes/ajax/post_comment.php";
+		var form = $(this).closest('form');
+
+		$.ajax({
+			type: "POST",
+			url: url,
+			dataType:"json",
+			data: $("#comment_form").serialize(),
+			success: function(data)
+			{
+				console.log(data);
+				if (data['result'] == 'done' || data['result'] == 'approvals')
+				{
+					$('.comments').load('/includes/ajax/post_comment.php', {'type':'reload', 'article_id':data['article_id'], 'page':data['page']}, function()
+					{
+						$(form).removeClass('dirty'); // prevent ays dialogue when leaving
+						$('.comments #r' + data['comment_id']).scrollMinimal();
+						$('.comments').highlight();
+					});
+					$('#comment').val('');
+
+					if (data['result'] == 'approvals')
+					{
+						$('#comment_form').hide();
+						alert(data['message']);
+					}
+				}
+				if (data['result'] == 'error')
+				{
+					alert(data['message']);
+				}
+			}
+		}).done(function() 
+		{
+			$('#send').prop('disabled', false);
+		});	
+	});
+
 	/* Ajax comment editing */
 	/*
 	var current_comment_text = {};
@@ -1635,25 +1716,6 @@ jQuery(document).ready(function()
 		}
 		return false;
 	}
-	
-	$(document).on('click', "ul.pagination li a, .head-list-position a", function(e)
-	{
-		var $this = $(this);
-		ajax_page_comments(e, $this);
-	});
-	
-	$(document).on('change', ".head-list-position select, .pagination", function(e)
-	{
-		var $this = $(this).find(':selected');
-		if (!ajax_page_comments(e, $this))
-		{
-			var url = $(this).val(); // get selected value
-			if (url) 
-			{ // require a URL
-				window.location = url; // redirect
-			}
-		}
-	});
 	
 	/* CHARTS */
 	

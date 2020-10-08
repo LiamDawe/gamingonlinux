@@ -34,5 +34,20 @@ return [
 	"comment_promoted" =>
 	[
 		"text" => 'That comment has been promoted to the top!'
+	],
+	"not_logged_in" =>
+	[
+		"text" => 'You need to be logged in to comment on articles!',
+		"error" => 1
+	],
+	"no_permission" =>
+	[
+		"text" => 'Your account does not have permission to comment at this time.',
+		"error" => 1
+	],
+	"comments_offline" =>
+	[
+		"text" => 'Sorry, commenting is currently offline.',
+		"error" => 1
 	]
 ];

@@ -292,6 +292,7 @@ if (isset($_GET['view']))
 			$date = '';
 			if (!empty($get_item['date']))
 			{
+				$date .= '<li><strong>Release Date</strong></li>';
 				$unreleased = '';
 				if ($get_item['date'] > date('Y-m-d'))
 				{
@@ -302,11 +303,7 @@ if (isset($_GET['view']))
 				{
 					$best_guess = '<span class="badge blue">Best Guess</span>';
 				}
-				$date = '<li>' . $get_item['date'] . ' ' . $best_guess . $unreleased . '</li>';
-			}
-			else
-			{
-				$date = '<li>Not currently known.</li>';
+				$date .= '<li>' . $get_item['date'] . ' ' . $best_guess . $unreleased . '</li>';
 			}
 			$templating->set('release-date', $date);
 

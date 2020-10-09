@@ -141,11 +141,9 @@
 [/block: base_game]
 
 [block: main-info]
-
 	{:uploaded_media}
 	<div class="database-extra">
 		<ul>
-			<li><strong>Release Date</strong></li>
 			{:release-date}
 			{:license}
 			<li><strong>External Links</strong></li>
@@ -201,3 +199,48 @@
 [block: user_bottom]
 </div>
 [/block: user_bottom]
+
+[block: comments_top]
+				<div class="box comments">
+					<a class="anchor" id="comments"></a>
+					<div class="head">{:comments_top_text} {:subscribe_link} <div class="head-list-position head-list">{:pagination_head}</div><br class="clearer" /></div>
+					<div id="comments-background" class="body group">
+						<div id="selective-quote" data-username="" style="display:none; border: 1px solid grey;">
+							<div>
+								<div class="body group" style="height: 100%; text-align: center;"><button id="insert-selective-quote">Quote This</button></div>
+							</div>
+						</div>
+[/block: comments_top]
+
+[block: comments_box_top]
+<form id="comment_form" method="post" action="{:url}index.php?module=items_database" enctype="multipart/form-data">
+[/block: comments_box_top]
+
+[block: rules]
+<div class="box"><div class="body group"><strong>Make sure your post <a href="{:url}index.php?module=rules" target="_blank">follows our rules</a>. If you need technical support, it may be better to <a href="{:url}forum/">use the GOL Forum</a>.</strong></div></div>
+[/block: rules]
+
+[block: comment_buttons]
+<div class="box">
+	<div class="body group">
+		<strong>Subscribe to item comments?</strong><br />
+		<em>You can <a href="/usercp.php?module=subscriptions">see all subscriptions here</a>.</em><br />
+		<label class="checkbox">
+			<input type="checkbox" name="subscribe" {:subscribe_check} /> Subscribe to comments
+		</label>
+		<select name="subscribe-type"><option value="sub-only">Subscribe without emails</option><option value="sub-emails" {:subscribe_email_check}>Subscribe and get emailed</option></select><br />
+		<input type="hidden" name="iid" value="{:iid}" />
+		<button id="send" onclick="setTimeout(disableFunction, 1);" type="submit" class="button" name="act" value="comment" formaction="{:url}index.php?module=items_database">Post Comment</button> <button id="preview_text_button" type="button">Preview Comment</button>
+	</div>
+</div>
+</form>
+[/block: comment_buttons]
+
+[block: preview]
+<div class="preview_pm">
+	<div class="box">
+		<div class="head">Preview</div>
+		<div id="preview" class="pm_text_preview body group"></div>
+	</div>
+</div>
+[/block: preview]

@@ -44,7 +44,10 @@ class bbcode
 		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)
 		{
 			$game_info = $this->dbl->run("SELECT `id`, `giveaway_name`, `supporters_only`, `display_all` FROM `game_giveaways` WHERE `id` = ?", array($giveaway_id))->fetch();
-
+			if (!$game_info)
+			{
+				return $text;
+			}
 			$your_key = $this->dbl->run("SELECT COUNT(game_key) as counter, `game_key` FROM `game_giveaways_keys` WHERE `claimed_by_id` = ? AND `game_id` = ? GROUP BY `game_key`", [$_SESSION['user_id'], $giveaway_id])->fetch();
 
 			if ($external_page == 1)

@@ -178,8 +178,11 @@ else
 		else if (isset($_POST['yes']))
 		{
             // check it exists
-            $check = $dbl->run("SELECT `author_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['pid']))->fetch();
-            if (isset($check) && ($check['author_id'] == $_SESSION['user_id'] || $user->check_group([1,2]) == true))
+			$check = $dbl->run("SELECT `post_id`,`topic_id` FROM `forum_replies` WHERE `post_id` = ?", array($_GET['pid']))->fetch();
+			// check they're allowed to do it
+			$check_owner = $dbl->run("SELECT `author_id` FROM `forum_topics` WHERE `topic_id` = ?", array($check['topic_id']))->fetch();
+
+            if (isset($check) && ($check_owner['author_id'] == $_SESSION['user_id'] || $user->check_group([1,2]) == true))
             {
                 // add it as answer
                 $dbl->run("UPDATE `forum_replies` SET `post_answer` = 1 WHERE `post_id` = ?", array($_GET['pid']));

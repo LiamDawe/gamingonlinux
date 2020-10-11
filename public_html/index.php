@@ -55,13 +55,13 @@ if (core::$current_module['module_file_name'] == 'home')
 			{
 				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image'].'" type="image/webp">';
 				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'" type="image/jpeg">';
-				$images .= '<img src="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'">';
+				$images .= '<img src="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'" alt="Featured Article - '.$featured['title'].'">';
 			}
 			if (strpos($featured['featured_image'], 'jpg'))
 			{
 				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image'].'" type="image/jpeg">';
 				$images .= '<source srcset="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'" type="image/webp">';
-				$images .= '<img src="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'">';
+				$images .= '<img src="'.url.'uploads/carousel/'.$featured['featured_image_backup'].'" alt="Featured Article - '.$featured['title'].'">';
 			}
 
 			$templating->set('images', $images);

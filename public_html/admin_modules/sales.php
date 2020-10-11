@@ -38,8 +38,10 @@ if (!isset($_POST['act']) && isset($_GET['view']))
 
 		foreach ($existing_res as $bundle)
 		{
+			$end_date = new DateTime($bundle['end_date']);
+
 			$templating->block('item', 'admin_modules/admin_module_sales');
-			$templating->set_many(['approve' => '', 'name' => $bundle['name'], 'total' => $bundle['linux_total'], 'link' => $bundle['link'], 'end_date' => $bundle['end_date']]);
+			$templating->set_many(['approve' => '', 'name' => $bundle['name'], 'total' => $bundle['linux_total'], 'link' => $bundle['link'], 'end_date' => $end_date->format('Y-m-d'), 'end_time' => $end_date->format('H:i')]);
 			$templating->set('id', 'edit_'.$bundle['id']);
 			$templating->set('act', 'edit_bundle');
 			$templating->set('button_text', 'Edit Bundle');
@@ -70,8 +72,9 @@ if (!isset($_POST['act']) && isset($_GET['view']))
 		
 		foreach ($existing_res as $bundle)
 		{
+			$end_date = new DateTime($bundle['end_date']);
 			$templating->block('item', 'admin_modules/admin_module_sales');
-			$templating->set_many(['name' => $bundle['name'], 'total' => $bundle['linux_total'], 'link' => $bundle['link'], 'end_date' => $bundle['end_date']]);
+			$templating->set_many(['approve' => '', 'name' => $bundle['name'], 'total' => $bundle['linux_total'], 'link' => $bundle['link'], 'end_date' => $end_date->format('Y-m-d'), 'end_time' => $end_date->format('H:i')]);
 			$templating->set('id', 'edit_'.$bundle['id']);
 			$templating->set('act', 'edit_bundle');
 			$templating->set('approve', '<button name="act" type="submit" value="approve_bundle">Approve</button>');
@@ -105,13 +108,21 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$total = trim($_POST['total']);
 		$link = trim($_POST['link']);
-		$end_date = trim($_POST['end_date']);
+		$end_date = trim($_POST['end_date'] . ' ' . $_POST['end_time']);
 
-		$empty_check = core::mempty(compact('name','link','end_date'));
+		$empty_check = core::mempty(compact('name','link','end_date','end_time'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = $empty_check;
+			header("Location: /admin.php?module=sales&view=manage_bundles");
+			die();
+		}
+
+		// make sure end date isn't before today
+		if( strtotime('now') > strtotime($end_date) ) 
+		{
+			$_SESSION['message'] = 'end_date_wrong';
 			header("Location: /admin.php?module=sales&view=manage_bundles");
 			die();
 		}
@@ -148,14 +159,22 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$total = trim($_POST['total']);
 		$link = trim($_POST['link']);
-		$end_date = trim($_POST['end_date']);
+		$end_date = trim($_POST['end_date'] . ' ' . $_POST['end_time']);
 		$id = trim($_POST['id']);
 
-		$empty_check = core::mempty(compact('name','link','end_date'));
+		$empty_check = core::mempty(compact('name','link','end_date','end_time'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = $empty;
+			header("Location: /admin.php?module=sales&view=manage_bundles");
+			die();
+		}
+
+		// make sure end date isn't before today
+		if( strtotime('now') > strtotime($end_date) ) 
+		{
+			$_SESSION['message'] = 'end_date_wrong';
 			header("Location: /admin.php?module=sales&view=manage_bundles");
 			die();
 		}

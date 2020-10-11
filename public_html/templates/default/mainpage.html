@@ -55,7 +55,7 @@
 			</ul>
 			<div class="right-menu">
 				<div id="search-button-nav" class="toggle-nav search-box">
-					<a href="#"><img src="{:this_template}/images/search.svg" alt="search articles"/></a>
+					<a href="#"><img src="{:this_template}/images/search.svg" width="12.5" height="12.5" alt="search articles"/></a>
 					<div class="toggle-content">
 							<form method="get" action="{:url}index.php?module=search">
 								<input type="hidden" name="module" value="search" />
@@ -106,7 +106,7 @@
 
 [block: notifications]
 <div id="alert_box" class="toggle-nav alerts-box right alerts-box-{:alert_box_type}">
-	<a href="#" id="notifications_total">{:notifications_total} <img src="{:this_template}/images/comments/{:alerts_icon}.svg" alt="notifications"/></a>
+	<a href="#" id="notifications_total">{:notifications_total} {:alerts_icon}</a>
 	<div class="toggle-content">
 		<ul>
 			{:admin_line}

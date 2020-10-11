@@ -238,11 +238,11 @@ else if ($_SESSION['user_id'] > 0)
 
 	// sort out the styling for the alerts indicator
 	$alerts_indicator = '';
-	$alerts_icon = 'envelope-open';
+	$alerts_icon = '<img src="{:this_template}/images/comments/envelope-open.svg" width="14" height="14" alt="notifications"/>';
 	$alert_box_type = 'normal';
 	if ($alerts_counter > 0)
 	{
-		$alerts_icon = 'envelope';
+		$alerts_icon = '<img src="{:this_template}/images/comments/envelope.svg" width="14" height="14" alt="notifications"/>';
 		$alert_box_type = 'new';
 		$alerts_indicator = " <span id=\"notes-counter\" class=\"badge badge-important\">$alerts_counter</span>";
 	}

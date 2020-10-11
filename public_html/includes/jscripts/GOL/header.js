@@ -165,8 +165,8 @@ if ($('.countdown').length)
 		var time_listed = $(value).text();
 		var countdown_object = $(value);
 					
-		// Set the date we're counting down to
-		var countDownDate = new Date(time_listed).getTime();
+		// Set the date we're counting down to - normalised to UTC
+		var countDownDate = new Date(time_listed+' GMT+00:00').getTime();
 
 		var counterFunction = function() 
         {
@@ -190,7 +190,7 @@ if ($('.countdown').length)
             if (distance < 0) 
             {
                 clearInterval(x);
-                countdown_object.text("EXPIRED");
+                countdown_object.text("Countdown Expired");
             }
             return counterFunction;
         }

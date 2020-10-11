@@ -33,7 +33,9 @@ if (!isset($_POST['act']))
 			$templating->set('community_name', $_SESSION['e_community_name']);
 			$templating->set('stream_url', $_SESSION['e_stream_url']);
 			$templating->set('date', $_SESSION['e_date']);
+			$templating->set('time', $_SESSION['e_time']);
 			$templating->set('end_date', $_SESSION['e_end_date']);
+			$templating->set('end_time', $_SESSION['e_end_time']);
 		}
 
 		else
@@ -42,7 +44,9 @@ if (!isset($_POST['act']))
 			$templating->set('tagline', '');
 			$templating->set('stream_url', '');
 			$templating->set('date', '');
+			$templating->set('time', '');
 			$templating->set('end_date', '');
+			$templating->set('end_time', '');
 		}
 	}
 
@@ -227,8 +231,8 @@ if (isset($_POST['act']))
 			// wipe any old details
 			unset($_SESSION['live_info']);
 		
-			$start_time = core::adjust_time($_POST['date'], $_POST['timezone'], 'UTC', 0);
-			$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone'], 'UTC', 0);
+			$start_time = core::adjust_time($_POST['date'].$_POST['time'], $_POST['timezone'], 'UTC', 0);
+			$end_time = core::adjust_time($_POST['end_date'].$_POST['end_time'], $_POST['timezone'], 'UTC', 0);
 			$title = trim($_POST['title']);
 			$title = strip_tags($title);
 			$community_name = trim($_POST['community_name']);
@@ -246,6 +250,14 @@ if (isset($_POST['act']))
 			
 			if ($empty_check !== true)
 			{
+				$_SESSION['e_title'] = $title;
+				$_SESSION['e_community_name'] = $community_name;
+				$_SESSION['e_stream_url'] = $stream_url;
+				$_SESSION['e_date'] = $_POST['date'];
+				$_SESSION['e_time'] = $_POST['time'];
+				$_SESSION['e_end_date'] = $_POST['end_date'];
+				$_SESSION['e_end_time'] = $_POST['end_time'];
+
 				$_SESSION['message'] = 'empty';
 				$_SESSION['message_extra'] = $empty_check;
 				header("Location: /index.php?module=livestreams");
@@ -262,7 +274,9 @@ if (isset($_POST['act']))
 				$_SESSION['e_community_name'] = $community_name;
 				$_SESSION['e_stream_url'] = $stream_url;
 				$_SESSION['e_date'] = $_POST['date'];
+				$_SESSION['e_time'] = $_POST['time'];
 				$_SESSION['e_end_date'] = $_POST['end_date'];
+				$_SESSION['e_end_time'] = $_POST['end_time'];
 
 				$_SESSION['message'] = 'ends_before_start';
 				header("Location: /index.php?module=livestreams");
@@ -276,7 +290,7 @@ if (isset($_POST['act']))
 		
 			$_SESSION['live_info'] = ['start' => $start_time, 'end' => $end_time, 'title' => $title, 'community_name' => $community_name, 'stream_url' => $stream_url, 'user_ids' => $user_ids];
 		
-			$confirmation_text = 'The stream will last ' . $diff->format('%a Day and %h Hours') . '<br />Start time: ' . $_POST['date'] . ' ('.$_POST['timezone'].')<br />End time: ' . $_POST['end_date'] . ' ('.$_POST['timezone'].')<br />Title: ' . $title . '<br />Stream url: ' . $stream_url;
+			$confirmation_text = 'The stream will last ' . $diff->format('%a days and %h hours') . '<br />Start time: ' . $_POST['date'] . ' ' . $_POST['time'] . ' ('.$_POST['timezone'].')<br />End time: ' . $_POST['end_date'] . ' ' .  $_POST['end_time'] .  ' ('.$_POST['timezone'].')<br />Title: ' . $title . '<br />Stream url: ' . $stream_url;
 			
 			$core->confirmation(['title' => 'Please confirm these details are correct!', 'text' => $confirmation_text, 'act' => 'submit', 'action_url' => '/index.php?module=livestreams']);
 		}

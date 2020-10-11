@@ -59,10 +59,12 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('id', $streams['row_id']);
 
 			$date = new DateTime($streams['date']);
-			$templating->set('date', $date->format('Y-m-d H:i:s'));
+			$templating->set('date', $date->format('Y-m-d'));
+			$templating->set('time', $date->format('H:i'));
 
 			$end_date = new DateTime($streams['end_date']);
-			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
+			$templating->set('end_date', $end_date->format('Y-m-d'));
+			$templating->set('end_time', $end_date->format('H:i'));
 			
 			$templating->set('timezones_list', '');
 
@@ -139,10 +141,12 @@ if (isset($_GET['view']) && !isset($_POST['act']))
 			$templating->set('timezones_list', '');
 
 			$date = new DateTime($streams['date']);
-			$templating->set('date', $date->format('Y-m-d H:i:s'));
+			$templating->set('date', $date->format('Y-m-d'));
+			$templating->set('time', $date->format('H:i'));
 
 			$end_date = new DateTime($streams['end_date']);
-			$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
+			$templating->set('end_date', $end_date->format('Y-m-d'));
+			$templating->set('end_time', $end_date->format('H:i'));
 
 			$streamer_list = '';
 			$stream_res = $dbl->run("SELECT s.`user_id`, u.username FROM `livestream_presenters` s INNER JOIN `users` u ON u.user_id = s.user_id WHERE `livestream_id` = ?", array($streams['row_id']))->fetch_all();
@@ -193,8 +197,8 @@ if (isset($_POST['act']))
 			die();
 		}
 		
-		$start_time = core::adjust_time($_POST['date'], $_POST['timezone'], 'UTC', 0);
-		$end_time = core::adjust_time($_POST['end_date'], $_POST['timezone'], 'UTC', 0);
+		$start_time = core::adjust_time($_POST['date'].$_POST['time'], $_POST['timezone'], 'UTC', 0);
+		$end_time = core::adjust_time($_POST['end_date'].$_POST['end_time'], $_POST['timezone'], 'UTC', 0);
 		
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);
@@ -249,8 +253,8 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$date = new DateTime($_POST['date']);
-		$end_date = new DateTime($_POST['end_date']);
+		$date = new DateTime($_POST['date'].$_POST['time']);
+		$end_date = new DateTime($_POST['end_date'].$_POST['end_time']);
 
 		$title = trim($_POST['title']);
 		$community_name = trim($_POST['community_name']);
@@ -375,8 +379,8 @@ if (isset($_POST['act']))
 			die();
 		}
 
-		$date = new DateTime($_POST['date']);
-		$end_date = new DateTime($_POST['end_date']);
+		$date = new DateTime($_POST['date'].$_POST['time']);
+		$end_date = new DateTime($_POST['end_date'].$_POST['end_time']);
 		$title = trim($_POST['title']);
 		$community_name = trim($_POST['community_name']);
 		$stream_url = trim($_POST['stream_url']);

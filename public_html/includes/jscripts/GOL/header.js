@@ -148,14 +148,55 @@ function getYouTubeID(input)
 	var video_id;
 
 	video_id = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
-		if(video_id === null) 
+	if(video_id === null) 
 	{
 		return null;
 	}
 	else
-		{
-		return video_id[1];
-		}
+	{
+	return video_id[1];
+	}
+}
+
+if ($('.countdown').length)
+{
+	$.each( $('.countdown'), function( key, value ) 
+	{
+		var time_listed = $(value).text();
+		var countdown_object = $(value);
+					
+		// Set the date we're counting down to
+		var countDownDate = new Date(time_listed).getTime();
+
+		var counterFunction = function() 
+        {
+            // Get today's date and time
+            var now = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="demo"
+            countdown_object.text (days + " days " + hours + "h "
+            + minutes + "m " + seconds + "s ");
+
+            // If the count down is finished, write some text
+            if (distance < 0) 
+            {
+                clearInterval(x);
+                countdown_object.text("EXPIRED");
+            }
+            return counterFunction;
+        }
+        // Update the count down every 1 second
+        var x = setInterval(counterFunction(), 1000);
+	});
 }
 
 // scroll to an element if it's not in view, all other ways I could find completely sucked
@@ -1786,19 +1827,6 @@ jQuery(document).ready(function()
 		}
 	});
 
-	/* countdown timers */
-	$('.countdown').each(function () 
-	{
-		var time_listed = $(this).text();
-
-		var livestream_time = moment.tz(time_listed, "UTC");
-
-		$(this).countdown(livestream_time.toDate(),function(event) 
-		{
-			$(this).text(event.strftime('%D days %H:%M:%S'));
-		});
-	});
-
 	/* cocoen image comparison */
 	if ($('.cocoen').length)
 	{
@@ -1808,57 +1836,6 @@ jQuery(document).ready(function()
 		Promise.all([cocoen_js, cocoean_jquery]).then(() => { 
 			$('.cocoen').cocoen();
 		  });
-	}
-
-	/* datetime fields */
-	if ($('.datetimepicker').length)
-	{
-		$.cachedScript( "/includes/jscripts/timepicker/datepicker.js?v1.1" ).done(function( script, textStatus ) 
-		{		  	
-			$('.datetimepicker').each(function () 
-			{
-				var current_date = new Date();
-				var current_field = document.getElementById($(this).attr('id'));
-
-				var default_date = '';
-				if($(this).val().length > 0)
-				{
-					default_date = new Date($(this).val());
-				}
-
-				var show_time = true;
-				var format = "YYYY-MM-DD HH:mm:ss";
-				if ($(this).hasClass('date-only'))
-				{
-					show_time = false;
-					format = "YYYY-MM-DD";
-				}
-
-				var min_date = new Date(1990, 0, 1);
-				var min_year = 1990;
-				if($(this).data('date-min') == 'now')
-				{
-					min_date = Date();
-					var min_year = current_date.getFullYear();
-				}
-
-				var max_date = current_date.getFullYear() + 10;
-
-				new Pikaday(
-				{
-					defaultDate: default_date,
-					setDefaultDate: true,
-					field: current_field,
-					firstDay: 1,
-					minDate: min_date,
-					yearRange: [min_year,max_date],
-					format: format,
-					showTime: show_time,
-					autoClose: false,
-					use24hour: true
-				});
-			});
-		});
 	}
 	
 	/* ARTICLE PREVIEW */	

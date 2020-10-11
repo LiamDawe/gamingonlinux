@@ -5,7 +5,10 @@
 [block: edit_top]
 <div class="box">
 	<div class="head">
-		Edit an existing livestream calendar entry (all times here in <strong>UTC</strong>)
+		Edit an existing livestream calendar entry
+	</div>
+	<div class="subhead">
+		All times here are in <strong>UTC</strong>.
 	</div>
 </div>
 [/block: edit_top]
@@ -13,7 +16,10 @@
 [block: submit_top]
 <div class="box">
 	<div class="head">
-		Manage livestream event submissions (All times here are in <strong>UTC</strong>)
+		Manage livestream event submissions
+	</div>
+	<div class="subhead">
+		All times here are in <strong>UTC</strong>.
 	</div>
 </div>
 [/block: submit_top]
@@ -23,11 +29,13 @@
 	<div class="box">
 			<div class="body group">
 					Title: <input type="text" name="title" value="{:title}" /><br />
-					{:timezones_list}
-					Start Date: <br />
-					<input class="datetimepicker" name="date" id="datetimepicker{:id}" type="text" value="{:date} "/>
-					End Date: <br />
-					<input class="datetimepicker" name="end_date" id="datetimepickere{:id}" type="text" value="{:end_date} "/>
+					{:timezones_list}<br />
+					Start Date (24HR): <br />
+					<input name="date" type="date" value="{:date}" autocomplete="off" />
+					<input name="time" type="time" value="{:time}" autocomplete="off" /><br />
+					End Date (24HR): <br />
+					<input name="end_date" type="date" value="{:end_date}" autocomplete="off" />
+					<input name="end_time" type="time" value="{:end_time}" autocomplete="off" /><br />
 				</div>
 			</div>
 			<div class="box">

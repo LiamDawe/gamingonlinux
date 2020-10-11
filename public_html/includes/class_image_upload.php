@@ -312,7 +312,9 @@ class image_upload
 
 					$this->dbl->run("UPDATE `config` SET `data_value` = (data_value + 1) WHERE `data_key` = 'total_featured'");
 
-					$this->dbl->run("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?, `featured_image_backup` = ?, `end_date` = ?", array($article_id, $main_file, $backup_file, $_POST['end_date']));
+					$end_date = $_POST['end_date'] . ' ' . $_POST['end_time'] . ':00';
+
+					$this->dbl->run("INSERT INTO `editor_picks` SET `article_id` = ?, `featured_image` = ?, `featured_image_backup` = ?, `end_date` = ?", array($article_id, $main_file, $backup_file, $end_date));
 				}
 
 				return true;

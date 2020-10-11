@@ -10,9 +10,6 @@ $templating->load('admin_modules/admin_module_featured');
 
 if (isset($_GET['view']))
 {
-	$start_year = date('Y');
-	$next_year = $start_year + 1;
-
 	if ($_GET['view'] == 'add')
 	{
 		if (isset($_GET['article_id']))
@@ -24,8 +21,6 @@ if (isset($_GET['view']))
 				$templating->set('max_width', $core->config('carousel_image_width'));
 				$templating->set('max_height', $core->config('carousel_image_height'));
 				$templating->set('featured_max_filesize', core::readable_bytes($core->config('max_featured_image_filesize')));
-				$templating->set('start_year', $start_year);
-				$templating->set('next_year', $next_year);
 
 				$templating->set('article_title', $title['title']);
 				$templating->set('article_id', $_GET['article_id']);
@@ -61,9 +56,8 @@ if (isset($_GET['view']))
 				}
 
 				$end_date = new DateTime($items['end_date']);
-				$templating->set('end_date', $end_date->format('Y-m-d H:i:s'));
-				$templating->set('start_year', $start_year);
-				$templating->set('next_year', $next_year);
+				$templating->set('end_date', $end_date->format('Y-m-d'));
+				$templating->set('end_time', $end_date->format('H:i:s'));
 
 				$templating->set('current_image', $image);
 				$templating->set('featured_max_filesize', core::readable_bytes($core->config('max_featured_image_filesize')));
@@ -83,6 +77,8 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
+		$end_date = $_POST['end_date'] . ' ' . $_POST['end_time'] . ':00';
+
 		if (!isset($_POST['article_id']) || (isset($_POST['article_id']) && !is_numeric($_POST['article_id'])))
 		{
 			$_SESSION['message'] = 'empty';
@@ -92,7 +88,7 @@ if (isset($_POST['act']))
 		}
 
 		// make sure date is valid
-		if (!core::validateDate($_POST['end_date']))
+		if (!core::validateDate($end_date))
 		{
 			$_SESSION['message'] = 'invalid_end_date';
 			header("Location: /admin.php?module=featured&view=add&article_id=".$_POST['article_id']);
@@ -100,8 +96,7 @@ if (isset($_POST['act']))
 		}
 
 		// make sure end date isn't before today
-		$current_time = date('Y-m-d H:i:s');
-		if ($_POST['end_date'] < $current_time)
+		if( strtotime($end_date) < strtotime('now') ) 
 		{
 			$_SESSION['message'] = 'end_date_wrong';
 			header("Location: /admin.php?module=featured&view=add&article_id=".$_POST['article_id']);
@@ -135,6 +130,8 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'edit')
 	{
+		$end_date = $_POST['end_date'] . ' ' . $_POST['end_time'] . ':00';
+
 		if (!isset($_POST['article_id']) || (isset($_POST['article_id']) && !is_numeric($_POST['article_id'])))
 		{
 			$_SESSION['message'] = 'empty';
@@ -144,7 +141,7 @@ if (isset($_POST['act']))
 		}
 
 		// make sure date is valid
-		if (!core::validateDate($_POST['end_date']))
+		if (!core::validateDate($end_date))
 		{
 			$_SESSION['message'] = 'invalid_end_date';
 			header("Location: /admin.php?module=featured&view=manage");
@@ -152,15 +149,14 @@ if (isset($_POST['act']))
 		}
 
 		// make sure end date isn't before today
-		$current_time = date('Y-m-d H:i:s');
-		if ($_POST['end_date'] < $current_time)
+		if( strtotime($end_date) < strtotime('now') ) 
 		{
 			$_SESSION['message'] = 'end_date_wrong';
 			header("Location: /admin.php?module=featured&view=manage");
 			die();
 		}
 
-		$dbl->run("UPDATE `editor_picks` SET `end_date` = ? WHERE `article_id` = ?", array($_POST['end_date'], $_POST['article_id']));
+		$dbl->run("UPDATE `editor_picks` SET `end_date` = ? WHERE `article_id` = ?", array($end_date, $_POST['article_id']));
 
 		if (isset($_FILES['new_image']) && $_FILES['new_image']['name'] != "")
 		{

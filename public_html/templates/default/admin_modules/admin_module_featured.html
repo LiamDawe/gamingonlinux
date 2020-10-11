@@ -9,8 +9,9 @@
 	<form method="post" action="/admin.php?module=featured" enctype="multipart/form-data" id="something">
 	Must be {:max_width} width, {:max_height} height. Max of {:featured_max_filesize}!<br />
 	<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
-	End Date (UTC): <br />
-	<input class="datetimepicker" name="end_date" data-date-min="now" id="datetimepicker" type="text" value="" autocomplete="off" />
+	End Date (UTC 24HR): <br />
+	<input name="end_date" type="date" value="{:end_date}" autocomplete="off" />
+	<input name="end_time" type="time" value="{:end_time}" autocomplete="off" /><br />
 	<input type="hidden" name="article_id" value="{:article_id}" />
 	<button type="submit" name="act" value="add" class="btn btn-primary">Upload &amp; Activate</button>
 	</form>
@@ -30,8 +31,9 @@
 	{:current_image}
 	Carousel Image (Must be {:max_width} width, {:max_height} height). Max of {:featured_max_filesize}!<br />
 	<input name="new_image" id="new_image" size="30" type="file" class="fileUpload" /><br />
-	End Date (UTC): <br />
-	<input class="datetimepicker" name="end_date" data-date-min="now" id="datetimepicker{:article_id}" type="text" value="{:end_date}" autocomplete="off" />
+	End Date (UTC 24HR): <br />
+	<input name="end_date" type="date" value="{:end_date}" autocomplete="off" />
+	<input name="end_time" type="time" value="{:end_time}" autocomplete="off" /><br />
 	Total hits: {:hits}<br />
 	<button type="submit" name="act" value="edit" class="btn btn-primary">Edit</button> <button type="submit" name="act" value="delete" class="btn btn-primary">Delete</button>
 	<input type="hidden" name="article_id" value="{:article_id}" />

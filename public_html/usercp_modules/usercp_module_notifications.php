@@ -63,6 +63,7 @@ if (!isset($_GET['go']))
 		u.`avatar_gallery`,
 		u.`avatar`,
 		u.`avatar_uploaded`,
+		u.`profile_address`,
 		a.`title`,
 		ft.`topic_title`,
 		c.`name`
@@ -143,6 +144,12 @@ if (!isset($_GET['go']))
 					$title = 'the admin area';
 				}
 
+				$profile_link = '/profiles/' . $note_list['user_id'];
+				if (isset($note_list['profile_address']) && !empty($note_list['profile_address']))
+				{
+					$profile_link = '/profiles/' . $note_list['profile_address'];
+				}
+
 				$note_row = $templating->block_store('plain_row', 'usercp_modules/notifications');
 
 				$note_row = $templating->store_replace($note_row, array(
@@ -151,7 +158,7 @@ if (!isset($_GET['go']))
 					'link' => $link,
 					'avatar' => $avatar,
 					'username' => $username,
-					'profile_link' => '/profiles/' . $note_list['user_id'],
+					'profile_link' => $profile_link,
 					'action_text' => $notification_types[$note_list['type']]['text'],
 					'title' => $title,
 					'additional_comments' => $additional_comments,

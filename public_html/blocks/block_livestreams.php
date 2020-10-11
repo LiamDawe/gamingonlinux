@@ -19,9 +19,7 @@ if ($get_official)
 	}
 	else
 	{
-		$countdown = '<noscript>'.$get_official['date'].' UTC</noscript><span id="livestream'.$get_official['row_id'].'">'.$get_official['date'].'</span>
-		
-		<script type="text/javascript">var livestream' . $get_official['row_id'] . ' = moment.tz("'.$get_official['date'].'", "UTC"); $("#livestream'.$get_official['row_id'].'").countdown(livestream'.$get_official['row_id'].'.toDate(),function(event) {$(this).text(event.strftime(\'%D days %H:%M:%S\'));});</script>';
+		$countdown = '<noscript>'.$get_official['date'].' UTC</noscript><span class="countdown">'.$get_official['date'].'</span>';
 	}
 
 	$official = $templating->block_store('official_streams');
@@ -48,7 +46,7 @@ else if ($count_total > 3)
 
 $templating->set('more_text', $more_text);
 
-$livestream_query = "SELECT `row_id`, `title`, `date`, `stream_url` FROM `livestreams` WHERE NOW() < `end_date` AND `community_stream` = 1 AND `accepted` = 1 GROUP BY `author_id` ORDER BY `date` ASC LIMIT 3";
+$livestream_query = "SELECT t1.`row_id`, t1.`title`, t1.`date`, t1.`stream_url` FROM livestreams t1 WHERE t1.date = (SELECT MIN(t2.date) FROM livestreams t2 WHERE t2.author_id = t1.author_id AND NOW() < `end_date` ORDER BY `t2`.`date` ASC) ORDER BY `date` ASC LIMIT 3";
 $get_info = $dbl->run($livestream_query)->fetch_all();
 
 if ($get_info)

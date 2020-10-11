@@ -9,7 +9,9 @@ $templating->set_previous('meta_description', 'About Us information for GamingOn
 $templating->load('about_us');
 $templating->block('top');
 
-$get_editors = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`article_bio`, u.`author_picture` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE u.`user_id` != 1844 AND g.group_id = 1 OR g.group_id = 2 ORDER BY u.`user_id` = 1 DESC, u.`username` ASC")->fetch_all();
+$needed_fields_sql = 'u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`article_bio`, u.`author_picture`, u.`profile_address`';
+
+$get_editors = $dbl->run("SELECT $needed_fields_sql FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE u.`user_id` != 1844 AND g.group_id = 1 OR g.group_id = 2 ORDER BY u.`user_id` = 1 DESC, u.`username` ASC")->fetch_all();
 
 foreach ($get_editors as $editors)
 {
@@ -26,6 +28,17 @@ foreach ($get_editors as $editors)
 			$templating->block('row_nopic');
 		}
 		$templating->set('user_id', $editors['user_id']);
+
+		if (isset($editors['profile_address']) && !empty($editors['profile_address']))
+		{
+			$profile_address = '/profiles/' . $editors['profile_address'];
+		}
+		else
+		{
+			$profile_address = '/profiles/' . $editors['user_id'];
+		}
+		$templating->set('profile_address', $profile_address);
+		
 		$templating->set('username', $editors['username']);
 		$templating->set('bio', $bbcode->parse_bbcode($editors['article_bio']));
 	}
@@ -33,7 +46,7 @@ foreach ($get_editors as $editors)
 
 $templating->block('contributors_top');
 
-$get_editors = $dbl->run("SELECT u.`username`, u.`user_id`, u.`supporter_link`, u.`avatar`, u.`avatar_uploaded`, u.`avatar_gallery`, u.`article_bio`, u.`author_picture` FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 5 ORDER BY u.`username` ASC")->fetch_all();
+$get_editors = $dbl->run("SELECT $needed_fields_sql FROM `users` u INNER JOIN `user_group_membership` g ON u.user_id = g.user_id WHERE g.group_id = 5 ORDER BY u.`username` ASC")->fetch_all();
 	
 foreach ($get_editors as $editors)
 {
@@ -50,6 +63,17 @@ foreach ($get_editors as $editors)
 			$templating->block('row_nopic');
 		}
 		$templating->set('user_id', $editors['user_id']);
+
+		if (isset($editors['profile_address']) && !empty($editors['profile_address']))
+		{
+			$profile_address = '/profiles/' . $editors['profile_address'];
+		}
+		else
+		{
+			$profile_address = '/profiles/' . $editors['user_id'];
+		}
+		$templating->set('profile_address', $profile_address);
+
 		$templating->set('username', $editors['username']);
 		$templating->set('bio', $bbcode->parse_bbcode($editors['article_bio']));
 	}

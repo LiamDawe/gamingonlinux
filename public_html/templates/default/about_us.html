@@ -15,7 +15,7 @@
 
 [block: row]
 				<div class="box comment">
-						<div class="subhead"><a href="/profiles/{:user_id}">{:username}</a></div>
+						<div class="subhead"><a href="{:profile_address}">{:username}</a></div>
 						<div class="body group">
 							<div class="comment-author hide-xsmall">
 								<div class="avatar">{:author_picture}</div>
@@ -27,7 +27,7 @@
 
 [block: row_nopic]
 				<div class="box">
-					<div class="subhead"><a href="/profiles/{:user_id}">{:username}</a></div>
+					<div class="subhead"><a href="{:profile_address}">{:username}</a></div>
 					<div class="body group">
 							{:bio} <br /><span class="badge blue"><a href="/index.php?module=search&author_id={:user_id}">See my articles</a></span>
 						</div>

@@ -253,6 +253,7 @@ else
 			u.`avatar_gallery`,
 			u.`register_date`,
 			u.`forum_posts`,
+			u.`show_supporter_status`,
 			u.`game_developer`,
 			$db_grab_fields
 			f.`name` as `forum_name`,
@@ -742,7 +743,8 @@ else
 						u.username, 
 						u.avatar, 
 						u.avatar_uploaded, 
-						u.avatar_gallery, 
+						u.avatar_gallery,
+						u.`show_supporter_status`,
 						$db_grab_fields 
 						u.forum_posts, 
 						u.game_developer,

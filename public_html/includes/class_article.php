@@ -1333,7 +1333,7 @@ class article
 		$params = array_merge([(int) $article_info['article']['article_id']], [$this->core->start], [$per_page]);
 
 		/* NORMAL COMMENTS */
-		$comments_get = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.`comment_text`, a.`comment_id`, u.`pc_info_public`, u.`distro`, a.`time_posted`, a.`last_edited`, a.`last_edited_time`, a.`total_likes`, u.`username`, u.`profile_address`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, ul.`username` as `username_edited` FROM `articles_comments` a LEFT JOIN `users` u ON a.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = a.`last_edited` WHERE a.`article_id` = ? AND a.`approved` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
+		$comments_get = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.`comment_text`, a.`comment_id`, u.`pc_info_public`, u.`distro`, a.`time_posted`, a.`last_edited`, a.`last_edited_time`, a.`total_likes`, u.`username`, u.`profile_address`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.`pc_info_filled`, u.`game_developer`, u.`register_date`, u.`show_supporter_status`, ul.`username` as `username_edited` FROM `articles_comments` a LEFT JOIN `users` u ON a.`author_id` = u.`user_id` LEFT JOIN `users` ul ON ul.`user_id` = a.`last_edited` WHERE a.`article_id` = ? AND a.`approved` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
 
 		// make an array of all comment ids and user ids to search for likes (instead of one query per comment for likes) and user groups for badge displaying
 		$like_array = [];
@@ -1411,7 +1411,7 @@ class article
 		/* PROMOTED COMMENTS */
 		if ($page == 1)
 		{
-			$promoted_comments = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`total_likes`, u.username, u.`profile_address`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.`approved` = 1 AND a.`promoted` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
+			$promoted_comments = $this->dbl->run("SELECT a.`author_id`, a.`guest_username`, a.`promoted`, a.comment_text, a.comment_id, u.pc_info_public, u.distro, a.time_posted, a.last_edited, a.last_edited_time, a.`total_likes`, u.username, u.`profile_address`, u.`avatar`,  $db_grab_fields u.`avatar_uploaded`, u.`avatar_gallery`, u.pc_info_filled, u.game_developer, u.register_date, u.`show_supporter_status`, ul.username as username_edited FROM `articles_comments` a LEFT JOIN `users` u ON a.author_id = u.user_id LEFT JOIN `users` ul ON ul.user_id = a.last_edited WHERE a.`article_id` = ? AND a.`approved` = 1 AND a.`promoted` = 1 ORDER BY a.`time_posted` ASC LIMIT ?, ?", $params)->fetch_all();
 
 			if (isset($promoted_comments) && !empty($promoted_comments))
 			{
@@ -2132,23 +2132,23 @@ class article
 							// subject
 							$subject = "New reply to article {$title['title']} on GamingOnLinux.com";
 
-							$comment_email = $bbcode->email_bbcode($comment);
+							$comment_email = $this->bbcode->email_bbcode($comment);
 
 							// message
 							$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-							<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
+							<p><strong>{$_SESSION['username']}</strong> has replied to an article you follow on titled \"<strong><a href=\"" . $this->core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\">{$title['title']}</a></strong>\". There may be more comments after this one, and you may not get any more emails depending on your email settings in your UserCP.</p>
 							<div>
 							<hr>
 							{$comment_email}
 							<hr>
-							<p>You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
+							<p>You can unsubscribe from this article by <a href=\"" . $this->core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $this->core->config('website_url') . "usercp.php\">User Control Panel</a>.</p>";
 
-							$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . $core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
+							$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an article on " . $this->core->config('website_url') . "index.php?module=articles_full&aid=$article_id&comment_id={$new_comment_id}&clear_note={$new_notification_id[$email_user['user_id']]}\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $this->core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}&secret_key={$email_user['secret_key']}";
 
 							// Mail it
-							if ($core->config('send_emails') == 1)
+							if ($this->core->config('send_emails') == 1)
 							{
-								$mail = new mailer($core);
+								$mail = new mailer($this->core);
 								$mail->sendMail($email_user['email'], $subject, $html_message, $plain_message);
 							}
 

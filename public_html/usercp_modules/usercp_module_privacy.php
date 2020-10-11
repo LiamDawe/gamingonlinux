@@ -9,7 +9,13 @@ $templating->load('usercp_modules/privacy');
 $templating->block('main');
 
 // extra details rarely needed, not included in normal user info grabbed when logged in
-$get_details = $dbl->run("SELECT `global_search_visible`, `private_profile`, `get_pms` FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
+$get_details = $dbl->run("SELECT `global_search_visible`, `private_profile`, `get_pms`, `show_supporter_status`  FROM `users` WHERE `user_id` = ?", [$_SESSION['user_id']])->fetch();
+
+$supporter = '';
+if ($get_details['show_supporter_status'] == 1)
+{
+	$supporter = 'checked';
+}
 
 $search = '';
 if ($get_details['global_search_visible'] == 1)
@@ -29,12 +35,18 @@ if ($get_details['private_profile'] == 1)
 	$private = 'checked';
 }
 
-$templating->set_many(['search_check' => $search, 'pm_check' => $pms, 'private_check' => $private]);
+$templating->set_many(['show_supporter' => $supporter, 'search_check' => $search, 'pm_check' => $pms, 'private_check' => $private]);
 
 if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'update')
 	{
+		$supporter_list = 0;
+		if (isset($_POST['show_supporter']))
+		{
+			$supporter_list = 1;
+		}
+
 		$search_check = 0;
 		if (isset($_POST['user_search']))
 		{
@@ -53,7 +65,7 @@ if (isset($_POST['act']))
 			$private_check = 1;
 		}
 		
-		$dbl->run("UPDATE `users` SET `global_search_visible` = ?, `get_pms` = ?, `private_profile` = ? WHERE `user_id` = ?", array($search_check, $pm_check, $private_check, $_SESSION['user_id']));
+		$dbl->run("UPDATE `users` SET `global_search_visible` = ?, `get_pms` = ?, `private_profile` = ?, `show_supporter_status` = ? WHERE `user_id` = ?", array($search_check, $pm_check, $private_check, $supporter_list, $_SESSION['user_id']));
 		
 		$_SESSION['message'] = 'privacy_updated';
 		header("Location: /usercp.php?module=privacy");

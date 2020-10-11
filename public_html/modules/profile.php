@@ -42,7 +42,7 @@ else
             $db_grab_fields .= "{$field['db_field']},";
         }
 
-        $profile = $dbl->run("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `about_me`, `last_login`, `banned`, `ip`, `game_developer`, `private_profile`, `get_pms`, `profile_address` FROM `users` WHERE `user_id` = ?", array($profile_id))->fetch();
+        $profile = $dbl->run("SELECT `user_id`, `pc_info_public`, `username`, `distro`, `register_date`, `email`, `avatar`, `avatar_uploaded`, `avatar_gallery`, `comment_count`, `forum_posts`, $db_grab_fields `about_me`, `last_login`, `banned`, `ip`, `game_developer`, `private_profile`, `get_pms`, `profile_address`, `show_supporter_status` FROM `users` WHERE `user_id` = ?", array($profile_id))->fetch();
         if (!$profile)
         {
             $core->message('That person does not exist here!');

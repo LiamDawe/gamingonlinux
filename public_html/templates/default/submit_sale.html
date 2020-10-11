@@ -9,12 +9,13 @@
 			<div class="collapse_header">Add a Bundle, click me</div>
 			<div class="collapse_content">
 				<div class="body group">
-					<form method="post" action="index.php?module=submit_sale">
+					<form class="gol-form" method="post" action="index.php?module=submit_sale">
 						Name: <input type="text" name="name" value="" /><br />
 						Total Linux Games: <input type="number" name="total" value="" /><br />
 						Link: <input type="text" name="link" value="" /><br />
-						End Date (<strong>UTC Only</strong>): 
-						<input class="datetimepicker" name="end_date" id="datetimepicker_bundle" type="text" value="" />
+						End Date (24HR UTC): <br />
+						<input name="end_date" type="date" value="{:end_date}" autocomplete="off" />
+						<input name="end_time" type="time" value="{:end_time}" autocomplete="off" /><br />
 						Store <br />
 						<select name="store">{:stores}</select><br />
 						<em>Are we missing a store? <a href="/email-us/">Email Us</a> to let us know!</em><br />

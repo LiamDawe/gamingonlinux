@@ -14,7 +14,7 @@ if (!isset($_POST['act']))
 	$stores = $dbl->run("SELECT `id`, `name` FROM `game_stores` ORDER BY `name` ASC")->fetch_all();
 
 	// add bundle
-	$templating->set_many(['name' => '', 'total' => '', 'link' => '', 'end_date' => '', 'id' => '']);
+	$templating->set_many(['name' => '', 'total' => '', 'link' => '', 'end_date' => '', 'end_time' => '', 'id' => '']);
 	$templating->set('id', 'addbundle');
 	$templating->set('act', 'add_bundle');
 	$templating->set('button_text', 'Add Bundle');
@@ -38,13 +38,21 @@ if (isset($_POST['act']))
 		$name = trim($_POST['name']);
 		$total = trim($_POST['total']);
 		$link = trim($_POST['link']);
-		$end_date = trim($_POST['end_date']);
+		$end_date = trim($_POST['end_date'] . ' ' . $_POST['end_time']);
 
-		$empty_check = core::mempty(compact('name','total','link','end_date'));
+		$empty_check = core::mempty(compact('name','total','link','end_date', 'end_time'));
 		if ($empty_check !== true)
 		{
 			$_SESSION['message'] = 'empty';
 			$_SESSION['message_extra'] = $empty_check;
+			header("Location: /index.php?module=submit_sale");
+			die();
+		}
+
+		// make sure end date isn't before today
+		if( strtotime('now') > strtotime($end_date) ) 
+		{
+			$_SESSION['message'] = 'end_date_wrong';
 			header("Location: /index.php?module=submit_sale");
 			die();
 		}
@@ -65,8 +73,7 @@ if (isset($_POST['act']))
 
 		$core->new_admin_note(array('content' => ' submitted a new bundle for the sales page named: <a href="/admin.php?module=sales&view=submitted_bundles">'.$name.'</a>.', 'type' => 'submitted_sale_bundle', 'data' => $bundle_id));
 
-		$_SESSION['message'] = 'saved';
-		$_SESSION['message_extra'] = 'bundle';
+		$_SESSION['message'] = 'bundle_submitted';
 		header("Location: /sales.php");
 		die();
 	}

@@ -19,7 +19,9 @@ if ($get_official)
 	}
 	else
 	{
-		$countdown = '<noscript>'.$get_official['date'].' UTC</noscript><span class="countdown">'.$get_official['date'].'</span>';
+		$machine_date = new DateTime($get_official['date']);
+
+		$countdown = '<noscript>'.$get_official['date'].' UTC</noscript><span class="countdown" data-machine-time="'.$machine_date->format('c').'">'.$get_official['date'].'</span>';
 	}
 
 	$official = $templating->block_store('official_streams');
@@ -62,7 +64,9 @@ if ($get_info)
 		}
 		else
 		{
-			$countdown = '<noscript>'.$info['date'].' UTC</noscript><span class="countdown" id="livestream'.$info['row_id'].'">'.$info['date'].'</span>';
+			$machine_date = new DateTime($info['date']);
+
+			$countdown = '<noscript>'.$info['date'].' UTC</noscript><span class="countdown" data-machine-time="'.$machine_date->format('c').'">'.$info['date'].'</span>';
 		}
 
 		$community_output .= '<li><a href="'.$info['stream_url'].'" target="_blank">'.$info['title'].'</a><br />

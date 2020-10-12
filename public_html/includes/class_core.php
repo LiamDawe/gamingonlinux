@@ -192,6 +192,10 @@ class core
 	// check the given date and time is actually a valid date and time
 	public static function validateDate($date, $format = 'Y-m-d H:i:s') 
 	{
+		if (is_numeric($date)) // allow timestamps to be checked too
+		{
+			$date = date("Y-m-d H:i:s", $date);
+		}
 		$dateTime = DateTime::createFromFormat($format, $date);
 	
 		if ($dateTime instanceof DateTime && $dateTime->format($format) == $date) 

@@ -88,8 +88,10 @@ if ($res_bundle)
 		}
 		$templating->set('linux_total', $total);
 
+		$machine_date = new DateTime($bundle['end_date']);
+
 		// end timer
-		$countdown = '<noscript>'.$bundle['end_date'].' UTC</noscript><span class="countdown" id="bundle'.$bundle['id'].'">'.$bundle['end_date'].'</span>';
+		$countdown = '<noscript>'.$bundle['end_date'].' UTC</noscript><span class="countdown" data-machine-time="'.$machine_date->format('c').'">'.$bundle['end_date'].'</span>';
 		$templating->set('time_left', $countdown);
 	}
 

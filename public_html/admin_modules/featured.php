@@ -77,7 +77,7 @@ if (isset($_POST['act']))
 {
 	if ($_POST['act'] == 'add')
 	{
-		$end_date = $_POST['end_date'] . ' ' . $_POST['end_time'] . ':00';
+		$end_date = $_POST['end_date'] . ' ' . $_POST['end_time'];
 
 		if (!isset($_POST['article_id']) || (isset($_POST['article_id']) && !is_numeric($_POST['article_id'])))
 		{
@@ -88,7 +88,7 @@ if (isset($_POST['act']))
 		}
 
 		// make sure date is valid
-		if (!core::validateDate($end_date))
+		if (!core::validateDate(strtotime($end_date)))
 		{
 			$_SESSION['message'] = 'invalid_end_date';
 			header("Location: /admin.php?module=featured&view=add&article_id=".$_POST['article_id']);
@@ -130,7 +130,7 @@ if (isset($_POST['act']))
 
 	if ($_POST['act'] == 'edit')
 	{
-		$end_date = $_POST['end_date'] . ' ' . $_POST['end_time'] . ':00';
+		$end_date = $_POST['end_date'] . ' ' . $_POST['end_time'];
 
 		if (!isset($_POST['article_id']) || (isset($_POST['article_id']) && !is_numeric($_POST['article_id'])))
 		{
@@ -141,7 +141,7 @@ if (isset($_POST['act']))
 		}
 
 		// make sure date is valid
-		if (!core::validateDate($end_date))
+		if (!core::validateDate(strtotime($end_date)))
 		{
 			$_SESSION['message'] = 'invalid_end_date';
 			header("Location: /admin.php?module=featured&view=manage");

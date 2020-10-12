@@ -162,11 +162,11 @@ if ($('.countdown').length)
 {
 	$.each( $('.countdown'), function( key, value ) 
 	{
-		var time_listed = $(value).text();
+		var time_listed = $(value).attr('data-machine-time');
 		var countdown_object = $(value);
 					
 		// Set the date we're counting down to - normalised to UTC
-		var countDownDate = new Date(time_listed+' GMT+00:00').getTime();
+		var countDownDate = new Date(time_listed).getTime();
 
 		var counterFunction = function() 
         {

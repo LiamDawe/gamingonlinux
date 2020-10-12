@@ -116,8 +116,10 @@ if (!isset($_POST['act']))
 				
 				$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $user_timezone));
 				$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $user_timezone));
+
+				$machine_date = new DateTime($streams['date']);
 	
-				$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
+				$countdown = '<span class="countdown" data-machine-time="'.$machine_date->format('c').'">'.$streams['date'].'</span>';
 				$templating->set('countdown', $countdown);
 	
 				$streamer_output = '';
@@ -180,8 +182,10 @@ if (!isset($_POST['act']))
 				
 				$templating->set('local_time', core::adjust_time($streams['date'], 'UTC', $user_timezone));
 				$templating->set('local_time_end', core::adjust_time($streams['end_date'], 'UTC', $user_timezone));
+
+				$machine_date = new DateTime($streams['date']);
 	
-				$countdown = '<span class="countdown" id="timer'.$streams['row_id'].'">'.$streams['date'].'</span>';
+				$countdown = '<span class="countdown" data-machine-time="'.$machine_date->format('c').'">'.$streams['date'].'</span>';
 				$templating->set('countdown', $countdown);
 	
 				$streamer_output = '';

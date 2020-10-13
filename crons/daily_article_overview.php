@@ -1,9 +1,7 @@
 <?php
 define("APP_ROOT", dirname( dirname(__FILE__) ) . '/public_html');
 
-require APP_ROOT . "/includes/cron_bootstrap.php";
-
-$article_class = new article($dbl, $core, $user = NULL, $templating = NULL, $bbcode = NULL);
+require APP_ROOT . "/includes/bootstrap.php";
 
 // gather a list of users who want a daily email of articles
 $email_users = $dbl->run("SELECT `username`, `email`, `mailing_list_key`,`user_id` FROM `users` WHERE `email_articles` = 'daily'")->fetch_all();

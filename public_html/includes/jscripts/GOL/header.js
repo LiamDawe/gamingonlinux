@@ -1425,6 +1425,7 @@ jQuery(document).ready(function()
 		
 		$('.comments').load(url, {'type':'reload', 'article_id': article_id, 'page': page}, function()
 		{
+			$(".lb-container").show();
 			$('.box.comments').get(0).scrollIntoView();
 			$('.box.comments').highlight();
 		});

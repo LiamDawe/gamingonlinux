@@ -153,7 +153,12 @@ else if ($_SESSION['user_id'] > 0)
 	$admin_notes = 0;
 	if ($user->can('access_admin'))
 	{
-		$admin_notes = $dbl->run("SELECT count(*) FROM `admin_notifications` WHERE `completed` = 0")->fetchOne();
+		if (($admin_notes = $core->get_dbcache('admin_notifications')) === false) // there's no cache
+		{
+			$admin_notes = $dbl->run("SELECT count(*) FROM `admin_notifications` WHERE `completed` = 0")->fetchOne();
+			$core->set_dbcache('admin_notifications', $admin_notes);
+		}
+		
 		if ($admin_notes > 0)
 		{
 			$admin_indicator = '<span class="badge badge-important">' . $admin_notes . '</span>';

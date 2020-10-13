@@ -1159,6 +1159,9 @@ class core
 		}		
 
 		$this->dbl->run("INSERT INTO `admin_notifications` SET `user_id` = ?, `completed` = ?, `created_date` = ?, `completed_date` = ?, `content` = ?, `type` = ?, `data` = ?", array($_SESSION['user_id'], $completed, core::$date, $completed_date, $options['content'], $type, $data));
+
+		$admin_notes = $this->dbl->run("SELECT count(*) FROM `admin_notifications` WHERE `completed` = 0")->fetchOne();
+		$this->set_dbcache('admin_notifications', $admin_notes);
 	}
 
 	// setting an admin notification as completed
@@ -1187,6 +1190,9 @@ class core
 			$options['type'] = [$options['type']];
 		}
 		$this->dbl->run("UPDATE `admin_notifications` SET `completed` = 1, `completed_date` = ? WHERE `type` $type_search $type_value AND `data` = ? $extra_sql_where", array_merge([core::$date], $options['type'], [$options['data']], $extra_values));
+
+		$admin_notes = $this->dbl->run("SELECT count(*) FROM `admin_notifications` WHERE `completed` = 0")->fetchOne();
+		$this->set_dbcache('admin_notifications', $admin_notes);
 	}
 
     function delete_folder($dir)

@@ -1411,6 +1411,9 @@ a.button {
 a:target + div.comment {border-color: #428BCA;}
 a:target + div.comment .comment-meta {background-color: #428BCA; color: white;}
 a:target + div.comment .comment-meta a:link, a:target + div.comment .comment-meta a:visited {color:white;}
+.highlighted-comment {border-color: #428BCA;}
+.highlighted-comment .comment-meta {background-color: #428BCA; color: white;}
+.highlighted-comment .comment-meta a:link, .highlighted-comment .comment-meta a:visited {color: white;}
 
 .badge {
     background: #333333;

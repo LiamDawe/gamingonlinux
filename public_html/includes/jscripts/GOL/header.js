@@ -1427,7 +1427,6 @@ jQuery(document).ready(function()
 		{
 			$(".lb-container").show();
 			$('.box.comments').get(0).scrollIntoView();
-			$('.box.comments').highlight();
 		});
 	}
 
@@ -1473,7 +1472,6 @@ jQuery(document).ready(function()
 			data: $("#comment_form").serialize(),
 			success: function(data)
 			{
-				console.log(data);
 				if (data['result'] == 'done' || data['result'] == 'approvals')
 				{
 					$('.comments').load('/includes/ajax/post_comment.php', {'type':'reload', 'article_id':data['article_id'], 'page':data['page']}, function()
@@ -1481,7 +1479,7 @@ jQuery(document).ready(function()
 						$(".lb-container").show();
 						$(form).removeClass('dirty'); // prevent ays dialogue when leaving
 						$('.comments #r' + data['comment_id']).scrollMinimal();
-						$('.comments').highlight();
+						$('.comment.r' + data['comment_id']).addClass('highlighted-comment');
 					});
 					$('#comment').val('');
 

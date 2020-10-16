@@ -1,12 +1,9 @@
 <?php
 define("APP_ROOT", dirname ( dirname ( dirname(__FILE__) ) ) );
 
-require APP_ROOT . "/includes/minimal_bootstrap.php";
+require APP_ROOT . "/includes/bootstrap.php";
 
-// setup the templating, if not logged in default theme, if logged in use selected theme
-$templating = new template($core, $core->config('template'));
 $forum_class = new forum($dbl, $core);
-$article_class = new article($dbl, $core, $user = NULL, $templating, $bbcode = NULL);
 
 if(isset($_GET['post_id']))
 {

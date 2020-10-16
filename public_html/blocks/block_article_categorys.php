@@ -28,7 +28,7 @@ $templating->set('submit_article_link', $submit_link);
 /*
 // top articles this week
 */
-$top_article_query = "SELECT `article_id`, `title`, `date`, `slug` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY) AND `views` > ? AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 4";
+$top_article_query = "SELECT `article_id`, `title`, `date`, `slug` FROM `articles` WHERE `date` > UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY) AND `views` > ? AND `show_in_menu` = 0 ORDER BY `views` DESC LIMIT 5";
 
 // setup a cache
 $querykey = "KEY" . md5($top_article_query . serialize($core->config('hot-article-viewcount')));

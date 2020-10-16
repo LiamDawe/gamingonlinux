@@ -103,9 +103,11 @@ if(isset($_POST))
 
 					$comment_email = $bbcode->email_bbcode($comment);
 
+					$article_link = $core->config('website_url') . 'admin.php?module=reviewqueue&aid=' . $article_id . '#comments';
+
 					// message
 					$html_message = "<p>Hello <strong>{$email_user['username']}</strong>,</p>
-					<p><strong>{$_SESSION['username']}</strong> has replied to an editor review article you follow on titled \"<strong><a href=\"" . $core->config('website_url') . "admin.php?module=comments&aid=$article_id#comments\">{$title['title']}</a></strong>\".</p>
+					<p><strong>{$_SESSION['username']}</strong> has replied to an editor review article you follow on titled \"<strong><a href=\"" . $article_link ."\">{$title['title']}</a></strong>\".</p>
 					<div>
 					<hr>
 					{$comment_email}
@@ -113,7 +115,7 @@ if(isset($_POST))
 					You can unsubscribe from this article by <a href=\"" . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}\">clicking here</a>, you can manage your subscriptions anytime in your <a href=\"" . $core->config('website_url') . "usercp.php\">User Control Panel</a>.
 					<hr>";
 
-					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an editor review article on " . $core->config('website_url') . "admin.php?module=comments&aid=$article_id#comments\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
+					$plain_message = PHP_EOL."Hello {$email_user['username']}, {$_SESSION['username']} replied to an editor review article on " . $article_link ."\r\n\r\n{$_POST['text']}\r\n\r\nIf you wish to unsubscribe you can go here: " . $core->config('website_url') . "unsubscribe.php?user_id={$email_user['user_id']}&article_id={$article_id}&email={$email_user['email']}";
 
 					// Mail it
 					if ($core->config('send_emails') == 1)

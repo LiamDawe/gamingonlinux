@@ -84,7 +84,7 @@ if (isset($_POST['act']))
 			
 			$message = core::make_safe($_POST['message']);
 			
-			$html_message = '<p>' . $name . ' writes,</p><p>' . $bbcode->email_bbcode($_POST['message']) . '</p>';
+			$html_message = '<p>' . $name . ' writes,</p><hr><p>' . $bbcode->email_bbcode($_POST['message']) . '</p>';
 
 			$plain_message = "$name writes:" . PHP_EOL . $message;
 			

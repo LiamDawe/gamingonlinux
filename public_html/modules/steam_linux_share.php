@@ -9,12 +9,13 @@ $templating->set_previous('meta_description', 'Steam Linux Market Share', 1);
 $templating->load('steam_linux_share');
 $templating->block('top');
 
+$first_data = $dbl->run("SELECT `date` FROM `steam_linux_share` ORDER BY `date` ASC LIMIT 1")->fetchOne();
 $data_years = $dbl->run("SELECT DISTINCT YEAR(`date`) FROM `steam_linux_share` ORDER BY `date` ASC")->fetch_all(PDO::FETCH_COLUMN);
 
 $months = array('01','02','03','04','05','06','07','08','09','10','11','12');
 
 //defaults
-$from = '2018-01-01';
+$from = '2018-09-01';
 $to_year = date('Y');
 $to_month = date('m');
 $sql_from = $from;
@@ -32,49 +33,77 @@ foreach ($data_years as $year)
 {
 	foreach($months as $month)
 	{
-		$dates_to_insert[] = $year . '-' . $month . '-01';
+		if (date('Y-m-d', strtotime($year.'-'.$month.'-01')) >= $first_data)
+		{
+			$dates_to_insert[] = $year . '-' . $month . '-01';
+		}
 	}
 }
+
+if (isset($_POST['filter-date']))
+{
+	$plain_start = (int) str_replace('-','', $_POST['start']);
+	$plain_end = (int) str_replace('-','', $_POST['end']);
+
+	if ($_POST['start'] < $first_data)
+	{
+		$_POST['start'] = $first_data;
+	}
+
+	if ($plain_start > $plain_end) // flip them if they did it backwards
+	{
+		$new_end = $_POST['start'];
+		$new_start = $_POST['end'];
+		$_POST['start'] = $new_start;
+		$_POST['end'] = $new_end;
+	}
+	if ($plain_start == $plain_end) // prevent matching dates
+	{
+		unset($_POST);
+	}
+}
+
 foreach ($dates_to_insert as $insert)
 {
-	if (isset($_POST['filter-date']))
+	$plain_date = str_replace('-','', $insert);
+
+	if (isset($_POST['filter-date']) && $plain_start <= $last_month && $plain_end <= $last_month)
 	{
-		$selected = '';
+		$start_selected = '';
 		if ($insert == $_POST['start'])
 		{
-			$selected = ' selected';
+			$start_selected = ' selected';
 		}
-		$start_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';
 
-		$selected = '';
+		$end_selected = '';
 		if ($insert == $_POST['end'])
 		{
-			$selected = ' selected';
-		}
-		$end_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';		
+			$end_selected = ' selected';
+		}	
 	}
 	else
 	{
-		$selected = '';
+		$start_selected = '';
 		if ($from == $insert)
 		{
-			$selected = ' selected';
+			$start_selected = ' selected';
 		}
-		$start_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';
-
-        $plain_date = str_replace('-','', $insert);
-
-		$selected = '';
+        
+		$end_selected = '';
 		if ($plain_date == $last_month)
 		{
-            
-			$selected = ' selected';
+			$end_selected = ' selected';
         }
-        
-        if ($last_month >= $plain_date)
-        {
-            $end_options .= '<option value="'.$insert.'" '.$selected.'>' . $insert . '</option>';
-        }
+	}
+
+	if ($last_month >= $plain_date)
+	{
+		$start_options .= '<option value="'.$insert.'" '.$start_selected.'>' . $insert . '</option>';
+	}
+
+	if ($last_month >= $plain_date)
+	{
+		$end_options .= '<option value="'.$insert.'" '.$end_selected.'>' . $insert . '</option>';
 	}
 }
 
@@ -104,6 +133,7 @@ $data = $dbl->run("SELECT * FROM `steam_linux_share` WHERE `date` BETWEEN ? AND 
 
 if ($data)
 {
+	$templating->block('charts');
     $colours = array(
         '#3999cc',
         '#548c22',
@@ -494,5 +524,5 @@ if ($data)
 }
 else
 {
-    $templating->set('threesome', 'No Data.');
+	$core->message('No data found between those dates.');
 }

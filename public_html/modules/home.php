@@ -44,6 +44,25 @@ if (!isset($_GET['view']))
 
 	if ($total)
 	{
+		if (!isset($_GET['displayall']))
+		{
+			$in  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
+			$pagination_target = '/home/';
+			if (!empty($user->blocked_tags) && $user->blocked_tags[0] != 0) // can't rely on counter cache if they're blocking tags
+			{
+				$total_blocked = $dbl->run("SELECT count(*) FROM article_category_reference c LEFT JOIN `articles` a ON a.article_id = c.article_id WHERE c.`category_id` IN ( $in ) AND a.active = 1", $user->blocked_tags)->fetchOne();
+				$total = $total - $total_blocked;
+			}
+		}
+		else
+		{
+			$in = '?';
+			$user->blocked_tags = [0 => 0];
+			$pagination_target = '/all-articles/';
+
+			$templating->block('view_all');
+		}
+
 		$per_page = 15;
 		if (isset($_SESSION['articles-per-page']) && is_numeric($_SESSION['articles-per-page']))
 		{
@@ -55,20 +74,6 @@ if (!isset($_GET['view']))
 		if ($page > $last_page)
 		{
 			$page = $last_page;
-		}
-
-		if (!isset($_GET['displayall']))
-		{
-			$in  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
-			$pagination_target = '/home/';
-		}
-		else
-		{
-			$in = '?';
-			$user->blocked_tags = [0 => 0];
-			$pagination_target = '/all-articles/';
-
-			$templating->block('view_all');
 		}
 
 		// sort out the pagination link

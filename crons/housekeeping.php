@@ -298,7 +298,7 @@ foreach ($find_requests as $request)
 }
 
 // check for old pc info and notify users if they haven't been reminded for 1 month (to not spam them)
-$pc_info_checker = $dbl->run("SELECT `user_id` FROM `user_profile_info` WHERE `date_updated` <= NOW() - INTERVAL 3 MONTH AND `last_update_reminder` IS NULL OR `last_update_reminder` <= NOW() - INTERVAL 1 MONTH")->fetch_all(PDO::FETCH_COLUMN);
+$pc_info_checker = $dbl->run("SELECT `user_id` FROM `user_profile_info` WHERE `date_updated` <= NOW() - INTERVAL 3 MONTH AND (`last_update_reminder` IS NULL OR `last_update_reminder` <= NOW() - INTERVAL 1 MONTH)")->fetch_all(PDO::FETCH_COLUMN);
 if ($pc_info_checker)
 {
 	foreach ($pc_info_checker as $key => $user_id)

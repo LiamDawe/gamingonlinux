@@ -1632,7 +1632,7 @@ ul li.answered_title_css
 }
 .header-text-plain.bigger
 {
-	font-size: 1.1em;
+	font-size: 1.2em;
 }
 .header-text-plain::after 
 {
@@ -1659,6 +1659,8 @@ ul li.answered_title_css
 .flex-noshrink{flex-shrink: 0;}
 .flex-pull-center{justify-content: center;}
 .flex-pull-top{align-items: flex-start;}
+.flex-spaceout{justify-content: space-between;}
+
 .flex-force-row{flex-direction: row !important;}
 
 .flex-stretch
@@ -2912,14 +2914,66 @@ div.dataTables_wrapper .dataTables_info {padding-top: 0.25em}
 	transition: all 0.4s ease 0s;
 }
 
-.footer-article-flex-col
+/* 
+@media screen and ( min-width: 1200px ) 
+{
+	.box .footer-article-flex-col-item{flex: 0 0 calc(50% - 10px);}
+}
+  
+@media screen and ( min-width: 600px ) 
+{
+	.box .footer-article-flex-col-item{display: flex; flex-direction: row-reverse; width: 100%; max-width: 100%; border-bottom: 1px solid var(--header-title-line-color); margin-bottom: 5px;}
+	.footer-articles div:last-child {border-bottom: none;}
+	.box .footer-article-flex-col-item img {width: 100%; height: auto;}
+	.footer-article-title{flex: 2; order: 1; padding-right: 5px;}
+	.footer-article-image{flex: 1;}
+}*/
+
+@media screen and ( min-width: 850px ) 
+{
+	.box .footer-articles {
+		display: grid;
+		overflow: hidden;
+		grid-template-columns: repeat(3, 1fr);
+		grid-auto-rows: 1fr;
+		grid-column-gap: 5px;
+		grid-row-gap: 5px;
+		grid-template-columns: 1fr 0px 1fr;
+	}
+
+		.box .footer-articles .footer-grid-seperator {width: 1px;
+		height: 100%;
+		margin: 0px;
+		background: var(--header-title-line-color); grid-row: span 2 / auto;}
+
+		.footer-article-flex-col-item:nth-child(-n+3){border-bottom: 1px solid var(--header-title-line-color);}
+
+		.box .footer-article-flex-col-item {display: flex; flex-direction: row-reverse; width: 100%; max-width: 100%;  margin-bottom: 5px;}
+		.footer-article-title{flex: 2; order: 1; padding-right: 5px;}
+		.footer-article-image{flex: 1;}
+		.box .footer-article-flex-col-item img {width: 100%; height: auto;}
+		
+}
+  
+@media screen and ( max-width: 850px ) 
+{
+	.footer-grid-seperator{display: none;}
+	.box .footer-articles{display: flex; flex-direction: row; flex-wrap: wrap;}
+	.box article{display: flex; flex-direction: row-reverse; width: 100%; max-width: 100%; border-bottom: 1px solid var(--header-title-line-color); margin-bottom: 5px; padding-bottom: 5px;}
+	.footer-articles article:last-child {border-bottom: none;}
+	.box .footer-article-flex-col-item img {width: 100%; height: auto;}
+	.footer-article-title{flex: 2; order: 1; padding-right: 5px;}
+	.footer-article-image{flex: 1;}
+}
+
+.footer-article-meta{font-size: small; font-weight: normal;}
+
+.footer-article-title{font-weight: bold;}
+.footer-article-title .comments-pip {float: none;}
+  
+  .footer-article-flex-col
 {
 	justify-content: center;
-}
-.footer-article-flex-col-item
-{
-	padding: 5px 20px;
-	max-width: 250px;
 }
 
 @import 'content';

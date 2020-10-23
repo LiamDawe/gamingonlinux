@@ -12,21 +12,64 @@ if (!isset(core::$current_module) || isset(core::$current_module) && (core::$cur
 	// top articles this month but not from the most recent 2 days to prevent showing what they've just seen on the home page
 	*/
 	$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
-	$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename FROM `articles` a LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND a.`date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND a.`views` > ? AND a.`show_in_menu` = 0 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) ORDER BY RAND() DESC LIMIT 6";
+	$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, a.comment_count, a.author_id, a.guest_username, t.`filename` as gallery_tagline_filename, u.`username`, u.`profile_address` FROM `articles` a LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND a.`date` < UNIX_TIMESTAMP(NOW() - INTERVAL 2 DAY) AND a.`views` > ? AND a.`show_in_menu` = 0 AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) ORDER BY RAND() DESC LIMIT 4";
 
 	$fetch_top = $dbl->run($top_article_query, array_merge([$core->config('hot-article-viewcount')], $user->blocked_tags))->fetch_all();
+
+	$used_article_ids = array();
 
 	if (is_array($fetch_top))
 	{
 		$templating->block('random_top_articles', 'footer');
 		$random_list = '';
+		$counter = 0;
 		foreach ($fetch_top as $top_articles)
 		{
+			$counter++;
+			$used_article_ids[] = $top_articles['article_id'];
 			$tagline_image = $article_class->tagline_image($top_articles, 142, 250);
 
-			$random_list .= '<div class="footer-article-flex-col-item"><div><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$tagline_image.'</a></div><div><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></div></div>';
-		}
+			if ($article['author_id'] == 0)
+			{
+				if (empty($article['guest_username']))
+				{
+					$username = 'Guest';
+				}
 
+				else
+				{
+					$username = $article['guest_username'];
+				}
+			}
+
+			else
+			{
+                if (isset($article['profile_address']) && !empty($article['profile_address']))
+                {
+                    $profile_address = '/profiles/' . $article['profile_address'];
+                }
+                else
+                {
+                    $profile_address = '/profiles/' . $article['author_id'];
+                }
+				$username = "<a href=\"".$profile_address."\">" . $article['username'] . '</a>';
+			}
+
+			$random_list .= '
+			<article class="footer-article-flex-col-item">
+					<div class="footer-article-image">
+						<a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$tagline_image.'</a>
+					</div>
+						<div class="footer-article-title"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a><div class="footer-article-meta">by '.$username.' <span class="comments-pip"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'], 'additional' => '#comments')).'">'.$article['comment_count'].'</a></span></div> 
+					</div>
+			</article>
+			';
+			
+			if ($counter == 1)
+			{
+				$random_list .= '<div class="footer-grid-seperator"></div>';
+			}
+		}
 		$templating->set('random_list', $random_list);
 	}
 }
@@ -35,19 +78,62 @@ if (!isset(core::$current_module) || isset(core::$current_module) && (core::$cur
 if (!isset(core::$current_module) || isset(core::$current_module) && (core::$current_module['module_file_name'] == 'home') && $core->current_page() == 'index.php')
 {
 	$blocked_tags  = str_repeat('?,', count($user->blocked_tags) - 1) . '?';
-	$top_article_query = "SELECT a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, t.`filename` as gallery_tagline_filename FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) AND r.category_id IN (11,192,170) ORDER BY RAND() DESC LIMIT 6";
+	$used_ids_sql = str_repeat('?,', count($used_article_ids) - 1) . '?';
 
-	$fetch_top_os = $dbl->run($top_article_query, array_merge($user->blocked_tags))->fetch_all();
+	$top_article_query = "SELECT DISTINCT a.`article_id`, a.`title`, a.`slug`, a.`date`, a.`tagline_image`, a.`gallery_tagline`, a.comment_count, a.author_id, a.guest_username, t.`filename` as gallery_tagline_filename, u.`username`, u.`profile_address` FROM `article_category_reference` r JOIN `articles` a ON a.`article_id` = r.`article_id` LEFT JOIN `articles_tagline_gallery` t ON t.`id` = a.`gallery_tagline` LEFT JOIN `users` u ON a.author_id = u.user_id WHERE a.`date` > UNIX_TIMESTAMP(NOW() - INTERVAL 1 MONTH) AND NOT EXISTS (SELECT 1 FROM article_category_reference c  WHERE a.article_id = c.article_id AND c.`category_id` IN ( $blocked_tags )) AND r.category_id IN (11,192,170) AND a.`article_id` NOT IN ( $used_ids_sql ) ORDER BY RAND() DESC LIMIT 4";
+
+	$fetch_top_os = $dbl->run($top_article_query, array_merge($user->blocked_tags, $used_article_ids))->fetch_all();
 
 	if (is_array($fetch_top_os) && count($fetch_top_os) >= 3)
 	{
 		$templating->block('recent_open_source', 'footer');
 		$random_list = '';
+		$counter = 0;
 		foreach ($fetch_top_os as $top_articles)
 		{
+			$counter++;
 			$tagline_image = $article_class->tagline_image($top_articles, 142, 250);
 
-			$random_list .= '<div class="footer-article-flex-col-item"><div><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$tagline_image.'</a></div><div><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a></div></div>';
+			if ($article['author_id'] == 0)
+			{
+				if (empty($article['guest_username']))
+				{
+					$username = 'Guest';
+				}
+
+				else
+				{
+					$username = $article['guest_username'];
+				}
+			}
+
+			else
+			{
+                if (isset($article['profile_address']) && !empty($article['profile_address']))
+                {
+                    $profile_address = '/profiles/' . $article['profile_address'];
+                }
+                else
+                {
+                    $profile_address = '/profiles/' . $article['author_id'];
+                }
+				$username = "<a href=\"".$profile_address."\">" . $article['username'] . '</a>';
+			}
+
+			$random_list .= '
+			<article class="footer-article-flex-col-item">
+					<div class="footer-article-image">
+						<a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$tagline_image.'</a>
+					</div>
+						<div class="footer-article-title"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a><div class="footer-article-meta">by '.$username.' <span class="comments-pip"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'], 'additional' => '#comments')).'">'.$article['comment_count'].'</a></span></div> 
+					</div>
+			</article>
+			';
+			
+			if ($counter == 1)
+			{
+				$random_list .= '<div class="footer-grid-seperator"></div>';
+			}
 		}
 
 		$templating->set('random_list', $random_list);

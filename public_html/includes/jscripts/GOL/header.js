@@ -1882,7 +1882,7 @@ jQuery(document).ready(function()
 		quote_box.hide();
 		$('#comment').scrollMinimal();
 	}
-	$(document).on('mouseup', ".comment-body div.actual-comment-text", function(e) 
+	$(document).on('click', ".comment-body div.actual-comment-text", function(e) 
 	{
 		if ($('#comment').length) // only do this if comment box exists (logged in)
 		{

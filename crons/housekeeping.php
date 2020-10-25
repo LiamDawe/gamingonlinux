@@ -260,7 +260,7 @@ if ($say_bye)
 		$dbl->run("DELETE FROM `user_group_membership` WHERE `user_id` = ?", array($remove['user_id']));
 	}
 	$dbl->run("UPDATE `config` SET `data_value` = (data_value - ?) WHERE `data_key` = 'total_users'", array($total_users));
-	core::$redis->delete('CONFIG_total_users'); // force new cache
+	$core->delete_dbcache('CONFIG_total_users'); // force new cache
 }
 
 // remove guests from the mailing list if they haven't activated after 7 days

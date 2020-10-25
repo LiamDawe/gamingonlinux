@@ -1015,4 +1015,22 @@ class user
 			$this->core->new_admin_note(array('completed' => 1, 'content' => ' deleted the account for ' . $deleted_info['username'] . '.'));
 		}
 	}
+
+	function profile_link($data)
+	{
+		$profile_link = NULL;
+		if (isset($data['profile_address']) && !empty($data['profile_address']))
+		{
+			$profile_link = 'profiles/' . $data['profile_address'];
+		}
+		else if (isset($data['author_id']) && is_numeric($data['author_id']))
+		{
+			$profile_link = 'profiles/' . $data['author_id'];
+		}
+		else if (isset($data['user_id']) && is_numeric($data['user_id']))
+		{
+			$profile_link = 'profiles/' . $data['user_id'];
+		}
+		return $this->core->config('website_url') . $profile_link;
+	}
 }

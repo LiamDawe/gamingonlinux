@@ -10,8 +10,8 @@ $templating->block('main');
 if (isset($_POST['act']) && $_POST['act'] == 'count')
 {
 	// tool for making a single user account
-	$start_date = core::make_safe($_POST['start_date']);
-	$end_date = core::make_safe($_POST['end_date']);
+	$start_date = core::make_safe($_POST['start_date'] . ' ' . $_POST['start_time']);
+	$end_date = core::make_safe($_POST['end_date']. ' ' . $_POST['end_time']);
 
 	$check_empty = core::mempty(compact('start_date', 'end_date'));
 	if ($check_empty !== true)

@@ -3,12 +3,10 @@
 	<div class="body group">
 		You can use this form to easily count articles between specific dates.<br />
 		<form class="gol-form" method="post" action="/admin.php?module=count_articles">
-		Start Date: <br />
-										<input class="datetimepicker" name="start_date" id="datetimepicker1" type="text" value="" autocomplete="off" />
-										
-											End Date: <br />
-											<input class="datetimepicker" name="end_date" id="datetimepickere2" type="text" value="" autocomplete="off" />
-											
+		Start Date / Time: <br />
+		<input name="start_date" type="date" value="" autocomplete="off" /> <input name="start_time" type="time" value="" autocomplete="off" /><br />
+		End Date / Time: <br />
+		<input name="end_date" type="date" value="" autocomplete="off" /> <input name="end_time" type="time" value="" autocomplete="off" /><br />
 		<button type="submit" name="act" value="count">Count articles</button>		
 		</form>
 	</div>

@@ -98,7 +98,7 @@ if (!isset($_GET['view']))
 		{
 			$location = $item['location'];
 		}
-		$featured_output .= '<li style="display:inline;"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img src="'.$location.'uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" /></a></li>';
+		$featured_output .= '<li style="display:inline;"><a href="/itemdb/'.$item['item_id'].'" title="'.$item['name'].'"><img height="215" width="460" src="'.$location.'uploads/gamesdb/big/'.$item['item_id'].'/' . $item['filename'] . '" /></a></li>';
 	}
 
 	$featured_output .= '</ul>';

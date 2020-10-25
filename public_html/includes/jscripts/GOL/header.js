@@ -1896,7 +1896,6 @@ jQuery(document).ready(function()
 				switch(selection.getRangeAt(0).startContainer.parentElement.tagName)
 				{
 					case 'CITE':
-						console.log('test');
 						allow_quoting = 0;
 						break;
 					case 'BLOCKQUOTE':
@@ -1917,6 +1916,7 @@ jQuery(document).ready(function()
 					var relative=document.body.parentNode.getBoundingClientRect();
 
 					var username = container.parent().parent().children('.comment-meta').find('.username').text();
+					var quote_box = $('#selective-quote');
 					quote_box.attr( "data-username", username );
 					quote_box.css('position','absolute');
 					quote_box.css('top',r.bottom -relative.top - 45);

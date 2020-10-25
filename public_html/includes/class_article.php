@@ -1145,14 +1145,7 @@ class article
 
 			else
 			{
-                if (isset($article['profile_address']) && !empty($article['profile_address']))
-                {
-                    $profile_address = '/profiles/' . $article['profile_address'];
-                }
-                else
-                {
-                    $profile_address = '/profiles/' . $article['author_id'];
-                }
+				$profile_address = $this->user->profile_link($article);
 				$username = "<a href=\"".$profile_address."\">" . $article['username'] . '</a>';
 			}
 
@@ -1527,14 +1520,7 @@ class article
 			}
 			else
 			{
-                if (isset($comments['profile_address']) && !empty($comments['profile_address']))
-                {
-                    $profile_address = '/profiles/' . $comments['profile_address'];
-                }
-                else
-                {
-                    $profile_address = '/profiles/' . $comments['author_id'];
-                }
+                $profile_address = $this->user->profile_link($comments);
 				$username = "<a href=\"".$profile_address."\">{$comments['username']}</a>";
 				$quote_username = $comments['username'];
 			}

@@ -61,7 +61,8 @@ if (!isset($_GET['go']))
 				u.`username`,
 				u.`twitter_on_profile`,
 				u.`article_bio`,
-				u.`author_picture`
+				u.`author_picture`,
+				u.`profile_address`
 				FROM `articles` a
 				LEFT JOIN
 				`users` u on a.`author_id` = u.`user_id`
@@ -223,9 +224,10 @@ if (!isset($_GET['go']))
 
 					else
 					{
+						$profile_address = $user->profile_link($article);
 						$username = $article['username'];
-						$username_top = "<a rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
-						$username_bio = "<a class=\"p-name u-url\" rel=\"author\" href=\"".url."profiles/{$article['author_id']}\">{$username}</a>";
+						$username_top = '<a rel="author" href="'.$profile_address.'">'.$username.'</a>';
+						$username_bio = '<a class="p-name u-url" rel="author" href="'.$profile_address.'">'.$username.'</a>';
 					}
 
 					// structured data for search engines

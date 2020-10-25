@@ -60,7 +60,7 @@ if (!isset(core::$current_module) || isset(core::$current_module) && (core::$cur
 					<div class="footer-article-image">
 						<a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$tagline_image.'</a>
 					</div>
-						<div class="footer-article-title"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a><div class="footer-article-meta">by '.$username.' <span class="comments-pip"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'], 'additional' => '#comments')).'">'.$article['comment_count'].'</a></span></div> 
+						<div class="footer-article-title"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a><div class="footer-article-meta">by '.$username.' <span class="comments-pip"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'], 'additional' => '#comments')).'">'.$top_articles['comment_count'].'</a></span></div> 
 					</div>
 			</article>
 			';
@@ -125,7 +125,7 @@ if (!isset(core::$current_module) || isset(core::$current_module) && (core::$cur
 					<div class="footer-article-image">
 						<a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$tagline_image.'</a>
 					</div>
-						<div class="footer-article-title"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a><div class="footer-article-meta">by '.$username.' <span class="comments-pip"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'], 'additional' => '#comments')).'">'.$article['comment_count'].'</a></span></div> 
+						<div class="footer-article-title"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'])).'">'.$top_articles['title'].'</a><div class="footer-article-meta">by '.$username.' <span class="comments-pip"><a href="'.$article_class->article_link(array('date' => $top_articles['date'], 'slug' => $top_articles['slug'], 'additional' => '#comments')).'">'.$top_articles['comment_count'].'</a></span></div> 
 					</div>
 			</article>
 			';

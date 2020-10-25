@@ -120,10 +120,6 @@ The GOL site source is MIT licensed, but we also use other scripts which use dif
 
 - /includes/jscripts/clipboard (https://clipboardjs.com/ MIT)
 
-- /includes/jscripts/jquery.countdown.min.js (http://hilios.github.io/jQuery.countdown/ MIT)
-
-- /includes/jscripts/moment/ (http://momentjs.com/timezone/ MIT)
-
 - Gallery avatars (https://openclipart.org/ Public Domain)
 
 - /includes/jscripts/Chart.min.js (http://www.chartjs.org/ MIT)

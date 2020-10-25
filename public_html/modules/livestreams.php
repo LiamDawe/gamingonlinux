@@ -78,12 +78,8 @@ if (!isset($_POST['act']))
 			$grab_streamers = $dbl->run("SELECT s.`user_id`, s.`livestream_id`, u.`username`, u.`profile_address` FROM `livestream_presenters` s INNER JOIN `users` u ON u.`user_id` = s.`user_id` WHERE `livestream_id` IN ( $in )", $stream_ids)->fetch_all();
 			foreach ($grab_streamers as $streamer)
 			{
-				$profile_link = '/profiles/' . $streamer['user_id'];
-				if (!empty($streamer['profile_address']))
-				{
-					$profile_link = '/profiles/' . $streamer['profile_address'];
-				}
-				$streamer_list[$streamer['livestream_id']][] = '<a href="' . $profile_link . '">'.$streamer['username'].'</a>';
+				$profile_address = $user->profile_link($streamer);
+				$streamer_list[$streamer['livestream_id']][] = '<a href="' . $profile_address . '">'.$streamer['username'].'</a>';
 			}
 		}
 

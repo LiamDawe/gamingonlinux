@@ -255,6 +255,7 @@ else
 			u.`forum_posts`,
 			u.`show_supporter_status`,
 			u.`game_developer`,
+			u.`profile_address`,
 			$db_grab_fields
 			f.`name` as `forum_name`,
             f.`pretty_url`,
@@ -585,7 +586,8 @@ else
 
 						if ($topic['author_id'] != 0)
 						{
-							$username = "<a href=\"/profiles/{$topic['author_id']}\">{$topic['username']}</a>";
+							$profile_address = $user->profile_link($topic);
+							$username = '<a href="'.$profile_address.'">'.$topic['username'].'</a>';
 						}
 						else
 						{
@@ -735,20 +737,21 @@ else
 						p.`last_edited`,
 						p.`last_edited_time`,
                         p.`post_answer`,
-						u.user_id, 
-						u.pc_info_public, 
-						u.register_date, 
-						u.pc_info_filled, 
-						u.distro, 
-						u.username, 
-						u.avatar, 
-						u.avatar_uploaded, 
-						u.avatar_gallery,
+						u.`user_id`, 
+						u.`pc_info_public`, 
+						u.`register_date`, 
+						u.`pc_info_filled`, 
+						u.`distro`, 
+						u.`username`, 
+						u.`avatar`, 
+						u.`avatar_uploaded`, 
+						u.`avatar_gallery`,
 						u.`show_supporter_status`,
 						$db_grab_fields 
-						u.forum_posts, 
-						u.game_developer,
-						ul.username as username_edited
+						u.`forum_posts`, 
+						u.`game_developer`,
+						u.`profile_address`,
+						ul.`username` as `username_edited`
 						FROM `forum_replies` p 
 						LEFT JOIN `users` u ON p.author_id = u.user_id 
 						LEFT JOIN `users` ul ON ul.user_id = p.last_edited
@@ -841,7 +844,8 @@ else
 
 								if ($post['author_id'] != 0)
 								{
-									$username = "<a href=\"/profiles/{$post['author_id']}\">{$post['username']}</a>";
+									$profile_address = $user->profile_link($post);
+									$username = '<a href="'.$profile_address.'">'.$post['username'].'</a>';
 								}
 								else
 								{

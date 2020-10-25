@@ -75,8 +75,10 @@ else
 			i.`owner_id`,
 			u.`username`,
 			u.`user_id`,
+			u.`profile_address`,
 			u2.`username` as last_username,
 			u2.`user_id` as last_user_id,
+			u2.`profile_address` as `last_profile_address`,
 			p.`unread`
 		FROM
 			`user_conversations_info` i
@@ -116,15 +118,29 @@ else
 			$templating->set('last_reply_date', $core->time_ago($message['last_reply_date']));
 			if (isset($message['username']))
 			{
-				$author_username = "<a href=\"/profiles/{$message['user_id']}/\">{$message['username']}</a>";
+				$profile_link = $user->profile_link($message);
+				$author_username = '<a href="'.$profile_link.'">'.$message['username'].'</a>';
 			}
 			else
 			{
 				$author_username = 'Guest';
 			}
+
+			// last person info
+			if (isset($message['last_username']))
+			{
+				$last_details = ['user_id' => $message['last_user_id'], 'profile_address' => $message['last_profile_address']];
+				$profile_link = $user->profile_link($last_details);
+				$last_post_username = '<a href="'.$profile_link.'">'.$message['last_username'].'</a>';
+			}
+			else
+			{
+				$last_post_username = 'Guest';
+			}
+
 			$templating->set('author', $author_username);
 			$templating->set('creation_date', $core->time_ago($message['creation_date']));
-			$templating->set('last_reply_username', "<a href=\"/profiles/{$message['last_user_id']}/\">{$message['last_username']}</a>");
+			$templating->set('last_reply_username', $last_post_username);
 		}
 
 		if ($total > 0)
@@ -195,14 +211,15 @@ else
 			include('includes/profile_fields.php');
 
 			// get usernames of everyone in this conversation
-			$people_res = $dbl->run("SELECT u.`username`, u.`user_id` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.`user_id` = p.`participant_id` WHERE p.`conversation_id` = ?", array($_GET['id']))->fetch_all();
+			$people_res = $dbl->run("SELECT u.`username`, u.`user_id`, u.`profile_address` FROM `users` u INNER JOIN `user_conversations_participants` p ON u.`user_id` = p.`participant_id` WHERE p.`conversation_id` = ?", array($_GET['id']))->fetch_all();
 			$p_list = '';
 
 			$count_participants = count($people_res);
 
 			foreach ($people_res as $participants)
 			{
-				$p_list .= "<a href=\"/profiles/{$participants['user_id']}/\">{$participants['username']}</a> ";
+				$profile_link = $user->profile_link($participants);
+				$p_list .= '<a href="'.$profile_link.'">'.$participants['username'].'</a> ';
 			}
 
 			// count them for pagination
@@ -226,7 +243,7 @@ else
 				$db_grab_fields .= "u.`{$field['db_field']}`,";
 			}
 
-			$start = $dbl->run("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded`, u.`show_supporter_status` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` LEFT JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']))->fetch();
+			$start = $dbl->run("SELECT i.`conversation_id`, i.`title`, m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`register_date`, u.`username`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded`, u.`show_supporter_status`, u.`profile_address` FROM `user_conversations_info` i INNER JOIN `user_conversations_messages` m ON m.`conversation_id` = i.`conversation_id` LEFT JOIN `users` u ON u.user_id = i.author_id WHERE i.`conversation_id` = ?", array($_GET['id']))->fetch();
 
 			$templating->block('view_row', 'private_messages');
 			$templating->set('title', $start['title']);
@@ -244,7 +261,10 @@ else
 			$templating->set('username', $start['username']);
 			$cake_bit = $user->cake_day($start['register_date'], $start['username']);
 			$templating->set('cake_icon', $cake_bit);
-			$templating->set('user_id', $start['user_id']);
+
+			$profile_address = $user->profile_link($start);
+
+			$templating->set('profile_address', $profile_address);
 			$templating->set('message_text', $bbcode->parse_bbcode($start['message']));
 
 			$their_groups = $user->post_group_list([$start['author_id']]);
@@ -301,7 +321,7 @@ else
 			$templating->set('edit_link', $edit_link);
 
 			// replies
-			$get_replies = $dbl->run("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded`, u.`show_supporter_status` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start))->fetch_all();
+			$get_replies = $dbl->run("SELECT m.`creation_date`, m.`message`, m.`message_id`, m.`author_id`, u.`user_id`, u.`username`, u.`register_date`, u.`user_group`, u.`secondary_user_group`, u.`avatar`, u.`avatar_gallery`, $db_grab_fields u.`avatar_uploaded`, u.`show_supporter_status`, u.`profile_address` FROM `user_conversations_messages` m INNER JOIN `users` u ON u.`user_id` = m.`author_id` WHERE m.`conversation_id` = ? AND m.position > 0 ORDER BY m.message_id ASC LIMIT ?, 9", array($_GET['id'], $core->start))->fetch_all();
 			
 			if ($get_replies)
 			{
@@ -331,7 +351,10 @@ else
 				$templating->set('username', $replies['username']);
 				$cake_bit = $user->cake_day($replies['register_date'], $replies['username']);
 				$templating->set('cake_icon', $cake_bit);
-				$templating->set('user_id', $replies['user_id']);
+
+				$profile_address = $user->profile_link($replies);
+
+				$templating->set('profile_address', $profile_address);
 				$templating->set('message_text', $bbcode->parse_bbcode($replies['message']));
 
 				$profile_fields_output = '';

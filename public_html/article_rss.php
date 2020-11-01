@@ -122,10 +122,13 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute( 'xmlns:dc', 'http://purl.org/dc/elements/1.1/' );
 	$xml->writeAttribute('xmlns:media', 'http://search.yahoo.com/mrss/');
 
-
-	$xml->startElement( 'link' );
-	$xml->writeAttribute( 'rel', 'hub' );
-	$xml->writeAttribute( 'href', 'https://pubsubhubbub.appspot.com/' );
+	// if main article feed, support pubsubhubbub
+	if ($core->current_page_url() == $core->config('website_url') . 'article_rss.php')
+	{
+		$xml->startElement( 'link' );
+		$xml->writeAttribute( 'rel', 'hub' );
+		$xml->writeAttribute( 'href', 'https://pubsubhubbub.appspot.com/' );
+	}
 
 	$xml->startElement('channel');
 

@@ -1073,6 +1073,10 @@ class article
 
 		post_to_discord(array('title' => $checked['title'], 'link' => $article_link, 'tagline' => $checked['tagline'], 'image' => $tagline_image));
 
+		include($this->core->config('path') . 'includes/pubsubhubbub_poster.php');
+
+		update_pubsubhubbub($this->core->config('website_url') . 'article_rss.php');
+
 		if (!isset($_POST['show_block']))
 		{
 			$redirect = $article_link;

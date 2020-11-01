@@ -122,9 +122,14 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute( 'xmlns:dc', 'http://purl.org/dc/elements/1.1/' );
 	$xml->writeAttribute('xmlns:media', 'http://search.yahoo.com/mrss/');
 
+
+	$xml->startElement( 'link' );
+	$xml->writeAttribute( 'rel', 'hub' );
+	$xml->writeAttribute( 'href', 'https://pubsubhubbub.appspot.com/' );
+
 	$xml->startElement('channel');
 
-	if ($tags[0] == 5 && isset($_GET['steamcurator'])) // Steam only for Curator RSS
+	if (isset($tags) && $tags[0] == 5 && isset($_GET['steamcurator'])) // Steam only for Curator RSS
 	{
 		$xml->writeAttribute( 'xmlns:steam', 'https://store.steampowered.com/' );
 	}
@@ -236,7 +241,7 @@ if ($core->config('articles_rss') == 1)
 				$tagline_image = $core->config('website_url')."uploads/articles/tagline_images/defaulttagline.png";
 			}
 
-			if ($tags[0] == 5 && isset($_GET['steamcurator'])) // Steam only for Curator RSS
+			if (isset($tags) && $tags[0] == 5 && isset($_GET['steamcurator'])) // Steam only for Curator RSS
 			{
 				$current_linked_games = $dbl->run("SELECT g.`steam_id` FROM `article_item_assoc` a INNER JOIN `calendar` g ON g.id = a.game_id WHERE a.`article_id` = ? AND g.is_dlc = 0", array($line['article_id']))->fetch_all();
 				if ($current_linked_games)

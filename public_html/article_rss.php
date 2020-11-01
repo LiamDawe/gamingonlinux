@@ -122,14 +122,6 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute( 'xmlns:dc', 'http://purl.org/dc/elements/1.1/' );
 	$xml->writeAttribute('xmlns:media', 'http://search.yahoo.com/mrss/');
 
-	// if main article feed, support pubsubhubbub
-	if ($core->current_page_url() == $core->config('website_url') . 'article_rss.php')
-	{
-		$xml->startElement( 'link' );
-		$xml->writeAttribute( 'rel', 'hub' );
-		$xml->writeAttribute( 'href', 'https://pubsubhubbub.appspot.com/' );
-	}
-
 	$xml->startElement('channel');
 
 	if (isset($tags) && $tags[0] == 5 && isset($_GET['steamcurator'])) // Steam only for Curator RSS
@@ -158,6 +150,15 @@ if ($core->config('articles_rss') == 1)
 	$xml->writeAttribute('rel', 'self');
 	$xml->writeAttribute('type', 'application/rss+xml');
 	$xml->endElement();
+
+	// if main article feed, support pubsubhubbub
+	if ($core->current_page_url() == $core->config('website_url') . 'article_rss.php')
+	{
+		$xml->startElement( 'atom:link' );
+		$xml->writeAttribute( 'rel', 'hub' );
+		$xml->writeAttribute( 'href', 'https://pubsubhubbub.appspot.com/' );
+		$xml->endElement();
+	}
 
 	$articles = $dbl->run("SELECT 
 	a.title,

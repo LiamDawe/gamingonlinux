@@ -150,6 +150,15 @@ if ( isset($_GET['code']) && $_GET['code'] != '' )
 
 					$return_text .= "Given Supporter status!";
 				}
+
+				// they're not currently set in the Patreon group, add them
+				if (!in_array(13, $their_groups[$_SESSION['user_id']]))
+				{
+					$dbl->run("INSERT INTO `user_group_membership` SET `user_id` = ?, `group_id` = 13", [$_SESSION['user_id']]);
+
+					$return_text .= " Added to Patreon user group!";
+				}
+
 				if ($pledge <= 600)
 				{
 					// they don't pledge enough for supporter plus, if they're currently in it then remove them

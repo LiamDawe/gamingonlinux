@@ -1418,35 +1418,51 @@ jQuery(document).ready(function()
 		$(this).children('span').addClass('plus').removeClass('minus');
 	});	
 
+	/* forum head jump menu pagination */
+	$(document).on('change', ".forum-topic-head select", function(e)
+	{
+		var $this = $(this).find(':selected');
+		var page = $this.attr('value');
+
+		if (page != '')
+		{
+			location.href = page;
+		}
+	});	
+
 	/* normal article pagination */
 	function paginate_comments(page, article_id)
 	{
 		var url = "/includes/ajax/post_comment.php";
+		var current_url = window.location.href;
+		var host = window.location.host;
 		
-		$('.comments').load(url, {'type':'reload', 'article_id': article_id, 'page': page}, function()
+		if(current_url.indexOf(host + '/admin.php?module=reviewqueue') != -1 || current_url.indexOf(host + '/admin.php?module=articles&view=Submitted') != -1 || current_url.indexOf(host + '/admin.php?module=articles&view=Submitted') != -1)
 		{
+			var area = 'admin';
+		}
+		else
+		{
+			var area = 'normal';
+		}
+		
+		$('.comments').load(url, {'type':'reload', 'article_id': article_id, 'page': page, 'area': area}, function()
+		{
+			hide_long_quotes();
 			$(".lb-container").show();
 			$('.box.comments').get(0).scrollIntoView();
 		});
 	}
-
-	$(document).on('click', "ul.pagination li a, .head-list-position a", function(e)
-	{
-		var $this = $(this);
-		ajax_page_comments(e, $this);
-	});
-	
-	$(document).on('change', ".head-list-position select, .pagination", function(e)
+	// article pagination jump menu
+	$(document).on('change', ".article-pagination.head-list-position select", function(e)
 	{
 		var $this = $(this).find(':selected');
-		if (!ajax_page_comments(e, $this)) // if not admin pages
-		{
-			var page = $this.attr('data-page');
-			var article_id = $(this).closest('.article-pagination').data('article-id');
-			paginate_comments(page, article_id);
-		}
+		
+		var page = $this.attr('data-page');
+		var article_id = $(this).closest('.article-pagination').data('article-id');
+		paginate_comments(page, article_id);
 	});
-
+	// bottom pagination + head list pagination links click detection
 	$(document).on('click', ".article-pagination .pagination a, .article-pagination a", function(e)
 	{
 		e.preventDefault();
@@ -1736,30 +1752,8 @@ jQuery(document).ready(function()
 			}
 		});
 	});
-
-	
-	function ajax_page_comments(e, element)
-	{
-		var url = window.location.href;
-		var host = window.location.host;
-		// limit to the admin review queue for now
-		if(url.indexOf(host + '/admin.php?module=reviewqueue') != -1 || url.indexOf(host + '/admin.php?module=articles&view=Submitted') != -1 || url.indexOf(host + '/admin.php?module=articles&view=Submitted') != -1) 
-		{
-			e.preventDefault();
-			var page = element.attr("data-page");
-			var article_id = $_GET('aid');
-			$('.comments').load('/includes/ajax/article_comment_pagination.php', {'type':'reload', 'article_id':article_id, 'page':page}, function() 
-			{
-				$('.comments').scrollMinimal();
-				$('.comments').highlight();
-			});
-			return true;
-		}
-		return false;
-	}
 	
 	/* CHARTS */
-	
 	$('#preview_chart').click(function()
 	{
 		var myform = document.getElementById("chart_form");
@@ -2002,40 +1996,47 @@ jQuery(document).ready(function()
 	var moretext = "&plus; Click to view long quote ";
 	var lesstext = "&minus; Click to hide long quote ";
 	var quote_count = $(".comment_quote").length;
-	$('.comment_quote').each(function(i) 
+
+	hide_long_quotes();
+	function hide_long_quotes()
 	{
-		var actual_text = $(this).text();
-		var content = $(this).outerHTML();
-
-		if(actual_text.length > showChar) 
+		$('.comment_quote').each(function(i) 
 		{
-			var cite = $(this).find('cite span.username').first().text();
-			var cite_link = '';
-
-			if (cite.length > 0)
+			var actual_text = $(this).text();
+			var content = $(this).outerHTML();
+	
+			if(actual_text.length > showChar) 
 			{
-				cite_link = 'from ' + cite;
-			}
-
-			var html = '<span class="morecontent">' + content + '</span><a href="" class="morelink">' + moretext + cite_link + '</a><br />';
-
-			$(this).replaceWith(html);
-		}
-		if (i+1 === quote_count) // this will be executed at the end of the loop
-		{
-			// deal with being linked to a comment, so we can put the window to the correct scroll position, since it will be different due to hidden quotes making the page smaller
-			if(window.location.hash) 
-			{
-				var hash = window.location.hash.substring(1); //Puts hash in variable, and removes the # character
-				if (hash.indexOf("r") >= 0)
+				var cite = $(this).find('cite span.username').first().text();
+				var cite_link = '';
+	
+				if (cite.length > 0)
 				{
-					$('#'+hash)[0].scrollIntoView();
+					cite_link = 'from ' + cite;
+				}
+	
+				var html = '<span class="morecontent">' + content + '</span><a href="" class="morelink">' + moretext + cite_link + '</a><br />';
+	
+				$(this).replaceWith(html);
+			}
+			if (i+1 === quote_count) // this will be executed at the end of the loop
+			{
+				// deal with being linked to a comment, so we can put the window to the correct scroll position, since it will be different due to hidden quotes making the page smaller
+				if(window.location.hash) 
+				{
+					var hash = window.location.hash.substring(1); //Puts hash in variable, and removes the # character
+					if (hash.indexOf("r") >= 0)
+					{
+						$('#'+hash)[0].scrollIntoView();
+					}
 				}
 			}
-		}
-	});
-	$(".morelink").click(function()
+		});
+	}
+
+	$(document).on('click', ".morelink", function(e) 
 	{
+		e.preventDefault();
 		var cite = $(this).prev().find('cite span.username').first().text();
 		var cite_link = '';
 

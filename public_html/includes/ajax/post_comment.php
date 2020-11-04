@@ -47,7 +47,7 @@ if (isset($_POST))
 
 		$article_link_main = $article_class->article_link(array('date' => $article_info['date'], 'slug' => $article_info['slug']));
 		
-		$article_class->display_comments(['article' => $article_info, 'pagination_link' => $article_link_main . '/', 'page' => $_POST['page'], 'type' => 'normal']);
+		$article_class->display_comments(['article' => $article_info, 'pagination_link' => $article_link_main . '/', 'page' => $_POST['page'], 'type' => $_POST['area']]);
 
 		echo $templating->output();
 	}

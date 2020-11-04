@@ -145,17 +145,4 @@ if(isset($_POST))
 		echo json_encode(array("result" => 'done', 'article_id' => $article_id, 'page' => $comment_page, 'comment_id' => $new_comment_id));
 		return; 
 	}
-	
-	if ($_POST['type'] == 'reload')
-	{
-		$pagination_link = 'test';
-		
-		$templating->load('articles_full');
-		
-		$article_info = $dbl->run("SELECT `article_id`, `slug`, `comments_open`, `comment_count` FROM `articles` WHERE `article_id` = ?", array($_POST['article_id']))->fetch();
-		
-		$article_class->display_comments(['article' => $article_info, 'pagination_link' => $pagination_link, 'type' => 'admin', 'page' => $_POST['page']]);
-
-		echo $templating->output();
-	}
 }
